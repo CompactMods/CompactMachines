@@ -1,0 +1,30 @@
+# Creative Tabs
+itemGroup.compactmachines=Compact Machines
+
+# Items
+item.compactmachines:psd.name=Personal Shrinking Device
+item.compactmachines:shrinker.name=Atom Shrinking Module
+item.compactmachines:enlarger.name=Atom Enlarging Module
+item.compactmachines:interfaceitem.name=World Resizing Interface
+
+# Blocks
+tile.compactmachines:machine.name=Compact Machine
+tile.compactmachines:interface.name=Compact Machine Interface
+tile.compactmachines:innerwall.name=Compact Machine Wall
+tile.compactmachines:resizingcube.name=World Resizing Cube
+
+# Container
+container.cm:machine=Compact Machine
+container.cm:interface=Compact Machine Interface
+
+# ToolTips
+tooltip.cm:machine.size.zero=Tiny
+tooltip.cm:machine.size.one=Small
+tooltip.cm:machine.size.two=Normal size
+tooltip.cm:machine.size.three=Big
+tooltip.cm:machine.size.four=Giant
+tooltip.cm:machine.size.five=Maximum Size
+
+# Dimension Travelling
+loading.cm:enter=Shrinking to machine size. Ffffflllp.
+loading.cm:leave=Expanding to normal size. Ffffflllp.
