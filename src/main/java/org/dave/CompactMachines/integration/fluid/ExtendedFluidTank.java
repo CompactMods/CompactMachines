@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.storage;
+package org.dave.CompactMachines.integration.fluid;
 
 
 import org.dave.CompactMachines.utility.FluidUtils;

@@ -1,5 +1,7 @@
-package org.dave.CompactMachines.handler.storage;
+package org.dave.CompactMachines.integration.fluid;
 
+import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.utility.FluidUtils;
 import org.dave.CompactMachines.utility.LogHelper;
 

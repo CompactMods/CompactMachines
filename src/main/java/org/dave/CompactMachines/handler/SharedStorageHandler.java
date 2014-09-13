@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.storage;
+package org.dave.CompactMachines.handler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,6 +18,10 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
+import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.utility.LogHelper;
 

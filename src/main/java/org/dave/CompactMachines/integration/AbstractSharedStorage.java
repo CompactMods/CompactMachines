@@ -1,4 +1,6 @@
-package org.dave.CompactMachines.handler.storage;
+package org.dave.CompactMachines.integration;
+
+import org.dave.CompactMachines.handler.SharedStorageHandler;
 
 import net.minecraft.nbt.NBTTagCompound;
 

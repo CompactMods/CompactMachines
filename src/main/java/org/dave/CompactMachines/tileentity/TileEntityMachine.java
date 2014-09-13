@@ -3,10 +3,10 @@ package org.dave.CompactMachines.tileentity;
 import java.util.HashMap;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.handler.storage.FluidSharedStorage;
-import org.dave.CompactMachines.handler.storage.FluxSharedStorage;
-import org.dave.CompactMachines.handler.storage.ItemSharedStorage;
-import org.dave.CompactMachines.handler.storage.SharedStorageHandler;
+import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
+import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
+import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.utility.LogHelper;
 

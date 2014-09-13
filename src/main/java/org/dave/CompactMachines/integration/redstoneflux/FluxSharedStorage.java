@@ -1,4 +1,7 @@
-package org.dave.CompactMachines.handler.storage;
+package org.dave.CompactMachines.integration.redstoneflux;
+
+import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
 
 import cofh.api.energy.IEnergyStorage;
 import net.minecraft.nbt.NBTTagCompound;

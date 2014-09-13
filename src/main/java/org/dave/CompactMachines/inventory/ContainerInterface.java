@@ -9,8 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidTankInfo;
 
-import org.dave.CompactMachines.handler.storage.FluidSharedStorage;
-import org.dave.CompactMachines.handler.storage.SharedStorageHandler;
+import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.utility.LogHelper;
 

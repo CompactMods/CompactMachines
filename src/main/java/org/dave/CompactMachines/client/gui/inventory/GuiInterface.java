@@ -1,7 +1,6 @@
 package org.dave.CompactMachines.client.gui.inventory;
 
-import org.dave.CompactMachines.handler.storage.FluidSharedStorage;
-import org.dave.CompactMachines.handler.storage.SharedStorageHandler;
+import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Textures;
