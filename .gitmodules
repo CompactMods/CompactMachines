@@ -1,0 +1,3 @@
+[submodule "src/api/java/appeng/api"]
+	path = src/api/java/appeng/api
+	url = https://github.com/AlgorithmX2/Applied-Energistics-2-API.git
