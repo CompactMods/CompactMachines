@@ -2,17 +2,6 @@ package org.dave.CompactMachines.tileentity;
 
 import java.util.HashMap;
 
-import org.dave.CompactMachines.integration.appeng.CMGridBlock;
-import org.dave.CompactMachines.integration.appeng.AESharedStorage;
-import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
-import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
-import org.dave.CompactMachines.integration.item.ItemSharedStorage;
-import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.reference.Names;
-import appeng.api.networking.IGridHost;
-import appeng.api.networking.IGridNode;
-import appeng.api.util.AECableType;
-import cofh.api.energy.IEnergyHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -24,8 +13,22 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.appeng.AESharedStorage;
+import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
+import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
+import org.dave.CompactMachines.reference.Names;
+
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.IGridNode;
+import appeng.api.util.AECableType;
+import cofh.api.energy.IEnergyHandler;
+import cpw.mods.fml.common.Optional;
 
 
+@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2")
 public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost {
 
 	public int coords = -1;
@@ -266,6 +269,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return gridBlock;
 	}
 
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
 		if(!worldObj.isRemote) {
@@ -287,11 +291,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return null;
 	}
 
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public AECableType getCableConnectionType(ForgeDirection dir) {
 		return AECableType.DENSE;
 	}
 
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public void securityBreak() {
 		// TODO Auto-generated method stub

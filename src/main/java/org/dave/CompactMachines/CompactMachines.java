@@ -3,14 +3,15 @@ package org.dave.CompactMachines;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
+
 import org.dave.CompactMachines.handler.CMEventHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.GuiHandler;
+import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.handler.SharedStorageHandler.SharedStorageSaveHandler;
 import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
 import org.dave.CompactMachines.handler.machinedimension.MachineWorldChunkloadCallback;
 import org.dave.CompactMachines.handler.machinedimension.WorldProviderMachines;
-import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.handler.SharedStorageHandler.SharedStorageSaveHandler;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.init.Recipes;
@@ -28,7 +29,7 @@ import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION)
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2")
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
     public static CompactMachines instance;

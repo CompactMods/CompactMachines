@@ -18,12 +18,14 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
+
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
+import cpw.mods.fml.common.Optional;
 
-
+@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2")
 public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost {
 
 	public FluidSharedStorage storageLiquid;
@@ -201,20 +203,19 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return gridBlock;
 	}
 
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
 		return storageAE.getInterfaceNode(getGridBlock(dir));
 	}
 
-
-
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public AECableType getCableConnectionType(ForgeDirection dir) {
 		return AECableType.DENSE;
 	}
 
-
-
+	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public void securityBreak() {
 		// TODO Auto-generated method stub
