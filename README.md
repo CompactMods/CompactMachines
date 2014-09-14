@@ -5,8 +5,8 @@ Adds one simple game mechanic: Small rooms inside of blocks.
 It basically gives you the ability to build your contraptions inside of a single block.
 
 Each side of a Compact Machine has a small buffer for items, fluids and Redstone Flux
-allowing the room to interact with the outside. The room has the corresponding counter
-parts on its walls.
+allowing the room to interact with the outside. Applied Energistics channels are
+supported as well. The room has the corresponding counter parts on its walls.
 
 
 Your first room
