@@ -14,17 +14,18 @@ public class ItemBlockMachine extends ItemBlock {
 
 	public ItemBlockMachine(Block block) {
 		super(block);
-		
+
 		this.setHasSubtypes(true);
 	}
-	
+
     @Override
     public int getMetadata(int meta)
     {
         return meta;
     }
 
-    @SideOnly(Side.CLIENT)
+    @Override
+	@SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean flag)
     {
         int metaData = itemStack.getItemDamage();
@@ -52,7 +53,7 @@ public class ItemBlockMachine extends ItemBlock {
         else if (metaData == 5)
         {
         	list.add(StatCollector.translateToLocal("tooltip.cm:machine.size.five"));
-        }         
-    }	
+        }
+    }
 
 }

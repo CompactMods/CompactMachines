@@ -9,31 +9,31 @@ import net.minecraft.network.*;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 
 public class TileEntityCM extends TileEntity {
-	
+
     protected ForgeDirection orientation;
     protected byte state;
     protected String customName;
-    protected String owner;	
-	
+    protected String owner;
+
 	public TileEntityCM() {
         orientation = ForgeDirection.SOUTH;
         state = 0;
         customName = "";
         owner = "";
     }
-	
+
 	@Override
 	public Packet getDescriptionPacket() {
 	    NBTTagCompound tag = new NBTTagCompound();
 	    writeToNBT(tag);
 	    return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
-	}	
-	
+	}
+
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 	    readFromNBT(pkt.func_148857_g());
-	}	
-	
+	}
+
     public ForgeDirection getOrientation()
     {
         return orientation;
@@ -132,6 +132,6 @@ public class TileEntityCM extends TileEntity {
     public boolean hasOwner()
     {
         return owner != null && owner.length() > 0;
-    }	
-	
+    }
+
 }

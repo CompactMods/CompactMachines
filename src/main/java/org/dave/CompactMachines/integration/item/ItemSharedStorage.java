@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class ItemSharedStorage extends AbstractSharedStorage implements IInventory {
-	private int size = 1; 
+	private int size = 1;
 	private ItemStack[] items;
-	
+
 	public ItemSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 		empty();
@@ -21,7 +21,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 	public void empty() {
 		items = new ItemStack[size];
 	}
-	
+
 	@Override
 	public String type() {
 		return "item";
@@ -30,10 +30,10 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 	@Override
 	public NBTTagCompound saveToTag() {
         NBTTagCompound compound = new NBTTagCompound();
-        
+
         compound.setTag("Items", ItemHelper.writeItemStacksToTag(items));
         compound.setByte("size", (byte) size);
-		
+
 		return compound;
 	}
 
@@ -76,7 +76,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
         {
             items[slot] = stack;
             markDirty();
-        }		
+        }
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public void openInventory() {
-		return;		
+		return;
 	}
 
 	@Override

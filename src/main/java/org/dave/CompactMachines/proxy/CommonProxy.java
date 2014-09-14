@@ -9,6 +9,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public abstract class CommonProxy implements IProxy
 {
+	@Override
 	public void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileEntityMachine.class, Names.Blocks.MACHINE);
 		GameRegistry.registerTileEntity(TileEntityInterface.class, Names.Blocks.INTERFACE);

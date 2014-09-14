@@ -12,11 +12,11 @@ import net.minecraft.world.chunk.IChunkProvider;
 
 public class ChunkProviderMachines implements IChunkProvider {
 	World worldObj;
-	
+
 	public ChunkProviderMachines(World worldObj) {
 		this.worldObj = worldObj;
 	}
-	
+
     /**
      * loads or generates the chunk at the chunk location specified
      */
@@ -54,7 +54,7 @@ public class ChunkProviderMachines implements IChunkProvider {
     @Override
 	public void populate(IChunkProvider par1IChunkProvider, int par2, int par3)
     {
-        
+
     }
 
     /**
@@ -125,6 +125,6 @@ public class ChunkProviderMachines implements IChunkProvider {
 
 	@Override
 	public void recreateStructures(int var1, int var2)
-	{	
-	}	
+	{
+	}
 }

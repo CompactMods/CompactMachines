@@ -13,10 +13,10 @@ import appeng.api.networking.IGridNode;
 public class AESharedStorage extends AbstractSharedStorage {
 	public int coord;
 	public int side;
-	
+
 	public IGridNode machineNode;
 	public IGridNode interfaceNode;
-	
+
 	boolean isConnected = false;
 
 	public AESharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
@@ -30,16 +30,16 @@ public class AESharedStorage extends AbstractSharedStorage {
 	public String type() {
 		return "appeng";
 	}
-	
+
 	public void connectNodes() {
 		if(interfaceNode == null || machineNode == null) {
 			return;
 		}
-		
+
 		if(isConnected) {
 			return;
 		}
-		
+
 		try {
 			AEApi.instance().createGridConnection(interfaceNode, machineNode);
 			isConnected = true;
@@ -47,7 +47,7 @@ public class AESharedStorage extends AbstractSharedStorage {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public IGridNode getInterfaceNode(CMGridBlock gridBlock) {
 		if(interfaceNode == null) {
 			interfaceNode = AEApi.instance().createGridNode(gridBlock);
@@ -55,8 +55,8 @@ public class AESharedStorage extends AbstractSharedStorage {
 		}
 		connectNodes();
 		return interfaceNode;
-	}	
-	
+	}
+
 	public IGridNode getMachineNode(CMGridBlock gridBlock) {
 		if(machineNode == null) {
 			machineNode = AEApi.instance().createGridNode(gridBlock);
@@ -73,7 +73,7 @@ public class AESharedStorage extends AbstractSharedStorage {
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		
+
 	}
 
 }

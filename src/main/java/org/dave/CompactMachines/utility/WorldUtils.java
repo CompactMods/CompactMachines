@@ -8,15 +8,11 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.ForgeEventFactory;
 
 public class WorldUtils {
 
@@ -27,7 +23,7 @@ public class WorldUtils {
 
 		int maxX = Math.max(posX1, posX2);
 		int maxY = Math.max(posY1, posY2);
-		int maxZ = Math.max(posZ1, posZ2);		
+		int maxZ = Math.max(posZ1, posZ2);
 
 		ArrayList<ItemStack> returnList = new ArrayList<ItemStack>();
 		for (int x = minX; x <= maxX; x++)
@@ -42,9 +38,9 @@ public class WorldUtils {
 							returnList.add(s);
 						}
 					}
-					
+
 					worldObj.setBlockToAir(x, y, z);
-					
+
 					// Collect any lost items laying around
 					double[] head = new double[]{ x, y, z};
 					AxisAlignedBB axis = AxisAlignedBB.getBoundingBox(head[0] - 2, head[1] - 2, head[2] - 2, head[0] + 3, head[1] + 3, head[2] + 3);
@@ -60,18 +56,18 @@ public class WorldUtils {
 							if (mineable.stackSize <= 0) {
 								continue;
 							}
-							
+
 							entity.worldObj.removeEntity(entity);
 							returnList.add(mineable);
 						}
-					}					
+					}
 				}
 			}
 		}
-		
-		return returnList;		
+
+		return returnList;
 	}
-	
+
 	public static ArrayList<ItemStack> getItemStackFromBlock(World world, int i, int j, int k) {
 		Block block = world.getBlock(i, j, k);
 
@@ -87,7 +83,7 @@ public class WorldUtils {
 
 		return block.getDrops(world, i, j, k, meta, 0);
 	}
-	
+
 	public static HashMap<Integer, Vec3> generateCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2)
 	{
 		int minX = Math.min(posX1, posX2);
@@ -97,13 +93,13 @@ public class WorldUtils {
 		int maxX = Math.max(posX1, posX2);
 		int maxY = Math.max(posY1, posY2);
 		int maxZ = Math.max(posZ1, posZ2);
-		
+
 		int midX = (int)Math.floor((posX1 + posX2) / 2);
 		int midY = (int)Math.floor((posY1 + posY2) / 2);
 		int midZ = (int)Math.floor((posZ1 + posZ2) / 2);
-		
+
 		HashMap<Integer, Vec3> interfaces = new HashMap<Integer, Vec3>();
-		
+
 		for (int x = minX; x <= maxX; x++)
 		{
 			for (int y = minY; y <= maxY; y++)
@@ -144,8 +140,8 @@ public class WorldUtils {
 				}
 			}
 		}
-		
+
 		return interfaces;
-	}	
+	}
 }
 

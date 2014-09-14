@@ -9,5 +9,5 @@ public class BlockResizingCube extends BlockCM {
 		this.setBlockTextureName(Names.Blocks.RESIZINGCUBE);
 		this.setHardness(16.0F);
 		this.setResistance(20.0F);
-	}	
+	}
 }

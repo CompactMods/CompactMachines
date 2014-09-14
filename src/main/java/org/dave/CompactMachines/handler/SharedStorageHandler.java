@@ -24,40 +24,36 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
-import org.dave.CompactMachines.utility.LogHelper;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 
 public class SharedStorageHandler {
 	private static SharedStorageHandler serverStorageHandler;
 	private static SharedStorageHandler clientStorageHandler;
 
 	private Map<String, AbstractSharedStorage> storageMap;
-	private Map<String, List<AbstractSharedStorage>> storageList;	
+	private Map<String, List<AbstractSharedStorage>> storageList;
 
 	public final boolean client;
 
 	private File saveDir;
 	private File[] saveFiles;
 	private int saveTo;
-	
+
 	private List<AbstractSharedStorage> dirtyStorage;
 	private NBTTagCompound saveTag;
 
 	public SharedStorageHandler(boolean client) {
 		this.client = client;
-		
+
 		storageMap = Collections.synchronizedMap(new HashMap<String, AbstractSharedStorage>());
 		storageList = Collections.synchronizedMap(new HashMap<String, List<AbstractSharedStorage>>());
 		dirtyStorage = Collections.synchronizedList(new LinkedList<AbstractSharedStorage>());
-		
+
 		storageList.put("item", new ArrayList<AbstractSharedStorage>());
 		storageList.put("liquid", new ArrayList<AbstractSharedStorage>());
 		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
 		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
-		
+
 		if (!client) {
             load();
 		}
@@ -65,8 +61,8 @@ public class SharedStorageHandler {
 
     public void requestSave(AbstractSharedStorage storage) {
         dirtyStorage.add(storage);
-    }	
-	
+    }
+
 	public static SharedStorageHandler instance(boolean client) {
 		return client ? clientStorageHandler : serverStorageHandler;
 	}
@@ -82,25 +78,25 @@ public class SharedStorageHandler {
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {
 		String key = coord + "|" + side + "|" + type;
-		
+
 		AbstractSharedStorage storage = storageMap.get(key);
 		if(storage == null) {
 			if(type.equals("item")) {
 				storage = new ItemSharedStorage(this, coord, side);
 			}
-			
+
 			if(type.equals("liquid")) {
 				storage = new FluidSharedStorage(this, coord, side);
 			}
-			
+
 			if(type.equals("flux")) {
 				storage = new FluxSharedStorage(this, coord, side);
 			}
 
 			if(type.equals("appeng")) {
 				storage = new AESharedStorage(this, coord, side);
-			}			
-			
+			}
+
 			if (!client && saveTag.hasKey(key)) {
 				storage.loadFromTag(saveTag.getCompoundTag(key));
 			}
@@ -112,19 +108,19 @@ public class SharedStorageHandler {
 		return storage;
 	}
 
-	private void load() {		
+	private void load() {
 		saveDir = new File(DimensionManager.getCurrentSaveRootDirectory(), Reference.MOD_ID);
 		try {
 			if (!saveDir.exists()) {
 				saveDir.mkdirs();
 			}
-			
+
 			saveFiles = new File[]{
 					new File(saveDir, "data1.dat"),
 					new File(saveDir, "data2.dat"),
 					new File(saveDir, "lock.dat")
 			};
-			
+
 			if (saveFiles[2].exists() && saveFiles[2].length() > 0) {
 				FileInputStream fin = new FileInputStream(saveFiles[2]);
 				saveTo = fin.read() ^ 1;
@@ -159,11 +155,11 @@ public class SharedStorageHandler {
 				if (!saveFile.exists()) {
 					saveFile.createNewFile();
 				}
-				
+
 				DataOutputStream dout = new DataOutputStream(new FileOutputStream(saveFile));
-				CompressedStreamTools.writeCompressed(saveTag, dout);			
+				CompressedStreamTools.writeCompressed(saveTag, dout);
 				dout.close();
-				
+
 				FileOutputStream fout = new FileOutputStream(saveFiles[2]);
 				fout.write(saveTo);
 				fout.close();
@@ -172,7 +168,7 @@ public class SharedStorageHandler {
             	throw new RuntimeException(e);
 			}
 		}
-	}	
+	}
 
 	public static class SharedStorageSaveHandler
 	{
@@ -189,5 +185,5 @@ public class SharedStorageHandler {
 				instance(false).save(false);
 			}
 		}
-	}	
+	}
 }

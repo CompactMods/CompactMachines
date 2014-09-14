@@ -1,34 +1,21 @@
 package org.dave.CompactMachines.handler.machinedimension;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.reference.GuiId;
-import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
-import org.dave.CompactMachines.utility.LogHelper;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 import com.google.common.collect.ImmutableSetMultimap;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
@@ -39,40 +26,39 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class MachineHandler extends WorldSavedData {
-	
+
 	int nextCoord;
 	private World worldObj;
-	
+
 	public MachineHandler(String s) {
 		super(s);
 
 		nextCoord = 0;
 	}
-	
+
 	public MachineHandler(World worldObj)	{
 		this("MachineHandler");
 		this.worldObj = worldObj;
 	}
-		
-	public List<ItemStack> harvestMachine(TileEntityMachine machine) {	
+
+	public List<ItemStack> harvestMachine(TileEntityMachine machine) {
 		if(machine.coords == -1) {
 			return null;
 		}
-		
+
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-	
+
 		int size = Reference.getBoxSize(machine.blockMetadata);
 		int height = size;
-			
+
 		List<ItemStack> stacks = WorldUtils.harvestCube(machineWorld,
 				//   x           y           z
 				machine.coords * 64 + 1   , 40 + 1     , 1,
 				machine.coords * 64 + size-1, 40 + height-1, size-1
 		);
-		
+
 		for(ItemStack stack : stacks) {
 			EntityItem entityitem = new EntityItem(machine.getWorldObj(), machine.xCoord, machine.yCoord + 0.5F, machine.zCoord, stack);
 
@@ -82,23 +68,23 @@ public class MachineHandler extends WorldSavedData {
 			float f3 = 0.05F;
 			entityitem.motionX = (float) worldObj.rand.nextGaussian() * f3;
 			entityitem.motionY = (float) worldObj.rand.nextGaussian() * f3 + 0.2F;
-			entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;		
+			entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
 			machine.getWorldObj().spawnEntityInWorld(entityitem);
 		}
-		
+
 		return null;
 	}
-	
-	
-	
-	public void disableMachine(TileEntityMachine machine) {		
+
+
+
+	public void disableMachine(TileEntityMachine machine) {
 		if(machine.coords == -1) {
 			return;
 		}
-		
+
 		// Find the ticket that is being used for this machines chunk
 		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
-		
+
 		Iterator ticketIterator = existingTickets.values().iterator();
 		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
 		while(ticketIterator.hasNext()) {
@@ -106,13 +92,13 @@ public class MachineHandler extends WorldSavedData {
 			if(visitedTickets.contains(ticket.hashCode())) {
 				continue;
 			}
-			
+
 			visitedTickets.add(ticket.hashCode());
-			
+
 			NBTTagCompound data = ticket.getModData();
 			if(data.hasKey("coords")) {
 				int[] nbtCoords = data.getIntArray("coords");
-				
+
 				boolean foundMatch = false;
 				for (int i = 0; i < nbtCoords.length; i++) {
 					if(nbtCoords[i] != machine.coords) {
@@ -120,50 +106,50 @@ public class MachineHandler extends WorldSavedData {
 					}
 
 					ForgeChunkManager.unforceChunk(ticket, new ChunkCoordIntPair((machine.coords * 64) >> 4, 0 >> 4));
-					
+
 					int usedChunks = 0;
 					if(data.hasKey("usedChunks")) {
-						usedChunks = data.getInteger("usedChunks");			
+						usedChunks = data.getInteger("usedChunks");
 					}
-					
+
 					if(usedChunks < 2) {
 						ForgeChunkManager.releaseTicket(ticket);
 					} else {
 						nbtCoords[i] = -1;
-						data.setInteger("usedChunks", usedChunks - 1);						
+						data.setInteger("usedChunks", usedChunks - 1);
 						data.setIntArray("coords", nbtCoords);
-					}					
-										
+					}
+
 					foundMatch = true;
-					break;	
+					break;
 				}
-				
+
 				if(foundMatch) {
 					break;
 				}
-			}						
+			}
 		}
-		
+
 		this.markDirty();
 	}
-	
-	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {			
-		int coord = this.createChunk(machine);		
-		
+
+	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
+		int coord = this.createChunk(machine);
+
 		if (player.dimension != ConfigurationHandler.dimensionId) {
 			player.getEntityData().setInteger("oldDimension", player.dimension);
 			player.getEntityData().setDouble("oldPosX", player.posX);
 			player.getEntityData().setDouble("oldPosY", player.posY);
 			player.getEntityData().setDouble("oldPosZ", player.posZ);
-			
+
 			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, ConfigurationHandler.dimensionId, new TeleporterCM(machineWorld));
 		}
-		
+
 		// TODO: OPTIONAL: Think about a way to prevent players building at the teleport location.
-		player.setPositionAndUpdate(coord * 64 + 1.5, 42, 1.5);		
+		player.setPositionAndUpdate(coord * 64 + 1.5, 42, 1.5);
 	}
-	
+
 	public void teleportPlayerOutOfMachineWorld(EntityPlayerMP player) {
 		if (player.getEntityData().hasKey("oldPosX"))
 		{
@@ -182,16 +168,16 @@ public class MachineHandler extends WorldSavedData {
 
 			player.setPositionAndUpdate(cc.posX, cc.posY, cc.posZ);
 		}
-	}	
-	
+	}
+
 	public void forceChunkLoad(int coord) {
 		if(worldObj == null) {
 			return;
 		}
-		
+
 		Ticket chunkTicket = null;
 		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
-		
+
 		Iterator ticketIterator = existingTickets.values().iterator();
 		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
 		while(ticketIterator.hasNext()) {
@@ -199,30 +185,30 @@ public class MachineHandler extends WorldSavedData {
 			if(visitedTickets.contains(ticket.hashCode())) {
 				continue;
 			}
-			
+
 			visitedTickets.add(ticket.hashCode());
 
 			NBTTagCompound data = ticket.getModData();
 			if(data.hasKey("coords")) {
 				// Found a ticket that belongs to our mod, this should be true for all cases
-								
+
 				int usedChunks = 0;
 				if(data.hasKey("usedChunks")) {
 					usedChunks = data.getInteger("usedChunks");
 				}
-				
+
 				if(usedChunks < ticket.getMaxChunkListDepth()) {
 					chunkTicket = ticket;
 					break;
 				}
 			}
-		}		
-		
+		}
+
 		if(chunkTicket == null) {
 			// No existing/free ticket found. Requesting a new one.
 			chunkTicket = ForgeChunkManager.requestTicket(CompactMachines.instance, worldObj, Type.NORMAL);
 		}
-		
+
 		if(chunkTicket == null) {
 			return;
 		}
@@ -232,8 +218,8 @@ public class MachineHandler extends WorldSavedData {
 		if(data.hasKey("usedChunks")) {
 			usedChunks = data.getInteger("usedChunks");
 		}
-		
-		int[] nbtCoords = new int[chunkTicket.getMaxChunkListDepth()];		
+
+		int[] nbtCoords = new int[chunkTicket.getMaxChunkListDepth()];
 		if(data.hasKey("coords")) {
 			nbtCoords = data.getIntArray("coords");
 			if(nbtCoords.length > chunkTicket.getMaxChunkListDepth()) {
@@ -246,9 +232,9 @@ public class MachineHandler extends WorldSavedData {
 			// initialize with -1
 			for (int i = 0; i < nbtCoords.length; i++) {
 				nbtCoords[i] = -1;
-			}			
+			}
 		}
-		
+
 		// Find "slot" in ticket:
 		for (int i = 0; i < nbtCoords.length; i++) {
 			if(nbtCoords[i] == -1) {
@@ -256,27 +242,27 @@ public class MachineHandler extends WorldSavedData {
 				break;
 			}
 		}
-		
+
 		// Each ticket needs to remember for which areas it is responsible
 		data.setIntArray("coords", nbtCoords);
 		data.setInteger("usedChunks", usedChunks+1);
 
-		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * 64) >> 4, 0 >> 4));		
-	}	
-	
+		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * 64) >> 4, 0 >> 4));
+	}
+
 	public int createChunk(TileEntityMachine machine) {
 		if(machine.coords != -1) {
 			return machine.coords;
 		}
-		
+
 		machine.coords = nextCoord;
 		nextCoord++;
-		
+
 		int size = Reference.getBoxSize(machine.blockMetadata);
 		int height = size;
-		
+
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-		
+
 		machine.interfaces = WorldUtils.generateCube(machineWorld,
 				//          x           y           z
 				machine.coords * 64,        40,          0,
@@ -291,21 +277,21 @@ public class MachineHandler extends WorldSavedData {
 		}
 
 		machine.markDirty();
-		
+
 		this.forceChunkLoad(machine.coords);
 		this.markDirty();
-		
+
 		return machine.coords;
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		nextCoord = nbt.getInteger("nextMachineCoord");		
+		nextCoord = nbt.getInteger("nextMachineCoord");
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
-		nbt.setInteger("nextMachineCoord", nextCoord);		
+		nbt.setInteger("nextMachineCoord", nextCoord);
 	}
 
 	public void setWorld(World world) {

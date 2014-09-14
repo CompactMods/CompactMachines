@@ -13,7 +13,7 @@ public class WorldProviderMachines extends WorldProvider {
 	public WorldProviderMachines()
 	{
 		this.hasNoSky = true;
-	}	
+	}
 
 	@Override
 	protected void generateLightBrightnessTable()
@@ -46,7 +46,7 @@ public class WorldProviderMachines extends WorldProvider {
 	public void setAllowedSpawnTypes(boolean allowHostile, boolean allowPeaceful)
 	{
 		super.setAllowedSpawnTypes(false, false);
-	}	
+	}
 
 	@Override
 	public String getDimensionName() {
@@ -65,19 +65,19 @@ public class WorldProviderMachines extends WorldProvider {
 	{
 		return new ChunkProviderMachines(this.worldObj);
 	}
-	
+
 	@Override
 	public float[] calcSunriseSunsetColors(float par1, float par2)
 	{
 		return new float[]{0,0,0,0};
 	}
-	
+
 	@Override
 	public float calculateCelestialAngle(long par1, float par3)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public float getCloudHeight()
 	{
@@ -94,6 +94,6 @@ public class WorldProviderMachines extends WorldProvider {
 	public String getDepartMessage()
 	{
 		return StatCollector.translateToLocal("loading.cm:leave");
-	}	
-	
+	}
+
 }

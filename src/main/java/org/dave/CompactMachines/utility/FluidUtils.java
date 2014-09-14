@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.utility; 
+package org.dave.CompactMachines.utility;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -18,27 +18,27 @@ public class FluidUtils
 
     public static boolean fillTankWithContainer(IFluidHandler tank, EntityPlayer player) {
     	return fillTankWithContainer(tank, player, ForgeDirection.UNKNOWN);
-    }    
-    
+    }
+
     public static boolean fillTankWithContainer(IFluidHandler tank, EntityPlayer player, ForgeDirection dir)
     {
         ItemStack stack = player.getCurrentEquippedItem();
         FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(stack);
-        
+
         if(liquid == null)
             return false;
-        
+
         if(tank.fill(dir, liquid, false) != liquid.amount)
             return false;
-        
+
         tank.fill(dir, liquid, true);
-        
+
         ItemHelper.consumeItem(player.inventory, player.inventory.currentItem);
 
         player.inventoryContainer.detectAndSendChanges();
         return true;
     }
-    
+
     public static boolean emptyTankIntoContainer(IFluidHandler tank, EntityPlayer player, FluidStack tankLiquid) {
     	return emptyTankIntoContainer(tank, player, tankLiquid, ForgeDirection.UNKNOWN);
     }
@@ -49,13 +49,13 @@ public class FluidUtils
 
         if(!FluidContainerRegistry.isEmptyContainer(stack))
             return false;
-        
+
         ItemStack filled = FluidContainerRegistry.fillFluidContainer(tankLiquid, stack);
         FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(filled);
 
         if(liquid == null || filled == null)
             return false;
-        
+
         tank.drain(dir, liquid.amount, true);
 
         if(stack.stackSize == 1)
@@ -64,8 +64,8 @@ public class FluidUtils
             stack.stackSize--;
         else
             return false;
-        
-        player.inventoryContainer.detectAndSendChanges();        
+
+        player.inventoryContainer.detectAndSendChanges();
         return true;
     }
 
@@ -81,7 +81,7 @@ public class FluidUtils
         FluidStack stack = FluidStack.loadFluidStackFromNBT(tag);
         return stack != null ? stack : new FluidStack(0, 0);
     }
-    
+
     public static NBTTagCompound write(FluidStack fluid, NBTTagCompound tag)
     {
         return fluid == null || fluid.getFluid() == null ? new NBTTagCompound() : fluid.writeToNBT(new NBTTagCompound());

@@ -3,9 +3,6 @@ package org.dave.CompactMachines;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import org.dave.CompactMachines.handler.CMEventHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.GuiHandler;
@@ -35,17 +32,17 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
     public static CompactMachines instance;
-	
+
 	@SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
     public static IProxy proxy;
-	
+
 	public MachineHandler machineHandler;
 
     @Mod.EventHandler
     public void preServerStart(FMLServerAboutToStartEvent event) {
         SharedStorageHandler.reloadStorageHandler(false);
     }
-	
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
@@ -58,7 +55,7 @@ public class CompactMachines {
 		CMEventHandler rte = new CMEventHandler();
 		MinecraftForge.EVENT_BUS.register(rte);
 		MinecraftForge.EVENT_BUS.register(new SharedStorageSaveHandler());
-		
+
 		FMLCommonHandler.instance().bus().register(rte);
     }
 
@@ -66,9 +63,9 @@ public class CompactMachines {
     public void init(FMLInitializationEvent event)
     {
     	NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
-    	
+
     	proxy.registerTileEntities();
-    	            
+
         Recipes.init();
     }
 
@@ -83,8 +80,8 @@ public class CompactMachines {
         }
 
         DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
-        DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);    
-        
+        DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+
     	ForgeChunkManager.setForcedChunkLoadingCallback(instance, new MachineWorldChunkloadCallback());
-    }	
+    }
 }

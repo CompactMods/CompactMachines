@@ -24,13 +24,13 @@ public final class Names
         public static final String STATE = "teState";
         public static final String CUSTOM_NAME = "CustomName";
         public static final String OWNER = "owner";
-        
+
         public static final String OWNER_UUID_MOST_SIG = "OwnerUUIDmost";
         public static final String OWNER_UUID_LEAST_SIG = "OwnerUUIDleast";
-        
+
         public static final String UUID_MOST_SIG = "UUIDmost";
         public static final String UUID_LEAST_SIG = "UUIDleast";
-        
+
         public static final String INTERFACE_ITEMS = "interfaceItems";
         public static final String INTERFACE_UP = "interfaceUp";
         public static final String INTERFACE_DOWN = "interfaceDown";
@@ -39,7 +39,7 @@ public final class Names
         public static final String INTERFACE_NORTH = "interfaceNorth";
         public static final String INTERFACE_SOUTH = "interfaceSouth";
     }
-    
+
     public static final class Containers
     {
     	public static final String VANILLA_INVENTORY = "container.inventory";

@@ -9,7 +9,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class CMEventHandler {
 
-	
+
 	@SubscribeEvent
 	public void loadWorld(WorldEvent.Load event)
 	{
@@ -28,6 +28,6 @@ public class CMEventHandler {
 			CompactMachines.instance.machineHandler = machineHandler;
 		}
 	}
-		
-	
+
+
 }

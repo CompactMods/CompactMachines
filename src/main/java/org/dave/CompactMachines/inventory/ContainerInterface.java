@@ -6,24 +6,20 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidTankInfo;
 
-import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.utility.LogHelper;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ContainerInterface extends ContainerCM {
 	private TileEntityInterface tileEntityInterface;
-	
+
 	public ContainerInterface(InventoryPlayer inventoryPlayer, TileEntityInterface tileEntityInterface) {
 		this.tileEntityInterface = tileEntityInterface;
-		
+
 		this.addSlotToContainer(new Slot(tileEntityInterface, 0, 80, 45));
-		
+
         // Add the player's inventory slots to the container
         for (int inventoryRowIndex = 0; inventoryRowIndex < PLAYER_INVENTORY_ROWS; ++inventoryRowIndex)
         {
@@ -37,7 +33,7 @@ public class ContainerInterface extends ContainerCM {
         for (int actionBarSlotIndex = 0; actionBarSlotIndex < PLAYER_INVENTORY_COLUMNS; ++actionBarSlotIndex)
         {
             this.addSlotToContainer(new Slot(inventoryPlayer, actionBarSlotIndex, 8 + actionBarSlotIndex * 18, 164));
-        }		
+        }
 	}
 
 	@Override
@@ -46,26 +42,26 @@ public class ContainerInterface extends ContainerCM {
 	{
 		super.updateProgressBar(var, value);
 
-		if(var == 31) {			
+		if(var == 31) {
 			tileEntityInterface._fluidamount = value;
-		} else if(var == 32) {			
+		} else if(var == 32) {
 			tileEntityInterface._fluidid = value;
-		} else if(var == 33) {			
+		} else if(var == 33) {
 			tileEntityInterface._energy = value;
 		}
-	}	
-	
+	}
+
 	@Override
 	public void detectAndSendChanges()
 	{
 		super.detectAndSendChanges();
-				
+
 		FluidTankInfo[] tanks = tileEntityInterface.getTankInfo(ForgeDirection.UNKNOWN);
 		int n = tanks.length;
 		if (n != 0) {
 			FluidTankInfo tank = tanks[0];
 			if(tank != null) {
-				for(int i = 0; i < crafters.size(); i++) {						
+				for(int i = 0; i < crafters.size(); i++) {
 					if(tank.fluid != null && tank.fluid.amount != 0) {
 						((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 31, tank.fluid.amount);
 						((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 32, tank.fluid.fluidID);
@@ -74,14 +70,14 @@ public class ContainerInterface extends ContainerCM {
 						((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 32, 0);
 					}
 				}
-			}			
+			}
 		}
-		
+
 		for(int i = 0; i < crafters.size(); i++) {
 			((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 33, tileEntityInterface.getEnergyStored(ForgeDirection.UNKNOWN));
 		}
-	}	
-	
+	}
+
     @Override
     public ItemStack transferStackInSlot(EntityPlayer entityPlayer, int slotIndex)
     {
@@ -127,5 +123,5 @@ public class ContainerInterface extends ContainerCM {
         }
 
         return itemStack;
-    }	
+    }
 }

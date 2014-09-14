@@ -3,9 +3,6 @@ package org.dave.CompactMachines.integration.appeng;
 import java.util.EnumSet;
 
 import org.dave.CompactMachines.tileentity.TileEntityCM;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
-import org.dave.CompactMachines.utility.LogHelper;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -19,7 +16,7 @@ import appeng.api.util.DimensionalCoord;
 
 public class CMGridBlock implements IGridBlock {
 	protected TileEntityCM gridHost;
-	
+
 	public CMGridBlock(TileEntityCM gridHost) {
 		this.gridHost = gridHost;
 	}
@@ -40,8 +37,8 @@ public class CMGridBlock implements IGridBlock {
 	}
 
 	@Override
-	public DimensionalCoord getLocation() {		
-		return new DimensionalCoord((TileEntity)gridHost);
+	public DimensionalCoord getLocation() {
+		return new DimensionalCoord(gridHost);
 	}
 
 	@Override

@@ -7,8 +7,6 @@ import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
-import org.dave.CompactMachines.utility.LogHelper;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -18,7 +16,7 @@ public class GuiHandler implements IGuiHandler {
 	public GuiHandler() {
 
 	}
-	
+
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world,	int x, int y, int z) {
 		if(ID == GuiId.INTERFACE.ordinal()) {

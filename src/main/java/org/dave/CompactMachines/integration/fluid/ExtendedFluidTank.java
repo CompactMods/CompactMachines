@@ -13,7 +13,7 @@ public class ExtendedFluidTank implements IFluidTank
     private FluidStack fluid;
     private boolean changeType;
     private int capacity;
-    
+
     public ExtendedFluidTank(FluidStack type, int capacity)
     {
         if(type == null)
@@ -25,12 +25,12 @@ public class ExtendedFluidTank implements IFluidTank
             fluid = FluidUtils.copy(type, 0);
         this.capacity = capacity;
     }
-    
+
     public ExtendedFluidTank(int capacity)
     {
         this(null, capacity);
     }
-    
+
     @Override
     public FluidStack getFluid()
     {
@@ -56,7 +56,7 @@ public class ExtendedFluidTank implements IFluidTank
 
         if(!canAccept(resource))
             return 0;
-        
+
         int tofill = Math.min(getCapacity()-fluid.amount, resource.amount);
         if(doFill && tofill > 0)
         {
@@ -66,7 +66,7 @@ public class ExtendedFluidTank implements IFluidTank
                 fluid.amount+=tofill;
             onLiquidChanged();
         }
-        
+
         return tofill;
     }
 
@@ -75,7 +75,7 @@ public class ExtendedFluidTank implements IFluidTank
     {
         if(fluid.amount == 0 || maxDrain <= 0)
             return null;
-        
+
         int todrain = Math.min(maxDrain, fluid.amount);
         if(doDrain && todrain > 0)
         {
@@ -84,12 +84,12 @@ public class ExtendedFluidTank implements IFluidTank
         }
         return FluidUtils.copy(fluid, todrain);
     }
-    
+
     public FluidStack drain(FluidStack resource, boolean doDrain)
     {
         if (resource == null || !resource.isFluidEqual(fluid))
             return null;
-        
+
         return drain(resource.amount, doDrain);
     }
 
@@ -101,7 +101,7 @@ public class ExtendedFluidTank implements IFluidTank
     {
         fluid = FluidUtils.read(tag);
     }
-    
+
     public NBTTagCompound toTag()
     {
         return FluidUtils.write(fluid, new NBTTagCompound());

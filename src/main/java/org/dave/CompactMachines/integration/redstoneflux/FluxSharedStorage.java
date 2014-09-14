@@ -11,12 +11,12 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 	protected int energy = 0;
 	protected int capacity = 10000;
 	protected int maxReceive = 10000;
-	protected int maxExtract = 10000;	
+	protected int maxExtract = 10000;
 
 	public FluxSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 	}
-	
+
 	@Override
 	public String type() {
 		return "flux";
@@ -36,7 +36,7 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 
 	}
 
-	
+
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate) {
 		int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));

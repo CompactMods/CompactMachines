@@ -6,9 +6,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * Reference implementation of {@link IEnergyHandler}. Use/extend this or implement your own.
- * 
+ *
  * @author King Lemming
- * 
+ *
  */
 public class TileEnergyHandler extends TileEntity implements IEnergyHandler {
 

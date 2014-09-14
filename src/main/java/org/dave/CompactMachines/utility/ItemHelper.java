@@ -26,7 +26,8 @@ public class ItemHelper
 
     public static Comparator<ItemStack> comparator = new Comparator<ItemStack>()
     {
-        public int compare(ItemStack itemStack1, ItemStack itemStack2)
+        @Override
+		public int compare(ItemStack itemStack1, ItemStack itemStack2)
         {
             if (itemStack1 != null && itemStack2 != null)
             {
@@ -188,7 +189,7 @@ public class ItemHelper
         NBTHelper.setLong(itemStack, Names.NBT.OWNER_UUID_MOST_SIG, entityPlayer.getUniqueID().getMostSignificantBits());
         NBTHelper.setLong(itemStack, Names.NBT.OWNER_UUID_LEAST_SIG, entityPlayer.getUniqueID().getLeastSignificantBits());
     }
-    
+
     // Taken from CodeChickenLib. All credits to Chicken-Bones
     // TODO: Add to credits.
     /**
@@ -202,15 +203,15 @@ public class ItemHelper
             if (tag.hasKey("Quantity"))
                 items[b].stackSize = ((NBTBase.NBTPrimitive) tag.getTag("Quantity")).func_150287_d();
         }
-    }   
+    }
 
     /**
      * NBT item saving function
      */
     public static NBTTagList writeItemStacksToTag(ItemStack[] items) {
         return writeItemStacksToTag(items, 64);
-    }    
-    
+    }
+
     /**
      * NBT item saving function with support for stack sizes > 32K
      */
@@ -232,7 +233,7 @@ public class ItemHelper
         }
         return tagList;
     }
-    
+
     /**
      * Static default implementation for IInventory method
      */
@@ -254,7 +255,7 @@ public class ItemHelper
         }
         return null;
     }
-    
+
     /**
      * Consumes one item from slot in inv with support for containers.
      */
@@ -267,5 +268,5 @@ public class ItemHelper
         } else {
             inv.decrStackSize(slot, 1);
         }
-    }    
+    }
 }

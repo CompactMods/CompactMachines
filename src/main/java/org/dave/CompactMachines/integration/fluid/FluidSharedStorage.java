@@ -3,8 +3,6 @@ package org.dave.CompactMachines.integration.fluid;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.utility.FluidUtils;
-import org.dave.CompactMachines.utility.LogHelper;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -27,12 +25,12 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
             setDirty();
         }
     }
-    
+
     private Tank tank;
-	
+
 	public FluidSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
-		
+
 		tank = new Tank(1*FluidUtils.B);
 	}
 
@@ -51,10 +49,10 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		tank.fromTag(tag.getCompoundTag("tank"));		
+		tank.fromTag(tag.getCompoundTag("tank"));
 	}
 
-	
+
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
 		return tank.fill(resource, doFill);
@@ -84,10 +82,10 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
 		return new FluidTankInfo[]{tank.getInfo()};
 	}
-	
+
 	public FluidStack getFluid() {
 		return tank.getFluid();
 	}
-	
+
 
 }

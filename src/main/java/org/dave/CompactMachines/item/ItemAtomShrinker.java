@@ -8,5 +8,5 @@ public class ItemAtomShrinker extends ItemCM {
     {
         super();
         this.setUnlocalizedName(Names.Items.SHRINKER);
-    }	
+    }
 }

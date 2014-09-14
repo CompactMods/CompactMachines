@@ -16,7 +16,7 @@ public class ItemPersonalShrinkingDevice extends ItemCM
         super();
         this.setUnlocalizedName(Names.Items.PSD);
     }
-    
+
     @Override
     public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer entityPlayer) {
     	if(!world.isRemote && entityPlayer instanceof EntityPlayerMP) {
