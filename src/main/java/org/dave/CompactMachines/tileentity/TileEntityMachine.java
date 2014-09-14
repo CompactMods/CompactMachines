@@ -3,6 +3,8 @@ package org.dave.CompactMachines.tileentity;
 import java.util.HashMap;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
@@ -10,6 +12,10 @@ import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.utility.LogHelper;
 
+import appeng.api.networking.IGridConnection;
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.IGridNode;
+import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,7 +33,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler {
+
+
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost {
 
 	public int coords = -1;
 	public int[] _fluidid;
@@ -35,6 +43,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int[] _energy;
 	
 	public HashMap<Integer, Vec3> interfaces;
+	public HashMap<Integer, CMGridBlock> gridBlocks;
+	public HashMap<Integer, IGridNode> gridNodes;
 		
 	public static final int INVENTORY_SIZE = 6;
 
@@ -43,6 +53,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
 		_energy = new int[6];
+		
+		gridBlocks = new HashMap<Integer, CMGridBlock>();
+		gridNodes = new HashMap<Integer, IGridNode>();
 	}
 
 	@Override
@@ -61,7 +74,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	
 	public FluxSharedStorage getStorageFlux(int side) {
 		return (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "flux");
-	}	
+	}
+
+	public AESharedStorage getStorageAE(int side) {
+		return (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
+	}
 
 
 	@Override
@@ -246,6 +263,48 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
 		return getStorageFlux(from.ordinal()).getMaxEnergyStored();
+	}
+
+	public CMGridBlock getGridBlock(ForgeDirection dir) {
+		CMGridBlock gridBlock = gridBlocks.get(dir.ordinal());
+		if(gridBlock == null) {
+			gridBlock = new CMGridBlock(this);
+			gridBlocks.put(dir.ordinal(), gridBlock);
+		}
+		
+		return gridBlock;		
+	}
+	
+	@Override
+	public IGridNode getGridNode(ForgeDirection dir) {
+		if(!worldObj.isRemote) {			
+			IGridNode gridNode = gridNodes.get(dir.ordinal());			
+			if(gridNode == null) {				
+				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir));
+				gridNodes.put(dir.ordinal(), gridNode);
+			}
+			/*
+			LogHelper.info("Gridnode " + dir + " is: " + gridNode.hashCode());
+			for(IGridConnection conn : gridNode.getConnections()) {
+				LogHelper.info(" * Connection between: " + conn.a().hashCode() + " and " + conn.b().hashCode());				
+			}
+			*/			
+		
+			return gridNode;
+		}
+		
+		return null;
+	}
+
+	@Override
+	public AECableType getCableConnectionType(ForgeDirection dir) {
+		return AECableType.DENSE;
+	}
+
+	@Override
+	public void securityBreak() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -19,6 +19,7 @@ import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
@@ -55,6 +56,7 @@ public class SharedStorageHandler {
 		storageList.put("item", new ArrayList<AbstractSharedStorage>());
 		storageList.put("liquid", new ArrayList<AbstractSharedStorage>());
 		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
+		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
 		
 		if (!client) {
             load();
@@ -80,6 +82,7 @@ public class SharedStorageHandler {
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {
 		String key = coord + "|" + side + "|" + type;
+		
 		AbstractSharedStorage storage = storageMap.get(key);
 		if(storage == null) {
 			if(type.equals("item")) {
@@ -92,8 +95,12 @@ public class SharedStorageHandler {
 			
 			if(type.equals("flux")) {
 				storage = new FluxSharedStorage(this, coord, side);
-			}				
+			}
 
+			if(type.equals("appeng")) {
+				storage = new AESharedStorage(this, coord, side);
+			}			
+			
 			if (!client && saveTag.hasKey(key)) {
 				storage.loadFromTag(saveTag.getCompoundTag(key));
 			}

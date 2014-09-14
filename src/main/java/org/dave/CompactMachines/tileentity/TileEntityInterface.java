@@ -17,21 +17,29 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.appeng.AESharedStorage;
+import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.utility.LogHelper;
 
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.IGridNode;
+import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
 
 
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost {
 	
 	public FluidSharedStorage storageLiquid;
 	public ItemSharedStorage storage;
 	public FluxSharedStorage storageFlux;
+	public AESharedStorage storageAE;
+	
+	public CMGridBlock gridBlock;
 	
 	public int coords;
 	public int side;
@@ -98,6 +106,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		storage = (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
 		storageLiquid = (FluidSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
 		storageFlux = (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
+		storageAE = (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
 	}
 	
     @Override
@@ -187,7 +196,36 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public int getEnergyStored(ForgeDirection from) { return storageFlux.getEnergyStored(); }
 
 	@Override
-	public int getMaxEnergyStored(ForgeDirection from) { return storageFlux.getMaxEnergyStored(); }    
+	public int getMaxEnergyStored(ForgeDirection from) { return storageFlux.getMaxEnergyStored(); }
+
+
+	public CMGridBlock getGridBlock(ForgeDirection dir) {
+		if(gridBlock == null) {
+			gridBlock = new CMGridBlock(this);
+		}
+		
+		return gridBlock;		
+	}	
+
+	@Override
+	public IGridNode getGridNode(ForgeDirection dir) {
+		return storageAE.getInterfaceNode(getGridBlock(dir));
+	}
+
+
+
+	@Override
+	public AECableType getCableConnectionType(ForgeDirection dir) {
+		return AECableType.DENSE;
+	}
+
+
+
+	@Override
+	public void securityBreak() {
+		// TODO Auto-generated method stub
+		
+	}    
     
     
 }

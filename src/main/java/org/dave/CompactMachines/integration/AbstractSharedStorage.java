@@ -4,6 +4,7 @@ import org.dave.CompactMachines.handler.SharedStorageHandler;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+
 public abstract class AbstractSharedStorage {
 	public final SharedStorageHandler storageHandler;
 	
