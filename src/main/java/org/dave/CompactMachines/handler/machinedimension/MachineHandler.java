@@ -3,14 +3,6 @@ package org.dave.CompactMachines.handler.machinedimension;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.dave.CompactMachines.CompactMachines;
-import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.reference.Reference;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
-import org.dave.CompactMachines.utility.WorldUtils;
-
-import com.google.common.collect.ImmutableSetMultimap;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -26,6 +18,15 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
+
+import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.reference.Reference;
+import org.dave.CompactMachines.tileentity.TileEntityInterface;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.WorldUtils;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 public class MachineHandler extends WorldSavedData {
 
@@ -43,9 +44,9 @@ public class MachineHandler extends WorldSavedData {
 		this.worldObj = worldObj;
 	}
 
-	public List<ItemStack> harvestMachine(TileEntityMachine machine) {
+	public void harvestMachine(TileEntityMachine machine) {
 		if(machine.coords == -1) {
-			return null;
+			return;
 		}
 
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
@@ -59,7 +60,12 @@ public class MachineHandler extends WorldSavedData {
 				machine.coords * 64 + size-1, 40 + height-1, size-1
 		);
 
+		int droppedStacks = 0;
 		for(ItemStack stack : stacks) {
+			if(ConfigurationHandler.maxDroppedStacks != -1 && droppedStacks >= ConfigurationHandler.maxDroppedStacks) {
+				return;
+			}
+
 			EntityItem entityitem = new EntityItem(machine.getWorldObj(), machine.xCoord, machine.yCoord + 0.5F, machine.zCoord, stack);
 
 			entityitem.lifespan = 1200;
@@ -70,9 +76,10 @@ public class MachineHandler extends WorldSavedData {
 			entityitem.motionY = (float) worldObj.rand.nextGaussian() * f3 + 0.2F;
 			entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
 			machine.getWorldObj().spawnEntityInWorld(entityitem);
+			droppedStacks++;
 		}
 
-		return null;
+		return;
 	}
 
 

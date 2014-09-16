@@ -1,18 +1,20 @@
 package org.dave.CompactMachines.handler;
 
+import java.io.File;
+
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+
 import org.dave.CompactMachines.reference.Reference;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
-import java.io.File;
 
 public class ConfigurationHandler {
     public static Configuration configuration;
     public static boolean testValue = false;
     public static int dimensionId;
+    public static int maxDroppedStacks;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -24,6 +26,7 @@ public class ConfigurationHandler {
 
     private static void loadConfiguration() {
         dimensionId = configuration.getInt("dimension", "Internal", -1, Integer.MIN_VALUE, Integer.MAX_VALUE, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
+        maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
 
         if (configuration.hasChanged()) {
             configuration.save();

@@ -83,7 +83,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 			// TODO: Implement a limit on how deep block breaking can recurse!
 			// And while you are at it, reduce drop chance the deeper in the item comes from.
-			List<ItemStack> droppedItems = CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
+			CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
 
 			// Disable chunk loading and remove it from the worlds NBT table
 			CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
