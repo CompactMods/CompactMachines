@@ -15,12 +15,14 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
+
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.FluidUtils;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -79,8 +81,6 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
 			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
 
-			// TODO: Teleport all players out of the hazard zone, or kill them
-
 			// TODO: Implement a limit on how deep block breaking can recurse!
 			// And while you are at it, reduce drop chance the deeper in the item comes from.
 			List<ItemStack> droppedItems = CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
@@ -126,5 +126,10 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 			return true;
 		}
+	}
+
+	@Override
+	public int damageDropped(int meta) {
+		return meta;
 	}
 }
