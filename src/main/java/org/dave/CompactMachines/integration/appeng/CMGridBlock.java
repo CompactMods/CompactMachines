@@ -2,10 +2,11 @@ package org.dave.CompactMachines.integration.appeng;
 
 import java.util.EnumSet;
 
-import org.dave.CompactMachines.tileentity.TileEntityCM;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import org.dave.CompactMachines.tileentity.TileEntityCM;
+
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.GridNotification;
 import appeng.api.networking.IGrid;
@@ -13,7 +14,9 @@ import appeng.api.networking.IGridBlock;
 import appeng.api.networking.IGridHost;
 import appeng.api.util.AEColor;
 import appeng.api.util.DimensionalCoord;
+import cpw.mods.fml.common.Optional;
 
+@Optional.Interface(iface = "appeng.api.networking.IGridBlock", modid = "appliedenergistics2")
 public class CMGridBlock implements IGridBlock {
 	protected TileEntityCM gridHost;
 

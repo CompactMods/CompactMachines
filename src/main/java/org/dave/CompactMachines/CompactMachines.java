@@ -20,6 +20,7 @@ import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.utility.LogHelper;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -49,6 +50,10 @@ public class CompactMachines {
     {
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
         FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
+
+        Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
+
+        LogHelper.info("AE is available: " + Reference.AE_AVAILABLE);
 
         ModItems.init();
         ModBlocks.init();

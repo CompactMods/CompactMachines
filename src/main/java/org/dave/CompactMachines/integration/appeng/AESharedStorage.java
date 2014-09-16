@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.reference.Reference;
 
 import appeng.api.AEApi;
 import appeng.api.exceptions.FailedConnection;
@@ -37,6 +38,10 @@ public class AESharedStorage extends AbstractSharedStorage {
 		}
 
 		if(isConnected) {
+			return;
+		}
+
+		if(!Reference.AE_AVAILABLE) {
 			return;
 		}
 

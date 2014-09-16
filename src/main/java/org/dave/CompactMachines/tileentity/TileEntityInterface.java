@@ -18,6 +18,7 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
+import org.dave.CompactMachines.reference.Reference;
 
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
@@ -102,7 +103,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		storage = (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
 		storageLiquid = (FluidSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
 		storageFlux = (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
-		storageAE = (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
+
+		if(Reference.AE_AVAILABLE) {
+			storageAE = (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
+		}
 	}
 
     @Override
