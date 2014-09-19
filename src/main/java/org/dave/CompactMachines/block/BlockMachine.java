@@ -1,13 +1,16 @@
 package org.dave.CompactMachines.block;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -60,12 +63,41 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int metaData) {
-		return new TileEntityMachine();
+		TileEntityMachine tileEntityMachine = new TileEntityMachine();
+		tileEntityMachine.meta = metaData;
+		return tileEntityMachine;
 	}
 
 	@Override
 	public boolean hasTileEntity(int metadata) {
 	    return true;
+	}
+
+	@Override
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) {
+		super.onBlockPlacedBy(world, x, y, z, player, stack);
+
+		if(stack.stackTagCompound == null) {
+			return;
+		}
+
+		int coords = stack.stackTagCompound.getInteger("coords");
+		//LogHelper.info("Placing block with coords: " + coords);
+		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
+			if(tileEntityMachine.coords == -1) {
+				tileEntityMachine.coords = coords;
+				tileEntityMachine.isUpgraded = true;
+				tileEntityMachine.markDirty();
+				CompactMachines.instance.machineHandler.forceChunkLoad(coords);
+			}
+		}
+
+	}
+
+	@Override
+	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+		return new ArrayList<ItemStack>();
 	}
 
 	@Override
@@ -76,17 +108,21 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		}
 	}
 
+
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
 		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
 			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
 
-			// TODO: Implement a limit on how deep block breaking can recurse!
-			// And while you are at it, reduce drop chance the deeper in the item comes from.
-			CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
+			if(!tileEntityMachine.isUpgraded) {
+				CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
+			}
 
 			// Disable chunk loading and remove it from the worlds NBT table
 			CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
+
+			tileEntityMachine.dropAsItem();
+			world.removeTileEntity(x,y,z);
 		}
 
 		super.breakBlock(world, x, y, z, block, meta);
@@ -107,18 +143,24 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 					return false;
 				}
 
-				TileEntityMachine tank = (TileEntityMachine) world.getTileEntity(x, y, z);
+				TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 				ItemStack playerStack = player.getCurrentEquippedItem();
+
 				// First check if the player is right clicking with a shrinker
 				if(playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
 					// Activated with a PSD
-					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP)player, tank);
+					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP)player, tileEntityMachine);
 				} else if(playerStack != null && FluidContainerRegistry.isEmptyContainer(playerStack)) {
 					// Activated with an empty bucket
-					FluidUtils.emptyTankIntoContainer(tank, player, tank.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
+					FluidUtils.emptyTankIntoContainer(tileEntityMachine, player, tileEntityMachine.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
 				} else if(playerStack != null && FluidContainerRegistry.isFilledContainer(playerStack)) {
 					// Activated with a filled bucket
-					FluidUtils.fillTankWithContainer(tank, player, ForgeDirection.getOrientation(faceHit));
+					FluidUtils.fillTankWithContainer(tileEntityMachine, player, ForgeDirection.getOrientation(faceHit));
+				} else if(tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Items.nether_star) {
+					// Activated with a nether star
+					tileEntityMachine.isUpgraded = true;
+					tileEntityMachine.markDirty();
+					playerStack.stackSize--;
 				} else {
 					player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);
 				}

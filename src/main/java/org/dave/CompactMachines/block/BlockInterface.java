@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
+
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.reference.Names;
@@ -34,6 +35,11 @@ public class BlockInterface extends BlockCM implements ITileEntityProvider {
 	    return true;
 	}
 
+
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
+		return false;
+	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int faceHit, float par7, float par8, float par9)

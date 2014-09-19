@@ -142,7 +142,7 @@ public class MachineHandler extends WorldSavedData {
 
 	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
 		int coord = this.createChunk(machine);
-
+		//LogHelper.info("Teleporting player to: " + coord);
 		if (player.dimension != ConfigurationHandler.dimensionId) {
 			player.getEntityData().setInteger("oldDimension", player.dimension);
 			player.getEntityData().setDouble("oldPosX", player.posX);
@@ -262,6 +262,7 @@ public class MachineHandler extends WorldSavedData {
 			return machine.coords;
 		}
 
+		//LogHelper.info("Reserving new coords...");
 		machine.coords = nextCoord;
 		nextCoord++;
 

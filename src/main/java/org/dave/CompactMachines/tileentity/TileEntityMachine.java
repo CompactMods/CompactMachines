@@ -2,6 +2,7 @@ package org.dave.CompactMachines.tileentity;
 
 import java.util.HashMap;
 
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
@@ -35,6 +37,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int[] _fluidid;
 	public int[] _fluidamount;
 	public int[] _energy;
+	public int meta = 0;
+
+	public boolean isUpgraded = false;
 
 	public HashMap<Integer, Vec3> interfaces;
 	public HashMap<Integer, CMGridBlock> gridBlocks;
@@ -47,6 +52,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
 		_energy = new int[6];
+
 
 		gridBlocks = new HashMap<Integer, CMGridBlock>();
 		gridNodes = new HashMap<Integer, IGridNode>();
@@ -80,7 +86,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	{
 		super.readFromNBT(nbtTagCompound);
 
-        coords = nbtTagCompound.getInteger("coords");
+		//LogHelper.info("Reading nbt data of machine:");
+		coords = nbtTagCompound.getInteger("coords");
+		meta = nbtTagCompound.getInteger("meta");
+		isUpgraded = nbtTagCompound.getBoolean("upgraded");
+		//LogHelper.info("* Coords is: " + coords);
 
 		readInterfacesFromNBT(nbtTagCompound);
 	}
@@ -90,9 +100,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	{
 		super.writeToNBT(nbtTagCompound);
 
-		if (!nbtTagCompound.hasKey("coords")) {
-			nbtTagCompound.setInteger("coords", coords);
+		if (!nbtTagCompound.hasKey("meta")) {
+			nbtTagCompound.setInteger("meta", meta);
 		}
+
+		//LogHelper.info("Writing nbt data");
+		nbtTagCompound.setInteger("coords", coords);
+		nbtTagCompound.setBoolean("upgraded", isUpgraded);
 
 		addInterfacesToNBT(nbtTagCompound);
 	}
@@ -299,9 +313,29 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
-	public void securityBreak() {
-		// TODO Auto-generated method stub
+	public void securityBreak() { }
 
+	public void dropAsItem() {
+		ItemStack stack = new ItemStack(ModBlocks.machine, 1, meta);
+
+		if(isUpgraded) {
+			if(stack.stackTagCompound == null) {
+				stack.stackTagCompound = new NBTTagCompound();
+			}
+			//LogHelper.info("Dropping item stack with coords: " + coords);
+			stack.stackTagCompound.setInteger("coords", coords);
+		}
+
+		EntityItem entityitem = new EntityItem(this.getWorldObj(), this.xCoord, this.yCoord + 0.5F, this.zCoord, stack);
+
+		entityitem.lifespan = 1200;
+		entityitem.delayBeforeCanPickup = 10;
+
+		float f3 = 0.05F;
+		entityitem.motionX = (float) worldObj.rand.nextGaussian() * f3;
+		entityitem.motionY = (float) worldObj.rand.nextGaussian() * f3 + 0.2F;
+		entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
+		this.getWorldObj().spawnEntityInWorld(entityitem);
 	}
 
 

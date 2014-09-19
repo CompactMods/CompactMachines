@@ -2,13 +2,13 @@ package org.dave.CompactMachines.item;
 
 import java.util.List;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemBlockMachine extends ItemBlock {
 
@@ -53,6 +53,13 @@ public class ItemBlockMachine extends ItemBlock {
         else if (metaData == 5)
         {
         	list.add(StatCollector.translateToLocal("tooltip.cm:machine.size.five"));
+        }
+
+        if(itemStack.stackTagCompound != null) {
+        	int coords = itemStack.stackTagCompound.getInteger("coords");
+        	if(coords > -1) {
+        		list.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + coords);
+        	}
         }
     }
 
