@@ -53,7 +53,11 @@ public class CompactMachines {
 
         Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
 
-        LogHelper.info("AE is available: " + Reference.AE_AVAILABLE);
+        // Insist on keeping an already registered dimension by registering in pre-init.
+        if(ConfigurationHandler.dimensionId != -1) {
+            DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
+            DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+        }
 
         ModItems.init();
         ModBlocks.init();
@@ -83,10 +87,10 @@ public class CompactMachines {
         	LogHelper.info("Using dimension " + dimensionId + " as machine dimension.");
         	ConfigurationHandler.dimensionId = dimensionId;
         	ConfigurationHandler.saveConfiguration();
-        }
 
-        DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
-        DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+            DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
+            DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+        }
 
     	ForgeChunkManager.setForcedChunkLoadingCallback(instance, new MachineWorldChunkloadCallback());
     }
