@@ -109,7 +109,9 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 				tileEntityMachine.isUpgraded = true;
 				tileEntityMachine.meta = stack.getItemDamage();
 				tileEntityMachine.markDirty();
-				CompactMachines.instance.machineHandler.forceChunkLoad(coords);
+				if(!world.isRemote) {
+					CompactMachines.instance.machineHandler.forceChunkLoad(coords);
+				}
 			}
 		}
 
