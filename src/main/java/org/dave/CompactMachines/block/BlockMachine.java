@@ -15,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -33,6 +34,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 {
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
+	private IIcon[] iconsUpg;
 
 	public BlockMachine()
 	{
@@ -47,10 +49,12 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {
         icons = new IIcon[6];
+        iconsUpg = new IIcon[6];
 
         for (int i = 0; i < icons.length; i++)
         {
             icons[i] = iconRegister.registerIcon("compactmachines:machine_" + i);
+            iconsUpg[i] = iconRegister.registerIcon("compactmachines:machine_" + i + "_upg");
         }
 	}
 
@@ -60,6 +64,21 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		return icons[metadata];
 	}
 
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
+		TileEntityMachine tileEntityMachine = (TileEntityMachine)blockAccess.getTileEntity(x, y, z);
+		if(tileEntityMachine == null) {
+			return icons[0];
+		} else {
+			if(tileEntityMachine.isUpgraded) {
+				return iconsUpg[tileEntityMachine.meta];
+			} else {
+				return icons[tileEntityMachine.meta];
+			}
+		}
+	}
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int metaData) {
@@ -88,6 +107,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 			if(tileEntityMachine.coords == -1) {
 				tileEntityMachine.coords = coords;
 				tileEntityMachine.isUpgraded = true;
+				tileEntityMachine.meta = stack.getItemDamage();
 				tileEntityMachine.markDirty();
 				CompactMachines.instance.machineHandler.forceChunkLoad(coords);
 			}
@@ -160,6 +180,9 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 					// Activated with a nether star
 					tileEntityMachine.isUpgraded = true;
 					tileEntityMachine.markDirty();
+
+					world.markBlockForUpdate(x, y, z);
+
 					playerStack.stackSize--;
 				} else {
 					player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);

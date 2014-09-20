@@ -266,7 +266,7 @@ public class MachineHandler extends WorldSavedData {
 		machine.coords = nextCoord;
 		nextCoord++;
 
-		int size = Reference.getBoxSize(machine.blockMetadata);
+		int size = Reference.getBoxSize(machine.meta);
 		int height = size;
 
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);

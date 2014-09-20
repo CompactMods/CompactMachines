@@ -90,7 +90,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		coords = nbtTagCompound.getInteger("coords");
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
-		//LogHelper.info("* Coords is: " + coords);
+		//LogHelper.info("* isUpgraded: " + isUpgraded);
+
+		if(isUpgraded && worldObj != null && worldObj.isRemote) {
+			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		}
 
 		readInterfacesFromNBT(nbtTagCompound);
 	}
@@ -337,8 +341,4 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
 		this.getWorldObj().spawnEntityInWorld(entityitem);
 	}
-
-
-
-
 }
