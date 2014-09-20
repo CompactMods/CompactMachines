@@ -15,6 +15,7 @@ import org.dave.CompactMachines.handler.machinedimension.WorldProviderMachines;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.init.Recipes;
+import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.proxy.IProxy;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.utility.LogHelper;
@@ -72,6 +73,7 @@ public class CompactMachines {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
+    	PacketHandler.init();
     	NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 
     	proxy.registerTileEntities();

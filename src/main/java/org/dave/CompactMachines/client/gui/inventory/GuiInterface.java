@@ -1,13 +1,6 @@
 package org.dave.CompactMachines.client.gui.inventory;
 
-import org.dave.CompactMachines.inventory.ContainerInterface;
-import org.dave.CompactMachines.reference.Names;
-import org.dave.CompactMachines.reference.Textures;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -18,17 +11,51 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.dave.CompactMachines.inventory.ContainerInterface;
+import org.dave.CompactMachines.network.MessageHoppingModeChange;
+import org.dave.CompactMachines.network.PacketHandler;
+import org.dave.CompactMachines.reference.Names;
+import org.dave.CompactMachines.reference.Textures;
+import org.dave.CompactMachines.tileentity.TileEntityInterface;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 @SideOnly(Side.CLIENT)
 public class GuiInterface extends GuiContainer {
 	private TileEntityInterface tileEntityInterface;
 
 	private static int tankHeight = 16;
 
+	private GuiButton hoppingButton;
+
 	public GuiInterface(InventoryPlayer inventoryPlayer, TileEntityInterface tileEntityInterface) {
 		super(new ContainerInterface(inventoryPlayer, tileEntityInterface));
 		this.tileEntityInterface = tileEntityInterface;
 		xSize = 176;
 		ySize = 187;
+	}
+
+	@Override
+	public void initGui() {
+		super.initGui();
+		int buttonWidth = 80;
+
+        int xStart = (width - xSize) / 2;
+        int yStart = (height - ySize) / 2;
+
+		hoppingButton = new GuiButton(0, xStart + (xSize / 2 - buttonWidth / 2), yStart + 17, buttonWidth, 20, "Import");
+		this.buttonList.add(hoppingButton);
+	}
+
+	@Override
+	protected void actionPerformed(GuiButton button) {
+		int nextHoppingMode = tileEntityInterface._hoppingmode + 1;
+		if(nextHoppingMode > 2) { nextHoppingMode = 0; }
+
+		MessageHoppingModeChange packet = new MessageHoppingModeChange(tileEntityInterface.coords, tileEntityInterface.side, nextHoppingMode);
+		PacketHandler.INSTANCE.sendToServer(packet);
 	}
 
     @Override
@@ -52,6 +79,13 @@ public class GuiInterface extends GuiContainer {
         	drawEnergy(96, 61, energySize);
         }
 
+        String hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.disabled");
+        if(tileEntityInterface._hoppingmode == 1) {
+        	hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.importing");
+        } else if(tileEntityInterface._hoppingmode == 2) {
+        	hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.exporting");
+        }
+        hoppingButton.displayString = hoppingText;
     }
 
     protected void drawEnergy(int xOffset, int yOffset, int level)
@@ -81,13 +115,18 @@ public class GuiInterface extends GuiContainer {
 
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level)
 	{
-		if (stack == null) return;
+		if (stack == null) {
+			return;
+		}
 		Fluid fluid = stack.getFluid();
-		if (fluid == null) return;
+		if (fluid == null) {
+			return;
+		}
 
 		IIcon icon = fluid.getIcon(stack);
-		if (icon == null)
+		if (icon == null) {
 			icon = Blocks.flowing_lava.getIcon(0, 0);
+		}
 
 		int vertOffset = 0;
 
@@ -120,10 +159,11 @@ public class GuiInterface extends GuiContainer {
 
 	protected void bindTexture(Fluid fluid)
 	{
-		if (fluid.getSpriteNumber() == 0)
+		if (fluid.getSpriteNumber() == 0) {
 			this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-		else
+		} else {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, fluid.getSpriteNumber());
+		}
 	}
 
     @Override

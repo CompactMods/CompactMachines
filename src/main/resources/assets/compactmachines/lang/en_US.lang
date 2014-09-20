@@ -17,6 +17,10 @@ tile.compactmachines:resizingcube.name=World Resizing Cube
 container.cm:machine=Compact Machine
 container.cm:interface=Compact Machine Interface
 
+container.cm:hoppingMode.disabled=Disabled
+container.cm:hoppingMode.importing=Importing
+container.cm:hoppingMode.exporting=Exporting
+
 # ToolTips
 tooltip.cm:machine.size.zero=Tiny
 tooltip.cm:machine.size.one=Small

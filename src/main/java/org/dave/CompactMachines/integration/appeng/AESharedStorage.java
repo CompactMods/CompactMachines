@@ -1,10 +1,13 @@
 package org.dave.CompactMachines.integration.appeng;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
+import org.dave.CompactMachines.tileentity.TileEntityInterface;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 import appeng.api.AEApi;
 import appeng.api.exceptions.FailedConnection;
@@ -73,12 +76,24 @@ public class AESharedStorage extends AbstractSharedStorage {
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		return null;
+		NBTTagCompound compound = prepareTagCompound();
+		return compound;
 	}
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
+		loadHoppingModeFromCompound(tag);
+	}
+
+	@Override
+	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
+		// TODO Auto-generated method stub
 
 	}
 
+	@Override
+	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
+		// TODO Auto-generated method stub
+
+	}
 }

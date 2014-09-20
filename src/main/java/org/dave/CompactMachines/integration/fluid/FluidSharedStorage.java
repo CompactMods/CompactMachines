@@ -1,14 +1,18 @@
 package org.dave.CompactMachines.integration.fluid;
 
-import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.utility.FluidUtils;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
+
+import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.tileentity.TileEntityInterface;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.FluidUtils;
 
 public class FluidSharedStorage extends AbstractSharedStorage implements IFluidHandler  {
 
@@ -41,14 +45,14 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = new NBTTagCompound();
-        compound.setTag("tank", tank.toTag());
-
-        return compound;
+		NBTTagCompound compound = prepareTagCompound();
+		compound.setTag("tank", tank.toTag());
+		return compound;
 	}
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
+		loadHoppingModeFromCompound(tag);
 		tank.fromTag(tag.getCompoundTag("tank"));
 	}
 
@@ -87,5 +91,42 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 		return tank.getFluid();
 	}
 
+	private void hopToTileEntity(TileEntity tileEntityOutside) {
+		FluidStack stack = getFluid().copy();
+		if(stack == null || stack.amount == 0) {
+			return;
+		}
+
+		if(cooldown == max_cooldown) {
+			cooldown = 0;
+		} else {
+			cooldown++;
+			return;
+		}
+
+		if(tileEntityOutside instanceof IFluidHandler) {
+			IFluidHandler fh = (IFluidHandler)tileEntityOutside;
+
+			if(fh.canFill(ForgeDirection.getOrientation(side).getOpposite(), stack.getFluid())) {
+				int filled = fh.fill(ForgeDirection.getOrientation(side).getOpposite(), stack, false);
+				if(filled > 0) {
+					//LogHelper.info("Simulation filled: " + filled);
+					fh.fill(ForgeDirection.getOrientation(side).getOpposite(), stack, true);
+					this.drain(ForgeDirection.UNKNOWN, filled, true);
+					tileEntityOutside.markDirty();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
+		hopToTileEntity(tileEntityOutside);
+	}
+
+	@Override
+	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
+		hopToTileEntity(tileEntityInside);
+	}
 
 }

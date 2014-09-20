@@ -1,10 +1,16 @@
 package org.dave.CompactMachines.integration.redstoneflux;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.tileentity.TileEntityInterface;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
+import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyStorage {
 
@@ -24,16 +30,15 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = new NBTTagCompound();
+		NBTTagCompound compound = prepareTagCompound();
         compound.setInteger("Energy", energy);
-
-        return compound;
+		return compound;
 	}
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
+		loadHoppingModeFromCompound(tag);
 		energy = tag.getInteger("Energy");
-
 	}
 
 
@@ -67,6 +72,55 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 	@Override
 	public int getMaxEnergyStored() {
 		return capacity;
+	}
+
+	public void hopToTileEntity(TileEntity tileEntityOutside) {
+		if(getEnergyStored() == 0) {
+			return;
+		}
+
+		if(cooldown == max_cooldown) {
+			cooldown = 0;
+		} else {
+			cooldown++;
+			return;
+		}
+
+		if(tileEntityOutside instanceof IEnergyStorage) {
+			//LogHelper.info("Hopping flux into IEnergyStorage");
+			IEnergyStorage storage = (IEnergyStorage)tileEntityOutside;
+
+			int filled = storage.receiveEnergy(getEnergyStored(), true);
+			if(filled > 0) {
+				storage.receiveEnergy(filled, false);
+				this.extractEnergy(filled, false);
+				tileEntityOutside.markDirty();
+			}
+
+		} else if(tileEntityOutside instanceof IEnergyHandler) {
+			//LogHelper.info("Hopping flux into IEnergyHandler");
+			IEnergyHandler handler = (IEnergyHandler)tileEntityOutside;
+
+			int filled = handler.receiveEnergy(ForgeDirection.getOrientation(side).getOpposite(), getEnergyStored(), true);
+			if(filled > 0) {
+				//LogHelper.info("Transferred RF: " + filled);
+				handler.receiveEnergy(ForgeDirection.getOrientation(side).getOpposite(), filled, false);
+				this.extractEnergy(filled, false);
+				tileEntityOutside.markDirty();
+			}
+		}
+	}
+
+
+	@Override
+	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
+		hopToTileEntity(tileEntityOutside);
+
+	}
+
+	@Override
+	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
+		hopToTileEntity(tileEntityInside);
 	}
 
 }

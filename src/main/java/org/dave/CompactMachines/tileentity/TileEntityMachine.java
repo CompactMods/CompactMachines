@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -154,6 +155,33 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_NORTH, ForgeDirection.NORTH.ordinal());
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_SOUTH, ForgeDirection.SOUTH.ordinal());
 	}
+
+	@Override
+	public void updateEntity() {
+		super.updateEntity();
+
+		if (!worldObj.isRemote)	{
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if(getStorage(dir.ordinal()) == null) {
+					continue;
+				}
+
+				TileEntity outside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+				if(outside != null && getStorage(dir.ordinal()).hoppingMode == 2) {
+					getStorage(dir.ordinal()).hopToOutside(this, outside);
+
+					if(getStorageFluid(dir.ordinal()) != null) {
+						getStorageFluid(dir.ordinal()).hopToOutside(this, outside);
+					}
+
+					if(getStorageFlux(dir.ordinal()) != null) {
+						getStorageFlux(dir.ordinal()).hopToOutside(this, outside);
+					}
+				}
+			}
+		}
+	}
+
 
 	@Override
 	public int getSizeInventory() {

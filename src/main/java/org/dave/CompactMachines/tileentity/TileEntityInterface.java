@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -42,6 +43,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public int _fluidid;
 	public int _fluidamount;
 	public int _energy;
+	public int _hoppingmode;
 
 	public TileEntityInterface() {
 		super();
@@ -97,7 +99,30 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
         tag.setInteger("coords", coords);
     }
 
+	@Override
+	public void updateEntity() {
+		super.updateEntity();
 
+		if(storage == null) {
+			return;
+		}
+
+		if (!worldObj.isRemote)	{
+			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
+			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+
+			if(tileEntityInside != null && storage.hoppingMode == 1) {
+				storage.hopToInside(this, tileEntityInside);
+
+				if(storageLiquid != null) {
+					storageLiquid.hopToInside(this, tileEntityInside);
+				}
+				if(storageFlux != null) {
+					storageFlux.hopToInside(this, tileEntityInside);
+				}
+			}
+		}
+	}
 
 	public void reloadStorage() {
 		storage = (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
@@ -198,6 +223,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) { return storageFlux.getMaxEnergyStored(); }
 
+	public int getHoppingMode(ForgeDirection from) { return storage.hoppingMode; }
 
 	public CMGridBlock getGridBlock(ForgeDirection dir) {
 		if(gridBlock == null) {

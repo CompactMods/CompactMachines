@@ -9,6 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
 
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -48,6 +49,8 @@ public class ContainerInterface extends ContainerCM {
 			tileEntityInterface._fluidid = value;
 		} else if(var == 33) {
 			tileEntityInterface._energy = value;
+		} else if(var == 34) {
+			tileEntityInterface._hoppingmode = value;
 		}
 	}
 
@@ -75,6 +78,7 @@ public class ContainerInterface extends ContainerCM {
 
 		for(int i = 0; i < crafters.size(); i++) {
 			((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 33, tileEntityInterface.getEnergyStored(ForgeDirection.UNKNOWN));
+			((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 34, tileEntityInterface.getHoppingMode(ForgeDirection.UNKNOWN));
 		}
 	}
 
