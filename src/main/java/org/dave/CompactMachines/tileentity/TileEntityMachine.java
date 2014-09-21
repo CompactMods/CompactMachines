@@ -24,6 +24,7 @@ import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 
+import appeng.api.movable.IMovableTile;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
@@ -31,8 +32,11 @@ import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
 
 
-@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2")
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost {
+@Optional.InterfaceList({
+		@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
+		@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2")
+})
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost, IMovableTile {
 
 	public int coords = -1;
 	public int[] _fluidid;
@@ -369,4 +373,17 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
 		this.getWorldObj().spawnEntityInWorld(entityitem);
 	}
+
+	@Override
+	@Optional.Method(modid = "appliedenergistics2")
+	public boolean prepareToMove() {
+		if(isUpgraded) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	@Optional.Method(modid = "appliedenergistics2")
+	public void doneMoving() { }
 }
