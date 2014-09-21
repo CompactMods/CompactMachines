@@ -24,6 +24,7 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class SharedStorageHandler {
@@ -74,6 +75,19 @@ public class SharedStorageHandler {
 		} else {
 			serverStorageHandler = newHandler;
 		}
+	}
+
+	public void setHoppingMode(int coord, int side, String type, int hoppingMode) {
+		AbstractSharedStorage storage = getStorage(coord, side, type);
+		storage.hoppingMode = hoppingMode;
+		storage.setDirty();
+	}
+
+	public void setHoppingModeForAll(int coord, int side, int hoppingMode) {
+		setHoppingMode(coord, side, "item", hoppingMode);
+		setHoppingMode(coord, side, "liquid", hoppingMode);
+		setHoppingMode(coord, side, "flux", hoppingMode);
+		setHoppingMode(coord, side, "appeng", hoppingMode);
 	}
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {

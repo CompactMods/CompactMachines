@@ -3,7 +3,6 @@ package org.dave.CompactMachines.network;
 import io.netty.buffer.ByteBuf;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -22,9 +21,7 @@ public class MessageHoppingModeChange implements IMessage,IMessageHandler<Messag
 
 	@Override
 	public IMessage onMessage(MessageHoppingModeChange message, MessageContext ctx) {
-		ItemSharedStorage storage = (ItemSharedStorage)SharedStorageHandler.instance(false).getStorage(message.coord, message.side, "item");
-		storage.hoppingMode = message.hoppingMode;
-		storage.markDirty();
+		SharedStorageHandler.instance(false).setHoppingModeForAll(message.coord, message.side, message.hoppingMode);
 		return null;
 	}
 

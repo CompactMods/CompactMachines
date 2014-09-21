@@ -13,6 +13,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
@@ -103,24 +104,21 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public void updateEntity() {
 		super.updateEntity();
 
-		if(storage == null) {
-			return;
-		}
-
 		if (!worldObj.isRemote)	{
 			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
 			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
 
-			if(tileEntityInside != null && storage.hoppingMode == 1) {
-				storage.hopToInside(this, tileEntityInside);
-
-				if(storageLiquid != null) {
-					storageLiquid.hopToInside(this, tileEntityInside);
-				}
-				if(storageFlux != null) {
-					storageFlux.hopToInside(this, tileEntityInside);
-				}
+			if(tileEntityInside != null) {
+				hopStorage(storage, tileEntityInside);
+				hopStorage(storageLiquid, tileEntityInside);
+				hopStorage(storageFlux, tileEntityInside);
 			}
+		}
+	}
+
+	private void hopStorage(AbstractSharedStorage storage, TileEntity tileEntityInside) {
+		if(storage != null && (storage.hoppingMode == 1 || storage.hoppingMode == 3 && storage.autoHopToInside == true)) {
+			storage.hopToInside(this, tileEntityInside);
 		}
 	}
 
@@ -147,7 +145,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
     public ItemStack getStackInSlotOnClosing(int var1) { return storage.getStackInSlotOnClosing(var1); }
 
     @Override
-    public void setInventorySlotContents(int var1, ItemStack var2) { storage.setInventorySlotContents(var1, var2); }
+    public void setInventorySlotContents(int var1, ItemStack var2) {
+    	storage.autoHopToInside = false;
+    	storage.setDirty();
+    	storage.setInventorySlotContents(var1, var2);
+    }
 
 	@Override
 	public String getInventoryName() {
@@ -184,7 +186,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) { return storageLiquid.fill(from, resource, doFill); }
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    	storageLiquid.autoHopToInside = false;
+    	storageLiquid.setDirty();
+    	return storageLiquid.fill(from, resource, doFill);
+    }
 
     @Override
     public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) { return storageLiquid.drain(from, maxDrain, doDrain); }
@@ -211,7 +217,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) { return storageFlux.receiveEnergy(maxReceive, simulate); }
+	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+		storageFlux.autoHopToInside = false;
+		storageFlux.setDirty();
+		return storageFlux.receiveEnergy(maxReceive, simulate);
+	}
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) { return storageFlux.extractEnergy(maxExtract, simulate); }

@@ -20,6 +20,7 @@ container.cm:interface=Compact Machine Interface
 container.cm:hoppingMode.disabled=Disabled
 container.cm:hoppingMode.importing=Importing
 container.cm:hoppingMode.exporting=Exporting
+container.cm:hoppingMode.auto=Auto
 
 # ToolTips
 tooltip.cm:machine.size.zero=Tiny

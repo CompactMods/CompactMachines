@@ -13,7 +13,8 @@ public abstract class AbstractSharedStorage {
 
 	public int coord;
 	public int side;
-	public int hoppingMode;		// 0 - Off, 1 - To the inside, 2 - To the outside
+	public int hoppingMode;		// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto
+	public boolean autoHopToInside;
 
 	// TODO: Make cooldown configurable
 	public int max_cooldown = 20;
@@ -27,6 +28,7 @@ public abstract class AbstractSharedStorage {
 		this.coord = coord;
 		this.side = side;
 		this.hoppingMode = 0;
+		this.autoHopToInside = false;
 	}
 
 	public void setDirty() {
@@ -54,11 +56,13 @@ public abstract class AbstractSharedStorage {
 
 	public void loadHoppingModeFromCompound(NBTTagCompound compound) {
 		hoppingMode = compound.getInteger("hoppingMode");
+		autoHopToInside = compound.getBoolean("autoToInside");
 	}
 
 	public NBTTagCompound prepareTagCompound() {
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setInteger("hoppingMode", hoppingMode);
+		compound.setBoolean("autoToInside", autoHopToInside);
 		return compound;
 	}
 

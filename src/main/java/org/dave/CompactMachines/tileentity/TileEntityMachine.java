@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.init.ModBlocks;
+import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
@@ -171,18 +172,18 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				}
 
 				TileEntity outside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if(outside != null && getStorage(dir.ordinal()).hoppingMode == 2) {
-					getStorage(dir.ordinal()).hopToOutside(this, outside);
-
-					if(getStorageFluid(dir.ordinal()) != null) {
-						getStorageFluid(dir.ordinal()).hopToOutside(this, outside);
-					}
-
-					if(getStorageFlux(dir.ordinal()) != null) {
-						getStorageFlux(dir.ordinal()).hopToOutside(this, outside);
-					}
+				if(outside != null) {
+					hopStorage(getStorage(dir.ordinal()), outside);
+					hopStorage(getStorageFluid(dir.ordinal()), outside);
+					hopStorage(getStorageFlux(dir.ordinal()), outside);
 				}
 			}
+		}
+	}
+
+	private void hopStorage(AbstractSharedStorage storage, TileEntity outside) {
+		if(storage != null && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
+			storage.hopToOutside(this, outside);
 		}
 	}
 
@@ -209,7 +210,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public void setInventorySlotContents(int slotIndex, ItemStack itemStack) {
-		getStorage(slotIndex).setInventorySlotContents(0, itemStack);
+		ItemSharedStorage storage = getStorage(slotIndex);
+		storage.autoHopToInside = true;
+		storage.setDirty();
+		storage.setInventorySlotContents(0, itemStack);
 	}
 
 	@Override
@@ -257,7 +261,14 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) { return getStorageFluid(from.ordinal()).fill(from, resource, doFill); }
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    	FluidSharedStorage fss = getStorageFluid(from.ordinal());
+    	if(doFill && resource.amount > 0) {
+    		fss.autoHopToInside = true;
+    		fss.setDirty();
+    	}
+    	return fss.fill(from, resource, doFill);
+    }
 
     @Override
     public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) { return getStorageFluid(from.ordinal()).drain(from, maxDrain, doDrain); }
@@ -291,7 +302,12 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		return getStorageFlux(from.ordinal()).receiveEnergy(maxReceive, simulate);
+		FluxSharedStorage fss = getStorageFlux(from.ordinal());
+		if(!simulate && maxReceive > 0) {
+			fss.autoHopToInside = true;
+			fss.setDirty();
+		}
+		return fss.receiveEnergy(maxReceive, simulate);
 	}
 
 	@Override

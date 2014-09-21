@@ -52,7 +52,7 @@ public class GuiInterface extends GuiContainer {
 	@Override
 	protected void actionPerformed(GuiButton button) {
 		int nextHoppingMode = tileEntityInterface._hoppingmode + 1;
-		if(nextHoppingMode > 2) { nextHoppingMode = 0; }
+		if(nextHoppingMode > 3) { nextHoppingMode = 0; }
 
 		MessageHoppingModeChange packet = new MessageHoppingModeChange(tileEntityInterface.coords, tileEntityInterface.side, nextHoppingMode);
 		PacketHandler.INSTANCE.sendToServer(packet);
@@ -84,6 +84,8 @@ public class GuiInterface extends GuiContainer {
         	hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.importing");
         } else if(tileEntityInterface._hoppingmode == 2) {
         	hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.exporting");
+        } else if(tileEntityInterface._hoppingmode == 3) {
+        	hoppingText = StatCollector.translateToLocal("container.cm:hoppingMode.auto");
         }
         hoppingButton.displayString = hoppingText;
     }
