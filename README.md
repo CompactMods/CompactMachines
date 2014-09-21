@@ -5,8 +5,9 @@ Adds one simple game mechanic: Small rooms inside of blocks.
 It basically gives you the ability to build your contraptions inside of a single block.
 
 Each side of a Compact Machine has a small buffer for items, fluids and Redstone Flux
-allowing the room to interact with the outside. Applied Energistics channels are
-supported as well. The room has the corresponding counter parts on its walls.
+allowing the room to interact with the outside. Applied Energistics channels and Project
+Red bundled cables are supported as well. The room has the corresponding counter parts
+on its walls.
 
 
 Your first room
@@ -21,16 +22,11 @@ Your first room
 State of the mod
 ================
 
-It is experimental and might screw your worlds, though it is unlikely. I might also add
+It is still in beta and might screw your worlds, though it is unlikely. I might also add
 some world breaking stuff later on, but you will be warned if that should happen. Also
 unlikely though.
-This mod is in a very very early stage and I expect a few bugs here and there, feedback is
+This mod is in an early stage and I expect a few bugs here and there, feedback is
 much appreciated on the GitHub issue tracker. As are pull requests obviously :)
-
-For now this mod is feature complete and I do not really plan on adding more stuff. But I
-might be adding some machinery you need to use to be able to craft these rooms. Just being
-able to craft these things directly seems like a bit of a waste. Textures/Names might get
-an overhaul soon.
 
 
 Blocks and Items
