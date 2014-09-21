@@ -31,7 +31,7 @@ import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission")
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
     public static CompactMachines instance;
@@ -53,6 +53,7 @@ public class CompactMachines {
         FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
 
         Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
+        Reference.PR_AVAILABLE = Loader.isModLoaded("ProjRed|Transmission");
 
         // Insist on keeping an already registered dimension by registering in pre-init.
         if(ConfigurationHandler.dimensionId != -1) {

@@ -86,14 +86,8 @@ public class AESharedStorage extends AbstractSharedStorage {
 	}
 
 	@Override
-	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		// TODO Auto-generated method stub
-
-	}
+	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {}
 
 	@Override
-	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		// TODO Auto-generated method stub
-
-	}
+	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {}
 }

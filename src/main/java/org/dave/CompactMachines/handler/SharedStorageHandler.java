@@ -20,6 +20,7 @@ import net.minecraftforge.event.world.WorldEvent.Save;
 
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
+import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
@@ -54,6 +55,7 @@ public class SharedStorageHandler {
 		storageList.put("liquid", new ArrayList<AbstractSharedStorage>());
 		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
 		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
+		storageList.put("bundledRedstone", new ArrayList<AbstractSharedStorage>());
 
 		if (!client) {
             load();
@@ -88,6 +90,7 @@ public class SharedStorageHandler {
 		setHoppingMode(coord, side, "liquid", hoppingMode);
 		setHoppingMode(coord, side, "flux", hoppingMode);
 		setHoppingMode(coord, side, "appeng", hoppingMode);
+		setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
 	}
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {
@@ -109,6 +112,10 @@ public class SharedStorageHandler {
 
 			if(type.equals("appeng")) {
 				storage = new AESharedStorage(this, coord, side);
+			}
+
+			if(type.equals("bundledRedstone")) {
+				storage = new BRSharedStorage(this, coord, side);
 			}
 
 			if (!client && saveTag.hasKey(key)) {

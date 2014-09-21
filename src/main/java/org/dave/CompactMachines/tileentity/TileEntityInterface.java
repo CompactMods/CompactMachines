@@ -1,5 +1,7 @@
 package org.dave.CompactMachines.tileentity;
 
+import mrtjp.projectred.api.IBundledTile;
+import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,7 @@ import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
@@ -27,14 +30,17 @@ import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
-
-@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2")
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost {
+@Optional.InterfaceList({
+	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
+	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission")
+})
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost, IBundledTile {
 
 	public FluidSharedStorage storageLiquid;
 	public ItemSharedStorage storage;
 	public FluxSharedStorage storageFlux;
 	public AESharedStorage storageAE;
+	public BRSharedStorage storageBR;
 
 	public CMGridBlock gridBlock;
 
@@ -104,6 +110,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public void updateEntity() {
 		super.updateEntity();
 
+		if(Reference.PR_AVAILABLE) {
+			updateIncomingSignals();
+		}
+
 		if (!worldObj.isRemote)	{
 			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
 			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
@@ -114,6 +124,29 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 				hopStorage(storageFlux, tileEntityInside);
 			}
 		}
+	}
+
+	private void updateIncomingSignals() {
+		boolean needsNotify = false;
+		boolean haveChanges = false;
+
+		byte[] previous = storageBR.interfaceBundledSignal;
+		byte[] current = ProjectRedAPI.transmissionAPI.getBundledInput(worldObj, xCoord, yCoord, zCoord, ForgeDirection.getOrientation(side).getOpposite().ordinal());
+		if(current != null) {
+			for(int i = 0; i < current.length; i++) {
+				if(previous[i] != current[i]) {
+					haveChanges = true;
+					previous[i] = current[i];
+				}
+			}
+		}
+
+		if(haveChanges) {
+			//LogHelper.info("Interface input on side " + ForgeDirection.getOrientation(side) + " is now: " + getByteString(previous));
+			storageBR.machineNeedsNotify = true;
+		}
+
+		storageBR.setDirty();
 	}
 
 	private void hopStorage(AbstractSharedStorage storage, TileEntity tileEntityInside) {
@@ -129,6 +162,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 		if(Reference.AE_AVAILABLE) {
 			storageAE = (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
+		}
+
+		if(Reference.PR_AVAILABLE) {
+			storageBR = (BRSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "bundledRedstone");
 		}
 	}
 
@@ -257,9 +294,44 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
-	public void securityBreak() {
-		// TODO Auto-generated method stub
+	public void securityBreak() { }
 
+	@Override
+	@Optional.Method(modid = "ProjRed|Transmission")
+	public byte[] getBundledSignal(int dir) {
+		byte[] current = storageBR.machineBundledSignal;
+
+		if(current == null) {
+			return null;
+		}
+
+		byte[] result = new byte[current.length];
+		for(int i = 0; i < current.length; i++) {
+			//Output = Opposite-Input unless Opposite-Output is made by us
+			int a = current[i] & 255;
+			int b = storageBR.machineOutputtedSignal[i] & 255;
+			int c = a;
+			if(b > 0) {
+				continue;
+			}
+
+			result[i] = (byte)c;
+		}
+
+		storageBR.interfaceOutputtedSignal = result;
+		storageBR.setDirty();
+
+		//LogHelper.info("Interface outputting to " + ForgeDirection.getOrientation(dir) + ": " + getByteString(result));
+
+		return result;
+	}
+
+
+
+	@Override
+	@Optional.Method(modid = "ProjRed|Transmission")
+	public boolean canConnectBundled(int side) {
+		return true;
 	}
 
 

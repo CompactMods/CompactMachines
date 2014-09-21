@@ -2,28 +2,35 @@ package org.dave.CompactMachines.tileentity;
 
 import java.util.HashMap;
 
+import mrtjp.projectred.api.IBundledTile;
+import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
+import org.dave.CompactMachines.reference.Reference;
 
 import appeng.api.movable.IMovableTile;
 import appeng.api.networking.IGridHost;
@@ -34,10 +41,11 @@ import cpw.mods.fml.common.Optional;
 
 
 @Optional.InterfaceList({
-		@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
-		@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2")
+	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
+	@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2"),
+	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission")
 })
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost, IMovableTile {
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost, IMovableTile, IBundledTile {
 
 	public int coords = -1;
 	public int[] _fluidid;
@@ -84,6 +92,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public AESharedStorage getStorageAE(int side) {
 		return (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
+	}
+
+	public BRSharedStorage getStorageBR(int side) {
+		return (BRSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "bundledRedstone");
 	}
 
 
@@ -164,6 +176,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
+
+		if(Reference.PR_AVAILABLE) {
+			updateIncomingSignals();
+		}
 
 		if (!worldObj.isRemote)	{
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -402,4 +418,81 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "appliedenergistics2")
 	public void doneMoving() { }
+
+
+	@Optional.Method(modid = "ProjRed|Transmission")
+	private void updateIncomingSignals() {
+		boolean needsNotify = false;
+		boolean haveChanges = false;
+		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			BRSharedStorage br = getStorageBR(dir.ordinal());
+			if(br.machineNeedsNotify) {
+				//LogHelper.info("Signal into one of the interfaces changed: " + dir);
+				needsNotify = true;
+				br.machineNeedsNotify = false;
+			}
+			byte[] previous = br.machineBundledSignal;
+			byte[] current = ProjectRedAPI.transmissionAPI.getBundledInput(worldObj, xCoord, yCoord, zCoord, dir.ordinal());
+
+			if(current != null) {
+				for(int i = 0; i < current.length; i++) {
+					if(previous[i] != current[i]) {
+						haveChanges = true;
+						previous[i] = current[i];
+					}
+				}
+			}
+			br.setDirty();
+		}
+
+		if(haveChanges) {
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				Vec3 pos = interfaces.get(dir.ordinal());
+				WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
+				machineWorld.notifyBlockChange((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord, ModBlocks.interfaceblock);
+			}
+		}
+
+		if(needsNotify || haveChanges) {
+			worldObj.notifyBlockChange(xCoord, yCoord, zCoord, blockType);
+		}
+	}
+
+	@Override
+	@Optional.Method(modid = "ProjRed|Transmission")
+	public byte[] getBundledSignal(int dir) {
+
+		BRSharedStorage storage = getStorageBR(dir);
+		byte[] current = storage.interfaceBundledSignal;
+
+		if(current == null) {
+			return null;
+		}
+
+		byte[] result = new byte[current.length];
+		for(int i = 0; i < current.length; i++) {
+			//Machine-Output = Interface-Input unless Interface-Output is made by us
+			int a = current[i] & 255;
+			int b = storage.interfaceOutputtedSignal[i] & 255;
+			int c = a;
+			if(b > 0) {
+				continue;
+			}
+
+			result[i] = (byte)c;
+		}
+
+		storage.machineOutputtedSignal = result;
+		storage.setDirty();
+
+		//LogHelper.info("Machine outputting to " + ForgeDirection.getOrientation(dir) + ": " + getByteString(result));
+
+		return result;
+	}
+
+	@Override
+	@Optional.Method(modid = "ProjRed|Transmission")
+	public boolean canConnectBundled(int side) {
+		return true;
+	}
 }
