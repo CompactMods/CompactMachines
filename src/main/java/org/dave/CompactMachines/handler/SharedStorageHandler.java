@@ -89,8 +89,8 @@ public class SharedStorageHandler {
 		setHoppingMode(coord, side, "item", hoppingMode);
 		setHoppingMode(coord, side, "liquid", hoppingMode);
 		setHoppingMode(coord, side, "flux", hoppingMode);
-		setHoppingMode(coord, side, "appeng", hoppingMode);
-		setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
+		//setHoppingMode(coord, side, "appeng", hoppingMode);
+		//setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
 	}
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {
