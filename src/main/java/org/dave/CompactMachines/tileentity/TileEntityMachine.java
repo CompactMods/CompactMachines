@@ -19,6 +19,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.init.ModBlocks;
@@ -58,6 +59,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public HashMap<Integer, Vec3> interfaces;
 	public HashMap<Integer, CMGridBlock> gridBlocks;
 	public HashMap<Integer, IGridNode> gridNodes;
+	private boolean	init;
 
 	public static final int INVENTORY_SIZE = 6;
 
@@ -174,8 +176,28 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
+
+		if(ConfigurationHandler.chunkLoadingMode == 2) {
+			CompactMachines.instance.machineHandler.disableMachine(this);
+		}
+	}
+
+	public void initialize() {
+		if(ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
+			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
+		}
+	}
+
+	@Override
 	public void updateEntity() {
 		super.updateEntity();
+
+		if(!init && !isInvalid() && coords != -1) {
+			initialize();
+			init = true;
+		}
 
 		if(Reference.PR_AVAILABLE) {
 			updateIncomingSignals();

@@ -28,7 +28,7 @@ public class ConfigurationHandler {
     private static void loadConfiguration() {
         dimensionId = configuration.getInt("dimension", "Internal", -1, Integer.MIN_VALUE, Integer.MAX_VALUE, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
         maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
-        chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 1, "Chunk Loading Mode: 0 = Never, 1 = Always");
+        chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 2, "Chunk Loading Mode: 0 = Never, 1 = Always, 2 = When machine is loaded");
 
         if (configuration.hasChanged()) {
             configuration.save();

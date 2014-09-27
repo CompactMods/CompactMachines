@@ -24,7 +24,6 @@ import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
-import org.dave.CompactMachines.utility.LogHelper;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 import com.google.common.collect.ImmutableSetMultimap;
@@ -85,7 +84,41 @@ public class MachineHandler extends WorldSavedData {
 		return;
 	}
 
+	public boolean isCoordChunkLoaded(TileEntityMachine machine) {
+		return isCoordChunkLoaded(machine.coords);
+	}
 
+	public boolean isCoordChunkLoaded(int coords) {
+		if(coords == -1) {
+			return false;
+		}
+
+		// Find the ticket that is being used for this machines chunk
+		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
+
+		Iterator ticketIterator = existingTickets.values().iterator();
+		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
+		while(ticketIterator.hasNext()) {
+			Ticket ticket = (Ticket)ticketIterator.next();
+			if(visitedTickets.contains(ticket.hashCode())) {
+				continue;
+			}
+			visitedTickets.add(ticket.hashCode());
+
+			NBTTagCompound data = ticket.getModData();
+			if(data.hasKey("coords")) {
+				int[] nbtCoords = data.getIntArray("coords");
+
+				for (int i = 0; i < nbtCoords.length; i++) {
+					if(nbtCoords[i] == coords) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 
 	public void disableMachine(TileEntityMachine machine) {
 		if(machine.coords == -1) {
@@ -115,6 +148,7 @@ public class MachineHandler extends WorldSavedData {
 						continue;
 					}
 
+					//LogHelper.info("Unforcing chunk for room: " + machine.coords);
 					ForgeChunkManager.unforceChunk(ticket, new ChunkCoordIntPair((machine.coords * 64) >> 4, 0 >> 4));
 
 					int usedChunks = 0;
@@ -179,6 +213,8 @@ public class MachineHandler extends WorldSavedData {
 			player.setPositionAndUpdate(cc.posX, cc.posY, cc.posZ);
 		}
 	}
+
+
 
 	public void forceChunkLoad(int coord) {
 		if(worldObj == null) {
@@ -262,7 +298,7 @@ public class MachineHandler extends WorldSavedData {
 		data.setIntArray("coords", nbtCoords);
 		data.setInteger("usedChunks", usedChunks+1);
 
-		LogHelper.info("Forcing chunk for room: " + coord);
+		//LogHelper.info("Forcing chunk for room: " + coord);
 		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * 64) >> 4, 0 >> 4));
 	}
 

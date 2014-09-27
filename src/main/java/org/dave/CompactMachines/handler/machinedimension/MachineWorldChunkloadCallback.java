@@ -22,6 +22,15 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 			return;
 		}
 
+		if(ConfigurationHandler.chunkLoadingMode == 2) {
+			LogHelper.info("Chunkloading is in smart mode. Releasing previously requested tickets...");
+			for (Ticket ticket : tickets) {
+				ForgeChunkManager.releaseTicket(ticket);
+			}
+			return;
+		}
+
+		LogHelper.info("Chunkloading is in always mode. Loading all previously loaded chunks.");
 		for (Ticket ticket : tickets) {
 			NBTTagCompound data = ticket.getModData();
 			if(data.hasKey("coords")) {
@@ -33,17 +42,15 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 						continue;
 					}
 
-					LogHelper.info("Forcing chunk for room: " + nbtCoords[i]);
+					//LogHelper.info("Forcing chunk for room: " + nbtCoords[i]);
 					ForgeChunkManager.forceChunk(ticket, new ChunkCoordIntPair((nbtCoords[i] * 64) >> 4, 0 >> 4));
 				}
-			}
 
-			/*
-			if(!CompactMachines.instance.machineHandler.coordTickets.containsKey(coord)) {
-				CompactMachines.instance.machineHandler.coordTickets.put(coord, ticket);
+				// Ticket has no valid coords stored, releasing it.
+				if(!foundMatch) {
+					ForgeChunkManager.releaseTicket(ticket);
+				}
 			}
-			*/
-
 		}
 	}
 }
