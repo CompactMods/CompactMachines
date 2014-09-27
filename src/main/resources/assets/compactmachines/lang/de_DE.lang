@@ -1,0 +1,35 @@
+# Creative Tabs
+itemGroup.compactmachines=Compact Machines
+# Items
+item.compactmachines:psd.name=Persönliches Schrumpfgerät
+item.compactmachines:shrinker.name=Atomschrumpfgerät
+item.compactmachines:enlarger.name=Atomwachstumsgerät
+item.compactmachines:interfaceitem.name=Weltgrößenschittstelle
+item.compactmachines:quantumentangler.name=Quantenverschänker
+# Blocks
+tile.compactmachines:machine.name=Kompakte Maschine
+tile.compactmachines:interface.name=Kompakte Maschinenschnittstelle
+tile.compactmachines:innerwall.name=Kompakte Maschinenwand
+tile.compactmachines:resizingcube.name=Weltgrößenwürfel
+# Container
+container.cm:machine=Kompakte Maschine
+container.cm:interface=Kompakte Maschinenschnittstelle
+container.cm:hoppingMode.disabled=Deaktiviert
+container.cm:hoppingMode.importing=Import
+container.cm:hoppingMode.exporting=Export
+container.cm:hoppingMode.auto=Automatisch
+# ToolTips
+tooltip.cm:machine.size.zero=Winzig
+tooltip.cm:machine.size.one=Klein
+tooltip.cm:machine.size.two=Normalgröße
+tooltip.cm:machine.size.three=Groß
+tooltip.cm:machine.size.four=Gigantisch
+tooltip.cm:machine.size.five=Maximalgröße
+tooltip.cm:machine.coords=Maschinennummer
+# Dimension Travelling
+loading.cm:enter=Schrumpfe auf Maschinengröße. Ffffflllp.
+loading.cm:leave=Wachse auf Normalgröße. Ffffflllp.
+# Chat messages
+msg.message_machine_already_in_use.txt=Verschränkung fehlgeschlagen: Maschine wird bereits verwendet.
+msg.message_machine_not_upgraded.txt=Verschränkung fehlgeschlagen: Mschine besitzt nicht die nötigen Upgrades.
+msg.message_machine_invalid_size.txt=Verschränkung fehlgeschlagen: Maschine hat nicht die richtige Größe.
