@@ -56,8 +56,8 @@ public class MachineHandler extends WorldSavedData {
 
 		List<ItemStack> stacks = WorldUtils.harvestCube(machineWorld,
 				//   x           y           z
-				machine.coords * 64 + 1   , 40 + 1     , 1,
-				machine.coords * 64 + size-1, 40 + height-1, size-1
+				machine.coords * ConfigurationHandler.cubeDistance + 1   , 40 + 1     , 1,
+				machine.coords * ConfigurationHandler.cubeDistance + size-1, 40 + height-1, size-1
 		);
 
 		// TODO: Add the items currently in the buffer to the list of item stacks to drop
@@ -149,7 +149,7 @@ public class MachineHandler extends WorldSavedData {
 					}
 
 					//LogHelper.info("Unforcing chunk for room: " + machine.coords);
-					ForgeChunkManager.unforceChunk(ticket, new ChunkCoordIntPair((machine.coords * 64) >> 4, 0 >> 4));
+					ForgeChunkManager.unforceChunk(ticket, new ChunkCoordIntPair((machine.coords * ConfigurationHandler.cubeDistance) >> 4, 0 >> 4));
 
 					int usedChunks = 0;
 					if(data.hasKey("usedChunks")) {
@@ -191,7 +191,7 @@ public class MachineHandler extends WorldSavedData {
 		}
 
 		// TODO: OPTIONAL: Think about a way to prevent players building at the teleport location.
-		player.setPositionAndUpdate(coord * 64 + 1.5, 42, 1.5);
+		player.setPositionAndUpdate(coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5);
 	}
 
 	public void teleportPlayerOutOfMachineWorld(EntityPlayerMP player) {
@@ -299,7 +299,7 @@ public class MachineHandler extends WorldSavedData {
 		data.setInteger("usedChunks", usedChunks+1);
 
 		//LogHelper.info("Forcing chunk for room: " + coord);
-		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * 64) >> 4, 0 >> 4));
+		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * ConfigurationHandler.cubeDistance) >> 4, 0 >> 4));
 	}
 
 	public int createChunk(TileEntityMachine machine) {
@@ -318,8 +318,8 @@ public class MachineHandler extends WorldSavedData {
 
 		machine.interfaces = WorldUtils.generateCube(machineWorld,
 				//          x           y           z
-				machine.coords * 64,        40,          0,
-				machine.coords * 64 + size, 40 + height, size
+				machine.coords * ConfigurationHandler.cubeDistance,        40,          0,
+				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
 		);
 
 		// After creating the Block, make sure the TileEntities inside have their information ready.

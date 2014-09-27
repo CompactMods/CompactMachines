@@ -16,6 +16,7 @@ public class ConfigurationHandler {
     public static int dimensionId;
     public static int maxDroppedStacks;
     public static int chunkLoadingMode;
+    public static int cubeDistance;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -27,6 +28,7 @@ public class ConfigurationHandler {
 
     private static void loadConfiguration() {
         dimensionId = configuration.getInt("dimension", "Internal", -1, Integer.MIN_VALUE, Integer.MAX_VALUE, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
+        cubeDistance = configuration.getInt("cubeDistance", "Internal", 64, 16, Integer.MAX_VALUE, "The distance between the cubes in the machine dimension! Must be a multiple of 16, i.e. 16, 32, 48, 64... DO NOT CHANGE THIS.");
         maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
         chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 2, "Chunk Loading Mode: 0 = Never, 1 = Always, 2 = When machine is loaded");
 

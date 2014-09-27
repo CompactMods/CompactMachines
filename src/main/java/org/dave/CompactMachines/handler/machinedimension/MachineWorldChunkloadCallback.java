@@ -43,7 +43,7 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 					}
 
 					//LogHelper.info("Forcing chunk for room: " + nbtCoords[i]);
-					ForgeChunkManager.forceChunk(ticket, new ChunkCoordIntPair((nbtCoords[i] * 64) >> 4, 0 >> 4));
+					ForgeChunkManager.forceChunk(ticket, new ChunkCoordIntPair((nbtCoords[i] * ConfigurationHandler.cubeDistance) >> 4, 0 >> 4));
 				}
 
 				// Ticket has no valid coords stored, releasing it.
