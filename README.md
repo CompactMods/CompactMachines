@@ -54,6 +54,16 @@ machine or you might get trapped.
 ![](/readme-images/personal_shrinking_device.png)
 
 
+Quantum Entangler
+-------------------------
+Use it to link two machines to the same room. They share the same content and buffers.
+Both machines must be upgraded with a netherstar and must be of the same size. You
+cannot entangle two used machines, i.e. the target machine must never have been
+entered before.
+
+![](/readme-images/quantum_entangler.png)
+
+
 Stuff only required for crafting
 --------------------------------
 You only need these to craft the two things above.
