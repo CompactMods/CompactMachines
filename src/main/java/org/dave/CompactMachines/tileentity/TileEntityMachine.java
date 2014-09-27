@@ -233,21 +233,33 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public ItemStack getStackInSlot(int slotIndex) {
+		if(coords == -1) {
+			return null;
+		}
 		return getStorage(slotIndex).getStackInSlot(0);
 	}
 
 	@Override
 	public ItemStack decrStackSize(int slotIndex, int decreaseAmount) {
+		if(coords == -1) {
+			return null;
+		}
 		return getStorage(slotIndex).decrStackSize(0, decreaseAmount);
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int slotIndex) {
+		if(coords == -1) {
+			return null;
+		}
 		return getStorage(slotIndex).getStackInSlotOnClosing(0);
 	}
 
 	@Override
 	public void setInventorySlotContents(int slotIndex, ItemStack itemStack) {
+		if(coords == -1) {
+			return;
+		}
 		ItemSharedStorage storage = getStorage(slotIndex);
 		storage.autoHopToInside = true;
 		storage.setDirty();
@@ -266,6 +278,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int getInventoryStackLimit() {
+		if(coords == -1) {
+			return 0;
+		}
 		return 64;
 	}
 
@@ -284,22 +299,34 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
+		if(coords == -1) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean canInsertItem(int slotIndex, ItemStack itemStack, int side) {
+		if(coords == -1) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean canExtractItem(int slotIndex, ItemStack itemStack, int side) {
+		if(coords == -1) {
+			return false;
+		}
 		return true;
 	}
 
 
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if(coords == -1) {
+			return 0;
+		}
     	FluidSharedStorage fss = getStorageFluid(from.ordinal());
     	if(doFill && resource.amount > 0) {
     		fss.autoHopToInside = true;
@@ -315,10 +342,20 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
     public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) { return getStorageFluid(from.ordinal()).drain(from, resource, doDrain); }
 
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) { return getStorageFluid(from.ordinal()).canDrain(from, fluid); }
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		if(coords == -1) {
+			return false;
+		}
+    	return getStorageFluid(from.ordinal()).canDrain(from, fluid);
+    }
 
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) { return getStorageFluid(from.ordinal()).canFill(from, fluid); }
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+		if(coords == -1) {
+			return false;
+		}
+    	return getStorageFluid(from.ordinal()).canFill(from, fluid);
+    }
 
     @Override
     public FluidTankInfo[] getTankInfo(ForgeDirection from) { return getStorageFluid(from.ordinal()).getTankInfo(from); }
@@ -340,6 +377,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+		if(coords == -1) {
+			return 0;
+		}
 		FluxSharedStorage fss = getStorageFlux(from.ordinal());
 		if(!simulate && maxReceive > 0) {
 			fss.autoHopToInside = true;
@@ -350,16 +390,25 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
+		if(coords == -1) {
+			return 0;
+		}
 		return getStorageFlux(from.ordinal()).extractEnergy(maxExtract, simulate);
 	}
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {
+		if(coords == -1) {
+			return 0;
+		}
 		return getStorageFlux(from.ordinal()).getEnergyStored();
 	}
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
+		if(coords == -1) {
+			return 0;
+		}
 		return getStorageFlux(from.ordinal()).getMaxEnergyStored();
 	}
 
