@@ -24,6 +24,7 @@ import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.LogHelper;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 import com.google.common.collect.ImmutableSetMultimap;
@@ -184,6 +185,11 @@ public class MachineHandler extends WorldSavedData {
 			return;
 		}
 
+		// Do not load chunks when the config is set to "never"
+		if(ConfigurationHandler.chunkLoadingMode == 0) {
+			return;
+		}
+
 		Ticket chunkTicket = null;
 		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
 
@@ -256,6 +262,7 @@ public class MachineHandler extends WorldSavedData {
 		data.setIntArray("coords", nbtCoords);
 		data.setInteger("usedChunks", usedChunks+1);
 
+		LogHelper.info("Forcing chunk for room: " + coord);
 		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * 64) >> 4, 0 >> 4));
 	}
 

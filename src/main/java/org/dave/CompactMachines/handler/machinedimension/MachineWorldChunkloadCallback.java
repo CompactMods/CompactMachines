@@ -9,10 +9,18 @@ import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.LoadingCallback;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.utility.LogHelper;
+
 public class MachineWorldChunkloadCallback implements LoadingCallback {
 
 	@Override
 	public void ticketsLoaded(List<Ticket> tickets, World world) {
+		// Do not load chunks when the config is set to "never"
+		if(ConfigurationHandler.chunkLoadingMode == 0) {
+			LogHelper.info("Chunkloading is disabled. Skipping...");
+			return;
+		}
 
 		for (Ticket ticket : tickets) {
 			NBTTagCompound data = ticket.getModData();
@@ -25,6 +33,7 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 						continue;
 					}
 
+					LogHelper.info("Forcing chunk for room: " + nbtCoords[i]);
 					ForgeChunkManager.forceChunk(ticket, new ChunkCoordIntPair((nbtCoords[i] * 64) >> 4, 0 >> 4));
 				}
 			}

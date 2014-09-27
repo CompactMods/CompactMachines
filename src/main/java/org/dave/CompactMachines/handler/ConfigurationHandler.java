@@ -15,6 +15,7 @@ public class ConfigurationHandler {
     public static boolean testValue = false;
     public static int dimensionId;
     public static int maxDroppedStacks;
+    public static int chunkLoadingMode;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -27,6 +28,7 @@ public class ConfigurationHandler {
     private static void loadConfiguration() {
         dimensionId = configuration.getInt("dimension", "Internal", -1, Integer.MIN_VALUE, Integer.MAX_VALUE, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
         maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
+        chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 1, "Chunk Loading Mode: 0 = Never, 1 = Always");
 
         if (configuration.hasChanged()) {
             configuration.save();
