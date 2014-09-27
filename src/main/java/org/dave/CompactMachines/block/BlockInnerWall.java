@@ -17,6 +17,7 @@ public class BlockInnerWall extends BlockCM {
 		this.setBlockTextureName(Names.Blocks.INNERWALL);
 		this.setBlockUnbreakable();
 		this.setResistance(6000000.0F);
+		this.setLightOpacity(1);
 	}
 
 	@Override

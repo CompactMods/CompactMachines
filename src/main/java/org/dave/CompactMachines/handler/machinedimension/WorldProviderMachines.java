@@ -1,18 +1,16 @@
 package org.dave.CompactMachines.handler.machinedimension;
 
-import org.dave.CompactMachines.handler.ConfigurationHandler;
-
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManagerHell;
 import net.minecraft.world.chunk.IChunkProvider;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+
 public class WorldProviderMachines extends WorldProvider {
 
-	public WorldProviderMachines()
-	{
-		this.hasNoSky = true;
+	public WorldProviderMachines()	{
 	}
 
 	@Override
