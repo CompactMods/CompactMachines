@@ -60,6 +60,8 @@ public class MachineHandler extends WorldSavedData {
 				machine.coords * 64 + size-1, 40 + height-1, size-1
 		);
 
+		// TODO: Add the items currently in the buffer to the list of item stacks to drop
+
 		int droppedStacks = 0;
 		for(ItemStack stack : stacks) {
 			if(ConfigurationHandler.maxDroppedStacks != -1 && droppedStacks >= ConfigurationHandler.maxDroppedStacks) {

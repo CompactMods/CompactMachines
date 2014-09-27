@@ -1,10 +1,10 @@
 package org.dave.CompactMachines.init;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Recipes
 {
@@ -68,6 +68,16 @@ public class Recipes
     			'g', "blockGlass",
     			'r', "dustRedstone",
     			'p', new ItemStack(Blocks.piston)
+    	));
+
+    	GameRegistry.addRecipe(new ShapedOreRecipe(
+    			new ItemStack(ModItems.quantumEntangler),
+    			"qqq",
+    			"xsx",
+    			"qqq",
+    			'q', "gemQuartz",
+    			'x', new ItemStack(ModItems.interfaceItem),
+    			's', new ItemStack(Items.nether_star)
     	));
     }
 

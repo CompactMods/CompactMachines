@@ -6,6 +6,7 @@ item.compactmachines:psd.name=Personal Shrinking Device
 item.compactmachines:shrinker.name=Atom Shrinking Module
 item.compactmachines:enlarger.name=Atom Enlarging Module
 item.compactmachines:interfaceitem.name=World Resizing Interface
+item.compactmachines:quantumentangler.name=Quantum Entangler
 
 # Blocks
 tile.compactmachines:machine.name=Compact Machine
@@ -34,3 +35,8 @@ tooltip.cm:machine.coords=Machine Number
 # Dimension Travelling
 loading.cm:enter=Shrinking to machine size. Ffffflllp.
 loading.cm:leave=Expanding to normal size. Ffffflllp.
+
+# Chat messages
+msg.message_machine_already_in_use.txt=Can not entangle: Machine is already in use.
+msg.message_machine_not_upgraded.txt=Can not entangle: Machine is not upgraded.
+msg.message_machine_invalid_size.txt=Can not entangle: Machine has not the right size.

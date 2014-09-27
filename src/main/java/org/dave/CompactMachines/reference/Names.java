@@ -8,6 +8,7 @@ public final class Names
         public static final String SHRINKER = "shrinker";
         public static final String ENLARGER = "enlarger";
         public static final String INTERFACEITEM = "interfaceitem";
+        public static final String QUANTUMENTANGLER = "quantumentangler";
     }
 
     public static final class Blocks

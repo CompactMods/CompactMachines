@@ -13,7 +13,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -21,6 +23,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.reference.Names;
@@ -186,6 +189,34 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 					world.markBlockForUpdate(x, y, z);
 
 					playerStack.stackSize--;
+				} else if(playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
+					if(playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
+						// quantumEntangler already has a compound
+						if(tileEntityMachine.coords != -1) {
+							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_already_in_use.txt"));
+						} else if(tileEntityMachine.isUpgraded == false) {
+							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
+						} else {
+							int size = playerStack.getTagCompound().getInteger("size");
+							if(size != tileEntityMachine.meta) {
+								player.addChatMessage(new ChatComponentTranslation("msg.message_machine_invalid_size.txt"));
+							} else {
+								int coords = playerStack.getTagCompound().getInteger("coords");
+								tileEntityMachine.coords = coords;
+								tileEntityMachine.markDirty();
+
+								playerStack.stackSize--;
+							}
+						}
+					} else if(tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
+						// No "coords" tag yet and the machine is in use and upgraded
+						// --> Save the coords
+						NBTTagCompound nbt = new NBTTagCompound();
+						nbt.setInteger("coords", tileEntityMachine.coords);
+						nbt.setInteger("size", tileEntityMachine.meta);
+
+						playerStack.setTagCompound(nbt);
+					}
 				} else {
 					player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);
 				}
