@@ -5,7 +5,7 @@ item.compactmachines:psd.name=Persönliches Schrumpfgerät
 item.compactmachines:shrinker.name=Atomschrumpfgerät
 item.compactmachines:enlarger.name=Atomwachstumsgerät
 item.compactmachines:interfaceitem.name=Weltgrößenschittstelle
-item.compactmachines:quantumentangler.name=Quantenverschänker
+item.compactmachines:quantumentangler.name=Quantenverschränker
 # Blocks
 tile.compactmachines:machine.name=Kompakte Maschine
 tile.compactmachines:interface.name=Kompakte Maschinenschnittstelle
@@ -31,5 +31,5 @@ loading.cm:enter=Schrumpfe auf Maschinengröße. Ffffflllp.
 loading.cm:leave=Wachse auf Normalgröße. Ffffflllp.
 # Chat messages
 msg.message_machine_already_in_use.txt=Verschränkung fehlgeschlagen: Maschine wird bereits verwendet.
-msg.message_machine_not_upgraded.txt=Verschränkung fehlgeschlagen: Mschine besitzt nicht die nötigen Upgrades.
+msg.message_machine_not_upgraded.txt=Verschränkung fehlgeschlagen: Maschine besitzt nicht das nötige Upgrade.
 msg.message_machine_invalid_size.txt=Verschränkung fehlgeschlagen: Maschine hat nicht die richtige Größe.
