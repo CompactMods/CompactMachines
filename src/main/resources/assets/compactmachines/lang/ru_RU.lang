@@ -1,0 +1,42 @@
+ Creative Tabs
+itemGroup.compactmachines=Compact Machines
+
+# Items
+item.compactmachines:psd.name=Личное устройство сжатия
+item.compactmachines:shrinker.name=Модуль сжатия атома
+item.compactmachines:enlarger.name=Модуль увеличения атома
+item.compactmachines:interfaceitem.name=Интерфейс изменения размера мира
+item.compactmachines:quantumentangler.name=Квантовый соединитель
+
+# Blocks
+tile.compactmachines:machine.name=Компактный механизм
+tile.compactmachines:interface.name=Интерфейс компактного механизма
+tile.compactmachines:innerwall.name=Стена компактного механизма
+tile.compactmachines:resizingcube.name=Куб изменения размера мира
+
+# Container
+container.cm:machine=Компактный механизм
+container.cm:interface=Интерфейс компактного механизма
+
+container.cm:hoppingMode.disabled=Отключен
+container.cm:hoppingMode.importing=Импорт
+container.cm:hoppingMode.exporting=Экспорт
+container.cm:hoppingMode.auto=Автоматический
+
+# ToolTips
+tooltip.cm:machine.size.zero=Крошечный
+tooltip.cm:machine.size.one=Маленький
+tooltip.cm:machine.size.two=Обычного размера
+tooltip.cm:machine.size.three=Большой
+tooltip.cm:machine.size.four=Гигантский
+tooltip.cm:machine.size.five=Максимального размера
+tooltip.cm:machine.coords=Номер механизма
+
+# Dimension Travelling
+loading.cm:enter=Сжатие до размера механизма. Ffffflllp.
+loading.cm:leave=Расширение до обычного размера. Ffffflllp.
+
+# Chat messages
+msg.message_machine_already_in_use.txt=Не получается соединить: Механизм используется.
+msg.message_machine_not_upgraded.txt=Не получается соединить: Механизм не улучшен.
+msg.message_machine_invalid_size.txt=Не получается соединить: Механизм имеет неправильный размер.
