@@ -12,6 +12,9 @@ import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
+import cpw.mods.fml.common.Optional;
+
+@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers")
 public class OpenComputersSharedStorage extends AbstractSharedStorage implements Environment {
 
 	public Node node;
