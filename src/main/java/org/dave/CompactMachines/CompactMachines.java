@@ -25,13 +25,14 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila")
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
     public static CompactMachines instance;
@@ -81,6 +82,10 @@ public class CompactMachines {
     	proxy.registerTileEntities();
 
         Recipes.init();
+
+        if(Loader.isModLoaded("Waila")) {
+        	FMLInterModComms.sendMessage("Waila", "register", "org.dave.CompactMachines.handler.waila.BlockHandler.callbackRegister");
+        }
     }
 
     @Mod.EventHandler
