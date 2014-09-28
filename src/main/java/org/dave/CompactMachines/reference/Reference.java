@@ -10,6 +10,7 @@ public class Reference {
 
     public static boolean AE_AVAILABLE = false;
     public static boolean PR_AVAILABLE = false;
+    public static boolean OC_AVAILABLE = false;
 
     public static int getBoxSize(int type) {
     	if(type <= 0) {

@@ -23,6 +23,7 @@ import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 
@@ -56,6 +57,7 @@ public class SharedStorageHandler {
 		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
 		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
 		storageList.put("bundledRedstone", new ArrayList<AbstractSharedStorage>());
+		storageList.put("OpenComputers", new ArrayList<AbstractSharedStorage>());
 
 		if (!client) {
             load();
@@ -116,6 +118,10 @@ public class SharedStorageHandler {
 
 			if(type.equals("bundledRedstone")) {
 				storage = new BRSharedStorage(this, coord, side);
+			}
+
+			if(type.equals("OpenComputers")) {
+				storage = new OpenComputersSharedStorage(this, coord, side);
 			}
 
 			if (!client && saveTag.hasKey(key)) {

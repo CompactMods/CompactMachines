@@ -2,6 +2,8 @@ package org.dave.CompactMachines.tileentity;
 
 import java.util.HashMap;
 
+import li.cil.oc.api.network.Node;
+import li.cil.oc.api.network.SidedEnvironment;
 import mrtjp.projectred.api.IBundledTile;
 import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.item.EntityItem;
@@ -29,6 +31,7 @@ import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
@@ -44,9 +47,10 @@ import cpw.mods.fml.common.Optional;
 @Optional.InterfaceList({
 	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
 	@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2"),
-	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission")
+	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
+	@Optional.Interface(iface = "li.cil.oc.api.network.SidedEnvironment", modid = "OpenComputers")
 })
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost, IMovableTile, IBundledTile {
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment {
 
 	public int coords = -1;
 	public int[] _fluidid;
@@ -98,6 +102,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public BRSharedStorage getStorageBR(int side) {
 		return (BRSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "bundledRedstone");
+	}
+
+	public OpenComputersSharedStorage getStorageOC(int side) {
+		return (OpenComputersSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
 	}
 
 
@@ -182,12 +190,64 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if(ConfigurationHandler.chunkLoadingMode == 2) {
 			CompactMachines.instance.machineHandler.disableMachine(this);
 		}
+
+		if(Reference.OC_AVAILABLE && !worldObj.isRemote) {
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if(getStorageOC(dir.ordinal()) == null) {
+					continue;
+				}
+
+				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
+				Node node = storage.getNode();
+				if(node != null) {
+					node.remove();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+
+		if(Reference.OC_AVAILABLE && !worldObj.isRemote) {
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if(getStorageOC(dir.ordinal()) == null) {
+					continue;
+				}
+
+				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
+				Node node = storage.getNode();
+				if(node != null) {
+					node.remove();
+				}
+			}
+		}
 	}
 
 	public void initialize() {
+		if(worldObj.isRemote) {
+			return;
+		}
+
 		if(ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
 			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
 		}
+
+		if(Reference.OC_AVAILABLE) {
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if(getStorageOC(dir.ordinal()) == null) {
+					continue;
+				}
+
+				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
+				Node node = storage.getNode();
+				if(node != null && node.network() == null) {
+					li.cil.oc.api.Network.joinOrCreateNetwork(this);
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -564,6 +624,22 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public boolean canConnectBundled(int side) {
+		return true;
+	}
+
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public Node sidedNode(ForgeDirection side) {
+		if (worldObj.isRemote)	{
+			return null;
+		}
+		return getStorageOC(side.ordinal()).getNode();
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public boolean canConnect(ForgeDirection side) {
 		return true;
 	}
 }

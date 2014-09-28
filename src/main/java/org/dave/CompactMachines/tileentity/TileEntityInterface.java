@@ -1,5 +1,8 @@
 package org.dave.CompactMachines.tileentity;
 
+import li.cil.oc.api.network.Environment;
+import li.cil.oc.api.network.Message;
+import li.cil.oc.api.network.Node;
 import mrtjp.projectred.api.IBundledTile;
 import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +24,7 @@ import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
@@ -32,15 +36,17 @@ import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
 @Optional.InterfaceList({
 	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
-	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission")
+	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
+	@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost, IBundledTile {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost, IBundledTile, Environment {
 
 	public FluidSharedStorage storageLiquid;
 	public ItemSharedStorage storage;
 	public FluxSharedStorage storageFlux;
 	public AESharedStorage storageAE;
 	public BRSharedStorage storageBR;
+	public OpenComputersSharedStorage storageOC;
 
 	public CMGridBlock gridBlock;
 
@@ -59,7 +65,29 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		_energy = 0;
 	}
 
+	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
 
+		if(Reference.OC_AVAILABLE && !worldObj.isRemote && storageOC != null) {
+			Node node = storageOC.getNode();
+			if(node != null) {
+				node.remove();
+			}
+		}
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+
+		if(Reference.OC_AVAILABLE && !worldObj.isRemote && storageOC != null) {
+			Node node = storageOC.getNode();
+			if(node != null) {
+				node.remove();
+			}
+		}
+	}
 
     @Override
     public void validate()
@@ -114,6 +142,14 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			updateIncomingSignals();
 		}
 
+		if(Reference.OC_AVAILABLE && !worldObj.isRemote) {
+			Node node = storageOC.getNode();
+
+			if(node != null && node.network() == null) {
+				li.cil.oc.api.Network.joinOrCreateNetwork(this);
+			}
+		}
+
 		if (!worldObj.isRemote)	{
 			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
 			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
@@ -159,6 +195,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		storage = (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
 		storageLiquid = (FluidSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
 		storageFlux = (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
+
+		if(Reference.OC_AVAILABLE) {
+			storageOC = (OpenComputersSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "OpenComputers");
+		}
 
 		if(Reference.AE_AVAILABLE) {
 			storageAE = (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
@@ -333,6 +373,26 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public boolean canConnectBundled(int side) {
 		return true;
 	}
+
+
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public Node node() {
+		return storageOC.getNode();
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public void onConnect(Node node) {}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public void onDisconnect(Node node) {}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public void onMessage(Message message) {}
 
 
 }
