@@ -14,15 +14,14 @@ import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.utility.FluidUtils;
 
-public class BlockInterface extends BlockCM implements ITileEntityProvider {
+public class BlockInterface extends BlockProtected implements ITileEntityProvider {
 
 	public BlockInterface()
 	{
 		super();
 		this.setBlockName(Names.Blocks.INTERFACE);
 		this.setBlockTextureName(Names.Blocks.INTERFACE);
-		this.setBlockUnbreakable();
-		this.setResistance(6000000.0F);
+		this.setLightOpacity(1);
 	}
 
 	@Override
