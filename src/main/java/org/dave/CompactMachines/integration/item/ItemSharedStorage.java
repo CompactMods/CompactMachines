@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
@@ -21,6 +22,8 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 	public ItemSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 		empty();
+
+		max_cooldown = ConfigurationHandler.cooldownItems;
 	}
 
 	public void empty() {

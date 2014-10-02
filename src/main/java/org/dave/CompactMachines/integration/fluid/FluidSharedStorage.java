@@ -8,6 +8,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
@@ -36,6 +37,7 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 		super(storageHandler, coord, side);
 
 		tank = new Tank(1*FluidUtils.B);
+		max_cooldown = ConfigurationHandler.cooldownFluid;
 	}
 
 	@Override

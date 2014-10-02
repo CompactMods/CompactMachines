@@ -16,9 +16,8 @@ public abstract class AbstractSharedStorage {
 	public int hoppingMode;		// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto
 	public boolean autoHopToInside;
 
-	// TODO: Make cooldown configurable
 	public int max_cooldown = 20;
-	public int cooldown = max_cooldown;
+	public int cooldown = 0;
 
 	private boolean dirty;
 	private int changeCount;
