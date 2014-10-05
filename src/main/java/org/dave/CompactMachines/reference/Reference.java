@@ -1,5 +1,7 @@
 package org.dave.CompactMachines.reference;
 
+import net.minecraft.item.Item;
+
 public class Reference {
     public static final String MOD_ID = "CompactMachines";
     public static final String MOD_NAME = "Compact Machines";
@@ -11,6 +13,8 @@ public class Reference {
     public static boolean AE_AVAILABLE = false;
     public static boolean PR_AVAILABLE = false;
     public static boolean OC_AVAILABLE = false;
+
+    public static Item upgradeItem = null;
 
     public static int getBoxSize(int type) {
     	if(type <= 0) {

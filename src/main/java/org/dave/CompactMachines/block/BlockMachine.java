@@ -10,7 +10,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,6 +26,7 @@ import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.reference.Names;
+import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.FluidUtils;
 
@@ -181,7 +181,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 				} else if(playerStack != null && FluidContainerRegistry.isFilledContainer(playerStack)) {
 					// Activated with a filled bucket
 					FluidUtils.fillTankWithContainer(tileEntityMachine, player, ForgeDirection.getOrientation(faceHit));
-				} else if(tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Items.nether_star) {
+				} else if(tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Reference.upgradeItem) {
 					// Activated with a nether star
 					tileEntityMachine.isUpgraded = true;
 					tileEntityMachine.markDirty();

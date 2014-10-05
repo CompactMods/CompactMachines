@@ -20,6 +20,7 @@ public class ConfigurationHandler {
     public static int cooldownRF;
     public static int cooldownItems;
     public static int cooldownFluid;
+    public static String upgradeItem;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -38,6 +39,8 @@ public class ConfigurationHandler {
         cooldownRF = configuration.getInt("cooldownRF", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Redstone Flux, i.e. 20 => 10000 RF/s, 0 => 10000 RF/t");
         cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");
         cooldownFluid = configuration.getInt("cooldownFluid", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Fluids, i.e. 0 => 1 Bucket per tick");
+
+        upgradeItem = configuration.getString("upgradeItem", "CompactMachines", "nether_star", "The item used to upgrade compact machines. Format: modid:name_block_registered_with");
 
         if (configuration.hasChanged()) {
             configuration.save();

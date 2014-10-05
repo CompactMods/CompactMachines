@@ -1,5 +1,6 @@
 package org.dave.CompactMachines;
 
+import net.minecraft.init.Items;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,6 +31,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.GameData;
 
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila")
@@ -101,6 +103,11 @@ public class CompactMachines {
             DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
         }
 
+        Reference.upgradeItem = GameData.getItemRegistry().getObject(ConfigurationHandler.upgradeItem);
+        if(Reference.upgradeItem == null) {
+        	LogHelper.warn("Upgrade item '" + ConfigurationHandler.upgradeItem + "' not found! Using nether_star.");
+        	Reference.upgradeItem = Items.nether_star;
+        }
     	ForgeChunkManager.setForcedChunkLoadingCallback(instance, new MachineWorldChunkloadCallback());
     }
 }
