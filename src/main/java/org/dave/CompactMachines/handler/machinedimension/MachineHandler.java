@@ -18,9 +18,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
@@ -60,7 +62,15 @@ public class MachineHandler extends WorldSavedData {
 				machine.coords * ConfigurationHandler.cubeDistance + size-1, 40 + height-1, size-1
 		);
 
-		// TODO: Add the items currently in the buffer to the list of item stacks to drop
+		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			ItemSharedStorage storage = machine.getStorage(dir.ordinal());
+			ItemStack storedStack = storage.getStackInSlot(0);
+			if(storedStack != null && storedStack.stackSize > 0) {
+				stacks.add(storedStack);
+			}
+			storage.setInventorySlotContents(0, null);
+			storage.setDirty();
+		}
 
 		int droppedStacks = 0;
 		for(ItemStack stack : stacks) {
