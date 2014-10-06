@@ -93,7 +93,7 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 		return tank.getFluid();
 	}
 
-	private void hopToTileEntity(TileEntity tileEntityOutside) {
+	private void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		FluidStack stack = getFluid().copy();
 		if(stack == null || stack.amount == 0) {
 			return;
@@ -106,16 +106,21 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 			return;
 		}
 
-		if(tileEntityOutside instanceof IFluidHandler) {
-			IFluidHandler fh = (IFluidHandler)tileEntityOutside;
+		if(tileEntity instanceof IFluidHandler) {
+			IFluidHandler fh = (IFluidHandler)tileEntity;
 
-			if(fh.canFill(ForgeDirection.getOrientation(side).getOpposite(), stack.getFluid())) {
-				int filled = fh.fill(ForgeDirection.getOrientation(side).getOpposite(), stack, false);
+			ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
+			if(opposite) {
+				hoppingSide = hoppingSide.getOpposite();
+			}
+
+			if(fh.canFill(hoppingSide, stack.getFluid())) {
+				int filled = fh.fill(hoppingSide, stack, false);
 				if(filled > 0) {
 					//LogHelper.info("Simulation filled: " + filled);
-					fh.fill(ForgeDirection.getOrientation(side).getOpposite(), stack, true);
+					fh.fill(hoppingSide, stack, true);
 					this.drain(ForgeDirection.UNKNOWN, filled, true);
-					tileEntityOutside.markDirty();
+					tileEntity.markDirty();
 				}
 			}
 		}
@@ -123,12 +128,12 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	@Override
 	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		hopToTileEntity(tileEntityOutside);
+		hopToTileEntity(tileEntityOutside, true);
 	}
 
 	@Override
 	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		hopToTileEntity(tileEntityInside);
+		hopToTileEntity(tileEntityInside, false);
 	}
 
 }

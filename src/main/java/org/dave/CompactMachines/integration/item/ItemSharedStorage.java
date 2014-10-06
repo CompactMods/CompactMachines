@@ -127,7 +127,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 	}
 
 
-	private void hopToTileEntity(TileEntity tileEntityOutside) {
+	private void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		ItemStack stack = getStackInSlot(0);
 		if(stack == null || stack.stackSize == 0) {
 			return;
@@ -141,10 +141,16 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 		}
 
 		int targetSlot = -1;
-		if(tileEntityOutside instanceof IInventory) {
-			if(tileEntityOutside instanceof ISidedInventory) {
-				ISidedInventory inv = (ISidedInventory)tileEntityOutside;
-				int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(ForgeDirection.getOrientation(side).getOpposite().ordinal());
+		if(tileEntity instanceof IInventory) {
+			if(tileEntity instanceof ISidedInventory) {
+				ISidedInventory inv = (ISidedInventory)tileEntity;
+
+				ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
+				if(opposite) {
+					hoppingSide = hoppingSide.getOpposite();
+				}
+
+				int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(hoppingSide.ordinal());
 
 				for(int slot : accessibleSlotsFromSide) {
 					if(inv.isItemValidForSlot(slot, stack) && (inv.getStackInSlot(slot) == null || inv.getStackInSlot(slot).stackSize < inv.getInventoryStackLimit())) {
@@ -153,7 +159,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 					}
 				}
 			} else {
-				IInventory inv = (IInventory)tileEntityOutside;
+				IInventory inv = (IInventory)tileEntity;
 
 				for(int i = 0; i < inv.getSizeInventory(); i++) {
 					if(inv.isItemValidForSlot(i, stack) && (inv.getStackInSlot(i) == null || inv.getStackInSlot(i).stackSize < inv.getInventoryStackLimit())) {
@@ -168,7 +174,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 			return;
 		}
 
-		IInventory inv = (IInventory)tileEntityOutside;
+		IInventory inv = (IInventory)tileEntity;
 		ItemStack targetStack = inv.getStackInSlot(targetSlot);
 
 		int max = Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit());
@@ -203,12 +209,12 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		hopToTileEntity(tileEntityOutside);
+		hopToTileEntity(tileEntityOutside, true);
 	}
 
 	@Override
 	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		hopToTileEntity(tileEntityInside);
+		hopToTileEntity(tileEntityInside, false);
 	}
 
 }

@@ -77,7 +77,7 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 		return capacity;
 	}
 
-	public void hopToTileEntity(TileEntity tileEntityOutside) {
+	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		if(getEnergyStored() == 0) {
 			return;
 		}
@@ -89,27 +89,32 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 			return;
 		}
 
-		if(tileEntityOutside instanceof IEnergyStorage) {
+		if(tileEntity instanceof IEnergyStorage) {
 			//LogHelper.info("Hopping flux into IEnergyStorage");
-			IEnergyStorage storage = (IEnergyStorage)tileEntityOutside;
+			IEnergyStorage storage = (IEnergyStorage)tileEntity;
 
 			int filled = storage.receiveEnergy(getEnergyStored(), true);
 			if(filled > 0) {
 				storage.receiveEnergy(filled, false);
 				this.extractEnergy(filled, false);
-				tileEntityOutside.markDirty();
+				tileEntity.markDirty();
 			}
 
-		} else if(tileEntityOutside instanceof IEnergyHandler) {
+		} else if(tileEntity instanceof IEnergyHandler) {
 			//LogHelper.info("Hopping flux into IEnergyHandler");
-			IEnergyHandler handler = (IEnergyHandler)tileEntityOutside;
+			IEnergyHandler handler = (IEnergyHandler)tileEntity;
 
-			int filled = handler.receiveEnergy(ForgeDirection.getOrientation(side).getOpposite(), getEnergyStored(), true);
+			ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
+			if(opposite) {
+				hoppingSide = hoppingSide.getOpposite();
+			}
+
+			int filled = handler.receiveEnergy(hoppingSide, getEnergyStored(), true);
 			if(filled > 0) {
 				//LogHelper.info("Transferred RF: " + filled);
-				handler.receiveEnergy(ForgeDirection.getOrientation(side).getOpposite(), filled, false);
+				handler.receiveEnergy(hoppingSide, filled, false);
 				this.extractEnergy(filled, false);
-				tileEntityOutside.markDirty();
+				tileEntity.markDirty();
 			}
 		}
 	}
@@ -117,13 +122,13 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 
 	@Override
 	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		hopToTileEntity(tileEntityOutside);
+		hopToTileEntity(tileEntityOutside, true);
 
 	}
 
 	@Override
 	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		hopToTileEntity(tileEntityInside);
+		hopToTileEntity(tileEntityInside, false);
 	}
 
 }
