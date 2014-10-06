@@ -1,6 +1,7 @@
 package org.dave.CompactMachines.handler.machinedimension;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
@@ -34,6 +36,8 @@ public class MachineHandler extends WorldSavedData {
 
 	int nextCoord;
 	private World worldObj;
+
+	HashMap<Integer, double[]> spawnPoints = new HashMap<Integer, double[]>();
 
 	public MachineHandler(String s) {
 		super(s);
@@ -187,30 +191,77 @@ public class MachineHandler extends WorldSavedData {
 		this.markDirty();
 	}
 
-	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
-		int coord = this.createChunk(machine);
+	public void setCoordSpawnpoint(EntityPlayerMP player) {
+		NBTTagCompound playerNBT = player.getEntityData();
+		if(!playerNBT.hasKey("coordHistory")) {
+			return;
+		}
+
+		NBTTagList coordHistory = playerNBT.getTagList("coordHistory", 10);
+		if(coordHistory.tagCount() == 0) {
+			return;
+		}
+
+		int lastCoord = coordHistory.getCompoundTagAt(coordHistory.tagCount()-1).getInteger("coord");
+		if(lastCoord > -1) {
+			//LogHelper.info("Saved spawnpoint for " + lastCoord + ": {" + player.posX +", "+ player.posY +", "+ player.posZ + "}");
+			spawnPoints.put(lastCoord, new double[]{player.posX, player.posY, player.posZ});
+		}
+
+		this.markDirty();
+	}
+
+	public void teleportPlayerToCoords(EntityPlayerMP player, int coord, boolean isReturning) {
 		//LogHelper.info("Teleporting player to: " + coord);
+		NBTTagCompound playerNBT = player.getEntityData();
+
 		if (player.dimension != ConfigurationHandler.dimensionId) {
-			player.getEntityData().setInteger("oldDimension", player.dimension);
-			player.getEntityData().setDouble("oldPosX", player.posX);
-			player.getEntityData().setDouble("oldPosY", player.posY);
-			player.getEntityData().setDouble("oldPosZ", player.posZ);
+			playerNBT.setInteger("oldDimension", player.dimension);
+			playerNBT.setDouble("oldPosX", player.posX);
+			playerNBT.setDouble("oldPosY", player.posY);
+			playerNBT.setDouble("oldPosZ", player.posZ);
 
 			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, ConfigurationHandler.dimensionId, new TeleporterCM(machineWorld));
 		}
 
-		// TODO: OPTIONAL: Think about a way to prevent players building at the teleport location.
-		player.setPositionAndUpdate(coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5);
+		if(!isReturning) {
+			NBTTagList coordHistory;
+			if(playerNBT.hasKey("coordHistory")) {
+				coordHistory = playerNBT.getTagList("coordHistory", 10);
+			} else {
+				coordHistory = new NBTTagList();
+			}
+			NBTTagCompound toAppend = new NBTTagCompound();
+			toAppend.setInteger("coord", coord);
+
+			coordHistory.appendTag(toAppend);
+			playerNBT.setTag("coordHistory", coordHistory);
+		}
+
+		// TODO: Set default spawn point to a better location
+		double[] destination = new double[]{coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5};
+		if(spawnPoints.containsKey(coord)) {
+			destination = spawnPoints.get(coord);
+		}
+
+		player.setPositionAndUpdate(destination[0],destination[1],destination[2]);
 	}
 
-	public void teleportPlayerOutOfMachineWorld(EntityPlayerMP player) {
-		if (player.getEntityData().hasKey("oldPosX"))
+	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
+		int coords = this.createChunk(machine);
+		teleportPlayerToCoords(player, coords, false);
+	}
+
+
+	public void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
+		NBTTagCompound playerNBT = player.getEntityData();
+		if (playerNBT.hasKey("oldPosX"))
 		{
-			int oldDimension = player.getEntityData().getInteger("oldDimension");
-			double oldPosX = player.getEntityData().getDouble("oldPosX");
-			double oldPosY = player.getEntityData().getDouble("oldPosY");
-			double oldPosZ = player.getEntityData().getDouble("oldPosZ");
+			int oldDimension = playerNBT.getInteger("oldDimension");
+			double oldPosX = playerNBT.getDouble("oldPosX");
+			double oldPosY = playerNBT.getDouble("oldPosY");
+			double oldPosZ = playerNBT.getDouble("oldPosZ");
 
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, oldDimension, new TeleporterCM(MinecraftServer.getServer().worldServerForDimension(oldDimension)));
 			player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
@@ -221,6 +272,27 @@ public class MachineHandler extends WorldSavedData {
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, 0, new TeleporterCM(MinecraftServer.getServer().worldServerForDimension(0)));
 
 			player.setPositionAndUpdate(cc.posX, cc.posY, cc.posZ);
+		}
+	}
+
+	public void teleportPlayerBack(EntityPlayerMP player) {
+		NBTTagCompound playerNBT = player.getEntityData();
+		if (playerNBT.hasKey("coordHistory")) {
+			NBTTagList coordHistory = playerNBT.getTagList("coordHistory", 10);
+			if(coordHistory.tagCount() == 0) {
+				// No coord history so far, teleport back to overworld
+				teleportPlayerOutOfMachineDimension(player);
+			} else {
+				// Remove the last tag, then teleport to the new last
+				coordHistory.removeTag(coordHistory.tagCount()-1);
+				if(coordHistory.tagCount() == 0) {
+					teleportPlayerOutOfMachineDimension(player);
+					return;
+				}
+
+				int coord = coordHistory.getCompoundTagAt(coordHistory.tagCount()-1).getInteger("coord");
+				teleportPlayerToCoords(player, coord, true);
+			}
 		}
 	}
 
@@ -350,11 +422,39 @@ public class MachineHandler extends WorldSavedData {
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		nextCoord = nbt.getInteger("nextMachineCoord");
+
+		if(nbt.hasKey("spawnpoints")) {
+			spawnPoints.clear();
+			NBTTagList tagList = nbt.getTagList("spawnpoints", 10);
+			for (int i = 0; i < tagList.tagCount(); i++) {
+				NBTTagCompound tag = tagList.getCompoundTagAt(i);
+				int coords = tag.getInteger("coords");
+				double[] positions = new double[]{tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z")};
+
+				spawnPoints.put(coords, positions);
+			}
+		}
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("nextMachineCoord", nextCoord);
+
+		NBTTagList tagList = new NBTTagList();
+		Iterator sp = spawnPoints.keySet().iterator();
+		while(sp.hasNext()) {
+			int coords = (Integer)sp.next();
+			double[] positions = spawnPoints.get(coords);
+
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setInteger("coords", coords);
+			tag.setDouble("x", positions[0]);
+			tag.setDouble("y", positions[1]);
+			tag.setDouble("z", positions[2]);
+			tagList.appendTag(tag);
+		}
+
+		nbt.setTag("spawnpoints", tagList);
 	}
 
 	public void setWorld(World world) {

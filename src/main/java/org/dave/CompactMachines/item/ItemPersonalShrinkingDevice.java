@@ -21,8 +21,14 @@ public class ItemPersonalShrinkingDevice extends ItemCM
     public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer entityPlayer) {
     	if(!world.isRemote && entityPlayer instanceof EntityPlayerMP) {
     		EntityPlayerMP serverPlayer = (EntityPlayerMP)entityPlayer;
+
+    		if(serverPlayer.isSneaking()) {
+    			CompactMachines.instance.machineHandler.setCoordSpawnpoint(serverPlayer);
+    			return itemStack;
+    		}
+
     		if(world.provider.dimensionId == ConfigurationHandler.dimensionId) {
-    			CompactMachines.instance.machineHandler.teleportPlayerOutOfMachineWorld(serverPlayer);
+    			CompactMachines.instance.machineHandler.teleportPlayerBack(serverPlayer);
     		}
     	}
     	return itemStack;
