@@ -93,9 +93,9 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 			//LogHelper.info("Hopping flux into IEnergyStorage");
 			IEnergyStorage storage = (IEnergyStorage)tileEntity;
 
-			int filled = storage.receiveEnergy(getEnergyStored(), true);
+			int filled = storage.receiveEnergy(getEnergyStored(), false);
 			if(filled > 0) {
-				storage.receiveEnergy(filled, false);
+				//LogHelper.info("Transferred RF: " + filled);
 				this.extractEnergy(filled, false);
 				tileEntity.markDirty();
 			}
@@ -109,10 +109,9 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 				hoppingSide = hoppingSide.getOpposite();
 			}
 
-			int filled = handler.receiveEnergy(hoppingSide, getEnergyStored(), true);
+			int filled = handler.receiveEnergy(hoppingSide, getEnergyStored(), false);
 			if(filled > 0) {
 				//LogHelper.info("Transferred RF: " + filled);
-				handler.receiveEnergy(hoppingSide, filled, false);
 				this.extractEnergy(filled, false);
 				tileEntity.markDirty();
 			}
