@@ -223,6 +223,13 @@ public class MachineHandler extends WorldSavedData {
 
 			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, ConfigurationHandler.dimensionId, new TeleporterCM(machineWorld));
+
+			// Since the player is currently not in the machine dimension, we want to clear
+			// his coord history - in case he exited the machine world not via a shrinking device
+			// which automatically clears the last entry in the coord history.
+			if(playerNBT.hasKey("coordHistory")) {
+				playerNBT.removeTag("coordHistory");
+			}
 		}
 
 		if(!isReturning) {
