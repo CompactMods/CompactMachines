@@ -1,0 +1,4 @@
+[prefix{l}]11x11x11 [prefix{}]
+Enough space for two large floors.
+
+[crafting{200,50,key=compactmachines:machine_4}]

@@ -26,6 +26,13 @@ minecraft {
     assetDir = "eclipse/assets"
 }
 
+repositories {
+    maven {
+        name = "IGW"
+        url = "http://maven.k-4u.nl/"
+    }
+}
+
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -35,6 +42,7 @@ dependencies {
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+    compile "igwmod:IGW-Mod-1.7.10:1.1.1-17:userdev"
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

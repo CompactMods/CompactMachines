@@ -82,6 +82,7 @@ public class CompactMachines {
     	NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 
     	proxy.registerTileEntities();
+    	proxy.registerHandlers();
 
         Recipes.init();
 

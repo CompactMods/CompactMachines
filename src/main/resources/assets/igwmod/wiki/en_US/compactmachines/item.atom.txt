@@ -1,0 +1,4 @@
+The Atom Shrinking and Enlarging Modules are only used for crafting.
+You require one of each to craft a [link{compactmachines/item.interfaceitem}]World Resizing Interface[link{}]
+[crafting{200,70,key=item/compactmachines:shrinker}]
+[crafting{200,190,key=item/compactmachines:enlarger}]

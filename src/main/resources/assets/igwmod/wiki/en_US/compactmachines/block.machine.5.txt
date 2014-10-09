@@ -1,0 +1,4 @@
+[prefix{l}]13x13x13 [prefix{}]
+The maximum possible size. You should be able to fit several floors in here.
+
+[crafting{200,50,key=compactmachines:machine_5}]

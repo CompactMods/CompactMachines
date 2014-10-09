@@ -1,0 +1,4 @@
+[prefix{l}]3x3x3 [prefix{}]
+The smallest of the Compact Machines.
+
+[crafting{200,50,key=compactmachines:machine_0}]

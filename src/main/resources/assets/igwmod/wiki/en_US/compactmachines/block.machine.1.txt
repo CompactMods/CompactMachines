@@ -1,0 +1,4 @@
+[prefix{l}]5x5x5 [prefix{}]
+Little bigger than a Tiny Machine, but still already useful.
+
+[crafting{200,50,key=compactmachines:machine_1}]

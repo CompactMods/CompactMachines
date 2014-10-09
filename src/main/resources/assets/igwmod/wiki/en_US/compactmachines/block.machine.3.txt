@@ -1,0 +1,4 @@
+[prefix{l}]9x9x9 [prefix{}]
+Enough space for two floors.
+
+[crafting{200,50,key=compactmachines:machine_3}]

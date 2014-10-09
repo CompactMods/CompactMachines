@@ -1,0 +1,3 @@
+The World Resizing Cube is only used for crafting.
+Surround it with your desired material to create a [link{compactmachines/block.machine}]Compact Machine[link{}].
+[crafting{200,70,key=block/compactmachines:resizingcube}]

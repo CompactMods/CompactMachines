@@ -1,7 +1,6 @@
 package org.dave.CompactMachines.proxy;
 
 import org.dave.CompactMachines.reference.Names;
-
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
@@ -14,4 +13,7 @@ public abstract class CommonProxy implements IProxy
 		GameRegistry.registerTileEntity(TileEntityMachine.class, Names.Blocks.MACHINE);
 		GameRegistry.registerTileEntity(TileEntityInterface.class, Names.Blocks.INTERFACE);
 	}
+
+	@Override
+	public void registerHandlers() {}
 }

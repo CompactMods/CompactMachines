@@ -1,0 +1,23 @@
+A Compact Machine is a single block that itself contains a room in which you can build anything.
+
+[prefix{l}]Room size[prefix{}]
+This depends on the material you're crafting your Compact Machine with:
+* [link{compactmachines/block.machine.0}]Wood [link{}]
+* [link{compactmachines/block.machine.1}]Iron [link{}]
+* [link{compactmachines/block.machine.2}]Gold [link{}]
+* [link{compactmachines/block.machine.3}]Obsidian [link{}]
+* [link{compactmachines/block.machine.4}]Diamond [link{}]
+* [link{compactmachines/block.machine.5}]Nether Star[link{}]
+
+
+[prefix{l}]Upgraded Compact Machine[prefix{}]
+You can upgrade a Compact Machine by right-clicking it with a Nether Star. Upgraded machines do not lose their contents and can be placed down again. Not upgraded machines drop their content - you might lose stuff though, be warned.
+Once a Compact Machine is upgraded you can also use a [link{compactmachines/item.quantumentangler}]Quantum Entangler[link{}] to link it to another Compact Machine.
+
+
+[prefix{l}]Sides [prefix{}]
+Each side can be used to import or export items, fluids and Redstone Flux by whichever means you have. Each side can also act like a Hopper - you can configure this on the inside of the machine by interacting with the [link{compactmachines/block.interface}]Compact Machine Interfaces[link{}].
+
+
+[prefix{l}]GUI [prefix{}]
+[image{250, 360, igwmod:textures/compactmachines/gui_compactmachine.png}]

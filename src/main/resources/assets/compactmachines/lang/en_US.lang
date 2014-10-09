@@ -40,3 +40,7 @@ loading.cm:leave=Expanding to normal size. Ffffflllp.
 msg.message_machine_already_in_use.txt=Can not entangle: Machine is already in use.
 msg.message_machine_not_upgraded.txt=Can not entangle: Machine is not upgraded.
 msg.message_machine_invalid_size.txt=Can not entangle: Machine has not the right size.
+
+
+# IGW Mod Pages
+igwpage.basics=Introduction

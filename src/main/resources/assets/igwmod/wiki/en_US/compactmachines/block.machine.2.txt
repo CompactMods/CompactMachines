@@ -1,0 +1,4 @@
+[prefix{l}]7x7x7 [prefix{}]
+The Direwolf20 size.
+
+[crafting{200,50,key=compactmachines:machine_2}]

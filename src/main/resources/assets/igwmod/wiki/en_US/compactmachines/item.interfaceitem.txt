@@ -1,0 +1,6 @@
+The World Resizing Interface is only used for crafting.
+It is a core component for all useable items and blocks. Use it to craft:
+* [link{compactmachines/item.psd}]Personal Shrinking Devices[link{}]
+* [link{compactmachines/block.resizingcube}]World Resizing Cubes[link{}]
+* [link{compactmachines/item.quantumentangler}]Quantum Entanglers[link{}]
+[crafting{200,100,key=item/compactmachines:interfaceitem}]

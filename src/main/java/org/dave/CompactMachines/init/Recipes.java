@@ -11,12 +11,12 @@ public class Recipes
     public static void init()
     {
 
-    	GameRegistry.addRecipe(getMachineRecipe(0, "plankWood"));
-    	GameRegistry.addRecipe(getMachineRecipe(1, "ingotIron"));
-    	GameRegistry.addRecipe(getMachineRecipe(2, "ingotGold"));
-    	GameRegistry.addRecipe(getMachineRecipe(3, new ItemStack(Blocks.obsidian)));
-    	GameRegistry.addRecipe(getMachineRecipe(4, "gemDiamond"));
-    	GameRegistry.addRecipe(getMachineRecipe(5, new ItemStack(Items.nether_star)));
+    	GameRegistry.addRecipe(getMachineRecipe(0));
+    	GameRegistry.addRecipe(getMachineRecipe(1));
+    	GameRegistry.addRecipe(getMachineRecipe(2));
+    	GameRegistry.addRecipe(getMachineRecipe(3));
+    	GameRegistry.addRecipe(getMachineRecipe(4));
+    	GameRegistry.addRecipe(getMachineRecipe(5));
 
     	GameRegistry.addRecipe(new ShapedOreRecipe(
     			new ItemStack(ModItems.personalShrinkingDevice),
@@ -79,6 +79,20 @@ public class Recipes
     			'x', new ItemStack(ModItems.interfaceItem),
     			's', new ItemStack(Items.nether_star)
     	));
+    }
+
+    public static ShapedOreRecipe getMachineRecipe(int meta) {
+    	switch (meta) {
+			case 0: return getMachineRecipe(meta, "plankWood");
+			case 1: return getMachineRecipe(meta, "ingotIron");
+			case 2: return getMachineRecipe(meta, "ingotGold");
+			case 3: return getMachineRecipe(meta, new ItemStack(Blocks.obsidian));
+			case 4: return getMachineRecipe(meta, "gemDiamond");
+			case 5: return getMachineRecipe(meta, new ItemStack(Items.nether_star));
+			default: break;
+		}
+
+    	return null;
     }
 
     public static ShapedOreRecipe getMachineRecipe(int meta, ItemStack requiredItem) {
