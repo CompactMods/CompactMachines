@@ -187,11 +187,15 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void onChunkUnload() {
 		super.onChunkUnload();
 
+		if(!worldObj.isRemote) {
+			return;
+		}
+
 		if(ConfigurationHandler.chunkLoadingMode == 2) {
 			CompactMachines.instance.machineHandler.disableMachine(this);
 		}
 
-		if(Reference.OC_AVAILABLE && !worldObj.isRemote) {
+		if(Reference.OC_AVAILABLE) {
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				if(getStorageOC(dir.ordinal()) == null) {
 					continue;
