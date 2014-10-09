@@ -3,14 +3,14 @@
   "modid": "CompactMachines",
   "name": "Compact Machines",
   "description": "Allows you to fit many machines inside a single block",
-  "version": "1.7",
+  "version": "1.8",
   "mcversion": "1.7.10",
   "url": "https://github.com/thraaawn/CompactMachines",
   "updateUrl": "",
   "authorList": [
     "Davenonymous"
   ],
-  "credits": "Pahimar, ChickenBones and more",
+  "credits": "Pahimar, ChickenBones and many more",
   "logoFile": "",
   "screenshots": [
   ],
