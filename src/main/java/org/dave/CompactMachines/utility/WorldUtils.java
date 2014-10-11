@@ -1,7 +1,5 @@
 package org.dave.CompactMachines.utility;
 
-import org.dave.CompactMachines.init.ModBlocks;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +12,20 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.init.ModBlocks;
+
 public class WorldUtils {
+
+
+	public static AxisAlignedBB getBoundingBoxForCube(int coord, int size) {
+		AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(
+				coord * ConfigurationHandler.cubeDistance + 1, 40,  0,
+				coord * ConfigurationHandler.cubeDistance + size+1, 40+size+1, size+1
+		);
+
+		return bb;
+	}
 
 	public static List<ItemStack> harvestCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2) {
 		int minX = Math.min(posX1, posX2);

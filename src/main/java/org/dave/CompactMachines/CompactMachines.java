@@ -6,6 +6,7 @@ import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.dave.CompactMachines.handler.CMEventHandler;
+import org.dave.CompactMachines.handler.CMTickHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.GuiHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
@@ -70,9 +71,13 @@ public class CompactMachines {
 
 		CMEventHandler rte = new CMEventHandler();
 		MinecraftForge.EVENT_BUS.register(rte);
-		MinecraftForge.EVENT_BUS.register(new SharedStorageSaveHandler());
-
 		FMLCommonHandler.instance().bus().register(rte);
+
+		CMTickHandler cth = new CMTickHandler();
+		MinecraftForge.EVENT_BUS.register(cth);
+		FMLCommonHandler.instance().bus().register(cth);
+
+		MinecraftForge.EVENT_BUS.register(new SharedStorageSaveHandler());
     }
 
     @Mod.EventHandler

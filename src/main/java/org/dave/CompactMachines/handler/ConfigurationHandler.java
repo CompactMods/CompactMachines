@@ -22,6 +22,7 @@ public class ConfigurationHandler {
     public static int cooldownFluid;
     public static String upgradeItem;
     public static boolean allowEntanglement;
+    public static boolean keepPlayersInsideOfRooms;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -37,6 +38,7 @@ public class ConfigurationHandler {
         maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
         chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 2, "Chunk Loading Mode: 0 = Never, 1 = Always, 2 = When machine is loaded");
         allowEntanglement = configuration.getBoolean("allowEntanglement", "CompactMachines", true, "Allow entangling of Compact Machines. This is very powerful as it makes AE2s Quantum Network Bridges obsolete for example.");
+        keepPlayersInsideOfRooms = configuration.getBoolean("keepPlayersInsideOfRooms", "CompactMachines", true, "Prevent players from leaving a Compact Machines room boundaries.");
 
         cooldownRF = configuration.getInt("cooldownRF", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Redstone Flux, i.e. 20 => 10000 RF/s, 0 => 10000 RF/t");
         cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");

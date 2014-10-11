@@ -6,11 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -28,6 +31,7 @@ import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.PlayerUtils;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 import com.google.common.collect.ImmutableSetMultimap;
@@ -49,6 +53,41 @@ public class MachineHandler extends WorldSavedData {
 	public MachineHandler(World worldObj)	{
 		this("MachineHandler");
 		this.worldObj = worldObj;
+	}
+
+	public void tick() {
+		if(worldObj.getTotalWorldTime() % 10 == 0 && ConfigurationHandler.keepPlayersInsideOfRooms) {
+			for(int i = 0; i < worldObj.playerEntities.size(); i++) {
+				if(worldObj.playerEntities.get(i) instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer)worldObj.playerEntities.get(i);
+					if(player.capabilities.isCreativeMode && PlayerUtils.isPlayerOpped(player)) {
+						// Opped players in creative mode are actually allowed to leave the rooms
+						continue;
+					}
+					int lastCoord = PlayerUtils.getPlayerCoords(player);
+					if(lastCoord == -1) {
+						// We don't know where the player is atm :(
+						continue;
+					}
+					if(!roomSizes.containsKey(lastCoord)) {
+						// We sadly don't know the size of the room the player is in. Skipping.
+						// This automatically changes once any player enters the cube again.
+						continue;
+					}
+
+					int roomSize = Reference.getBoxSize(roomSizes.get(lastCoord));
+
+					AxisAlignedBB bb = WorldUtils.getBoundingBoxForCube(lastCoord, roomSize);
+					if (!bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
+						teleportPlayerToCoords((EntityPlayerMP)player, lastCoord, true);
+
+						// Add potion effects for 200 ticks
+						player.addPotionEffect(new PotionEffect(2, 200, 5, false));	// Slowness
+						player.addPotionEffect(new PotionEffect(9, 200, 5, false)); // Nausea
+					}
+				}
+			}
+		}
 	}
 
 	public void harvestMachine(TileEntityMachine machine) {
@@ -193,20 +232,15 @@ public class MachineHandler extends WorldSavedData {
 	}
 
 	public void setCoordSpawnpoint(EntityPlayerMP player) {
-		NBTTagCompound playerNBT = player.getEntityData();
-		if(!playerNBT.hasKey("coordHistory")) {
-			return;
-		}
+		int lastCoord = PlayerUtils.getPlayerCoords(player);
+		if(lastCoord > -1 && roomSizes.containsKey(lastCoord)) {
+			int roomSize = Reference.getBoxSize(roomSizes.get(lastCoord));
+			AxisAlignedBB bb = WorldUtils.getBoundingBoxForCube(lastCoord, roomSize);
 
-		NBTTagList coordHistory = playerNBT.getTagList("coordHistory", 10);
-		if(coordHistory.tagCount() == 0) {
-			return;
-		}
-
-		int lastCoord = coordHistory.getCompoundTagAt(coordHistory.tagCount()-1).getInteger("coord");
-		if(lastCoord > -1) {
-			//LogHelper.info("Saved spawnpoint for " + lastCoord + ": {" + player.posX +", "+ player.posY +", "+ player.posZ + "}");
-			spawnPoints.put(lastCoord, new double[]{player.posX, player.posY, player.posZ});
+			if (bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
+				//LogHelper.info("Saved spawnpoint for " + lastCoord + ": {" + player.posX +", "+ player.posY +", "+ player.posZ + "}");
+				spawnPoints.put(lastCoord, new double[]{player.posX, player.posY, player.posZ});
+			}
 		}
 
 		this.markDirty();
