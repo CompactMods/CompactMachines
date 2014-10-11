@@ -38,6 +38,7 @@ public class MachineHandler extends WorldSavedData {
 	private World worldObj;
 
 	HashMap<Integer, double[]> spawnPoints = new HashMap<Integer, double[]>();
+	HashMap<Integer, Integer> roomSizes = new HashMap<Integer, Integer>();
 
 	public MachineHandler(String s) {
 		super(s);
@@ -250,6 +251,14 @@ public class MachineHandler extends WorldSavedData {
 		double[] destination = new double[]{coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5};
 		if(spawnPoints.containsKey(coord)) {
 			destination = spawnPoints.get(coord);
+		} else if(roomSizes.containsKey(coord)) {
+			int size = Reference.getBoxSize(roomSizes.get(coord));
+
+			destination = new double[]{
+					coord * ConfigurationHandler.cubeDistance + 0.5 + size / 2,
+					42,
+					0.5 + size / 2
+			};
 		}
 
 		player.setPositionAndUpdate(destination[0],destination[1],destination[2]);
@@ -257,6 +266,10 @@ public class MachineHandler extends WorldSavedData {
 
 	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
 		int coords = this.createChunk(machine);
+
+		roomSizes.put(coords, machine.meta);
+		this.markDirty();
+
 		teleportPlayerToCoords(player, coords, false);
 	}
 
@@ -441,11 +454,36 @@ public class MachineHandler extends WorldSavedData {
 				spawnPoints.put(coords, positions);
 			}
 		}
+
+		if(nbt.hasKey("roomsizes")) {
+			roomSizes.clear();
+			NBTTagList tagList = nbt.getTagList("roomsizes", 10);
+			for (int i = 0; i < tagList.tagCount(); i++) {
+				NBTTagCompound tag = tagList.getCompoundTagAt(i);
+				int coords = tag.getInteger("coords");
+				int size = tag.getInteger("size");
+
+				roomSizes.put(coords, size);
+			}
+		}
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("nextMachineCoord", nextCoord);
+
+		NBTTagList sizeList = new NBTTagList();
+		Iterator sizeIterator = roomSizes.keySet().iterator();
+		while(sizeIterator.hasNext()) {
+			int coords = (Integer)sizeIterator.next();
+			int size = roomSizes.get(coords);
+
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setInteger("coords", coords);
+			tag.setInteger("size", size);
+			sizeList.appendTag(tag);
+		}
+		nbt.setTag("roomsizes", sizeList);
 
 		NBTTagList tagList = new NBTTagList();
 		Iterator sp = spawnPoints.keySet().iterator();
