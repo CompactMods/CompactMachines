@@ -42,6 +42,8 @@ import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 @Optional.InterfaceList({
@@ -184,10 +186,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	@Override
+	@SideOnly(Side.SERVER)
 	public void onChunkUnload() {
 		super.onChunkUnload();
 
-		if(!worldObj.isRemote) {
+		if(worldObj.isRemote) {
 			return;
 		}
 
