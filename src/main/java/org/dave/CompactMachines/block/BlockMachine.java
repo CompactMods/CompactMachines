@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
@@ -190,6 +191,10 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 					playerStack.stackSize--;
 				} else if(playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
+					if(!ConfigurationHandler.allowEntanglement) {
+						player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));
+						return true;
+					}
 					if(playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
 						// quantumEntangler already has a compound
 						if(tileEntityMachine.coords != -1) {
