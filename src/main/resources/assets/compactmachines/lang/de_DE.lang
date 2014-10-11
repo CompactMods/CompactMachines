@@ -33,3 +33,6 @@ loading.cm:leave=Wachse auf Normalgröße. Ffffflllp.
 msg.message_machine_already_in_use.txt=Verschränkung fehlgeschlagen: Maschine wird bereits verwendet.
 msg.message_machine_not_upgraded.txt=Verschränkung fehlgeschlagen: Maschine besitzt nicht das nötige Upgrade.
 msg.message_machine_invalid_size.txt=Verschränkung fehlgeschlagen: Maschine hat nicht die richtige Größe.
+msg.message_quantum_entanglement_disabled.txt=Quantenverschränkung ist deaktiviert, sorry!
+# IGW Mod Pages
+igwpage.basics=Einführung
