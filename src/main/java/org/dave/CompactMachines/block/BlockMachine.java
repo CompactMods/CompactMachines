@@ -221,6 +221,12 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 						nbt.setInteger("size", tileEntityMachine.meta);
 
 						playerStack.setTagCompound(nbt);
+					} else {
+						if(tileEntityMachine.coords == -1) {
+							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_in_use.txt"));
+						} else if(!tileEntityMachine.isUpgraded) {
+							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
+						}
 					}
 				} else {
 					player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);
