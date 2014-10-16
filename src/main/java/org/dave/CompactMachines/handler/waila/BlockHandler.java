@@ -1,5 +1,10 @@
 package org.dave.CompactMachines.handler.waila;
 
+import static mcp.mobius.waila.api.SpecialChars.RESET;
+import static mcp.mobius.waila.api.SpecialChars.WHITE;
+import static mcp.mobius.waila.api.SpecialChars.YELLOW;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -19,6 +24,7 @@ public class BlockHandler implements IWailaDataProvider {
 
 	public static void callbackRegister(IWailaRegistrar registrar) {
 		BlockHandler instance = new BlockHandler();
+		registrar.registerHeadProvider(instance, ModBlocks.machine.getClass());
 		registrar.registerBodyProvider(instance, ModBlocks.machine.getClass());
 		registrar.registerBodyProvider(instance, ModBlocks.interfaceblock.getClass());
 	}
@@ -30,17 +36,26 @@ public class BlockHandler implements IWailaDataProvider {
 
 	@Override
 	public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+		TileEntity te = accessor.getTileEntity();
+
+		if(te instanceof TileEntityMachine) {
+			TileEntityMachine machine = (TileEntityMachine) te;
+			if(machine.coords != -1) {
+				List<String> head = new ArrayList<String>();
+				head.add(WHITE + StatCollector.translateToLocal("tile.compactmachines:machine.name") + RESET + YELLOW + " #" + machine.coords + RESET);
+				return head;
+			}
+		}
+
 		return currenttip;
 	}
 
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 		TileEntity te = accessor.getTileEntity();
+
 		if(te instanceof TileEntityMachine) {
 			TileEntityMachine machine = (TileEntityMachine) te;
-			if(machine.coords != -1) {
-				currenttip.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + machine.coords);
-			}
 
 			String langStr = "tooltip.cm:machine.size.zero";
 			switch (machine.meta) {
@@ -53,13 +68,16 @@ public class BlockHandler implements IWailaDataProvider {
 				default: break;
 			}
 
-			currenttip.add(StatCollector.translateToLocal(langStr));
+			String direction = accessor.getSide().toString();
+			direction = direction.substring(0,1) + direction.substring(1).toLowerCase();
+			currenttip.add(YELLOW + "Side: " + RESET + direction);
+			currenttip.add(YELLOW + "Size: " + RESET + StatCollector.translateToLocal(langStr));
 		} else if(te instanceof TileEntityInterface) {
 			TileEntityInterface interf = (TileEntityInterface) te;
 			if(interf.side != -1) {
 				String direction = ForgeDirection.getOrientation(interf.side).toString();
 				direction = direction.substring(0,1) + direction.substring(1).toLowerCase();
-				currenttip.add(direction);
+				currenttip.add(YELLOW + "Side: " + RESET + direction);
 			}
 		}
 
