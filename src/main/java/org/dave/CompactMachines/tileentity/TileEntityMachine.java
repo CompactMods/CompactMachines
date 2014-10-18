@@ -120,7 +120,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		coords = nbtTagCompound.getInteger("coords");
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
-		//LogHelper.info("* isUpgraded: " + isUpgraded);
 
 		if(isUpgraded && worldObj != null && worldObj.isRemote) {
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
@@ -530,6 +529,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			}
 			//LogHelper.info("Dropping item stack with coords: " + coords);
 			stack.stackTagCompound.setInteger("coords", coords);
+		}
+
+		if(hasCustomName()) {
+			stack.setStackDisplayName(getCustomName());
 		}
 
 		EntityItem entityitem = new EntityItem(this.getWorldObj(), this.xCoord, this.yCoord + 0.5F, this.zCoord, stack);

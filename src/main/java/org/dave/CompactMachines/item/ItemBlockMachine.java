@@ -56,9 +56,11 @@ public class ItemBlockMachine extends ItemBlock {
         }
 
         if(itemStack.stackTagCompound != null) {
-        	int coords = itemStack.stackTagCompound.getInteger("coords");
-        	if(coords > -1) {
-        		list.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + coords);
+        	if(itemStack.stackTagCompound.hasKey("coords")) {
+	        	int coords = itemStack.stackTagCompound.getInteger("coords");
+	        	if(coords > -1) {
+	        		list.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + coords);
+	        	}
         	}
         }
     }

@@ -104,21 +104,29 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 			return;
 		}
 
-		int coords = stack.stackTagCompound.getInteger("coords");
-		//LogHelper.info("Placing block with coords: " + coords);
-		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
-			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
-			if(tileEntityMachine.coords == -1) {
+		if(!(world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			return;
+		}
+
+		TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
+		if(tileEntityMachine.coords != -1) {
+			// The machine already has data for some reason
+			return;
+		}
+
+		if(stack.stackTagCompound.hasKey("coords")) {
+			int coords = stack.stackTagCompound.getInteger("coords");
+			if(coords != -1) {
 				tileEntityMachine.coords = coords;
 				tileEntityMachine.isUpgraded = true;
-				tileEntityMachine.meta = stack.getItemDamage();
-				tileEntityMachine.markDirty();
-				if(!world.isRemote) {
-					CompactMachines.instance.machineHandler.forceChunkLoad(coords);
-				}
 			}
 		}
 
+		if(stack.hasDisplayName()) {
+			tileEntityMachine.setCustomName(stack.getDisplayName());
+		}
+
+		tileEntityMachine.markDirty();
 	}
 
 	@Override

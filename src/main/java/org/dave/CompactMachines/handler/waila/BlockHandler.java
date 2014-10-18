@@ -1,5 +1,6 @@
 package org.dave.CompactMachines.handler.waila;
 
+import static mcp.mobius.waila.api.SpecialChars.ITALIC;
 import static mcp.mobius.waila.api.SpecialChars.RESET;
 import static mcp.mobius.waila.api.SpecialChars.WHITE;
 import static mcp.mobius.waila.api.SpecialChars.YELLOW;
@@ -56,6 +57,10 @@ public class BlockHandler implements IWailaDataProvider {
 
 		if(te instanceof TileEntityMachine) {
 			TileEntityMachine machine = (TileEntityMachine) te;
+
+			if(machine.hasCustomName() && machine.coords != -1) {
+				currenttip.add(ITALIC + machine.getCustomName() + RESET);
+			}
 
 			String langStr = "tooltip.cm:machine.size.zero";
 			switch (machine.meta) {
