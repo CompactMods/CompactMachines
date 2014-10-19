@@ -11,6 +11,7 @@ import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.GuiHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler.SharedStorageSaveHandler;
+import org.dave.CompactMachines.handler.VillagerHandler;
 import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
 import org.dave.CompactMachines.handler.machinedimension.MachineWorldChunkloadCallback;
 import org.dave.CompactMachines.handler.machinedimension.WorldProviderMachines;
@@ -68,6 +69,9 @@ public class CompactMachines {
 
         ModItems.init();
         ModBlocks.init();
+        if(ConfigurationHandler.enableVillager) {
+        	VillagerHandler.instance().init();
+        }
 
 		CMEventHandler rte = new CMEventHandler();
 		MinecraftForge.EVENT_BUS.register(rte);
@@ -88,6 +92,9 @@ public class CompactMachines {
 
     	proxy.registerTileEntities();
     	proxy.registerHandlers();
+    	if(ConfigurationHandler.enableVillager) {
+    		proxy.registerVillagerSkins();
+    	}
 
         Recipes.init();
 

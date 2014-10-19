@@ -23,6 +23,8 @@ public class ConfigurationHandler {
     public static String upgradeItem;
     public static boolean allowEntanglement;
     public static boolean keepPlayersInsideOfRooms;
+    public static int villagerId;
+    public static boolean enableVillager;
 
     public static void init(File configFile) {
         // Create the configuration object from the given configuration file
@@ -35,6 +37,9 @@ public class ConfigurationHandler {
     private static void loadConfiguration() {
         dimensionId = configuration.getInt("dimension", "Internal", -1, Integer.MIN_VALUE, Integer.MAX_VALUE, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
         cubeDistance = configuration.getInt("cubeDistance", "Internal", 64, 16, Integer.MAX_VALUE, "The distance between the cubes in the machine dimension! Must be a multiple of 16, i.e. 16, 32, 48, 64... DO NOT CHANGE THIS.");
+        villagerId = configuration.getInt("villagerId", "Internal", 64, 16, Integer.MAX_VALUE, "ID used for the Compact Machines villager. Change if id should collide with another mod adding villagers.");
+
+
         maxDroppedStacks = configuration.getInt("maxDroppedStacks", "CompactMachines", 128, 0, Integer.MAX_VALUE, "Maximum number of items dropping when breaking a Compact Machine");
         chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 2, "Chunk Loading Mode: 0 = Never, 1 = Always, 2 = When machine is loaded");
         allowEntanglement = configuration.getBoolean("allowEntanglement", "CompactMachines", true, "Allow entangling of Compact Machines. This is very powerful as it makes AE2s Quantum Network Bridges obsolete for example.");
@@ -45,6 +50,8 @@ public class ConfigurationHandler {
         cooldownFluid = configuration.getInt("cooldownFluid", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Fluids, i.e. 0 => 1 Bucket per tick");
 
         upgradeItem = configuration.getString("upgradeItem", "CompactMachines", "nether_star", "The item used to upgrade compact machines. Format: modid:name_block_registered_with");
+
+        enableVillager = configuration.getBoolean("enableVillager", "CompactMachines", true, "Enables Villager spawns trading PSDs, QEs and World Resizing Cubes.");
 
         if (configuration.hasChanged()) {
             configuration.save();
