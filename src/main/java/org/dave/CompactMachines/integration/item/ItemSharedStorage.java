@@ -150,23 +150,10 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 					hoppingSide = hoppingSide.getOpposite();
 				}
 
-				int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(hoppingSide.ordinal());
-
-				for(int slot : accessibleSlotsFromSide) {
-					if(inv.isItemValidForSlot(slot, stack) && (inv.getStackInSlot(slot) == null || inv.getStackInSlot(slot).stackSize < inv.getInventoryStackLimit())) {
-						targetSlot = slot;
-						break;
-					}
-				}
+				targetSlot = ItemHelper.findBestSlotForSidedInventory(inv, stack, hoppingSide);
 			} else {
 				IInventory inv = (IInventory)tileEntity;
-
-				for(int i = 0; i < inv.getSizeInventory(); i++) {
-					if(inv.isItemValidForSlot(i, stack) && (inv.getStackInSlot(i) == null || inv.getStackInSlot(i).stackSize < inv.getInventoryStackLimit())) {
-						targetSlot = i;
-						break;
-					}
-				}
+				targetSlot = ItemHelper.findBestSlotForInventory(inv, stack);
 			}
 		}
 

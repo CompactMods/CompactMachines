@@ -3,17 +3,19 @@ package org.dave.CompactMachines.utility;
 import java.util.Comparator;
 import java.util.UUID;
 
-import org.dave.CompactMachines.reference.Messages;
-import org.dave.CompactMachines.reference.Names;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import org.dave.CompactMachines.reference.Messages;
+import org.dave.CompactMachines.reference.Names;
 
 public class ItemHelper
 {
@@ -22,6 +24,96 @@ public class ItemHelper
         ItemStack clonedItemStack = itemStack.copy();
         clonedItemStack.stackSize = stackSize;
         return clonedItemStack;
+    }
+
+	public static int findBestSlotForSidedInventory(ISidedInventory inv, ItemStack stack, ForgeDirection side) {
+		int result = -1;
+
+		// First search for a matching slot
+		result = findBestMatchingSlotForSidedInventory(inv, stack, side);
+		if (result != -1) {
+			return result;
+		}
+
+		// Then check for an empty slot
+		result = findFirstEmptySlotInSidedInventory(inv, side);
+		if (result != -1) {
+			return result;
+		}
+
+		// No slot found :(
+		return result;
+
+	}
+
+	public static int findBestSlotForInventory(IInventory inv, ItemStack stack) {
+		int result = -1;
+
+		// First search for a matching slot
+		result = findBestMatchingSlotForInventory(inv, stack);
+		if (result != -1) {
+			return result;
+		}
+
+		// Then check for an empty slot
+		result = findFirstEmptySlot(inv);
+		if (result != -1) {
+			return result;
+		}
+
+		// No slot found :(
+		return result;
+	}
+
+	private static int findBestMatchingSlotForSidedInventory(ISidedInventory inv, ItemStack stack, ForgeDirection side) {
+		int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(side.ordinal());
+
+		for (int slot : accessibleSlotsFromSide) {
+			ItemStack target = inv.getStackInSlot(slot);
+			if (target != null && target.getItem() == stack.getItem() && target.isStackable() && target.stackSize < target.getMaxStackSize()
+					&& target.stackSize < inv.getInventoryStackLimit() && (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage())
+					&& ItemStack.areItemStackTagsEqual(target, stack)) {
+				return slot;
+			}
+		}
+
+		return -1;
+	}
+
+	private static int findFirstEmptySlotInSidedInventory(ISidedInventory inv, ForgeDirection side) {
+		int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(side.ordinal());
+
+		for (int slot : accessibleSlotsFromSide) {
+			ItemStack target = inv.getStackInSlot(slot);
+			if (target == null) {
+				return slot;
+			}
+		}
+
+		return -1;
+	}
+
+    private static int findBestMatchingSlotForInventory(IInventory inv, ItemStack stack) {
+        for (int i = 0; i < inv.getSizeInventory(); ++i) {
+        	ItemStack target = inv.getStackInSlot(i);
+            if (target != null && target.getItem() == stack.getItem() && target.isStackable() && target.stackSize < target.getMaxStackSize() && target.stackSize < inv.getInventoryStackLimit() && (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage()) && ItemStack.areItemStackTagsEqual(target, stack))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static int findFirstEmptySlot(IInventory inv) {
+        for (int i = 0; i < inv.getSizeInventory(); ++i) {
+        	ItemStack target = inv.getStackInSlot(i);
+        	if(target == null) {
+        		return i;
+        	}
+        }
+
+        return -1;
     }
 
     public static Comparator<ItemStack> comparator = new Comparator<ItemStack>()
@@ -200,8 +292,9 @@ public class ItemHelper
             NBTTagCompound tag = tagList.getCompoundTagAt(i);
             int b = tag.getShort("Slot");
             items[b] = ItemStack.loadItemStackFromNBT(tag);
-            if (tag.hasKey("Quantity"))
-                items[b].stackSize = ((NBTBase.NBTPrimitive) tag.getTag("Quantity")).func_150287_d();
+            if (tag.hasKey("Quantity")) {
+				items[b].stackSize = ((NBTBase.NBTPrimitive) tag.getTag("Quantity")).func_150287_d();
+			}
         }
     }
 
@@ -223,10 +316,11 @@ public class ItemHelper
                 tag.setShort("Slot", (short) i);
                 items[i].writeToNBT(tag);
 
-                if (maxQuantity > Short.MAX_VALUE)
-                    tag.setInteger("Quantity", items[i].stackSize);
-                else if (maxQuantity > Byte.MAX_VALUE)
-                    tag.setShort("Quantity", (short) items[i].stackSize);
+                if (maxQuantity > Short.MAX_VALUE) {
+					tag.setInteger("Quantity", items[i].stackSize);
+				} else if (maxQuantity > Byte.MAX_VALUE) {
+					tag.setShort("Quantity", (short) items[i].stackSize);
+				}
 
                 tagList.appendTag(tag);
             }
@@ -247,8 +341,9 @@ public class ItemHelper
                 return item;
             }
             ItemStack itemstack1 = item.splitStack(size);
-            if (item.stackSize == 0)
-                inv.setInventorySlotContents(slot, null);
+            if (item.stackSize == 0) {
+				inv.setInventorySlotContents(slot, null);
+			}
 
             inv.markDirty();
             return itemstack1;
