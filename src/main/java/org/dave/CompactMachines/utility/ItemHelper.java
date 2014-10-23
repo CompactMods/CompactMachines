@@ -36,7 +36,7 @@ public class ItemHelper
 		}
 
 		// Then check for an empty slot
-		result = findFirstEmptySlotInSidedInventory(inv, side);
+		result = findFirstEmptySlotInSidedInventory(inv, stack, side);
 		if (result != -1) {
 			return result;
 		}
@@ -56,7 +56,7 @@ public class ItemHelper
 		}
 
 		// Then check for an empty slot
-		result = findFirstEmptySlot(inv);
+		result = findFirstEmptySlot(inv, stack);
 		if (result != -1) {
 			return result;
 		}
@@ -70,8 +70,9 @@ public class ItemHelper
 
 		for (int slot : accessibleSlotsFromSide) {
 			ItemStack target = inv.getStackInSlot(slot);
-			if (target != null && target.getItem() == stack.getItem() && target.isStackable() && target.stackSize < target.getMaxStackSize()
-					&& target.stackSize < inv.getInventoryStackLimit() && (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage())
+			if (target != null && target.getItem() == stack.getItem() && target.isStackable() && inv.isItemValidForSlot(slot, stack)
+					&& target.stackSize < target.getMaxStackSize() && target.stackSize < inv.getInventoryStackLimit()
+					&& inv.canInsertItem(slot, stack, side.ordinal()) && (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage())
 					&& ItemStack.areItemStackTagsEqual(target, stack)) {
 				return slot;
 			}
@@ -80,12 +81,12 @@ public class ItemHelper
 		return -1;
 	}
 
-	private static int findFirstEmptySlotInSidedInventory(ISidedInventory inv, ForgeDirection side) {
+	private static int findFirstEmptySlotInSidedInventory(ISidedInventory inv, ItemStack stack, ForgeDirection side) {
 		int[] accessibleSlotsFromSide = inv.getAccessibleSlotsFromSide(side.ordinal());
 
 		for (int slot : accessibleSlotsFromSide) {
 			ItemStack target = inv.getStackInSlot(slot);
-			if (target == null) {
+			if (target == null && inv.isItemValidForSlot(slot, stack) && inv.canInsertItem(slot, stack, side.ordinal())) {
 				return slot;
 			}
 		}
@@ -93,22 +94,23 @@ public class ItemHelper
 		return -1;
 	}
 
-    private static int findBestMatchingSlotForInventory(IInventory inv, ItemStack stack) {
-        for (int i = 0; i < inv.getSizeInventory(); ++i) {
-        	ItemStack target = inv.getStackInSlot(i);
-            if (target != null && target.getItem() == stack.getItem() && target.isStackable() && target.stackSize < target.getMaxStackSize() && target.stackSize < inv.getInventoryStackLimit() && (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage()) && ItemStack.areItemStackTagsEqual(target, stack))
-            {
-                return i;
-            }
-        }
+	private static int findBestMatchingSlotForInventory(IInventory inv, ItemStack stack) {
+		for (int i = 0; i < inv.getSizeInventory(); ++i) {
+			ItemStack target = inv.getStackInSlot(i);
+			if (target != null && target.getItem() == stack.getItem() && target.isStackable() && inv.isItemValidForSlot(i, stack)
+					&& target.stackSize < target.getMaxStackSize() && target.stackSize < inv.getInventoryStackLimit()
+					&& (!target.getHasSubtypes() || target.getItemDamage() == stack.getItemDamage()) && ItemStack.areItemStackTagsEqual(target, stack)) {
+				return i;
+			}
+		}
 
-        return -1;
+		return -1;
     }
 
-    private static int findFirstEmptySlot(IInventory inv) {
+    private static int findFirstEmptySlot(IInventory inv, ItemStack stack) {
         for (int i = 0; i < inv.getSizeInventory(); ++i) {
         	ItemStack target = inv.getStackInSlot(i);
-        	if(target == null) {
+        	if(target == null && inv.isItemValidForSlot(i, stack)) {
         		return i;
         	}
         }
