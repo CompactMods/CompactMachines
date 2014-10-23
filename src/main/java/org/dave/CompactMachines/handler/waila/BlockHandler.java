@@ -58,7 +58,7 @@ public class BlockHandler implements IWailaDataProvider {
 		if(te instanceof TileEntityMachine) {
 			TileEntityMachine machine = (TileEntityMachine) te;
 
-			if(machine.hasCustomName() && machine.coords != -1) {
+			if(machine.hasCustomName() && machine.coords != -1 && !machine.getCustomName().equals("Compact Machine")) {
 				currenttip.add(ITALIC + machine.getCustomName() + RESET);
 			}
 
