@@ -6,6 +6,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -58,6 +59,14 @@ public class BlockProtected extends BlockCM {
 		return false;
 	}
 
+	@Override
+	public boolean canDropFromExplosion(Explosion explosion) {
+		return false;
+	}
 
+	@Override
+	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
+		return;
+	}
 
 }
