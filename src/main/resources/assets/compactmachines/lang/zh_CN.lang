@@ -41,7 +41,7 @@ msg.message_machine_already_in_use.txt=无法建立量子纠缠:机器已经投�
 msg.message_machine_not_upgraded.txt=无法建立量子纠缠:机器尚未升级.
 msg.message_machine_invalid_size.txt=无法建立量子纠缠:机器大小并不合适.
 msg.message_quantum_entanglement_disabled.txt=量子纠缠已经停止!
-msg.message_machine_not_in_use.txt=无法建立量子纠缠: 机器从未被使用过.
+msg.message_machine_not_in_use.txt=无法建立量子纠缠:机器从未被使用过.
 
 # IGW Mod Pages
 igwpage.basics=引言
