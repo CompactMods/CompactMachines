@@ -30,6 +30,7 @@ import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.FluidUtils;
+import org.dave.CompactMachines.utility.WorldUtils;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -100,6 +101,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) {
 		super.onBlockPlacedBy(world, x, y, z, player, stack);
 
+		WorldUtils.updateNeighborAEGrids(world, x, y, z);
+
 		if(stack.stackTagCompound == null) {
 			return;
 		}
@@ -160,6 +163,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		}
 
 		super.breakBlock(world, x, y, z, block, meta);
+		WorldUtils.updateNeighborAEGrids(world, x, y, z);
 	}
 
 	@Override
