@@ -97,7 +97,7 @@ public class MachineHandler extends WorldSavedData {
 
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 
-		int size = Reference.getBoxSize(machine.blockMetadata);
+		int size = Reference.getBoxSize(machine.meta);
 		int height = size;
 
 		List<ItemStack> stacks = WorldUtils.harvestCube(machineWorld,
