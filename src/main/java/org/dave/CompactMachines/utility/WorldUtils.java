@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
@@ -62,7 +63,7 @@ public class WorldUtils {
 		return countUpdated;
 	}
 
-	public static List<ItemStack> harvestCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2) {
+	public static List<ItemStack> harvestCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2, EntityPlayer player) {
 		int minX = Math.min(posX1, posX2);
 		int minY = Math.min(posY1, posY2);
 		int minZ = Math.min(posZ1, posZ2);
@@ -83,6 +84,11 @@ public class WorldUtils {
 						for (ItemStack s : dropsList) {
 							returnList.add(s);
 						}
+					}
+
+					if(player != null) {
+						Block block = worldObj.getBlock(x, y, z);
+						block.removedByPlayer(worldObj, player, x, y, z, true);
 					}
 
 					worldObj.setBlockToAir(x, y, z);

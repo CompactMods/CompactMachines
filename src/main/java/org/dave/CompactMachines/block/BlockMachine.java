@@ -145,24 +145,38 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		}
 	}
 
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+		if(willHarvest && (world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			final TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
+
+			boolean result = super.removedByPlayer(world, player, x, y, z, willHarvest);
+
+			if(result) {
+				if(!tileEntityMachine.isUpgraded) {
+					CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine, player);
+				}
+
+				tileEntityMachine.dropAsItem();
+			}
+
+			return result;
+		}
+
+		return super.removedByPlayer(world, player, x, y, z, willHarvest);
+	};
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
 		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
 			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
 
-			if(!tileEntityMachine.isUpgraded) {
-				CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine);
-			}
-
 			// Disable chunk loading and remove it from the worlds NBT table
 			CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
 
-			tileEntityMachine.dropAsItem();
 			world.removeTileEntity(x,y,z);
 		}
 
-		super.breakBlock(world, x, y, z, block, meta);
 		WorldUtils.updateNeighborAEGrids(world, x, y, z);
 	}
 

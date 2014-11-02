@@ -520,7 +520,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	public void securityBreak() { }
 
-	public void dropAsItem() {
+	public ItemStack getItemDrop() {
 		ItemStack stack = new ItemStack(ModBlocks.machine, 1, meta);
 
 		if(isUpgraded) {
@@ -534,6 +534,12 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if(hasCustomName()) {
 			stack.setStackDisplayName(getCustomName());
 		}
+
+		return stack;
+	}
+
+	public void dropAsItem() {
+		ItemStack stack = getItemDrop();
 
 		EntityItem entityitem = new EntityItem(this.getWorldObj(), this.xCoord, this.yCoord + 0.5F, this.zCoord, stack);
 

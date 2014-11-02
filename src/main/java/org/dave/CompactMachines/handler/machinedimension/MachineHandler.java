@@ -90,7 +90,7 @@ public class MachineHandler extends WorldSavedData {
 		}
 	}
 
-	public void harvestMachine(TileEntityMachine machine) {
+	public void harvestMachine(TileEntityMachine machine, EntityPlayer player) {
 		if(machine.coords == -1) {
 			return;
 		}
@@ -103,7 +103,8 @@ public class MachineHandler extends WorldSavedData {
 		List<ItemStack> stacks = WorldUtils.harvestCube(machineWorld,
 				//   x           y           z
 				machine.coords * ConfigurationHandler.cubeDistance + 1   , 40 + 1     , 1,
-				machine.coords * ConfigurationHandler.cubeDistance + size-1, 40 + height-1, size-1
+				machine.coords * ConfigurationHandler.cubeDistance + size-1, 40 + height-1, size-1,
+				player
 		);
 
 		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
