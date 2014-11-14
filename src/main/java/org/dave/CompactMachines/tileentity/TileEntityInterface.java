@@ -23,6 +23,7 @@ import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
+import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
@@ -32,16 +33,24 @@ import org.dave.CompactMachines.reference.Reference;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
+import mekanism.api.gas.IGasHandler;
+import mekanism.api.gas.ITubeConnection;
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
+
 @Optional.InterfaceList({
 	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
 	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
-	@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers")
+	@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers"),
+	@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
+	@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IEnergyHandler, IGridHost, IBundledTile, Environment {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment {
 
 	public FluidSharedStorage storageLiquid;
+	public GasSharedStorage storageGas;
 	public ItemSharedStorage storage;
 	public FluxSharedStorage storageFlux;
 	public AESharedStorage storageAE;
@@ -157,6 +166,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			if(tileEntityInside != null) {
 				hopStorage(storage, tileEntityInside);
 				hopStorage(storageLiquid, tileEntityInside);
+				hopStorage(storageGas, tileEntityInside);
 				hopStorage(storageFlux, tileEntityInside);
 			}
 		}
@@ -194,6 +204,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public void reloadStorage() {
 		storage = (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
 		storageLiquid = (FluidSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
+		storageGas = (GasSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "gas");
 		storageFlux = (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
 
 		if(Reference.OC_AVAILABLE) {
@@ -286,6 +297,26 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
     public FluidStack getFluid() {
     	return storageLiquid.getFluid();
+    }
+
+    public int receiveGas(ForgeDirection from, GasStack stack) {
+        return storageGas.receiveGas(from, stack);
+    }
+
+    public GasStack drawGas(ForgeDirection from, int amount) {
+        return storageGas.drawGas(from, amount);
+    }
+
+    public boolean canReceiveGas(ForgeDirection from, Gas type) {
+        return storageGas.canReceiveGas(from, type);
+    }
+
+    public boolean canDrawGas(ForgeDirection from, Gas type) {
+        return storageGas.canDrawGas(from, type);
+    }
+
+    public boolean canTubeConnect(ForgeDirection side) {
+        return true;
     }
 
 	@Override
