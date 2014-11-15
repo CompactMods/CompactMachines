@@ -217,10 +217,12 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 					playerStack.stackSize--;
 				} else if(playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
+
 					if(!ConfigurationHandler.allowEntanglement) {
 						player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));
 						return true;
 					}
+
 					if(playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
 						// quantumEntangler already has a compound
 						if(tileEntityMachine.coords != -1) {
@@ -228,23 +230,32 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 						} else if(tileEntityMachine.isUpgraded == false) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
 						} else {
-							int size = playerStack.getTagCompound().getInteger("size");
+							NBTTagCompound stackNbt = playerStack.getTagCompound();
+
+							int size = stackNbt.getInteger("size");
 							if(size != tileEntityMachine.meta) {
 								player.addChatMessage(new ChatComponentTranslation("msg.message_machine_invalid_size.txt"));
 							} else {
-								int coords = playerStack.getTagCompound().getInteger("coords");
+								int coords = stackNbt.getInteger("coords");
 								tileEntityMachine.coords = coords;
+
+								if(stackNbt.hasKey("roomname")) {
+									tileEntityMachine.setCustomName(stackNbt.getString("roomname"));
+								}
+
 								tileEntityMachine.markDirty();
 
 								playerStack.stackSize--;
 							}
 						}
+
 					} else if(tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
 						// No "coords" tag yet and the machine is in use and upgraded
 						// --> Save the coords
 						NBTTagCompound nbt = new NBTTagCompound();
 						nbt.setInteger("coords", tileEntityMachine.coords);
 						nbt.setInteger("size", tileEntityMachine.meta);
+						nbt.setString("roomname", tileEntityMachine.getCustomName());
 
 						playerStack.setTagCompound(nbt);
 					} else {
