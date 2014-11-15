@@ -27,9 +27,54 @@ minecraft {
 }
 
 repositories {
+     maven {
+        name "CB Maven FS"
+        url  "http://chickenbones.net/maven/"
+    }
+
     maven {
-        name = "IGW"
-        url = "http://maven.k-4u.nl/"
+        name "IC2 Repo"
+        url "http://maven.ic2.player.to/"
+    }
+
+    maven {
+        name  "mvnmrtjp"
+        url "http://projectredwiki.com/maven"
+    }
+
+    maven {
+        name "IGW"
+        url "http://maven.k-4u.nl/"
+    }
+
+    maven {
+        name "Waila Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+
+    maven {
+        name "OpenComputers Repo"
+        url "http://maven.cil.li/"
+    }
+
+    maven {
+        name "dvs1"
+        url "http://dvs1.progwml6.com/files/maven/"
+    }
+
+    maven {
+        name "FireBall API Depot"
+        url "http://dl.tsr.me/artifactory/libs-release-local"
+    }
+
+    ivy {
+        name "ThermalExpansion"
+        artifactPattern "http://addons.cursecdn.com/files/2212/447/[module]-[revision].[ext]"
+    }
+
+    ivy {
+        name "CoFHCore"
+        artifactPattern "http://addons.cursecdn.com/files/2212/895/[module]-[revision].[ext]"
     }
 }
 
@@ -42,7 +87,15 @@ dependencies {
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // "Mekansim" is NOT a typo - it's spelt this way in the Fireball repo
+    compile "api:mekansim:1"
+
     compile "igwmod:IGW-Mod-1.7.10:1.1.1-17:userdev"
+    compile "mrtjp:ProjectRed:1.7.10-4.5.+:dev"
+    compile "appeng:appliedenergistics2:rv1-stable-1:dev"
+    compile "mcp.mobius.waila:Waila:1.5.5_1.7.10"
+    compile "li.cil.oc:OpenComputers:MC1.7.10-1.4.+:api"
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
