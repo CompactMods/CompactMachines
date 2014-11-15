@@ -46,3 +46,8 @@ msg.message_spawnpoint_set.txt=Spawnpoint set to your current location.
 
 # IGW Mod Pages
 igwpage.basics=Introduction
+
+# Commands
+command.cm.setCMCoords.usage=/setCMCoords <room-id>
+command.cm.setCMCoords.noblock=You need to hold a CM block in your hand to use this command.
+command.cm.setCMCoords.success=Successfully updated CM block.

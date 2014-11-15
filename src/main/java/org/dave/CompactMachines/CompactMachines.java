@@ -5,6 +5,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 
+import org.dave.CompactMachines.command.CommandSetCMCoords;
 import org.dave.CompactMachines.handler.CMEventHandler;
 import org.dave.CompactMachines.handler.CMTickHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
@@ -32,6 +33,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameData;
 
@@ -49,6 +51,11 @@ public class CompactMachines {
     @Mod.EventHandler
     public void preServerStart(FMLServerAboutToStartEvent event) {
         SharedStorageHandler.reloadStorageHandler(false);
+    }
+
+    @Mod.EventHandler
+    public void onServerStarting(FMLServerStartingEvent event) {
+    	event.registerServerCommand(new CommandSetCMCoords());
     }
 
     @Mod.EventHandler
