@@ -76,13 +76,13 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
     }
 
     private void hopToTileEntity(TileEntity te, boolean opposite) {
-        GasStack stack = tank.getGas().copy();
+        GasStack stack = tank.getGas();
 
         if (stack == null || stack.amount == 0) {
             return;
         }
 
-//        stack = stack.copy();
+        stack = stack.copy();
 
         if (cooldown == max_cooldown) {
             cooldown = 0;
