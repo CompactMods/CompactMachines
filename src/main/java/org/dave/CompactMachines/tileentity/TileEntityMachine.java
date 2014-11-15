@@ -448,7 +448,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
     }
 
     public int receiveGas(ForgeDirection from, GasStack stack) {
-        return getStorageGas(from.ordinal()).receiveGas(from, stack);
+        GasSharedStorage gss = getStorageGas(from.ordinal());
+
+        // XXX: Should we test with canReceiveGas first? Or do we rely on 
+        // suppliers to do this?
+        gss.autoHopToInside = true;
+
+        return gss.receiveGas(from, stack);
     }
 
     public GasStack drawGas(ForgeDirection from, int amount) {

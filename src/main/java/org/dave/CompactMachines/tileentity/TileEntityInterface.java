@@ -300,6 +300,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
     }
 
     public int receiveGas(ForgeDirection from, GasStack stack) {
+        storageGas.autoHopToInside = false;
+
         return storageGas.receiveGas(from, stack);
     }
 
