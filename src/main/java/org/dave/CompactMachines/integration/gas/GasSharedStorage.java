@@ -7,29 +7,29 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import mekanism.api.gas.Gas;
 import mekanism.api.gas.GasStack;
-import mekanism.api.gas.GasTank;
 import mekanism.api.gas.IGasHandler;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.gas.ExtendedGasTank;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
-// Need to implement ITubeConnection too, and on TileEntity{Machine,Interface}
-// probably needs to implement IGasTransmitter too
-// FIXME: Need to be calling setDirty in here somewhere
-// Create a private class extending gas tank, add onGasChanged method, call markDirty in it
-// Will need to also set autoHopToInside as approprate. See IRC logs
 public class GasSharedStorage extends AbstractSharedStorage implements IGasHandler {
     // I just pulled this number out of my arse, no idea if it's appropriate ^_^
     private static final int MAX_GAS = 1000;
-    private GasTank tank;
+    private ExtendedGasTank tank;
 
     public GasSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
         super(storageHandler, coord, side);
 
-        tank = new GasTank(MAX_GAS);
+        tank = new ExtendedGasTank(MAX_GAS) {
+            public void onGasChanged() {
+                setDirty();
+            }
+        };
+
 		max_cooldown = ConfigurationHandler.cooldownGas;
     }
 
