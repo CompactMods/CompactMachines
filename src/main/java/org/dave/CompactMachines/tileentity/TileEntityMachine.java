@@ -448,6 +448,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
     }
 
     public int receiveGas(ForgeDirection from, GasStack stack) {
+		if (coords == -1) {
+			return 0;
+		}
+
         GasSharedStorage gss = getStorageGas(from.ordinal());
 
         // XXX: Should we test with canReceiveGas first? Or do we rely on 
