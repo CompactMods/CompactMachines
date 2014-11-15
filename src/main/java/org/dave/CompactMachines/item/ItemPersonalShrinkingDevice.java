@@ -3,6 +3,7 @@ package org.dave.CompactMachines.item;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 
 import org.dave.CompactMachines.CompactMachines;
@@ -25,6 +26,7 @@ public class ItemPersonalShrinkingDevice extends ItemCM
     		if(world.provider.dimensionId == ConfigurationHandler.dimensionId) {
         		if(serverPlayer.isSneaking()) {
         			CompactMachines.instance.machineHandler.setCoordSpawnpoint(serverPlayer);
+        			serverPlayer.addChatMessage(new ChatComponentTranslation("msg.message_spawnpoint_set.txt"));
         			return itemStack;
         		}
 

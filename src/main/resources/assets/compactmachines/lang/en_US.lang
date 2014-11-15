@@ -42,6 +42,7 @@ msg.message_machine_not_upgraded.txt=Can not entangle: Machine is not upgraded.
 msg.message_machine_invalid_size.txt=Can not entangle: Machine has not the right size.
 msg.message_quantum_entanglement_disabled.txt=Quantum Entanglement is disabled, sorry!
 msg.message_machine_not_in_use.txt=Can not entangle: Machine has never been used before.
+msg.message_spawnpoint_set.txt=Spawnpoint set to your current location.
 
 # IGW Mod Pages
 igwpage.basics=Introduction

@@ -34,5 +34,6 @@ msg.message_machine_already_in_use.txt=Verschränkung fehlgeschlagen: Maschine w
 msg.message_machine_not_upgraded.txt=Verschränkung fehlgeschlagen: Maschine besitzt nicht das nötige Upgrade.
 msg.message_machine_invalid_size.txt=Verschränkung fehlgeschlagen: Maschine hat nicht die richtige Größe.
 msg.message_quantum_entanglement_disabled.txt=Quantenverschränkung ist deaktiviert, sorry!
+msg.message_spawnpoint_set.txt=Spawnpunkt auf aktuelle Position eingestellt.
 # IGW Mod Pages
 igwpage.basics=Einführung
