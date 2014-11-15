@@ -39,6 +39,10 @@ public class CMGridBlock implements IGridBlock {
 		return false;
 	}
 
+	public boolean isWorldAccessible() {
+		return isWorldAccessable();
+	}
+
 	@Override
 	public DimensionalCoord getLocation() {
 		return new DimensionalCoord(gridHost);
