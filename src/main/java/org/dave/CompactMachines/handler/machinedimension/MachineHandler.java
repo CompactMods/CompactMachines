@@ -282,7 +282,6 @@ public class MachineHandler extends WorldSavedData {
 			playerNBT.setTag("coordHistory", coordHistory);
 		}
 
-		// TODO: Set default spawn point to a better location
 		double[] destination = new double[]{coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5};
 		if(spawnPoints.containsKey(coord)) {
 			destination = spawnPoints.get(coord);
@@ -296,7 +295,55 @@ public class MachineHandler extends WorldSavedData {
 			};
 		}
 
+		// Check whether the spawn location is blocked
+		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
+		int dstX = (int) Math.floor(destination[0]);
+		int dstY = (int) Math.floor(destination[1]);
+		int dstZ = (int) Math.floor(destination[2]);
+
+		if(!machineWorld.isAirBlock(dstX, dstY, dstZ) || !machineWorld.isAirBlock(dstX, dstY+1, dstZ)) {
+			// If it is blocked, try to find a better position
+			if(findBestSpawnLocation(machineWorld, player, coord)) {
+				return;
+			}
+
+			// otherwise teleport to the default location... player will probably die though.
+		}
+
 		player.setPositionAndUpdate(destination[0],destination[1],destination[2]);
+	}
+
+	public boolean findBestSpawnLocation(WorldServer machineWorld, EntityPlayerMP player, int coord) {
+		int size = Reference.getBoxSize(roomSizes.get(coord));
+
+		int posX1 = coord * ConfigurationHandler.cubeDistance + 1;
+		int posY1 = 40 + 1;
+		int posZ1 = 1;
+
+		int posX2 = coord * ConfigurationHandler.cubeDistance + size-1;
+		int posY2 = 40 + size-1;
+		int posZ2 = size - 1;
+
+		int minX = Math.min(posX1, posX2);
+		int minY = Math.min(posY1, posY2);
+		int minZ = Math.min(posZ1, posZ2);
+
+		int maxX = Math.max(posX1, posX2);
+		int maxY = Math.max(posY1, posY2)-1;
+		int maxZ = Math.max(posZ1, posZ2);
+
+		for (int x = minX; x <= maxX; x++) {
+			for (int y = minY; y <= maxY; y++) {
+				for (int z = minZ; z <= maxZ; z++) {
+					if(machineWorld.isAirBlock(x, y, z) && machineWorld.isAirBlock(x, y+1, z)) {
+						player.setPositionAndUpdate(x+0.5, y+0.5, z+0.5);
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
