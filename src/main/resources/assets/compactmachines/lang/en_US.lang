@@ -12,6 +12,7 @@ item.compactmachines:quantumentangler.name=Quantum Entangler
 tile.compactmachines:machine.name=Compact Machine
 tile.compactmachines:interface.name=Compact Machine Interface
 tile.compactmachines:innerwall.name=Compact Machine Wall
+tile.compactmachines:innerwalldecor.name=Compact Machine Wall (Decorative)
 tile.compactmachines:resizingcube.name=World Resizing Cube
 
 # Container

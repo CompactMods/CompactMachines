@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.creativetab.CreativeTabCM;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
@@ -48,6 +49,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		this.setBlockTextureName(Names.Blocks.MACHINE);
 		this.setHardness(4.0F);
 		this.setResistance(6000000.0F);
+		this.setCreativeTab(CreativeTabCM.CM_TAB);
 	}
 
 	@SideOnly(Side.CLIENT)

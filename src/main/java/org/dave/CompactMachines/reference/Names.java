@@ -16,6 +16,7 @@ public final class Names
         public static final String MACHINE = "machine";
         public static final String INTERFACE = "interface";
         public static final String INNERWALL = "innerwall";
+        public static final String INNERWALL_DECORATIVE = "innerwalldecor";
         public static final String RESIZINGCUBE = "resizingcube";
     }
 

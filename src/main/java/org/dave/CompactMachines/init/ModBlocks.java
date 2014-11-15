@@ -2,6 +2,7 @@ package org.dave.CompactMachines.init;
 
 import org.dave.CompactMachines.block.BlockCM;
 import org.dave.CompactMachines.block.BlockInnerWall;
+import org.dave.CompactMachines.block.BlockInnerWallDecorative;
 import org.dave.CompactMachines.block.BlockInterface;
 import org.dave.CompactMachines.block.BlockMachine;
 import org.dave.CompactMachines.block.BlockResizingCube;
@@ -17,6 +18,7 @@ public class ModBlocks
     public static final BlockCM machine = new BlockMachine();
     public static final BlockCM interfaceblock = new BlockInterface();
     public static final BlockCM innerwall = new BlockInnerWall();
+    public static final BlockCM innerwallDecorative = new BlockInnerWallDecorative();
     public static final BlockCM resizingcube = new BlockResizingCube();
 
     public static void init()
@@ -24,6 +26,7 @@ public class ModBlocks
         GameRegistry.registerBlock(machine, ItemBlockMachine.class, Names.Blocks.MACHINE);
         GameRegistry.registerBlock(interfaceblock, Names.Blocks.INTERFACE);
         GameRegistry.registerBlock(innerwall, Names.Blocks.INNERWALL);
+        GameRegistry.registerBlock(innerwallDecorative, Names.Blocks.INNERWALL_DECORATIVE);
         GameRegistry.registerBlock(resizingcube, Names.Blocks.RESIZINGCUBE);
     }
 }
