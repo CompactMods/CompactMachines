@@ -60,6 +60,8 @@ public class CompactMachines {
         Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
         Reference.PR_AVAILABLE = Loader.isModLoaded("ProjRed|Transmission");
         Reference.OC_AVAILABLE = Loader.isModLoaded("OpenComputers");
+        // XXX: Other mods can provide gas support (like galacticraft), this
+        // flag is probably not sufficient.
         Reference.MEK_AVAILABLE = Loader.isModLoaded("Mekanism");
 
         // Insist on keeping an already registered dimension by registering in pre-init.

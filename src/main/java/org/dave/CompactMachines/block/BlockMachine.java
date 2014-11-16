@@ -198,6 +198,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 				TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 				ItemStack playerStack = player.getCurrentEquippedItem();
 
+                // XXX: Do we need to do anything for gases here?
+
 				// First check if the player is right clicking with a shrinker
 				if(playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
 					// Activated with a PSD
