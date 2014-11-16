@@ -60,6 +60,7 @@ public class CompactMachines {
         Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
         Reference.PR_AVAILABLE = Loader.isModLoaded("ProjRed|Transmission");
         Reference.OC_AVAILABLE = Loader.isModLoaded("OpenComputers");
+        Reference.MEK_AVAILABLE = Loader.isModLoaded("Mekanism");
 
         // Insist on keeping an already registered dimension by registering in pre-init.
         if(ConfigurationHandler.dimensionId != -1) {
