@@ -457,6 +457,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
         // XXX: Should we test with canReceiveGas first? Or do we rely on 
         // suppliers to do this?
         gss.autoHopToInside = true;
+        gss.setDirty();
 
         return gss.receiveGas(from, stack);
     }
