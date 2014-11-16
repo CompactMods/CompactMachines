@@ -64,6 +64,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int coords = -1;
 	public int[] _fluidid;
 	public int[] _fluidamount;
+	public int[] _gasid;
+	public int[] _gasamount;
 	public int[] _energy;
 	public int meta = 0;
 
@@ -80,6 +82,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		super();
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
+		_gasid = new int[6];
+		_gasamount = new int[6];
 		_energy = new int[6];
 
 
@@ -476,6 +480,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
     public boolean canTubeConnect(ForgeDirection side) {
         return true;
+    }
+
+    public GasStack getGasContents(ForgeDirection from) {
+        return getStorageGas(from.ordinal()).getGasContents();
     }
 
 	@Override

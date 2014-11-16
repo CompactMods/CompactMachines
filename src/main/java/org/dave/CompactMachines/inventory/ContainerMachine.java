@@ -7,6 +7,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
+import mekanism.api.gas.GasStack;
 
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import cpw.mods.fml.relauncher.Side;
@@ -84,6 +85,30 @@ public class ContainerMachine extends ContainerCM {
 			tileEntityMachine._energy[4] = value;
 		} else if(var == 65) {
 			tileEntityMachine._energy[5] = value;
+		} else if(var == 66) {
+            tileEntityMachine._gasamount[0] = value;
+		} else if(var == 67) {
+            tileEntityMachine._gasamount[1] = value;
+		} else if(var == 68) {
+            tileEntityMachine._gasamount[2] = value;
+		} else if(var == 69) {
+            tileEntityMachine._gasamount[3] = value;
+		} else if(var == 70) {
+            tileEntityMachine._gasamount[4] = value;
+		} else if(var == 71) {
+            tileEntityMachine._gasamount[5] = value;
+		} else if(var == 72) {
+            tileEntityMachine._gasid[0] = value;
+		} else if(var == 73) {
+            tileEntityMachine._gasid[1] = value;
+		} else if(var == 74) {
+            tileEntityMachine._gasid[2] = value;
+		} else if(var == 75) {
+            tileEntityMachine._gasid[3] = value;
+		} else if(var == 76) {
+            tileEntityMachine._gasid[4] = value;
+		} else if(var == 77) {
+            tileEntityMachine._gasid[5] = value;
 		}
 	}
 
@@ -109,6 +134,20 @@ public class ContainerMachine extends ContainerCM {
 					}
 				}
 			}
+
+            GasStack gasContents = tileEntityMachine.getGasContents(dir);
+
+            if (gasContents != null) {
+                for(int i = 0; i < crafters.size(); i++) {
+                    if (gasContents.amount > 0) {
+                        ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), gasContents.amount);
+                        ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), gasContents.getGas().getID());
+                    } else {
+                        ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), 0);
+                        ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), 0);
+                    }
+                }
+            }
 
 			for(int i = 0; i < crafters.size(); i++) {
 				((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 60 + dir.ordinal(), tileEntityMachine.getEnergyStored(dir));

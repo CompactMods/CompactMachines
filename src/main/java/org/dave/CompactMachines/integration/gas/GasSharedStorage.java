@@ -33,6 +33,17 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 		max_cooldown = ConfigurationHandler.cooldownGas;
     }
 
+    public GasStack getGasContents() {
+        GasStack gas = tank.getGas();
+
+        if (gas != null) {
+            // Return a copy so tank contents cannot be externally modified
+            gas = gas.copy();
+        }
+
+        return gas; 
+    }
+
     @Override
     public int receiveGas(ForgeDirection side, GasStack stack) {
         // XXX: Is always passing true for doReceive correct?

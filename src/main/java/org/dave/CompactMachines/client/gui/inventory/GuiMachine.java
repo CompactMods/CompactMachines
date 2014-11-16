@@ -14,6 +14,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import mekanism.api.gas.GasStack;
+import mekanism.api.gas.Gas;
+
 import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Textures;
@@ -56,6 +59,8 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
+            int gasId = tileEntityMachine._gasid[i];
+            int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 
 			if (isPointInRegion(xPositions[i] - 4, yPositions[i], 24, 16, mouseX, mouseY)) {
@@ -71,6 +76,13 @@ public class GuiMachine extends GuiContainer {
 					FluidStack fluid = new FluidStack(fluidId, fluidAmount);
 					lines.add(fluid.getLocalizedName() + ": " + fluidAmount);
 				}
+
+                if (gasAmount > 0) {
+                    GasStack gasStack = new GasStack(gasId, gasAmount);
+                    Gas gas = gasStack.getGas();
+
+                    lines.add(gas.getLocalizedName() + ": " + gasAmount);
+                }
 			}
 		}
 
@@ -160,10 +172,14 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
+			int gasId = tileEntityMachine._gasid[i];
+			int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 
 			FluidStack fluid = new FluidStack(fluidId, fluidAmount);
 			int tankSize = fluidAmount * tankHeight / 1000;
+
+            // TODO: CreateGasStack, get tank size, render
 			int energySize = energyAmount * tankHeight / 10000;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -205,6 +221,7 @@ public class GuiMachine extends GuiContainer {
 		}
 	}
 
+    // TODO: Rework to draw both fluid and gas tanks
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
 		if (stack == null) {
 			return;

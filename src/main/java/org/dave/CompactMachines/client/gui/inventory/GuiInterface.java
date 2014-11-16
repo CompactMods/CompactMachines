@@ -15,6 +15,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import mekanism.api.gas.GasStack;
+
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.network.MessageHoppingModeChange;
 import org.dave.CompactMachines.network.PacketHandler;
@@ -79,6 +81,17 @@ public class GuiInterface extends GuiContainer {
 			drawTank(76, 61, fluid, tankSize);
 		}
 
+        // TODO: This will need to be reworked. As was discussed on IRC, we'll
+        // most likely present gases and fluids as two segments within one bar
+        if (tileEntityInterface._gasamount > 0) {
+            GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+            int tankSize = tileEntityInterface._gasamount * tankHeight / 1000; 
+
+            //GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            //drawGasTank(96, 61, gas, tankSize);
+            // TODO
+        }
+
 		if (tileEntityInterface._energy > 0) {
 			int energySize = tileEntityInterface._energy * tankHeight / 10000;
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -116,6 +129,11 @@ public class GuiInterface extends GuiContainer {
 		}
 	}
 
+    // TODO
+    // gasStack.getGas().getIcon()
+//    protected void drawGasTank
+
+    // TODO: Rework to draw both fluids and gas
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
 		if (stack == null) {
 			return;

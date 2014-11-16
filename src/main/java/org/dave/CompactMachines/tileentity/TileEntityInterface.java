@@ -64,6 +64,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	public int _fluidid;
 	public int _fluidamount;
+	public int _gasid;
+	public int _gasamount;
 	public int _energy;
 	public int _hoppingmode;
 
@@ -71,6 +73,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		super();
 		_fluidid = -1;
 		_fluidamount = 0;
+		_gasid = -1;
+		_gasamount = 0;
 		_energy = 0;
 	}
 
@@ -316,6 +320,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
     public boolean canDrawGas(ForgeDirection from, Gas type) {
         return storageGas.canDrawGas(from, type);
+    }
+
+    public GasStack getGasContents() {
+        return storageGas.getGasContents(); 
     }
 
     public boolean canTubeConnect(ForgeDirection side) {
