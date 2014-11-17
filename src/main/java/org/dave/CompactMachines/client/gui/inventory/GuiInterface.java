@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
 import mekanism.api.gas.GasStack;
+import mekanism.api.gas.Gas;
 
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.network.MessageHoppingModeChange;
@@ -85,11 +86,11 @@ public class GuiInterface extends GuiContainer {
         // most likely present gases and fluids as two segments within one bar
         if (tileEntityInterface._gasamount > 0) {
             GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
-            int tankSize = tileEntityInterface._gasamount * tankHeight / 1000; 
+            int tankSize = tileEntityInterface._gasamount * tankHeight / 1024; 
 
-            //GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            //drawGasTank(96, 61, gas, tankSize);
-            // TODO
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            // XXX: Offset values?
+            drawGasTank(78, 61, gas, tankSize);
         }
 
 		if (tileEntityInterface._energy > 0) {
@@ -130,10 +131,44 @@ public class GuiInterface extends GuiContainer {
 	}
 
     // TODO
-    // gasStack.getGas().getIcon()
-//    protected void drawGasTank
+    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level) {
+		if (stack == null) {
+			return;
+		}
+		Gas gas = stack.getGas();
+		if (gas == null) {
+			return;
+		}
 
-    // TODO: Rework to draw both fluids and gas
+		IIcon icon = gas.getIcon();
+		if (icon == null) {
+            // TODO: Proper fallback?
+			icon = Blocks.flowing_lava.getIcon(0, 0);
+		}
+
+		int vertOffset = 0;
+
+		while (level > 0) {
+			int texHeight = 0;
+
+			if (level > 4) {
+				texHeight = 4;
+				level -= 4;
+			} else {
+				texHeight = level;
+				level = 0;
+			}
+
+			bindTexture(gas);
+
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
+			vertOffset = vertOffset + 4;
+		}
+    }
+
+    // TODO: Rework to draw both fluids and gas with one method, since the
+    // current two are mostly identical
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
 		if (stack == null) {
 			return;
@@ -163,7 +198,9 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(fluid);
 
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 4, texHeight);
+            // FIXME: width should only be 2 when a gas-enabling mod is
+            // installed. Should be 4 otherwise.
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}
@@ -171,6 +208,11 @@ public class GuiInterface extends GuiContainer {
 	protected void bindTexture(ResourceLocation tex) {
 		this.mc.renderEngine.bindTexture(tex);
 	}
+
+    protected void bindTexture(Gas gas) {
+        // FIXME: Not sure if this is correct...
+        this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+    }
 
 	protected void bindTexture(Fluid fluid) {
 		if (fluid.getSpriteNumber() == 0) {
@@ -218,6 +260,13 @@ public class GuiInterface extends GuiContainer {
 				FluidStack fluid = new FluidStack(tileEntityInterface._fluidid, tileEntityInterface._fluidamount);
 				lines.add(fluid.getLocalizedName() + ": " + tileEntityInterface._fluidamount);
 			}
+
+            if (tileEntityInterface._gasamount > 0) {
+                GasStack gasStack = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+                Gas gas = gasStack.getGas();
+
+                lines.add(gas.getLocalizedName() + ": " + tileEntityInterface._gasamount);
+            }
 
 		}
 

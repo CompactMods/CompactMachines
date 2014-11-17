@@ -17,8 +17,7 @@ import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 public class GasSharedStorage extends AbstractSharedStorage implements IGasHandler {
-    // I just pulled this number out of my arse, no idea if it's appropriate ^_^
-    private static final int MAX_GAS = 1000;
+    private static final int MAX_GAS = 1024;
     private ExtendedGasTank tank;
 
     public GasSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
