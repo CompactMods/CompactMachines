@@ -16,7 +16,7 @@ public class ExtendedGasTank extends GasTank {
     public GasStack draw(int amount, boolean doDraw) {
         GasStack drawn = super.draw(amount, doDraw);
 
-        if (doDraw && drawn.amount > 0) {
+        if (doDraw && drawn != null && drawn.amount > 0) {
             onGasChanged();
         }
         
