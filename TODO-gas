@@ -1,4 +1,2 @@
 * Auto mode doesn't work - Might not be easily fixable?
-* IGW docs
-* Make half-width fluid bar conditional - only half if gas stored
 * Cleanup duplicated code between fluids and gases

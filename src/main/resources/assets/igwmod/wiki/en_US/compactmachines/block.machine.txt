@@ -16,7 +16,7 @@ Once a Compact Machine is upgraded you can also use a [link{compactmachines/item
 
 
 [prefix{l}]Sides [prefix{}]
-Each side can be used to import or export items, fluids and Redstone Flux by whichever means you have. Each side can also act like a Hopper - you can configure this on the inside of the machine by interacting with the [link{compactmachines/block.interface}]Compact Machine Interfaces[link{}].
+Each side can be used to import or export items, fluids, gases and Redstone Flux by whichever means you have. Each side can also act like a Hopper - you can configure this on the inside of the machine by interacting with the [link{compactmachines/block.interface}]Compact Machine Interfaces[link{}].
 
 [prefix{l}]Names [prefix{}]
 You can give your Compact Machines specific names to make it easier to identify them after they are placed. Simply put a Compact Machine Block inside of an Anvil to rename it.

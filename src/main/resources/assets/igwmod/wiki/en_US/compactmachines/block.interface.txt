@@ -5,7 +5,7 @@
 These blocks are not craftable, but each room has one for each side.
 
 [prefix{l}]Buffers and connectivity[prefix{}]
-With this block you have access to some buffers shared with the outside world. You have access to 1 stack of items, 1 bucket of fluid and 10000 RF.
+With this block you have access to some buffers shared with the outside world. You have access to 1 stack of items, 1 bucket of fluid, 1024 units of gas, and 10000 RF.
 
 The block additionally acts as a cable for Applied Energistics 2, as a bundled cable for Project Red or as a OpenComputers cable. This allows you to share the same ME and OpenComputers network with the outside world.
 
