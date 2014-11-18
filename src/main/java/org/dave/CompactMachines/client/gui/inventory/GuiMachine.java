@@ -178,20 +178,18 @@ public class GuiMachine extends GuiContainer {
 
 			FluidStack fluid = new FluidStack(fluidId, fluidAmount);
 			int tankSize = fluidAmount * tankHeight / 1000;
-
-            // TODO: CreateGasStack, get tank size, render
-            GasStack gas = new GasStack(gasId, gasAmount);
-            int gasTankSize = gasAmount * tankHeight / 1024; 
-
-			int energySize = energyAmount * tankHeight / 10000;
-            
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize, gasAmount > 0);
 
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
-			drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
+            if (gasId != -1) {
+                GasStack gas = new GasStack(gasId, gasAmount);
+                int gasTankSize = gasAmount * tankHeight / 1024; 
+                int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
+            }
 
+			int energySize = energyAmount * tankHeight / 10000;
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
 		}

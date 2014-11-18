@@ -80,9 +80,12 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public TileEntityMachine() {
 		super();
+        // XXX: Should these be initialised to -1, as in TileEntityInterface
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
-		_gasid = new int[6];
+        // These need to be initialised to -1 to avoid a crash when no 
+        // gas-providing mod is installed
+		_gasid = new int[] { -1, -1, -1, -1, -1, -1 };
 		_gasamount = new int[6];
 		_energy = new int[6];
 
