@@ -186,10 +186,11 @@ public class GuiMachine extends GuiContainer {
 			int energySize = energyAmount * tankHeight / 10000;
             
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawGasTank(xPositions[i] - 4, yPositions[i] + 16, gas, gasTankSize);
+			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize, gasAmount > 0);
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize);
+            int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
+			drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
@@ -227,7 +228,7 @@ public class GuiMachine extends GuiContainer {
 		}
 	}
 
-    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level) {
+    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -257,14 +258,16 @@ public class GuiMachine extends GuiContainer {
 
 			bindTexture(gas);
 
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
     }
 
     // TODO: Rework to draw both fluids and gas with one method, since the
     // current two are mostly identical
-	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
+	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -293,9 +296,9 @@ public class GuiMachine extends GuiContainer {
 
 			bindTexture(fluid);
 
-            // FIXME: width should only be 2 when a gas-enabling mod is
-            // installed. Should be 4 otherwise.
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}

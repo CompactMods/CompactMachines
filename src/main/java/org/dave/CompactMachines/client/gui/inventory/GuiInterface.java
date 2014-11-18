@@ -79,18 +79,19 @@ public class GuiInterface extends GuiContainer {
 			int tankSize = tileEntityInterface._fluidamount * tankHeight / 1000;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(76, 61, fluid, tankSize);
+			drawTank(76, 61, fluid, tankSize, tileEntityInterface._gasamount > 0);
 		}
 
-        // TODO: This will need to be reworked. As was discussed on IRC, we'll
-        // most likely present gases and fluids as two segments within one bar
         if (tileEntityInterface._gasamount > 0) {
             GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
             int tankSize = tileEntityInterface._gasamount * tankHeight / 1024; 
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            // XXX: Offset values?
-            drawGasTank(78, 61, gas, tankSize);
+
+            boolean haveFluid = tileEntityInterface._fluidamount > 0;
+            int xOffset = haveFluid ? 78 : 76;
+
+            drawGasTank(xOffset, 61, gas, tankSize, haveFluid);
         }
 
 		if (tileEntityInterface._energy > 0) {
@@ -130,8 +131,7 @@ public class GuiInterface extends GuiContainer {
 		}
 	}
 
-    // TODO
-    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level) {
+    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -161,15 +161,16 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(gas);
 
+            int tankWidth = halfWidth ? 2 : 4;
 
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
     }
 
     // TODO: Rework to draw both fluids and gas with one method, since the
     // current two are mostly identical
-	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
+	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -198,9 +199,9 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(fluid);
 
-            // FIXME: width should only be 2 when a gas-enabling mod is
-            // installed. Should be 4 otherwise.
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 2, texHeight);
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}
