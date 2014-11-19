@@ -15,6 +15,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import mekanism.api.gas.GasStack;
+import mekanism.api.gas.Gas;
+
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.network.MessageHoppingModeChange;
 import org.dave.CompactMachines.network.PacketHandler;
@@ -76,8 +79,20 @@ public class GuiInterface extends GuiContainer {
 			int tankSize = tileEntityInterface._fluidamount * tankHeight / 1000;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(76, 61, fluid, tankSize);
+			drawTank(76, 61, fluid, tankSize, tileEntityInterface._gasamount > 0);
 		}
+
+        if (tileEntityInterface._gasamount > 0) {
+            GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+            int tankSize = tileEntityInterface._gasamount * tankHeight / 1024; 
+
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+            boolean haveFluid = tileEntityInterface._fluidamount > 0;
+            int xOffset = haveFluid ? 78 : 76;
+
+            drawGasTank(xOffset, 61, gas, tankSize, haveFluid);
+        }
 
 		if (tileEntityInterface._energy > 0) {
 			int energySize = tileEntityInterface._energy * tankHeight / 10000;
@@ -116,7 +131,46 @@ public class GuiInterface extends GuiContainer {
 		}
 	}
 
-	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
+    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
+		if (stack == null) {
+			return;
+		}
+		Gas gas = stack.getGas();
+		if (gas == null) {
+			return;
+		}
+
+		IIcon icon = gas.getIcon();
+		if (icon == null) {
+            // TODO: Proper fallback?
+			icon = Blocks.flowing_lava.getIcon(0, 0);
+		}
+
+		int vertOffset = 0;
+
+		while (level > 0) {
+			int texHeight = 0;
+
+			if (level > 4) {
+				texHeight = 4;
+				level -= 4;
+			} else {
+				texHeight = level;
+				level = 0;
+			}
+
+			bindTexture(gas);
+
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
+			vertOffset = vertOffset + 4;
+		}
+    }
+
+    // TODO: Rework to draw both fluids and gas with one method, since the
+    // current two are mostly identical
+	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -145,7 +199,9 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(fluid);
 
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 4, texHeight);
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}
@@ -153,6 +209,11 @@ public class GuiInterface extends GuiContainer {
 	protected void bindTexture(ResourceLocation tex) {
 		this.mc.renderEngine.bindTexture(tex);
 	}
+
+    protected void bindTexture(Gas gas) {
+        // FIXME: Not sure if this is correct...
+        this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+    }
 
 	protected void bindTexture(Fluid fluid) {
 		if (fluid.getSpriteNumber() == 0) {
@@ -200,6 +261,13 @@ public class GuiInterface extends GuiContainer {
 				FluidStack fluid = new FluidStack(tileEntityInterface._fluidid, tileEntityInterface._fluidamount);
 				lines.add(fluid.getLocalizedName() + ": " + tileEntityInterface._fluidamount);
 			}
+
+            if (tileEntityInterface._gasamount > 0) {
+                GasStack gasStack = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+                Gas gas = gasStack.getGas();
+
+                lines.add(gas.getLocalizedName() + ": " + tileEntityInterface._gasamount);
+            }
 
 		}
 

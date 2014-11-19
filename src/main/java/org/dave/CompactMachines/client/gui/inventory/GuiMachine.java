@@ -14,6 +14,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import mekanism.api.gas.GasStack;
+import mekanism.api.gas.Gas;
+
 import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Textures;
@@ -56,6 +59,8 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
+            int gasId = tileEntityMachine._gasid[i];
+            int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 
 			if (isPointInRegion(xPositions[i] - 4, yPositions[i], 24, 16, mouseX, mouseY)) {
@@ -71,6 +76,13 @@ public class GuiMachine extends GuiContainer {
 					FluidStack fluid = new FluidStack(fluidId, fluidAmount);
 					lines.add(fluid.getLocalizedName() + ": " + fluidAmount);
 				}
+
+                if (gasAmount > 0) {
+                    GasStack gasStack = new GasStack(gasId, gasAmount);
+                    Gas gas = gasStack.getGas();
+
+                    lines.add(gas.getLocalizedName() + ": " + gasAmount);
+                }
 			}
 		}
 
@@ -160,15 +172,24 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
+			int gasId = tileEntityMachine._gasid[i];
+			int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 
 			FluidStack fluid = new FluidStack(fluidId, fluidAmount);
 			int tankSize = fluidAmount * tankHeight / 1000;
-			int energySize = energyAmount * tankHeight / 10000;
-
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize);
+			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize, gasAmount > 0);
 
+            if (gasId != -1) {
+                GasStack gas = new GasStack(gasId, gasAmount);
+                int gasTankSize = gasAmount * tankHeight / 1024; 
+                int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
+            }
+
+			int energySize = energyAmount * tankHeight / 10000;
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
 		}
@@ -205,7 +226,46 @@ public class GuiMachine extends GuiContainer {
 		}
 	}
 
-	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level) {
+    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
+		if (stack == null) {
+			return;
+		}
+		Gas gas = stack.getGas();
+		if (gas == null) {
+			return;
+		}
+
+		IIcon icon = gas.getIcon();
+		if (icon == null) {
+            // TODO: Proper fallback?
+			icon = Blocks.flowing_lava.getIcon(0, 0);
+		}
+
+		int vertOffset = 0;
+
+		while (level > 0) {
+			int texHeight = 0;
+
+			if (level > 4) {
+				texHeight = 4;
+				level -= 4;
+			} else {
+				texHeight = level;
+				level = 0;
+			}
+
+			bindTexture(gas);
+
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
+			vertOffset = vertOffset + 4;
+		}
+    }
+
+    // TODO: Rework to draw both fluids and gas with one method, since the
+    // current two are mostly identical
+	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -234,7 +294,9 @@ public class GuiMachine extends GuiContainer {
 
 			bindTexture(fluid);
 
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, 4, texHeight);
+            int tankWidth = halfWidth ? 2 : 4;
+
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}
@@ -242,6 +304,11 @@ public class GuiMachine extends GuiContainer {
 	protected void bindTexture(ResourceLocation tex) {
 		this.mc.renderEngine.bindTexture(tex);
 	}
+
+    protected void bindTexture(Gas gas) {
+        // FIXME: Not sure if this is correct...
+        this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+    }
 
 	protected void bindTexture(Fluid fluid) {
 		if (fluid.getSpriteNumber() == 0) {

@@ -22,6 +22,7 @@ import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
+import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
@@ -54,6 +55,7 @@ public class SharedStorageHandler {
 
 		storageList.put("item", new ArrayList<AbstractSharedStorage>());
 		storageList.put("liquid", new ArrayList<AbstractSharedStorage>());
+		storageList.put("gas", new ArrayList<AbstractSharedStorage>());
 		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
 		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
 		storageList.put("bundledRedstone", new ArrayList<AbstractSharedStorage>());
@@ -90,6 +92,7 @@ public class SharedStorageHandler {
 	public void setHoppingModeForAll(int coord, int side, int hoppingMode) {
 		setHoppingMode(coord, side, "item", hoppingMode);
 		setHoppingMode(coord, side, "liquid", hoppingMode);
+		setHoppingMode(coord, side, "gas", hoppingMode);
 		setHoppingMode(coord, side, "flux", hoppingMode);
 		//setHoppingMode(coord, side, "appeng", hoppingMode);
 		//setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
@@ -106,6 +109,10 @@ public class SharedStorageHandler {
 
 			if(type.equals("liquid")) {
 				storage = new FluidSharedStorage(this, coord, side);
+			}
+
+			if(type.equals("gas")) {
+				storage = new GasSharedStorage(this, coord, side);
 			}
 
 			if(type.equals("flux")) {

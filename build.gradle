@@ -31,6 +31,12 @@ repositories {
         name = "IGW"
         url = "http://maven.k-4u.nl/"
     }
+
+
+    maven {
+        name "FireBall API Depot"
+        url "http://dl.tsr.me/artifactory/libs-release-local"
+    }
 }
 
 dependencies {
@@ -43,6 +49,9 @@ dependencies {
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
     compile "igwmod:IGW-Mod-1.7.10:1.1.1-17:userdev"
+
+    // "Mekansim" is NOT a typo - it's spelt this way in the Fireball repo
+    compile "api:mekansim:1"
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

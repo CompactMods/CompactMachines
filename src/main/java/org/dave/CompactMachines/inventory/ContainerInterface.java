@@ -7,6 +7,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
+import mekanism.api.gas.GasStack;
 
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 
@@ -51,7 +52,11 @@ public class ContainerInterface extends ContainerCM {
 			tileEntityInterface._energy = value;
 		} else if(var == 34) {
 			tileEntityInterface._hoppingmode = value;
-		}
+		} else if(var == 35) {
+            tileEntityInterface._gasamount = value;
+        } else if(var == 36) {
+            tileEntityInterface._gasid = value;
+        }
 	}
 
 	@Override
@@ -75,6 +80,20 @@ public class ContainerInterface extends ContainerCM {
 				}
 			}
 		}
+
+        GasStack gasContents = tileEntityInterface.getGasContents();
+
+        if (gasContents != null) {
+            for(int i = 0; i < crafters.size(); i++) {
+                if (gasContents.amount > 0) {
+                    ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 35, gasContents.amount);
+                    ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 36, gasContents.getGas().getID());
+                } else {
+                    ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 35, 0);
+                    ((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 36, 0); 
+                }
+            }
+        }
 
 		for(int i = 0; i < crafters.size(); i++) {
 			((ICrafting)crafters.get(i)).sendProgressBarUpdate(this, 33, tileEntityInterface.getEnergyStored(ForgeDirection.UNKNOWN));

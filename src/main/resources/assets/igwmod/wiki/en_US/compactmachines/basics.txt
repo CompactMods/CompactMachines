@@ -1,7 +1,7 @@
 [prefix{l}]Compact Machines[prefix{}]
 The mod adds one simple game mechanic: Small rooms inside of blocks. It basically gives you the ability to build your contraptions inside of a single block.
 
-Each side of a Compact Machine has a small buffer for items, fluids and Redstone Flux allowing the room to interact with the outside. Applied Energistics channels and ProjectRed bundled cables are supported as well. The room has the corresponding counterparts on its walls.
+Each side of a Compact Machine has a small buffer for items, fluids, gases and Redstone Flux allowing the room to interact with the outside. Applied Energistics channels and ProjectRed bundled cables are supported as well. The room has the corresponding counterparts on its walls.
 
 [prefix{l}]Your first room[prefix{}]
 * Craft yourself a [link{compactmachines/block.machine}]Compact Machine[link{}]

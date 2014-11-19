@@ -57,6 +57,8 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 
 			ItemStack playerStack = player.inventory.getCurrentItem();
 
+            // XXX: Do we need to do anything for gases here?
+
 			if(playerStack != null) {
 				if(FluidContainerRegistry.isEmptyContainer(playerStack)) {
 					FluidUtils.emptyTankIntoContainer(tank, player, tank.getFluid());
