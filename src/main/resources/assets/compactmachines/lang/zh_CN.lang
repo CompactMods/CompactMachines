@@ -12,6 +12,7 @@ item.compactmachines:quantumentangler.name=量子纠缠仪
 tile.compactmachines:machine.name=紧凑机器
 tile.compactmachines:interface.name=紧凑机器接口
 tile.compactmachines:innerwall.name=紧凑机器外壳
+tile.compactmachines:innerwalldecor.name=紧凑机器外壳 (装饰)
 tile.compactmachines:resizingcube.name=世界缩放方块
 
 # Container
@@ -33,8 +34,8 @@ tooltip.cm:machine.size.five=最大尺寸
 tooltip.cm:machine.coords=机器数量
 
 # Dimension Travelling
-loading.cm:enter=缩小到机器尺寸,我变变变变.
-loading.cm:leave=放大到普通高度,我变变变变.
+loading.cm:enter=缩小到机器尺寸,我变变变变
+loading.cm:leave=放大到普通高度,我变变变变
 
 # Chat messages
 msg.message_machine_already_in_use.txt=无法建立量子纠缠:机器已经投入使用.
@@ -42,6 +43,12 @@ msg.message_machine_not_upgraded.txt=无法建立量子纠缠:机器尚未升级
 msg.message_machine_invalid_size.txt=无法建立量子纠缠:机器大小并不合适.
 msg.message_quantum_entanglement_disabled.txt=量子纠缠已经停止!
 msg.message_machine_not_in_use.txt=无法建立量子纠缠:机器从未被使用过.
+msg.message_spawnpoint_set.txt=你所在的位置已被设为出生点.
 
 # IGW Mod Pages
-igwpage.basics=引言
+igwpage.basics=介绍
+
+# Commands
+command.cm.setCMCoords.usage=/setCMCoords <空间 id>
+command.cm.setCMCoords.noblock=你必须持有紧凑机器模组中的方块才能使用该指令.
+command.cm.setCMCoords.success=成功更新方块数据.
