@@ -12,15 +12,15 @@ public class PlayerUtils {
 
 	public static int getPlayerCoords(EntityPlayer player) {
 		NBTTagCompound playerNBT = player.getEntityData();
-		if(!playerNBT.hasKey("coordHistory")) {
+		if (!playerNBT.hasKey("coordHistory")) {
 			return -1;
 		}
 
 		NBTTagList coordHistory = playerNBT.getTagList("coordHistory", 10);
-		if(coordHistory.tagCount() == 0) {
+		if (coordHistory.tagCount() == 0) {
 			return -1;
 		}
 
-		return coordHistory.getCompoundTagAt(coordHistory.tagCount()-1).getInteger("coord");
+		return coordHistory.getCompoundTagAt(coordHistory.tagCount() - 1).getInteger("coord");
 	}
 }

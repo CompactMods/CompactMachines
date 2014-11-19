@@ -59,8 +59,8 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
-            int gasId = tileEntityMachine._gasid[i];
-            int gasAmount = tileEntityMachine._gasamount[i];
+			int gasId = tileEntityMachine._gasid[i];
+			int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 
 			if (isPointInRegion(xPositions[i] - 4, yPositions[i], 24, 16, mouseX, mouseY)) {
@@ -77,12 +77,12 @@ public class GuiMachine extends GuiContainer {
 					lines.add(fluid.getLocalizedName() + ": " + fluidAmount);
 				}
 
-                if (gasAmount > 0) {
-                    GasStack gasStack = new GasStack(gasId, gasAmount);
-                    Gas gas = gasStack.getGas();
+				if (gasAmount > 0) {
+					GasStack gasStack = new GasStack(gasId, gasAmount);
+					Gas gas = gasStack.getGas();
 
-                    lines.add(gas.getLocalizedName() + ": " + gasAmount);
-                }
+					lines.add(gas.getLocalizedName() + ": " + gasAmount);
+				}
 			}
 		}
 
@@ -181,13 +181,13 @@ public class GuiMachine extends GuiContainer {
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize, gasAmount > 0);
 
-            if (gasId != -1) {
-                GasStack gas = new GasStack(gasId, gasAmount);
-                int gasTankSize = gasAmount * tankHeight / 1024; 
-                int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
-            }
+			if (gasId != -1) {
+				GasStack gas = new GasStack(gasId, gasAmount);
+				int gasTankSize = gasAmount * tankHeight / 1024;
+				int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
+			}
 
 			int energySize = energyAmount * tankHeight / 10000;
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -226,7 +226,7 @@ public class GuiMachine extends GuiContainer {
 		}
 	}
 
-    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
+	protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -237,7 +237,7 @@ public class GuiMachine extends GuiContainer {
 
 		IIcon icon = gas.getIcon();
 		if (icon == null) {
-            // TODO: Proper fallback?
+			// TODO: Proper fallback?
 			icon = Blocks.flowing_lava.getIcon(0, 0);
 		}
 
@@ -256,15 +256,15 @@ public class GuiMachine extends GuiContainer {
 
 			bindTexture(gas);
 
-            int tankWidth = halfWidth ? 2 : 4;
+			int tankWidth = halfWidth ? 2 : 4;
 
 			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
-    }
+	}
 
-    // TODO: Rework to draw both fluids and gas with one method, since the
-    // current two are mostly identical
+	// TODO: Rework to draw both fluids and gas with one method, since the
+	// current two are mostly identical
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
@@ -294,7 +294,7 @@ public class GuiMachine extends GuiContainer {
 
 			bindTexture(fluid);
 
-            int tankWidth = halfWidth ? 2 : 4;
+			int tankWidth = halfWidth ? 2 : 4;
 
 			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
@@ -305,10 +305,10 @@ public class GuiMachine extends GuiContainer {
 		this.mc.renderEngine.bindTexture(tex);
 	}
 
-    protected void bindTexture(Gas gas) {
-        // FIXME: Not sure if this is correct...
-        this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-    }
+	protected void bindTexture(Gas gas) {
+		// FIXME: Not sure if this is correct...
+		this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+	}
 
 	protected void bindTexture(Fluid fluid) {
 		if (fluid.getSpriteNumber() == 0) {

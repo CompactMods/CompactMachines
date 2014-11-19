@@ -31,9 +31,8 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 
 	@Override
 	public boolean hasTileEntity(int metadata) {
-	    return true;
+		return true;
 	}
-
 
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
@@ -53,18 +52,18 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 				return false;
 			}
 
-			TileEntityInterface tank = (TileEntityInterface)world.getTileEntity(x, y, z);
+			TileEntityInterface tank = (TileEntityInterface) world.getTileEntity(x, y, z);
 
 			ItemStack playerStack = player.inventory.getCurrentItem();
 
-            // XXX: Do we need to do anything for gases here?
+			// XXX: Do we need to do anything for gases here?
 
-			if(playerStack != null) {
-				if(FluidContainerRegistry.isEmptyContainer(playerStack)) {
+			if (playerStack != null) {
+				if (FluidContainerRegistry.isEmptyContainer(playerStack)) {
 					FluidUtils.emptyTankIntoContainer(tank, player, tank.getFluid());
 					world.markBlockForUpdate(x, y, z);
 					return true;
-				} else if(FluidContainerRegistry.isFilledContainer(playerStack)) {
+				} else if (FluidContainerRegistry.isFilledContainer(playerStack)) {
 					FluidUtils.fillTankWithContainer(tank, player);
 					world.markBlockForUpdate(x, y, z);
 					return true;

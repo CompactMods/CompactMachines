@@ -15,28 +15,28 @@ import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.FluidUtils;
 
-public class FluidSharedStorage extends AbstractSharedStorage implements IFluidHandler  {
+public class FluidSharedStorage extends AbstractSharedStorage implements IFluidHandler {
 
-    private class Tank extends ExtendedFluidTank
-    {
-        public Tank(int capacity)
-        {
-            super(capacity);
-        }
+	private class Tank extends ExtendedFluidTank
+	{
+		public Tank(int capacity)
+		{
+			super(capacity);
+		}
 
-        @Override
-        public void onLiquidChanged()
-        {
-            setDirty();
-        }
-    }
+		@Override
+		public void onLiquidChanged()
+		{
+			setDirty();
+		}
+	}
 
-    private Tank tank;
+	private Tank	tank;
 
 	public FluidSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 
-		tank = new Tank(1*FluidUtils.B);
+		tank = new Tank(1 * FluidUtils.B);
 		max_cooldown = ConfigurationHandler.cooldownFluid;
 	}
 
@@ -57,7 +57,6 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 		loadHoppingModeFromCompound(tag);
 		tank.fromTag(tag.getCompoundTag("tank"));
 	}
-
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
@@ -86,7 +85,7 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		return new FluidTankInfo[]{tank.getInfo()};
+		return new FluidTankInfo[] { tank.getInfo() };
 	}
 
 	public FluidStack getFluid() {
@@ -95,28 +94,28 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	private void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		FluidStack stack = getFluid().copy();
-		if(stack == null || stack.amount == 0) {
+		if (stack == null || stack.amount == 0) {
 			return;
 		}
 
-		if(cooldown == max_cooldown) {
+		if (cooldown == max_cooldown) {
 			cooldown = 0;
 		} else {
 			cooldown++;
 			return;
 		}
 
-		if(tileEntity instanceof IFluidHandler) {
-			IFluidHandler fh = (IFluidHandler)tileEntity;
+		if (tileEntity instanceof IFluidHandler) {
+			IFluidHandler fh = (IFluidHandler) tileEntity;
 
 			ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
-			if(opposite) {
+			if (opposite) {
 				hoppingSide = hoppingSide.getOpposite();
 			}
 
-			if(fh.canFill(hoppingSide, stack.getFluid())) {
+			if (fh.canFill(hoppingSide, stack.getFluid())) {
 				int filled = fh.fill(hoppingSide, stack, false);
-				if(filled > 0) {
+				if (filled > 0) {
 					//LogHelper.info("Simulation filled: " + filled);
 					fh.fill(hoppingSide, stack, true);
 					this.drain(ForgeDirection.UNKNOWN, filled, true);

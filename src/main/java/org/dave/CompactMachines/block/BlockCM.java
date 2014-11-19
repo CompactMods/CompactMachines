@@ -11,31 +11,31 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockCM extends Block
 {
-    public BlockCM(Material material)
-    {
-        super(material);
-    }
+	public BlockCM(Material material)
+	{
+		super(material);
+	}
 
-    public BlockCM()
-    {
-        this(Material.rock);
-    }
+	public BlockCM()
+	{
+		this(Material.rock);
+	}
 
-    @Override
-    public String getUnlocalizedName()
-    {
-        return String.format("tile.%s:%s", Reference.MOD_ID.toLowerCase(), getUnwrappedUnlocalizedName(super.getUnlocalizedName()));
-    }
+	@Override
+	public String getUnlocalizedName()
+	{
+		return String.format("tile.%s:%s", Reference.MOD_ID.toLowerCase(), getUnwrappedUnlocalizedName(super.getUnlocalizedName()));
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister iconRegister)
-    {
-        blockIcon = iconRegister.registerIcon(String.format("%s:%s", Reference.MOD_ID.toLowerCase(), this.getTextureName()));
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerBlockIcons(IIconRegister iconRegister)
+	{
+		blockIcon = iconRegister.registerIcon(String.format("%s:%s", Reference.MOD_ID.toLowerCase(), this.getTextureName()));
+	}
 
-    protected String getUnwrappedUnlocalizedName(String unlocalizedName)
-    {
-        return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
-    }
+	protected String getUnwrappedUnlocalizedName(String unlocalizedName)
+	{
+		return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
+	}
 }

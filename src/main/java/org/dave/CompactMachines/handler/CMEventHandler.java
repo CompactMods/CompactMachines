@@ -9,7 +9,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class CMEventHandler {
 
-
 	@SubscribeEvent
 	public void loadWorld(WorldEvent.Load event)
 	{
@@ -17,7 +16,7 @@ public class CMEventHandler {
 		{
 			LogHelper.info("Loading machine world!");
 			MachineHandler machineHandler = (MachineHandler) event.world.mapStorage.loadData(MachineHandler.class, "MachineHandler");
-			if (machineHandler == null)	{
+			if (machineHandler == null) {
 				machineHandler = new MachineHandler(event.world);
 				machineHandler.markDirty();
 			}
@@ -28,6 +27,5 @@ public class CMEventHandler {
 			CompactMachines.instance.machineHandler = machineHandler;
 		}
 	}
-
 
 }

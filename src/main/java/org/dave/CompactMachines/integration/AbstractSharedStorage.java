@@ -7,20 +7,19 @@ import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
-
 public abstract class AbstractSharedStorage {
-	public final SharedStorageHandler storageHandler;
+	public final SharedStorageHandler	storageHandler;
 
-	public int coord;
-	public int side;
-	public int hoppingMode;		// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto
-	public boolean autoHopToInside;
+	public int							coord;
+	public int							side;
+	public int							hoppingMode;			// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto
+	public boolean						autoHopToInside;
 
-	public int max_cooldown = 20;
-	public int cooldown = 0;
+	public int							max_cooldown	= 20;
+	public int							cooldown		= 0;
 
-	private boolean dirty;
-	private int changeCount;
+	private boolean						dirty;
+	private int							changeCount;
 
 	public AbstractSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		this.storageHandler = storageHandler;
@@ -31,11 +30,11 @@ public abstract class AbstractSharedStorage {
 	}
 
 	public void setDirty() {
-		if(storageHandler.client) {
+		if (storageHandler.client) {
 			return;
 		}
 
-		if(!dirty) {
+		if (!dirty) {
 			dirty = true;
 			storageHandler.requestSave(this);
 		}

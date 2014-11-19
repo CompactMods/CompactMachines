@@ -13,15 +13,14 @@ import appeng.api.AEApi;
 import appeng.api.exceptions.FailedConnection;
 import appeng.api.networking.IGridNode;
 
-
 public class AESharedStorage extends AbstractSharedStorage {
-	public int coord;
-	public int side;
+	public int			coord;
+	public int			side;
 
-	public IGridNode machineNode;
-	public IGridNode interfaceNode;
+	public IGridNode	machineNode;
+	public IGridNode	interfaceNode;
 
-	boolean isConnected = false;
+	boolean				isConnected	= false;
 
 	public AESharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -36,15 +35,15 @@ public class AESharedStorage extends AbstractSharedStorage {
 	}
 
 	public void connectNodes() {
-		if(interfaceNode == null || machineNode == null) {
+		if (interfaceNode == null || machineNode == null) {
 			return;
 		}
 
-		if(isConnected) {
+		if (isConnected) {
 			return;
 		}
 
-		if(!Reference.AE_AVAILABLE) {
+		if (!Reference.AE_AVAILABLE) {
 			return;
 		}
 
@@ -57,7 +56,7 @@ public class AESharedStorage extends AbstractSharedStorage {
 	}
 
 	public IGridNode getInterfaceNode(CMGridBlock gridBlock) {
-		if(interfaceNode == null) {
+		if (interfaceNode == null) {
 			interfaceNode = AEApi.instance().createGridNode(gridBlock);
 			interfaceNode.updateState();
 		}
@@ -66,7 +65,7 @@ public class AESharedStorage extends AbstractSharedStorage {
 	}
 
 	public IGridNode getMachineNode(CMGridBlock gridBlock) {
-		if(machineNode == null) {
+		if (machineNode == null) {
 			machineNode = AEApi.instance().createGridNode(gridBlock);
 			machineNode.updateState();
 		}

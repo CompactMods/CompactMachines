@@ -26,7 +26,6 @@ public class IGWHandler {
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.innerwall, "compactmachines/basics");
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.resizingcube, "compactmachines/block.resizingcube");
 
-
 		WikiRegistry.registerWikiTab(new IGWTab());
 
 		MinecraftForge.EVENT_BUS.register(new IGWHandler());
@@ -36,13 +35,13 @@ public class IGWHandler {
 
 	@SubscribeEvent
 	public void onIGWRecipe(CraftingRetrievalEvent event) {
-		if(event.key.startsWith(Reference.MOD_ID.toLowerCase() + ":machine_")) {
+		if (event.key.startsWith(Reference.MOD_ID.toLowerCase() + ":machine_")) {
 			int meta = -1;
 			try {
-				meta = Integer.parseInt(event.key.substring( (Reference.MOD_ID.toLowerCase() + ":machine_").length() ));
+				meta = Integer.parseInt(event.key.substring((Reference.MOD_ID.toLowerCase() + ":machine_").length()));
 			} catch (Exception e) {}
 
-			if(meta > -1 && meta < 6) {
+			if (meta > -1 && meta < 6) {
 				event.recipe = Recipes.getMachineRecipe(meta);
 			}
 		}

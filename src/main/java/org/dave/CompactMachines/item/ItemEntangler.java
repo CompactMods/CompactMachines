@@ -15,29 +15,29 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemEntangler extends ItemCM {
-	private static IIcon itemIconEntangled;
+	private static IIcon	itemIconEntangled;
 
 	public ItemEntangler() {
 		super();
 		this.setUnlocalizedName(Names.Items.QUANTUMENTANGLER);
 	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister iconRegister) {
-    	//super.registerIcons(iconRegister);
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerIcons(IIconRegister iconRegister) {
+		//super.registerIcons(iconRegister);
 
-    	itemIcon = iconRegister.registerIcon(this.getUnlocalizedName().substring(this.getUnlocalizedName().indexOf(".") + 1));
-        itemIconEntangled = iconRegister.registerIcon(this.getUnlocalizedName().substring(this.getUnlocalizedName().indexOf(".") + 1) + "_entangled");
-    }
+		itemIcon = iconRegister.registerIcon(this.getUnlocalizedName().substring(this.getUnlocalizedName().indexOf(".") + 1));
+		itemIconEntangled = iconRegister.registerIcon(this.getUnlocalizedName().substring(this.getUnlocalizedName().indexOf(".") + 1) + "_entangled");
+	}
 
-    @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean flag) {
-    	super.addInformation(itemStack, entityPlayer, list, flag);
+	@Override
+	public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean flag) {
+		super.addInformation(itemStack, entityPlayer, list, flag);
 
-		if(itemStack.hasTagCompound()) {
+		if (itemStack.hasTagCompound()) {
 			NBTTagCompound nbt = itemStack.getTagCompound();
-			if(nbt.hasKey("size")) {
+			if (nbt.hasKey("size")) {
 				int size = nbt.getInteger("size");
 				switch (size) {
 					case 0:
@@ -63,19 +63,19 @@ public class ItemEntangler extends ItemCM {
 				}
 			}
 
-        	int coords = nbt.getInteger("coords");
-        	if(coords > -1) {
-        		list.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + coords);
-        	}
+			int coords = nbt.getInteger("coords");
+			if (coords > -1) {
+				list.add(StatCollector.translateToLocal("tooltip.cm:machine.coords") + ": " + coords);
+			}
 		}
 
-    }
+	}
 
-    @Override
-    public IIcon getIconIndex(ItemStack stack) {
-		if(stack.hasTagCompound()) {
+	@Override
+	public IIcon getIconIndex(ItemStack stack) {
+		if (stack.hasTagCompound()) {
 			NBTTagCompound nbt = stack.getTagCompound();
-			if(nbt.hasKey("coords")) {
+			if (nbt.hasKey("coords")) {
 				return itemIconEntangled;
 			}
 		}
@@ -84,9 +84,9 @@ public class ItemEntangler extends ItemCM {
 
 	@Override
 	public IIcon getIcon(ItemStack stack, int pass) {
-		if(stack.hasTagCompound()) {
+		if (stack.hasTagCompound()) {
 			NBTTagCompound nbt = stack.getTagCompound();
-			if(nbt.hasKey("coords")) {
+			if (nbt.hasKey("coords")) {
 				return itemIconEntangled;
 			}
 		}

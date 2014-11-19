@@ -18,7 +18,7 @@ import cpw.mods.fml.common.Optional;
 
 @Optional.Interface(iface = "appeng.api.networking.IGridBlock", modid = "appliedenergistics2")
 public class CMGridBlock implements IGridBlock {
-	protected TileEntityCM gridHost;
+	protected TileEntityCM	gridHost;
 
 	public CMGridBlock(TileEntityCM gridHost) {
 		this.gridHost = gridHost;
@@ -54,12 +54,10 @@ public class CMGridBlock implements IGridBlock {
 	}
 
 	@Override
-	public void onGridNotification(GridNotification notification) {
-	}
+	public void onGridNotification(GridNotification notification) {}
 
 	@Override
-	public void setNetworkStatus(IGrid grid, int channelsInUse) {
-	}
+	public void setNetworkStatus(IGrid grid, int channelsInUse) {}
 
 	@Override
 	public EnumSet<ForgeDirection> getConnectableSides() {
@@ -67,7 +65,7 @@ public class CMGridBlock implements IGridBlock {
 				ForgeDirection.DOWN, ForgeDirection.UP,
 				ForgeDirection.WEST, ForgeDirection.EAST,
 				ForgeDirection.NORTH, ForgeDirection.SOUTH
-		);
+				);
 	}
 
 	@Override
@@ -76,8 +74,7 @@ public class CMGridBlock implements IGridBlock {
 	}
 
 	@Override
-	public void gridChanged() {
-	}
+	public void gridChanged() {}
 
 	@Override
 	public ItemStack getMachineRepresentation() {

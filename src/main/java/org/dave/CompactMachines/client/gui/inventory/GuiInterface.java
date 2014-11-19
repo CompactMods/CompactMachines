@@ -82,17 +82,17 @@ public class GuiInterface extends GuiContainer {
 			drawTank(76, 61, fluid, tankSize, tileEntityInterface._gasamount > 0);
 		}
 
-        if (tileEntityInterface._gasamount > 0) {
-            GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
-            int tankSize = tileEntityInterface._gasamount * tankHeight / 1024; 
+		if (tileEntityInterface._gasamount > 0) {
+			GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+			int tankSize = tileEntityInterface._gasamount * tankHeight / 1024;
 
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-            boolean haveFluid = tileEntityInterface._fluidamount > 0;
-            int xOffset = haveFluid ? 78 : 76;
+			boolean haveFluid = tileEntityInterface._fluidamount > 0;
+			int xOffset = haveFluid ? 78 : 76;
 
-            drawGasTank(xOffset, 61, gas, tankSize, haveFluid);
-        }
+			drawGasTank(xOffset, 61, gas, tankSize, haveFluid);
+		}
 
 		if (tileEntityInterface._energy > 0) {
 			int energySize = tileEntityInterface._energy * tankHeight / 10000;
@@ -131,7 +131,7 @@ public class GuiInterface extends GuiContainer {
 		}
 	}
 
-    protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
+	protected void drawGasTank(int xOffset, int yOffset, GasStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
 		}
@@ -142,7 +142,7 @@ public class GuiInterface extends GuiContainer {
 
 		IIcon icon = gas.getIcon();
 		if (icon == null) {
-            // TODO: Proper fallback?
+			// TODO: Proper fallback?
 			icon = Blocks.flowing_lava.getIcon(0, 0);
 		}
 
@@ -161,15 +161,15 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(gas);
 
-            int tankWidth = halfWidth ? 2 : 4;
+			int tankWidth = halfWidth ? 2 : 4;
 
 			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
 		}
-    }
+	}
 
-    // TODO: Rework to draw both fluids and gas with one method, since the
-    // current two are mostly identical
+	// TODO: Rework to draw both fluids and gas with one method, since the
+	// current two are mostly identical
 	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
 		if (stack == null) {
 			return;
@@ -199,7 +199,7 @@ public class GuiInterface extends GuiContainer {
 
 			bindTexture(fluid);
 
-            int tankWidth = halfWidth ? 2 : 4;
+			int tankWidth = halfWidth ? 2 : 4;
 
 			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
 			vertOffset = vertOffset + 4;
@@ -210,10 +210,10 @@ public class GuiInterface extends GuiContainer {
 		this.mc.renderEngine.bindTexture(tex);
 	}
 
-    protected void bindTexture(Gas gas) {
-        // FIXME: Not sure if this is correct...
-        this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-    }
+	protected void bindTexture(Gas gas) {
+		// FIXME: Not sure if this is correct...
+		this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+	}
 
 	protected void bindTexture(Fluid fluid) {
 		if (fluid.getSpriteNumber() == 0) {
@@ -262,12 +262,12 @@ public class GuiInterface extends GuiContainer {
 				lines.add(fluid.getLocalizedName() + ": " + tileEntityInterface._fluidamount);
 			}
 
-            if (tileEntityInterface._gasamount > 0) {
-                GasStack gasStack = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
-                Gas gas = gasStack.getGas();
+			if (tileEntityInterface._gasamount > 0) {
+				GasStack gasStack = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
+				Gas gas = gasStack.getGas();
 
-                lines.add(gas.getLocalizedName() + ": " + tileEntityInterface._gasamount);
-            }
+				lines.add(gas.getLocalizedName() + ": " + tileEntityInterface._gasamount);
+			}
 
 		}
 

@@ -8,10 +8,10 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageHoppingModeChange implements IMessage,IMessageHandler<MessageHoppingModeChange,IMessage> {
-	int coord, side, hoppingMode;
+public class MessageHoppingModeChange implements IMessage, IMessageHandler<MessageHoppingModeChange, IMessage> {
+	int	coord, side, hoppingMode;
 
-	public MessageHoppingModeChange() { }
+	public MessageHoppingModeChange() {}
 
 	public MessageHoppingModeChange(int coord, int side, int hoppingMode) {
 		this.coord = coord;
@@ -38,6 +38,5 @@ public class MessageHoppingModeChange implements IMessage,IMessageHandler<Messag
 		buf.writeInt(side);
 		buf.writeInt(hoppingMode);
 	}
-
 
 }

@@ -10,8 +10,7 @@ import org.dave.CompactMachines.handler.ConfigurationHandler;
 
 public class WorldProviderMachines extends WorldProvider {
 
-	public WorldProviderMachines()	{
-	}
+	public WorldProviderMachines() {}
 
 	@Override
 	protected void generateLightBrightnessTable()
@@ -67,7 +66,7 @@ public class WorldProviderMachines extends WorldProvider {
 	@Override
 	public float[] calcSunriseSunsetColors(float par1, float par2)
 	{
-		return new float[]{0,0,0,0};
+		return new float[] { 0, 0, 0, 0 };
 	}
 
 	@Override

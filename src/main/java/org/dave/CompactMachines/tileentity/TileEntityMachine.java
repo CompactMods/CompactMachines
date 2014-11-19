@@ -50,45 +50,43 @@ import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-
 @Optional.InterfaceList({
-	@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
-	@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2"),
-	@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
-	@Optional.Interface(iface = "li.cil.oc.api.network.SidedEnvironment", modid = "OpenComputers"),
-	@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
-	@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
+		@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
+		@Optional.Interface(iface = "appeng.api.movable.IMovableTile", modid = "appliedenergistics2"),
+		@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
+		@Optional.Interface(iface = "li.cil.oc.api.network.SidedEnvironment", modid = "OpenComputers"),
+		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
+		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
 })
 public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment {
 
-	public int coords = -1;
-	public int[] _fluidid;
-	public int[] _fluidamount;
-	public int[] _gasid;
-	public int[] _gasamount;
-	public int[] _energy;
-	public int meta = 0;
+	public int								coords			= -1;
+	public int[]							_fluidid;
+	public int[]							_fluidamount;
+	public int[]							_gasid;
+	public int[]							_gasamount;
+	public int[]							_energy;
+	public int								meta			= 0;
 
-	public boolean isUpgraded = false;
+	public boolean							isUpgraded		= false;
 
-	public HashMap<Integer, Vec3> interfaces;
-	public HashMap<Integer, CMGridBlock> gridBlocks;
-	public HashMap<Integer, IGridNode> gridNodes;
-	private boolean	init;
+	public HashMap<Integer, Vec3>			interfaces;
+	public HashMap<Integer, CMGridBlock>	gridBlocks;
+	public HashMap<Integer, IGridNode>		gridNodes;
+	private boolean							init;
 
-	public static final int INVENTORY_SIZE = 6;
+	public static final int					INVENTORY_SIZE	= 6;
 
 	public TileEntityMachine() {
 		super();
-        // XXX: Should these be initialised to -1, as in TileEntityInterface
+		// XXX: Should these be initialised to -1, as in TileEntityInterface
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
-        // These need to be initialised to -1 to avoid a crash when no 
-        // gas-providing mod is installed
+		// These need to be initialised to -1 to avoid a crash when no 
+		// gas-providing mod is installed
 		_gasid = new int[] { -1, -1, -1, -1, -1, -1 };
 		_gasamount = new int[6];
 		_energy = new int[6];
-
 
 		gridBlocks = new HashMap<Integer, CMGridBlock>();
 		gridNodes = new HashMap<Integer, IGridNode>();
@@ -101,33 +99,32 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	public ItemSharedStorage getStorage(int side) {
-		return (ItemSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "item");
+		return (ItemSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "item");
 	}
 
 	public FluidSharedStorage getStorageFluid(int side) {
-		return (FluidSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "liquid");
+		return (FluidSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "liquid");
 	}
 
 	public GasSharedStorage getStorageGas(int side) {
-		return (GasSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "gas");
+		return (GasSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "gas");
 	}
 
 	public FluxSharedStorage getStorageFlux(int side) {
-		return (FluxSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "flux");
+		return (FluxSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "flux");
 	}
 
 	public AESharedStorage getStorageAE(int side) {
-		return (AESharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
+		return (AESharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
 	}
 
 	public BRSharedStorage getStorageBR(int side) {
-		return (BRSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "bundledRedstone");
+		return (BRSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "bundledRedstone");
 	}
 
 	public OpenComputersSharedStorage getStorageOC(int side) {
-		return (OpenComputersSharedStorage)SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
+		return (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
 	}
-
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbtTagCompound)
@@ -139,7 +136,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
 
-		if(isUpgraded && worldObj != null && worldObj.isRemote) {
+		if (isUpgraded && worldObj != null && worldObj.isRemote) {
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		}
 
@@ -163,8 +160,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	private void readInterfaceFromNBT(NBTTagCompound nbt, String key, int direction) {
-		if(nbt.hasKey(key)) {
-			if(interfaces == null) {
+		if (nbt.hasKey(key)) {
+			if (interfaces == null) {
 				interfaces = new HashMap<Integer, Vec3>();
 			}
 			int[] xyz = nbt.getIntArray(key);
@@ -174,10 +171,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	private void readInterfacesFromNBT(NBTTagCompound nbt) {
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_DOWN,  ForgeDirection.DOWN.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_UP,    ForgeDirection.UP.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_EAST,  ForgeDirection.EAST.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_WEST,  ForgeDirection.WEST.ordinal());
+		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
+		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
+		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
+		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_WEST, ForgeDirection.WEST.ordinal());
 		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_NORTH, ForgeDirection.NORTH.ordinal());
 		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_SOUTH, ForgeDirection.SOUTH.ordinal());
 	}
@@ -185,19 +182,19 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	private void addInterfaceToNBT(NBTTagCompound nbt, String key, int direction) {
 		if (!nbt.hasKey(key) && interfaces != null) {
 			Vec3 pos = interfaces.get(direction);
-			int x = (int)pos.xCoord;
-			int y = (int)pos.yCoord;
-			int z = (int)pos.zCoord;
+			int x = (int) pos.xCoord;
+			int y = (int) pos.yCoord;
+			int z = (int) pos.zCoord;
 
-			nbt.setIntArray(key, new int[]{x,y,z});
+			nbt.setIntArray(key, new int[] { x, y, z });
 		}
 	}
 
 	private void addInterfacesToNBT(NBTTagCompound nbt) {
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_DOWN,  ForgeDirection.DOWN.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_UP,    ForgeDirection.UP.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_EAST,  ForgeDirection.EAST.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_WEST,  ForgeDirection.WEST.ordinal());
+		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
+		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
+		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
+		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_WEST, ForgeDirection.WEST.ordinal());
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_NORTH, ForgeDirection.NORTH.ordinal());
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_SOUTH, ForgeDirection.SOUTH.ordinal());
 	}
@@ -207,23 +204,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void onChunkUnload() {
 		super.onChunkUnload();
 
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return;
 		}
 
-		if(ConfigurationHandler.chunkLoadingMode == 2) {
+		if (ConfigurationHandler.chunkLoadingMode == 2) {
 			CompactMachines.instance.machineHandler.disableMachine(this);
 		}
 
-		if(Reference.OC_AVAILABLE) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if(getStorageOC(dir.ordinal()) == null) {
+		if (Reference.OC_AVAILABLE) {
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (getStorageOC(dir.ordinal()) == null) {
 					continue;
 				}
 
 				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
 				Node node = storage.getNode();
-				if(node != null) {
+				if (node != null) {
 					node.remove();
 				}
 			}
@@ -234,15 +231,15 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void invalidate() {
 		super.invalidate();
 
-		if(Reference.OC_AVAILABLE && !worldObj.isRemote) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if(getStorageOC(dir.ordinal()) == null) {
+		if (Reference.OC_AVAILABLE && !worldObj.isRemote) {
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (getStorageOC(dir.ordinal()) == null) {
 					continue;
 				}
 
 				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
 				Node node = storage.getNode();
-				if(node != null) {
+				if (node != null) {
 					node.remove();
 				}
 			}
@@ -250,23 +247,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	public void initialize() {
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return;
 		}
 
-		if(ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
+		if (ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
 			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
 		}
 
-		if(Reference.OC_AVAILABLE) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if(getStorageOC(dir.ordinal()) == null) {
+		if (Reference.OC_AVAILABLE) {
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (getStorageOC(dir.ordinal()) == null) {
 					continue;
 				}
 
 				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
 				Node node = storage.getNode();
-				if(node != null && node.network() == null) {
+				if (node != null && node.network() == null) {
 					li.cil.oc.api.Network.joinOrCreateNetwork(this);
 				}
 			}
@@ -278,23 +275,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void updateEntity() {
 		super.updateEntity();
 
-		if(!init && !isInvalid() && coords != -1) {
+		if (!init && !isInvalid() && coords != -1) {
 			initialize();
 			init = true;
 		}
 
-		if(Reference.PR_AVAILABLE) {
+		if (Reference.PR_AVAILABLE) {
 			updateIncomingSignals();
 		}
 
-		if (!worldObj.isRemote)	{
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if(getStorage(dir.ordinal()) == null) {
+		if (!worldObj.isRemote) {
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (getStorage(dir.ordinal()) == null) {
 					continue;
 				}
 
 				TileEntity outside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if(outside != null) {
+				if (outside != null) {
 					hopStorage(getStorage(dir.ordinal()), outside);
 					hopStorage(getStorageFluid(dir.ordinal()), outside);
 					hopStorage(getStorageGas(dir.ordinal()), outside);
@@ -305,11 +302,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	private void hopStorage(AbstractSharedStorage storage, TileEntity outside) {
-		if(storage != null && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
+		if (storage != null && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
 			storage.hopToOutside(this, outside);
 		}
 	}
-
 
 	@Override
 	public int getSizeInventory() {
@@ -318,7 +314,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public ItemStack getStackInSlot(int slotIndex) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return null;
 		}
 		return getStorage(slotIndex).getStackInSlot(0);
@@ -326,7 +322,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public ItemStack decrStackSize(int slotIndex, int decreaseAmount) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return null;
 		}
 		return getStorage(slotIndex).decrStackSize(0, decreaseAmount);
@@ -334,7 +330,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int slotIndex) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return null;
 		}
 		return getStorage(slotIndex).getStackInSlotOnClosing(0);
@@ -342,7 +338,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public void setInventorySlotContents(int slotIndex, ItemStack itemStack) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return;
 		}
 		ItemSharedStorage storage = getStorage(slotIndex);
@@ -363,7 +359,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int getInventoryStackLimit() {
-		if(coords == -1) {
+		if (coords == -1) {
 			return 0;
 		}
 		return 64;
@@ -375,16 +371,14 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	@Override
-	public void openInventory() {
-	}
+	public void openInventory() {}
 
 	@Override
-	public void closeInventory() {
-	}
+	public void closeInventory() {}
 
 	@Override
 	public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return false;
 		}
 		return true;
@@ -392,7 +386,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public boolean canInsertItem(int slotIndex, ItemStack itemStack, int side) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return false;
 		}
 		return true;
@@ -400,94 +394,98 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public boolean canExtractItem(int slotIndex, ItemStack itemStack, int side) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return false;
 		}
 		return true;
 	}
 
-
-    @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		if(coords == -1) {
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if (coords == -1) {
 			return 0;
 		}
-    	FluidSharedStorage fss = getStorageFluid(from.ordinal());
-    	if(doFill && resource.amount > 0) {
-    		fss.autoHopToInside = true;
-    		fss.setDirty();
-    	}
-    	return fss.fill(from, resource, doFill);
-    }
+		FluidSharedStorage fss = getStorageFluid(from.ordinal());
+		if (doFill && resource.amount > 0) {
+			fss.autoHopToInside = true;
+			fss.setDirty();
+		}
+		return fss.fill(from, resource, doFill);
+	}
 
-    @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) { return getStorageFluid(from.ordinal()).drain(from, maxDrain, doDrain); }
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return getStorageFluid(from.ordinal()).drain(from, maxDrain, doDrain);
+	}
 
-    @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) { return getStorageFluid(from.ordinal()).drain(from, resource, doDrain); }
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		return getStorageFluid(from.ordinal()).drain(from, resource, doDrain);
+	}
 
-    @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		if(coords == -1) {
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		if (coords == -1) {
 			return false;
 		}
-    	return getStorageFluid(from.ordinal()).canDrain(from, fluid);
-    }
+		return getStorageFluid(from.ordinal()).canDrain(from, fluid);
+	}
 
-    @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
-		if(coords == -1) {
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		if (coords == -1) {
 			return false;
 		}
-    	return getStorageFluid(from.ordinal()).canFill(from, fluid);
-    }
+		return getStorageFluid(from.ordinal()).canFill(from, fluid);
+	}
 
-    @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) { return getStorageFluid(from.ordinal()).getTankInfo(from); }
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return getStorageFluid(from.ordinal()).getTankInfo(from);
+	}
 
-    public FluidStack getFluid(int side) {
-    	return getStorageFluid(side).getFluid();
-    }
+	public FluidStack getFluid(int side) {
+		return getStorageFluid(side).getFluid();
+	}
 
+	public FluidStack getFluid(ForgeDirection from) {
+		return getStorageFluid(from.ordinal()).getFluid();
+	}
 
-    public FluidStack getFluid(ForgeDirection from) {
-    	return getStorageFluid(from.ordinal()).getFluid();
-    }
-
-    public int receiveGas(ForgeDirection from, GasStack stack) {
+	public int receiveGas(ForgeDirection from, GasStack stack) {
 		if (coords == -1) {
 			return 0;
 		}
 
-        GasSharedStorage gss = getStorageGas(from.ordinal());
+		GasSharedStorage gss = getStorageGas(from.ordinal());
 
-        // XXX: Should we test with canReceiveGas first? Or do we rely on 
-        // suppliers to do this?
-        gss.autoHopToInside = true;
-        gss.setDirty();
+		// XXX: Should we test with canReceiveGas first? Or do we rely on 
+		// suppliers to do this?
+		gss.autoHopToInside = true;
+		gss.setDirty();
 
-        return gss.receiveGas(from, stack);
-    }
+		return gss.receiveGas(from, stack);
+	}
 
-    public GasStack drawGas(ForgeDirection from, int amount) {
-        return getStorageGas(from.ordinal()).drawGas(from, amount);
-    }
+	public GasStack drawGas(ForgeDirection from, int amount) {
+		return getStorageGas(from.ordinal()).drawGas(from, amount);
+	}
 
-    public boolean canReceiveGas(ForgeDirection from, Gas type) {
-        return getStorageGas(from.ordinal()).canReceiveGas(from, type);
-    }
+	public boolean canReceiveGas(ForgeDirection from, Gas type) {
+		return getStorageGas(from.ordinal()).canReceiveGas(from, type);
+	}
 
-    public boolean canDrawGas(ForgeDirection from, Gas type) {
-        return getStorageGas(from.ordinal()).canDrawGas(from, type);
-    }
+	public boolean canDrawGas(ForgeDirection from, Gas type) {
+		return getStorageGas(from.ordinal()).canDrawGas(from, type);
+	}
 
-    public boolean canTubeConnect(ForgeDirection side) {
-        return true;
-    }
+	public boolean canTubeConnect(ForgeDirection side) {
+		return true;
+	}
 
-    public GasStack getGasContents(ForgeDirection from) {
-        return getStorageGas(from.ordinal()).getGasContents();
-    }
+	public GasStack getGasContents(ForgeDirection from) {
+		return getStorageGas(from.ordinal()).getGasContents();
+	}
 
 	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
@@ -496,11 +494,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return 0;
 		}
 		FluxSharedStorage fss = getStorageFlux(from.ordinal());
-		if(!simulate && maxReceive > 0) {
+		if (!simulate && maxReceive > 0) {
 			fss.autoHopToInside = true;
 			fss.setDirty();
 		}
@@ -509,7 +507,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return 0;
 		}
 		return getStorageFlux(from.ordinal()).extractEnergy(maxExtract, simulate);
@@ -517,7 +515,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return 0;
 		}
 		return getStorageFlux(from.ordinal()).getEnergyStored();
@@ -525,7 +523,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return 0;
 		}
 		return getStorageFlux(from.ordinal()).getMaxEnergyStored();
@@ -533,7 +531,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public CMGridBlock getGridBlock(ForgeDirection dir) {
 		CMGridBlock gridBlock = gridBlocks.get(dir.ordinal());
-		if(gridBlock == null) {
+		if (gridBlock == null) {
 			gridBlock = new CMGridBlock(this);
 			gridBlocks.put(dir.ordinal(), gridBlock);
 		}
@@ -544,9 +542,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
-		if(!worldObj.isRemote) {
+		if (!worldObj.isRemote) {
 			IGridNode gridNode = gridNodes.get(dir.ordinal());
-			if(gridNode == null) {
+			if (gridNode == null) {
 				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir));
 				gridNodes.put(dir.ordinal(), gridNode);
 			}
@@ -571,20 +569,20 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
-	public void securityBreak() { }
+	public void securityBreak() {}
 
 	public ItemStack getItemDrop() {
 		ItemStack stack = new ItemStack(ModBlocks.machine, 1, meta);
 
-		if(isUpgraded) {
-			if(stack.stackTagCompound == null) {
+		if (isUpgraded) {
+			if (stack.stackTagCompound == null) {
 				stack.stackTagCompound = new NBTTagCompound();
 			}
 			//LogHelper.info("Dropping item stack with coords: " + coords);
 			stack.stackTagCompound.setInteger("coords", coords);
 		}
 
-		if(hasCustomName()) {
+		if (hasCustomName()) {
 			stack.setStackDisplayName(getCustomName());
 		}
 
@@ -609,7 +607,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "appliedenergistics2")
 	public boolean prepareToMove() {
-		if(isUpgraded) {
+		if (isUpgraded) {
 			return true;
 		}
 		return false;
@@ -617,16 +615,15 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Override
 	@Optional.Method(modid = "appliedenergistics2")
-	public void doneMoving() { }
-
+	public void doneMoving() {}
 
 	@Optional.Method(modid = "ProjRed|Transmission")
 	private void updateIncomingSignals() {
 		boolean needsNotify = false;
 		boolean haveChanges = false;
-		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			BRSharedStorage br = getStorageBR(dir.ordinal());
-			if(br.machineNeedsNotify) {
+			if (br.machineNeedsNotify) {
 				//LogHelper.info("Signal into one of the interfaces changed: " + dir);
 				needsNotify = true;
 				br.machineNeedsNotify = false;
@@ -634,9 +631,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			byte[] previous = br.machineBundledSignal;
 			byte[] current = ProjectRedAPI.transmissionAPI.getBundledInput(worldObj, xCoord, yCoord, zCoord, dir.ordinal());
 
-			if(current != null) {
-				for(int i = 0; i < current.length; i++) {
-					if(previous[i] != current[i]) {
+			if (current != null) {
+				for (int i = 0; i < current.length; i++) {
+					if (previous[i] != current[i]) {
 						haveChanges = true;
 						previous[i] = current[i];
 					}
@@ -645,15 +642,15 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			br.setDirty();
 		}
 
-		if(haveChanges) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		if (haveChanges) {
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				Vec3 pos = interfaces.get(dir.ordinal());
 				WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-				machineWorld.notifyBlockChange((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord, ModBlocks.interfaceblock);
+				machineWorld.notifyBlockChange((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord, ModBlocks.interfaceblock);
 			}
 		}
 
-		if(needsNotify || haveChanges) {
+		if (needsNotify || haveChanges) {
 			worldObj.notifyBlockChange(xCoord, yCoord, zCoord, blockType);
 		}
 	}
@@ -665,21 +662,21 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		BRSharedStorage storage = getStorageBR(dir);
 		byte[] current = storage.interfaceBundledSignal;
 
-		if(current == null) {
+		if (current == null) {
 			return null;
 		}
 
 		byte[] result = new byte[current.length];
-		for(int i = 0; i < current.length; i++) {
+		for (int i = 0; i < current.length; i++) {
 			//Machine-Output = Interface-Input unless Interface-Output is made by us
 			int a = current[i] & 255;
 			int b = storage.interfaceOutputtedSignal[i] & 255;
 			int c = a;
-			if(b > 0) {
+			if (b > 0) {
 				continue;
 			}
 
-			result[i] = (byte)c;
+			result[i] = (byte) c;
 		}
 
 		storage.machineOutputtedSignal = result;
@@ -696,11 +693,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return true;
 	}
 
-
 	@Override
 	@Optional.Method(modid = "OpenComputers")
 	public Node sidedNode(ForgeDirection side) {
-		if (worldObj.isRemote)	{
+		if (worldObj.isRemote) {
 			return null;
 		}
 		return getStorageOC(side.ordinal()).getNode();

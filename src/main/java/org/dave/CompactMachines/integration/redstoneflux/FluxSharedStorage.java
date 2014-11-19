@@ -15,10 +15,10 @@ import cofh.api.energy.IEnergyStorage;
 
 public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyStorage {
 
-	protected int energy = 0;
-	protected int capacity = 10000;
-	protected int maxReceive = 10000;
-	protected int maxExtract = 10000;
+	protected int	energy		= 0;
+	protected int	capacity	= 10000;
+	protected int	maxReceive	= 10000;
+	protected int	maxExtract	= 10000;
 
 	public FluxSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -34,7 +34,7 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 	@Override
 	public NBTTagCompound saveToTag() {
 		NBTTagCompound compound = prepareTagCompound();
-        compound.setInteger("Energy", energy);
+		compound.setInteger("Energy", energy);
 		return compound;
 	}
 
@@ -43,7 +43,6 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 		loadHoppingModeFromCompound(tag);
 		energy = tag.getInteger("Energy");
 	}
-
 
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate) {
@@ -78,46 +77,45 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 	}
 
 	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
-		if(getEnergyStored() == 0) {
+		if (getEnergyStored() == 0) {
 			return;
 		}
 
-		if(cooldown == max_cooldown) {
+		if (cooldown == max_cooldown) {
 			cooldown = 0;
 		} else {
 			cooldown++;
 			return;
 		}
 
-		if(tileEntity instanceof IEnergyStorage) {
+		if (tileEntity instanceof IEnergyStorage) {
 			//LogHelper.info("Hopping flux into IEnergyStorage");
-			IEnergyStorage storage = (IEnergyStorage)tileEntity;
+			IEnergyStorage storage = (IEnergyStorage) tileEntity;
 
 			int filled = storage.receiveEnergy(getEnergyStored(), false);
-			if(filled > 0) {
+			if (filled > 0) {
 				//LogHelper.info("Transferred RF: " + filled);
 				this.extractEnergy(filled, false);
 				tileEntity.markDirty();
 			}
 
-		} else if(tileEntity instanceof IEnergyHandler) {
+		} else if (tileEntity instanceof IEnergyHandler) {
 			//LogHelper.info("Hopping flux into IEnergyHandler");
-			IEnergyHandler handler = (IEnergyHandler)tileEntity;
+			IEnergyHandler handler = (IEnergyHandler) tileEntity;
 
 			ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
-			if(opposite) {
+			if (opposite) {
 				hoppingSide = hoppingSide.getOpposite();
 			}
 
 			int filled = handler.receiveEnergy(hoppingSide, getEnergyStored(), false);
-			if(filled > 0) {
+			if (filled > 0) {
 				//LogHelper.info("Transferred RF: " + filled);
 				this.extractEnergy(filled, false);
 				tileEntity.markDirty();
 			}
 		}
 	}
-
 
 	@Override
 	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {

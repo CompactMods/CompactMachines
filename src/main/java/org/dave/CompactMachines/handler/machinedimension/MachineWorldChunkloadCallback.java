@@ -17,12 +17,12 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 	@Override
 	public void ticketsLoaded(List<Ticket> tickets, World world) {
 		// Do not load chunks when the config is set to "never"
-		if(ConfigurationHandler.chunkLoadingMode == 0) {
+		if (ConfigurationHandler.chunkLoadingMode == 0) {
 			LogHelper.info("Chunkloading is disabled. Skipping...");
 			return;
 		}
 
-		if(ConfigurationHandler.chunkLoadingMode == 2) {
+		if (ConfigurationHandler.chunkLoadingMode == 2) {
 			LogHelper.info("Chunkloading is in smart mode. Releasing previously requested tickets...");
 			for (Ticket ticket : tickets) {
 				ForgeChunkManager.releaseTicket(ticket);
@@ -33,12 +33,12 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 		LogHelper.info("Chunkloading is in always mode. Loading all previously loaded chunks.");
 		for (Ticket ticket : tickets) {
 			NBTTagCompound data = ticket.getModData();
-			if(data.hasKey("coords")) {
+			if (data.hasKey("coords")) {
 				int[] nbtCoords = data.getIntArray("coords");
 
 				boolean foundMatch = false;
 				for (int i = 0; i < nbtCoords.length; i++) {
-					if(nbtCoords[i] == -1) {
+					if (nbtCoords[i] == -1) {
 						continue;
 					}
 
@@ -47,7 +47,7 @@ public class MachineWorldChunkloadCallback implements LoadingCallback {
 				}
 
 				// Ticket has no valid coords stored, releasing it.
-				if(!foundMatch) {
+				if (!foundMatch) {
 					ForgeChunkManager.releaseTicket(ticket);
 				}
 			}

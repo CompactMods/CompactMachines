@@ -17,7 +17,7 @@ import cpw.mods.fml.common.Optional;
 @Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers")
 public class OpenComputersSharedStorage extends AbstractSharedStorage implements Environment {
 
-	public Node node;
+	public Node	node;
 
 	public OpenComputersSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -27,14 +27,13 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 	}
 
 	public Node getNode() {
-		if(node == null) {
+		if (node == null) {
 			//LogHelper.info("Creating new node for side: " + ForgeDirection.getOrientation(side));
 			node = li.cil.oc.api.Network.newNode(this, Visibility.Network).withConnector().create();
 			setDirty();
 		}
 		return node;
 	}
-
 
 	@Override
 	public String type() {
@@ -53,10 +52,10 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 	}
 
 	@Override
-	public void hopToOutside(TileEntityMachine te, TileEntity outside) { }
+	public void hopToOutside(TileEntityMachine te, TileEntity outside) {}
 
 	@Override
-	public void hopToInside(TileEntityInterface te, TileEntity inside) { }
+	public void hopToInside(TileEntityInterface te, TileEntity inside) {}
 
 	@Override
 	public Node node() {
@@ -64,15 +63,12 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 	}
 
 	@Override
-	public void onConnect(Node node) {
-	}
+	public void onConnect(Node node) {}
 
 	@Override
-	public void onDisconnect(Node node) {
-	}
+	public void onDisconnect(Node node) {}
 
 	@Override
-	public void onMessage(Message message) {
-	}
+	public void onMessage(Message message) {}
 
 }

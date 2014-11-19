@@ -22,37 +22,36 @@ import appeng.api.networking.IGridNode;
 
 public class WorldUtils {
 
-
 	public static AxisAlignedBB getBoundingBoxForCube(int coord, int size) {
 		AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(
-				coord * ConfigurationHandler.cubeDistance + 1, 40,  0,
-				coord * ConfigurationHandler.cubeDistance + size+1, 40+size+1, size+1
-		);
+				coord * ConfigurationHandler.cubeDistance + 1, 40, 0,
+				coord * ConfigurationHandler.cubeDistance + size + 1, 40 + size + 1, size + 1
+				);
 
 		return bb;
 	}
 
 	public static int updateNeighborAEGrids(World world, int x, int y, int z) {
-		if(!Reference.AE_AVAILABLE) {
+		if (!Reference.AE_AVAILABLE) {
 			return 0;
 		}
 
 		int countUpdated = 0;
 
-		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			int offX = x + dir.offsetX;
 			int offY = y + dir.offsetY;
 			int offZ = z + dir.offsetZ;
 
-			if(world.getTileEntity(offX, offY, offZ) instanceof IGridHost) {
-				IGridHost host = (IGridHost)world.getTileEntity(offX, offY, offZ);
+			if (world.getTileEntity(offX, offY, offZ) instanceof IGridHost) {
+				IGridHost host = (IGridHost) world.getTileEntity(offX, offY, offZ);
 				IGridNode node = host.getGridNode(dir.getOpposite());
 
-				if(node == null) {
+				if (node == null) {
 					node = host.getGridNode(ForgeDirection.UNKNOWN);
 				}
 
-				if(node != null) {
+				if (node != null) {
 					node.updateState();
 					//LogHelper.info("Updating node state on side: " + dir);
 					countUpdated++;
@@ -80,13 +79,13 @@ public class WorldUtils {
 				for (int z = minZ; z <= maxZ; z++)
 				{
 					ArrayList<ItemStack> dropsList = getItemStackFromBlock(worldObj, x, y, z);
-					if(dropsList != null) {
+					if (dropsList != null) {
 						for (ItemStack s : dropsList) {
 							returnList.add(s);
 						}
 					}
 
-					if(player != null) {
+					if (player != null) {
 						Block block = worldObj.getBlock(x, y, z);
 						block.removedByPlayer(worldObj, player, x, y, z, true);
 					}
@@ -94,7 +93,7 @@ public class WorldUtils {
 					worldObj.setBlockToAir(x, y, z);
 
 					// Collect any lost items laying around
-					double[] head = new double[]{ x, y, z};
+					double[] head = new double[] { x, y, z };
 					AxisAlignedBB axis = AxisAlignedBB.getBoundingBox(head[0] - 2, head[1] - 2, head[2] - 2, head[0] + 3, head[1] + 3, head[2] + 3);
 					List result = worldObj.getEntitiesWithinAABB(EntityItem.class, axis);
 					for (int ii = 0; ii < result.size(); ii++) {
@@ -146,9 +145,9 @@ public class WorldUtils {
 		int maxY = Math.max(posY1, posY2);
 		int maxZ = Math.max(posZ1, posZ2);
 
-		int midX = (int)Math.floor((posX1 + posX2) / 2);
-		int midY = (int)Math.floor((posY1 + posY2) / 2);
-		int midZ = (int)Math.floor((posZ1 + posZ2) / 2);
+		int midX = (int) Math.floor((posX1 + posX2) / 2);
+		int midY = (int) Math.floor((posY1 + posY2) / 2);
+		int midZ = (int) Math.floor((posZ1 + posZ2) / 2);
 
 		HashMap<Integer, Vec3> interfaces = new HashMap<Integer, Vec3>();
 
@@ -161,27 +160,27 @@ public class WorldUtils {
 					if (x == minX || y == minY || z == minZ || x == maxX || y == maxY || z == maxZ)
 					{
 						Vec3 pos = Vec3.createVectorHelper(x, y, z);
-						if(x == midX && y == midY && z == minZ) {
+						if (x == midX && y == midY && z == minZ) {
 							// XY mid, Z min --> north
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.NORTH.ordinal(), pos);
-						} else if(x == midX && y == midY && z == maxZ) {
+						} else if (x == midX && y == midY && z == maxZ) {
 							// XY mid, Z max --> south
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.SOUTH.ordinal(), pos);
-						} else if(x == midX && y == minY && z == midZ) {
+						} else if (x == midX && y == minY && z == midZ) {
 							// XZ mid, Y min --> down
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.DOWN.ordinal(), pos);
-						} else if(x == midX && y == maxY && z == midZ) {
+						} else if (x == midX && y == maxY && z == midZ) {
 							// XZ mid, Y max --> up
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.UP.ordinal(), pos);
-						} else if(x == minX && y == midY && z == midZ) {
+						} else if (x == minX && y == midY && z == midZ) {
 							// YZ mid, X min --> west
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.WEST.ordinal(), pos);
-						} else if(x == maxX && y == midY && z == midZ) {
+						} else if (x == maxX && y == midY && z == midZ) {
 							// YZ mid, X max --> east
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
 							interfaces.put(ForgeDirection.EAST.ordinal(), pos);
@@ -196,4 +195,3 @@ public class WorldUtils {
 		return interfaces;
 	}
 }
-

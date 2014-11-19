@@ -7,12 +7,12 @@ import net.minecraft.item.Item;
 
 public class CreativeTabCM
 {
-    public static final CreativeTabs CM_TAB = new CreativeTabs(Reference.MOD_ID.toLowerCase())
-    {
-        @Override
-        public Item getTabIconItem()
-        {
-            return ModItems.personalShrinkingDevice;
-        }
-    };
+	public static final CreativeTabs	CM_TAB	= new CreativeTabs(Reference.MOD_ID.toLowerCase())
+												{
+													@Override
+													public Item getTabIconItem()
+													{
+														return ModItems.personalShrinkingDevice;
+													}
+												};
 }

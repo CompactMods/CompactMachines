@@ -41,7 +41,7 @@ public class CommandSetCMCoords extends CommandBase {
 			throw new WrongUsageException("command.cm.setCMCoords.noblock");
 		}
 
-		if(!itemStack.hasTagCompound()) {
+		if (!itemStack.hasTagCompound()) {
 			itemStack.setTagCompound(new NBTTagCompound());
 		}
 

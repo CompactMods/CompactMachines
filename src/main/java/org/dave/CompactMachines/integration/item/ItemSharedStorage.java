@@ -16,8 +16,8 @@ import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.ItemHelper;
 
 public class ItemSharedStorage extends AbstractSharedStorage implements IInventory {
-	private int size = 1;
-	private ItemStack[] items;
+	private int			size	= 1;
+	private ItemStack[]	items;
 
 	public ItemSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -58,7 +58,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		synchronized(this)
+		synchronized (this)
 		{
 			return items[slot];
 		}
@@ -66,7 +66,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public ItemStack decrStackSize(int slot, int decreaseAmount) {
-		synchronized(this)
+		synchronized (this)
 		{
 			return ItemHelper.decrStackSize(this, slot, decreaseAmount);
 		}
@@ -79,7 +79,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
-		synchronized(this)
+		synchronized (this)
 		{
 			items[slot] = stack;
 			markDirty();
@@ -126,14 +126,13 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 		return true;
 	}
 
-
 	private void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		ItemStack stack = getStackInSlot(0);
-		if(stack == null || stack.stackSize == 0) {
+		if (stack == null || stack.stackSize == 0) {
 			return;
 		}
 
-		if(cooldown == max_cooldown) {
+		if (cooldown == max_cooldown) {
 			cooldown = 0;
 		} else {
 			cooldown++;
@@ -141,33 +140,33 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 		}
 
 		int targetSlot = -1;
-		if(tileEntity instanceof IInventory) {
-			if(tileEntity instanceof ISidedInventory) {
-				ISidedInventory inv = (ISidedInventory)tileEntity;
+		if (tileEntity instanceof IInventory) {
+			if (tileEntity instanceof ISidedInventory) {
+				ISidedInventory inv = (ISidedInventory) tileEntity;
 
 				ForgeDirection hoppingSide = ForgeDirection.getOrientation(side);
-				if(opposite) {
+				if (opposite) {
 					hoppingSide = hoppingSide.getOpposite();
 				}
 
 				targetSlot = ItemHelper.findBestSlotForSidedInventory(inv, stack, hoppingSide);
 			} else {
-				IInventory inv = (IInventory)tileEntity;
+				IInventory inv = (IInventory) tileEntity;
 				targetSlot = ItemHelper.findBestSlotForInventory(inv, stack);
 			}
 		}
 
-		if(targetSlot == -1) {
+		if (targetSlot == -1) {
 			return;
 		}
 
-		IInventory inv = (IInventory)tileEntity;
+		IInventory inv = (IInventory) tileEntity;
 		ItemStack targetStack = inv.getStackInSlot(targetSlot);
 
 		int max = Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit());
-		if(targetStack == null) {
+		if (targetStack == null) {
 			// Target slot is empty
-			if(stack.stackSize <= max) {
+			if (stack.stackSize <= max) {
 				// We can safely transfer the whole stack
 				inv.setInventorySlotContents(targetSlot, stack);
 				stack = null;
@@ -176,14 +175,14 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 				inv.setInventorySlotContents(targetSlot, stack.splitStack(max));
 			}
 			inv.markDirty();
-		} else if(targetStack.isItemEqual(stack)) {
+		} else if (targetStack.isItemEqual(stack)) {
 			// Target slot contains the same kind of item
-			if(stack.stackSize <= max) {
+			if (stack.stackSize <= max) {
 				int amount = Math.min(stack.stackSize, max - targetStack.stackSize);
-				if(amount > 0) {
+				if (amount > 0) {
 					targetStack.stackSize += amount;
 					stack.stackSize -= amount;
-					if(stack.stackSize < 1) {
+					if (stack.stackSize < 1) {
 						stack = null;
 					}
 					inv.markDirty();

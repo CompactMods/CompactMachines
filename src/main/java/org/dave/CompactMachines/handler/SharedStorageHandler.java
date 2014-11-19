@@ -31,20 +31,20 @@ import org.dave.CompactMachines.reference.Reference;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class SharedStorageHandler {
-	private static SharedStorageHandler serverStorageHandler;
-	private static SharedStorageHandler clientStorageHandler;
+	private static SharedStorageHandler					serverStorageHandler;
+	private static SharedStorageHandler					clientStorageHandler;
 
-	private Map<String, AbstractSharedStorage> storageMap;
-	private Map<String, List<AbstractSharedStorage>> storageList;
+	private Map<String, AbstractSharedStorage>			storageMap;
+	private Map<String, List<AbstractSharedStorage>>	storageList;
 
-	public final boolean client;
+	public final boolean								client;
 
-	private File saveDir;
-	private File[] saveFiles;
-	private int saveTo;
+	private File										saveDir;
+	private File[]										saveFiles;
+	private int											saveTo;
 
-	private List<AbstractSharedStorage> dirtyStorage;
-	private NBTTagCompound saveTag;
+	private List<AbstractSharedStorage>					dirtyStorage;
+	private NBTTagCompound								saveTag;
 
 	public SharedStorageHandler(boolean client) {
 		this.client = client;
@@ -62,13 +62,13 @@ public class SharedStorageHandler {
 		storageList.put("OpenComputers", new ArrayList<AbstractSharedStorage>());
 
 		if (!client) {
-            load();
+			load();
 		}
 	}
 
-    public void requestSave(AbstractSharedStorage storage) {
-        dirtyStorage.add(storage);
-    }
+	public void requestSave(AbstractSharedStorage storage) {
+		dirtyStorage.add(storage);
+	}
 
 	public static SharedStorageHandler instance(boolean client) {
 		return client ? clientStorageHandler : serverStorageHandler;
@@ -76,7 +76,7 @@ public class SharedStorageHandler {
 
 	public static void reloadStorageHandler(boolean client) {
 		SharedStorageHandler newHandler = new SharedStorageHandler(client);
-		if(client) {
+		if (client) {
 			clientStorageHandler = newHandler;
 		} else {
 			serverStorageHandler = newHandler;
@@ -102,32 +102,32 @@ public class SharedStorageHandler {
 		String key = coord + "|" + side + "|" + type;
 
 		AbstractSharedStorage storage = storageMap.get(key);
-		if(storage == null) {
-			if(type.equals("item")) {
+		if (storage == null) {
+			if (type.equals("item")) {
 				storage = new ItemSharedStorage(this, coord, side);
 			}
 
-			if(type.equals("liquid")) {
+			if (type.equals("liquid")) {
 				storage = new FluidSharedStorage(this, coord, side);
 			}
 
-			if(type.equals("gas")) {
+			if (type.equals("gas")) {
 				storage = new GasSharedStorage(this, coord, side);
 			}
 
-			if(type.equals("flux")) {
+			if (type.equals("flux")) {
 				storage = new FluxSharedStorage(this, coord, side);
 			}
 
-			if(type.equals("appeng")) {
+			if (type.equals("appeng")) {
 				storage = new AESharedStorage(this, coord, side);
 			}
 
-			if(type.equals("bundledRedstone")) {
+			if (type.equals("bundledRedstone")) {
 				storage = new BRSharedStorage(this, coord, side);
 			}
 
-			if(type.equals("OpenComputers")) {
+			if (type.equals("OpenComputers")) {
 				storage = new OpenComputersSharedStorage(this, coord, side);
 			}
 
@@ -149,7 +149,7 @@ public class SharedStorageHandler {
 				saveDir.mkdirs();
 			}
 
-			saveFiles = new File[]{
+			saveFiles = new File[] {
 					new File(saveDir, "data1.dat"),
 					new File(saveDir, "data2.dat"),
 					new File(saveDir, "lock.dat")
@@ -199,7 +199,7 @@ public class SharedStorageHandler {
 				fout.close();
 				saveTo ^= 1;
 			} catch (Exception e) {
-            	throw new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

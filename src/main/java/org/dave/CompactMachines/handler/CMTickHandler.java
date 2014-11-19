@@ -11,8 +11,8 @@ public class CMTickHandler {
 
 	@SubscribeEvent
 	public void tick(TickEvent event) {
-		if(event.side == Side.SERVER && event.phase == Phase.START) {
-			if(CompactMachines.instance.machineHandler != null) {
+		if (event.side == Side.SERVER && event.phase == Phase.START) {
+			if (CompactMachines.instance.machineHandler != null) {
 				CompactMachines.instance.machineHandler.tick();
 			}
 		}

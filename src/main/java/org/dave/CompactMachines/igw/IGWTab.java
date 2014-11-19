@@ -1,6 +1,5 @@
 package org.dave.CompactMachines.igw;
 
-
 import igwmod.gui.GuiWiki;
 import igwmod.gui.tabs.BaseWikiTab;
 import net.minecraft.client.resources.I18n;
@@ -33,10 +32,10 @@ public class IGWTab extends BaseWikiTab {
 
 	@Override
 	protected String getPageName(String pageEntry) {
-		if(pageEntry.startsWith("block")) {
-			return I18n.format("tile." + Reference.MOD_ID.toLowerCase() + ":"+ pageEntry.substring(6) +".name");
-		} else if(pageEntry.startsWith("item")) {
-			return I18n.format("item." + Reference.MOD_ID.toLowerCase() + ":"+ pageEntry.substring(5) +".name");
+		if (pageEntry.startsWith("block")) {
+			return I18n.format("tile." + Reference.MOD_ID.toLowerCase() + ":" + pageEntry.substring(6) + ".name");
+		} else if (pageEntry.startsWith("item")) {
+			return I18n.format("item." + Reference.MOD_ID.toLowerCase() + ":" + pageEntry.substring(5) + ".name");
 		} else {
 			return I18n.format("igwpage." + pageEntry);
 		}

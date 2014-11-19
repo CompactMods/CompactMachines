@@ -4,9 +4,9 @@ import org.dave.CompactMachines.reference.Names;
 
 public class ItemAtomShrinker extends ItemCM {
 
-    public ItemAtomShrinker()
-    {
-        super();
-        this.setUnlocalizedName(Names.Items.SHRINKER);
-    }
+	public ItemAtomShrinker()
+	{
+		super();
+		this.setUnlocalizedName(Names.Items.SHRINKER);
+	}
 }
