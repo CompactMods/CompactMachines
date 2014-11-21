@@ -1,5 +1,6 @@
 package org.dave.CompactMachines.inventory;
 
+import mekanism.api.gas.GasStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ICrafting;
@@ -7,9 +8,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
-import mekanism.api.gas.GasStack;
 
+import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -134,16 +136,18 @@ public class ContainerMachine extends ContainerCM {
 				}
 			}
 
-			GasStack gasContents = tileEntityMachine.getGasContents(dir);
+			if(Reference.MEK_AVAILABLE) {
+				GasStack gasContents = tileEntityMachine.getGasContents(dir);
 
-			if (gasContents != null) {
-				for (int i = 0; i < crafters.size(); i++) {
-					if (gasContents.amount > 0) {
-						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), gasContents.amount);
-						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), gasContents.getGas().getID());
-					} else {
-						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), 0);
-						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), 0);
+				if (gasContents != null) {
+					for (int i = 0; i < crafters.size(); i++) {
+						if (gasContents.amount > 0) {
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), gasContents.amount);
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), gasContents.getGas().getID());
+						} else {
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), 0);
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), 0);
+						}
 					}
 				}
 			}
@@ -151,6 +155,7 @@ public class ContainerMachine extends ContainerCM {
 			for (int i = 0; i < crafters.size(); i++) {
 				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 60 + dir.ordinal(), tileEntityMachine.getEnergyStored(dir));
 			}
+
 		}
 	}
 

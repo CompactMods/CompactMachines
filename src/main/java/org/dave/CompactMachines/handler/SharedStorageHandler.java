@@ -92,8 +92,11 @@ public class SharedStorageHandler {
 	public void setHoppingModeForAll(int coord, int side, int hoppingMode) {
 		setHoppingMode(coord, side, "item", hoppingMode);
 		setHoppingMode(coord, side, "liquid", hoppingMode);
-		setHoppingMode(coord, side, "gas", hoppingMode);
 		setHoppingMode(coord, side, "flux", hoppingMode);
+		if(Reference.MEK_AVAILABLE) {
+			setHoppingMode(coord, side, "gas", hoppingMode);
+		}
+
 		//setHoppingMode(coord, side, "appeng", hoppingMode);
 		//setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
 	}

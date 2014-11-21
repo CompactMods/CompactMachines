@@ -3,6 +3,10 @@ package org.dave.CompactMachines.tileentity;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
+import mekanism.api.gas.IGasHandler;
+import mekanism.api.gas.ITubeConnection;
 import mrtjp.projectred.api.IBundledTile;
 import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,10 +37,6 @@ import org.dave.CompactMachines.reference.Reference;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
-import mekanism.api.gas.IGasHandler;
-import mekanism.api.gas.ITubeConnection;
-import mekanism.api.gas.Gas;
-import mekanism.api.gas.GasStack;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
 
@@ -207,8 +207,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public void reloadStorage() {
 		storage = (ItemSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
 		storageLiquid = (FluidSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
-		storageGas = (GasSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "gas");
 		storageFlux = (FluxSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
+
+		if (Reference.MEK_AVAILABLE) {
+			storageGas = (GasSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "gas");
+		}
 
 		if (Reference.OC_AVAILABLE) {
 			storageOC = (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "OpenComputers");
@@ -317,6 +320,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return storageLiquid.getFluid();
 	}
 
+	@Override
 	public int receiveGas(ForgeDirection from, GasStack stack) {
 		storageGas.autoHopToInside = false;
 		storageGas.setDirty();
@@ -324,14 +328,17 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return storageGas.receiveGas(from, stack);
 	}
 
+	@Override
 	public GasStack drawGas(ForgeDirection from, int amount) {
 		return storageGas.drawGas(from, amount);
 	}
 
+	@Override
 	public boolean canReceiveGas(ForgeDirection from, Gas type) {
 		return storageGas.canReceiveGas(from, type);
 	}
 
+	@Override
 	public boolean canDrawGas(ForgeDirection from, Gas type) {
 		return storageGas.canDrawGas(from, type);
 	}
@@ -340,6 +347,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return storageGas.getGasContents();
 	}
 
+	@Override
 	public boolean canTubeConnect(ForgeDirection side) {
 		return true;
 	}
