@@ -39,6 +39,24 @@ public class Recipes
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
+				new ItemStack(ModBlocks.innerwallDecorative, 8),
+				"xxx",
+				"xdx",
+				"xxx",
+				'd', new ItemStack(ModItems.atomEnlarger),
+				'x', "plankWood"
+				));
+
+		GameRegistry.addRecipe(new ShapedOreRecipe(
+				new ItemStack(ModBlocks.innerwallDecorative, 8),
+				"xxx",
+				"xdx",
+				"xxx",
+				'd', new ItemStack(ModItems.atomShrinker),
+				'x', "plankWood"
+				));
+
+		GameRegistry.addRecipe(new ShapedOreRecipe(
 				new ItemStack(ModItems.interfaceItem),
 				"isi",
 				"rgr",
