@@ -38,6 +38,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockMachine extends BlockCM implements ITileEntityProvider
 {
+	private boolean forceTeleport;
+
 	@SideOnly(Side.CLIENT)
 	private IIcon[]	icons;
 	private IIcon[]	iconsUpg;
@@ -180,6 +182,14 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 		WorldUtils.updateNeighborAEGrids(world, x, y, z);
 	}
+ 	
+	public boolean getForceTeleport() { 	
+		return forceTeleport; 	
+	} 	
+	
+	public void setForceTeleport( boolean value ) { 	
+		forceTeleport = value; 	
+	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int faceHit, float par7, float par8, float par9)
@@ -201,8 +211,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 				// XXX: Do we need to do anything for gases here?
 
-				// First check if the player is right clicking with a shrinker
-				if (playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
+				// First check if the force teleport flag is on or the player is right clicking with a shrinker
+				if (forceTeleport || playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
 					// Activated with a PSD
 					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
 				} else if (playerStack != null && FluidContainerRegistry.isEmptyContainer(playerStack)) {
