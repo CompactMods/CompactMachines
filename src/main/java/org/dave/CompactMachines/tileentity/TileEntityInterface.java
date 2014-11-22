@@ -169,7 +169,9 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			if (tileEntityInside != null) {
 				hopStorage(storage, tileEntityInside);
 				hopStorage(storageLiquid, tileEntityInside);
-				hopStorage(storageGas, tileEntityInside);
+				if(Reference.MEK_AVAILABLE) {
+					hopStorage(storageGas, tileEntityInside);
+				}
 				hopStorage(storageFlux, tileEntityInside);
 			}
 		}
@@ -321,6 +323,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public int receiveGas(ForgeDirection from, GasStack stack) {
 		storageGas.autoHopToInside = false;
 		storageGas.setDirty();
@@ -329,25 +332,30 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public GasStack drawGas(ForgeDirection from, int amount) {
 		return storageGas.drawGas(from, amount);
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public boolean canReceiveGas(ForgeDirection from, Gas type) {
 		return storageGas.canReceiveGas(from, type);
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public boolean canDrawGas(ForgeDirection from, Gas type) {
 		return storageGas.canDrawGas(from, type);
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	public GasStack getGasContents() {
 		return storageGas.getGasContents();
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public boolean canTubeConnect(ForgeDirection side) {
 		return true;
 	}

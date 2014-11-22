@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SidedEnvironment;
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
+import mekanism.api.gas.IGasHandler;
+import mekanism.api.gas.ITubeConnection;
 import mrtjp.projectred.api.IBundledTile;
 import mrtjp.projectred.api.ProjectRedAPI;
 import net.minecraft.entity.item.EntityItem;
@@ -41,10 +45,6 @@ import appeng.api.movable.IMovableTile;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
-import mekanism.api.gas.Gas;
-import mekanism.api.gas.GasStack;
-import mekanism.api.gas.IGasHandler;
-import mekanism.api.gas.ITubeConnection;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
@@ -82,7 +82,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		// XXX: Should these be initialised to -1, as in TileEntityInterface
 		_fluidid = new int[6];
 		_fluidamount = new int[6];
-		// These need to be initialised to -1 to avoid a crash when no 
+		// These need to be initialised to -1 to avoid a crash when no
 		// gas-providing mod is installed
 		_gasid = new int[] { -1, -1, -1, -1, -1, -1 };
 		_gasamount = new int[6];
@@ -294,7 +294,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				if (outside != null) {
 					hopStorage(getStorage(dir.ordinal()), outside);
 					hopStorage(getStorageFluid(dir.ordinal()), outside);
-					hopStorage(getStorageGas(dir.ordinal()), outside);
+					if(Reference.MEK_AVAILABLE) {
+						hopStorage(getStorageGas(dir.ordinal()), outside);
+					}
 					hopStorage(getStorageFlux(dir.ordinal()), outside);
 				}
 			}
@@ -452,6 +454,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return getStorageFluid(from.ordinal()).getFluid();
 	}
 
+	@Optional.Method(modid = "Mekanism")
+	@Override
 	public int receiveGas(ForgeDirection from, GasStack stack) {
 		if (coords == -1) {
 			return 0;
@@ -459,7 +463,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 		GasSharedStorage gss = getStorageGas(from.ordinal());
 
-		// XXX: Should we test with canReceiveGas first? Or do we rely on 
+		// XXX: Should we test with canReceiveGas first? Or do we rely on
 		// suppliers to do this?
 		gss.autoHopToInside = true;
 		gss.setDirty();
@@ -467,25 +471,35 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return gss.receiveGas(from, stack);
 	}
 
+	@Optional.Method(modid = "Mekanism")
+	@Override
 	public GasStack drawGas(ForgeDirection from, int amount) {
 		return getStorageGas(from.ordinal()).drawGas(from, amount);
 	}
 
+	@Optional.Method(modid = "Mekanism")
+	@Override
 	public boolean canReceiveGas(ForgeDirection from, Gas type) {
 		return getStorageGas(from.ordinal()).canReceiveGas(from, type);
 	}
 
+	@Optional.Method(modid = "Mekanism")
+	@Override
 	public boolean canDrawGas(ForgeDirection from, Gas type) {
 		return getStorageGas(from.ordinal()).canDrawGas(from, type);
 	}
 
+	@Optional.Method(modid = "Mekanism")
+	@Override
 	public boolean canTubeConnect(ForgeDirection side) {
 		return true;
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	public GasStack getGasContents(ForgeDirection from) {
 		return getStorageGas(from.ordinal()).getGasContents();
 	}
+
 
 	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
