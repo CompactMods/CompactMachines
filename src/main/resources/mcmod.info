@@ -3,8 +3,8 @@
   "modid": "CompactMachines",
   "name": "Compact Machines",
   "description": "Allows you to fit many machines inside a single block",
-  "version": "1.10",
-  "mcversion": "1.7.11",
+  "version": "1.12",
+  "mcversion": "1.7.10",
   "url": "https://github.com/thraaawn/CompactMachines",
   "updateUrl": "",
   "authorList": [

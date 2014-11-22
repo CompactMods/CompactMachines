@@ -1,21 +1,22 @@
 package org.dave.CompactMachines.integration.gas;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-
-import net.minecraftforge.common.util.ForgeDirection;
-
 import mekanism.api.gas.Gas;
 import mekanism.api.gas.GasStack;
 import mekanism.api.gas.IGasHandler;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.integration.gas.ExtendedGasTank;
+import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
+import cpw.mods.fml.common.Optional;
+
+@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism")
 public class GasSharedStorage extends AbstractSharedStorage implements IGasHandler {
 	private static final int	MAX_GAS	= 1024;
 	private ExtendedGasTank		tank;
@@ -23,11 +24,14 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 	public GasSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 
-		tank = new ExtendedGasTank(MAX_GAS) {
-			public void onGasChanged() {
-				setDirty();
-			}
-		};
+		if(Reference.MEK_AVAILABLE) {
+			tank = new ExtendedGasTank(MAX_GAS) {
+				@Override
+				public void onGasChanged() {
+					setDirty();
+				}
+			};
+		}
 
 		max_cooldown = ConfigurationHandler.cooldownGas;
 	}

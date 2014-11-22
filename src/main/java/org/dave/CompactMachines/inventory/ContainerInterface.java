@@ -1,5 +1,6 @@
 package org.dave.CompactMachines.inventory;
 
+import mekanism.api.gas.GasStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ICrafting;
@@ -7,8 +8,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
-import mekanism.api.gas.GasStack;
 
+import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 
 import cpw.mods.fml.relauncher.Side;
@@ -81,16 +82,18 @@ public class ContainerInterface extends ContainerCM {
 			}
 		}
 
-		GasStack gasContents = tileEntityInterface.getGasContents();
+		if(Reference.MEK_AVAILABLE) {
+			GasStack gasContents = tileEntityInterface.getGasContents();
 
-		if (gasContents != null) {
-			for (int i = 0; i < crafters.size(); i++) {
-				if (gasContents.amount > 0) {
-					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 35, gasContents.amount);
-					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 36, gasContents.getGas().getID());
-				} else {
-					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 35, 0);
-					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 36, 0);
+			if (gasContents != null) {
+				for (int i = 0; i < crafters.size(); i++) {
+					if (gasContents.amount > 0) {
+						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 35, gasContents.amount);
+						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 36, gasContents.getGas().getID());
+					} else {
+						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 35, 0);
+						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 36, 0);
+					}
 				}
 			}
 		}

@@ -41,8 +41,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	private boolean forceTeleport;
 
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons;
-	private IIcon[] iconsUpg;
+	private IIcon[]	icons;
+	private IIcon[]	iconsUpg;
 
 	public BlockMachine()
 	{
@@ -57,14 +57,14 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {
-        icons = new IIcon[6];
-        iconsUpg = new IIcon[6];
+		icons = new IIcon[6];
+		iconsUpg = new IIcon[6];
 
-        for (int i = 0; i < icons.length; i++)
-        {
-            icons[i] = iconRegister.registerIcon("compactmachines:machine_" + i);
-            iconsUpg[i] = iconRegister.registerIcon("compactmachines:machine_" + i + "_upg");
-        }
+		for (int i = 0; i < icons.length; i++)
+		{
+			icons[i] = iconRegister.registerIcon("compactmachines:machine_" + i);
+			iconsUpg[i] = iconRegister.registerIcon("compactmachines:machine_" + i + "_upg");
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -73,15 +73,14 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 		return icons[metadata];
 	}
 
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
-		TileEntityMachine tileEntityMachine = (TileEntityMachine)blockAccess.getTileEntity(x, y, z);
-		if(tileEntityMachine == null) {
+		TileEntityMachine tileEntityMachine = (TileEntityMachine) blockAccess.getTileEntity(x, y, z);
+		if (tileEntityMachine == null) {
 			return icons[0];
 		} else {
-			if(tileEntityMachine.isUpgraded) {
+			if (tileEntityMachine.isUpgraded) {
 				return iconsUpg[tileEntityMachine.meta];
 			} else {
 				return icons[tileEntityMachine.meta];
@@ -98,7 +97,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 	@Override
 	public boolean hasTileEntity(int metadata) {
-	    return true;
+		return true;
 	}
 
 	@Override
@@ -107,29 +106,29 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 		WorldUtils.updateNeighborAEGrids(world, x, y, z);
 
-		if(stack.stackTagCompound == null) {
+		if (stack.stackTagCompound == null) {
 			return;
 		}
 
-		if(!(world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+		if (!(world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
 			return;
 		}
 
-		TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
-		if(tileEntityMachine.coords != -1) {
+		TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
+		if (tileEntityMachine.coords != -1) {
 			// The machine already has data for some reason
 			return;
 		}
 
-		if(stack.stackTagCompound.hasKey("coords")) {
+		if (stack.stackTagCompound.hasKey("coords")) {
 			int coords = stack.stackTagCompound.getInteger("coords");
-			if(coords != -1) {
+			if (coords != -1) {
 				tileEntityMachine.coords = coords;
 				tileEntityMachine.isUpgraded = true;
 			}
 		}
 
-		if(stack.hasDisplayName()) {
+		if (stack.hasDisplayName()) {
 			tileEntityMachine.setCustomName(stack.getDisplayName());
 		}
 
@@ -151,13 +150,13 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
-		if(willHarvest && (world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
-			final TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
+		if (willHarvest && (world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			final TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 
 			boolean result = super.removedByPlayer(world, player, x, y, z, willHarvest);
 
-			if(result) {
-				if(!tileEntityMachine.isUpgraded) {
+			if (result) {
+				if (!tileEntityMachine.isUpgraded) {
 					CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine, player);
 				}
 
@@ -172,24 +171,16 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-		if((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
-			TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(x, y, z);
+		if ((world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 
 			// Disable chunk loading and remove it from the worlds NBT table
 			CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
 
-			world.removeTileEntity(x,y,z);
+			world.removeTileEntity(x, y, z);
 		}
 
 		WorldUtils.updateNeighborAEGrids(world, x, y, z);
-	}
-
-	public boolean getForceTeleport() {
-		return forceTeleport;
-	}
-
-	public void setForceTeleport( boolean value ) {
-		forceTeleport = value;
 	}
 
 	@Override
@@ -210,18 +201,19 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 				TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 				ItemStack playerStack = player.getCurrentEquippedItem();
 
+				// XXX: Do we need to do anything for gases here?
+
 				// First check if the force teleport flag is on or the player is right clicking with a shrinker
-				if(forceTeleport || ((playerStack != null) && (playerStack.getItem() instanceof ItemPersonalShrinkingDevice))) {
-					// Activated with the force teleport flag on or a PSD
-					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP)player, tileEntityMachine);
-					forceTeleport = false;
-				} else if(playerStack != null && FluidContainerRegistry.isEmptyContainer(playerStack)) {
+				if (forceTeleport || playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
+					// Activated with a PSD
+					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
+				} else if (playerStack != null && FluidContainerRegistry.isEmptyContainer(playerStack)) {
 					// Activated with an empty bucket
 					FluidUtils.emptyTankIntoContainer(tileEntityMachine, player, tileEntityMachine.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
-				} else if(playerStack != null && FluidContainerRegistry.isFilledContainer(playerStack)) {
+				} else if (playerStack != null && FluidContainerRegistry.isFilledContainer(playerStack)) {
 					// Activated with a filled bucket
 					FluidUtils.fillTankWithContainer(tileEntityMachine, player, ForgeDirection.getOrientation(faceHit));
-				} else if(tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Reference.upgradeItem) {
+				} else if (tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Reference.upgradeItem) {
 					// Activated with a nether star
 					tileEntityMachine.isUpgraded = true;
 					tileEntityMachine.markDirty();
@@ -229,30 +221,30 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 					world.markBlockForUpdate(x, y, z);
 
 					playerStack.stackSize--;
-				} else if(playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
+				} else if (playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
 
-					if(!ConfigurationHandler.allowEntanglement) {
+					if (!ConfigurationHandler.allowEntanglement) {
 						player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));
 						return true;
 					}
 
-					if(playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
+					if (playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
 						// quantumEntangler already has a compound
-						if(tileEntityMachine.coords != -1) {
+						if (tileEntityMachine.coords != -1) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_already_in_use.txt"));
-						} else if(tileEntityMachine.isUpgraded == false) {
+						} else if (tileEntityMachine.isUpgraded == false) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
 						} else {
 							NBTTagCompound stackNbt = playerStack.getTagCompound();
 
 							int size = stackNbt.getInteger("size");
-							if(size != tileEntityMachine.meta) {
+							if (size != tileEntityMachine.meta) {
 								player.addChatMessage(new ChatComponentTranslation("msg.message_machine_invalid_size.txt"));
 							} else {
 								int coords = stackNbt.getInteger("coords");
 								tileEntityMachine.coords = coords;
 
-								if(stackNbt.hasKey("roomname")) {
+								if (stackNbt.hasKey("roomname")) {
 									tileEntityMachine.setCustomName(stackNbt.getString("roomname"));
 								}
 
@@ -262,7 +254,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 							}
 						}
 
-					} else if(tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
+					} else if (tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
 						// No "coords" tag yet and the machine is in use and upgraded
 						// --> Save the coords
 						NBTTagCompound nbt = new NBTTagCompound();
@@ -272,9 +264,9 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 						playerStack.setTagCompound(nbt);
 					} else {
-						if(tileEntityMachine.coords == -1) {
+						if (tileEntityMachine.coords == -1) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_in_use.txt"));
-						} else if(!tileEntityMachine.isUpgraded) {
+						} else if (!tileEntityMachine.isUpgraded) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
 						}
 					}
