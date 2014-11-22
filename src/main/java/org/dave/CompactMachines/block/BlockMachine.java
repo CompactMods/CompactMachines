@@ -182,6 +182,14 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 		WorldUtils.updateNeighborAEGrids(world, x, y, z);
 	}
+ 	
+	public boolean getForceTeleport() { 	
+		return forceTeleport; 	
+	} 	
+	
+	public void setForceTeleport( boolean value ) { 	
+		forceTeleport = value; 	
+	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int faceHit, float par7, float par8, float par9)
