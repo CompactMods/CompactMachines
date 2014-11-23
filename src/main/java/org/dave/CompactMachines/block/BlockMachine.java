@@ -198,75 +198,90 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 				TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 				ItemStack playerStack = player.getCurrentEquippedItem();
+				NBTTagCompound stackNBT = null;
+				NBTTagCompound cmNBT = null;
 
-				// XXX: Do we need to do anything for gases here?
+				if (playerStack != null) {
+					
+				        if (playerStack.hasTagCompound()) {
+				                stackNBT = playerStack.getTagCompound();
 
-				// First check if the player is right clicking with a shrinker
-				if (playerStack != null && playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
-					// Activated with a PSD
-					CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
-				} else if (playerStack != null && FluidContainerRegistry.isEmptyContainer(playerStack)) {
-					// Activated with an empty bucket
-					FluidUtils.emptyTankIntoContainer(tileEntityMachine, player, tileEntityMachine.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
-				} else if (playerStack != null && FluidContainerRegistry.isFilledContainer(playerStack)) {
-					// Activated with a filled bucket
-					FluidUtils.fillTankWithContainer(tileEntityMachine, player, ForgeDirection.getOrientation(faceHit));
-				} else if (tileEntityMachine.isUpgraded == false && playerStack != null && playerStack.getItem() == Reference.upgradeItem) {
-					// Activated with a nether star
-					tileEntityMachine.isUpgraded = true;
-					tileEntityMachine.markDirty();
-
-					world.markBlockForUpdate(x, y, z);
-
-					playerStack.stackSize--;
-				} else if (playerStack != null && playerStack.getItem() == ModItems.quantumEntangler) {
-
-					if (!ConfigurationHandler.allowEntanglement) {
-						player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));
-						return true;
+						// The CompactMachines NBT group
+						if (stackNBT.hasKey("CompactMachines")) {
+						    cmNBT = stackNBT.getCompoundTag("CompactMachines");
+						}
 					}
 
-					if (playerStack.hasTagCompound() && playerStack.getTagCompound().hasKey("coords") && playerStack.getTagCompound().hasKey("size")) {
-						// quantumEntangler already has a compound
-						if (tileEntityMachine.coords != -1) {
-							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_already_in_use.txt"));
-						} else if (tileEntityMachine.isUpgraded == false) {
-							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
-						} else {
-							NBTTagCompound stackNbt = playerStack.getTagCompound();
+				        // XXX: Do we need to do anything for gases here?
 
-							int size = stackNbt.getInteger("size");
-							if (size != tileEntityMachine.meta) {
-								player.addChatMessage(new ChatComponentTranslation("msg.message_machine_invalid_size.txt"));
-							} else {
-								int coords = stackNbt.getInteger("coords");
-								tileEntityMachine.coords = coords;
+				        // First check if the player is right clicking with a shrinker or if the player has an item with canShrink set as true
+				        if (playerStack.getItem() instanceof ItemPersonalShrinkingDevice || ((cmNBT != null && cmNBT.hasKey("canShrink")) && cmNBT.getBoolean("canShrink"))) {
+					        // Activated with a PSD
+					        CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
+				        } else if (FluidContainerRegistry.isEmptyContainer(playerStack)) {
+					        // Activated with an empty bucket
+					        FluidUtils.emptyTankIntoContainer(tileEntityMachine, player, tileEntityMachine.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
+				        } else if (FluidContainerRegistry.isFilledContainer(playerStack)) {
+					        // Activated with a filled bucket
+					        FluidUtils.fillTankWithContainer(tileEntityMachine, player, ForgeDirection.getOrientation(faceHit));
+				        } else if (tileEntityMachine.isUpgraded == false && playerStack.getItem() == Reference.upgradeItem) {
+					        // Activated with a nether star
+					        tileEntityMachine.isUpgraded = true;
+					        tileEntityMachine.markDirty();
 
-								if (stackNbt.hasKey("roomname")) {
-									tileEntityMachine.setCustomName(stackNbt.getString("roomname"));
-								}
+					        world.markBlockForUpdate(x, y, z);
 
-								tileEntityMachine.markDirty();
+					        playerStack.stackSize--;
+				        } else if (playerStack.getItem() == ModItems.quantumEntangler) {
 
-								playerStack.stackSize--;
-							}
-						}
+					        if (!ConfigurationHandler.allowEntanglement) {
+						        player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));
+						        return true;
+					        }
 
-					} else if (tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
-						// No "coords" tag yet and the machine is in use and upgraded
-						// --> Save the coords
-						NBTTagCompound nbt = new NBTTagCompound();
-						nbt.setInteger("coords", tileEntityMachine.coords);
-						nbt.setInteger("size", tileEntityMachine.meta);
-						nbt.setString("roomname", tileEntityMachine.getCustomName());
+					        if (stackNBT != null && stackNBT.hasKey("coords") && stackNBT.hasKey("size")) {
+						        // quantumEntangler already has a compound
+						        if (tileEntityMachine.coords != -1) {
+							        player.addChatMessage(new ChatComponentTranslation("msg.message_machine_already_in_use.txt"));
+						        } else if (tileEntityMachine.isUpgraded == false) {
+							        player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
+						        } else {
 
-						playerStack.setTagCompound(nbt);
+							        int size = stackNBT.getInteger("size");
+							        if (size != tileEntityMachine.meta) {
+								        player.addChatMessage(new ChatComponentTranslation("msg.message_machine_invalid_size.txt"));
+							        } else {
+								        int coords = stackNBT.getInteger("coords");
+								        tileEntityMachine.coords = coords;
+
+								        if (stackNBT.hasKey("roomname")) {
+									        tileEntityMachine.setCustomName(stackNBT.getString("roomname"));
+								        }
+
+								        tileEntityMachine.markDirty();
+
+								        playerStack.stackSize--;
+							        }
+						        }
+
+					        } else if (tileEntityMachine.isUpgraded && tileEntityMachine.coords != -1) {
+						        // No "coords" tag yet and the machine is in use and upgraded
+						        // --> Save the coords
+						        NBTTagCompound nbt = new NBTTagCompound();
+						        nbt.setInteger("coords", tileEntityMachine.coords);
+						        nbt.setInteger("size", tileEntityMachine.meta);
+						        nbt.setString("roomname", tileEntityMachine.getCustomName());
+
+						        playerStack.setTagCompound(nbt);
+					        } else {
+						        if (tileEntityMachine.coords == -1) {
+							        player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_in_use.txt"));
+						        } else if (!tileEntityMachine.isUpgraded) {
+							        player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
+						        }
+					        }
 					} else {
-						if (tileEntityMachine.coords == -1) {
-							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_in_use.txt"));
-						} else if (!tileEntityMachine.isUpgraded) {
-							player.addChatMessage(new ChatComponentTranslation("msg.message_machine_not_upgraded.txt"));
-						}
+					        player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);
 					}
 				} else {
 					player.openGui(CompactMachines.instance, GuiId.MACHINE.ordinal(), world, x, y, z);
