@@ -170,7 +170,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 	}
 
-	private void readInterfacesFromNBT(NBTTagCompound nbt) {
+	public void readInterfacesFromNBT(NBTTagCompound nbt) {
 		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
 		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
 		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
@@ -190,7 +190,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 	}
 
-	private void addInterfacesToNBT(NBTTagCompound nbt) {
+	public void addInterfacesToNBT(NBTTagCompound nbt) {
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
 		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
@@ -656,7 +656,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			br.setDirty();
 		}
 
-		if (haveChanges) {
+		if (haveChanges && interfaces != null) {
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				Vec3 pos = interfaces.get(dir.ordinal());
 				WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);

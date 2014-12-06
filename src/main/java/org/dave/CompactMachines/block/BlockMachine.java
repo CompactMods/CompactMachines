@@ -258,6 +258,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 										tileEntityMachine.setCustomName(stackNBT.getString("roomname"));
 									}
 
+									tileEntityMachine.readInterfacesFromNBT(stackNBT);
+
 									tileEntityMachine.markDirty();
 
 									playerStack.stackSize--;
@@ -270,6 +272,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 							NBTTagCompound nbt = new NBTTagCompound();
 							nbt.setInteger("coords", tileEntityMachine.coords);
 							nbt.setInteger("size", tileEntityMachine.meta);
+							tileEntityMachine.addInterfacesToNBT(nbt);
 							nbt.setString("roomname", tileEntityMachine.getCustomName());
 
 							playerStack.setTagCompound(nbt);
