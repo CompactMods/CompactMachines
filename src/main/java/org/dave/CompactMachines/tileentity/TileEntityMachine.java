@@ -562,12 +562,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir));
 				gridNodes.put(dir.ordinal(), gridNode);
 			}
-			/*
-			LogHelper.info("Gridnode " + dir + " is: " + gridNode.hashCode());
-			for(IGridConnection conn : gridNode.getConnections()) {
-				LogHelper.info(" * Connection between: " + conn.a().hashCode() + " and " + conn.b().hashCode());
-			}
-			*/
 
 			return gridNode;
 		}

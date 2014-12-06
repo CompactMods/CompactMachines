@@ -402,6 +402,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
+		if(worldObj.isRemote) {
+			return null;
+		}
+
 		return storageAE.getInterfaceNode(getGridBlock(dir));
 	}
 
