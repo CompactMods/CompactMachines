@@ -16,12 +16,12 @@ public class IGWHandler {
 	public static void init() {
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.machine, "compactmachines/block.machine");
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.interfaceblock, "compactmachines/block.interface");
-		WikiRegistry.registerBlockAndItemPageEntry(ModItems.personalShrinkingDevice, "compactmachines/item.psd");
-		WikiRegistry.registerBlockAndItemPageEntry(ModItems.quantumEntangler, "compactmachines/item.quantumentangler");
+		WikiRegistry.registerBlockAndItemPageEntry(ModItems.psd, "compactmachines/item.psd");
+		WikiRegistry.registerBlockAndItemPageEntry(ModItems.quantumentangler, "compactmachines/item.quantumentangler");
 
-		WikiRegistry.registerBlockAndItemPageEntry(ModItems.atomEnlarger, "compactmachines/item.atom");
-		WikiRegistry.registerBlockAndItemPageEntry(ModItems.atomShrinker, "compactmachines/item.atom");
-		WikiRegistry.registerBlockAndItemPageEntry(ModItems.interfaceItem, "compactmachines/item.interfaceItem");
+		WikiRegistry.registerBlockAndItemPageEntry(ModItems.enlarger, "compactmachines/item.atom");
+		WikiRegistry.registerBlockAndItemPageEntry(ModItems.shrinker, "compactmachines/item.atom");
+		WikiRegistry.registerBlockAndItemPageEntry(ModItems.interfaceitem, "compactmachines/item.interfaceItem");
 
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.innerwall, "compactmachines/basics");
 		WikiRegistry.registerBlockAndItemPageEntry(ModBlocks.resizingcube, "compactmachines/block.resizingcube");

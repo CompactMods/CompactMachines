@@ -232,7 +232,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 						world.markBlockForUpdate(x, y, z);
 
 						playerStack.stackSize--;
-					} else if (playerStack.getItem() == ModItems.quantumEntangler) {
+					} else if (playerStack.getItem() == ModItems.quantumentangler) {
 
 						if (!ConfigurationHandler.allowEntanglement) {
 							player.addChatMessage(new ChatComponentTranslation("msg.message_quantum_entanglement_disabled.txt"));

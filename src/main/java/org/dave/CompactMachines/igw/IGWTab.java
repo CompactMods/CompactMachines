@@ -27,7 +27,7 @@ public class IGWTab extends BaseWikiTab {
 
 	@Override
 	public ItemStack renderTabIcon(GuiWiki gui) {
-		return new ItemStack(ModItems.personalShrinkingDevice);
+		return new ItemStack(ModItems.psd);
 	}
 
 	@Override

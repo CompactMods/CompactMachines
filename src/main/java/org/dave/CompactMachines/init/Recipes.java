@@ -19,12 +19,12 @@ public class Recipes
 		GameRegistry.addRecipe(getMachineRecipe(5));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModItems.personalShrinkingDevice),
+				new ItemStack(ModItems.psd),
 				"ddd",
 				"xrx",
 				"qqq",
 				'd', "gemDiamond",
-				'x', new ItemStack(ModItems.interfaceItem),
+				'x', new ItemStack(ModItems.interfaceitem),
 				'r', "dustRedstone",
 				'q', "gemQuartz"
 				));
@@ -35,41 +35,41 @@ public class Recipes
 				"xdx",
 				" xx",
 				'd', "gemDiamond",
-				'x', new ItemStack(ModItems.interfaceItem)
+				'x', new ItemStack(ModItems.interfaceitem)
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModBlocks.innerwallDecorative, 8),
+				new ItemStack(ModBlocks.innerwalldecor, 8),
 				"xxx",
 				"xdx",
 				"xxx",
-				'd', new ItemStack(ModItems.atomEnlarger),
+				'd', new ItemStack(ModItems.enlarger),
 				'x', "plankWood"
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModBlocks.innerwallDecorative, 8),
+				new ItemStack(ModBlocks.innerwalldecor, 8),
 				"xxx",
 				"xdx",
 				"xxx",
-				'd', new ItemStack(ModItems.atomShrinker),
+				'd', new ItemStack(ModItems.shrinker),
 				'x', "plankWood"
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModItems.interfaceItem),
+				new ItemStack(ModItems.interfaceitem),
 				"isi",
 				"rgr",
 				"iei",
 				'i', "ingotIron",
 				'g', "ingotGold",
 				'r', "dustRedstone",
-				's', new ItemStack(ModItems.atomShrinker),
-				'e', new ItemStack(ModItems.atomEnlarger)
+				's', new ItemStack(ModItems.shrinker),
+				'e', new ItemStack(ModItems.enlarger)
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModItems.atomShrinker),
+				new ItemStack(ModItems.shrinker),
 				"ggg",
 				"rpr",
 				"ggg",
@@ -79,7 +79,7 @@ public class Recipes
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModItems.atomEnlarger),
+				new ItemStack(ModItems.enlarger),
 				"ggg",
 				"rpr",
 				"ggg",
@@ -89,12 +89,12 @@ public class Recipes
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModItems.quantumEntangler),
+				new ItemStack(ModItems.quantumentangler),
 				"qqq",
 				"xsx",
 				"qqq",
 				'q', "gemQuartz",
-				'x', new ItemStack(ModItems.interfaceItem),
+				'x', new ItemStack(ModItems.interfaceitem),
 				's', new ItemStack(Items.nether_star)
 				));
 	}

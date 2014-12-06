@@ -12,7 +12,7 @@ public class CreativeTabCM
 													@Override
 													public Item getTabIconItem()
 													{
-														return ModItems.personalShrinkingDevice;
+														return ModItems.psd;
 													}
 												};
 }
