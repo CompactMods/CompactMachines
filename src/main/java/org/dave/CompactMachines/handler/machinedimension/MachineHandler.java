@@ -394,6 +394,9 @@ public class MachineHandler extends WorldSavedData {
 				int coord = coordHistory.getCompoundTagAt(coordHistory.tagCount() - 1).getInteger("coord");
 				teleportPlayerToCoords(player, coord, true);
 			}
+		} else {
+			// No coord history on the player yet - teleport him out of there.
+			teleportPlayerOutOfMachineDimension(player);
 		}
 	}
 
