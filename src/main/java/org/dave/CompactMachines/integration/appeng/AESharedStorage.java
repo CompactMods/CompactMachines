@@ -8,6 +8,7 @@ import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.WorldUtils;
 
 import appeng.api.AEApi;
 import appeng.api.exceptions.FailedConnection;
@@ -20,7 +21,7 @@ public class AESharedStorage extends AbstractSharedStorage {
 	public IGridNode	machineNode;
 	public IGridNode	interfaceNode;
 
-	boolean				isConnected	= false;
+	public boolean		isConnected	= false;
 
 	public AESharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -35,6 +36,8 @@ public class AESharedStorage extends AbstractSharedStorage {
 	}
 
 	public void connectNodes() {
+		//LogHelper.info("ConnectNodes called for side: " + ForgeDirection.getOrientation(side));
+
 		if (interfaceNode == null || machineNode == null) {
 			return;
 		}
@@ -68,6 +71,9 @@ public class AESharedStorage extends AbstractSharedStorage {
 		if (machineNode == null) {
 			machineNode = AEApi.instance().createGridNode(gridBlock);
 			machineNode.updateState();
+
+			// Update neighbor blocks since we are now having a gridnode
+			WorldUtils.updateNeighborAEGrids(gridBlock.getLocation().getWorld(), gridBlock.getLocation().x, gridBlock.getLocation().y, gridBlock.getLocation().z);
 		}
 		connectNodes();
 		return machineNode;

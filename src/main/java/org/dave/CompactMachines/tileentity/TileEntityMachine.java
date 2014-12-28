@@ -231,19 +231,42 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void invalidate() {
 		super.invalidate();
 
-		if (Reference.OC_AVAILABLE && !worldObj.isRemote) {
-			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if (getStorageOC(dir.ordinal()) == null) {
+		if(worldObj.isRemote) {
+			return;
+		}
+
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			if (Reference.OC_AVAILABLE) {
+				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
+				if (storage == null) {
 					continue;
 				}
 
-				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
 				Node node = storage.getNode();
 				if (node != null) {
 					node.remove();
 				}
 			}
+
+			if (Reference.AE_AVAILABLE) {
+				AESharedStorage storage = getStorageAE(dir.ordinal());
+				if(storage.machineNode != null) {
+					storage.machineNode.destroy();
+					storage.machineNode = null;
+				}
+
+				// Don't touch the interface nodes as another linked CM might be linked to them
+				/*
+				if(storage.interfaceNode != null) {
+					storage.interfaceNode.destroy();
+					storage.interfaceNode = null;
+				}
+				*/
+
+				storage.isConnected = false;
+			}
 		}
+
 	}
 
 	public void initialize() {
@@ -255,20 +278,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
 		}
 
-		if (Reference.OC_AVAILABLE) {
-			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if (getStorageOC(dir.ordinal()) == null) {
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			if (Reference.OC_AVAILABLE) {
+				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
+				if (storage == null) {
 					continue;
 				}
 
-				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
 				Node node = storage.getNode();
 				if (node != null && node.network() == null) {
 					li.cil.oc.api.Network.joinOrCreateNetwork(this);
 				}
 			}
-		}
 
+			if (Reference.AE_AVAILABLE) {
+				getGridNode(dir);
+			}
+		}
 	}
 
 	@Override
@@ -556,6 +582,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
+		if(coords == -1) {
+			return null;
+		}
+
 		if (!worldObj.isRemote) {
 			IGridNode gridNode = gridNodes.get(dir.ordinal());
 			if (gridNode == null) {

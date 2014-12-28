@@ -34,11 +34,11 @@ public class CMGridBlock implements IGridBlock {
 		return EnumSet.of(GridFlags.DENSE_CAPACITY);
 	}
 
-	@Override
 	public boolean isWorldAccessable() {
 		return false;
 	}
 
+	@Override
 	public boolean isWorldAccessible() {
 		return isWorldAccessable();
 	}

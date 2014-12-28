@@ -162,6 +162,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			}
 		}
 
+		if (Reference.AE_AVAILABLE && !worldObj.isRemote) {
+			getGridNode(ForgeDirection.UNKNOWN);
+		}
+
 		if (!worldObj.isRemote) {
 			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
 			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);

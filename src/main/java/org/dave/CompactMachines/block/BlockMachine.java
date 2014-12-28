@@ -102,8 +102,6 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) {
 		super.onBlockPlacedBy(world, x, y, z, player, stack);
 
-		WorldUtils.updateNeighborAEGrids(world, x, y, z);
-
 		if (stack.stackTagCompound == null) {
 			return;
 		}
@@ -261,6 +259,8 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 									tileEntityMachine.readInterfacesFromNBT(stackNBT);
 
 									tileEntityMachine.markDirty();
+
+									WorldUtils.updateNeighborAEGrids(world, x, y, z);
 
 									playerStack.stackSize--;
 								}
