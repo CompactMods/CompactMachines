@@ -215,6 +215,9 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 					// First check if the player is right clicking with a shrinker or if the player has an item with canShrink set as true
 					if (playerStack.getItem() instanceof ItemPersonalShrinkingDevice || ((cmNBT != null && cmNBT.hasKey("canShrink")) && cmNBT.getBoolean("canShrink"))) {
 						// Activated with a PSD
+						if(!ConfigurationHandler.allowEnterWithoutPSD) {
+							player.getEntityData().setBoolean("isUsingPSD", true);
+						}
 						CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
 					} else if (FluidContainerRegistry.isEmptyContainer(playerStack)) {
 						// Activated with an empty bucket

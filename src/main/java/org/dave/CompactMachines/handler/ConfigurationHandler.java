@@ -26,6 +26,7 @@ public class ConfigurationHandler {
 	public static boolean		keepPlayersInsideOfRooms;
 	public static int			villagerId;
 	public static boolean		enableVillager;
+	public static boolean		allowEnterWithoutPSD;
 
 	public static void init(File configFile) {
 		// Create the configuration object from the given configuration file
@@ -53,6 +54,8 @@ public class ConfigurationHandler {
 		upgradeItem = configuration.getString("upgradeItem", "CompactMachines", "nether_star", "The item used to upgrade compact machines. Format: modid:name_block_registered_with");
 
 		enableVillager = configuration.getBoolean("enableVillager", "CompactMachines", true, "Enables Villager spawns trading PSDs, QEs and World Resizing Cubes.");
+
+		allowEnterWithoutPSD = configuration.getBoolean("allowEnterWithoutPSD", "CompactMachines", false, "Allow players to enter Compact Machines by other means than a PSD. Gives wither effect and nausea if disallowed.");
 
 		if (configuration.hasChanged()) {
 			configuration.save();
