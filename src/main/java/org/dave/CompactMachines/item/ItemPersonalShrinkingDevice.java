@@ -16,6 +16,7 @@ public class ItemPersonalShrinkingDevice extends ItemCM
 	{
 		super();
 		this.setUnlocalizedName(Names.Items.PSD);
+		this.setMaxStackSize(1);
 	}
 
 	@Override
