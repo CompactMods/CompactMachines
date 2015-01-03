@@ -320,9 +320,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				if (outside != null) {
 					hopStorage(getStorage(dir.ordinal()), outside);
 					hopStorage(getStorageFluid(dir.ordinal()), outside);
-					if(Reference.MEK_AVAILABLE) {
-						hopStorage(getStorageGas(dir.ordinal()), outside);
-					}
+					hopStorage(getStorageGas(dir.ordinal()), outside);
 					hopStorage(getStorageFlux(dir.ordinal()), outside);
 				}
 			}
@@ -330,8 +328,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	private void hopStorage(AbstractSharedStorage storage, TileEntity outside) {
-		if (storage != null && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
-			storage.hopToOutside(this, outside);
+		if (storage != null && storage.isHopping() && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
+			storage.hopToTileEntity(outside, true);
 		}
 	}
 

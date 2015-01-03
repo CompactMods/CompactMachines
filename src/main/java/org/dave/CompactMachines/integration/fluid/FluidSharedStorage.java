@@ -11,8 +11,6 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.FluidUtils;
 
 public class FluidSharedStorage extends AbstractSharedStorage implements IFluidHandler {
@@ -92,7 +90,13 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 		return tank.getFluid();
 	}
 
-	private void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
+	@Override
+	public boolean isHopping() {
+		return true;
+	}
+
+	@Override
+	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		FluidStack stack = getFluid().copy();
 		if (stack == null || stack.amount == 0) {
 			return;
@@ -123,16 +127,6 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 				}
 			}
 		}
-	}
-
-	@Override
-	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		hopToTileEntity(tileEntityOutside, true);
-	}
-
-	@Override
-	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		hopToTileEntity(tileEntityInside, false);
 	}
 
 }

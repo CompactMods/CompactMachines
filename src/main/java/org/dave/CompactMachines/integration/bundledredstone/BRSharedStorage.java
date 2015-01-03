@@ -1,12 +1,9 @@
 package org.dave.CompactMachines.integration.bundledredstone;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 public class BRSharedStorage extends AbstractSharedStorage {
 	public int		coord;
@@ -66,12 +63,6 @@ public class BRSharedStorage extends AbstractSharedStorage {
 			interfaceOutputtedSignal = new byte[16];
 		}
 	}
-
-	@Override
-	public void hopToOutside(TileEntityMachine te, TileEntity outside) {}
-
-	@Override
-	public void hopToInside(TileEntityInterface te, TileEntity inside) {}
 
 	private static String getByteString(byte[] arr) {
 		String resString = "[";

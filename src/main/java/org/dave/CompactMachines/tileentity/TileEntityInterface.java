@@ -154,7 +154,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			updateIncomingSignals();
 		}
 
-		if (Reference.OC_AVAILABLE && !worldObj.isRemote) {
+		if(worldObj.isRemote) {
+			return;
+		}
+
+		if (Reference.OC_AVAILABLE) {
 			Node node = storageOC.getNode();
 
 			if (node != null && node.network() == null) {
@@ -162,22 +166,18 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			}
 		}
 
-		if (Reference.AE_AVAILABLE && !worldObj.isRemote) {
+		if (Reference.AE_AVAILABLE) {
 			getGridNode(ForgeDirection.UNKNOWN);
 		}
 
-		if (!worldObj.isRemote) {
-			ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
-			TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+		ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
+		TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
 
-			if (tileEntityInside != null) {
-				hopStorage(storage, tileEntityInside);
-				hopStorage(storageLiquid, tileEntityInside);
-				if(Reference.MEK_AVAILABLE) {
-					hopStorage(storageGas, tileEntityInside);
-				}
-				hopStorage(storageFlux, tileEntityInside);
-			}
+		if (tileEntityInside != null) {
+			hopStorage(storage, tileEntityInside);
+			hopStorage(storageLiquid, tileEntityInside);
+			hopStorage(storageGas, tileEntityInside);
+			hopStorage(storageFlux, tileEntityInside);
 		}
 	}
 
@@ -205,8 +205,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	private void hopStorage(AbstractSharedStorage storage, TileEntity tileEntityInside) {
-		if (storage != null && (storage.hoppingMode == 1 || storage.hoppingMode == 3 && storage.autoHopToInside == true)) {
-			storage.hopToInside(this, tileEntityInside);
+		if (storage != null && storage.isHopping() && (storage.hoppingMode == 1 || storage.hoppingMode == 3 && storage.autoHopToInside == true)) {
+			storage.hopToTileEntity(tileEntityInside, false);
 		}
 	}
 

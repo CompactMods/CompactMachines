@@ -7,8 +7,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
@@ -76,6 +74,7 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 		return capacity;
 	}
 
+	@Override
 	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		if (getEnergyStored() == 0) {
 			return;
@@ -118,14 +117,8 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 	}
 
 	@Override
-	public void hopToOutside(TileEntityMachine tileEntityMachine, TileEntity tileEntityOutside) {
-		hopToTileEntity(tileEntityOutside, true);
-
-	}
-
-	@Override
-	public void hopToInside(TileEntityInterface tileEntityInterface, TileEntity tileEntityInside) {
-		hopToTileEntity(tileEntityInside, false);
+	public boolean isHopping() {
+		return true;
 	}
 
 }

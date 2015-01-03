@@ -11,8 +11,6 @@ import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 import cpw.mods.fml.common.Optional;
 
@@ -89,7 +87,13 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 		tank.read(tag.getCompoundTag("tank"));
 	}
 
-	private void hopToTileEntity(TileEntity te, boolean opposite) {
+	@Override
+	public boolean isHopping() {
+		return Reference.MEK_AVAILABLE;
+	}
+
+	@Override
+	public void hopToTileEntity(TileEntity te, boolean opposite) {
 		GasStack stack = tank.getGas();
 
 		if (stack == null || stack.amount == 0) {
@@ -126,15 +130,5 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 
 		}
 
-	}
-
-	@Override
-	public void hopToOutside(TileEntityMachine te, TileEntity outside) {
-		hopToTileEntity(outside, true);
-	}
-
-	@Override
-	public void hopToInside(TileEntityInterface te, TileEntity inside) {
-		hopToTileEntity(inside, false);
 	}
 }

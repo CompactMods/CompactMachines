@@ -4,8 +4,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 public abstract class AbstractSharedStorage {
 	public final SharedStorageHandler	storageHandler;
@@ -68,8 +66,12 @@ public abstract class AbstractSharedStorage {
 
 	public abstract void loadFromTag(NBTTagCompound tag);
 
-	public abstract void hopToOutside(TileEntityMachine te, TileEntity outside);
+	public void hopToTileEntity(TileEntity target, boolean useOppositeSide) {
+		return;
+	}
 
-	public abstract void hopToInside(TileEntityInterface te, TileEntity inside);
+	public boolean isHopping() {
+		return false;
+	}
 
 }

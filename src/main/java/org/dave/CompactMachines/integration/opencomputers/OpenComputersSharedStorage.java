@@ -5,12 +5,9 @@ import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
-import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 import cpw.mods.fml.common.Optional;
 
@@ -50,12 +47,6 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 	public void loadFromTag(NBTTagCompound tag) {
 
 	}
-
-	@Override
-	public void hopToOutside(TileEntityMachine te, TileEntity outside) {}
-
-	@Override
-	public void hopToInside(TileEntityInterface te, TileEntity inside) {}
 
 	@Override
 	public Node node() {
