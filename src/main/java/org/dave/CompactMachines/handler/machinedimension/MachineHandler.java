@@ -500,17 +500,17 @@ public class MachineHandler extends WorldSavedData {
 
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 
-		machine.interfaces = WorldUtils.generateCube(machineWorld,
+		WorldUtils.generateCube(machineWorld,
 				//          x           y           z
 				machine.coords * ConfigurationHandler.cubeDistance, 40, 0,
 				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
 				);
 
 		// After creating the Block, make sure the TileEntities inside have their information ready.
-		for (int i = 0; i < 6; i++) {
-			Vec3 pos = machine.interfaces.get(i);
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			Vec3 pos = WorldUtils.getInterfacePosition(machine.coords, machine.meta, dir);
 			TileEntityInterface te = (TileEntityInterface) machineWorld.getTileEntity((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord);
-			te.setCoordSide(machine.coords, i);
+			te.setCoordSide(machine.coords, dir.ordinal());
 		}
 
 		machine.markDirty();

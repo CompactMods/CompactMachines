@@ -1,7 +1,6 @@
 package org.dave.CompactMachines.utility;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -29,6 +28,54 @@ public class WorldUtils {
 				);
 
 		return bb;
+	}
+
+	public static Vec3 getInterfacePosition(int coord, int meta, ForgeDirection dir) {
+		int size = Reference.getBoxSize(meta);
+		int height = size;
+
+		int xMin = coord * ConfigurationHandler.cubeDistance;
+		int yMin = 40;
+		int zMin = 0;
+
+		int midX = xMin + (size / 2);
+		int midY = yMin + (size / 2);
+		int midZ = zMin + (size / 2);
+
+		int x = 0;
+		int y = 0;
+		int z = 0;
+
+		if(dir == ForgeDirection.DOWN) {
+			y = yMin;
+			x = midX;
+			z = midZ;
+		} else if(dir == ForgeDirection.UP) {
+			y = yMin + size;
+			x = midX;
+			z = midZ;
+		} else {
+			y = midY;
+
+			if(dir == ForgeDirection.NORTH) {
+				// XY mid, Z min --> north
+				x = midX;
+				z = zMin;
+			} else if(dir == ForgeDirection.SOUTH) {
+				x = midX;
+				z = zMin + size;
+			} else if(dir == ForgeDirection.EAST) {
+				// YZ mid, X max --> east
+				z = midZ;
+				x = xMin + size;
+			} else if(dir == ForgeDirection.WEST) {
+				z = midZ;
+				x = xMin;
+			}
+
+		}
+
+		return Vec3.createVectorHelper(x, y, z);
 	}
 
 	public static int updateNeighborAEGrids(World world, int x, int y, int z) {
@@ -135,7 +182,7 @@ public class WorldUtils {
 		return block.getDrops(world, i, j, k, meta, 0);
 	}
 
-	public static HashMap<Integer, Vec3> generateCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2)
+	public static void generateCube(World worldObj, int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2)
 	{
 		int minX = Math.min(posX1, posX2);
 		int minY = Math.min(posY1, posY2);
@@ -149,8 +196,6 @@ public class WorldUtils {
 		int midY = (int) Math.floor((posY1 + posY2) / 2);
 		int midZ = (int) Math.floor((posZ1 + posZ2) / 2);
 
-		HashMap<Integer, Vec3> interfaces = new HashMap<Integer, Vec3>();
-
 		for (int x = minX; x <= maxX; x++)
 		{
 			for (int y = minY; y <= maxY; y++)
@@ -163,27 +208,21 @@ public class WorldUtils {
 						if (x == midX && y == midY && z == minZ) {
 							// XY mid, Z min --> north
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.NORTH.ordinal(), pos);
 						} else if (x == midX && y == midY && z == maxZ) {
 							// XY mid, Z max --> south
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.SOUTH.ordinal(), pos);
 						} else if (x == midX && y == minY && z == midZ) {
 							// XZ mid, Y min --> down
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.DOWN.ordinal(), pos);
 						} else if (x == midX && y == maxY && z == midZ) {
 							// XZ mid, Y max --> up
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.UP.ordinal(), pos);
 						} else if (x == minX && y == midY && z == midZ) {
 							// YZ mid, X min --> west
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.WEST.ordinal(), pos);
 						} else if (x == maxX && y == midY && z == midZ) {
 							// YZ mid, X max --> east
 							worldObj.setBlock(x, y, z, ModBlocks.interfaceblock, 0, 2);
-							interfaces.put(ForgeDirection.EAST.ordinal(), pos);
 						} else {
 							worldObj.setBlock(x, y, z, ModBlocks.innerwall, 0, 2);
 						}
@@ -191,7 +230,5 @@ public class WorldUtils {
 				}
 			}
 		}
-
-		return interfaces;
 	}
 }

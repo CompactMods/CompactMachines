@@ -40,6 +40,7 @@ import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedSto
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
+import org.dave.CompactMachines.utility.WorldUtils;
 
 import appeng.api.movable.IMovableTile;
 import appeng.api.networking.IGridHost;
@@ -70,7 +71,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public boolean							isUpgraded		= false;
 
-	public HashMap<Integer, Vec3>			interfaces;
 	public HashMap<Integer, CMGridBlock>	gridBlocks;
 	public HashMap<Integer, IGridNode>		gridNodes;
 	private boolean							init;
@@ -139,8 +139,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (isUpgraded && worldObj != null && worldObj.isRemote) {
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		}
-
-		readInterfacesFromNBT(nbtTagCompound);
 	}
 
 	@Override
@@ -155,49 +153,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		//LogHelper.info("Writing nbt data");
 		nbtTagCompound.setInteger("coords", coords);
 		nbtTagCompound.setBoolean("upgraded", isUpgraded);
-
-		addInterfacesToNBT(nbtTagCompound);
 	}
 
-	private void readInterfaceFromNBT(NBTTagCompound nbt, String key, int direction) {
-		if (nbt.hasKey(key)) {
-			if (interfaces == null) {
-				interfaces = new HashMap<Integer, Vec3>();
-			}
-			int[] xyz = nbt.getIntArray(key);
-			Vec3 pos = Vec3.createVectorHelper(xyz[0], xyz[1], xyz[2]);
-			interfaces.put(direction, pos);
-		}
-	}
-
-	public void readInterfacesFromNBT(NBTTagCompound nbt) {
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_WEST, ForgeDirection.WEST.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_NORTH, ForgeDirection.NORTH.ordinal());
-		readInterfaceFromNBT(nbt, Names.NBT.INTERFACE_SOUTH, ForgeDirection.SOUTH.ordinal());
-	}
-
-	private void addInterfaceToNBT(NBTTagCompound nbt, String key, int direction) {
-		if (!nbt.hasKey(key) && interfaces != null) {
-			Vec3 pos = interfaces.get(direction);
-			int x = (int) pos.xCoord;
-			int y = (int) pos.yCoord;
-			int z = (int) pos.zCoord;
-
-			nbt.setIntArray(key, new int[] { x, y, z });
-		}
-	}
-
-	public void addInterfacesToNBT(NBTTagCompound nbt) {
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_DOWN, ForgeDirection.DOWN.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_UP, ForgeDirection.UP.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_EAST, ForgeDirection.EAST.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_WEST, ForgeDirection.WEST.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_NORTH, ForgeDirection.NORTH.ordinal());
-		addInterfaceToNBT(nbt, Names.NBT.INTERFACE_SOUTH, ForgeDirection.SOUTH.ordinal());
-	}
 
 	@Override
 	@SideOnly(Side.SERVER)
@@ -678,11 +635,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			br.setDirty();
 		}
 
-		if (haveChanges && interfaces != null) {
+		if (haveChanges) {
+			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				Vec3 pos = interfaces.get(dir.ordinal());
-				WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
+				Vec3 pos = WorldUtils.getInterfacePosition(this.coords, this.meta, dir);
+
 				machineWorld.notifyBlockChange((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord, ModBlocks.interfaceblock);
+
 			}
 		}
 
