@@ -48,6 +48,10 @@ public class CMEventHandler {
 			return;
 		}
 
+		if(ConfigurationHandler.allowEnterWithoutPSD) {
+			return;
+		}
+
 		EntityPlayer player = (EntityPlayer)event.entity;
 
 		NBTTagCompound playerNBT = player.getEntityData();
