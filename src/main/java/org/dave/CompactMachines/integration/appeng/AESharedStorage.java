@@ -1,5 +1,8 @@
 package org.dave.CompactMachines.integration.appeng;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 import net.minecraft.nbt.NBTTagCompound;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
@@ -15,16 +18,25 @@ public class AESharedStorage extends AbstractSharedStorage {
 	public int			coord;
 	public int			side;
 
-	public IGridNode	machineNode;
+	public HashMap<Integer, Boolean> isConnected;
+	public HashMap<Integer, IGridNode>	machineNodes;
 	public IGridNode	interfaceNode;
 
-	public boolean		isConnected	= false;
+	public String random = UUID.randomUUID().toString();
 
 	public AESharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 
 		this.side = side;
 		this.coord = coord;
+
+		if(machineNodes == null) {
+			machineNodes = new HashMap<Integer, IGridNode>();
+		}
+
+		if(isConnected == null) {
+			isConnected = new HashMap<Integer, Boolean>();
+		}
 	}
 
 	@Override
@@ -32,14 +44,13 @@ public class AESharedStorage extends AbstractSharedStorage {
 		return "appeng";
 	}
 
-	public void connectNodes() {
-		//LogHelper.info("ConnectNodes called for side: " + ForgeDirection.getOrientation(side));
+	public void connectNodes(int entangledInstance) {
 
-		if (interfaceNode == null || machineNode == null) {
+		if (interfaceNode == null || machineNodes == null || machineNodes.get(entangledInstance) == null) {
 			return;
 		}
 
-		if (isConnected) {
+		if (isConnected != null && isConnected.containsKey(entangledInstance)) {
 			return;
 		}
 
@@ -48,11 +59,24 @@ public class AESharedStorage extends AbstractSharedStorage {
 		}
 
 		try {
-			AEApi.instance().createGridConnection(interfaceNode, machineNode);
-			isConnected = true;
+			AEApi.instance().createGridConnection(interfaceNode, machineNodes.get(entangledInstance));
+			isConnected.put(entangledInstance, true);
 		} catch (FailedConnection e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void connectAll() {
+		if(machineNodes == null) {
+			return;
+		}
+
+		for(int entangledIndex : machineNodes.keySet()) {
+			if(!isConnected.containsKey(entangledIndex) || !isConnected.get(entangledIndex)) {
+				connectNodes(entangledIndex);
+			}
+		}
+
 	}
 
 	public IGridNode getInterfaceNode(CMGridBlock gridBlock) {
@@ -60,19 +84,35 @@ public class AESharedStorage extends AbstractSharedStorage {
 			interfaceNode = AEApi.instance().createGridNode(gridBlock);
 			interfaceNode.updateState();
 		}
-		connectNodes();
+
+		connectAll();
+
 		return interfaceNode;
 	}
 
-	public IGridNode getMachineNode(CMGridBlock gridBlock) {
+	public void destroyMachineNode(int entangledIndex) {
+		IGridNode machineNode = machineNodes.get(entangledIndex);
+		if (machineNode != null) {
+			machineNode.destroy();
+			machineNodes.remove(entangledIndex);
+			isConnected.remove(entangledIndex);
+		}
+
+		connectAll();
+	}
+
+	public IGridNode getMachineNode(CMGridBlock gridBlock, int entangledIndex) {
+		IGridNode machineNode = machineNodes.get(entangledIndex);
 		if (machineNode == null) {
 			machineNode = AEApi.instance().createGridNode(gridBlock);
 			machineNode.updateState();
 
+			machineNodes.put(entangledIndex, machineNode);
+
 			// Update neighbor blocks since we are now having a gridnode
 			WorldUtils.updateNeighborAEGrids(gridBlock.getLocation().getWorld(), gridBlock.getLocation().x, gridBlock.getLocation().y, gridBlock.getLocation().z);
 		}
-		connectNodes();
+
 		return machineNode;
 	}
 

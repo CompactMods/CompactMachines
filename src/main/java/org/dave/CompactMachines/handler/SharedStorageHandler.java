@@ -102,6 +102,16 @@ public class SharedStorageHandler {
 	}
 
 	public AbstractSharedStorage getStorage(int coord, int side, String type) {
+		return getStorage(coord, side, 0, type);
+	}
+
+	public boolean storageExists(int coord, int side, int entangledInstance, String type) {
+		String key = coord + "|" + side + "|" + type;
+
+		return storageMap.containsKey(key);
+	}
+
+	public AbstractSharedStorage getStorage(int coord, int side, int entangledInstance, String type) {
 		String key = coord + "|" + side + "|" + type;
 
 		AbstractSharedStorage storage = storageMap.get(key);

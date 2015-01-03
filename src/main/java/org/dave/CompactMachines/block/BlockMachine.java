@@ -171,7 +171,9 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 			TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(x, y, z);
 
 			// Disable chunk loading and remove it from the worlds NBT table
-			CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
+			if(!CompactMachines.instance.entangleRegistry.hasRemainingMachines(tileEntityMachine.coords)) {
+				CompactMachines.instance.machineHandler.disableMachine(tileEntityMachine);
+			}
 
 			world.removeTileEntity(x, y, z);
 		}
@@ -258,7 +260,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 									if (stackNBT.hasKey("roomname")) {
 										tileEntityMachine.setCustomName(stackNBT.getString("roomname"));
 									}
-
+									tileEntityMachine.initialize();
 									tileEntityMachine.markDirty();
 
 									WorldUtils.updateNeighborAEGrids(world, x, y, z);

@@ -90,6 +90,7 @@ public class BlockHandler implements IWailaDataProvider {
 			direction = direction.substring(0, 1) + direction.substring(1).toLowerCase();
 			currenttip.add(YELLOW + "Side: " + RESET + direction);
 			currenttip.add(YELLOW + "Size: " + RESET + StatCollector.translateToLocal(langStr));
+			currenttip.add(YELLOW + "Entangled: " + RESET + machine.entangledInstance);
 		} else if (te instanceof TileEntityInterface) {
 			TileEntityInterface interf = (TileEntityInterface) te;
 			if (interf.side != -1) {

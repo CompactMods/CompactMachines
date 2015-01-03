@@ -69,6 +69,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int[]							_energy;
 	public int								meta			= 0;
 
+	public int								entangledInstance;
+
 	public boolean							isUpgraded		= false;
 
 	public HashMap<Integer, CMGridBlock>	gridBlocks;
@@ -115,7 +117,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	public AESharedStorage getStorageAE(int side) {
-		return (AESharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
+		return (AESharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, entangledInstance, "appeng");
 	}
 
 	public BRSharedStorage getStorageBR(int side) {
@@ -135,6 +137,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		coords = nbtTagCompound.getInteger("coords");
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
+		entangledInstance = nbtTagCompound.getInteger("entangle-id");
 
 		if (isUpgraded && worldObj != null && worldObj.isRemote) {
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
@@ -150,9 +153,11 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			nbtTagCompound.setInteger("meta", meta);
 		}
 
+
 		//LogHelper.info("Writing nbt data");
 		nbtTagCompound.setInteger("coords", coords);
 		nbtTagCompound.setBoolean("upgraded", isUpgraded);
+		nbtTagCompound.setInteger("entangle-id", entangledInstance);
 	}
 
 
@@ -207,20 +212,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 			if (Reference.AE_AVAILABLE) {
 				AESharedStorage storage = getStorageAE(dir.ordinal());
-				if(storage.machineNode != null) {
-					storage.machineNode.destroy();
-					storage.machineNode = null;
-				}
-
-				// Don't touch the interface nodes as another linked CM might be linked to them
-				/*
-				if(storage.interfaceNode != null) {
-					storage.interfaceNode.destroy();
-					storage.interfaceNode = null;
-				}
-				*/
-
-				storage.isConnected = false;
+				storage.destroyMachineNode(entangledInstance);
+				CompactMachines.instance.entangleRegistry.removeMachineTile(this);
 			}
 		}
 
@@ -230,6 +223,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (worldObj.isRemote) {
 			return;
 		}
+
+		entangledInstance = CompactMachines.instance.entangleRegistry.registerMachineTile(this);
+		this.markDirty();
 
 		if (ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
 			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
@@ -544,7 +540,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (!worldObj.isRemote) {
 			IGridNode gridNode = gridNodes.get(dir.ordinal());
 			if (gridNode == null) {
-				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir));
+				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir), entangledInstance);
 				gridNodes.put(dir.ordinal(), gridNode);
 			}
 

@@ -13,6 +13,7 @@ import org.dave.CompactMachines.handler.GuiHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler.SharedStorageSaveHandler;
 import org.dave.CompactMachines.handler.VillagerHandler;
+import org.dave.CompactMachines.handler.machinedimension.EntangleRegistry;
 import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
 import org.dave.CompactMachines.handler.machinedimension.MachineWorldChunkloadCallback;
 import org.dave.CompactMachines.handler.machinedimension.WorldProviderMachines;
@@ -46,9 +47,11 @@ public class CompactMachines {
 	public static IProxy			proxy;
 
 	public MachineHandler			machineHandler;
+	public EntangleRegistry			entangleRegistry;
 
 	@Mod.EventHandler
 	public void preServerStart(FMLServerAboutToStartEvent event) {
+		entangleRegistry.clear();
 		SharedStorageHandler.reloadStorageHandler(false);
 	}
 
@@ -97,6 +100,8 @@ public class CompactMachines {
 	public void init(FMLInitializationEvent event)
 	{
 		PacketHandler.init();
+		entangleRegistry = new EntangleRegistry();
+
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 
 		proxy.registerTileEntities();
