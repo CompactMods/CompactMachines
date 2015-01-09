@@ -12,9 +12,12 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.init.ModBlocks;
@@ -90,7 +93,6 @@ public class BlockHandler implements IWailaDataProvider {
 			direction = direction.substring(0, 1) + direction.substring(1).toLowerCase();
 			currenttip.add(YELLOW + "Side: " + RESET + direction);
 			currenttip.add(YELLOW + "Size: " + RESET + StatCollector.translateToLocal(langStr));
-			currenttip.add(YELLOW + "Entangled: " + RESET + machine.entangledInstance);
 		} else if (te instanceof TileEntityInterface) {
 			TileEntityInterface interf = (TileEntityInterface) te;
 			if (interf.side != -1) {
@@ -106,6 +108,11 @@ public class BlockHandler implements IWailaDataProvider {
 	@Override
 	public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 		return currenttip;
+	}
+
+	@Override
+	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, int x, int y, int z) {
+		return null;
 	}
 
 }
