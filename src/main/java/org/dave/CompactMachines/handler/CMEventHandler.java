@@ -46,8 +46,6 @@ public class CMEventHandler {
 			return;
 		}
 
-		LogHelper.info("Giving nausea!");
-
 		NBTTagCompound playerNBT = event.player.getEntityData();
 		if(!playerNBT.getBoolean("isUsingPSD")) {
 			event.player.addPotionEffect(new PotionEffect(Potion.wither.id, 300, 2, false));	// Wither
