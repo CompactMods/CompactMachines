@@ -1,10 +1,8 @@
 package org.dave.CompactMachines.handler;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.dave.CompactMachines.CompactMachines;
@@ -12,9 +10,9 @@ import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
 import org.dave.CompactMachines.utility.LogHelper;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 
 public class CMEventHandler {
-
 	@SubscribeEvent
 	public void loadWorld(WorldEvent.Load event)
 	{
@@ -35,16 +33,12 @@ public class CMEventHandler {
 	}
 
 	@SubscribeEvent
-	public void entityJoinWorldEvent(EntityJoinWorldEvent event) {
-		if(event.world.isRemote) {
+	public void playerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+		if(event.toDim != ConfigurationHandler.dimensionId) {
 			return;
 		}
 
-		if (event.entity == null || !(event.entity instanceof EntityPlayer)) {
-			return;
-		}
-
-		if(event.world.provider.dimensionId != ConfigurationHandler.dimensionId) {
+		if(event.player == null) {
 			return;
 		}
 
@@ -52,16 +46,14 @@ public class CMEventHandler {
 			return;
 		}
 
-		EntityPlayer player = (EntityPlayer)event.entity;
+		LogHelper.info("Giving nausea!");
 
-		NBTTagCompound playerNBT = player.getEntityData();
+		NBTTagCompound playerNBT = event.player.getEntityData();
 		if(!playerNBT.getBoolean("isUsingPSD")) {
-			player.addPotionEffect(new PotionEffect(Potion.wither.id, 300, 2, false));	// Wither
-			player.addPotionEffect(new PotionEffect(Potion.confusion.id, 300, 5, false)); // Nausea
+			event.player.addPotionEffect(new PotionEffect(Potion.wither.id, 300, 2, false));	// Wither
+			event.player.addPotionEffect(new PotionEffect(Potion.confusion.id, 300, 5, false)); // Nausea
 		} else {
 			playerNBT.removeTag("isUsingPSD");
 		}
-
 	}
-
 }
