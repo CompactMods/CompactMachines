@@ -12,6 +12,7 @@ public class PacketHandler {
 
 	public static void init() {
 		INSTANCE.registerMessage(MessageHoppingModeChange.class, MessageHoppingModeChange.class, 1, Side.SERVER);
+		INSTANCE.registerMessage(MessagePlayerRotation.class, MessagePlayerRotation.class, 2, Side.CLIENT);
 	}
 
 }

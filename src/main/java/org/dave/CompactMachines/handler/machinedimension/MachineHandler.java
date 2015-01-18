@@ -28,6 +28,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.network.MessagePlayerRotation;
+import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
@@ -239,8 +241,7 @@ public class MachineHandler extends WorldSavedData {
 			AxisAlignedBB bb = WorldUtils.getBoundingBoxForCube(lastCoord, roomSize);
 
 			if (bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
-				//LogHelper.info("Saved spawnpoint for " + lastCoord + ": {" + player.posX +", "+ player.posY +", "+ player.posZ + "}");
-				spawnPoints.put(lastCoord, new double[] { player.posX, player.posY, player.posZ });
+				spawnPoints.put(lastCoord, new double[] { player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch });
 			}
 		}
 
@@ -282,9 +283,11 @@ public class MachineHandler extends WorldSavedData {
 			playerNBT.setTag("coordHistory", coordHistory);
 		}
 
+		boolean usingPresetSpawnpoint = false;
 		double[] destination = new double[] { coord * ConfigurationHandler.cubeDistance + 1.5, 42, 1.5 };
 		if (spawnPoints.containsKey(coord)) {
 			destination = spawnPoints.get(coord);
+			usingPresetSpawnpoint = true;
 		} else if (roomSizes.containsKey(coord)) {
 			int size = Reference.getBoxSize(roomSizes.get(coord));
 
@@ -311,6 +314,12 @@ public class MachineHandler extends WorldSavedData {
 		}
 
 		player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
+
+		if(usingPresetSpawnpoint) {
+			MessagePlayerRotation packet = new MessagePlayerRotation((float) destination[3], (float) destination[4]);
+			PacketHandler.INSTANCE.sendTo(packet, player);
+		}
+
 	}
 
 	public boolean findBestSpawnLocation(WorldServer machineWorld, EntityPlayerMP player, int coord) {
@@ -531,7 +540,7 @@ public class MachineHandler extends WorldSavedData {
 			for (int i = 0; i < tagList.tagCount(); i++) {
 				NBTTagCompound tag = tagList.getCompoundTagAt(i);
 				int coords = tag.getInteger("coords");
-				double[] positions = new double[] { tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z") };
+				double[] positions = new double[] { tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z"), tag.getDouble("yaw"), tag.getDouble("pitch") };
 
 				spawnPoints.put(coords, positions);
 			}
@@ -578,6 +587,11 @@ public class MachineHandler extends WorldSavedData {
 			tag.setDouble("x", positions[0]);
 			tag.setDouble("y", positions[1]);
 			tag.setDouble("z", positions[2]);
+			if(positions.length == 5) {
+				tag.setDouble("yaw", positions[3]);
+				tag.setDouble("pitch", positions[4]);
+			}
+
 			tagList.appendTag(tag);
 		}
 
