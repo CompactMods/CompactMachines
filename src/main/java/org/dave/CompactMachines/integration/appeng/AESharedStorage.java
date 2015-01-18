@@ -62,7 +62,6 @@ public class AESharedStorage extends AbstractSharedStorage {
 			AEApi.instance().createGridConnection(interfaceNode, machineNodes.get(entangledInstance));
 			isConnected.put(entangledInstance, true);
 		} catch (FailedConnection e) {
-			e.printStackTrace();
 		}
 	}
 
