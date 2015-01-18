@@ -174,19 +174,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			CompactMachines.instance.machineHandler.disableMachine(this);
 		}
 
-		if (Reference.OC_AVAILABLE) {
-			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if (getStorageOC(dir.ordinal()) == null) {
-					continue;
-				}
-
-				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
-				Node node = storage.getNode();
-				if (node != null) {
-					node.remove();
-				}
-			}
-		}
+		deinitialize();
 	}
 
 	@Override
@@ -197,6 +185,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			return;
 		}
 
+		deinitialize();
+	}
+
+	public void deinitialize() {
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if (Reference.OC_AVAILABLE) {
 				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
@@ -216,7 +208,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				CompactMachines.instance.entangleRegistry.removeMachineTile(this);
 			}
 		}
-
 	}
 
 	public void initialize() {
