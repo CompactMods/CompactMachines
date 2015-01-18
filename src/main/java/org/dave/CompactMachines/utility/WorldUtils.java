@@ -15,6 +15,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.reference.Reference;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
@@ -132,7 +133,7 @@ public class WorldUtils {
 						}
 					}
 
-					if (player != null) {
+					if (player != null && worldObj.getTileEntity(x, y, z) instanceof TileEntityMachine) {
 						Block block = worldObj.getBlock(x, y, z);
 						block.removedByPlayer(worldObj, player, x, y, z, true);
 					}
