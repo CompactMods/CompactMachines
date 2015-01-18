@@ -264,7 +264,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 				if (outside != null) {
 					hopStorage(getStorage(dir.ordinal()), outside);
 					hopStorage(getStorageFluid(dir.ordinal()), outside);
-					hopStorage(getStorageGas(dir.ordinal()), outside);
+					if(Reference.MEK_AVAILABLE) {
+						hopStorage(getStorageGas(dir.ordinal()), outside);
+					}
 					hopStorage(getStorageFlux(dir.ordinal()), outside);
 				}
 			}
