@@ -7,4 +7,6 @@ public interface IProxy
 	public abstract void registerHandlers();
 
 	public abstract void registerVillagerSkins();
+
+	public abstract void registerRenderers();
 }

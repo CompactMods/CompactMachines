@@ -1,0 +1,79 @@
+package org.dave.CompactMachines.client.render;
+
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.init.ModBlocks;
+import org.lwjgl.opengl.GL11;
+
+public class RenderPersonalShrinkingDevice implements IItemRenderer {
+	private static RenderItem	renderItem	= new RenderItem();
+
+	@Override
+	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+		return type == ItemRenderType.EQUIPPED_FIRST_PERSON;
+	}
+
+	@Override
+	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
+		return false;
+	}
+
+	@Override
+	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
+		Tessellator tessellator = Tessellator.instance;
+
+		// Use minecrafts renderer to render the item with a thickness
+		IIcon icon = item.getIconIndex();
+		ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(), icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+
+		// The display only works in the machine dimension.
+		if(Minecraft.getMinecraft().thePlayer.dimension != ConfigurationHandler.dimensionId) {
+			return;
+		}
+
+		// Precalculate the max ray trace distance by using pythagoras in 3d
+		// floorDiagonalLength = Math.sqrt(13*13 + 13*13)
+		// roomDiagonalLength = Math.sqrt(13*13 + floorDiagonalLength*floorDiagonalLength)
+		// -> 22.51666F
+		MovingObjectPosition pos = Minecraft.getMinecraft().thePlayer.rayTrace(22.52F, 1.0F);
+		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
+
+		// We're only interested in blocks our walls are made of
+		if(block != ModBlocks.innerwall && block != ModBlocks.interfaceblock) {
+			return;
+		}
+
+		String direction = "?";
+		if(pos.sideHit != -1) {
+			direction = ForgeDirection.getOrientation(pos.sideHit).getOpposite().toString();
+		}
+
+		// Actually draw the string on the screen of the PSD
+		FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+		GL11.glPushMatrix();
+		GL11.glRotatef(180F, 0F, 0F, 1F);
+		GL11.glTranslatef(-0.715F, -0.785F, -0.0626F);
+		GL11.glScalef(0.015F, 0.015F, 0.015F);
+		font.drawString(direction, 0, 0, 0x27EBF5);
+
+		// Extra data when we have an interface block we're looking at
+		GL11.glTranslatef(0F, 8F, 0F);
+		GL11.glScalef(0.5F, 0.5F, 0.5F);
+		if(block == ModBlocks.interfaceblock) {
+			font.drawString("Interface", 0, 0, 0x27EBF5);
+		}
+
+		GL11.glPopMatrix();
+	}
+}

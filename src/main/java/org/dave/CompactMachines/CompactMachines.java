@@ -109,6 +109,7 @@ public class CompactMachines {
 		if (ConfigurationHandler.enableVillager) {
 			proxy.registerVillagerSkins();
 		}
+		proxy.registerRenderers();
 
 		Recipes.init();
 

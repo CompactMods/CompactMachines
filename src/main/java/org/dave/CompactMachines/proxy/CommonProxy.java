@@ -19,4 +19,7 @@ public abstract class CommonProxy implements IProxy
 
 	@Override
 	public void registerVillagerSkins() {}
+
+	@Override
+	public void registerRenderers() {}
 }
