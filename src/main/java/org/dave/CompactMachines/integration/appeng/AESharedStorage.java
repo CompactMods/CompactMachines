@@ -3,8 +3,6 @@ package org.dave.CompactMachines.integration.appeng;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.minecraft.nbt.NBTTagCompound;
-
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
@@ -113,16 +111,5 @@ public class AESharedStorage extends AbstractSharedStorage {
 		}
 
 		return machineNode;
-	}
-
-	@Override
-	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
-		return compound;
-	}
-
-	@Override
-	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
 	}
 }

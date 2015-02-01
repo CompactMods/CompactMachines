@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 
+import org.dave.CompactMachines.integration.AbstractBufferedStorage;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
@@ -27,6 +30,9 @@ import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
+import org.dave.CompactMachines.utility.LogHelper;
+
+import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -36,6 +42,7 @@ public class SharedStorageHandler {
 
 	private Map<String, AbstractSharedStorage>			storageMap;
 	private Map<String, List<AbstractSharedStorage>>	storageList;
+	private Map<String, Class> classMap;
 
 	public final boolean								client;
 
@@ -46,32 +53,55 @@ public class SharedStorageHandler {
 	private List<AbstractSharedStorage>					dirtyStorage;
 	private NBTTagCompound								saveTag;
 
+	public static SharedStorageHandler instance(boolean client) {
+		return client ? clientStorageHandler : serverStorageHandler;
+	}
+
 	public SharedStorageHandler(boolean client) {
 		this.client = client;
 
 		storageMap = Collections.synchronizedMap(new HashMap<String, AbstractSharedStorage>());
 		storageList = Collections.synchronizedMap(new HashMap<String, List<AbstractSharedStorage>>());
 		dirtyStorage = Collections.synchronizedList(new LinkedList<AbstractSharedStorage>());
+		classMap = Collections.synchronizedMap(new HashMap<String, Class>());
 
-		storageList.put("item", new ArrayList<AbstractSharedStorage>());
-		storageList.put("liquid", new ArrayList<AbstractSharedStorage>());
-		storageList.put("gas", new ArrayList<AbstractSharedStorage>());
-		storageList.put("flux", new ArrayList<AbstractSharedStorage>());
-		storageList.put("appeng", new ArrayList<AbstractSharedStorage>());
-		storageList.put("bundledRedstone", new ArrayList<AbstractSharedStorage>());
-		storageList.put("OpenComputers", new ArrayList<AbstractSharedStorage>());
+		registerModInteraction("item", ItemSharedStorage.class);
+		registerModInteraction("liquid", FluidSharedStorage.class);
+		registerModInteraction("flux", FluxSharedStorage.class);
+
+		if(Reference.MEK_AVAILABLE) {
+			registerModInteraction("gas", GasSharedStorage.class);
+		}
+
+		if(Reference.AE_AVAILABLE) {
+			registerModInteraction("appeng", AESharedStorage.class);
+		}
+
+		if(Reference.PR_AVAILABLE) {
+			registerModInteraction("bundledRedstone", BRSharedStorage.class);
+		}
+
+		if(Reference.OC_AVAILABLE) {
+			registerModInteraction("OpenComputers", OpenComputersSharedStorage.class);
+		}
 
 		if (!client) {
 			load();
 		}
 	}
 
-	public void requestSave(AbstractSharedStorage storage) {
-		dirtyStorage.add(storage);
+	public void registerModInteraction(String key, Class integrationClass) {
+		if(storageList.containsKey(key)) {
+			LogHelper.error("Double registration of abstract storage: " + integrationClass);
+			return;
+		}
+
+		storageList.put(key, new ArrayList<AbstractSharedStorage>());
+		classMap.put(key, integrationClass);
 	}
 
-	public static SharedStorageHandler instance(boolean client) {
-		return client ? clientStorageHandler : serverStorageHandler;
+	public void requestSave(AbstractSharedStorage storage) {
+		dirtyStorage.add(storage);
 	}
 
 	public static void reloadStorageHandler(boolean client) {
@@ -85,24 +115,16 @@ public class SharedStorageHandler {
 
 	public void setHoppingMode(int coord, int side, String type, int hoppingMode) {
 		AbstractSharedStorage storage = getStorage(coord, side, type);
-		storage.hoppingMode = hoppingMode;
-		storage.setDirty();
+		if(storage instanceof AbstractHoppingStorage) {
+			((AbstractHoppingStorage)storage).setHoppingMode(hoppingMode);
+			((AbstractHoppingStorage)storage).setDirty();
+		}
 	}
 
 	public void setHoppingModeForAll(int coord, int side, int hoppingMode) {
-		setHoppingMode(coord, side, "item", hoppingMode);
-		setHoppingMode(coord, side, "liquid", hoppingMode);
-		setHoppingMode(coord, side, "flux", hoppingMode);
-		if(Reference.MEK_AVAILABLE) {
-			setHoppingMode(coord, side, "gas", hoppingMode);
+		for(String key : storageList.keySet()) {
+			setHoppingMode(coord, side, key, hoppingMode);
 		}
-
-		//setHoppingMode(coord, side, "appeng", hoppingMode);
-		//setHoppingMode(coord, side, "bundledRedstone", hoppingMode);
-	}
-
-	public AbstractSharedStorage getStorage(int coord, int side, String type) {
-		return getStorage(coord, side, 0, type);
 	}
 
 	public boolean storageExists(int coord, int side, int entangledInstance, String type) {
@@ -111,41 +133,40 @@ public class SharedStorageHandler {
 		return storageMap.containsKey(key);
 	}
 
+	public List<AbstractSharedStorage> getAllStorages(int coord, int side) {
+		List<AbstractSharedStorage> result = Lists.newArrayList();
+		for(String key : storageList.keySet()) {
+			result.add(getStorage(coord, side, key));
+		}
+
+		return result;
+	}
+
+	public AbstractSharedStorage getStorage(int coord, int side, String type) {
+		return getStorage(coord, side, 0, type);
+	}
+
 	public AbstractSharedStorage getStorage(int coord, int side, int entangledInstance, String type) {
 		String key = coord + "|" + side + "|" + type;
 
 		AbstractSharedStorage storage = storageMap.get(key);
 		if (storage == null) {
-			if (type.equals("item")) {
-				storage = new ItemSharedStorage(this, coord, side);
+			Class<?> storageClass = classMap.get(type);
+			if(storageClass == null) {
+				return null;
 			}
 
-			if (type.equals("liquid")) {
-				storage = new FluidSharedStorage(this, coord, side);
+			try {
+				Constructor constructor = storageClass.getConstructor(SharedStorageHandler.class, Integer.TYPE, Integer.TYPE);
+				storage = (AbstractSharedStorage) constructor.newInstance(this, coord, side);
+			} catch (Exception e) {
+				LogHelper.error("Could not create instance of class: " + storageClass);
+				e.printStackTrace();
+				return null;
 			}
 
-			if (type.equals("gas")) {
-				storage = new GasSharedStorage(this, coord, side);
-			}
-
-			if (type.equals("flux")) {
-				storage = new FluxSharedStorage(this, coord, side);
-			}
-
-			if (type.equals("appeng")) {
-				storage = new AESharedStorage(this, coord, side);
-			}
-
-			if (type.equals("bundledRedstone")) {
-				storage = new BRSharedStorage(this, coord, side);
-			}
-
-			if (type.equals("OpenComputers")) {
-				storage = new OpenComputersSharedStorage(this, coord, side);
-			}
-
-			if (!client && saveTag.hasKey(key)) {
-				storage.loadFromTag(saveTag.getCompoundTag(key));
+			if (!client && saveTag.hasKey(key) && storage instanceof AbstractBufferedStorage) {
+				((AbstractBufferedStorage)storage).loadFromTag(saveTag.getCompoundTag(key));
 			}
 
 			storageMap.put(key, storage);
@@ -191,9 +212,10 @@ public class SharedStorageHandler {
 	private void save(boolean force) {
 		if (!dirtyStorage.isEmpty() || force) {
 			for (AbstractSharedStorage inv : dirtyStorage) {
+
 				String key = inv.coord + "|" + inv.side + "|" + inv.type();
-				saveTag.setTag(key, inv.saveToTag());
-				inv.setClean();
+				saveTag.setTag(key, ((AbstractBufferedStorage)inv).saveToTag());
+				((AbstractBufferedStorage)inv).setClean();
 			}
 
 			dirtyStorage.clear();

@@ -29,6 +29,7 @@ import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.init.ModBlocks;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
@@ -133,7 +134,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	{
 		super.readFromNBT(nbtTagCompound);
 
-		//LogHelper.info("Reading nbt data of machine:");
 		coords = nbtTagCompound.getInteger("coords");
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
@@ -153,13 +153,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			nbtTagCompound.setInteger("meta", meta);
 		}
 
-
-		//LogHelper.info("Writing nbt data");
 		nbtTagCompound.setInteger("coords", coords);
 		nbtTagCompound.setBoolean("upgraded", isUpgraded);
 		nbtTagCompound.setInteger("entangle-id", entangledInstance);
 	}
-
 
 	@Override
 	@SideOnly(Side.SERVER)
@@ -181,7 +178,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public void invalidate() {
 		super.invalidate();
 
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return;
 		}
 
@@ -190,21 +187,17 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public void deinitialize() {
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (Reference.OC_AVAILABLE) {
-				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
-				if (storage == null) {
-					continue;
-				}
-
-				Node node = storage.getNode();
+			OpenComputersSharedStorage storageOC = getStorageOC(dir.ordinal());
+			if (storageOC != null) {
+				Node node = storageOC.getNode();
 				if (node != null) {
 					node.remove();
 				}
 			}
 
-			if (Reference.AE_AVAILABLE) {
-				AESharedStorage storage = getStorageAE(dir.ordinal());
-				storage.destroyMachineNode(entangledInstance);
+			AESharedStorage storageAE = getStorageAE(dir.ordinal());
+			if (storageAE != null) {
+				storageAE.destroyMachineNode(entangledInstance);
 				CompactMachines.instance.entangleRegistry.removeMachineTile(this);
 			}
 		}
@@ -223,19 +216,16 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (Reference.OC_AVAILABLE) {
-				OpenComputersSharedStorage storage = getStorageOC(dir.ordinal());
-				if (storage == null) {
-					continue;
-				}
-
-				Node node = storage.getNode();
+			OpenComputersSharedStorage storageOC = getStorageOC(dir.ordinal());
+			if (storageOC != null) {
+				Node node = storageOC.getNode();
 				if (node != null && node.network() == null) {
 					li.cil.oc.api.Network.joinOrCreateNetwork(this);
 				}
 			}
 
-			if (Reference.AE_AVAILABLE) {
+			AESharedStorage storageAE = getStorageAE(dir.ordinal());
+			if (storageAE != null) {
 				getGridNode(dir);
 			}
 		}
@@ -256,26 +246,27 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 		if (!worldObj.isRemote) {
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if (getStorage(dir.ordinal()) == null) {
-					continue;
-				}
-
 				TileEntity outside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if (outside != null) {
-					hopStorage(getStorage(dir.ordinal()), outside);
-					hopStorage(getStorageFluid(dir.ordinal()), outside);
-					if(Reference.MEK_AVAILABLE) {
-						hopStorage(getStorageGas(dir.ordinal()), outside);
+				for (AbstractSharedStorage storage : SharedStorageHandler.instance(false).getAllStorages(coords, dir.ordinal())) {
+					if (!(storage instanceof AbstractHoppingStorage)) {
+						continue;
 					}
-					hopStorage(getStorageFlux(dir.ordinal()), outside);
+
+					hopStorage(storage, outside);
 				}
 			}
 		}
 	}
 
 	private void hopStorage(AbstractSharedStorage storage, TileEntity outside) {
-		if (storage != null && storage.isHopping() && (storage.hoppingMode == 2 || storage.hoppingMode == 3 && storage.autoHopToInside == false)) {
-			storage.hopToTileEntity(outside, true);
+		if (storage == null || !(storage instanceof AbstractHoppingStorage)) {
+			return;
+		}
+
+		AbstractHoppingStorage hoppingStorage = (AbstractHoppingStorage) storage;
+
+		if (hoppingStorage.getHoppingMode() == 2 || (hoppingStorage.getHoppingMode() == 3 && hoppingStorage.isAutoHoppingToInside() == false)) {
+			hoppingStorage.hoppingTick(outside, true);
 		}
 	}
 
@@ -313,8 +304,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (coords == -1) {
 			return;
 		}
+
 		ItemSharedStorage storage = getStorage(slotIndex);
-		storage.autoHopToInside = true;
+		storage.setAutoHoppingToInside(true);
 		storage.setDirty();
 		storage.setInventorySlotContents(0, itemStack);
 	}
@@ -379,7 +371,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 		FluidSharedStorage fss = getStorageFluid(from.ordinal());
 		if (doFill && resource.amount > 0) {
-			fss.autoHopToInside = true;
+			fss.setAutoHoppingToInside(true);
 			fss.setDirty();
 		}
 		return fss.fill(from, resource, doFill);
@@ -435,7 +427,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 		// XXX: Should we test with canReceiveGas first? Or do we rely on
 		// suppliers to do this?
-		gss.autoHopToInside = true;
+		gss.setAutoHoppingToInside(true);
 		gss.setDirty();
 
 		return gss.receiveGas(from, stack);
@@ -470,7 +462,6 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return getStorageGas(from.ordinal()).getGasContents();
 	}
 
-
 	@Override
 	public boolean canConnectEnergy(ForgeDirection from) {
 		return true;
@@ -483,7 +474,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 		FluxSharedStorage fss = getStorageFlux(from.ordinal());
 		if (!simulate && maxReceive > 0) {
-			fss.autoHopToInside = true;
+			fss.setAutoHoppingToInside(true);
 			fss.setDirty();
 		}
 		return fss.receiveEnergy(maxReceive, simulate);
@@ -526,7 +517,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
-		if(coords == -1) {
+		if (coords == -1) {
 			return null;
 		}
 

@@ -4,7 +4,6 @@ import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
-import net.minecraft.nbt.NBTTagCompound;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -27,7 +26,6 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 		if (node == null) {
 			//LogHelper.info("Creating new node for side: " + ForgeDirection.getOrientation(side));
 			node = li.cil.oc.api.Network.newNode(this, Visibility.Network).withConnector().create();
-			setDirty();
 		}
 		return node;
 	}
@@ -35,17 +33,6 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 	@Override
 	public String type() {
 		return "OpenComputers";
-	}
-
-	@Override
-	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
-		return compound;
-	}
-
-	@Override
-	public void loadFromTag(NBTTagCompound tag) {
-
 	}
 
 	@Override
@@ -61,5 +48,4 @@ public class OpenComputersSharedStorage extends AbstractSharedStorage implements
 
 	@Override
 	public void onMessage(Message message) {}
-
 }

@@ -9,13 +9,13 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.reference.Reference;
 
 import cpw.mods.fml.common.Optional;
 
 @Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism")
-public class GasSharedStorage extends AbstractSharedStorage implements IGasHandler {
+public class GasSharedStorage extends AbstractHoppingStorage implements IGasHandler {
 	private static final int	MAX_GAS	= 1024;
 	private ExtendedGasTank		tank;
 
@@ -74,7 +74,7 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
+		NBTTagCompound compound = super.saveToTag();
 		compound.setTag("tank", tank.write(new NBTTagCompound()));
 
 		return compound;
@@ -82,14 +82,8 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
-
+		super.loadFromTag(tag);
 		tank.read(tag.getCompoundTag("tank"));
-	}
-
-	@Override
-	public boolean isHopping() {
-		return Reference.MEK_AVAILABLE;
 	}
 
 	@Override
@@ -101,13 +95,6 @@ public class GasSharedStorage extends AbstractSharedStorage implements IGasHandl
 		}
 
 		stack = stack.copy();
-
-		if (cooldown == max_cooldown) {
-			cooldown = 0;
-		} else {
-			cooldown++;
-			return;
-		}
 
 		if (te instanceof IGasHandler) {
 			IGasHandler gh = (IGasHandler) te;

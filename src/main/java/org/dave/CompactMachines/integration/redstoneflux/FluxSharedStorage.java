@@ -6,12 +6,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
 
-public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyStorage {
+public class FluxSharedStorage extends AbstractHoppingStorage implements IEnergyStorage {
 
 	protected int	energy		= 0;
 	protected int	capacity	= 10000;
@@ -31,14 +31,14 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
+		NBTTagCompound compound = super.saveToTag();
 		compound.setInteger("Energy", energy);
 		return compound;
 	}
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
+		super.loadFromTag(tag);
 		energy = tag.getInteger("Energy");
 	}
 
@@ -80,13 +80,6 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 			return;
 		}
 
-		if (cooldown == max_cooldown) {
-			cooldown = 0;
-		} else {
-			cooldown++;
-			return;
-		}
-
 		if (tileEntity instanceof IEnergyStorage) {
 			//LogHelper.info("Hopping flux into IEnergyStorage");
 			IEnergyStorage storage = (IEnergyStorage) tileEntity;
@@ -115,10 +108,4 @@ public class FluxSharedStorage extends AbstractSharedStorage implements IEnergyS
 			}
 		}
 	}
-
-	@Override
-	public boolean isHopping() {
-		return true;
-	}
-
 }

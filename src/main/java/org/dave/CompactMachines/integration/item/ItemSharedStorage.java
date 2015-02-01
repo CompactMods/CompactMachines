@@ -10,10 +10,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.utility.ItemHelper;
 
-public class ItemSharedStorage extends AbstractSharedStorage implements IInventory {
+public class ItemSharedStorage extends AbstractHoppingStorage implements IInventory {
 	private int			size	= 1;
 	private ItemStack[]	items;
 
@@ -35,7 +35,7 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
+		NBTTagCompound compound = super.saveToTag();
 		compound.setTag("Items", ItemHelper.writeItemStacksToTag(items));
 		compound.setByte("size", (byte) size);
 		return compound;
@@ -43,7 +43,8 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
+		super.loadFromTag(tag);
+
 		size = tag.getByte("size");
 		empty();
 		ItemHelper.readItemStacksFromTag(items, tag.getTagList("Items", 10));
@@ -125,21 +126,9 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 	}
 
 	@Override
-	public boolean isHopping() {
-		return true;
-	}
-
-	@Override
 	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		ItemStack stack = getStackInSlot(0);
 		if (stack == null || stack.stackSize == 0) {
-			return;
-		}
-
-		if (cooldown == max_cooldown) {
-			cooldown = 0;
-		} else {
-			cooldown++;
 			return;
 		}
 
@@ -196,5 +185,4 @@ public class ItemSharedStorage extends AbstractSharedStorage implements IInvento
 
 		setInventorySlotContents(0, stack);
 	}
-
 }

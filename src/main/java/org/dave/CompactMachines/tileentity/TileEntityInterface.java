@@ -14,7 +14,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -22,6 +21,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
@@ -49,25 +49,17 @@ import cpw.mods.fml.common.Optional;
 })
 public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment {
 
-	public FluidSharedStorage			storageLiquid;
-	public GasSharedStorage				storageGas;
-	public ItemSharedStorage			storage;
-	public FluxSharedStorage			storageFlux;
-	public AESharedStorage				storageAE;
-	public BRSharedStorage				storageBR;
-	public OpenComputersSharedStorage	storageOC;
+	public CMGridBlock	gridBlock;
 
-	public CMGridBlock					gridBlock;
+	public int			coords;
+	public int			side;
 
-	public int							coords;
-	public int							side;
-
-	public int							_fluidid;
-	public int							_fluidamount;
-	public int							_gasid;
-	public int							_gasamount;
-	public int							_energy;
-	public int							_hoppingmode;
+	public int			_fluidid;
+	public int			_fluidamount;
+	public int			_gasid;
+	public int			_gasamount;
+	public int			_energy;
+	public int			_hoppingmode;
 
 	public TileEntityInterface() {
 		super();
@@ -78,12 +70,41 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		_energy = 0;
 	}
 
+	public ItemSharedStorage getStorageItem() {
+		return (ItemSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "item");
+	}
+
+	public FluidSharedStorage getStorageFluid() {
+		return (FluidSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "liquid");
+	}
+
+	public GasSharedStorage getStorageGas() {
+		return (GasSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "gas");
+	}
+
+	public FluxSharedStorage getStorageFlux() {
+		return (FluxSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "flux");
+	}
+
+	public AESharedStorage getStorageAE() {
+		// TODO: Check entangled instance etc
+		return (AESharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "appeng");
+	}
+
+	public BRSharedStorage getStorageBR() {
+		return (BRSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "bundledRedstone");
+	}
+
+	public OpenComputersSharedStorage getStorageOC() {
+		return (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
+	}
+
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
 
-		if (Reference.OC_AVAILABLE && !worldObj.isRemote && storageOC != null) {
-			Node node = storageOC.getNode();
+		if (Reference.OC_AVAILABLE && !worldObj.isRemote && getStorageOC() != null) {
+			Node node = getStorageOC().getNode();
 			if (node != null) {
 				node.remove();
 			}
@@ -94,39 +115,27 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public void invalidate() {
 		super.invalidate();
 
-		if (Reference.OC_AVAILABLE && !worldObj.isRemote && storageOC != null) {
-			Node node = storageOC.getNode();
+		if (Reference.OC_AVAILABLE && !worldObj.isRemote && getStorageOC() != null) {
+			Node node = getStorageOC().getNode();
 			if (node != null) {
 				node.remove();
 			}
 		}
 	}
 
-	@Override
-	public void validate()
-	{
-		super.validate();
-		if (!(worldObj instanceof WorldServer) == worldObj.isRemote) {
-			reloadStorage();
-		}
-	}
-
 	public void setSide(int side) {
 		this.side = side;
-		reloadStorage();
 		markDirty();
 	}
 
 	public void setCoords(int coords) {
 		this.coords = coords;
-		reloadStorage();
 		markDirty();
 	}
 
 	public void setCoordSide(int coords, int side) {
 		this.coords = coords;
 		this.side = side;
-		reloadStorage();
 		markDirty();
 	}
 
@@ -154,12 +163,12 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			updateIncomingSignals();
 		}
 
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return;
 		}
 
 		if (Reference.OC_AVAILABLE) {
-			Node node = storageOC.getNode();
+			Node node = getStorageOC().getNode();
 
 			if (node != null && node.network() == null) {
 				li.cil.oc.api.Network.joinOrCreateNetwork(this);
@@ -174,10 +183,13 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		TileEntity tileEntityInside = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
 
 		if (tileEntityInside != null) {
-			hopStorage(storage, tileEntityInside);
-			hopStorage(storageLiquid, tileEntityInside);
-			hopStorage(storageGas, tileEntityInside);
-			hopStorage(storageFlux, tileEntityInside);
+			for (AbstractSharedStorage storage : SharedStorageHandler.instance(false).getAllStorages(coords, side)) {
+				if (!(storage instanceof AbstractHoppingStorage)) {
+					continue;
+				}
+
+				hopStorage((AbstractHoppingStorage) storage, tileEntityInside);
+			}
 		}
 	}
 
@@ -185,7 +197,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		boolean needsNotify = false;
 		boolean haveChanges = false;
 
-		byte[] previous = storageBR.interfaceBundledSignal;
+		byte[] previous = getStorageBR().interfaceBundledSignal;
 		byte[] current = ProjectRedAPI.transmissionAPI.getBundledInput(worldObj, xCoord, yCoord, zCoord, ForgeDirection.getOrientation(side).getOpposite().ordinal());
 		if (current != null) {
 			for (int i = 0; i < current.length; i++) {
@@ -198,65 +210,43 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 		if (haveChanges) {
 			//LogHelper.info("Interface input on side " + ForgeDirection.getOrientation(side) + " is now: " + getByteString(previous));
-			storageBR.machineNeedsNotify = true;
+			getStorageBR().machineNeedsNotify = true;
 		}
 
-		storageBR.setDirty();
+		getStorageBR().setDirty();
 	}
 
-	private void hopStorage(AbstractSharedStorage storage, TileEntity tileEntityInside) {
-		if (storage != null && storage.isHopping() && (storage.hoppingMode == 1 || storage.hoppingMode == 3 && storage.autoHopToInside == true)) {
+	private void hopStorage(AbstractHoppingStorage storage, TileEntity tileEntityInside) {
+		if (storage != null && (storage.getHoppingMode() == 1 || storage.getHoppingMode() == 3 && storage.isAutoHoppingToInside() == true)) {
 			storage.hopToTileEntity(tileEntityInside, false);
-		}
-	}
-
-	public void reloadStorage() {
-		storage = (ItemSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "item");
-		storageLiquid = (FluidSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "liquid");
-		storageFlux = (FluxSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "flux");
-
-		if (Reference.MEK_AVAILABLE) {
-			storageGas = (GasSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "gas");
-		}
-
-		if (Reference.OC_AVAILABLE) {
-			storageOC = (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "OpenComputers");
-		}
-
-		if (Reference.AE_AVAILABLE) {
-			storageAE = (AESharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "appeng");
-		}
-
-		if (Reference.PR_AVAILABLE) {
-			storageBR = (BRSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(coords, side, "bundledRedstone");
 		}
 	}
 
 	@Override
 	public int getSizeInventory() {
-		return storage.getSizeInventory();
+		return getStorageItem().getSizeInventory();
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int var1) {
-		return storage.getStackInSlot(var1);
+		return getStorageItem().getStackInSlot(var1);
 	}
 
 	@Override
 	public ItemStack decrStackSize(int var1, int var2) {
-		return storage.decrStackSize(var1, var2);
+		return getStorageItem().decrStackSize(var1, var2);
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int var1) {
-		return storage.getStackInSlotOnClosing(var1);
+		return getStorageItem().getStackInSlotOnClosing(var1);
 	}
 
 	@Override
 	public void setInventorySlotContents(int var1, ItemStack var2) {
-		storage.autoHopToInside = false;
-		storage.setDirty();
-		storage.setInventorySlotContents(var1, var2);
+		getStorageItem().setAutoHoppingToInside(false);
+		getStorageItem().setDirty();
+		getStorageItem().setInventorySlotContents(var1, var2);
 	}
 
 	@Override
@@ -292,70 +282,70 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		storageLiquid.autoHopToInside = false;
-		storageLiquid.setDirty();
-		return storageLiquid.fill(from, resource, doFill);
+		getStorageFluid().setAutoHoppingToInside(false);
+		getStorageFluid().setDirty();
+		return getStorageFluid().fill(from, resource, doFill);
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return storageLiquid.drain(from, maxDrain, doDrain);
+		return getStorageFluid().drain(from, maxDrain, doDrain);
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		return storageLiquid.drain(from, resource, doDrain);
+		return getStorageFluid().drain(from, resource, doDrain);
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		return storageLiquid.canDrain(from, fluid);
+		return getStorageFluid().canDrain(from, fluid);
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		return storageLiquid.canFill(from, fluid);
+		return getStorageFluid().canFill(from, fluid);
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		return storageLiquid.getTankInfo(from);
+		return getStorageFluid().getTankInfo(from);
 	}
 
 	public FluidStack getFluid() {
-		return storageLiquid.getFluid();
+		return getStorageFluid().getFluid();
 	}
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public int receiveGas(ForgeDirection from, GasStack stack) {
-		storageGas.autoHopToInside = false;
-		storageGas.setDirty();
+		getStorageGas().setAutoHoppingToInside(false);
+		getStorageGas().setDirty();
 
-		return storageGas.receiveGas(from, stack);
+		return getStorageGas().receiveGas(from, stack);
 	}
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public GasStack drawGas(ForgeDirection from, int amount) {
-		return storageGas.drawGas(from, amount);
+		return getStorageGas().drawGas(from, amount);
 	}
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public boolean canReceiveGas(ForgeDirection from, Gas type) {
-		return storageGas.canReceiveGas(from, type);
+		return getStorageGas().canReceiveGas(from, type);
 	}
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public boolean canDrawGas(ForgeDirection from, Gas type) {
-		return storageGas.canDrawGas(from, type);
+		return getStorageGas().canDrawGas(from, type);
 	}
 
 	@Optional.Method(modid = "Mekanism")
 	public GasStack getGasContents() {
-		return storageGas.getGasContents();
+		return getStorageGas().getGasContents();
 	}
 
 	@Override
@@ -371,28 +361,28 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
-		storageFlux.autoHopToInside = false;
-		storageFlux.setDirty();
-		return storageFlux.receiveEnergy(maxReceive, simulate);
+		getStorageFlux().setAutoHoppingToInside(false);
+		getStorageFlux().setDirty();
+		return getStorageFlux().receiveEnergy(maxReceive, simulate);
 	}
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
-		return storageFlux.extractEnergy(maxExtract, simulate);
+		return getStorageFlux().extractEnergy(maxExtract, simulate);
 	}
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {
-		return storageFlux.getEnergyStored();
+		return getStorageFlux().getEnergyStored();
 	}
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
-		return storageFlux.getMaxEnergyStored();
+		return getStorageFlux().getMaxEnergyStored();
 	}
 
 	public int getHoppingMode(ForgeDirection from) {
-		return storage.hoppingMode;
+		return getStorageFlux().getHoppingMode();
 	}
 
 	public CMGridBlock getGridBlock(ForgeDirection dir) {
@@ -406,11 +396,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Optional.Method(modid = "appliedenergistics2")
 	@Override
 	public IGridNode getGridNode(ForgeDirection dir) {
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return null;
 		}
 
-		return storageAE.getInterfaceNode(getGridBlock(dir));
+		return getStorageAE().getInterfaceNode(getGridBlock(dir));
 	}
 
 	@Optional.Method(modid = "appliedenergistics2")
@@ -426,7 +416,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public byte[] getBundledSignal(int dir) {
-		byte[] current = storageBR.machineBundledSignal;
+		byte[] current = getStorageBR().machineBundledSignal;
 
 		if (current == null) {
 			return null;
@@ -436,7 +426,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		for (int i = 0; i < current.length; i++) {
 			//Output = Opposite-Input unless Opposite-Output is made by us
 			int a = current[i] & 255;
-			int b = storageBR.machineOutputtedSignal[i] & 255;
+			int b = getStorageBR().machineOutputtedSignal[i] & 255;
 			int c = a;
 			if (b > 0) {
 				continue;
@@ -445,8 +435,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			result[i] = (byte) c;
 		}
 
-		storageBR.interfaceOutputtedSignal = result;
-		storageBR.setDirty();
+		getStorageBR().interfaceOutputtedSignal = result;
+		getStorageBR().setDirty();
 
 		//LogHelper.info("Interface outputting to " + ForgeDirection.getOrientation(dir) + ": " + getByteString(result));
 
@@ -462,7 +452,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "OpenComputers")
 	public Node node() {
-		return storageOC.getNode();
+		return getStorageOC().getNode();
 	}
 
 	@Override

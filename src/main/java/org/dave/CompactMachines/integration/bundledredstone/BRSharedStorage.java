@@ -3,9 +3,9 @@ package org.dave.CompactMachines.integration.bundledredstone;
 import net.minecraft.nbt.NBTTagCompound;
 
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.AbstractBufferedStorage;
 
-public class BRSharedStorage extends AbstractSharedStorage {
+public class BRSharedStorage extends AbstractBufferedStorage {
 	public int		coord;
 	public int		side;
 
@@ -31,7 +31,7 @@ public class BRSharedStorage extends AbstractSharedStorage {
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
+		NBTTagCompound compound = new NBTTagCompound();
 		compound.setByteArray("machineBundledSignal", machineBundledSignal);
 		compound.setByteArray("machineOutputtedSignal", machineOutputtedSignal);
 		compound.setByteArray("interfaceBundledSignal", interfaceBundledSignal);
@@ -41,7 +41,6 @@ public class BRSharedStorage extends AbstractSharedStorage {
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
 		machineBundledSignal = tag.getByteArray("machineBundledSignal");
 		machineOutputtedSignal = tag.getByteArray("machineOutputtedSignal");
 		interfaceBundledSignal = tag.getByteArray("interfaceBundledSignal");

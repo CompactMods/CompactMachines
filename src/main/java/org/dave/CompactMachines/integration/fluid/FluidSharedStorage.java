@@ -10,10 +10,10 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.integration.AbstractSharedStorage;
+import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.utility.FluidUtils;
 
-public class FluidSharedStorage extends AbstractSharedStorage implements IFluidHandler {
+public class FluidSharedStorage extends AbstractHoppingStorage implements IFluidHandler {
 
 	private class Tank extends ExtendedFluidTank
 	{
@@ -45,14 +45,14 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 
 	@Override
 	public NBTTagCompound saveToTag() {
-		NBTTagCompound compound = prepareTagCompound();
+		NBTTagCompound compound = super.saveToTag();
 		compound.setTag("tank", tank.toTag());
 		return compound;
 	}
 
 	@Override
 	public void loadFromTag(NBTTagCompound tag) {
-		loadHoppingModeFromCompound(tag);
+		super.loadFromTag(tag);
 		tank.fromTag(tag.getCompoundTag("tank"));
 	}
 
@@ -91,21 +91,9 @@ public class FluidSharedStorage extends AbstractSharedStorage implements IFluidH
 	}
 
 	@Override
-	public boolean isHopping() {
-		return true;
-	}
-
-	@Override
 	public void hopToTileEntity(TileEntity tileEntity, boolean opposite) {
 		FluidStack stack = getFluid().copy();
 		if (stack == null || stack.amount == 0) {
-			return;
-		}
-
-		if (cooldown == max_cooldown) {
-			cooldown = 0;
-		} else {
-			cooldown++;
 			return;
 		}
 
