@@ -12,8 +12,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.init.ModBlocks;
+import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.lwjgl.opengl.GL11;
 
 public class RenderPersonalShrinkingDevice implements IItemRenderer {
@@ -37,11 +37,6 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		IIcon icon = item.getIconIndex();
 		ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(), icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
 
-		// The display only works in the machine dimension.
-		if(Minecraft.getMinecraft().thePlayer.dimension != ConfigurationHandler.dimensionId) {
-			return;
-		}
-
 		// Precalculate the max ray trace distance by using pythagoras in 3d
 		// floorDiagonalLength = Math.sqrt(13*13 + 13*13)
 		// roomDiagonalLength = Math.sqrt(13*13 + floorDiagonalLength*floorDiagonalLength)
@@ -49,14 +44,18 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		MovingObjectPosition pos = Minecraft.getMinecraft().thePlayer.rayTrace(22.52F, 1.0F);
 		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
 
-		// We're only interested in blocks our walls are made of
-		if(block != ModBlocks.innerwall && block != ModBlocks.interfaceblock) {
+		// We're only interested in our blocks
+		if(block != ModBlocks.innerwall && block != ModBlocks.interfaceblock && block != ModBlocks.machine) {
 			return;
 		}
 
 		String direction = "?";
 		if(pos.sideHit != -1) {
-			direction = ForgeDirection.getOrientation(pos.sideHit).getOpposite().toString();
+			ForgeDirection dir = ForgeDirection.getOrientation(pos.sideHit);
+			if(block != ModBlocks.machine) {
+				dir = dir.getOpposite();
+			}
+			direction = dir.toString();
 		}
 
 		// Actually draw the string on the screen of the PSD
@@ -67,11 +66,24 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		GL11.glScalef(0.015F, 0.015F, 0.015F);
 		font.drawString(direction, 0, 0, 0x27EBF5);
 
-		// Extra data when we have an interface block we're looking at
+		// Extra data when we have a "special" block we're looking at
 		GL11.glTranslatef(0F, 8F, 0F);
-		GL11.glScalef(0.5F, 0.5F, 0.5F);
+
 		if(block == ModBlocks.interfaceblock) {
+			GL11.glScalef(0.5F, 0.5F, 0.5F);
 			font.drawString("Interface", 0, 0, 0x27EBF5);
+		} else if(block == ModBlocks.machine) {
+			GL11.glScalef(0.4F, 0.4F, 0.4F);
+			TileEntityMachine teMachine = (TileEntityMachine)Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos.blockX, pos.blockY, pos.blockZ);
+
+			if(teMachine.hasCustomName()) {
+				font.drawString(teMachine.getCustomName(), 0, 0, 0x27EBF5);
+			} else {
+				font.drawString("Machine: " + (teMachine.coords == -1 ? "NEW" : teMachine.coords), 0, 0, 0x27EBF5);
+			}
+
+			GL11.glTranslatef(0F, 9F, 0F);
+			font.drawString("Upgraded: " + (teMachine.isUpgraded ? "yes" : "no"), 0, 0, 0x27EBF5);
 		}
 
 		GL11.glPopMatrix();
