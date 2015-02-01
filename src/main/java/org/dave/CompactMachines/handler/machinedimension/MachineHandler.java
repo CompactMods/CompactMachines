@@ -258,13 +258,17 @@ public class MachineHandler extends WorldSavedData {
 			playerNBT.setDouble("oldPosY", player.posY);
 			playerNBT.setDouble("oldPosZ", player.posZ);
 
+			int oldDimension = player.dimension;
+
 			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, ConfigurationHandler.dimensionId, new TeleporterCM(machineWorld));
 
 			// If this is not being called teleporting from The End ends up without
 			// the client knowing about any blocks, i.e. blank screen, no blocks, but
 			// server collisions etc.
-			machineWorld.spawnEntityInWorld(player);
+			if(oldDimension == 1) {
+				machineWorld.spawnEntityInWorld(player);
+			}
 
 			// Since the player is currently not in the machine dimension, we want to clear
 			// his coord history - in case he exited the machine world not via a shrinking device
