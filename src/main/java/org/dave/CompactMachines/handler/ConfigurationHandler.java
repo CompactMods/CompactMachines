@@ -27,6 +27,7 @@ public class ConfigurationHandler {
 	public static int			villagerId;
 	public static boolean		enableVillager;
 	public static boolean		allowEnterWithoutPSD;
+	public static int			psdDisplayColor;
 
 	public static void init(File configFile) {
 		// Create the configuration object from the given configuration file
@@ -50,6 +51,12 @@ public class ConfigurationHandler {
 		cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");
 		cooldownFluid = configuration.getInt("cooldownFluid", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Fluids, i.e. 0 => 1 Bucket per tick");
 		cooldownGas = configuration.getInt("cooldownGas", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Gases, i.e. 0 => 1024 units per tick");
+
+		int red = configuration.getInt("psdDisplayColor.red", "Rendering", 0x27, 0, Integer.MAX_VALUE, "Font color for the PSD");
+		int green = configuration.getInt("psdDisplayColor.green", "Rendering", 0xEB, 0, Integer.MAX_VALUE, "");
+		int blue = configuration.getInt("psdDisplayColor.blue", "Rendering", 0xF5, 0, Integer.MAX_VALUE, "");
+
+		psdDisplayColor = (red << 16) + (green << 8) + blue;
 
 		upgradeItem = configuration.getString("upgradeItem", "CompactMachines", "nether_star", "The item used to upgrade compact machines. Format: modid:name_block_registered_with");
 

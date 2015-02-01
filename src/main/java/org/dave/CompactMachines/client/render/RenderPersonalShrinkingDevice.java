@@ -12,6 +12,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.lwjgl.opengl.GL11;
@@ -45,14 +46,14 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
 
 		// We're only interested in our blocks
-		if(block != ModBlocks.innerwall && block != ModBlocks.interfaceblock && block != ModBlocks.machine) {
+		if (block != ModBlocks.innerwall && block != ModBlocks.interfaceblock && block != ModBlocks.machine) {
 			return;
 		}
 
 		String direction = "?";
-		if(pos.sideHit != -1) {
+		if (pos.sideHit != -1) {
 			ForgeDirection dir = ForgeDirection.getOrientation(pos.sideHit);
-			if(block != ModBlocks.machine) {
+			if (block != ModBlocks.machine) {
 				dir = dir.getOpposite();
 			}
 			direction = dir.toString();
@@ -64,26 +65,26 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		GL11.glRotatef(180F, 0F, 0F, 1F);
 		GL11.glTranslatef(-0.715F, -0.785F, -0.0626F);
 		GL11.glScalef(0.015F, 0.015F, 0.015F);
-		font.drawString(direction, 0, 0, 0x27EBF5);
+		font.drawString(direction, 0, 0, ConfigurationHandler.psdDisplayColor);
 
 		// Extra data when we have a "special" block we're looking at
 		GL11.glTranslatef(0F, 8F, 0F);
 
-		if(block == ModBlocks.interfaceblock) {
+		if (block == ModBlocks.interfaceblock) {
 			GL11.glScalef(0.5F, 0.5F, 0.5F);
-			font.drawString("Interface", 0, 0, 0x27EBF5);
-		} else if(block == ModBlocks.machine) {
+			font.drawString("Interface", 0, 0, ConfigurationHandler.psdDisplayColor);
+		} else if (block == ModBlocks.machine) {
 			GL11.glScalef(0.4F, 0.4F, 0.4F);
-			TileEntityMachine teMachine = (TileEntityMachine)Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos.blockX, pos.blockY, pos.blockZ);
+			TileEntityMachine teMachine = (TileEntityMachine) Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos.blockX, pos.blockY, pos.blockZ);
 
-			if(teMachine.hasCustomName()) {
-				font.drawString(teMachine.getCustomName(), 0, 0, 0x27EBF5);
+			if (teMachine.hasCustomName()) {
+				font.drawString(teMachine.getCustomName(), 0, 0, ConfigurationHandler.psdDisplayColor);
 			} else {
-				font.drawString("Machine: " + (teMachine.coords == -1 ? "NEW" : teMachine.coords), 0, 0, 0x27EBF5);
+				font.drawString("Machine: " + (teMachine.coords == -1 ? "NEW" : teMachine.coords), 0, 0, ConfigurationHandler.psdDisplayColor);
 			}
 
 			GL11.glTranslatef(0F, 9F, 0F);
-			font.drawString("Upgraded: " + (teMachine.isUpgraded ? "yes" : "no"), 0, 0, 0x27EBF5);
+			font.drawString("Upgraded: " + (teMachine.isUpgraded ? "yes" : "no"), 0, 0, ConfigurationHandler.psdDisplayColor);
 		}
 
 		GL11.glPopMatrix();
