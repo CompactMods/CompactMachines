@@ -252,11 +252,20 @@ public class MachineHandler extends WorldSavedData {
 		//LogHelper.info("Teleporting player to: " + coord);
 		NBTTagCompound playerNBT = player.getEntityData();
 
+		// Grab the CompactMachines entry from the player NBT data
+		NBTTagCompound cmNBT;
+		if (playerNBT.hasKey(Reference.MOD_ID)) {
+			cmNBT = playerNBT.getCompoundTag(Reference.MOD_ID);
+		} else {
+			cmNBT = new NBTTagCompound();
+			playerNBT.setTag(Reference.MOD_ID, cmNBT);
+		}
+
 		if (player.dimension != ConfigurationHandler.dimensionId) {
-			playerNBT.setInteger("oldDimension", player.dimension);
-			playerNBT.setDouble("oldPosX", player.posX);
-			playerNBT.setDouble("oldPosY", player.posY);
-			playerNBT.setDouble("oldPosZ", player.posZ);
+			cmNBT.setInteger("oldDimension", player.dimension);
+			cmNBT.setDouble("oldPosX", player.posX);
+			cmNBT.setDouble("oldPosY", player.posY);
+			cmNBT.setDouble("oldPosZ", player.posZ);
 
 			int oldDimension = player.dimension;
 
@@ -375,23 +384,47 @@ public class MachineHandler extends WorldSavedData {
 
 	public void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
 		NBTTagCompound playerNBT = player.getEntityData();
-		if (playerNBT.hasKey("oldPosX"))
-		{
-			int oldDimension = playerNBT.getInteger("oldDimension");
-			double oldPosX = playerNBT.getDouble("oldPosX");
-			double oldPosY = playerNBT.getDouble("oldPosY");
-			double oldPosZ = playerNBT.getDouble("oldPosZ");
 
-			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, oldDimension, new TeleporterCM(MinecraftServer.getServer().worldServerForDimension(oldDimension)));
-			player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
+		// Grab the CompactMachines entry from the player NBT data
+		NBTTagCompound cmNBT = null;
+		if (playerNBT.hasKey(Reference.MOD_ID)) {
+			cmNBT = playerNBT.getCompoundTag(Reference.MOD_ID);
 		}
-		else
-		{
+
+		int targetDimension = 0;
+		double targetX;
+		double targetY;
+		double targetZ;
+
+		if (cmNBT != null && cmNBT.hasKey("oldPosX")) {
+			// First try to grab the original position by looking at the CompactMachines NBT Tag
+			targetDimension = cmNBT.getInteger("oldDimension");
+			targetX = cmNBT.getDouble("oldPosX");
+			targetY = cmNBT.getDouble("oldPosY");
+			targetZ = cmNBT.getDouble("oldPosZ");
+		} else if(playerNBT.hasKey("oldDimension") && playerNBT.getInteger("oldDimension") != ConfigurationHandler.dimensionId) {
+			// Backwards compatibility - but these values are also being set by RandomThings
+			// A problem exists in two cases:
+			// a) A player entered the SpiritDimension from the CM dimension, RandomThings would set the oldDimension to the CM dimension
+			// b) A player entered the CM dimension from the SpectreDimension, CM did previously set the oldDimension to the SpectreDimension
+			// In both cases the player gets trapped in a loop between the two dimensions and has no way of getting back to the overworld
+			// We want to allow backwards compatibility with our old settings so players in a CM during an update to a version containing this commit
+			// would still be trapped in the two dimensions. We can break this cycle by not allowing to get back to another CM using the
+			// old system.
+			// That's because CM never writes its own dimension into the oldDimension tag, only RandomThings would do that.
+			targetDimension = playerNBT.getInteger("oldDimension");
+			targetX = playerNBT.getDouble("oldPosX");
+			targetY = playerNBT.getDouble("oldPosY");
+			targetZ = playerNBT.getDouble("oldPosZ");
+		} else {
 			ChunkCoordinates cc = MinecraftServer.getServer().worldServerForDimension(0).provider.getRandomizedSpawnPoint();
-			MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, 0, new TeleporterCM(MinecraftServer.getServer().worldServerForDimension(0)));
-
-			player.setPositionAndUpdate(cc.posX, cc.posY, cc.posZ);
+			targetX = cc.posX;
+			targetY = cc.posY;
+			targetZ = cc.posZ;
 		}
+
+		MinecraftServer.getServer().getConfigurationManager().transferPlayerToDimension(player, targetDimension, new TeleporterCM(MinecraftServer.getServer().worldServerForDimension(targetDimension)));
+		player.setPositionAndUpdate(targetX, targetY, targetZ);
 	}
 
 	public void teleportPlayerBack(EntityPlayerMP player) {
