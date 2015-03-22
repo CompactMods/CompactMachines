@@ -50,9 +50,6 @@ dependencies {
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
     compile "igwmod:IGW-Mod-1.7.10:1.1.1-17:userdev"
 
-    // "Mekansim" is NOT a typo - it's spelt this way in the Fireball repo
-    compile "api:mekansim:1"
-
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
