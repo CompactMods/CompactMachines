@@ -20,6 +20,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.api.IBlockProxy;
+import org.dave.CompactMachines.handler.BlockProxyHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -40,6 +42,9 @@ import appeng.api.util.AECableType;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 @Optional.InterfaceList({
 		@Optional.Interface(iface = "appeng.api.networking.IGridHost", modid = "appliedenergistics2"),
 		@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
@@ -47,7 +52,7 @@ import cpw.mods.fml.common.Optional;
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
 		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IBlockProxy {
 
 	public CMGridBlock	gridBlock;
 
@@ -68,6 +73,18 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		_gasid = -1;
 		_gasamount = 0;
 		_energy = 0;
+	}
+
+	@Override
+	public BlockLocation[] getConnectedBlocks(ForgeDirection facing) {
+		// TODO test
+		ArrayList<BlockLocation> list = new ArrayList<BlockLocation>();
+		HashSet<TileEntityMachine> set = BlockProxyHandler.getMS(coords);
+		for (TileEntityMachine machine : set) {
+			ForgeDirection dir = facing.getOpposite();
+			list.add(new BlockLocation(machine.getWorldObj(), machine.xCoord + dir.offsetX, machine.yCoord + dir.offsetY, machine.zCoord + dir.offsetZ, facing));
+		}
+		return (BlockLocation[]) list.toArray();
 	}
 
 	public ItemSharedStorage getStorageItem() {
@@ -112,6 +129,15 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
+	public void validate() {
+		super.validate();
+		if (worldObj.isRemote) {
+			return;
+		}
+		BlockProxyHandler.add(coords, this);
+	}
+
+	@Override
 	public void invalidate() {
 		super.invalidate();
 
@@ -121,6 +147,11 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 				node.remove();
 			}
 		}
+
+		if (worldObj.isRemote) {
+			return;
+		}
+		BlockProxyHandler.remove(coords, this);
 	}
 
 	public void setSide(int side) {
