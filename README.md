@@ -1,4 +1,4 @@
-Compact Machines
+Compact Machines [![Build Status](https://travis-ci.org/thraaawn/CompactMachines.svg?branch=master)](https://travis-ci.org/thraaawn/CompactMachines)
 ================
 
 Adds one simple game mechanic: Small rooms inside of blocks.
