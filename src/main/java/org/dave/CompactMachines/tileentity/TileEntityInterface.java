@@ -80,9 +80,9 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		// TODO test
 		ArrayList<BlockLocation> list = new ArrayList<BlockLocation>();
 		HashSet<TileEntityMachine> set = BlockProxyHandler.getMS(coords);
+		ForgeDirection dir = ForgeDirection.getOrientation(side);
 		for (TileEntityMachine machine : set) {
-			ForgeDirection dir = facing.getOpposite();
-			list.add(new BlockLocation(machine.getWorldObj(), machine.xCoord + dir.offsetX, machine.yCoord + dir.offsetY, machine.zCoord + dir.offsetZ, facing));
+			list.add(new BlockLocation(machine.getWorldObj(), machine.xCoord + dir.offsetX, machine.yCoord + dir.offsetY, machine.zCoord + dir.offsetZ, dir));
 		}
 		return (BlockLocation[]) list.toArray();
 	}

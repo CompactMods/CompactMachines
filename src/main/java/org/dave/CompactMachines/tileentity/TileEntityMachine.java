@@ -110,11 +110,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		// TODO test
 		ArrayList<BlockLocation> list = new ArrayList<BlockLocation>();
 		HashSet<TileEntityInterface> set = BlockProxyHandler.getIS(coords);
+		int side = facing.getOpposite().ordinal();
 		for (TileEntityInterface iface : set) {
-            ForgeDirection orientation = ForgeDirection.getOrientation(iface.side);
-			if (orientation == facing) {
-                ForgeDirection dir = orientation.getOpposite();
-                list.add(new BlockLocation(iface.getWorldObj(), iface.xCoord + dir.offsetX, iface.yCoord + dir.offsetY, iface.zCoord + dir.offsetZ, facing));
+			if (iface.side == side) {
+                list.add(new BlockLocation(iface.getWorldObj(), iface.xCoord + facing.offsetX, iface.yCoord + facing.offsetY, iface.zCoord + facing.offsetZ, facing));
             }
 		}
 		return (BlockLocation[]) list.toArray();
