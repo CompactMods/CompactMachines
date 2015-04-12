@@ -1,7 +1,7 @@
 package org.dave.CompactMachines.api;
 
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * @author soniex2
@@ -53,5 +53,11 @@ public interface IBlockProxy {
         }
     }
 
+    /**
+     * Get the blocks connected to this {@link IBlockProxy}.
+     *
+     * @param facing The side.
+     * @return {@literal null} if the proxy/side is disconnected, an array of {@link BlockLocation} otherwise.
+     */
     BlockLocation[] getConnectedBlocks(ForgeDirection facing);
 }

@@ -108,6 +108,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	public BlockLocation[] getConnectedBlocks(ForgeDirection facing) {
 		// TODO test
+		if (coords == -1) return null;
 		ArrayList<BlockLocation> list = new ArrayList<BlockLocation>();
 		HashSet<TileEntityInterface> set = BlockProxyHandler.getIS(coords);
 		int side = facing.getOpposite().ordinal();
