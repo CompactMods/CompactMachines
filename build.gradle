@@ -22,7 +22,7 @@ group= "com.dave.compactmachines" // http://maven.apache.org/guides/mini/guide-n
 archivesBaseName = "compactmachines"
 
 minecraft {
-    version = "1.7.10-10.13.2.1291"
+    version = "1.7.10-10.13.3.1370-1.7.10"
     assetDir = "eclipse/assets"
 }
 
