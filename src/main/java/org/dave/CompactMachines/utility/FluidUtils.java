@@ -25,11 +25,13 @@ public class FluidUtils
 		ItemStack stack = player.getCurrentEquippedItem();
 		FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(stack);
 
-		if (liquid == null)
+		if (liquid == null) {
 			return false;
+		}
 
-		if (tank.fill(dir, liquid, false) != liquid.amount)
+		if (tank.fill(dir, liquid, false) != liquid.amount) {
 			return false;
+		}
 
 		tank.fill(dir, liquid, true);
 
@@ -47,23 +49,26 @@ public class FluidUtils
 	{
 		ItemStack stack = player.getCurrentEquippedItem();
 
-		if (!FluidContainerRegistry.isEmptyContainer(stack))
+		if (!FluidContainerRegistry.isEmptyContainer(stack)) {
 			return false;
+		}
 
 		ItemStack filled = FluidContainerRegistry.fillFluidContainer(tankLiquid, stack);
 		FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(filled);
 
-		if (liquid == null || filled == null)
+		if (liquid == null || filled == null) {
 			return false;
+		}
 
 		tank.drain(dir, liquid.amount, true);
 
-		if (stack.stackSize == 1)
+		if (stack.stackSize == 1) {
 			player.inventory.setInventorySlotContents(player.inventory.currentItem, filled);
-		else if (player.inventory.addItemStackToInventory(filled))
+		} else if (player.inventory.addItemStackToInventory(filled)) {
 			stack.stackSize--;
-		else
+		} else {
 			return false;
+		}
 
 		player.inventoryContainer.detectAndSendChanges();
 		return true;
@@ -79,7 +84,7 @@ public class FluidUtils
 	public static FluidStack read(NBTTagCompound tag)
 	{
 		FluidStack stack = FluidStack.loadFluidStackFromNBT(tag);
-		return stack != null ? stack : new FluidStack(0, 0);
+		return stack != null ? stack : new FluidStack(FluidRegistry.WATER, 0);
 	}
 
 	public static NBTTagCompound write(FluidStack fluid, NBTTagCompound tag)
@@ -90,11 +95,13 @@ public class FluidUtils
 	public static int getLuminosity(FluidStack stack, double density)
 	{
 		Fluid fluid = stack.getFluid();
-		if (fluid == null)
+		if (fluid == null) {
 			return 0;
+		}
 		int light = fluid.getLuminosity(stack);
-		if (fluid.isGaseous())
+		if (fluid.isGaseous()) {
 			light = (int) (light * density);
+		}
 		return light;
 	}
 }

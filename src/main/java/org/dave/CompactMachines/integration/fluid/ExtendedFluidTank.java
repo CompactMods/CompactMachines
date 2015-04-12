@@ -1,11 +1,12 @@
 package org.dave.CompactMachines.integration.fluid;
 
-import org.dave.CompactMachines.utility.FluidUtils;
-
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidTank;
+
+import org.dave.CompactMachines.utility.FluidUtils;
 
 public class ExtendedFluidTank implements IFluidTank
 {
@@ -17,11 +18,11 @@ public class ExtendedFluidTank implements IFluidTank
 	{
 		if (type == null)
 		{
-			fluid = new FluidStack(0, 0);
+			fluid = new FluidStack(FluidRegistry.WATER, 0);
 			changeType = true;
-		}
-		else
+		} else {
 			fluid = FluidUtils.copy(type, 0);
+		}
 		this.capacity = capacity;
 	}
 
@@ -44,25 +45,28 @@ public class ExtendedFluidTank implements IFluidTank
 
 	public boolean canAccept(FluidStack type)
 	{
-		return type == null || type.fluidID <= 0 || (fluid.amount == 0 && changeType) || fluid.isFluidEqual(type);
+		return type == null || type.getFluidID() <= 0 || (fluid.amount == 0 && changeType) || fluid.isFluidEqual(type);
 	}
 
 	@Override
 	public int fill(FluidStack resource, boolean doFill)
 	{
-		if (resource == null || resource.fluidID <= 0)
+		if (resource == null || resource.getFluidID() <= 0) {
 			return 0;
+		}
 
-		if (!canAccept(resource))
+		if (!canAccept(resource)) {
 			return 0;
+		}
 
 		int tofill = Math.min(getCapacity() - fluid.amount, resource.amount);
 		if (doFill && tofill > 0)
 		{
-			if (!fluid.isFluidEqual(resource))
+			if (!fluid.isFluidEqual(resource)) {
 				fluid = FluidUtils.copy(resource, fluid.amount + tofill);
-			else
+			} else {
 				fluid.amount += tofill;
+			}
 			onLiquidChanged();
 		}
 
@@ -72,8 +76,9 @@ public class ExtendedFluidTank implements IFluidTank
 	@Override
 	public FluidStack drain(int maxDrain, boolean doDrain)
 	{
-		if (fluid.amount == 0 || maxDrain <= 0)
+		if (fluid.amount == 0 || maxDrain <= 0) {
 			return null;
+		}
 
 		int todrain = Math.min(maxDrain, fluid.amount);
 		if (doDrain && todrain > 0)
@@ -86,8 +91,9 @@ public class ExtendedFluidTank implements IFluidTank
 
 	public FluidStack drain(FluidStack resource, boolean doDrain)
 	{
-		if (resource == null || !resource.isFluidEqual(fluid))
+		if (resource == null || !resource.isFluidEqual(fluid)) {
 			return null;
+		}
 
 		return drain(resource.amount, doDrain);
 	}

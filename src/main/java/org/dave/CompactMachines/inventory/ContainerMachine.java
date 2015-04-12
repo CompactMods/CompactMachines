@@ -127,7 +127,7 @@ public class ContainerMachine extends ContainerCM {
 					for (int i = 0; i < crafters.size(); i++) {
 						if (tank.fluid != null && tank.fluid.amount != 0) {
 							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 40 + dir.ordinal(), tank.fluid.amount);
-							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 50 + dir.ordinal(), tank.fluid.fluidID);
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 50 + dir.ordinal(), tank.fluid.getFluidID());
 						} else {
 							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 40 + dir.ordinal(), 0);
 							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 50 + dir.ordinal(), 0);

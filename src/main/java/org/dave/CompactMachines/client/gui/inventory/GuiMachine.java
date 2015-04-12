@@ -3,6 +3,8 @@ package org.dave.CompactMachines.client.gui.inventory;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,10 +14,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-
-import mekanism.api.gas.GasStack;
-import mekanism.api.gas.Gas;
 
 import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.Names;
@@ -58,6 +58,7 @@ public class GuiMachine extends GuiContainer {
 
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
+			Fluid fluid = FluidRegistry.getFluid(fluidId);
 			int fluidAmount = tileEntityMachine._fluidamount[i];
 			int gasId = tileEntityMachine._gasid[i];
 			int gasAmount = tileEntityMachine._gasamount[i];
@@ -73,8 +74,8 @@ public class GuiMachine extends GuiContainer {
 				}
 
 				if (fluidAmount > 0) {
-					FluidStack fluid = new FluidStack(fluidId, fluidAmount);
-					lines.add(fluid.getLocalizedName() + ": " + fluidAmount);
+					FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
+					lines.add(fluidStack.getLocalizedName() + ": " + fluidAmount);
 				}
 
 				if (gasAmount > 0) {
@@ -172,16 +173,18 @@ public class GuiMachine extends GuiContainer {
 		for (int i = 0; i < tileEntityMachine._fluidid.length; i++) {
 			int fluidId = tileEntityMachine._fluidid[i];
 			int fluidAmount = tileEntityMachine._fluidamount[i];
-			int gasId = tileEntityMachine._gasid[i];
 			int gasAmount = tileEntityMachine._gasamount[i];
-			int energyAmount = tileEntityMachine._energy[i];
 
-			FluidStack fluid = new FluidStack(fluidId, fluidAmount);
-			int tankSize = fluidAmount * tankHeight / 1000;
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(xPositions[i] - 4, yPositions[i] + 16, fluid, tankSize, gasAmount > 0);
+			Fluid fluid = FluidRegistry.getFluid(fluidId);
+			if(fluid != null && fluidAmount > 0) {
+				FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
+				int tankSize = fluidAmount * tankHeight / 1000;
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				drawTank(xPositions[i] - 4, yPositions[i] + 16, fluidStack, tankSize, gasAmount > 0);
+			}
 
-			if (gasId != -1) {
+			int gasId = tileEntityMachine._gasid[i];
+			if (gasId != -1 && gasAmount > 0) {
 				GasStack gas = new GasStack(gasId, gasAmount);
 				int gasTankSize = gasAmount * tankHeight / 1024;
 				int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
@@ -189,9 +192,12 @@ public class GuiMachine extends GuiContainer {
 				drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
 			}
 
-			int energySize = energyAmount * tankHeight / 10000;
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
+			int energyAmount = tileEntityMachine._energy[i];
+			if(energyAmount > 0) {
+				int energySize = energyAmount * tankHeight / 10000;
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
+			}
 		}
 	}
 

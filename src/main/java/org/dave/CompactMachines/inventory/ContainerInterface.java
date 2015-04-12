@@ -73,7 +73,7 @@ public class ContainerInterface extends ContainerCM {
 				for (int i = 0; i < crafters.size(); i++) {
 					if (tank.fluid != null && tank.fluid.amount != 0) {
 						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 31, tank.fluid.amount);
-						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 32, tank.fluid.fluidID);
+						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 32, tank.fluid.getFluidID());
 					} else {
 						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 31, 0);
 						((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 32, 0);

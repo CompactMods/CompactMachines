@@ -3,6 +3,8 @@ package org.dave.CompactMachines.client.gui.inventory;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -13,10 +15,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-
-import mekanism.api.gas.GasStack;
-import mekanism.api.gas.Gas;
 
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.network.MessageHoppingModeChange;
@@ -74,12 +74,13 @@ public class GuiInterface extends GuiContainer {
 		fontRendererObj.drawString(containerName, xSize / 2 - fontRendererObj.getStringWidth(containerName) / 2, 6, 4210752);
 		fontRendererObj.drawString(StatCollector.translateToLocal(Names.Containers.VANILLA_INVENTORY), 8, ySize - 96 + 2, 4210752);
 
-		if (tileEntityInterface._fluidamount > 0) {
-			FluidStack fluid = new FluidStack(tileEntityInterface._fluidid, tileEntityInterface._fluidamount);
+		Fluid fluid = FluidRegistry.getFluid(tileEntityInterface._fluidid);
+		if (tileEntityInterface._fluidamount > 0 && fluid != null) {
+			FluidStack fluidStack = new FluidStack(fluid, tileEntityInterface._fluidamount);
 			int tankSize = tileEntityInterface._fluidamount * tankHeight / 1000;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTank(76, 61, fluid, tankSize, tileEntityInterface._gasamount > 0);
+			drawTank(76, 61, fluidStack, tankSize, tileEntityInterface._gasamount > 0);
 		}
 
 		if (tileEntityInterface._gasamount > 0) {
@@ -257,9 +258,10 @@ public class GuiInterface extends GuiContainer {
 				lines.add("RF: " + tileEntityInterface._energy);
 			}
 
-			if (tileEntityInterface._fluidamount > 0) {
-				FluidStack fluid = new FluidStack(tileEntityInterface._fluidid, tileEntityInterface._fluidamount);
-				lines.add(fluid.getLocalizedName() + ": " + tileEntityInterface._fluidamount);
+			Fluid fluid = FluidRegistry.getFluid(tileEntityInterface._fluidid);
+			if (tileEntityInterface._fluidamount > 0 && fluid != null) {
+				FluidStack fluidStack = new FluidStack(fluid, tileEntityInterface._fluidamount);
+				lines.add(fluidStack.getLocalizedName() + ": " + tileEntityInterface._fluidamount);
 			}
 
 			if (tileEntityInterface._gasamount > 0) {
