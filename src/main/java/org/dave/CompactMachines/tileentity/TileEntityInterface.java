@@ -84,7 +84,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		for (TileEntityMachine machine : set) {
 			list.add(new BlockLocation(machine.getWorldObj(), machine.xCoord + dir.offsetX, machine.yCoord + dir.offsetY, machine.zCoord + dir.offsetZ, dir));
 		}
-		return (BlockLocation[]) list.toArray();
+		return list.toArray(new BlockLocation[list.size()]);
 	}
 
 	public ItemSharedStorage getStorageItem() {

@@ -117,7 +117,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
                 list.add(new BlockLocation(iface.getWorldObj(), iface.xCoord + facing.offsetX, iface.yCoord + facing.offsetY, iface.zCoord + facing.offsetZ, facing));
             }
 		}
-		return (BlockLocation[]) list.toArray();
+		return list.toArray(new BlockLocation[list.size()]);
 	}
 
 	public ItemSharedStorage getStorage(int side) {
