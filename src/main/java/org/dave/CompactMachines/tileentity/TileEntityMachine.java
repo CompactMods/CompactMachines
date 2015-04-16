@@ -1,6 +1,8 @@
 package org.dave.CompactMachines.tileentity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SidedEnvironment;
@@ -26,6 +28,8 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.api.IBlockProxy;
+import org.dave.CompactMachines.handler.BlockProxyHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.init.ModBlocks;
@@ -60,7 +64,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
 		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
 })
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment {
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment, IBlockProxy {
 
 	public int								coords			= -1;
 	public int[]							_fluidid;
@@ -99,6 +103,21 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int[] getAccessibleSlotsFromSide(int side) {
 		// Side directly determines the inventory
 		return new int[] { side };
+	}
+
+	@Override
+	public BlockLocation[] getConnectedBlocks(ForgeDirection facing) {
+		// TODO test
+		if (coords == -1) return null;
+		ArrayList<BlockLocation> list = new ArrayList<BlockLocation>();
+		HashSet<TileEntityInterface> set = BlockProxyHandler.getIS(coords);
+		int side = facing.getOpposite().ordinal();
+		for (TileEntityInterface iface : set) {
+			if (iface.side == side) {
+                list.add(new BlockLocation(iface.getWorldObj(), iface.xCoord + facing.offsetX, iface.yCoord + facing.offsetY, iface.zCoord + facing.offsetZ, facing));
+            }
+		}
+		return list.toArray(new BlockLocation[list.size()]);
 	}
 
 	public ItemSharedStorage getStorage(int side) {
@@ -186,6 +205,8 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	}
 
 	public void deinitialize() {
+		BlockProxyHandler.remove(coords, this);
+
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			OpenComputersSharedStorage storageOC = getStorageOC(dir.ordinal());
 			if (storageOC != null) {
@@ -207,6 +228,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (worldObj.isRemote) {
 			return;
 		}
+		BlockProxyHandler.add(coords, this);
 
 		entangledInstance = CompactMachines.instance.entangleRegistry.registerMachineTile(this);
 		this.markDirty();
