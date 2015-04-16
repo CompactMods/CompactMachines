@@ -1,23 +1,23 @@
 # Creative Tabs
-itemGroup.compactmachines=紧凑机器
+itemGroup.compactmachines=空间机器
 
 # Items
-item.compactmachines:psd.name=个人型缩小仪
+item.compactmachines:psd.name=手持缩放仪
 item.compactmachines:shrinker.name=原子缩小模块
 item.compactmachines:enlarger.name=原子放大模块
 item.compactmachines:interfaceitem.name=世界缩放接口
 item.compactmachines:quantumentangler.name=量子纠缠仪
 
 # Blocks
-tile.compactmachines:machine.name=紧凑机器
-tile.compactmachines:interface.name=紧凑机器接口
-tile.compactmachines:innerwall.name=紧凑机器外壳
-tile.compactmachines:innerwalldecor.name=紧凑机器外壳 (装饰)
+tile.compactmachines:machine.name=空间机器
+tile.compactmachines:interface.name=空间机器接口
+tile.compactmachines:innerwall.name=空间机器外壳
+tile.compactmachines:innerwalldecor.name=空间机器外壳 (装饰)
 tile.compactmachines:resizingcube.name=世界缩放方块
 
 # Container
-container.cm:machine=紧凑机器
-container.cm:interface=紧凑机器接口
+container.cm:machine=空间机器
+container.cm:interface=空间机器接口
 
 container.cm:hoppingMode.disabled=禁止
 container.cm:hoppingMode.importing=导入
@@ -50,5 +50,5 @@ igwpage.basics=介绍
 
 # Commands
 command.cm.setCMCoords.usage=/setCMCoords <空间 id>
-command.cm.setCMCoords.noblock=你必须持有紧凑机器模组中的方块才能使用该指令.
+command.cm.setCMCoords.noblock=你必须持有空间机器模组中的方块才能使用该指令.
 command.cm.setCMCoords.success=成功更新方块数据.
