@@ -63,6 +63,7 @@ public class GuiMachine extends GuiContainer {
 			int gasId = tileEntityMachine._gasid[i];
 			int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
+			int manaAmount = tileEntityMachine._mana;
 
 			if (isPointInRegion(xPositions[i] - 4, yPositions[i], 24, 16, mouseX, mouseY)) {
 				String side = ForgeDirection.getOrientation(i).toString();
@@ -83,6 +84,15 @@ public class GuiMachine extends GuiContainer {
 					Gas gas = gasStack.getGas();
 
 					lines.add(gas.getLocalizedName() + ": " + gasAmount);
+				}
+
+				if (manaAmount > 0) {
+					// TODO: Get rid of hardcoded capacities
+					double ratio = (manaAmount * 1.0 / 10000.0);
+					if(ratio > 1) {
+						ratio = 1.0;
+					}
+					lines.add(String.format("%s: %.1f%%", StatCollector.translateToLocal("tooltip.cm:machine.mana"), ratio * 100));
 				}
 			}
 		}

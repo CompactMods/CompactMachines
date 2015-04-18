@@ -271,6 +271,14 @@ public class GuiInterface extends GuiContainer {
 				lines.add(gas.getLocalizedName() + ": " + tileEntityInterface._gasamount);
 			}
 
+			if (tileEntityInterface._mana > 0) {
+				double ratio = (tileEntityInterface._mana * 1.0 / 10000.0);
+				if(ratio > 1) {
+					ratio = 1.0;
+				}
+				lines.add(String.format("%s: %.1f%%", StatCollector.translateToLocal("tooltip.cm:machine.mana"), ratio * 100));
+			}
+
 		}
 
 		if (lines.size() > 0) {

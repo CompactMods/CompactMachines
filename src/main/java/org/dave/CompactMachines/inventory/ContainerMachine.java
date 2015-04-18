@@ -110,6 +110,8 @@ public class ContainerMachine extends ContainerCM {
 			tileEntityMachine._gasid[4] = value;
 		} else if (var == 77) {
 			tileEntityMachine._gasid[5] = value;
+		} else if (var == 80) {
+			tileEntityMachine._mana = value;
 		}
 	}
 
@@ -117,6 +119,13 @@ public class ContainerMachine extends ContainerCM {
 	public void detectAndSendChanges()
 	{
 		super.detectAndSendChanges();
+
+		if(Reference.BOTANIA_AVAILABLE) {
+			for (int i = 0; i < crafters.size(); i++) {
+				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 80, tileEntityMachine.getCurrentMana());
+			}
+		}
+
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			FluidTankInfo[] tanks = tileEntityMachine.getTankInfo(dir);
@@ -155,7 +164,6 @@ public class ContainerMachine extends ContainerCM {
 			for (int i = 0; i < crafters.size(); i++) {
 				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 60 + dir.ordinal(), tileEntityMachine.getEnergyStored(dir));
 			}
-
 		}
 	}
 

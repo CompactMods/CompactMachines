@@ -57,6 +57,8 @@ public class ContainerInterface extends ContainerCM {
 			tileEntityInterface._gasamount = value;
 		} else if (var == 36) {
 			tileEntityInterface._gasid = value;
+		} else if (var == 37) {
+			tileEntityInterface._mana = value;
 		}
 	}
 
@@ -101,6 +103,10 @@ public class ContainerInterface extends ContainerCM {
 		for (int i = 0; i < crafters.size(); i++) {
 			((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 33, tileEntityInterface.getEnergyStored(ForgeDirection.UNKNOWN));
 			((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 34, tileEntityInterface.getHoppingMode(ForgeDirection.UNKNOWN));
+
+			if(Reference.BOTANIA_AVAILABLE) {
+				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 37, tileEntityInterface.getCurrentMana());
+			}
 		}
 	}
 

@@ -32,6 +32,7 @@ tooltip.cm:machine.size.three=Big
 tooltip.cm:machine.size.four=Giant
 tooltip.cm:machine.size.five=Maximum Size
 tooltip.cm:machine.coords=Machine Number
+tooltip.cm:machine.mana=Mana
 
 # Dimension Travelling
 loading.cm:enter=Shrinking to machine size. Ffffflllp.

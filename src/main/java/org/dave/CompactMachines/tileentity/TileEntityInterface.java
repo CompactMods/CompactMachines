@@ -25,6 +25,7 @@ import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.botania.BotaniaSharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.gas.GasSharedStorage;
@@ -34,6 +35,7 @@ import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 
+import vazkii.botania.api.mana.IManaPool;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
@@ -45,9 +47,10 @@ import cpw.mods.fml.common.Optional;
 		@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
 		@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers"),
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
-		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
+		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism"),
+		@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IManaPool {
 
 	public CMGridBlock	gridBlock;
 
@@ -59,6 +62,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public int			_gasid;
 	public int			_gasamount;
 	public int			_energy;
+	public int			_mana;
 	public int			_hoppingmode;
 
 	public TileEntityInterface() {
@@ -68,6 +72,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		_gasid = -1;
 		_gasamount = 0;
 		_energy = 0;
+		_mana = 0;
 	}
 
 	public ItemSharedStorage getStorageItem() {
@@ -97,6 +102,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	public OpenComputersSharedStorage getStorageOC() {
 		return (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
+	}
+
+	public BotaniaSharedStorage getStorageBotania() {
+		return (BotaniaSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, 0, "botania");
 	}
 
 	@Override
@@ -466,5 +475,36 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "OpenComputers")
 	public void onMessage(Message message) {}
+
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean isFull() {
+		return getStorageBotania().isFull();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public void recieveMana(int mana) {
+		getStorageBotania().recieveMana(mana);
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean canRecieveManaFromBursts() {
+		return getStorageBotania().canRecieveManaFromBursts();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public int getCurrentMana() {
+		return getStorageBotania().getCurrentMana();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean isOutputtingPower() {
+		return getStorageBotania().isOutputtingPower();
+	}
 
 }

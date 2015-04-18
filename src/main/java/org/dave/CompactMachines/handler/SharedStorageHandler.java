@@ -23,6 +23,7 @@ import org.dave.CompactMachines.integration.AbstractBufferedStorage;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
+import org.dave.CompactMachines.integration.botania.BotaniaSharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.gas.GasSharedStorage;
@@ -83,6 +84,10 @@ public class SharedStorageHandler {
 
 		if(Reference.OC_AVAILABLE) {
 			registerModInteraction("OpenComputers", OpenComputersSharedStorage.class);
+		}
+
+		if(Reference.BOTANIA_AVAILABLE) {
+			registerModInteraction("botania", BotaniaSharedStorage.class);
 		}
 
 		if (!client) {

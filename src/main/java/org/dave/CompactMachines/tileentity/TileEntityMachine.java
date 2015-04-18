@@ -33,6 +33,7 @@ import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
 import org.dave.CompactMachines.integration.appeng.AESharedStorage;
 import org.dave.CompactMachines.integration.appeng.CMGridBlock;
+import org.dave.CompactMachines.integration.botania.BotaniaSharedStorage;
 import org.dave.CompactMachines.integration.bundledredstone.BRSharedStorage;
 import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.gas.GasSharedStorage;
@@ -43,6 +44,7 @@ import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.utility.WorldUtils;
 
+import vazkii.botania.api.mana.IManaPool;
 import appeng.api.movable.IMovableTile;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
@@ -58,9 +60,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 		@Optional.Interface(iface = "mrtjp.projectred.api.IBundledTile", modid = "ProjRed|Transmission"),
 		@Optional.Interface(iface = "li.cil.oc.api.network.SidedEnvironment", modid = "OpenComputers"),
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
-		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism")
+		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism"),
+		@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania")
 })
-public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment {
+public class TileEntityMachine extends TileEntityCM implements ISidedInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IMovableTile, IBundledTile, SidedEnvironment, IManaPool {
 
 	public int								coords			= -1;
 	public int[]							_fluidid;
@@ -68,6 +71,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int[]							_gasid;
 	public int[]							_gasamount;
 	public int[]							_energy;
+	public int								_mana = 0;
 	public int								meta			= 0;
 
 	public int								entangledInstance;
@@ -90,6 +94,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		_gasid = new int[] { -1, -1, -1, -1, -1, -1 };
 		_gasamount = new int[6];
 		_energy = new int[6];
+		_mana = 0;
 
 		gridBlocks = new HashMap<Integer, CMGridBlock>();
 		gridNodes = new HashMap<Integer, IGridNode>();
@@ -127,6 +132,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	public OpenComputersSharedStorage getStorageOC(int side) {
 		return (OpenComputersSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "OpenComputers");
+	}
+
+	public BotaniaSharedStorage getStorageBotania(int side) {
+		return (BotaniaSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, 0, "botania");
 	}
 
 	@Override
@@ -681,5 +690,53 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Optional.Method(modid = "OpenComputers")
 	public boolean canConnect(ForgeDirection side) {
 		return true;
+	}
+
+
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean isFull() {
+		if (coords == -1) {
+			return true;
+		}
+
+		return getStorageBotania(0).isFull();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public void recieveMana(int mana) {
+		if (coords == -1) {
+			return;
+		}
+		getStorageBotania(0).recieveMana(mana);
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean canRecieveManaFromBursts() {
+		if (coords == -1) {
+			return false;
+		}
+		return getStorageBotania(0).canRecieveManaFromBursts();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public int getCurrentMana() {
+		if (coords == -1) {
+			return 0;
+		}
+		return getStorageBotania(0).getCurrentMana();
+	}
+
+	@Override
+	@Optional.Method(modid = "Botania")
+	public boolean isOutputtingPower() {
+		if (coords == -1) {
+			return false;
+		}
+		return getStorageBotania(0).isOutputtingPower();
 	}
 }

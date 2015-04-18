@@ -38,7 +38,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameData;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania")
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
 	public static CompactMachines	instance;
@@ -69,6 +69,7 @@ public class CompactMachines {
 		Reference.AE_AVAILABLE = Loader.isModLoaded("appliedenergistics2");
 		Reference.PR_AVAILABLE = Loader.isModLoaded("ProjRed|Transmission");
 		Reference.OC_AVAILABLE = Loader.isModLoaded("OpenComputers");
+		Reference.BOTANIA_AVAILABLE = Loader.isModLoaded("Botania");
 		// XXX: Other mods can provide gas support (like galacticraft), this
 		// flag is probably not sufficient.
 		Reference.MEK_AVAILABLE = Loader.isModLoaded("Mekanism");
