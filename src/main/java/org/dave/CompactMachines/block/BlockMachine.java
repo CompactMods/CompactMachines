@@ -24,6 +24,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.creativetab.CreativeTabCM;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.handler.machinedimension.TeleportTools;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
@@ -220,7 +221,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 						if(!ConfigurationHandler.allowEnterWithoutPSD) {
 							player.getEntityData().setBoolean("isUsingPSD", true);
 						}
-						CompactMachines.instance.machineHandler.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
+						TeleportTools.teleportPlayerToMachineWorld((EntityPlayerMP) player, tileEntityMachine);
 					} else if (FluidContainerRegistry.isEmptyContainer(playerStack)) {
 						// Activated with an empty bucket
 						FluidUtils.emptyTankIntoContainer(tileEntityMachine, player, tileEntityMachine.getFluid(faceHit), ForgeDirection.getOrientation(faceHit));
