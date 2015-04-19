@@ -1,10 +1,15 @@
 package org.dave.CompactMachines.machines.tools;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import org.dave.CompactMachines.CompactMachines;
@@ -15,8 +20,10 @@ import org.dave.CompactMachines.network.MessagePlayerRotation;
 import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.PlayerUtils;
 
 public class TeleportTools {
+
 	public static void teleportPlayerToCoords(EntityPlayerMP player, int coord, boolean isReturning) {
 		//LogHelper.info("Teleporting player to: " + coord);
 		NBTTagCompound playerNBT = player.getEntityData();
@@ -201,5 +208,42 @@ public class TeleportTools {
 		}
 
 		return null;
+	}
+
+	public static void checkPlayerPositions() {
+		World worldObj = CompactMachines.instance.machineHandler.getWorld();
+		if (worldObj.getTotalWorldTime() % 10 == 0 && ConfigurationHandler.keepPlayersInsideOfRooms) {
+			for (int i = 0; i < worldObj.playerEntities.size(); i++) {
+				if (worldObj.playerEntities.get(i) instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer) worldObj.playerEntities.get(i);
+					if (player.capabilities.isCreativeMode && PlayerUtils.isPlayerOpped(player)) {
+						// Opped players in creative mode are actually allowed to leave the rooms
+						continue;
+					}
+					int lastCoord = PlayerUtils.getPlayerCoords(player);
+					if (lastCoord == -1) {
+						// We don't know where the player is atm :(
+						continue;
+					}
+
+					if (!CompactMachines.instance.machineHandler.hasRoomSize(lastCoord)) {
+						// We sadly don't know the size of the room the player is in. Skipping.
+						// This automatically changes once any player enters the cube again.
+						continue;
+					}
+
+					int roomSize = Reference.getBoxSize(CompactMachines.instance.machineHandler.getRoomSize(lastCoord));
+
+					AxisAlignedBB bb = CubeTools.getBoundingBoxForCube(lastCoord, roomSize);
+					if (!bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
+						teleportPlayerToCoords((EntityPlayerMP) player, lastCoord, true);
+
+						// Add potion effects for 200 ticks
+						player.addPotionEffect(new PotionEffect(2, 200, 5, false));	// Slowness
+						player.addPotionEffect(new PotionEffect(9, 200, 5, false)); // Nausea
+					}
+				}
+			}
+		}
 	}
 }

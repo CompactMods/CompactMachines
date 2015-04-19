@@ -3,11 +3,9 @@ package org.dave.CompactMachines.machines;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -16,7 +14,6 @@ import net.minecraft.world.WorldSavedData;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.machines.tools.ChunkLoadingTools;
 import org.dave.CompactMachines.machines.tools.CubeTools;
-import org.dave.CompactMachines.machines.tools.TeleportTools;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.PlayerUtils;
@@ -38,41 +35,6 @@ public class MachineSaveData extends WorldSavedData {
 	public MachineSaveData(World worldObj) {
 		this("MachineHandler");
 		this.worldObj = worldObj;
-	}
-
-	public void tick() {
-		if (worldObj.getTotalWorldTime() % 10 == 0 && ConfigurationHandler.keepPlayersInsideOfRooms) {
-			for (int i = 0; i < worldObj.playerEntities.size(); i++) {
-				if (worldObj.playerEntities.get(i) instanceof EntityPlayer) {
-					EntityPlayer player = (EntityPlayer) worldObj.playerEntities.get(i);
-					if (player.capabilities.isCreativeMode && PlayerUtils.isPlayerOpped(player)) {
-						// Opped players in creative mode are actually allowed to leave the rooms
-						continue;
-					}
-					int lastCoord = PlayerUtils.getPlayerCoords(player);
-					if (lastCoord == -1) {
-						// We don't know where the player is atm :(
-						continue;
-					}
-					if (!roomSizes.containsKey(lastCoord)) {
-						// We sadly don't know the size of the room the player is in. Skipping.
-						// This automatically changes once any player enters the cube again.
-						continue;
-					}
-
-					int roomSize = Reference.getBoxSize(roomSizes.get(lastCoord));
-
-					AxisAlignedBB bb = CubeTools.getBoundingBoxForCube(lastCoord, roomSize);
-					if (!bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
-						TeleportTools.teleportPlayerToCoords((EntityPlayerMP) player, lastCoord, true);
-
-						// Add potion effects for 200 ticks
-						player.addPotionEffect(new PotionEffect(2, 200, 5, false));	// Slowness
-						player.addPotionEffect(new PotionEffect(9, 200, 5, false)); // Nausea
-					}
-				}
-			}
-		}
 	}
 
 	public void setCoordSpawnpoint(EntityPlayerMP player) {
@@ -97,14 +59,14 @@ public class MachineSaveData extends WorldSavedData {
 			usingPresetSpawnpoint = true;
 		} else if (roomSizes.containsKey(coord)) {
 			int size = Reference.getBoxSize(roomSizes.get(coord));
-	
+
 			destination = new double[] {
 					coord * ConfigurationHandler.cubeDistance + 0.5 + size / 2,
 					42,
 					0.5 + size / 2
 			};
 		}
-	
+
 		return destination;
 	}
 
@@ -206,6 +168,10 @@ public class MachineSaveData extends WorldSavedData {
 
 	public int getRoomSize(int coord) {
 		return roomSizes.get(coord);
+	}
+
+	public boolean hasRoomSize(int coord) {
+		return roomSizes.containsKey(coord);
 	}
 
 }
