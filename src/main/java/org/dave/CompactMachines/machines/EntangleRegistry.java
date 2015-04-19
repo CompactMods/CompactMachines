@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension;
+package org.dave.CompactMachines.machines;
 
 import java.util.HashMap;
 import java.util.Iterator;

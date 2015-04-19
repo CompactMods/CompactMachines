@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension.tools;
+package org.dave.CompactMachines.machines.tools;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,8 +9,8 @@ import net.minecraft.world.WorldServer;
 
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
-import org.dave.CompactMachines.handler.machinedimension.TeleporterCM;
+import org.dave.CompactMachines.machines.MachineSaveData;
+import org.dave.CompactMachines.machines.world.TeleporterCM;
 import org.dave.CompactMachines.network.MessagePlayerRotation;
 import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.reference.Reference;
@@ -70,7 +70,7 @@ public class TeleportTools {
 			playerNBT.setTag("coordHistory", coordHistory);
 		}
 
-		MachineHandler mHandler = CompactMachines.instance.machineHandler;
+		MachineSaveData mHandler = CompactMachines.instance.machineHandler;
 		double[] destination = mHandler.getSpawnLocation(coord);
 
 		// Check whether the spawn location is blocked

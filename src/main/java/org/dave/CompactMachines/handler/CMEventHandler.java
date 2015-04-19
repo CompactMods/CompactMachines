@@ -6,7 +6,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.dave.CompactMachines.CompactMachines;
-import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
+import org.dave.CompactMachines.machines.MachineSaveData;
 import org.dave.CompactMachines.utility.LogHelper;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -19,9 +19,9 @@ public class CMEventHandler {
 		if (!event.world.isRemote && event.world.provider.dimensionId == ConfigurationHandler.dimensionId)
 		{
 			LogHelper.info("Loading machine world!");
-			MachineHandler machineHandler = (MachineHandler) event.world.mapStorage.loadData(MachineHandler.class, "MachineHandler");
+			MachineSaveData machineHandler = (MachineSaveData) event.world.mapStorage.loadData(MachineSaveData.class, "MachineHandler");
 			if (machineHandler == null) {
-				machineHandler = new MachineHandler(event.world);
+				machineHandler = new MachineSaveData(event.world);
 				machineHandler.markDirty();
 			}
 

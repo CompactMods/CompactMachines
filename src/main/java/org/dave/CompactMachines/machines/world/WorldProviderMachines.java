@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension;
+package org.dave.CompactMachines.machines.world;
 
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldProvider;

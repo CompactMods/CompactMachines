@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.waila;
+package org.dave.CompactMachines.handler;
 
 import static mcp.mobius.waila.api.SpecialChars.ITALIC;
 import static mcp.mobius.waila.api.SpecialChars.RESET;
@@ -24,10 +24,10 @@ import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
-public class BlockHandler implements IWailaDataProvider {
+public class WailaHandler implements IWailaDataProvider {
 
 	public static void callbackRegister(IWailaRegistrar registrar) {
-		BlockHandler instance = new BlockHandler();
+		WailaHandler instance = new WailaHandler();
 		registrar.registerHeadProvider(instance, ModBlocks.machine.getClass());
 		registrar.registerBodyProvider(instance, ModBlocks.machine.getClass());
 		registrar.registerBodyProvider(instance, ModBlocks.interfaceblock.getClass());

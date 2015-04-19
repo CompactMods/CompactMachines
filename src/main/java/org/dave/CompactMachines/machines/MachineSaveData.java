@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension;
+package org.dave.CompactMachines.machines;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,14 +14,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.handler.machinedimension.tools.ChunkLoadingTools;
-import org.dave.CompactMachines.handler.machinedimension.tools.CubeTools;
-import org.dave.CompactMachines.handler.machinedimension.tools.TeleportTools;
+import org.dave.CompactMachines.machines.tools.ChunkLoadingTools;
+import org.dave.CompactMachines.machines.tools.CubeTools;
+import org.dave.CompactMachines.machines.tools.TeleportTools;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.PlayerUtils;
 
-public class MachineHandler extends WorldSavedData {
+public class MachineSaveData extends WorldSavedData {
 
 	int							nextCoord;
 	private World				worldObj;
@@ -29,13 +29,13 @@ public class MachineHandler extends WorldSavedData {
 	HashMap<Integer, double[]>	spawnPoints	= new HashMap<Integer, double[]>();
 	HashMap<Integer, Integer>	roomSizes	= new HashMap<Integer, Integer>();
 
-	public MachineHandler(String s) {
+	public MachineSaveData(String s) {
 		super(s);
 
 		nextCoord = 0;
 	}
 
-	public MachineHandler(World worldObj) {
+	public MachineSaveData(World worldObj) {
 		this("MachineHandler");
 		this.worldObj = worldObj;
 	}

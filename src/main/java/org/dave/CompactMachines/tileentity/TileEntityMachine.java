@@ -28,8 +28,6 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.handler.machinedimension.tools.ChunkLoadingTools;
-import org.dave.CompactMachines.handler.machinedimension.tools.CubeTools;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -42,6 +40,8 @@ import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
+import org.dave.CompactMachines.machines.tools.ChunkLoadingTools;
+import org.dave.CompactMachines.machines.tools.CubeTools;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 

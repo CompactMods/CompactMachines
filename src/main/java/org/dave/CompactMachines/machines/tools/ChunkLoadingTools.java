@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension.tools;
+package org.dave.CompactMachines.machines.tools;
 
 import java.util.ArrayList;
 import java.util.Iterator;

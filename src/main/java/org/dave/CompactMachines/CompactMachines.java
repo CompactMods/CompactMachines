@@ -13,13 +13,13 @@ import org.dave.CompactMachines.handler.GuiHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler.SharedStorageSaveHandler;
 import org.dave.CompactMachines.handler.VillagerHandler;
-import org.dave.CompactMachines.handler.machinedimension.EntangleRegistry;
-import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
-import org.dave.CompactMachines.handler.machinedimension.MachineWorldChunkloadCallback;
-import org.dave.CompactMachines.handler.machinedimension.WorldProviderMachines;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.init.Recipes;
+import org.dave.CompactMachines.machines.EntangleRegistry;
+import org.dave.CompactMachines.machines.MachineSaveData;
+import org.dave.CompactMachines.machines.world.MachineWorldChunkloadCallback;
+import org.dave.CompactMachines.machines.world.WorldProviderMachines;
 import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.proxy.IProxy;
 import org.dave.CompactMachines.reference.Reference;
@@ -46,7 +46,7 @@ public class CompactMachines {
 	@SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
 	public static IProxy			proxy;
 
-	public MachineHandler			machineHandler;
+	public MachineSaveData			machineHandler;
 	public EntangleRegistry			entangleRegistry;
 
 	@Mod.EventHandler
