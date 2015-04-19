@@ -28,6 +28,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
+import org.dave.CompactMachines.handler.machinedimension.ChunkLoadingTools;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -177,7 +178,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 
 		if (ConfigurationHandler.chunkLoadingMode == 2) {
-			CompactMachines.instance.machineHandler.disableMachine(this);
+			ChunkLoadingTools.disableMachine(this);
 		}
 
 		deinitialize();
@@ -220,7 +221,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		entangledInstance = CompactMachines.instance.entangleRegistry.registerMachineTile(this);
 		this.markDirty();
 
-		if (ConfigurationHandler.chunkLoadingMode != 0 && !CompactMachines.instance.machineHandler.isCoordChunkLoaded(this)) {
+		if (ConfigurationHandler.chunkLoadingMode != 0 && !ChunkLoadingTools.isCoordChunkLoaded(this)) {
 			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
 		}
 

@@ -138,98 +138,9 @@ public class MachineHandler extends WorldSavedData {
 		return;
 	}
 
-	public boolean isCoordChunkLoaded(TileEntityMachine machine) {
-		return isCoordChunkLoaded(machine.coords);
-	}
 
-	public boolean isCoordChunkLoaded(int coords) {
-		if (coords == -1) {
-			return false;
-		}
 
-		// Find the ticket that is being used for this machines chunk
-		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
 
-		Iterator ticketIterator = existingTickets.values().iterator();
-		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
-		while (ticketIterator.hasNext()) {
-			Ticket ticket = (Ticket) ticketIterator.next();
-			if (visitedTickets.contains(ticket.hashCode())) {
-				continue;
-			}
-			visitedTickets.add(ticket.hashCode());
-
-			NBTTagCompound data = ticket.getModData();
-			if (data.hasKey("coords")) {
-				int[] nbtCoords = data.getIntArray("coords");
-
-				for (int i = 0; i < nbtCoords.length; i++) {
-					if (nbtCoords[i] == coords) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	public void disableMachine(TileEntityMachine machine) {
-		if (machine.coords == -1) {
-			return;
-		}
-
-		// Find the ticket that is being used for this machines chunk
-		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
-
-		Iterator ticketIterator = existingTickets.values().iterator();
-		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
-		while (ticketIterator.hasNext()) {
-			Ticket ticket = (Ticket) ticketIterator.next();
-			if (visitedTickets.contains(ticket.hashCode())) {
-				continue;
-			}
-
-			visitedTickets.add(ticket.hashCode());
-
-			NBTTagCompound data = ticket.getModData();
-			if (data.hasKey("coords")) {
-				int[] nbtCoords = data.getIntArray("coords");
-
-				boolean foundMatch = false;
-				for (int i = 0; i < nbtCoords.length; i++) {
-					if (nbtCoords[i] != machine.coords) {
-						continue;
-					}
-
-					//LogHelper.info("Unforcing chunk for room: " + machine.coords);
-					ForgeChunkManager.unforceChunk(ticket, new ChunkCoordIntPair((machine.coords * ConfigurationHandler.cubeDistance) >> 4, 0 >> 4));
-
-					int usedChunks = 0;
-					if (data.hasKey("usedChunks")) {
-						usedChunks = data.getInteger("usedChunks");
-					}
-
-					if (usedChunks < 2) {
-						ForgeChunkManager.releaseTicket(ticket);
-					} else {
-						nbtCoords[i] = -1;
-						data.setInteger("usedChunks", usedChunks - 1);
-						data.setIntArray("coords", nbtCoords);
-					}
-
-					foundMatch = true;
-					break;
-				}
-
-				if (foundMatch) {
-					break;
-				}
-			}
-		}
-
-		this.markDirty();
-	}
 
 	public void setCoordSpawnpoint(EntityPlayerMP player) {
 		int lastCoord = PlayerUtils.getPlayerCoords(player);
@@ -487,6 +398,10 @@ public class MachineHandler extends WorldSavedData {
 		}
 
 		nbt.setTag("spawnpoints", tagList);
+	}
+
+	public World getWorld() {
+		return this.worldObj;
 	}
 
 	public void setWorld(World world) {
