@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.handler.machinedimension.TeleportTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.TeleportTools;
 import org.dave.CompactMachines.reference.Names;
 
 public class ItemPersonalShrinkingDevice extends ItemCM

@@ -1,39 +1,25 @@
 package org.dave.CompactMachines.handler.machinedimension;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.ForgeChunkManager.Type;
-import net.minecraftforge.common.util.ForgeDirection;
 
-import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.integration.item.ItemSharedStorage;
+import org.dave.CompactMachines.handler.machinedimension.tools.ChunkLoadingTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.CubeTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.TeleportTools;
 import org.dave.CompactMachines.reference.Reference;
-import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.dave.CompactMachines.utility.PlayerUtils;
-import org.dave.CompactMachines.utility.WorldUtils;
-
-import com.google.common.collect.ImmutableSetMultimap;
 
 public class MachineHandler extends WorldSavedData {
 
@@ -76,7 +62,7 @@ public class MachineHandler extends WorldSavedData {
 
 					int roomSize = Reference.getBoxSize(roomSizes.get(lastCoord));
 
-					AxisAlignedBB bb = WorldUtils.getBoundingBoxForCube(lastCoord, roomSize);
+					AxisAlignedBB bb = CubeTools.getBoundingBoxForCube(lastCoord, roomSize);
 					if (!bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
 						TeleportTools.teleportPlayerToCoords((EntityPlayerMP) player, lastCoord, true);
 
@@ -89,64 +75,11 @@ public class MachineHandler extends WorldSavedData {
 		}
 	}
 
-	public void harvestMachine(TileEntityMachine machine, EntityPlayer player) {
-		if (machine.coords == -1) {
-			return;
-		}
-
-		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-
-		int size = Reference.getBoxSize(machine.meta);
-		int height = size;
-
-		List<ItemStack> stacks = WorldUtils.harvestCube(machineWorld,
-				//   x           y           z
-				machine.coords * ConfigurationHandler.cubeDistance + 1, 40 + 1, 1,
-				machine.coords * ConfigurationHandler.cubeDistance + size - 1, 40 + height - 1, size - 1,
-				player
-				);
-
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			ItemSharedStorage storage = machine.getStorage(dir.ordinal());
-			ItemStack storedStack = storage.getStackInSlot(0);
-			if (storedStack != null && storedStack.stackSize > 0) {
-				stacks.add(storedStack);
-			}
-			storage.setInventorySlotContents(0, null);
-			storage.setDirty();
-		}
-
-		int droppedStacks = 0;
-		for (ItemStack stack : stacks) {
-			if (ConfigurationHandler.maxDroppedStacks != -1 && droppedStacks >= ConfigurationHandler.maxDroppedStacks) {
-				return;
-			}
-
-			EntityItem entityitem = new EntityItem(machine.getWorldObj(), machine.xCoord, machine.yCoord + 0.5F, machine.zCoord, stack);
-
-			entityitem.lifespan = 1200;
-			entityitem.delayBeforeCanPickup = 10;
-
-			float f3 = 0.05F;
-			entityitem.motionX = (float) worldObj.rand.nextGaussian() * f3;
-			entityitem.motionY = (float) worldObj.rand.nextGaussian() * f3 + 0.2F;
-			entityitem.motionZ = (float) worldObj.rand.nextGaussian() * f3;
-			machine.getWorldObj().spawnEntityInWorld(entityitem);
-			droppedStacks++;
-		}
-
-		return;
-	}
-
-
-
-
-
 	public void setCoordSpawnpoint(EntityPlayerMP player) {
 		int lastCoord = PlayerUtils.getPlayerCoords(player);
 		if (lastCoord > -1 && roomSizes.containsKey(lastCoord)) {
 			int roomSize = Reference.getBoxSize(roomSizes.get(lastCoord));
-			AxisAlignedBB bb = WorldUtils.getBoundingBoxForCube(lastCoord, roomSize);
+			AxisAlignedBB bb = CubeTools.getBoundingBoxForCube(lastCoord, roomSize);
 
 			if (bb.isVecInside(Vec3.createVectorHelper(player.posX, player.posY, player.posZ))) {
 				spawnPoints.put(lastCoord, new double[] { player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch });
@@ -164,134 +97,15 @@ public class MachineHandler extends WorldSavedData {
 			usingPresetSpawnpoint = true;
 		} else if (roomSizes.containsKey(coord)) {
 			int size = Reference.getBoxSize(roomSizes.get(coord));
-
+	
 			destination = new double[] {
 					coord * ConfigurationHandler.cubeDistance + 0.5 + size / 2,
 					42,
 					0.5 + size / 2
 			};
 		}
-
+	
 		return destination;
-	}
-
-	public double[] findBestSpawnLocation(WorldServer machineWorld, int coord) {
-		int size = Reference.getBoxSize(roomSizes.get(coord));
-
-		int posX1 = coord * ConfigurationHandler.cubeDistance + 1;
-		int posY1 = 40 + 1;
-		int posZ1 = 1;
-
-		int posX2 = coord * ConfigurationHandler.cubeDistance + size - 1;
-		int posY2 = 40 + size - 1;
-		int posZ2 = size - 1;
-
-		int minX = Math.min(posX1, posX2);
-		int minY = Math.min(posY1, posY2);
-		int minZ = Math.min(posZ1, posZ2);
-
-		int maxX = Math.max(posX1, posX2);
-		int maxY = Math.max(posY1, posY2) - 1;
-		int maxZ = Math.max(posZ1, posZ2);
-
-		for (int x = minX; x <= maxX; x++) {
-			for (int y = minY; y <= maxY; y++) {
-				for (int z = minZ; z <= maxZ; z++) {
-					if (machineWorld.isAirBlock(x, y, z) && machineWorld.isAirBlock(x, y + 1, z)) {
-						return new double[] { x + 0.5, y + 0.5, z + 0.5 };
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-
-	public void forceChunkLoad(int coord) {
-		if (worldObj == null) {
-			return;
-		}
-
-		// Do not load chunks when the config is set to "never"
-		if (ConfigurationHandler.chunkLoadingMode == 0) {
-			return;
-		}
-
-		Ticket chunkTicket = null;
-		ImmutableSetMultimap<ChunkCoordIntPair, Ticket> existingTickets = ForgeChunkManager.getPersistentChunksFor(worldObj);
-
-		Iterator ticketIterator = existingTickets.values().iterator();
-		ArrayList<Integer> visitedTickets = new ArrayList<Integer>();
-		while (ticketIterator.hasNext()) {
-			Ticket ticket = (Ticket) ticketIterator.next();
-			if (visitedTickets.contains(ticket.hashCode())) {
-				continue;
-			}
-
-			visitedTickets.add(ticket.hashCode());
-
-			NBTTagCompound data = ticket.getModData();
-			if (data.hasKey("coords")) {
-				// Found a ticket that belongs to our mod, this should be true for all cases
-
-				int usedChunks = 0;
-				if (data.hasKey("usedChunks")) {
-					usedChunks = data.getInteger("usedChunks");
-				}
-
-				if (usedChunks < ticket.getMaxChunkListDepth()) {
-					chunkTicket = ticket;
-					break;
-				}
-			}
-		}
-
-		if (chunkTicket == null) {
-			// No existing/free ticket found. Requesting a new one.
-			chunkTicket = ForgeChunkManager.requestTicket(CompactMachines.instance, worldObj, Type.NORMAL);
-		}
-
-		if (chunkTicket == null) {
-			return;
-		}
-
-		NBTTagCompound data = chunkTicket.getModData();
-		int usedChunks = 0;
-		if (data.hasKey("usedChunks")) {
-			usedChunks = data.getInteger("usedChunks");
-		}
-
-		int[] nbtCoords = new int[chunkTicket.getMaxChunkListDepth()];
-		if (data.hasKey("coords")) {
-			nbtCoords = data.getIntArray("coords");
-			if (nbtCoords.length > chunkTicket.getMaxChunkListDepth()) {
-				// TODO: oh oh. we have an old ticket with a bigger chunk-loading limit,
-				// we have to request more Tickets! This only happens if you actually change
-				// the forge chunk loading limits.
-				// --> Support this for the plebs of the internet :(
-			}
-		} else {
-			// initialize with -1
-			for (int i = 0; i < nbtCoords.length; i++) {
-				nbtCoords[i] = -1;
-			}
-		}
-
-		// Find "slot" in ticket:
-		for (int i = 0; i < nbtCoords.length; i++) {
-			if (nbtCoords[i] == -1) {
-				nbtCoords[i] = coord;
-				break;
-			}
-		}
-
-		// Each ticket needs to remember for which areas it is responsible
-		data.setIntArray("coords", nbtCoords);
-		data.setInteger("usedChunks", usedChunks + 1);
-
-		//LogHelper.info("Forcing chunk for room: " + coord);
-		ForgeChunkManager.forceChunk(chunkTicket, new ChunkCoordIntPair((coord * ConfigurationHandler.cubeDistance) >> 4, 0 >> 4));
 	}
 
 	public int createOrGetChunk(TileEntityMachine machine) {
@@ -301,30 +115,12 @@ public class MachineHandler extends WorldSavedData {
 
 		//LogHelper.info("Reserving new coords...");
 		machine.coords = nextCoord;
-		nextCoord++;
-
-		int size = Reference.getBoxSize(machine.meta);
-		int height = size;
-
-		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-
-		WorldUtils.generateCube(machineWorld,
-				//          x           y           z
-				machine.coords * ConfigurationHandler.cubeDistance, 40, 0,
-				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
-				);
-
-		// After creating the Block, make sure the TileEntities inside have their information ready.
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			Vec3 pos = WorldUtils.getInterfacePosition(machine.coords, machine.meta, dir);
-			TileEntityInterface te = (TileEntityInterface) machineWorld.getTileEntity((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord);
-			te.setCoordSide(machine.coords, dir.ordinal());
-		}
-
 		machine.markDirty();
 
+		nextCoord++;
 
-		this.forceChunkLoad(machine.coords);
+		CubeTools.generateCube(machine);
+		ChunkLoadingTools.forceChunkLoad(machine.coords);
 
 		roomSizes.put(machine.coords, machine.meta);
 		this.markDirty();
@@ -406,6 +202,10 @@ public class MachineHandler extends WorldSavedData {
 
 	public void setWorld(World world) {
 		this.worldObj = world;
+	}
+
+	public int getRoomSize(int coord) {
+		return roomSizes.get(coord);
 	}
 
 }

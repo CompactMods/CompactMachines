@@ -28,7 +28,8 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
-import org.dave.CompactMachines.handler.machinedimension.ChunkLoadingTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.ChunkLoadingTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.CubeTools;
 import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -43,7 +44,6 @@ import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedSto
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
-import org.dave.CompactMachines.utility.WorldUtils;
 
 import vazkii.botania.api.mana.IManaPool;
 import appeng.api.movable.IMovableTile;
@@ -222,7 +222,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		this.markDirty();
 
 		if (ConfigurationHandler.chunkLoadingMode != 0 && !ChunkLoadingTools.isCoordChunkLoaded(this)) {
-			CompactMachines.instance.machineHandler.forceChunkLoad(this.coords);
+			ChunkLoadingTools.forceChunkLoad(this.coords);
 		}
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -628,7 +628,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (haveChanges) {
 			WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				Vec3 pos = WorldUtils.getInterfacePosition(this.coords, this.meta, dir);
+				Vec3 pos = CubeTools.getInterfacePosition(this.coords, this.meta, dir);
 
 				machineWorld.notifyBlockChange((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord, ModBlocks.interfaceblock);
 

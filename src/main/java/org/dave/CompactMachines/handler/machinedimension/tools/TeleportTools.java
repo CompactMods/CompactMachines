@@ -1,4 +1,4 @@
-package org.dave.CompactMachines.handler.machinedimension;
+package org.dave.CompactMachines.handler.machinedimension.tools;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,6 +9,8 @@ import net.minecraft.world.WorldServer;
 
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.handler.machinedimension.MachineHandler;
+import org.dave.CompactMachines.handler.machinedimension.TeleporterCM;
 import org.dave.CompactMachines.network.MessagePlayerRotation;
 import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.reference.Reference;
@@ -79,7 +81,7 @@ public class TeleportTools {
 
 		if (!machineWorld.isAirBlock(dstX, dstY, dstZ) || !machineWorld.isAirBlock(dstX, dstY + 1, dstZ)) {
 			// If it is blocked, try to find a better position
-			double[] bestSpot = mHandler.findBestSpawnLocation(machineWorld, coord);
+			double[] bestSpot = findBestSpawnLocation(machineWorld, coord);
 			if (bestSpot != null) {
 				destination = bestSpot;
 			}
@@ -167,5 +169,37 @@ public class TeleportTools {
 			// No coord history on the player yet - teleport him out of there.
 			TeleportTools.teleportPlayerOutOfMachineDimension(player);
 		}
+	}
+
+	private static double[] findBestSpawnLocation(WorldServer machineWorld, int coord) {
+		int size = Reference.getBoxSize(CompactMachines.instance.machineHandler.getRoomSize(coord));
+
+		int posX1 = coord * ConfigurationHandler.cubeDistance + 1;
+		int posY1 = 40 + 1;
+		int posZ1 = 1;
+
+		int posX2 = coord * ConfigurationHandler.cubeDistance + size - 1;
+		int posY2 = 40 + size - 1;
+		int posZ2 = size - 1;
+
+		int minX = Math.min(posX1, posX2);
+		int minY = Math.min(posY1, posY2);
+		int minZ = Math.min(posZ1, posZ2);
+
+		int maxX = Math.max(posX1, posX2);
+		int maxY = Math.max(posY1, posY2) - 1;
+		int maxZ = Math.max(posZ1, posZ2);
+
+		for (int x = minX; x <= maxX; x++) {
+			for (int y = minY; y <= maxY; y++) {
+				for (int z = minZ; z <= maxZ; z++) {
+					if (machineWorld.isAirBlock(x, y, z) && machineWorld.isAirBlock(x, y + 1, z)) {
+						return new double[] { x + 0.5, y + 0.5, z + 0.5 };
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 }

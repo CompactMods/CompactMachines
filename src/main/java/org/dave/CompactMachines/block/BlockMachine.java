@@ -24,8 +24,9 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.creativetab.CreativeTabCM;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
-import org.dave.CompactMachines.handler.machinedimension.ChunkLoadingTools;
-import org.dave.CompactMachines.handler.machinedimension.TeleportTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.ChunkLoadingTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.CubeTools;
+import org.dave.CompactMachines.handler.machinedimension.tools.TeleportTools;
 import org.dave.CompactMachines.init.ModItems;
 import org.dave.CompactMachines.item.ItemPersonalShrinkingDevice;
 import org.dave.CompactMachines.reference.GuiId;
@@ -155,7 +156,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 
 			if (result) {
 				if (!tileEntityMachine.isUpgraded) {
-					CompactMachines.instance.machineHandler.harvestMachine(tileEntityMachine, player);
+					CubeTools.harvestMachine(tileEntityMachine, player);
 				}
 
 				tileEntityMachine.dropAsItem();
