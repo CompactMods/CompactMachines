@@ -2,6 +2,7 @@ package org.dave.CompactMachines.integration.botania;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractBufferedStorage;
 
@@ -10,8 +11,6 @@ import vazkii.botania.api.mana.IManaPool;
 public class BotaniaSharedStorage extends AbstractBufferedStorage implements IManaPool {
 
 	protected int mana = 0;
-	// TODO: Get rid of hardcoded capacities
-	protected int capacity = 10000;
 
 	public BotaniaSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -39,12 +38,12 @@ public class BotaniaSharedStorage extends AbstractBufferedStorage implements IMa
 
 	@Override
 	public boolean isFull() {
-		return (capacity <= mana);
+		return (ConfigurationHandler.capacityMana <= mana);
 	}
 
 	@Override
 	public void recieveMana(int mana) {
-		if(mana < 0 || this.mana < capacity) {
+		if(mana < 0 || this.mana < ConfigurationHandler.capacityMana) {
 			this.mana += mana;
 		}
 	}

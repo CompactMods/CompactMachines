@@ -1,13 +1,13 @@
 package org.dave.CompactMachines.integration.gas;
 
-import net.minecraftforge.common.util.ForgeDirection;
-
 import mekanism.api.gas.GasStack;
 import mekanism.api.gas.GasTank;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
+
 public class ExtendedGasTank extends GasTank {
-	public ExtendedGasTank(int capacity) {
-		super(capacity);
+	public ExtendedGasTank() {
+		super(ConfigurationHandler.capacityGas);
 	}
 
 	public void onGasChanged() {};
@@ -32,5 +32,10 @@ public class ExtendedGasTank extends GasTank {
 		}
 
 		return received;
+	}
+
+	@Override
+	public int getMaxGas() {
+		return ConfigurationHandler.capacityGas;
 	}
 }

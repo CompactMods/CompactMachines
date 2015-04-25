@@ -14,9 +14,6 @@ import cofh.api.energy.IEnergyStorage;
 public class FluxSharedStorage extends AbstractHoppingStorage implements IEnergyStorage {
 
 	protected int	energy		= 0;
-	protected int	capacity	= 10000;
-	protected int	maxReceive	= 10000;
-	protected int	maxExtract	= 10000;
 
 	public FluxSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
@@ -44,7 +41,7 @@ public class FluxSharedStorage extends AbstractHoppingStorage implements IEnergy
 
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate) {
-		int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
+		int energyReceived = Math.min(ConfigurationHandler.capacityRF - energy, Math.min(ConfigurationHandler.capacityRF, maxReceive));
 
 		if (!simulate) {
 			energy += energyReceived;
@@ -55,7 +52,7 @@ public class FluxSharedStorage extends AbstractHoppingStorage implements IEnergy
 
 	@Override
 	public int extractEnergy(int maxExtract, boolean simulate) {
-		int energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
+		int energyExtracted = Math.min(energy, Math.min(ConfigurationHandler.capacityRF, maxExtract));
 
 		if (!simulate) {
 			energy -= energyExtracted;
@@ -71,7 +68,7 @@ public class FluxSharedStorage extends AbstractHoppingStorage implements IEnergy
 
 	@Override
 	public int getMaxEnergyStored() {
-		return capacity;
+		return ConfigurationHandler.capacityRF;
 	}
 
 	@Override

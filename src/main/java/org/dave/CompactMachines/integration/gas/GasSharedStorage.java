@@ -16,14 +16,13 @@ import cpw.mods.fml.common.Optional;
 
 @Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism")
 public class GasSharedStorage extends AbstractHoppingStorage implements IGasHandler {
-	private static final int	MAX_GAS	= 1024;
 	private ExtendedGasTank		tank;
 
 	public GasSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 
 		if(Reference.MEK_AVAILABLE) {
-			tank = new ExtendedGasTank(MAX_GAS) {
+			tank = new ExtendedGasTank() {
 				@Override
 				public void onGasChanged() {
 					setDirty();

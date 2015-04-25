@@ -6,15 +6,15 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidTank;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.utility.FluidUtils;
 
 public class ExtendedFluidTank implements IFluidTank
 {
 	private FluidStack	fluid;
 	private boolean		changeType;
-	private int			capacity;
 
-	public ExtendedFluidTank(FluidStack type, int capacity)
+	public ExtendedFluidTank(FluidStack type)
 	{
 		if (type == null)
 		{
@@ -23,12 +23,11 @@ public class ExtendedFluidTank implements IFluidTank
 		} else {
 			fluid = FluidUtils.copy(type, 0);
 		}
-		this.capacity = capacity;
 	}
 
-	public ExtendedFluidTank(int capacity)
+	public ExtendedFluidTank()
 	{
-		this(null, capacity);
+		this(null);
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class ExtendedFluidTank implements IFluidTank
 	@Override
 	public int getCapacity()
 	{
-		return capacity;
+		return ConfigurationHandler.capacityFluid;
 	}
 
 	public boolean canAccept(FluidStack type)

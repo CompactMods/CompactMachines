@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Textures;
@@ -76,7 +77,7 @@ public class GuiMachine extends GuiContainer {
 
 				if (fluidAmount > 0) {
 					FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
-					lines.add(fluidStack.getLocalizedName() + ": " + fluidAmount);
+					lines.add(fluidStack.getLocalizedName() + ": " + fluidAmount + "mB");
 				}
 
 				if (gasAmount > 0) {
@@ -88,7 +89,7 @@ public class GuiMachine extends GuiContainer {
 
 				if (manaAmount > 0) {
 					// TODO: Get rid of hardcoded capacities
-					double ratio = (manaAmount * 1.0 / 10000.0);
+					double ratio = (manaAmount * 1.0 / ConfigurationHandler.capacityMana);
 					if(ratio > 1) {
 						ratio = 1.0;
 					}
@@ -188,7 +189,7 @@ public class GuiMachine extends GuiContainer {
 			Fluid fluid = FluidRegistry.getFluid(fluidId);
 			if(fluid != null && fluidAmount > 0) {
 				FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
-				int tankSize = fluidAmount * tankHeight / 1000;
+				int tankSize = fluidAmount * tankHeight / ConfigurationHandler.capacityFluid;
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				drawTank(xPositions[i] - 4, yPositions[i] + 16, fluidStack, tankSize, gasAmount > 0);
 			}
@@ -196,7 +197,7 @@ public class GuiMachine extends GuiContainer {
 			int gasId = tileEntityMachine._gasid[i];
 			if (gasId != -1 && gasAmount > 0) {
 				GasStack gas = new GasStack(gasId, gasAmount);
-				int gasTankSize = gasAmount * tankHeight / 1024;
+				int gasTankSize = gasAmount * tankHeight / ConfigurationHandler.capacityGas;
 				int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
@@ -204,7 +205,7 @@ public class GuiMachine extends GuiContainer {
 
 			int energyAmount = tileEntityMachine._energy[i];
 			if(energyAmount > 0) {
-				int energySize = energyAmount * tankHeight / 10000;
+				int energySize = energyAmount * tankHeight / ConfigurationHandler.capacityRF;
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
 			}

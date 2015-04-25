@@ -18,6 +18,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.inventory.ContainerInterface;
 import org.dave.CompactMachines.network.MessageHoppingModeChange;
 import org.dave.CompactMachines.network.PacketHandler;
@@ -77,7 +78,7 @@ public class GuiInterface extends GuiContainer {
 		Fluid fluid = FluidRegistry.getFluid(tileEntityInterface._fluidid);
 		if (tileEntityInterface._fluidamount > 0 && fluid != null) {
 			FluidStack fluidStack = new FluidStack(fluid, tileEntityInterface._fluidamount);
-			int tankSize = tileEntityInterface._fluidamount * tankHeight / 1000;
+			int tankSize = tileEntityInterface._fluidamount * tankHeight / ConfigurationHandler.capacityFluid;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawTank(76, 61, fluidStack, tankSize, tileEntityInterface._gasamount > 0);
@@ -85,7 +86,7 @@ public class GuiInterface extends GuiContainer {
 
 		if (tileEntityInterface._gasamount > 0) {
 			GasStack gas = new GasStack(tileEntityInterface._gasid, tileEntityInterface._gasamount);
-			int tankSize = tileEntityInterface._gasamount * tankHeight / 1024;
+			int tankSize = tileEntityInterface._gasamount * tankHeight / ConfigurationHandler.capacityGas;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -96,7 +97,7 @@ public class GuiInterface extends GuiContainer {
 		}
 
 		if (tileEntityInterface._energy > 0) {
-			int energySize = tileEntityInterface._energy * tankHeight / 10000;
+			int energySize = tileEntityInterface._energy * tankHeight / ConfigurationHandler.capacityRF;
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			drawEnergy(96, 61, energySize);
 		}
@@ -212,7 +213,6 @@ public class GuiInterface extends GuiContainer {
 	}
 
 	protected void bindTexture(Gas gas) {
-		// FIXME: Not sure if this is correct...
 		this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 	}
 
@@ -272,7 +272,7 @@ public class GuiInterface extends GuiContainer {
 			}
 
 			if (tileEntityInterface._mana > 0) {
-				double ratio = (tileEntityInterface._mana * 1.0 / 10000.0);
+				double ratio = (tileEntityInterface._mana * 1.0 / ConfigurationHandler.capacityMana);
 				if(ratio > 1) {
 					ratio = 1.0;
 				}

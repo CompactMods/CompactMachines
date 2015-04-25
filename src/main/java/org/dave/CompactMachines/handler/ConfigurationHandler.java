@@ -17,6 +17,10 @@ public class ConfigurationHandler {
 	public static int			maxDroppedStacks;
 	public static int			chunkLoadingMode;
 	public static int			cubeDistance;
+	public static int			capacityRF;
+	public static int			capacityFluid;
+	public static int			capacityGas;
+	public static int			capacityMana;
 	public static int			cooldownRF;
 	public static int			cooldownItems;
 	public static int			cooldownFluid;
@@ -51,6 +55,11 @@ public class ConfigurationHandler {
 		cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");
 		cooldownFluid = configuration.getInt("cooldownFluid", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Fluids, i.e. 0 => 1 Bucket per tick");
 		cooldownGas = configuration.getInt("cooldownGas", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Gases, i.e. 0 => 1024 units per tick");
+
+		capacityRF = configuration.getInt("capacityRF", "CompactMachines", 10000, 0, Integer.MAX_VALUE, "Maximum amount of RF a CM buffer can hold.");
+		capacityFluid = configuration.getInt("capacityFluid", "CompactMachines", 1000, 0, Integer.MAX_VALUE, "Maximum amount of fluid (in mB) a CM buffer can hold.");
+		capacityGas = configuration.getInt("capacityGas", "CompactMachines", 1024, 0, Integer.MAX_VALUE, "Maximum amount of gas a CM buffer can hold.");
+		capacityMana = configuration.getInt("capacityMana", "CompactMachines", 10000, 0, Integer.MAX_VALUE, "Maximum amount of Botania Mana a CM buffer can hold.");
 
 		int red = configuration.getInt("psdDisplayColor.red", "Rendering", 0x27, 0, Integer.MAX_VALUE, "Font color for the PSD");
 		int green = configuration.getInt("psdDisplayColor.green", "Rendering", 0xEB, 0, Integer.MAX_VALUE, "");

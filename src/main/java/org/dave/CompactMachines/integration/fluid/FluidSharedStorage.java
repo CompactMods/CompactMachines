@@ -11,15 +11,14 @@ import net.minecraftforge.fluids.IFluidHandler;
 import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
-import org.dave.CompactMachines.utility.FluidUtils;
 
 public class FluidSharedStorage extends AbstractHoppingStorage implements IFluidHandler {
 
 	private class Tank extends ExtendedFluidTank
 	{
-		public Tank(int capacity)
+		public Tank()
 		{
-			super(capacity);
+			super();
 		}
 
 		@Override
@@ -34,7 +33,7 @@ public class FluidSharedStorage extends AbstractHoppingStorage implements IFluid
 	public FluidSharedStorage(SharedStorageHandler storageHandler, int coord, int side) {
 		super(storageHandler, coord, side);
 
-		tank = new Tank(1 * FluidUtils.B);
+		tank = new Tank();
 		max_cooldown = ConfigurationHandler.cooldownFluid;
 	}
 
