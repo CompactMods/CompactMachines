@@ -45,6 +45,7 @@ public class BotaniaSharedStorage extends AbstractBufferedStorage implements IMa
 	public void recieveMana(int mana) {
 		if(mana < 0 || this.mana < ConfigurationHandler.capacityMana) {
 			this.mana += mana;
+			setDirty();
 		}
 	}
 
