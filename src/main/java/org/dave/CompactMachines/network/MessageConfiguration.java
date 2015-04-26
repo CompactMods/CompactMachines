@@ -21,11 +21,20 @@ public class MessageConfiguration implements IMessage, IMessageHandler<MessageCo
 		LogHelper.info("Receiving configuration from server");
 		ConfigurationHandler.isServerConfig = true;
 		ConfigurationHandler.dimensionId = buf.readInt();
+		ConfigurationHandler.capacityRF = buf.readInt();
+		ConfigurationHandler.capacityFluid = buf.readInt();
+		ConfigurationHandler.capacityGas = buf.readInt();
+		ConfigurationHandler.capacityMana = buf.readInt();
+
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
 		buf.writeInt(ConfigurationHandler.dimensionId);
+		buf.writeInt(ConfigurationHandler.capacityRF);
+		buf.writeInt(ConfigurationHandler.capacityFluid);
+		buf.writeInt(ConfigurationHandler.capacityGas);
+		buf.writeInt(ConfigurationHandler.capacityMana);
 	}
 
 	@Override

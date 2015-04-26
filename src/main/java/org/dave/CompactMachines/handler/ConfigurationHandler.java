@@ -87,10 +87,16 @@ public class ConfigurationHandler {
 	}
 
 	public static void saveConfiguration() {
+		if(isServerConfig) {
+			return;
+		}
+
 		Property dimProp = configuration.get("Internal", "dimension", -1, "Dimension used for machines. Do not change this unless it is somehow conflicting!");
 		dimProp.set(dimensionId);
 
-		configuration.save();
+		if (configuration.hasChanged()) {
+			configuration.save();
+		}
 	}
 
 	@SubscribeEvent
