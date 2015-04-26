@@ -35,8 +35,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania")
 public class CompactMachines {
@@ -53,6 +55,23 @@ public class CompactMachines {
 	public void preServerStart(FMLServerAboutToStartEvent event) {
 		entangleRegistry.clear();
 		SharedStorageHandler.reloadStorageHandler(false);
+
+		// Locally hosted servers, i.e. clients register their dimension here.
+		if(event.getSide() == Side.CLIENT) {
+			LogHelper.info("Registering dimension " + ConfigurationHandler.dimensionId + " on client side");
+			DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
+			DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+		}
+	}
+
+	@Mod.EventHandler
+	public void postServerEnd(FMLServerStoppedEvent event) {
+		// Locally hosted servers, i.e. clients need to unregister dimensions they've loaded.
+		if(event.getSide() == Side.CLIENT) {
+			LogHelper.info("Unregistering dimension " + ConfigurationHandler.dimensionId + " on client side");
+			DimensionManager.unregisterProviderType(ConfigurationHandler.dimensionId);
+			DimensionManager.unregisterDimension(ConfigurationHandler.dimensionId);
+		}
 	}
 
 	@Mod.EventHandler
@@ -76,8 +95,11 @@ public class CompactMachines {
 
 		// Insist on keeping an already registered dimension by registering in pre-init.
 		if (ConfigurationHandler.dimensionId != -1) {
-			DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
-			DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+			if(event.getSide() == Side.SERVER) {
+				LogHelper.info("Registering dimension on server side");
+				DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
+				DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
+			}
 		}
 
 		ModItems.init();

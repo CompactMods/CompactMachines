@@ -1,18 +1,48 @@
 package org.dave.CompactMachines.handler;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.machines.MachineSaveData;
+import org.dave.CompactMachines.network.MessageConfiguration;
+import org.dave.CompactMachines.network.PacketHandler;
 import org.dave.CompactMachines.utility.LogHelper;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 
 public class CMEventHandler {
+	@SubscribeEvent
+	public void onClientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event) {
+		if(!event.isLocal && event.handler instanceof NetHandlerPlayServer) {
+			NetHandlerPlayServer nhps = (NetHandlerPlayServer) event.handler;
+			EntityPlayerMP player = nhps.playerEntity;
+
+			LogHelper.info("Sending configuration to client: " + player.getDisplayName());
+			event.manager.scheduleOutboundPacket(PacketHandler.INSTANCE.getPacketFrom(new MessageConfiguration()));
+		}
+	}
+
+	@SubscribeEvent
+	public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+		if(ConfigurationHandler.isServerConfig) {
+			LogHelper.info("Unregistering dimension " + ConfigurationHandler.dimensionId + " on client side");
+			DimensionManager.unregisterDimension(ConfigurationHandler.dimensionId);
+			DimensionManager.unregisterProviderType(ConfigurationHandler.dimensionId);
+
+			ConfigurationHandler.reload();
+			ConfigurationHandler.isServerConfig = false;
+			LogHelper.info("Restored original dimension id: " + ConfigurationHandler.dimensionId);
+		}
+	}
+
 	@SubscribeEvent
 	public void loadWorld(WorldEvent.Load event)
 	{

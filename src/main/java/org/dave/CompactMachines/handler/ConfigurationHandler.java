@@ -33,10 +33,18 @@ public class ConfigurationHandler {
 	public static boolean		allowEnterWithoutPSD;
 	public static int			psdDisplayColor;
 
+	public static boolean		isServerConfig;
+
 	public static void init(File configFile) {
 		// Create the configuration object from the given configuration file
 		if (configuration == null) {
 			configuration = new Configuration(configFile);
+			loadConfiguration();
+		}
+	}
+
+	public static void reload() {
+		if(configuration != null) {
 			loadConfiguration();
 		}
 	}
