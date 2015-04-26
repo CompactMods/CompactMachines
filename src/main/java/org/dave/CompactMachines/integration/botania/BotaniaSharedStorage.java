@@ -7,7 +7,9 @@ import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractBufferedStorage;
 
 import vazkii.botania.api.mana.IManaPool;
+import cpw.mods.fml.common.Optional;
 
+@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania")
 public class BotaniaSharedStorage extends AbstractBufferedStorage implements IManaPool {
 
 	protected int mana = 0;
