@@ -12,6 +12,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.CompactMachines;
@@ -25,6 +28,29 @@ import org.dave.CompactMachines.utility.WorldUtils;
 
 public class CubeTools {
 
+	public static void setCubeBiome(int coords, BiomeGenBase biome) {
+		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
+		Chunk chunk = machineWorld.getChunkFromBlockCoords(coords * ConfigurationHandler.cubeDistance, 0);
+		if(chunk != null && chunk.isChunkLoaded) {
+			byte[] biomeArray = chunk.getBiomeArray();
+			for(int x = 0; x < 15; x++) {
+				for(int z = 0; z < 15; z++) {
+					biomeArray[z << 4 | x] = (byte) biome.biomeID;
+				}
+			}
+		}
+	}
+
+	public static BiomeGenBase getMachineBiome(TileEntityMachine machine) {
+		byte biomeArray[] = machine.getWorldObj().getChunkFromBlockCoords(machine.xCoord, machine.zCoord).getBiomeArray();
+		int biomeId = biomeArray[((machine.zCoord & 0xF) << 4 | machine.xCoord & 0xF)];
+		if(BiomeDictionary.isBiomeRegistered(biomeId)) {
+			return BiomeGenBase.getBiome(biomeId);
+		}
+
+		return BiomeGenBase.sky;
+	}
+
 	public static void generateCube(TileEntityMachine machine) {
 		int size = Reference.getBoxSize(machine.meta);
 		int height = size;
@@ -36,6 +62,8 @@ public class CubeTools {
 				machine.coords * ConfigurationHandler.cubeDistance, 40, 0,
 				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
 				);
+
+		setCubeBiome(machine.coords, getMachineBiome(machine));
 
 		// After creating the Block, make sure the TileEntities inside have their information ready.
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -255,7 +283,7 @@ public class CubeTools {
 				coord * ConfigurationHandler.cubeDistance + 1, 40, 0,
 				coord * ConfigurationHandler.cubeDistance + size + 1, 40 + size + 1, size + 1
 				);
-	
+
 		return bb;
 	}
 
