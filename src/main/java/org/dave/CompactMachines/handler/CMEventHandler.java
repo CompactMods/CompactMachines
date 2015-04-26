@@ -12,8 +12,10 @@ import org.dave.CompactMachines.CompactMachines;
 import org.dave.CompactMachines.machines.MachineSaveData;
 import org.dave.CompactMachines.network.MessageConfiguration;
 import org.dave.CompactMachines.network.PacketHandler;
+import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.utility.LogHelper;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
@@ -82,6 +84,13 @@ public class CMEventHandler {
 			event.player.addPotionEffect(new PotionEffect(Potion.confusion.id, 300, 5, false)); // Nausea
 		} else {
 			playerNBT.removeTag("isUsingPSD");
+		}
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+		if(event.modID.equals(Reference.MOD_ID)) {
+			ConfigurationHandler.saveConfiguration();
 		}
 	}
 }

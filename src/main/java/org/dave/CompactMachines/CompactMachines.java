@@ -40,7 +40,13 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania")
+@Mod(
+		modid = Reference.MOD_ID,
+		name = Reference.MOD_NAME,
+		version = Reference.VERSION,
+		dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania",
+		guiFactory = "org.dave.CompactMachines.client.CMGuiFactory"
+)
 public class CompactMachines {
 	@Mod.Instance(Reference.MOD_ID)
 	public static CompactMachines	instance;
@@ -96,7 +102,7 @@ public class CompactMachines {
 		// Insist on keeping an already registered dimension by registering in pre-init.
 		if (ConfigurationHandler.dimensionId != -1) {
 			if(event.getSide() == Side.SERVER) {
-				LogHelper.info("Registering dimension on server side");
+				LogHelper.info("Registering dimension " + ConfigurationHandler.dimensionId + " on server side");
 				DimensionManager.registerProviderType(ConfigurationHandler.dimensionId, WorldProviderMachines.class, true);
 				DimensionManager.registerDimension(ConfigurationHandler.dimensionId, ConfigurationHandler.dimensionId);
 			}

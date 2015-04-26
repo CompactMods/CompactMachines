@@ -38,6 +38,13 @@ public class ConfigurationHandler {
 	public static void init(File configFile) {
 		// Create the configuration object from the given configuration file
 		if (configuration == null) {
+			/*
+			File serverConfig = new File(configFile.getPath().replaceAll(".cfg", "-server.cfg"));
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer() && serverConfig.exists()) {
+				LogHelper.info("Using server config file: " + serverConfig.getPath());
+				configFile = serverConfig;
+			}
+			*/
 			configuration = new Configuration(configFile);
 			loadConfiguration();
 		}
