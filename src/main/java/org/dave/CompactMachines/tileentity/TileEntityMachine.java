@@ -433,6 +433,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			return 0;
 		}
 
+		if(!ConfigurationHandler.enableIntegrationMekanism) {
+			return 0;
+		}
+
 		GasSharedStorage gss = getStorageGas(from.ordinal());
 
 		// XXX: Should we test with canReceiveGas first? Or do we rely on
@@ -464,6 +468,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Optional.Method(modid = "Mekanism")
 	@Override
 	public boolean canTubeConnect(ForgeDirection side) {
+		if(!ConfigurationHandler.enableIntegrationMekanism) {
+			return false;
+		}
 		return true;
 	}
 
@@ -531,17 +538,22 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 			return null;
 		}
 
-		if (!worldObj.isRemote) {
-			IGridNode gridNode = gridNodes.get(dir.ordinal());
-			if (gridNode == null) {
-				gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir), entangledInstance);
-				gridNodes.put(dir.ordinal(), gridNode);
-			}
-
-			return gridNode;
+		if (worldObj.isRemote) {
+			return null;
 		}
 
-		return null;
+		if (!ConfigurationHandler.enableIntegrationAE2) {
+			return null;
+		}
+
+		IGridNode gridNode = gridNodes.get(dir.ordinal());
+
+		if (gridNode == null) {
+			gridNode = getStorageAE(dir.ordinal()).getMachineNode(getGridBlock(dir), entangledInstance);
+			gridNodes.put(dir.ordinal(), gridNode);
+		}
+
+		return gridNode;
 	}
 
 	@Optional.Method(modid = "appliedenergistics2")
@@ -602,6 +614,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Optional.Method(modid = "ProjRed|Transmission")
 	private void updateIncomingSignals() {
+		if(!ConfigurationHandler.enableIntegrationProjectRed) {
+			return;
+		}
+
 		boolean needsNotify = false;
 		boolean haveChanges = false;
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -643,6 +659,9 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public byte[] getBundledSignal(int dir) {
+		if(!ConfigurationHandler.enableIntegrationProjectRed) {
+			return null;
+		}
 
 		BRSharedStorage storage = getStorageBR(dir);
 		byte[] current = storage.interfaceBundledSignal;
@@ -675,6 +694,10 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public boolean canConnectBundled(int side) {
+		if(!ConfigurationHandler.enableIntegrationProjectRed) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -684,16 +707,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		if (worldObj.isRemote) {
 			return null;
 		}
+
+		if(!ConfigurationHandler.enableIntegrationOpenComputers) {
+			return null;
+		}
+
 		return getStorageOC(side.ordinal()).getNode();
 	}
 
 	@Override
 	@Optional.Method(modid = "OpenComputers")
 	public boolean canConnect(ForgeDirection side) {
+		if(!ConfigurationHandler.enableIntegrationOpenComputers) {
+			return false;
+		}
+
 		return true;
 	}
-
-
 
 	@Override
 	@Optional.Method(modid = "Botania")

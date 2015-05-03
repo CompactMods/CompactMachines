@@ -40,11 +40,18 @@ public class BotaniaSharedStorage extends AbstractBufferedStorage implements IMa
 
 	@Override
 	public boolean isFull() {
+		if(!ConfigurationHandler.enableIntegrationBotania) {
+			return true;
+		}
 		return (ConfigurationHandler.capacityMana <= mana);
 	}
 
 	@Override
 	public void recieveMana(int mana) {
+		if(!ConfigurationHandler.enableIntegrationBotania) {
+			return;
+		}
+
 		if(mana < 0 || this.mana < ConfigurationHandler.capacityMana) {
 			this.mana += mana;
 			setDirty();
@@ -53,16 +60,25 @@ public class BotaniaSharedStorage extends AbstractBufferedStorage implements IMa
 
 	@Override
 	public boolean canRecieveManaFromBursts() {
+		if(!ConfigurationHandler.enableIntegrationBotania) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public int getCurrentMana() {
+		if(!ConfigurationHandler.enableIntegrationBotania) {
+			return 0;
+		}
 		return mana;
 	}
 
 	@Override
 	public boolean isOutputtingPower() {
+		if(!ConfigurationHandler.enableIntegrationBotania) {
+			return false;
+		}
 		return false;
 	}
 

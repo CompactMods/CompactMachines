@@ -33,6 +33,12 @@ public class ConfigurationHandler {
 	public static boolean		allowEnterWithoutPSD;
 	public static int			psdDisplayColor;
 
+	public static boolean		enableIntegrationAE2;
+	public static boolean		enableIntegrationBotania;
+	public static boolean		enableIntegrationMekanism;
+	public static boolean		enableIntegrationProjectRed;
+	public static boolean		enableIntegrationOpenComputers;
+
 	public static boolean		isServerConfig;
 
 	public static void init(File configFile) {
@@ -65,6 +71,12 @@ public class ConfigurationHandler {
 		chunkLoadingMode = configuration.getInt("chunkLoadingMode", "CompactMachines", 1, 0, 2, "Chunk Loading Mode: 0 = Never, 1 = Always, 2 = When machine is loaded");
 		allowEntanglement = configuration.getBoolean("allowEntanglement", "CompactMachines", true, "Allow entangling of Compact Machines. This is very powerful as it makes AE2s Quantum Network Bridges obsolete for example.");
 		keepPlayersInsideOfRooms = configuration.getBoolean("keepPlayersInsideOfRooms", "CompactMachines", true, "Prevent players from leaving a Compact Machines room boundaries.");
+
+		enableIntegrationAE2 = configuration.getBoolean("AppliedEnergistics", "Integration", true, "Allow AE2 connections through Compact Machines");
+		enableIntegrationBotania = configuration.getBoolean("Botania", "Integration", true, "Compact Machines can transfer Mana. This is not sided, i.e. all interfaces share the same amount of mana.");
+		enableIntegrationMekanism = configuration.getBoolean("Mekanism", "Integration", true, "Transfer Mekanism Gas");
+		enableIntegrationProjectRed = configuration.getBoolean("ProjectRed", "Integration", true, "Transfer bundled cable signals through Compact Machines");
+		enableIntegrationOpenComputers = configuration.getBoolean("OpenComputers", "Integration", true, "Allow OpenComputers network connections through Compact Machines");
 
 		cooldownRF = configuration.getInt("cooldownRF", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Redstone Flux, i.e. 20 => 10000 RF/s, 0 => 10000 RF/t");
 		cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");

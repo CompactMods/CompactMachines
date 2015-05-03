@@ -20,6 +20,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.dave.CompactMachines.handler.ConfigurationHandler;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 import org.dave.CompactMachines.integration.AbstractHoppingStorage;
 import org.dave.CompactMachines.integration.AbstractSharedStorage;
@@ -328,6 +329,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public int receiveGas(ForgeDirection from, GasStack stack, boolean doTransfer) {
+		if(!ConfigurationHandler.enableIntegrationMekanism) {
+			return 0;
+		}
+
 		getStorageGas().setAutoHoppingToInside(false);
 		getStorageGas().setDirty();
 
@@ -360,6 +365,9 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "Mekanism")
 	public boolean canTubeConnect(ForgeDirection side) {
+		if(!ConfigurationHandler.enableIntegrationMekanism) {
+			return false;
+		}
 		return true;
 	}
 
@@ -409,6 +417,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 			return null;
 		}
 
+		if (!ConfigurationHandler.enableIntegrationAE2) {
+			return null;
+		}
+
 		return getStorageAE().getInterfaceNode(getGridBlock(dir));
 	}
 
@@ -425,6 +437,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public byte[] getBundledSignal(int dir) {
+		if(!ConfigurationHandler.enableIntegrationProjectRed) {
+			return null;
+		}
+
 		byte[] current = getStorageBR().machineBundledSignal;
 
 		if (current == null) {
@@ -455,12 +471,18 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "ProjRed|Transmission")
 	public boolean canConnectBundled(int side) {
+		if(!ConfigurationHandler.enableIntegrationProjectRed) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	@Optional.Method(modid = "OpenComputers")
 	public Node node() {
+		if(!ConfigurationHandler.enableIntegrationOpenComputers) {
+			return null;
+		}
 		return getStorageOC().getNode();
 	}
 
