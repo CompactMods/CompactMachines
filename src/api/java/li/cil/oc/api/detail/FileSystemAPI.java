@@ -1,6 +1,6 @@
 package li.cil.oc.api.detail;
 
-import li.cil.oc.api.driver.Container;
+import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.fs.FileSystem;
 import li.cil.oc.api.fs.Label;
 import li.cil.oc.api.network.ManagedEnvironment;
@@ -97,51 +97,76 @@ public interface FileSystemAPI {
      * access sounds.
      * <p/>
      * The container may be <tt>null</tt>, if no such context can be provided.
+     * <p/>
+     * The access sound is the name of the sound effect to play when the file
+     * system is accessed, for example by listing a directory or reading from
+     * a file. It may be <tt>null</tt> to create a silent file system.
+     * <p/>
+     * The speed multiplier controls how fast read and write operations on the
+     * file system are. It must be a value in [1,6], and controls the access
+     * speed, with the default being one.
+     * For reference, floppies are using the default, hard drives scale with
+     * their tiers, i.e. a tier one hard drive uses speed two, tier three uses
+     * speed four.
      *
-     * @param fileSystem the file system to wrap.
-     * @param label      the label of the file system.
-     * @param container  the tile entity containing the file system.
+     * @param fileSystem  the file system to wrap.
+     * @param label       the label of the file system.
+     * @param host        the tile entity containing the file system.
+     * @param accessSound the name of the sound effect to play when the file
+     *                    system is accessed. This has to be the fully
+     *                    qualified resource name, e.g.
+     *                    <tt>opencomputers:floppy_access</tt>.
+     * @param speed       the speed multiplier for this file system.
      * @return the network node wrapping the file system.
      */
-    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, Label label, Container container);
+    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, Label label, EnvironmentHost host, String accessSound, int speed);
 
     /**
-     * Like {@link #asManagedEnvironment(li.cil.oc.api.fs.FileSystem, Label, Container)},
-     * but creates a read-only label initialized to the specified value.
+     * Creates a network node that makes the specified file system available via
+     * the common file system driver.
+     * <p/>
+     * Creates a file system with the a read-only label and the specified
+     * access sound and file system speed.
      *
-     * @param fileSystem the file system to wrap.
-     * @param label      the read-only label of the file system.
+     * @param fileSystem  the file system to wrap.
+     * @param label       the read-only label of the file system.
+     * @param host        the tile entity containing the file system.
+     * @param accessSound the name of the sound effect to play when the file
+     *                    system is accessed. This has to be the fully
+     *                    qualified resource name, e.g.
+     *                    <tt>opencomputers:floppy_access</tt>.
+     * @param speed       the speed multiplier for this file system.
      * @return the network node wrapping the file system.
      */
-    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, String label, Container container);
+    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, String label, EnvironmentHost host, String accessSound, int speed);
 
     /**
-     * Like {@link #asManagedEnvironment(li.cil.oc.api.fs.FileSystem, Label, Container)},
-     * but does not provide a container.
-     *
-     * @param fileSystem the file system to wrap.
-     * @param label      the label of the file system.
-     * @return the network node wrapping the file system.
+     * @deprecated Don't use this directly, use the wrapper in {@link li.cil.oc.api.FileSystem}.
      */
+    @Deprecated
+    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, Label label, EnvironmentHost host, String accessSound);
+
+    /**
+     * @deprecated Don't use this directly, use the wrapper in {@link li.cil.oc.api.FileSystem}.
+     */
+    @Deprecated
+    ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, String label, EnvironmentHost host, String accessSound);
+
+    /**
+     * @deprecated Don't use this directly, use the wrapper in {@link li.cil.oc.api.FileSystem}.
+     */
+    @Deprecated
     ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, Label label);
 
     /**
-     * Like {@link #asManagedEnvironment(li.cil.oc.api.fs.FileSystem, Label)},
-     * but creates a read-only label initialized to the specified value.
-     *
-     * @param fileSystem the file system to wrap.
-     * @param label      the read-only label of the file system.
-     * @return the network node wrapping the file system.
+     * @deprecated Don't use this directly, use the wrapper in {@link li.cil.oc.api.FileSystem}.
      */
+    @Deprecated
     ManagedEnvironment asManagedEnvironment(FileSystem fileSystem, String label);
 
     /**
-     * Like {@link #asManagedEnvironment(li.cil.oc.api.fs.FileSystem, Label)},
-     * but creates an unlabeled file system (i.e. the label can neither be read
-     * nor written).
-     *
-     * @param fileSystem the file system to wrap.
-     * @return the network node wrapping the file system.
+     * @deprecated Don't use this directly, use the wrapper in {@link li.cil.oc.api.FileSystem}.
      */
+    @Deprecated
     ManagedEnvironment asManagedEnvironment(FileSystem fileSystem);
 }

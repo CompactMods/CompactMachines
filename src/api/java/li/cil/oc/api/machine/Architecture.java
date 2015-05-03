@@ -1,6 +1,12 @@
 package li.cil.oc.api.machine;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * This interface abstracts away any language specific details for the Machine.
@@ -11,12 +17,6 @@ import net.minecraft.nbt.NBTTagCompound;
  * Java Lua architecture (using LuaJ).
  */
 public interface Architecture {
-    /**
-     * A display friendly name of the architecture, mainly intended to be used
-     * when iterating all {@link li.cil.oc.api.Machine#architectures()}.
-     */
-    String name();
-
     /**
      * Used to check if the machine is fully initialized. If this is false no
      * signals for detected components will be generated. Avoids duplicate
@@ -36,8 +36,14 @@ public interface Architecture {
      * This is called when the amount of memory in the machine may have changed.
      * This is usually triggered by the owner when its composition changes. For
      * example this is called from computer cases' onInventoryChanged method.
+     * <p/>
+     * The amount of memory should be computed from the list of components given.
+     * The architecture should immediately apply the new memory size
+     *
+     * @param components the components to use for computing the total memory.
+     * @return whether any memory is present at all.
      */
-    void recomputeMemory();
+    boolean recomputeMemory(Iterable<ItemStack> components);
 
     /**
      * Called when a machine starts up. Used to (re-)initialize the underlying
@@ -133,4 +139,16 @@ public interface Architecture {
      * @param nbt the tag compound to save to.
      */
     void save(NBTTagCompound nbt);
+
+    /**
+     * Architectures can be annotated with this to provide a nice display name.
+     * <p/>
+     * This is used when the name of an architecture has to be displayed to the
+     * user, such as when cycling architectures on a CPU.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    static @interface Name {
+        String value();
+    }
 }

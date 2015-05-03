@@ -1,16 +1,12 @@
 package li.cil.oc.api.machine;
 
-import li.cil.oc.api.network.Callback;
-import li.cil.oc.api.network.Context;
 import li.cil.oc.api.network.ManagedEnvironment;
 
 import java.util.Map;
 
 /**
  * This interface allows interacting with a Machine obtained via the factory
- * method {@link li.cil.oc.api.Machine#create(Owner, Class)}. It is primarily
- * intended to be used by custom {@link Architecture}
- * implementations.
+ * method {@link li.cil.oc.api.Machine#create(MachineHost)}.
  */
 @SuppressWarnings("unused")
 public interface Machine extends ManagedEnvironment, Context {
@@ -19,13 +15,22 @@ public interface Machine extends ManagedEnvironment, Context {
      *
      * @return the owner of the machine.
      */
-    Owner owner();
+    MachineHost host();
+
+    /**
+     * This must be called from the host when something relevant to the
+     * machine changes, such as a change in the amount of available memory.
+     */
+    void onHostChanged();
 
     /**
      * The underlying architecture of the machine.
      * <p/>
      * This is what actually evaluates code running on the machine, where the
      * machine class itself serves as a scheduler.
+     * <p/>
+     * This may be <tt>null</tt>, for example when the hosting computer has
+     * no CPU installed.
      *
      * @return the architecture of this machine.
      */
@@ -57,6 +62,16 @@ public interface Machine extends ManagedEnvironment, Context {
      * @return the number of connected components.
      */
     int componentCount();
+
+    /**
+     * The maximum number of components this machine can currently support.
+     * <p/>
+     * This is automatically recomputed based on the hosts internal components
+     * whenever the host calls {@link li.cil.oc.api.machine.Machine#onHostChanged()}.
+     *
+     * @return the maximum number of components supported.
+     */
+    int maxComponents();
 
     /**
      * Gets the amount of energy this machine consumes per tick when it is
@@ -126,6 +141,51 @@ public interface Machine extends ManagedEnvironment, Context {
      */
     double cpuTime();
 
+    // ----------------------------------------------------------------------- //
+
+    /**
+     * Play a sound using the machine's built-in speaker.
+     * <p/>
+     * This is what's used to emit beep codes when an error occurs while trying
+     * to start the computer, for example, and what's used for playing sounds
+     * when <tt>computer.beep</tt> is called.
+     * <p/>
+     * Be responsible in how you limit calls to this, as each call will cause
+     * a packet to be sent to all nearby clients, and will cause the receiving
+     * clients to generate the required sound sample on-the-fly. It is
+     * therefore recommended to not call this too frequently, and to limit the
+     * length of the sound to something relatively short (not longer than a few
+     * seconds at most).
+     * <p/>
+     * The audio will be played at the machine's host's location.
+     *
+     * @param frequency the frequency of the tone to generate.
+     * @param duration  the duration of the tone to generate, in milliseconds.
+     */
+    void beep(short frequency, short duration);
+
+    /**
+     * Utility method for playing beep codes.
+     * <p/>
+     * The underlying functionality is similar to that of {@link #beep(short, short)},
+     * except that this will play tones at a fixed frequency, and two different
+     * durations - in a pattern as defined in the passed string.
+     * <p/>
+     * This is useful for generating beep codes, such as for boot errors. It
+     * has the advantage of only generating a single network packet, and
+     * generating a single, longer sound sample for the full pattern. As such
+     * the same considerations should be made as for {@link #beep(short, short)},
+     * i.e. prefer not to use overly long patterns.
+     * <p/>
+     * The passed pattern must consist of dots (<tt>.</tt>) and dashes (<tt>-</tt>),
+     * where a dot is short tone, and a dash is a long tone.
+     * <p/>
+     * The audio will be played at the machine's host's location.
+     *
+     * @param pattern the beep pattern to play.
+     */
+    void beep(String pattern);
+
     /**
      * Crashes the computer.
      * <p/>
@@ -147,6 +207,19 @@ public interface Machine extends ManagedEnvironment, Context {
      * @return a signal or <tt>null</tt> if the queue was empty.
      */
     Signal popSignal();
+
+    /**
+     * Get a list of all methods and their annotations of the specified object.
+     * <p/>
+     * The specified object can be either a {@link li.cil.oc.api.machine.Value}
+     * or a {@link li.cil.oc.api.network.Environment}. This is useful for
+     * custom architectures, to allow providing a list of callback methods to
+     * evaluated programs.
+     *
+     * @param value the value to get the method listing for.
+     * @return the methods that can be called on the object.
+     */
+    Map<String, Callback> methods(Object value);
 
     /**
      * Makes the machine call a component callback.
@@ -172,17 +245,6 @@ public interface Machine extends ManagedEnvironment, Context {
     Object[] invoke(String address, String method, Object[] args) throws Exception;
 
     /**
-     * Retrieves the docstring for the specified method of the specified
-     * component. This is the string set in a method's {@link Callback}
-     * annotation.
-     *
-     * @param address the address of the component.
-     * @param method  the name of the method.
-     * @return the docstring for that method.
-     */
-    String documentation(String address, String method);
-
-    /**
      * Makes the machine call a value callback.
      * <p/>
      * This is intended to be used from architectures, but may be useful in
@@ -204,16 +266,7 @@ public interface Machine extends ManagedEnvironment, Context {
      */
     Object[] invoke(Value value, String method, Object[] args) throws Exception;
 
-    /**
-     * Retrieves the docstring for the specified method of the specified
-     * value. This is the string set in a method's {@link Callback}
-     * annotation.
-     *
-     * @param value  the value.
-     * @param method the name of the method.
-     * @return the docstring for that method.
-     */
-    String documentation(Value value, String method);
+    // ----------------------------------------------------------------------- //
 
     /**
      * The list of users registered on this machine.

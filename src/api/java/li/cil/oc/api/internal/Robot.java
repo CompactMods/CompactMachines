@@ -1,10 +1,9 @@
-package li.cil.oc.api.machine;
+package li.cil.oc.api.internal;
 
-import li.cil.oc.api.Rotatable;
+import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.network.Environment;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.IFluidHandler;
 
 /**
  * This interface allows interaction with robots.
@@ -18,60 +17,21 @@ import net.minecraft.item.ItemStack;
  * follows:
  * <ul>
  * <li>Tool</li>
- * <li><tt>containerCount</tt> hot-swappable components.</li>
- * <li><tt>inventorySize</tt> internal inventory slots.</li>
+ * <li><tt>equipmentInventory.getSizeInventory</tt> hot-swappable components.</li>
+ * <li><tt>mainInventory.getSizeInventory</tt> internal inventory slots.</li>
  * <li><tt>componentCount</tt> hard-wired components.</li>
  * </ul>
  * Note that there may be no hot-swappable (or even built-in) components or
  * no inventory, depending on the configuration of the robot. The hard-wired
  * components cannot be changed (removed/replaced).
+ * <p/>
+ * This interface is <em>not meant to be implemented</em>, just used.
  */
-public interface Robot extends ISidedInventory, Rotatable {
-    /**
-     * Returns the fake player used to represent the robot as an entity for
-     * certain actions that require one.
-     * <p/>
-     * This will automatically be positioned and rotated to represent the
-     * robot's current position and rotation in the world. Use this to trigger
-     * events involving the robot that require a player entity, and for more
-     * in-depth interaction with the robots' inventory.
-     *
-     * @return the fake player for the robot.
-     */
-    EntityPlayer player();
-
-    /**
-     * The number of hot-swappable component slots in this robot.
-     * <p/>
-     * <em>Note</em>: this will always be three, regardless of the number of
-     * installed containers. For unused slots the inventory will simply be
-     * empty at that slot.
-     */
-    int containerCount();
-
+public interface Robot extends Agent, Environment, EnvironmentHost, Tiered, ISidedInventory, IFluidHandler {
     /**
      * The number of built-in components in this robot.
      */
     int componentCount();
-
-    /**
-     * The size of the internal inventory in this robot, excluding tool and
-     * component slots.
-     */
-    int inventorySize();
-
-    /**
-     * Get the item stack in the specified inventory slot.
-     * <p/>
-     * This operates on the underlying, real inventory, as described in the
-     * comment on top of this class.
-     * <p/>
-     * This will return <tt>null</tt> for empty slots.
-     *
-     * @param index the index of the slot from which to get the stack.
-     * @return the content of that slot, or <tt>null</tt>.
-     */
-    ItemStack getStackInSlot(int index);
 
     /**
      * Get the environment for the component in the specified slot.
@@ -86,17 +46,6 @@ public interface Robot extends ISidedInventory, Rotatable {
      * @return the environment for that slot, or <tt>null</tt>.
      */
     Environment getComponentInSlot(int index);
-
-    /**
-     * Gets the index of the currently selected slot in the robot's inventory.
-     * <p/>
-     * This is the index in the underlying, <em>real</em> inventory. To get
-     * the 'local' index, i.e. the way the robot itself addresses it, add
-     * one for the tool and <tt>containerCount</tt> to this value.
-     *
-     * @return the index of the currently selected slot.
-     */
-    int selectedSlot();
 
     /**
      * Sends the state of the <em>item</em> in the specified slot to the client

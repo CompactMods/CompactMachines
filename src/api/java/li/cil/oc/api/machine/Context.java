@@ -1,7 +1,9 @@
-package li.cil.oc.api.network;
+package li.cil.oc.api.machine;
+
+import li.cil.oc.api.network.Node;
 
 /**
- * This is used to provide some context to {@link Callback}s, i.e. the
+ * This is used to provide some context to {@link li.cil.oc.api.machine.Callback}s, i.e. the
  * computer from which the callback was called.
  */
 public interface Context {
@@ -151,6 +153,7 @@ public interface Context {
      * <li>Strings.</li>
      * <li>Byte arrays (which appear as strings on the Lua side, e.g.).</li>
      * <li>Maps if and only if both keys and values are strings.</li>
+     * <li>NBTTagCompounds.</li>
      * </ul>
      * If an unsupported type is specified the method will enqueue nothing
      * instead, resulting in a <tt>nil</tt> on the Lua side, e.g., and log a

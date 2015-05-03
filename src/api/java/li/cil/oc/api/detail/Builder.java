@@ -1,6 +1,10 @@
 package li.cil.oc.api.detail;
 
-import li.cil.oc.api.network.*;
+import li.cil.oc.api.network.Component;
+import li.cil.oc.api.network.ComponentConnector;
+import li.cil.oc.api.network.Connector;
+import li.cil.oc.api.network.Node;
+import li.cil.oc.api.network.Visibility;
 
 /**
  * Used for building {@link Node}s via {@link li.cil.oc.api.Network#newNode}.
@@ -27,7 +31,7 @@ public interface Builder<T extends Node> {
          * Makes the node a component.
          * <p/>
          * Nodes that are components can be accessed from computers, methods
-         * declared in them marked using the {@link Callback} annotation can
+         * declared in them marked using the {@link li.cil.oc.api.machine.Callback} annotation can
          * be invoked from computers that can see the component.
          *
          * @param name       the name of the component.
@@ -115,7 +119,7 @@ public interface Builder<T extends Node> {
          * Makes the node a component.
          * <p/>
          * Nodes that are components can be accessed from computers, methods
-         * declared in them marked using the {@link Callback} annotation can
+         * declared in them marked using the {@link li.cil.oc.api.machine.Callback} annotation can
          * be invoked from computers that can see the component.
          *
          * @param name       the name of the component.

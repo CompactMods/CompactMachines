@@ -37,8 +37,11 @@ public interface WirelessEndpoint {
     /**
      * Makes the endpoint receive a single packet.
      *
-     * @param packet   the packet to receive.
-     * @param distance the distance to the wireless endpoint that sent the packet.
+     * @param packet the packet to receive.
+     * @param sender the endpoint that sent the message. This is not
+     *               necessarily the original sender of the packet, just
+     *               the last point it went through, such as an access
+     *               point, for example.
      */
-    void receivePacket(Packet packet, double distance);
+    void receivePacket(Packet packet, WirelessEndpoint sender);
 }
