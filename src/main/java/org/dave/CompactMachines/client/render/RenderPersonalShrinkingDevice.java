@@ -42,7 +42,15 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		// floorDiagonalLength = Math.sqrt(13*13 + 13*13)
 		// roomDiagonalLength = Math.sqrt(13*13 + floorDiagonalLength*floorDiagonalLength)
 		// -> 22.51666F
+		if(Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().thePlayer.worldObj == null) {
+			return;
+		}
+
 		MovingObjectPosition pos = Minecraft.getMinecraft().thePlayer.rayTrace(22.52F, 1.0F);
+		if(pos == null) {
+			return;
+		}
+
 		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
 
 		// We're only interested in our blocks
