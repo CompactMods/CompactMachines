@@ -25,6 +25,7 @@ public class MessageConfiguration implements IMessage, IMessageHandler<MessageCo
 		ConfigurationHandler.capacityFluid = buf.readInt();
 		ConfigurationHandler.capacityGas = buf.readInt();
 		ConfigurationHandler.capacityMana = buf.readInt();
+		ConfigurationHandler.allowRespawning = buf.readBoolean();
 
 	}
 
@@ -35,6 +36,7 @@ public class MessageConfiguration implements IMessage, IMessageHandler<MessageCo
 		buf.writeInt(ConfigurationHandler.capacityFluid);
 		buf.writeInt(ConfigurationHandler.capacityGas);
 		buf.writeInt(ConfigurationHandler.capacityMana);
+		buf.writeBoolean(ConfigurationHandler.allowRespawning);
 	}
 
 	@Override

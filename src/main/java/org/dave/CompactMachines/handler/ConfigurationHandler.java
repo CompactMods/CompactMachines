@@ -39,6 +39,8 @@ public class ConfigurationHandler {
 	public static boolean		enableIntegrationProjectRed;
 	public static boolean		enableIntegrationOpenComputers;
 
+	public static boolean		allowRespawning;
+
 	public static boolean		isServerConfig;
 
 	public static void init(File configFile) {
@@ -99,6 +101,8 @@ public class ConfigurationHandler {
 		enableVillager = configuration.getBoolean("enableVillager", "CompactMachines", true, "Enables Villager spawns trading PSDs, QEs and World Resizing Cubes.");
 
 		allowEnterWithoutPSD = configuration.getBoolean("allowEnterWithoutPSD", "CompactMachines", false, "Allow players to enter Compact Machines by other means than a PSD. Gives wither effect and nausea if disallowed.");
+
+		allowRespawning = configuration.getBoolean("allowRespawn", "CompactMachines", false, "Allow players to respawn inside of Compact Machines and place their beds there. NOTE: Vanilla currently does not make you change dimensions on death.");
 
 		if (configuration.hasChanged()) {
 			configuration.save();
