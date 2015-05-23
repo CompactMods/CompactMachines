@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.dave.CompactMachines.reference.Reference;
@@ -13,6 +14,21 @@ import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 
 public class WorldUtils {
+
+	public static BiomeGenBase getBiomeByName(String name) {
+		for(BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
+			if(biome == null || biome.biomeName == null) {
+				continue;
+			}
+
+			if(biome.biomeName.toLowerCase().equals(name.toLowerCase())) {
+				return biome;
+			}
+		}
+
+		LogHelper.error("Invalid biome specified in config. Using sky biome instead.");
+		return BiomeGenBase.sky;
+	}
 
 	public static int updateNeighborAEGrids(World world, int x, int y, int z) {
 		if (!Reference.AE_AVAILABLE) {
