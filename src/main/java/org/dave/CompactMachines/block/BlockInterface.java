@@ -5,10 +5,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.machines.tools.CubeTools;
 import org.dave.CompactMachines.reference.GuiId;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
@@ -37,6 +39,11 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
 		return false;
+	}
+
+	@Override
+	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
+		return CubeTools.shouldSideBeRendered(world, x, y, z, side);
 	}
 
 	@Override

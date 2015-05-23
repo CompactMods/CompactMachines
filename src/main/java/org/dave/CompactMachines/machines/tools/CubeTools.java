@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -28,6 +29,76 @@ import org.dave.CompactMachines.utility.LogHelper;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 public class CubeTools {
+
+	public static int getCoordByPos(double x) {
+		return (int) (x / ConfigurationHandler.cubeDistance);
+	}
+
+	public static int getCubeSize(IBlockAccess world, int coord) {
+		int base = coord * ConfigurationHandler.cubeDistance;
+		if(world.getBlock(base+14, 40, 0) == ModBlocks.innerwall) {
+			return 5;
+		}
+
+		if(world.getBlock(base+12, 40, 0) == ModBlocks.innerwall) {
+			return 4;
+		}
+
+		if(world.getBlock(base+10, 40, 0) == ModBlocks.innerwall) {
+			return 3;
+		}
+
+		if(world.getBlock(base+8, 40, 0) == ModBlocks.innerwall) {
+			return 2;
+		}
+
+		if(world.getBlock(base+6, 40, 0) == ModBlocks.innerwall) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	public static boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
+		int coord = CubeTools.getCoordByPos(x);
+		int size = Reference.getBoxSize(CubeTools.getCubeSize(world, coord));
+
+		int relativeX = x - (coord * ConfigurationHandler.cubeDistance);
+
+		// Bottom layer
+		if(y == 41 && relativeX > 0 && relativeX < size && z < size && z > 0) {
+			if(side == ForgeDirection.UP.ordinal()) {
+				return true;
+			}
+		}
+
+		if(y == 39+size && relativeX > 0 && relativeX < size && z < size && z > 0) {
+			if(side == ForgeDirection.DOWN.ordinal()) {
+				return true;
+			}
+		}
+
+		if(y > 40 && y < 40+size) {
+			if(side == ForgeDirection.EAST.ordinal() && relativeX == 1 && z < size && z > 0) {
+				return true;
+			}
+
+			if(side == ForgeDirection.WEST.ordinal() && relativeX == size-1 && z < size && z > 0) {
+				return true;
+			}
+
+			if(side == ForgeDirection.NORTH.ordinal() && z == size-1 && relativeX < size && relativeX > 0) {
+				return true;
+			}
+
+			if(side == ForgeDirection.SOUTH.ordinal() && z == 1 && relativeX < size && relativeX > 0) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
 
 	public static void setCubeBiome(int coords, BiomeGenBase biome) {
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
