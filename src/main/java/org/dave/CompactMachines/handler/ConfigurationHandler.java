@@ -78,7 +78,7 @@ public class ConfigurationHandler {
 		keepPlayersInsideOfRooms = configuration.getBoolean("keepPlayersInsideOfRooms", "CompactMachines", true, "Prevent players from leaving a Compact Machines room boundaries.");
 
 		enableIntegrationAE2 = configuration.getBoolean("AppliedEnergistics", "Integration", true, "Allow AE2 connections through Compact Machines");
-		enableIntegrationBotania = configuration.getBoolean("Botania", "Integration", true, "Compact Machines can transfer Mana. This is not sided, i.e. all interfaces share the same amount of mana.");
+		enableIntegrationBotania = configuration.getBoolean("Botania", "Integration", false, "Compact Machines can transfer Mana. This is not sided, i.e. all interfaces share the same amount of mana.");
 		enableIntegrationMekanism = configuration.getBoolean("Mekanism", "Integration", true, "Transfer Mekanism Gas");
 		enableIntegrationProjectRed = configuration.getBoolean("ProjectRed", "Integration", true, "Transfer bundled cable signals through Compact Machines");
 		enableIntegrationOpenComputers = configuration.getBoolean("OpenComputers", "Integration", true, "Allow OpenComputers network connections through Compact Machines");
