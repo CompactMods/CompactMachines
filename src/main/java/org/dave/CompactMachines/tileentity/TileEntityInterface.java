@@ -328,7 +328,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
-	public int receiveGas(ForgeDirection from, GasStack stack, boolean doTransfer) {
+	public int receiveGas(ForgeDirection from, GasStack stack) {
 		if(!ConfigurationHandler.enableIntegrationMekanism) {
 			return 0;
 		}
@@ -336,13 +336,23 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		getStorageGas().setAutoHoppingToInside(false);
 		getStorageGas().setDirty();
 
-		return getStorageGas().receiveGas(from, stack, doTransfer);
+		return getStorageGas().receiveGas(from, stack);
 	}
 
 	@Override
 	@Optional.Method(modid = "Mekanism")
-	public GasStack drawGas(ForgeDirection from, int amount, boolean doTransfer) {
-		return getStorageGas().drawGas(from, amount, doTransfer);
+	public GasStack drawGas(ForgeDirection from, int amount) {
+		return getStorageGas().drawGas(from, amount);
+	}
+
+	@Override
+	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
+		return this.receiveGas(side, stack);
+	}
+
+	@Override
+	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
+		return this.drawGas(side, amount);
 	}
 
 	@Override

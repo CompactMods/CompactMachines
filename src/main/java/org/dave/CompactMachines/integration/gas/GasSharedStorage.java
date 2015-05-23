@@ -49,8 +49,7 @@ public class GasSharedStorage extends AbstractHoppingStorage implements IGasHand
 	}
 
 	@Override
-	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
-		// XXX: Is always passing true for doReceive correct?
+	public int receiveGas(ForgeDirection side, GasStack stack) {
 		if(!ConfigurationHandler.enableIntegrationMekanism) {
 			return 0;
 		}
@@ -59,12 +58,23 @@ public class GasSharedStorage extends AbstractHoppingStorage implements IGasHand
 	}
 
 	@Override
-	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
+	public GasStack drawGas(ForgeDirection side, int amount) {
 		if(!ConfigurationHandler.enableIntegrationMekanism) {
 			return null;
 		}
 		return tank.draw(amount, true);
 	}
+
+	@Override
+	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
+		return this.receiveGas(side, stack);
+	}
+
+	@Override
+	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
+		return this.drawGas(side, amount);
+	}
+
 
 	@Override
 	public boolean canReceiveGas(ForgeDirection side, Gas gas) {

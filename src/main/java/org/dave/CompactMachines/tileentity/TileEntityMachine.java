@@ -428,7 +428,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 	@Optional.Method(modid = "Mekanism")
 	@Override
-	public int receiveGas(ForgeDirection from, GasStack stack, boolean doTransfer) {
+	public int receiveGas(ForgeDirection from, GasStack stack) {
 		if (coords == -1) {
 			return 0;
 		}
@@ -444,13 +444,23 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		gss.setAutoHoppingToInside(true);
 		gss.setDirty();
 
-		return gss.receiveGas(from, stack, doTransfer);
+		return gss.receiveGas(from, stack);
 	}
 
 	@Optional.Method(modid = "Mekanism")
 	@Override
-	public GasStack drawGas(ForgeDirection from, int amount, boolean doTransfer) {
-		return getStorageGas(from.ordinal()).drawGas(from, amount, doTransfer);
+	public GasStack drawGas(ForgeDirection from, int amount) {
+		return getStorageGas(from.ordinal()).drawGas(from, amount);
+	}
+
+	@Override
+	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
+		return this.receiveGas(side, stack);
+	}
+
+	@Override
+	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
+		return this.drawGas(side, amount);
 	}
 
 	@Optional.Method(modid = "Mekanism")
