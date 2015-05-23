@@ -126,7 +126,7 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 				tileEntityMachine.isUpgraded = true;
 			}
 
-			if(!world.isRemote) {
+			if(!world.isRemote && ConfigurationHandler.adaptBiomes) {
 				CubeTools.setCubeBiome(coords, CubeTools.getMachineBiome(tileEntityMachine));
 			}
 		}

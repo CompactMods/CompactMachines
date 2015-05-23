@@ -24,6 +24,7 @@ import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
+import org.dave.CompactMachines.utility.LogHelper;
 import org.dave.CompactMachines.utility.WorldUtils;
 
 public class CubeTools {
@@ -63,7 +64,26 @@ public class CubeTools {
 				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
 				);
 
-		setCubeBiome(machine.coords, getMachineBiome(machine));
+		if(ConfigurationHandler.adaptBiomes) {
+			setCubeBiome(machine.coords, getMachineBiome(machine));
+		} else {
+			boolean bBiomeFound = false;
+			for(BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
+				if(biome == null || biome.biomeName == null) {
+					continue;
+				}
+
+				if(biome.biomeName.toLowerCase().equals(ConfigurationHandler.defaultBiome.toLowerCase())) {
+					setCubeBiome(machine.coords, biome);
+					bBiomeFound = true;
+					break;
+				}
+			}
+
+			if(!bBiomeFound) {
+				LogHelper.error("Invalid biome specified in config. Using sky biome instead.");
+			}
+		}
 
 		// After creating the Block, make sure the TileEntities inside have their information ready.
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {

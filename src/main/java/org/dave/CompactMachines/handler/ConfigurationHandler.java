@@ -41,6 +41,9 @@ public class ConfigurationHandler {
 
 	public static boolean		allowRespawning;
 
+	public static boolean		adaptBiomes;
+	public static String		defaultBiome;
+
 	public static boolean		isServerConfig;
 
 	public static void init(File configFile) {
@@ -103,6 +106,9 @@ public class ConfigurationHandler {
 		allowEnterWithoutPSD = configuration.getBoolean("allowEnterWithoutPSD", "CompactMachines", false, "Allow players to enter Compact Machines by other means than a PSD. Gives wither effect and nausea if disallowed.");
 
 		allowRespawning = configuration.getBoolean("allowRespawn", "CompactMachines", false, "Allow players to respawn inside of Compact Machines and place their beds there. NOTE: Vanilla currently does not make you change dimensions on death.");
+
+		adaptBiomes = configuration.getBoolean("adaptBiomes", "CompactMachines", true, "If set to true the CMs biome is the same as the spot it has been placed in. Otherwise uses the default.");
+		defaultBiome = configuration.getString("defaultBiome", "CompactMachines", "sky", "The biome to use when biome adaptation is disabled.");
 
 		if (configuration.hasChanged()) {
 			configuration.save();
