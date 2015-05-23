@@ -212,14 +212,27 @@ public class TeleportTools {
 
 	public static void checkPlayerPositions() {
 		World worldObj = CompactMachines.instance.machineHandler.getWorld();
-		if (worldObj.getTotalWorldTime() % 10 == 0 && ConfigurationHandler.keepPlayersInsideOfRooms) {
+		if (worldObj.getTotalWorldTime() % 10 == 0) {
 			for (int i = 0; i < worldObj.playerEntities.size(); i++) {
 				if (worldObj.playerEntities.get(i) instanceof EntityPlayer) {
 					EntityPlayer player = (EntityPlayer) worldObj.playerEntities.get(i);
+
+					// Protect against falling into the void
+					if(player.posY < 10) {
+						player.fallDistance = 0;
+						teleportPlayerOutOfMachineDimension((EntityPlayerMP) player);
+						continue;
+					}
+
+					if(!ConfigurationHandler.keepPlayersInsideOfRooms) {
+						continue;
+					}
+
 					if (player.capabilities.isCreativeMode && PlayerUtils.isPlayerOpped(player)) {
 						// Opped players in creative mode are actually allowed to leave the rooms
 						continue;
 					}
+
 					int lastCoord = PlayerUtils.getPlayerCoords(player);
 					if (lastCoord == -1) {
 						// We don't know where the player is atm :(
