@@ -28,4 +28,9 @@ public class ClientProxy extends CommonProxy
 	public void registerRenderers() {
 		MinecraftForgeClient.registerItemRenderer(ModItems.psd, new RenderPersonalShrinkingDevice());
 	}
+
+	@Override
+	public boolean isClient() {
+		return true;
+	}
 }

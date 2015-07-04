@@ -18,4 +18,9 @@ public class BlockInnerWall extends BlockProtected {
 	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
 		return CubeTools.shouldSideBeRendered(world, x, y, z, side);
 	}
+
+	@Override
+	public boolean isOpaqueCube() {
+		return false;
+	}
 }

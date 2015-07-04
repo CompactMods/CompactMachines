@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.Side;
 		modid = Reference.MOD_ID,
 		name = Reference.MOD_NAME,
 		version = Reference.VERSION,
-		dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania",
+		dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania;after:LookingGlass;",
 		guiFactory = "org.dave.CompactMachines.client.CMGuiFactory"
 )
 public class CompactMachines {
@@ -95,8 +95,6 @@ public class CompactMachines {
 		Reference.PR_AVAILABLE = Loader.isModLoaded("ProjRed|Transmission");
 		Reference.OC_AVAILABLE = Loader.isModLoaded("OpenComputers");
 		Reference.BOTANIA_AVAILABLE = Loader.isModLoaded("Botania");
-		// XXX: Other mods can provide gas support (like galacticraft), this
-		// flag is probably not sufficient.
 		Reference.MEK_AVAILABLE = Loader.isModLoaded("Mekanism");
 
 		// Insist on keeping an already registered dimension by registering in pre-init.
@@ -133,12 +131,18 @@ public class CompactMachines {
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 
+		if(Loader.isModLoaded("LookingGlass")) {
+			FMLInterModComms.sendMessage("LookingGlass", "API", "org.dave.CompactMachines.thirdparty.lookingglass.LookingGlassIntegration.register");
+		} else {
+			proxy.registerRenderers();
+		}
+
 		proxy.registerTileEntities();
 		proxy.registerHandlers();
 		if (ConfigurationHandler.enableVillager) {
 			proxy.registerVillagerSkins();
 		}
-		proxy.registerRenderers();
+
 
 		Recipes.init();
 

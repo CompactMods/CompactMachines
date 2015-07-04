@@ -31,7 +31,11 @@ public class ConfigurationHandler {
 	public static int			villagerId;
 	public static boolean		enableVillager;
 	public static boolean		allowEnterWithoutPSD;
+
+	public static boolean		enableIntegrationLookingGlass;
 	public static int			psdDisplayColor;
+	public static int			psdResolutionX;
+	public static int			psdResolutionY;
 
 	public static boolean		enableIntegrationAE2;
 	public static boolean		enableIntegrationBotania;
@@ -98,6 +102,10 @@ public class ConfigurationHandler {
 		int blue = configuration.getInt("psdDisplayColor.blue", "Rendering", 0xF5, 0, Integer.MAX_VALUE, "");
 
 		psdDisplayColor = (red << 16) + (green << 8) + blue;
+
+		enableIntegrationLookingGlass = configuration.getBoolean("LookingGlass", "Rendering", false, "Use Looking Glass to render previews of CM contents.");
+		psdResolutionX = configuration.getInt("psdDisplayResolution.x", "Rendering", 160, 40, 640, "[LookingGlass] Horizontal resolution");
+		psdResolutionY = configuration.getInt("psdDisplayResolution.y", "Rendering", 120, 30, 480, "[LookingGlass] Vertical resolution");
 
 		upgradeItem = configuration.getString("upgradeItem", "CompactMachines", "nether_star", "The item used to upgrade compact machines. Format: modid:name_block_registered_with");
 

@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 public class RenderPersonalShrinkingDevice implements IItemRenderer {
 	private static RenderItem	renderItem	= new RenderItem();
 
+
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
 		return type == ItemRenderType.EQUIPPED_FIRST_PERSON;
@@ -30,34 +31,7 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		return false;
 	}
 
-	@Override
-	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
-		Tessellator tessellator = Tessellator.instance;
-
-		// Use minecrafts renderer to render the item with a thickness
-		IIcon icon = item.getIconIndex();
-		ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(), icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
-
-		// Precalculate the max ray trace distance by using pythagoras in 3d
-		// floorDiagonalLength = Math.sqrt(13*13 + 13*13)
-		// roomDiagonalLength = Math.sqrt(13*13 + floorDiagonalLength*floorDiagonalLength)
-		// -> 22.51666F
-		if(Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().thePlayer.worldObj == null) {
-			return;
-		}
-
-		MovingObjectPosition pos = Minecraft.getMinecraft().thePlayer.rayTrace(22.52F, 1.0F);
-		if(pos == null) {
-			return;
-		}
-
-		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
-
-		// We're only interested in our blocks
-		if (block != ModBlocks.innerwall && block != ModBlocks.interfaceblock && block != ModBlocks.machine) {
-			return;
-		}
-
+	public void customRender(Tessellator tessellator, Block block, MovingObjectPosition pos) {
 		String direction = "?";
 		if (pos.sideHit != -1) {
 			ForgeDirection dir = ForgeDirection.getOrientation(pos.sideHit);
@@ -96,5 +70,36 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 		}
 
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
+		Tessellator tessellator = Tessellator.instance;
+
+		// Use minecrafts renderer to render the item with a thickness
+		IIcon icon = item.getIconIndex();
+		ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(), icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+
+		// Precalculate the max ray trace distance by using pythagoras in 3d
+		// floorDiagonalLength = Math.sqrt(13*13 + 13*13)
+		// roomDiagonalLength = Math.sqrt(13*13 + floorDiagonalLength*floorDiagonalLength)
+		// -> 22.51666F
+		if(Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().thePlayer.worldObj == null) {
+			return;
+		}
+
+		MovingObjectPosition pos = Minecraft.getMinecraft().thePlayer.rayTrace(22.52F, 1.0F);
+		if(pos == null) {
+			return;
+		}
+
+		Block block = Minecraft.getMinecraft().thePlayer.worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ);
+
+		// We're only interested in our blocks
+		if (block != ModBlocks.innerwall && block != ModBlocks.interfaceblock && block != ModBlocks.machine) {
+			return;
+		}
+
+		customRender(tessellator, block, pos);
 	}
 }

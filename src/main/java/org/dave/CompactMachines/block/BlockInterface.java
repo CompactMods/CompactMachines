@@ -47,6 +47,11 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 	}
 
 	@Override
+	public boolean isOpaqueCube() {
+		return false;
+	}
+
+	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int faceHit, float par7, float par8, float par9)
 	{
 		if (player.isSneaking())
