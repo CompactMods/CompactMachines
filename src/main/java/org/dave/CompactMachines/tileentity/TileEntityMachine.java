@@ -466,11 +466,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return getStorageGas(from.ordinal()).drawGas(from, amount);
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	@Override
 	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
 		return this.receiveGas(side, stack);
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	@Override
 	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
 		return this.drawGas(side, amount);
