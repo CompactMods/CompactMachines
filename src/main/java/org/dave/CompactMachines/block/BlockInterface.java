@@ -1,6 +1,7 @@
 package org.dave.CompactMachines.block;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -34,6 +35,13 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 	@Override
 	public boolean hasTileEntity(int metadata) {
 		return true;
+	}
+
+	// Prevent blocks from being placed by players
+	@Override
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) {
+		world.setBlockToAir(x, y, z);
+		return;
 	}
 
 	@Override

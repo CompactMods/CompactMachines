@@ -39,7 +39,7 @@ public class Recipes
 				));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
-				new ItemStack(ModBlocks.innerwalldecor, 8),
+				new ItemStack(ModBlocks.interfaceblockdecor, 6),
 				"xxx",
 				"xdx",
 				"xxx",
