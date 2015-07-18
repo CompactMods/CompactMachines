@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -268,6 +269,18 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		}
 	}
 
+
+	public ChunkCoordinates getChunkCoordinates() {
+		int x = coords * ConfigurationHandler.cubeDistance;
+		int y = 39;
+		int z = 0;
+
+		int size = (Reference.getBoxSize(meta) / 2);
+
+		return new ChunkCoordinates(x + size, y + size, z + size);
+
+	}
+
 	private void hopStorage(AbstractSharedStorage storage, TileEntity outside) {
 		if (storage == null || !(storage instanceof AbstractHoppingStorage)) {
 			return;
@@ -453,11 +466,13 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		return getStorageGas(from.ordinal()).drawGas(from, amount);
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	@Override
 	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
 		return this.receiveGas(side, stack);
 	}
 
+	@Optional.Method(modid = "Mekanism")
 	@Override
 	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
 		return this.drawGas(side, amount);

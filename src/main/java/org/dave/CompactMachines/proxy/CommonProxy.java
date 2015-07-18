@@ -22,4 +22,9 @@ public abstract class CommonProxy implements IProxy
 
 	@Override
 	public void registerRenderers() {}
+
+	@Override
+	public boolean isClient() {
+		return false;
+	}
 }

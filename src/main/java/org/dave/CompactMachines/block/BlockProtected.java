@@ -1,7 +1,6 @@
 package org.dave.CompactMachines.block;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -32,13 +31,6 @@ public class BlockProtected extends BlockCM {
 		}
 
 		return false;
-	}
-
-	// Prevent blocks from being placed by players
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) {
-		world.setBlockToAir(x, y, z);
-		return;
 	}
 
 	// Prevent entities from destroying the block

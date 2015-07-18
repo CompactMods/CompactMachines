@@ -1,14 +1,19 @@
 package org.dave.CompactMachines.handler;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.dave.CompactMachines.CompactMachines;
+import org.dave.CompactMachines.init.ModBlocks;
 import org.dave.CompactMachines.machines.MachineSaveData;
 import org.dave.CompactMachines.network.MessageConfiguration;
 import org.dave.CompactMachines.network.PacketHandler;
@@ -21,6 +26,20 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 
 public class CMEventHandler {
+	@SubscribeEvent
+	public void onItemTooltip(ItemTooltipEvent event) {
+		if(event.itemStack.getItem() instanceof ItemBlock) {
+			ItemBlock itemblock = (ItemBlock)event.itemStack.getItem();
+			Block holding = itemblock.field_150939_a;
+			if(holding == ModBlocks.interfaceblockcreative || holding == ModBlocks.innerwallcreative) {
+				event.toolTip.add(EnumChatFormatting.DARK_GREEN + "-- Creative Mode Fake Block --");
+				event.toolTip.add(EnumChatFormatting.RED + "You can only remove these blocks");
+				event.toolTip.add(EnumChatFormatting.RED + "while holding an Atom Shrinking");
+				event.toolTip.add(EnumChatFormatting.RED + "Module in Creative mode!");
+			}
+		}
+	}
+
 	@SubscribeEvent
 	public void onClientConnect(FMLNetworkEvent.ServerConnectionFromClientEvent event) {
 		if(!event.isLocal && event.handler instanceof NetHandlerPlayServer) {

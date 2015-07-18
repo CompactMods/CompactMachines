@@ -346,11 +346,14 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public int receiveGas(ForgeDirection side, GasStack stack, boolean doTransfer) {
 		return this.receiveGas(side, stack);
 	}
 
+
 	@Override
+	@Optional.Method(modid = "Mekanism")
 	public GasStack drawGas(ForgeDirection side, int amount, boolean doTransfer) {
 		return this.drawGas(side, amount);
 	}

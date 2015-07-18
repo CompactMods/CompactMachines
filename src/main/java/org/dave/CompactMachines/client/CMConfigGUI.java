@@ -23,6 +23,7 @@ public class CMConfigGUI extends GuiConfig {
 
 		list.add(categoryElement("compactmachines", "General", ""));
 		list.add(categoryElement("integration", "Integration", ""));
+		list.add(categoryElement("rendering", "Rendering", ""));
 
 		return list;
 	}
