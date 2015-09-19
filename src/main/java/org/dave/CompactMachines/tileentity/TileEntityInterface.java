@@ -33,9 +33,12 @@ import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
+import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.IEssentiaTransport;
 import vazkii.botania.api.mana.IManaPool;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
@@ -49,9 +52,10 @@ import cpw.mods.fml.common.Optional;
 		@Optional.Interface(iface = "li.cil.oc.api.network.Environment", modid = "OpenComputers"),
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
 		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism"),
-		@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania")
+		@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania"),
+		@Optional.Interface(iface = "thaumcraft.api.aspects.IEssentiaTransport", modid = "Thaumcraft")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IManaPool {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IManaPool, IEssentiaTransport {
 
 	public CMGridBlock	gridBlock;
 
@@ -65,6 +69,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	public int			_energy;
 	public int			_mana;
 	public int			_hoppingmode;
+	public int			_aspectid;
+	public int			_aspectamount;
 
 	public TileEntityInterface() {
 		super();
@@ -74,6 +80,8 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		_gasamount = 0;
 		_energy = 0;
 		_mana = 0;
+		_aspectid = -1;
+		_aspectamount = 0;
 	}
 
 	public ItemSharedStorage getStorageItem() {
@@ -107,6 +115,10 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 	public BotaniaSharedStorage getStorageBotania() {
 		return (BotaniaSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, 0, "botania");
+	}
+
+	public ThaumcraftSharedStorage getStorageThaumcraft() {
+		return (ThaumcraftSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "thaumcraft");
 	}
 
 	@Override
@@ -227,7 +239,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	private void hopStorage(AbstractHoppingStorage storage, TileEntity tileEntityInside) {
-		if (storage != null && (storage.getHoppingMode() == 1 || storage.getHoppingMode() == 3 && storage.isAutoHoppingToInside() == true)) {
+		if (storage != null && storage.getHoppingMode() == 4 || (storage.getHoppingMode() == 1 || storage.getHoppingMode() == 3 && storage.isAutoHoppingToInside() == true)) {
 			storage.hopToTileEntity(tileEntityInside, false);
 		}
 	}
@@ -542,4 +554,73 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return getStorageBotania().isOutputtingPower();
 	}
 
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public boolean isConnectable(ForgeDirection face) {
+		return getStorageThaumcraft().isConnectable(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public boolean canInputFrom(ForgeDirection face) {
+		return getStorageThaumcraft().canInputFrom(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public boolean canOutputTo(ForgeDirection face) {
+		return getStorageThaumcraft().canOutputTo(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public void setSuction(Aspect aspect, int amount) {}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public Aspect getSuctionType(ForgeDirection face) {
+		return getStorageThaumcraft().getSuctionType(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public int getSuctionAmount(ForgeDirection face) {
+		return getStorageThaumcraft().getSuctionAmount(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public int takeEssentia(Aspect aspect, int amount, ForgeDirection face) {
+		return getStorageThaumcraft().takeEssentia(aspect, amount, face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public int addEssentia(Aspect aspect, int amount, ForgeDirection face) {
+		return getStorageThaumcraft().addEssentia(aspect, amount, face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public Aspect getEssentiaType(ForgeDirection face) {
+		return getStorageThaumcraft().getEssentiaType(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public int getEssentiaAmount(ForgeDirection face) {
+		return getStorageThaumcraft().getEssentiaAmount(face);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public int getMinimumSuction() {
+		return getStorageThaumcraft().getMinimumSuction();
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft")
+	public boolean renderExtendedTube() {
+		return getStorageThaumcraft().renderExtendedTube();
+	}
 }

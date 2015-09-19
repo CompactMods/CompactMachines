@@ -6,7 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import org.dave.CompactMachines.handler.SharedStorageHandler;
 
 public abstract class AbstractHoppingStorage extends AbstractBufferedStorage {
-	private int		hoppingMode;			// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto
+	private int		hoppingMode;			// 0 - Off, 1 - To the inside, 2 - To the outside, 3 - Auto, 4 - Both/Always
 	private boolean	autoHopToInside;
 
 	protected int	max_cooldown	= 20;

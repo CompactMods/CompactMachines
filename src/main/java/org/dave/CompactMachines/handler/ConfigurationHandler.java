@@ -21,10 +21,12 @@ public class ConfigurationHandler {
 	public static int			capacityFluid;
 	public static int			capacityGas;
 	public static int			capacityMana;
+	public static int			capacityEssentia;
 	public static int			cooldownRF;
 	public static int			cooldownItems;
 	public static int			cooldownFluid;
 	public static int			cooldownGas;
+	public static int			cooldownEssentia;
 	public static String		upgradeItem;
 	public static boolean		allowEntanglement;
 	public static boolean		keepPlayersInsideOfRooms;
@@ -42,6 +44,7 @@ public class ConfigurationHandler {
 	public static boolean		enableIntegrationMekanism;
 	public static boolean		enableIntegrationProjectRed;
 	public static boolean		enableIntegrationOpenComputers;
+	public static boolean		enableIntegrationThaumcraft;
 
 	public static boolean		allowRespawning;
 
@@ -86,16 +89,19 @@ public class ConfigurationHandler {
 		enableIntegrationMekanism = configuration.getBoolean("Mekanism", "Integration", true, "Transfer Mekanism Gas");
 		enableIntegrationProjectRed = configuration.getBoolean("ProjectRed", "Integration", true, "Transfer bundled cable signals through Compact Machines");
 		enableIntegrationOpenComputers = configuration.getBoolean("OpenComputers", "Integration", true, "Allow OpenComputers network connections through Compact Machines");
+		enableIntegrationThaumcraft = configuration.getBoolean("Thaumcraft", "Integration", true, "Allow Thaumcraft Essentia transport through Compact Machines");
 
 		cooldownRF = configuration.getInt("cooldownRF", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Redstone Flux, i.e. 20 => 10000 RF/s, 0 => 10000 RF/t");
 		cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");
 		cooldownFluid = configuration.getInt("cooldownFluid", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Fluids, i.e. 0 => 1 Bucket per tick");
 		cooldownGas = configuration.getInt("cooldownGas", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Gases, i.e. 0 => 1024 units per tick");
+		cooldownEssentia = configuration.getInt("cooldownEssentia", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Essentia, i.e. 0 => 1 Essentia per tick");
 
 		capacityRF = configuration.getInt("capacityRF", "CompactMachines", 10000, 0, Integer.MAX_VALUE, "Maximum amount of RF a CM buffer can hold.");
 		capacityFluid = configuration.getInt("capacityFluid", "CompactMachines", 1000, 0, Integer.MAX_VALUE, "Maximum amount of fluid (in mB) a CM buffer can hold.");
 		capacityGas = configuration.getInt("capacityGas", "CompactMachines", 1024, 0, Integer.MAX_VALUE, "Maximum amount of gas a CM buffer can hold.");
 		capacityMana = configuration.getInt("capacityMana", "CompactMachines", 10000, 0, Integer.MAX_VALUE, "Maximum amount of Botania Mana a CM buffer can hold.");
+		capacityEssentia = configuration.getInt("capacityEssentia", "CompactMachines", 64, 0, Integer.MAX_VALUE, "Maximum amount of Thaumcraft Essentia a CM buffer can hold.");
 
 		int red = configuration.getInt("psdDisplayColor.red", "Rendering", 0x27, 0, Integer.MAX_VALUE, "Font color for the PSD");
 		int green = configuration.getInt("psdDisplayColor.green", "Rendering", 0xEB, 0, Integer.MAX_VALUE, "");

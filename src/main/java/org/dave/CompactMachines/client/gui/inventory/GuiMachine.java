@@ -1,12 +1,17 @@
 package org.dave.CompactMachines.client.gui.inventory;
 
+import java.awt.Color;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import mekanism.api.gas.Gas;
 import mekanism.api.gas.GasStack;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
@@ -18,6 +23,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.dave.CompactMachines.handler.ConfigurationHandler;
+import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.inventory.ContainerMachine;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Textures;
@@ -25,6 +31,9 @@ import org.dave.CompactMachines.tileentity.TileEntityMachine;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import thaumcraft.api.ItemApi;
+import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.api.aspects.Aspect;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -35,6 +44,8 @@ public class GuiMachine extends GuiContainer {
 	private static int			tankHeight	= 16;
 	private static int[]		xPositions	= new int[] { 80, 80, 80, 109, 109, 51 };
 	private static int[]		yPositions	= new int[] { 66, 24, 45, 66, 45, 45 };
+
+	private static IIcon		essentiaIcon;
 
 	public GuiMachine(InventoryPlayer inventoryPlayer, TileEntityMachine tileEntityMachine) {
 		super(new ContainerMachine(inventoryPlayer, tileEntityMachine));
@@ -65,6 +76,8 @@ public class GuiMachine extends GuiContainer {
 			int gasAmount = tileEntityMachine._gasamount[i];
 			int energyAmount = tileEntityMachine._energy[i];
 			int manaAmount = tileEntityMachine._mana;
+			int aspectId = tileEntityMachine._aspectid[i];
+			int aspectAmount = tileEntityMachine._aspectamount[i];
 
 			if (isPointInRegion(xPositions[i] - 4, yPositions[i], 24, 16, mouseX, mouseY)) {
 				String side = ForgeDirection.getOrientation(i).toString();
@@ -94,6 +107,18 @@ public class GuiMachine extends GuiContainer {
 						ratio = 1.0;
 					}
 					lines.add(String.format("%s: %.1f%%", StatCollector.translateToLocal("tooltip.cm:machine.mana"), ratio * 100));
+				}
+
+				if (aspectAmount > 0) {
+					Aspect aspect = ThaumcraftSharedStorage.getAspectForID(aspectId);
+					EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+					if (player != null && aspect != null) {
+						if (ThaumcraftApiHelper.hasDiscoveredAspect(player.getCommandSenderName(), aspect)) {
+							lines.add(aspect.getName() + ": " + aspectAmount);
+						} else {
+							lines.add(StatCollector.translateToLocal("tooltip.cm:machine.unknownaspect") + ": " + aspectAmount);
+						}
+					}
 				}
 			}
 		}
@@ -190,24 +215,31 @@ public class GuiMachine extends GuiContainer {
 			if(fluid != null && fluidAmount > 0) {
 				FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
 				int tankSize = fluidAmount * tankHeight / ConfigurationHandler.capacityFluid;
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				drawTank(xPositions[i] - 4, yPositions[i] + 16, fluidStack, tankSize, gasAmount > 0);
+
+				drawFluidTank(xPositions[i] - 4, yPositions[i] + 16, fluidStack, tankSize, gasAmount > 0);
 			}
 
 			int gasId = tileEntityMachine._gasid[i];
 			if (gasId != -1 && gasAmount > 0) {
 				GasStack gas = new GasStack(gasId, gasAmount);
-				int gasTankSize = gasAmount * tankHeight / ConfigurationHandler.capacityGas;
+				int tankSize = gasAmount * tankHeight / ConfigurationHandler.capacityGas;
 				int xOffsetDelta = fluidAmount > 0 ? 2 : 4;
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, gasTankSize, fluidAmount > 0);
+
+				drawGasTank(xPositions[i] - xOffsetDelta, yPositions[i] + 16, gas, tankSize, fluidAmount > 0);
 			}
 
 			int energyAmount = tileEntityMachine._energy[i];
+			int aspectAmount = tileEntityMachine._aspectamount[i];
 			if(energyAmount > 0) {
 				int energySize = energyAmount * tankHeight / ConfigurationHandler.capacityRF;
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				drawEnergy(xPositions[i] + 16, yPositions[i] + 16, energySize);
+				drawEnergyTank(xPositions[i] + 16, yPositions[i] + 16, Textures.Gui.INTERFACE, 176, 0, energySize, aspectAmount > 0);
+			}
+
+			if (aspectAmount > 0) {
+				int tankSize = aspectAmount * tankHeight / ConfigurationHandler.capacityEssentia;
+				Aspect aspect = ThaumcraftSharedStorage.getAspectForID(tileEntityMachine._aspectid[i]);
+				int xOffsetDelta = energyAmount > 0 ? 2 : 0;	
+				drawEssentiaTank(xPositions[i] + 16 + xOffsetDelta, yPositions[i] + 16, aspect, tankSize, energyAmount > 0);
 			}
 		}
 	}
@@ -223,8 +255,12 @@ public class GuiMachine extends GuiContainer {
 		this.drawTexturedModalRect(xStart, yStart, 0, 0, xSize, ySize);
 	}
 
-	protected void drawEnergy(int xOffset, int yOffset, int level) {
+	protected void drawGauge(int xOffset, int yOffset, IIcon icon, ResourceLocation texSheet, int level, boolean halfWidth) {
 		int vertOffset = 0;
+
+		if (texSheet != null) {
+			bindTexture(texSheet);
+		}
 
 		while (level > 0) {
 			int texHeight = 0;
@@ -237,8 +273,29 @@ public class GuiMachine extends GuiContainer {
 				level = 0;
 			}
 
-			bindTexture(Textures.Gui.MACHINE);
-			this.drawTexturedModalRect(xOffset, yOffset - texHeight - vertOffset, 176, 0, 4, texHeight);
+			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, halfWidth ? 2 : 4, texHeight);
+			vertOffset = vertOffset + 4;
+		}
+	}
+
+	protected void drawEnergyTank(int xOffset, int yOffset, ResourceLocation tex, int u, int v, int level, boolean halfWidth) {
+		int vertOffset = 0;
+
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		bindTexture(tex);
+
+		while (level > 0) {
+			int texHeight = 0;
+
+			if (level > 4) {
+				texHeight = 4;
+				level -= 4;
+			} else {
+				texHeight = level;
+				level = 0;
+			}
+
+			this.drawTexturedModalRect(xOffset, yOffset - texHeight - vertOffset, u, v, halfWidth ? 2 : 4, texHeight);
 			vertOffset = vertOffset + 4;
 		}
 	}
@@ -258,73 +315,49 @@ public class GuiMachine extends GuiContainer {
 			icon = Blocks.flowing_lava.getIcon(0, 0);
 		}
 
-		int vertOffset = 0;
-
-		while (level > 0) {
-			int texHeight = 0;
-
-			if (level > 4) {
-				texHeight = 4;
-				level -= 4;
-			} else {
-				texHeight = level;
-				level = 0;
-			}
-
-			bindTexture(gas);
-
-			int tankWidth = halfWidth ? 2 : 4;
-
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
-			vertOffset = vertOffset + 4;
-		}
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		drawGauge(xOffset, yOffset, icon, TextureMap.locationBlocksTexture, level, halfWidth);
 	}
 
-	// TODO: Rework to draw both fluids and gas with one method, since the
-	// current two are mostly identical
-	protected void drawTank(int xOffset, int yOffset, FluidStack stack, int level, boolean halfWidth) {
-		if (stack == null) {
+	protected void drawFluidTank(int xOffset, int yOffset, FluidStack fluidStack, int level, boolean halfWidth) {
+		if (fluidStack == null) {
 			return;
 		}
-		Fluid fluid = stack.getFluid();
+		Fluid fluid = fluidStack.getFluid();
 		if (fluid == null) {
 			return;
 		}
 
-		IIcon icon = fluid.getIcon(stack);
+		IIcon icon = fluid.getIcon(fluidStack);
 		if (icon == null) {
 			icon = Blocks.flowing_lava.getIcon(0, 0);
 		}
 
-		int vertOffset = 0;
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		bindTexture(fluid);
+		drawGauge(xOffset, yOffset, icon, null, level, halfWidth);
+	}
 
-		while (level > 0) {
-			int texHeight = 0;
-
-			if (level > 4) {
-				texHeight = 4;
-				level -= 4;
-			} else {
-				texHeight = level;
-				level = 0;
+	protected void drawEssentiaTank(int xOffset, int yOffset, Aspect aspect, int level, boolean halfWidth) {
+		if(essentiaIcon == null) {
+			try {
+				Block block = Block.getBlockFromItem(ItemApi.getBlock("blockJar", 0).getItem());
+				Field iconFld;
+				iconFld = block.getClass().getField("iconLiquid");
+				essentiaIcon = (IIcon) iconFld.get(block);
+			} catch (Exception e) {
+				essentiaIcon = Blocks.flowing_lava.getIcon(0, 0);
 			}
-
-			bindTexture(fluid);
-
-			int tankWidth = halfWidth ? 2 : 4;
-
-			drawTexturedModelRectFromIcon(xOffset, yOffset - texHeight - vertOffset, icon, tankWidth, texHeight);
-			vertOffset = vertOffset + 4;
 		}
+
+		Color aspectColor =  new Color(aspect.getColor());
+		GL11.glColor4f(aspectColor.getRed() / 256f, aspectColor.getGreen() / 256f, aspectColor.getBlue() / 256f, aspectColor.getAlpha() / 256f);
+
+		drawGauge(xOffset, yOffset, essentiaIcon, TextureMap.locationBlocksTexture, level, halfWidth);
 	}
 
 	protected void bindTexture(ResourceLocation tex) {
 		this.mc.renderEngine.bindTexture(tex);
-	}
-
-	protected void bindTexture(Gas gas) {
-		// FIXME: Not sure if this is correct...
-		this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 	}
 
 	protected void bindTexture(Fluid fluid) {
