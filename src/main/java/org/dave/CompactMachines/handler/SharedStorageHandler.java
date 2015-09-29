@@ -29,6 +29,7 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
+import org.dave.CompactMachines.integration.pneumaticcraft.PneumaticCraftSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
@@ -93,6 +94,10 @@ public class SharedStorageHandler {
 
 		if(Reference.THAUMCRAFT_AVAILABLE) {
 			registerModInteraction("thaumcraft", ThaumcraftSharedStorage.class);
+		}
+
+		if(Reference.PNEUMATICCRAFT_AVAILABLE) {
+			registerModInteraction("PneumaticCraft", PneumaticCraftSharedStorage.class);
 		}
 
 		if (!client) {

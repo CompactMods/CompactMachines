@@ -19,6 +19,7 @@ public class Reference {
 	public static boolean		MEK_AVAILABLE		= false;
 	public static boolean		BOTANIA_AVAILABLE	= false;
 	public static boolean		THAUMCRAFT_AVAILABLE= false;
+	public static boolean		PNEUMATICCRAFT_AVAILABLE= false;
 
 	public static Item			upgradeItem			= null;
 

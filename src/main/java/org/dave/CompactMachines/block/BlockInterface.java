@@ -45,6 +45,17 @@ public class BlockInterface extends BlockProtected implements ITileEntityProvide
 	}
 
 	@Override
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+
+		if (!(world.getTileEntity(x, y, z) instanceof TileEntityInterface)) {
+			return;
+		}
+
+		((TileEntityInterface)world.getTileEntity(x, y, z)).onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+	}
+
+	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
 		return false;
 	}

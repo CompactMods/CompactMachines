@@ -1,19 +1,25 @@
 package org.dave.CompactMachines.tileentity;
 
+import java.util.List;
+
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
+
 import mekanism.api.gas.Gas;
 import mekanism.api.gas.GasStack;
 import mekanism.api.gas.IGasHandler;
 import mekanism.api.gas.ITubeConnection;
+
 import mrtjp.projectred.api.IBundledTile;
 import mrtjp.projectred.api.ProjectRedAPI;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -32,18 +38,27 @@ import org.dave.CompactMachines.integration.fluid.FluidSharedStorage;
 import org.dave.CompactMachines.integration.gas.GasSharedStorage;
 import org.dave.CompactMachines.integration.item.ItemSharedStorage;
 import org.dave.CompactMachines.integration.opencomputers.OpenComputersSharedStorage;
+import org.dave.CompactMachines.integration.pneumaticcraft.PneumaticCraftSharedStorage;
 import org.dave.CompactMachines.integration.redstoneflux.FluxSharedStorage;
 import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.reference.Names;
 import org.dave.CompactMachines.reference.Reference;
 
+import pneumaticCraft.api.tileentity.IAirHandler;
+import pneumaticCraft.api.tileentity.IManoMeasurable;
+import pneumaticCraft.api.tileentity.ISidedPneumaticMachine;
+
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IEssentiaTransport;
+
 import vazkii.botania.api.mana.IManaPool;
+
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.util.AECableType;
+
 import cofh.api.energy.IEnergyHandler;
+
 import cpw.mods.fml.common.Optional;
 
 @Optional.InterfaceList({
@@ -53,9 +68,11 @@ import cpw.mods.fml.common.Optional;
 		@Optional.Interface(iface = "mekanism.api.gas.IGasHandler", modid = "Mekanism"),
 		@Optional.Interface(iface = "mekanism.api.gas.ITubeConnection", modid = "Mekanism"),
 		@Optional.Interface(iface = "vazkii.botania.api.mana.IManaPool", modid = "Botania"),
-		@Optional.Interface(iface = "thaumcraft.api.aspects.IEssentiaTransport", modid = "Thaumcraft")
+		@Optional.Interface(iface = "thaumcraft.api.aspects.IEssentiaTransport", modid = "Thaumcraft"),
+		@Optional.Interface(iface = "pneumaticCraft.api.tileentity.ISidedPneumaticMachine", modid = "PneumaticCraft"),
+		@Optional.Interface(iface = "pneumaticCraft.api.tileentity.IManoMeasurable", modid = "PneumaticCraft")
 })
-public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IManaPool, IEssentiaTransport {
+public class TileEntityInterface extends TileEntityCM implements IInventory, IFluidHandler, IGasHandler, ITubeConnection, IEnergyHandler, IGridHost, IBundledTile, Environment, IManaPool, IEssentiaTransport, ISidedPneumaticMachine, IManoMeasurable {
 
 	public CMGridBlock	gridBlock;
 
@@ -121,28 +138,40 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 		return (ThaumcraftSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "thaumcraft");
 	}
 
+	public PneumaticCraftSharedStorage getStoragePneumaticCraft() {
+		return (PneumaticCraftSharedStorage) SharedStorageHandler.instance(worldObj.isRemote).getStorage(this.coords, side, "PneumaticCraft");
+	}
+
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
 
-		if (Reference.OC_AVAILABLE && !worldObj.isRemote && getStorageOC() != null) {
-			Node node = getStorageOC().getNode();
-			if (node != null) {
-				node.remove();
-			}
-		}
+		deinitialize();
 	}
 
 	@Override
 	public void invalidate() {
 		super.invalidate();
 
+		deinitialize();
+	}
+
+	public void deinitialize() {
 		if (Reference.OC_AVAILABLE && !worldObj.isRemote && getStorageOC() != null) {
 			Node node = getStorageOC().getNode();
 			if (node != null) {
 				node.remove();
 			}
 		}
+
+		if (Reference.PNEUMATICCRAFT_AVAILABLE && getStoragePneumaticCraft() != null) {
+			getStoragePneumaticCraft().invalidateInterfaceAirHandler();
+		}
+	}
+
+	@Override
+	public void validate() {
+		super.validate();
 	}
 
 	public void setSide(int side) {
@@ -162,19 +191,35 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tag)
-	{
+	public void readFromNBT(NBTTagCompound tag)	{
 		super.readFromNBT(tag);
 		side = tag.getInteger("side");
 		coords = tag.getInteger("coords");
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag)
-	{
+	protected void readSyncNBT(NBTTagCompound tag) {
+		if (Reference.PNEUMATICCRAFT_AVAILABLE && worldObj !=  null && getStoragePneumaticCraft() != null) {
+			if (getStoragePneumaticCraft().isInterfaceValid()) {
+				getStoragePneumaticCraft().getInterfaceAirHandler().readFromNBTI(tag);
+			}
+		}
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
 		tag.setInteger("side", side);
 		tag.setInteger("coords", coords);
+	}
+
+	@Override
+	protected void writeSyncNBT(NBTTagCompound tag) {
+		if (Reference.PNEUMATICCRAFT_AVAILABLE && worldObj !=  null && getStoragePneumaticCraft() != null) {
+			if (getStoragePneumaticCraft().isInterfaceValid()) {
+				getStoragePneumaticCraft().getInterfaceAirHandler().writeToNBTI(tag);
+			}
+		}
 	}
 
 	@Override
@@ -183,6 +228,17 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 
 		if (Reference.PR_AVAILABLE) {
 			updateIncomingSignals();
+		}
+
+		if (Reference.PNEUMATICCRAFT_AVAILABLE) {
+			if (!getStoragePneumaticCraft().isInterfaceValid()) {
+				getStoragePneumaticCraft().validateInterfaceAirHandler(this);
+				int x = xCoord + ForgeDirection.getOrientation(side).getOpposite().offsetX;
+				int y = yCoord + ForgeDirection.getOrientation(side).getOpposite().offsetY;
+				int z = zCoord + ForgeDirection.getOrientation(side).getOpposite().offsetZ;
+				worldObj.notifyBlockOfNeighborChange(x, y, z, worldObj.getBlock(xCoord, yCoord, zCoord));
+			}
+			getStoragePneumaticCraft().getInterfaceAirHandler().updateEntityI();
 		}
 
 		if (worldObj.isRemote) {
@@ -622,5 +678,28 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean renderExtendedTube() {
 		return getStorageThaumcraft().renderExtendedTube();
+	}
+
+	@Override
+	@Optional.Method(modid = "PneumaticCraft")
+	public IAirHandler getAirHandler(ForgeDirection side) {
+		if (getStoragePneumaticCraft().isInterfaceValid()) {
+			return getStoragePneumaticCraft().getInterfaceAirHandler();
+		}
+		return null;
+	}
+
+	@Override
+	@Optional.Method(modid = "PneumaticCraft")
+	public void printManometerMessage(EntityPlayer player, List<String> curInfo) {
+		if(Reference.PNEUMATICCRAFT_AVAILABLE && getStoragePneumaticCraft().isInterfaceValid()) {
+			getStoragePneumaticCraft().getInterfaceAirHandler().printManometerMessage(player, curInfo);
+		}
+	}
+
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		if(Reference.PNEUMATICCRAFT_AVAILABLE && getStoragePneumaticCraft().isInterfaceValid()) {
+			getStoragePneumaticCraft().getInterfaceAirHandler().onNeighborChange();
+		}
 	}
 }
