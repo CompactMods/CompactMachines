@@ -45,6 +45,7 @@ public class ConfigurationHandler {
 	public static boolean		enableIntegrationProjectRed;
 	public static boolean		enableIntegrationOpenComputers;
 	public static boolean		enableIntegrationThaumcraft;
+	public static boolean		enableIntegrationPneumaticCraft;
 
 	public static boolean		allowRespawning;
 
@@ -90,6 +91,7 @@ public class ConfigurationHandler {
 		enableIntegrationProjectRed = configuration.getBoolean("ProjectRed", "Integration", true, "Transfer bundled cable signals through Compact Machines");
 		enableIntegrationOpenComputers = configuration.getBoolean("OpenComputers", "Integration", true, "Allow OpenComputers network connections through Compact Machines");
 		enableIntegrationThaumcraft = configuration.getBoolean("Thaumcraft", "Integration", true, "Allow Thaumcraft Essentia transport through Compact Machines");
+		enableIntegrationPneumaticCraft = configuration.getBoolean("PneumaticCraft", "Integration", true, "Allow PneumaticCraft Pressure transport through Compact Machines");
 
 		cooldownRF = configuration.getInt("cooldownRF", "CompactMachines", 0, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Redstone Flux, i.e. 20 => 10000 RF/s, 0 => 10000 RF/t");
 		cooldownItems = configuration.getInt("cooldownItems", "CompactMachines", 10, 0, Integer.MAX_VALUE, "Number of ticks between each import/export action for Items, i.e. 40 => 1 Stack every two seconds");

@@ -242,7 +242,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	public void validate() {
 		super.validate();
-		
+
 		if (Reference.PNEUMATICCRAFT_AVAILABLE) {
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				if (getStoragePneumaticCraft(dir.ordinal()) != null) {
@@ -905,7 +905,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean isConnectable(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return false;
 		}
 		return getStorageThaumcraft(face.ordinal()).isConnectable(face);
@@ -914,7 +914,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean canInputFrom(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return false;
 		}
 		return getStorageThaumcraft(face.ordinal()).canInputFrom(face);
@@ -923,7 +923,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean canOutputTo(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return false;
 		}
 		return getStorageThaumcraft(face.ordinal()).canOutputTo(face);
@@ -936,7 +936,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public Aspect getSuctionType(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return null;
 		}
 		return getStorageThaumcraft(face.ordinal()).getSuctionType(face);
@@ -945,7 +945,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getSuctionAmount(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return 0;
 		}
 		return getStorageThaumcraft(face.ordinal()).getSuctionAmount(face);
@@ -954,7 +954,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int takeEssentia(Aspect aspect, int amount, ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return 0;
 		}
 		return getStorageThaumcraft(face.ordinal()).takeEssentia(aspect, amount, face);
@@ -963,7 +963,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int addEssentia(Aspect aspect, int amount, ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return 0;
 		}
 		return getStorageThaumcraft(face.ordinal()).addEssentia(aspect, amount, face);
@@ -972,7 +972,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public Aspect getEssentiaType(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return null;
 		}
 		return getStorageThaumcraft(face.ordinal()).getEssentiaType(face);
@@ -981,7 +981,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getEssentiaAmount(ForgeDirection face) {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return 0;
 		}
 		return getStorageThaumcraft(face.ordinal()).getEssentiaAmount(face);
@@ -990,7 +990,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getMinimumSuction() {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return Integer.MAX_VALUE;
 		}
 		return getStorageThaumcraft(0).getMinimumSuction();
@@ -999,7 +999,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean renderExtendedTube() {
-		if (coords == -1) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft || coords == -1) {
 			return false;
 		}
 		return getStorageThaumcraft(0).renderExtendedTube();
@@ -1008,25 +1008,32 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	@Override
 	@Optional.Method(modid = "PneumaticCraft")
 	public IAirHandler getAirHandler(ForgeDirection side) {
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return null;
+		}
 		return (IAirHandler)airHandlers[side.ordinal()];
 	}
 
 	@Override
 	@Optional.Method(modid = "PneumaticCraft")
 	public void printManometerMessage(EntityPlayer player, List<String> curInfo) {
-		if(Reference.PNEUMATICCRAFT_AVAILABLE) {
-			if (coords != -1) {
-				curInfo.add(EnumChatFormatting.GREEN + "Pressures:");
-				for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-					if (getStoragePneumaticCraft(dir.ordinal()) != null) {
-						curInfo.add(EnumChatFormatting.GREEN + "Current pressure (" + dir.name() + "): " + roundNumberTo(getStoragePneumaticCraft(dir.ordinal()).getInterfaceAirHandler().getPressure(ForgeDirection.UNKNOWN), 1) + " bar.");
-					}
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return;
+		}
+		if(Reference.PNEUMATICCRAFT_AVAILABLE && coords != -1) {
+			curInfo.add(EnumChatFormatting.GREEN + "Pressures:");
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (getStoragePneumaticCraft(dir.ordinal()) != null) {
+					curInfo.add(EnumChatFormatting.GREEN + "Current pressure (" + dir.name() + "): " + roundNumberTo(getStoragePneumaticCraft(dir.ordinal()).getInterfaceAirHandler().getPressure(ForgeDirection.UNKNOWN), 1) + " bar.");
 				}
 			}
 		}
 	}
 
 	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return;
+		}
 		if(Reference.PNEUMATICCRAFT_AVAILABLE) {
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				if (airHandlers[dir.ordinal()] != null) {

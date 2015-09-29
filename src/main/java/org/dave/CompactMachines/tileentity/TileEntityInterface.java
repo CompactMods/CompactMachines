@@ -295,7 +295,7 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	}
 
 	private void hopStorage(AbstractHoppingStorage storage, TileEntity tileEntityInside) {
-		if (storage != null && storage.getHoppingMode() == 4 || (storage.getHoppingMode() == 1 || storage.getHoppingMode() == 3 && storage.isAutoHoppingToInside() == true)) {
+		if (storage != null && (storage.getHoppingMode() == 4 || (storage.getHoppingMode() == 1 || storage.getHoppingMode() == 3 && storage.isAutoHoppingToInside() == true))) {
 			storage.hopToTileEntity(tileEntityInside, false);
 		}
 	}
@@ -613,18 +613,27 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean isConnectable(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return false;
+		}
 		return getStorageThaumcraft().isConnectable(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean canInputFrom(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return false;
+		}
 		return getStorageThaumcraft().canInputFrom(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean canOutputTo(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return false;
+		}
 		return getStorageThaumcraft().canOutputTo(face);
 	}
 
@@ -635,54 +644,81 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public Aspect getSuctionType(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return null;
+		}
 		return getStorageThaumcraft().getSuctionType(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getSuctionAmount(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return 0;
+		}
 		return getStorageThaumcraft().getSuctionAmount(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int takeEssentia(Aspect aspect, int amount, ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return 0;
+		}
 		return getStorageThaumcraft().takeEssentia(aspect, amount, face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int addEssentia(Aspect aspect, int amount, ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return 0;
+		}
 		return getStorageThaumcraft().addEssentia(aspect, amount, face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public Aspect getEssentiaType(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return null;
+		}
 		return getStorageThaumcraft().getEssentiaType(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getEssentiaAmount(ForgeDirection face) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return 0;
+		}
 		return getStorageThaumcraft().getEssentiaAmount(face);
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public int getMinimumSuction() {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return Integer.MAX_VALUE;
+		}
 		return getStorageThaumcraft().getMinimumSuction();
 	}
 
 	@Override
 	@Optional.Method(modid = "Thaumcraft")
 	public boolean renderExtendedTube() {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return false;
+		}
 		return getStorageThaumcraft().renderExtendedTube();
 	}
 
 	@Override
 	@Optional.Method(modid = "PneumaticCraft")
 	public IAirHandler getAirHandler(ForgeDirection side) {
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return null;
+		}
 		if (getStoragePneumaticCraft().isInterfaceValid()) {
 			return getStoragePneumaticCraft().getInterfaceAirHandler();
 		}
@@ -692,12 +728,18 @@ public class TileEntityInterface extends TileEntityCM implements IInventory, IFl
 	@Override
 	@Optional.Method(modid = "PneumaticCraft")
 	public void printManometerMessage(EntityPlayer player, List<String> curInfo) {
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return;
+		}
 		if(Reference.PNEUMATICCRAFT_AVAILABLE && getStoragePneumaticCraft().isInterfaceValid()) {
 			getStoragePneumaticCraft().getInterfaceAirHandler().printManometerMessage(player, curInfo);
 		}
 	}
 
 	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		if (!ConfigurationHandler.enableIntegrationPneumaticCraft) {
+			return;
+		}
 		if(Reference.PNEUMATICCRAFT_AVAILABLE && getStoragePneumaticCraft().isInterfaceValid()) {
 			getStoragePneumaticCraft().getInterfaceAirHandler().onNeighborChange();
 		}

@@ -175,6 +175,10 @@ public class ThaumcraftSharedStorage extends AbstractHoppingStorage implements I
 
 	@Override
 	public void hopToTileEntity(TileEntity target, boolean useOppositeSide) {
+		if (!ConfigurationHandler.enableIntegrationThaumcraft) {
+			return;
+		}
+		
 		if (aspectAmount >= ConfigurationHandler.capacityEssentia || !(target instanceof IEssentiaTransport)) {
 			return;
 		}
@@ -196,7 +200,6 @@ public class ThaumcraftSharedStorage extends AbstractHoppingStorage implements I
 				ta = et.getEssentiaType(hoppingSide.getOpposite());
 			}
 			if ((ta != null) && (et.getSuctionAmount(hoppingSide.getOpposite()) < getSuctionAmount(hoppingSide))) {
-				
 				addEssentia(ta, et.takeEssentia(ta, 1, hoppingSide.getOpposite()), hoppingSide);
 			}
 		}
