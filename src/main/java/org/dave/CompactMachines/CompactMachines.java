@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.Side;
 		modid = Reference.MOD_ID,
 		name = Reference.MOD_NAME,
 		version = Reference.VERSION,
-		dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania;after:LookingGlass;",
+		dependencies = "after:appliedenergistics2;after:ProjRed|Transmission;after:OpenComputers;after:Waila;after:Botania;after:LookingGlass;after:Thaumcraft;after:PneumaticCraft;",
 		guiFactory = "org.dave.CompactMachines.client.CMGuiFactory"
 )
 public class CompactMachines {
@@ -96,6 +96,8 @@ public class CompactMachines {
 		Reference.OC_AVAILABLE = Loader.isModLoaded("OpenComputers");
 		Reference.BOTANIA_AVAILABLE = Loader.isModLoaded("Botania");
 		Reference.MEK_AVAILABLE = Loader.isModLoaded("Mekanism");
+		Reference.THAUMCRAFT_AVAILABLE = Loader.isModLoaded("Thaumcraft");
+		Reference.PNEUMATICCRAFT_AVAILABLE = Loader.isModLoaded("PneumaticCraft");
 
 		// Insist on keeping an already registered dimension by registering in pre-init.
 		if (ConfigurationHandler.dimensionId != -1) {

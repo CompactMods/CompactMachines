@@ -308,4 +308,15 @@ public class BlockMachine extends BlockCM implements ITileEntityProvider
 	public int damageDropped(int meta) {
 		return meta;
 	}
+
+	@Override
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+
+		if (!(world.getTileEntity(x, y, z) instanceof TileEntityMachine)) {
+			return;
+		}
+
+		((TileEntityMachine)world.getTileEntity(x, y, z)).onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
+	}
 }

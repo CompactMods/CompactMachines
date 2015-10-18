@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
 
+import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityInterface;
 
@@ -59,6 +60,10 @@ public class ContainerInterface extends ContainerCM {
 			tileEntityInterface._gasid = value;
 		} else if (var == 37) {
 			tileEntityInterface._mana = value;
+		} else if (var == 38) {
+			tileEntityInterface._aspectamount = value;
+		} else if (var == 39) {
+			tileEntityInterface._aspectid = value;
 		}
 	}
 
@@ -106,6 +111,16 @@ public class ContainerInterface extends ContainerCM {
 
 			if(Reference.BOTANIA_AVAILABLE) {
 				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 37, tileEntityInterface.getCurrentMana());
+			}
+
+			if(Reference.THAUMCRAFT_AVAILABLE) {
+				if (tileEntityInterface.getEssentiaAmount(ForgeDirection.UNKNOWN) > 0) {
+					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 38, tileEntityInterface.getEssentiaAmount(ForgeDirection.UNKNOWN));
+					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 39, ThaumcraftSharedStorage.getIDForAspect(tileEntityInterface.getEssentiaType(ForgeDirection.UNKNOWN)));
+				} else {
+					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 38, 0);
+					((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 39, 0);
+				}
 			}
 		}
 	}

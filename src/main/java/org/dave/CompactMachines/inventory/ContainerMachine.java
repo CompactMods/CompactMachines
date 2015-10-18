@@ -9,9 +9,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidTankInfo;
 
+import org.dave.CompactMachines.integration.thaumcraft.ThaumcraftSharedStorage;
 import org.dave.CompactMachines.reference.Reference;
 import org.dave.CompactMachines.tileentity.TileEntityMachine;
 
+import thaumcraft.api.aspects.Aspect;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -112,6 +114,30 @@ public class ContainerMachine extends ContainerCM {
 			tileEntityMachine._gasid[5] = value;
 		} else if (var == 80) {
 			tileEntityMachine._mana = value;
+		} else if (var == 81) {
+			tileEntityMachine._aspectamount[0] = value;
+		} else if (var == 82) {
+			tileEntityMachine._aspectamount[1] = value;
+		} else if (var == 83) {
+			tileEntityMachine._aspectamount[2] = value;
+		} else if (var == 84) {
+			tileEntityMachine._aspectamount[3] = value;
+		} else if (var == 85) {
+			tileEntityMachine._aspectamount[4] = value;
+		} else if (var == 86) {
+			tileEntityMachine._aspectamount[5] = value;
+		} else if (var == 87) {
+			tileEntityMachine._aspectid[0] = value;
+		} else if (var == 88) {
+			tileEntityMachine._aspectid[1] = value;
+		} else if (var == 89) {
+			tileEntityMachine._aspectid[2] = value;
+		} else if (var == 90) {
+			tileEntityMachine._aspectid[3] = value;
+		} else if (var == 91) {
+			tileEntityMachine._aspectid[4] = value;
+		} else if (var == 92) {
+			tileEntityMachine._aspectid[5] = value;
 		}
 	}
 
@@ -125,7 +151,6 @@ public class ContainerMachine extends ContainerCM {
 				((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 80, tileEntityMachine.getCurrentMana());
 			}
 		}
-
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			FluidTankInfo[] tanks = tileEntityMachine.getTankInfo(dir);
@@ -156,6 +181,23 @@ public class ContainerMachine extends ContainerCM {
 						} else {
 							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 66 + dir.ordinal(), 0);
 							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 72 + dir.ordinal(), 0);
+						}
+					}
+				}
+			}
+
+			if(Reference.THAUMCRAFT_AVAILABLE) {
+				Aspect aspect = tileEntityMachine.getEssentiaType(dir);
+				int aspectAmount = tileEntityMachine.getEssentiaAmount(dir);
+
+				if (aspect != null) {
+					for (int i = 0; i < crafters.size(); i++) {
+						if (aspectAmount > 0) {
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 81 + dir.ordinal(), aspectAmount);
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 87 + dir.ordinal(), ThaumcraftSharedStorage.getIDForAspect(aspect));
+						} else {
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 81 + dir.ordinal(), 0);
+							((ICrafting) crafters.get(i)).sendProgressBarUpdate(this, 87 + dir.ordinal(), 0);
 						}
 					}
 				}
