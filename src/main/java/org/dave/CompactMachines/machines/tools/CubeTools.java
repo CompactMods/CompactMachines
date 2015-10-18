@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -128,11 +129,16 @@ public class CubeTools {
 		int height = size;
 
 		WorldServer machineWorld = MinecraftServer.getServer().worldServerForDimension(ConfigurationHandler.dimensionId);
-
+		
+		int x=machine.coords * ConfigurationHandler.cubeDistance;
+		
+		// Be sure the chunk is loaded
+		machineWorld.theChunkProviderServer.loadChunk((int) Math.floor(x/16.0), 0);
+		
 		generateCube(machineWorld,
 				//          x           y           z
-				machine.coords * ConfigurationHandler.cubeDistance, 40, 0,
-				machine.coords * ConfigurationHandler.cubeDistance + size, 40 + height, size
+				x, 40, 0,
+				x + size, 40 + height, size
 				);
 
 		if(ConfigurationHandler.adaptBiomes) {
@@ -141,7 +147,7 @@ public class CubeTools {
 			BiomeGenBase biome = WorldUtils.getBiomeByName(ConfigurationHandler.defaultBiome);
 			setCubeBiome(machine.coords, biome);
 		}
-
+		
 		// After creating the Block, make sure the TileEntities inside have their information ready.
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			Vec3 pos = CubeTools.getInterfacePosition(machine.coords, machine.meta, dir);
