@@ -11,8 +11,11 @@ item.compactmachines:quantumentangler.name=量子纠缠仪
 # Blocks
 tile.compactmachines:machine.name=空间机器
 tile.compactmachines:interface.name=空间机器接口
+tile.compactmachines:interfacedecor.name=空间机器接口(装饰)
+tile.compactmachines:interfacecreative.name=空间机器接口
 tile.compactmachines:innerwall.name=空间机器外壳
 tile.compactmachines:innerwalldecor.name=空间机器外壳 (装饰)
+tile.compactmachines:innerwallcreative.name=空间机器外壳
 tile.compactmachines:resizingcube.name=世界缩放方块
 
 # Container
@@ -32,6 +35,8 @@ tooltip.cm:machine.size.three=大型
 tooltip.cm:machine.size.four=巨型
 tooltip.cm:machine.size.five=最大尺寸
 tooltip.cm:machine.coords=机器数量
+tooltip.cm:machine.mana=魔力
+tooltip.cm:machine.unknownaspect=未知要素
 
 # Dimension Travelling
 loading.cm:enter=缩小到机器尺寸,我变变变变
