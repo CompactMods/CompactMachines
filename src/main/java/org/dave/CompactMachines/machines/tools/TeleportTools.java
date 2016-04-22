@@ -106,6 +106,20 @@ public class TeleportTools {
 
 	public static void teleportPlayerToMachineWorld(EntityPlayerMP player, TileEntityMachine machine) {
 		int coords = CompactMachines.instance.machineHandler.createOrGetChunk(machine);
+
+		NBTTagCompound playerNBT = player.getEntityData();
+		// Grab the CompactMachines entry from the player NBT data
+		NBTTagCompound cmNBT;
+		if (playerNBT.hasKey(Reference.MOD_ID)) {
+			cmNBT = playerNBT.getCompoundTag(Reference.MOD_ID);
+		} else {
+			cmNBT = new NBTTagCompound();
+			playerNBT.setTag(Reference.MOD_ID, cmNBT);
+		}
+
+		cmNBT.setBoolean(
+			"fromIPSD", (machine != null && machine.hasIntegratedPSD)
+		);
 		teleportPlayerToCoords(player, coords, false);
 	}
 
@@ -175,6 +189,25 @@ public class TeleportTools {
 		} else {
 			// No coord history on the player yet - teleport him out of there.
 			TeleportTools.teleportPlayerOutOfMachineDimension(player);
+		}
+	}
+
+	public static void teleportPlayerBackIPSD(EntityPlayerMP player) {
+		NBTTagCompound playerNBT = player.getEntityData();
+		// Grab the CompactMachines entry from the player NBT data
+		NBTTagCompound cmNBT;
+		if (playerNBT.hasKey(Reference.MOD_ID)) {
+			cmNBT = playerNBT.getCompoundTag(Reference.MOD_ID);
+		} else {
+			cmNBT = new NBTTagCompound();
+			playerNBT.setTag(Reference.MOD_ID, cmNBT);
+		}
+
+		boolean fromIPSD = (cmNBT.hasKey("fromIPSD") && cmNBT.getBoolean("fromIPSD"));
+		cmNBT.setBoolean("fromIPSD", false);
+		if (fromIPSD) {
+            player.setSneaking(false);
+			TeleportTools.teleportPlayerBack(player);
 		}
 	}
 
