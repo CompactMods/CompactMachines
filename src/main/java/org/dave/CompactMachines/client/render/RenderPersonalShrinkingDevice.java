@@ -67,6 +67,10 @@ public class RenderPersonalShrinkingDevice implements IItemRenderer {
 
 			GL11.glTranslatef(0F, 9F, 0F);
 			font.drawString("Upgraded: " + (teMachine.isUpgraded ? "yes" : "no"), 0, 0, ConfigurationHandler.psdDisplayColor);
+			if (teMachine.hasIntegratedPSD) {
+				GL11.glTranslatef(0F, 9F, 0F);
+				font.drawString("Integrated PSD", 0, 0, ConfigurationHandler.psdDisplayColor);
+			}
 		}
 
 		GL11.glPopMatrix();
