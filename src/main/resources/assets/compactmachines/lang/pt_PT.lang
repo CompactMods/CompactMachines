@@ -1,0 +1,64 @@
+# Creative Tabs
+itemGroup.compactmachines=Compact Machines
+
+# Items
+item.compactmachines:psd.name=Equipamento de Encolhimento Pessoal
+item.compactmachines:shrinker.name=Módulo de Encolhimento Atómico
+item.compactmachines:enlarger.name=Módulo de Expansão Atómico
+item.compactmachines:interfaceitem.name=Interface de Redimensionamento
+item.compactmachines:quantumentangler.name=Interligador Quântico
+
+# Blocks
+tile.compactmachines:machine.name=Compact Machine
+tile.compactmachines:interface.name=Interface de Compact Machine
+tile.compactmachines:interfacedecor.name=Interface de Compact Machine (Decorativo)
+tile.compactmachines:interfacecreative.name=Interface de Compact Machine
+tile.compactmachines:innerwall.name=Parede de Compact Machine
+tile.compactmachines:innerwalldecor.name=Parede de Compact Machine (Decorativo)
+tile.compactmachines:innerwallcreative.name=Parede de Compact Machine
+tile.compactmachines:resizingcube.name=Cubo de Redimensionamento
+
+# Container
+container.cm:machine=Compact Machine
+container.cm:interface=Interface de Compact Machine
+
+container.cm:hoppingMode.disabled=Desligado
+container.cm:hoppingMode.importing=A Importar
+container.cm:hoppingMode.exporting=A Exportar
+container.cm:hoppingMode.auto=Auto
+
+# ToolTips
+tooltip.cm:machine.size.zero=Minúsculo
+tooltip.cm:machine.size.one=Pequeno
+tooltip.cm:machine.size.two=Tamanho Normal
+tooltip.cm:machine.size.three=Grande
+tooltip.cm:machine.size.four=Gigante
+tooltip.cm:machine.size.five=Tamanho Máximo
+tooltip.cm:machine.coords=Número de Máquina
+tooltip.cm:machine.mana=Mana
+tooltip.cm:machine.unknownaspect=Aspect Desconhecido
+
+# Dimension Travelling
+loading.cm:enter=A Encolher para o tamanho da máquina. Ffffflllp. 
+loading.cm:leave=A Expandir para o tamanho normal. Ffffflllp. 
+
+# Chat messages
+msg.message_machine_already_in_use.txt=Não é possível interligar: A máquina já está em uso.
+msg.message_machine_not_upgraded.txt=Não é possível interligar: A máquina não sofreu a melhoria (upgrade).
+msg.message_machine_invalid_size.txt=Não é possível interligar: A máquina não tem o tamanho correto.
+msg.message_quantum_entanglement_disabled.txt=Interligação quântica está disabilitada, desculpe!
+msg.message_machine_not_in_use.txt=Não é possível interligar: A máquina ainda não foi usada.
+msg.message_spawnpoint_set.txt=Spawnpoint atribuído à sua posição atual.
+
+# IGW Mod Pages
+igwpage.basics=Introdução
+
+# Commands
+command.cm.setCMCoords.usage=/setCMCoords <id da sala>
+command.cm.setCMCoords.noblock=É necessário estar a segurar um bloco CM para utilizar este comando.
+command.cm.setCMCoords.success=Bloco CM atualizado com sucesso.
+
+    Status API Training Shop Blog About 
+
+    © 2016 GitHub, Inc. Terms Privacy Security Contact Help 
+
