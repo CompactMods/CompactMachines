@@ -19,8 +19,8 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         super(Fluidss.miniaturizationFluid, Material.WATER);
         this.setUnlocalizedName("miniaturization_fluid_block");
 
-        this.quantaPerBlock = 4;
-        this.quantaPerBlockFloat = 4F;
+        this.setQuantaPerBlock(4);
+        this.setTickRate(5);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         if(isSourceBlock(world, pos)) {
             // Flow sideways
             for(BlockPos adjPos : adjacent) {
-                flowIntoBlock(world, adjPos, 4);
+                flowIntoBlock(world, adjPos, 1);
             }
         } else {
             // Find all nearby source blocks
@@ -76,12 +76,12 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
             }
 
             // Drain if no adjacent source block and no miniaturization fluid above
-            // TODO: Draining sometimes fails, investigate
             if(!hasAdjacentSourceBlock && world.getBlockState(pos.up()).getBlock() != this) {
                 int quantaRemaining = quantaPerBlock - state.getValue(LEVEL);
                 if(quantaRemaining > 0) {
                     world.setBlockState(pos, this.getBlockState().getBaseState().withProperty(LEVEL, state.getValue(LEVEL) + 1));
-                } else if(quantaRemaining <= 1) {
+                    world.notifyNeighborsOfStateChange(pos.down(), this);
+                } else if(quantaRemaining <= 0) {
                     world.setBlockToAir(pos);
                 }
             }
