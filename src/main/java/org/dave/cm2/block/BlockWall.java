@@ -1,0 +1,72 @@
+package org.dave.cm2.block;
+
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import org.dave.cm2.init.Blockss;
+import org.dave.cm2.item.ItemTunnelTool;
+import org.dave.cm2.world.tools.StructureTools;
+import org.dave.cm2.world.WorldSavedDataMachines;
+
+import javax.annotation.Nullable;
+import java.util.HashMap;
+
+public class BlockWall extends BlockProtected {
+    public BlockWall(Material material) {
+        super(material);
+        this.setLightOpacity(1);
+    }
+
+    @Override
+    public boolean isBlockProtected(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if(heldItem == null || !(heldItem.getItem() instanceof ItemTunnelTool && heldItem.stackSize > 0)) {
+            return false;
+        }
+
+        if(player.isSneaking()) {
+            return false;
+        }
+
+        if(world.isRemote || !(player instanceof EntityPlayerMP)) {
+            return true;
+        }
+
+        EnumFacing tunnelSide = EnumFacing.DOWN;
+        int coords = StructureTools.getCoordsForPos(pos);
+        HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
+        while(sideMapping != null && tunnelSide != null) {
+            if(sideMapping.get(tunnelSide) == null) {
+                break;
+            }
+
+            tunnelSide = StructureTools.getNextDirection(tunnelSide);
+        }
+
+        if(tunnelSide != null) {
+            IBlockState blockState = Blockss.tunnel.getDefaultState().withProperty(BlockTunnel.MACHINE_SIDE, tunnelSide);
+            world.setBlockState(pos, blockState);
+
+            heldItem.stackSize--;
+            WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
+        } else {
+            // TODO: Localization
+            player.addChatComponentMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"));
+        }
+
+        return true;
+    }
+}

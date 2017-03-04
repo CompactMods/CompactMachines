@@ -1,0 +1,10 @@
+{
+  forge_marker: 1,
+  defaults: {
+    model: "cm2:wall"
+  },
+  variants: {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

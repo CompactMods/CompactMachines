@@ -1,0 +1,16 @@
+[
+{
+  "modid": "cm2",
+  "name": "Compact Machines 2",
+  "description": "It's all so tiny!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Davenonymous"],
+  "credits": "The Forge and FML guys, for making this possible",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
