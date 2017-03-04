@@ -5,7 +5,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 import org.dave.cm2.CompactMachines2;
-import sun.plugin2.message.Message;
 
 public class PackageHandler {
     public static final SimpleNetworkWrapper instance = NetworkRegistry.INSTANCE.newSimpleChannel(CompactMachines2.MODID);
