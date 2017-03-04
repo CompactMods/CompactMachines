@@ -98,11 +98,15 @@ public class CMEventHandler {
 		}
 
 		NBTTagCompound playerNBT = event.player.getEntityData();
-		if(!playerNBT.getBoolean("isUsingPSD")) {
+		if (playerNBT.getBoolean("hasIntegratedPSD")) {
+			event.player.setSneaking(false);
+		}
+		if(!playerNBT.getBoolean("isUsingPSD") && !playerNBT.getBoolean("hasIntegratedPSD")) {
 			event.player.addPotionEffect(new PotionEffect(Potion.wither.id, 300, 2, false));	// Wither
 			event.player.addPotionEffect(new PotionEffect(Potion.confusion.id, 300, 5, false)); // Nausea
 		} else {
 			playerNBT.removeTag("isUsingPSD");
+			playerNBT.removeTag("hasIntegratedPSD");
 		}
 	}
 

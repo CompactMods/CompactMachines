@@ -105,6 +105,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 	public int								entangledInstance;
 
 	public boolean							isUpgraded		= false;
+	public boolean							hasIntegratedPSD	= false;
 
 	public HashMap<Integer, CMGridBlock>	gridBlocks;
 	public HashMap<Integer, IGridNode>		gridNodes;
@@ -188,6 +189,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 		coords = nbtTagCompound.getInteger("coords");
 		meta = nbtTagCompound.getInteger("meta");
 		isUpgraded = nbtTagCompound.getBoolean("upgraded");
+		hasIntegratedPSD = nbtTagCompound.getBoolean("integratedpsd");
 		entangledInstance = nbtTagCompound.getInteger("entangle-id");
 
 		if (isUpgraded && worldObj != null && worldObj.isRemote) {
@@ -218,6 +220,7 @@ public class TileEntityMachine extends TileEntityCM implements ISidedInventory, 
 
 		nbtTagCompound.setInteger("coords", coords);
 		nbtTagCompound.setBoolean("upgraded", isUpgraded);
+		nbtTagCompound.setBoolean("integratedpsd", hasIntegratedPSD);
 		nbtTagCompound.setInteger("entangle-id", entangledInstance);
 	}
 
