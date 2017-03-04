@@ -22,22 +22,18 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.cm2.init.Blockss;
-import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.item.ItemPersonalShrinkingDevice;
 import org.dave.cm2.misc.CreativeTabCM2;
-import org.dave.cm2.utility.Logz;
-import org.dave.cm2.world.tools.TeleportationTools;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.TeleportationTools;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -214,11 +210,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
                 machine.markDirty();
             }
-        } else {
-            player.addChatComponentMessage(new TextComponentString(TextFormatting.GREEN + "Machine fluid level: " + machine.getFluidLevel()));
         }
-
-
 
         return true;
     }

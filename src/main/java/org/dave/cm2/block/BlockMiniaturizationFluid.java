@@ -8,7 +8,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
-import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Potionss;
 
@@ -19,7 +18,6 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
     public BlockMiniaturizationFluid() {
         super(Fluidss.miniaturizationFluid, Material.WATER);
         this.setUnlocalizedName("miniaturization_fluid_block");
-        this.setCreativeTab(CreativeTabCM2.CM2_TAB);
 
         this.quantaPerBlock = 4;
         this.quantaPerBlockFloat = 4F;
@@ -78,6 +76,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
             }
 
             // Drain if no adjacent source block and no miniaturization fluid above
+            // TODO: Draining sometimes fails, investigate
             if(!hasAdjacentSourceBlock && world.getBlockState(pos.up()).getBlock() != this) {
                 int quantaRemaining = quantaPerBlock - state.getValue(LEVEL);
                 if(quantaRemaining > 0) {

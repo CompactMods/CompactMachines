@@ -1,7 +1,10 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "cm2:tunnel"
+    "model": "cube_all",
+    "textures": {
+      "all": "cm2:blocks/tunnel"
+    }
   },
   "variants": {
     "machineside": {

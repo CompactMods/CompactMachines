@@ -61,6 +61,8 @@ public class ClientProxy extends CommonProxy {
 
         registerItemBlockRenderer(Blockss.tunnel);
         registerItemBlockRenderer(Blockss.wall);
+        registerItemBlockRenderer(Blockss.wallBreakable);
+
         registerMetaItemBlockRenderers();
     }
 
@@ -71,11 +73,14 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void registerMetaItemBlockRenderers() {
-        Item item = Item.getItemFromBlock(Blockss.machine);
         ItemModelMesher imm = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+
+        Item itemBlockMachine = Item.getItemFromBlock(Blockss.machine);
         for(EnumMachineSize size : EnumMachineSize.values()) {
-            imm.register(item, size.getMeta(), new ModelResourceLocation(item.getRegistryName(), "size=" + size.getName()));
+            imm.register(itemBlockMachine, size.getMeta(), new ModelResourceLocation(itemBlockMachine.getRegistryName(), "size=" + size.getName()));
         }
+
+
     }
 
 

@@ -8,7 +8,8 @@ tile.cm2.machine.giant.name=Giant Compact Machine
 tile.cm2.machine.maximum.name=Maximum Compact Machine
 
 tile.cm2.tunnel.name=Tunnel
-tile.cm2.wall.name=Compact Machine Wall
+tile.cm2.wallbreakable.name=Compact Machine Wall
+tile.cm2.wall.name=Solid Compact Machine Wall
 
 item.cm2.psd.name=Personal Shrinking Device
 item.cm2.tunneltool.name=Tunnel

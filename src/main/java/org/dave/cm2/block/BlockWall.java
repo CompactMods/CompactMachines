@@ -10,25 +10,24 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.item.ItemTunnelTool;
-import org.dave.cm2.world.tools.StructureTools;
+import org.dave.cm2.misc.ConfigurationHandler;
+import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.StructureTools;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class BlockWall extends BlockProtected {
+
     public BlockWall(Material material) {
         super(material);
         this.setLightOpacity(1);
-    }
 
-    @Override
-    public boolean isBlockProtected(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return true;
+        this.setCreativeTab(CreativeTabCM2.CM2_TAB);
     }
 
     @Override
@@ -43,6 +42,10 @@ public class BlockWall extends BlockProtected {
 
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
             return true;
+        }
+
+        if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
+            return false;
         }
 
         EnumFacing tunnelSide = EnumFacing.DOWN;

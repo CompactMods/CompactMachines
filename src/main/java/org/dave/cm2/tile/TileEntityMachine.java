@@ -10,68 +10,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.dave.cm2.block.BlockMachine;
-import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.misc.ConfigurationHandler;
-import org.dave.cm2.utility.Logz;
-import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.world.ChunkLoadingMachines;
-import org.dave.cm2.world.tools.DimensionTools;
 import org.dave.cm2.world.WorldSavedDataMachines;
-
-import javax.annotation.Nullable;
+import org.dave.cm2.world.tools.DimensionTools;
+import org.dave.cm2.world.tools.StructureTools;
 
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
     public int coords = -1;
     private boolean initialized = false;
-    private static final int fluidPerOp = 10;
-    private static final boolean randomlyNoCost = true;
-
-    private MiniaturizationFluidTank tank;
 
     public TileEntityMachine() {
         super();
-
-        tank = new MiniaturizationFluidTank();
     }
 
     public EnumMachineSize getSize() {
         return this.getWorld().getBlockState(this.getPos()).getValue(BlockMachine.SIZE);
-    }
-
-    public int getFluidLevel() {
-        return tank.getFluidAmount();
-    }
-
-    public boolean hasEnoughEnergy(float multiplier) {
-        return this.getFluidLevel() >= this.fluidPerOp * multiplier;
-    }
-
-    public boolean energyTick(float multiplier) {
-        if(!hasEnoughEnergy(multiplier)) {
-            Logz.info("Not enough energy");
-            return false;
-        }
-
-        if(randomlyNoCost && Math.random() < 0.125) {
-            return true;
-        }
-
-        int realCost = (int) (this.fluidPerOp * multiplier);
-        FluidStack drainTest = tank.drainInternal(realCost, false);
-        if(drainTest != null && drainTest.amount >= realCost) {
-            tank.drainInternal(realCost, true);
-            return true;
-        }
-
-        return false;
     }
 
     /*
@@ -81,18 +38,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         coords = compound.getInteger("coords");
-
-        if(compound.hasKey("tank")) {
-            NBTTagCompound tankCompound = (NBTTagCompound) compound.getTag("tank");
-            tank.readFromNBT(tankCompound);
-        }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         compound.setInteger("coords", coords);
-        tank.addTankTagCompound("tank", compound);
 
         return compound;
     }
@@ -188,11 +139,6 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        // TODO: Add option to disable energy costs
-        if(!this.hasEnoughEnergy(1.0f)) {
-            return false;
-        }
-
         return machineWorld.getTileEntity(insetPos).hasCapability(capability, insetDirection.getOpposite());
     }
 
@@ -204,9 +150,6 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
         BlockPos tunnelPos = this.getTunnelForSide(facing);
         if(tunnelPos == null) {
-            if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-                return (T) this.tank;
-            }
             return null;
         }
 
@@ -222,9 +165,6 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return null;
         }
 
-        this.energyTick(1.0f);
-
-        // TODO: Add energy cost
         return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
     }
 }
