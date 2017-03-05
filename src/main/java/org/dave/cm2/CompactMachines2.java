@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Itemss;
@@ -20,6 +21,7 @@ import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.network.PackageHandler;
 import org.dave.cm2.proxy.CommonProxy;
 import org.dave.cm2.world.ChunkLoadingMachines;
+import org.dave.cm2.world.WorldGenMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.DimensionTools;
 
@@ -49,6 +51,8 @@ public class CompactMachines2
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
+
+        GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
 
         Fluidss.init();
         Blockss.init();

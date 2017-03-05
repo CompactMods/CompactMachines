@@ -54,11 +54,11 @@ public class StructureTools {
         int startZ = size;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        StructureTools.generateCube(machineWorld, new BlockPos(startX, startY, startZ), size);
+        IBlockState state = Blockss.wall.getDefaultState();
+        StructureTools.generateCube(machineWorld, new BlockPos(startX, startY, startZ), size, state);
     }
 
-    private static void generateCube(World world, BlockPos cornerPos, int size) {
-        IBlockState state = Blockss.wall.getDefaultState();
+    public static void generateCube(World world, BlockPos cornerPos, int size, IBlockState state) {
         for(BlockPos pos : getCubePositions(cornerPos, size+1, size+1, size+1, true)) {
             world.setBlockState(pos, state);
         }
