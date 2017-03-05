@@ -11,8 +11,6 @@ import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.world.TeleporterMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
-import org.dave.cm2.world.tools.DimensionTools;
-import org.dave.cm2.world.tools.StructureTools;
 
 public class TeleportationTools {
     private static void teleportPlayerToMachine(EntityPlayerMP player, int coords, boolean isReturning) {
@@ -82,7 +80,10 @@ public class TeleportationTools {
                     0.5 + machine.getSize().getDimension() / 2
             };
 
-            WorldSavedDataMachines.INSTANCE.spawnPoints.put(machine.coords, destination);
+            double x = machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2;
+            double z = 42;
+            double y = 0.5 + machine.getSize().getDimension() / 2;
+            WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, x, y, z);
         }
 
         teleportPlayerToMachine(player, machine.coords, false);

@@ -6,9 +6,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
+import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.world.tools.TeleportationTools;
 
 public class ItemPersonalShrinkingDevice extends ItemBase {
@@ -30,10 +35,20 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
         EntityPlayerMP serverPlayer = (EntityPlayerMP)player;
 
-        // TODO: Add set spawnpoint option when sneaking
+        if(player.isSneaking()) {
+            int coords = StructureTools.getCoordsForPos(player.getPosition());
+            Vec3d pos = player.getPositionVector();
+            WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.xCoord, pos.yCoord, pos.zCoord);
+
+            // TODO: Add localization
+            player.addChatComponentMessage(new TextComponentString(TextFormatting.GREEN + "Entry point set!"));
+
+            return new ActionResult(EnumActionResult.SUCCESS, itemStack);
+        }
 
         TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
-
         return new ActionResult(EnumActionResult.SUCCESS, itemStack);
     }
+
+
 }

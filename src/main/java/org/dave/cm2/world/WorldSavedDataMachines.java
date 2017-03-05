@@ -34,6 +34,21 @@ public class WorldSavedDataMachines extends WorldSavedData {
         this.markDirty();
     }
 
+    private void addSpawnPoint(int coord, double[] destination) {
+        if(destination.length != 3) {
+            Logz.warn("Trying to set spawn point with invalid double[]=%s", destination);
+            return;
+        }
+
+        spawnPoints.put(coord, destination);
+        Logz.debug("Setting spawn point: coords=%d, x=%.2f, y=%.2f, z=%.2f", coord, destination[0], destination[1], destination[2]);
+        this.markDirty();
+    }
+
+    public void addSpawnPoint(int coord, double x, double y, double z) {
+        addSpawnPoint(coord, new double[]{x, y, z});
+    }
+
     public void removeMachinePosition(int coord) {
         machinePositions.remove(coord);
         Logz.debug("Removing machine position by coord: coords=%d", coord);
