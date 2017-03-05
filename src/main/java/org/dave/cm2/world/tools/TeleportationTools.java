@@ -81,8 +81,8 @@ public class TeleportationTools {
             };
 
             double x = machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2;
-            double z = 42;
-            double y = 0.5 + machine.getSize().getDimension() / 2;
+            double y = 42;
+            double z = 0.5 + machine.getSize().getDimension() / 2;
             WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, x, y, z);
         }
 

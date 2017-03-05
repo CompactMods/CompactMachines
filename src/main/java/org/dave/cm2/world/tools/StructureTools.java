@@ -3,6 +3,7 @@ package org.dave.cm2.world.tools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.tile.TileEntityMachine;
@@ -47,37 +48,19 @@ public class StructureTools {
     }
 
     private static void generateCube(TileEntityMachine machine) {
-        int startX = machine.coords * 1024;
-        int startY = 40;
-        int startZ = 0;
         int size = machine.getSize().getDimension();
+        int startX = machine.coords * 1024 + size;
+        int startY = 40 + size;
+        int startZ = size;
 
-        StructureTools.generateCube(startX, startY, startZ, startX + size, startY + size, startZ + size);
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        StructureTools.generateCube(machineWorld, new BlockPos(startX, startY, startZ), size);
     }
 
-    private static void generateCube(int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2) {
-        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-
-        // TODO: Use getCubePositions!
-        int minX = Math.min(posX1, posX2);
-        int minY = Math.min(posY1, posY2);
-        int minZ = Math.min(posZ1, posZ2);
-
-        int maxX = Math.max(posX1, posX2);
-        int maxY = Math.max(posY1, posY2);
-        int maxZ = Math.max(posZ1, posZ2);
-
+    private static void generateCube(World world, BlockPos cornerPos, int size) {
         IBlockState state = Blockss.wall.getDefaultState();
-
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    if (x == minX || y == minY || z == minZ || x == maxX || y == maxY || z == maxZ) {
-                        BlockPos pos = new BlockPos(x, y, z);
-                        machineWorld.setBlockState(pos, state);
-                    }
-                }
-            }
+        for(BlockPos pos : getCubePositions(cornerPos, size+1, size+1, size+1, true)) {
+            world.setBlockState(pos, state);
         }
     }
 
