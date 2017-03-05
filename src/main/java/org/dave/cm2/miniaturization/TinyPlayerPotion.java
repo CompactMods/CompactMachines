@@ -39,11 +39,15 @@ public class TinyPlayerPotion extends Potion {
         }
 
         IAttributeInstance scaleAttribute = attributeMap.getAttributeInstance(Potionss.scaleAttribute);
+        if(scaleAttribute != null) {
+            // These should not stack -> remove all previous modifiers
+            scaleAttribute.removeModifier(SCALE_MODIFIER[0]);
+            scaleAttribute.removeModifier(SCALE_MODIFIER[1]);
+            scaleAttribute.removeModifier(SCALE_MODIFIER[2]);
+            scaleAttribute.removeModifier(SCALE_MODIFIER[3]);
 
-        // These should not stack!
-        scaleAttribute.removeAllModifiers();
-
-        scaleAttribute.applyModifier(SCALE_MODIFIER[amplifier]);
+            scaleAttribute.applyModifier(SCALE_MODIFIER[amplifier]);
+        }
     }
 
     @Override
