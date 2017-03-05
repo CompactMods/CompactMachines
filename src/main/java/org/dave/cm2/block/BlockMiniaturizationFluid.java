@@ -6,8 +6,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
@@ -31,12 +35,19 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         super.onEntityCollidedWithBlock(world, pos, state, entity);
 
         if(!(entity instanceof EntityLivingBase)) {
-            if(!world.isRemote && entity instanceof EntityItem) {
+            if(entity instanceof EntityItem) {
                 if(((EntityItem) entity).getEntityItem().getItem() == Items.REDSTONE) {
-                    CraftingTools.tryCrafting(world, pos);
+                    if(!world.isRemote) {
+                        CraftingTools.tryCrafting(world, pos);
+                        entity.setDead();
+                    } else {
+                        Vec3d entityPosition = entity.getPositionVector();
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord, entityPosition.yCoord+0.05f, entityPosition.zCoord, 0.0D, 0.0D, 0.0D, new int[0]);
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord+0.05f, entityPosition.yCoord, entityPosition.zCoord, 0.0D, 0.0D, 0.0D, new int[0]);
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord, entityPosition.yCoord-0.05f, entityPosition.zCoord+0.05f, 0.0D, 0.0D, 0.0D, new int[0]);
 
-                    // TODO: Spawn particle effects
-                    entity.setDead();
+                        world.playSound(entityPosition.xCoord, entityPosition.yCoord, entityPosition.zCoord, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2F, 1.0F, false);
+                    }
                 }
             }
             return;
