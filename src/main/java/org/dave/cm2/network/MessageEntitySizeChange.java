@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import org.dave.cm2.miniaturization.TinyPlayerPotion;
+import org.dave.cm2.miniaturization.MiniaturizationPotion;
 import org.dave.cm2.utility.Logz;
 
 
@@ -55,7 +55,7 @@ public class MessageEntitySizeChange implements IMessage, IMessageHandler<Messag
             return null;
         }
 
-        TinyPlayerPotion.setEntitySize((EntityPlayer) entity, message.scale);
+        MiniaturizationPotion.setEntitySize((EntityPlayer) entity, message.scale);
         return null;
     }
 }

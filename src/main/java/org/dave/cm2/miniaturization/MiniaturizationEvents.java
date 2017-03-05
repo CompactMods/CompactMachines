@@ -49,7 +49,7 @@ public class MiniaturizationEvents {
         }
 
         double scale = scaleAttribute.getAttributeValue();
-        TinyPlayerPotion.setEntitySize(event.player, (float)scale);
+        MiniaturizationPotion.setEntitySize(event.player, (float)scale);
     }
 
 

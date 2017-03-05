@@ -11,8 +11,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import org.dave.cm2.init.Potionss;
 
 
-public class TinyPlayerPotion extends Potion {
-    public TinyPlayerPotion(boolean isBadEffectIn, int liquidColorIn) {
+public class MiniaturizationPotion extends Potion {
+    public MiniaturizationPotion(boolean isBadEffectIn, int liquidColorIn) {
         super(isBadEffectIn, liquidColorIn);
 
         this.setPotionName("effect.shrink");

@@ -47,9 +47,9 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         int amplifier = 1;
 
         EntityLivingBase living = (EntityLivingBase) entity;
-        PotionEffect active = living.getActivePotionEffect(Potionss.tinyPlayerPotion);
+        PotionEffect active = living.getActivePotionEffect(Potionss.miniaturizationPotion);
 
-        PotionEffect effect = new PotionEffect(Potionss.tinyPlayerPotion, duration, amplifier, false, false);
+        PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
         if(active != null) {
             active.combine(effect);
         } else {
