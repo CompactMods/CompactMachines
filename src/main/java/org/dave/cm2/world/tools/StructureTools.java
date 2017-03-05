@@ -9,6 +9,9 @@ import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.WorldSavedDataMachines;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StructureTools {
     public static int getCoordsForPos(BlockPos pos) {
         return getCoordsForPos(pos.getX());
@@ -55,6 +58,7 @@ public class StructureTools {
     private static void generateCube(int posX1, int posY1, int posZ1, int posX2, int posY2, int posZ2) {
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
 
+        // TODO: Use getCubePositions!
         int minX = Math.min(posX1, posX2);
         int minY = Math.min(posY1, posY2);
         int minZ = Math.min(posZ1, posZ2);
@@ -97,4 +101,27 @@ public class StructureTools {
         }
     }
 
+    public static List<BlockPos> getCubePositions(BlockPos cornerPos, int width, int height, int depth, boolean includeFloor) {
+        int minX = Math.min(cornerPos.getX(), cornerPos.getX()-(width-1));
+        int minY = Math.min(cornerPos.getY(), cornerPos.getY()-(height-1));
+        int minZ = Math.min(cornerPos.getZ(), cornerPos.getZ()-(depth-1));
+
+        int maxX = Math.max(cornerPos.getX(), cornerPos.getX()-(width-1));
+        int maxY = Math.max(cornerPos.getY(), cornerPos.getY()-(height-1));
+        int maxZ = Math.max(cornerPos.getZ(), cornerPos.getZ()-(depth-1));
+
+        List<BlockPos> list = new ArrayList<>();
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    if (x == minX || z == minZ || x == maxX || y == maxY || z == maxZ || (y == minY && includeFloor)) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        list.add(pos);
+                    }
+                }
+            }
+        }
+
+        return list;
+    }
 }

@@ -4,12 +4,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Items;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Potionss;
+import org.dave.cm2.world.tools.CraftingTools;
 
 import java.util.Random;
 
@@ -28,6 +31,14 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         super.onEntityCollidedWithBlock(world, pos, state, entity);
 
         if(!(entity instanceof EntityLivingBase)) {
+            if(!world.isRemote && entity instanceof EntityItem) {
+                if(((EntityItem) entity).getEntityItem().getItem() == Items.REDSTONE) {
+                    CraftingTools.tryCrafting(world, pos);
+
+                    // TODO: Spawn particle effects
+                    entity.setDead();
+                }
+            }
             return;
         }
 
