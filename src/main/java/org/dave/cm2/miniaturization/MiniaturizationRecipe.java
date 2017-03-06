@@ -43,17 +43,20 @@ public class MiniaturizationRecipe {
         this.requiresFloor = requiresFloor;
     }
 
+    public ItemStack getTargetStack() {
+        if(targetItem != null) {
+            return new ItemStack(targetItem, targetQuantity, targetMeta);
+        } else {
+            return new ItemStack(targetBlock, targetQuantity, targetMeta);
+        }
+    }
+
     public void spawnResultInWorld(World world, BlockPos pos) {
         float posX = pos.getX() + 0.5f - (float)Math.floor((float)this.width / 2.0f);
         float posY = pos.getY() + 1;
         float posZ = pos.getZ() + 0.5f - (float)Math.floor((float)this.depth / 2.0f);
 
-        ItemStack toSpawn;
-        if(targetItem != null) {
-            toSpawn = new ItemStack(targetItem, targetQuantity);
-        } else {
-            toSpawn = new ItemStack(targetBlock, targetQuantity);
-        }
+        ItemStack toSpawn = getTargetStack();
 
         EntityItem entityItem = new EntityItem(world, posX, posY, posZ, toSpawn);
         entityItem.lifespan = 2400;
@@ -80,6 +83,13 @@ public class MiniaturizationRecipe {
 
     public int getDepth() {
         return depth;
+    }
+
+    public int getRequiredSourceBlockCount() {
+        int outer = width * height * depth;
+        int inner = Math.max((width-2) * (height-2) * (depth-2), 0);
+
+        return outer - inner;
     }
 
     public boolean isRequiresFloor() {
