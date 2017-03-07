@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Potionss;
+import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.world.tools.CraftingTools;
 
 import java.util.Random;
@@ -53,18 +54,19 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
             return;
         }
 
-        // TODO: Make this configurable, i.e. disable the effect, change duration, amplifier
-        int duration = 20;
-        int amplifier = 1;
+        int duration = ConfigurationHandler.PotionSettings.onBlockContactDuration;
+        int amplifier = ConfigurationHandler.PotionSettings.onBlockContactAmplifier;
 
-        EntityLivingBase living = (EntityLivingBase) entity;
-        PotionEffect active = living.getActivePotionEffect(Potionss.miniaturizationPotion);
+        if(duration > 0) {
+            EntityLivingBase living = (EntityLivingBase) entity;
+            PotionEffect active = living.getActivePotionEffect(Potionss.miniaturizationPotion);
 
-        PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
-        if(active != null) {
-            active.combine(effect);
-        } else {
-            living.addPotionEffect(effect);
+            PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
+            if (active != null) {
+                active.combine(effect);
+            } else {
+                living.addPotionEffect(effect);
+            }
         }
     }
 

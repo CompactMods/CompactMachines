@@ -1,6 +1,5 @@
 package org.dave.cm2.misc;
 
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -13,6 +12,7 @@ public class ConfigurationHandler {
     public static Configuration configuration;
 
     private static final String CATEGORY_INTERNAL = "Internal";
+    private static final String CATEGORY_MINIATURIZATION = "Miniaturization";
 
     public static void init(File configFile) {
         if(configuration != null) {
@@ -51,6 +51,24 @@ public class ConfigurationHandler {
                 Settings.FORCELOADCHUNKS_LABEL
         );
 
+        PotionSettings.onBlockContactAmplifier = configuration.getInt(
+                PotionSettings.OBC_AMPLIFIER_NAME,
+                CATEGORY_MINIATURIZATION,
+                PotionSettings.OBC_AMPLIFIER_DEFAULT,
+                0, 3,
+                PotionSettings.OBC_AMPLIFIER_COMMENT,
+                PotionSettings.OBC_AMPLIFIER_LABEL
+        );
+
+        PotionSettings.onBlockContactDuration = configuration.getInt(
+                PotionSettings.OBC_DURATION_NAME,
+                CATEGORY_MINIATURIZATION,
+                PotionSettings.OBC_DURATION_DEFAULT,
+                0, 12000,
+                PotionSettings.OBC_DURATION_COMMENT,
+                PotionSettings.OBC_DURATION_LABEL
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -68,6 +86,21 @@ public class ConfigurationHandler {
         }
 
         loadConfiguration();
+    }
+
+    public static class PotionSettings {
+        public static int onBlockContactDuration;
+        public static int onBlockContactAmplifier;
+
+        private static final String OBC_DURATION_NAME = "onBlockContactDuration";
+        private static final int OBC_DURATION_DEFAULT = 200;
+        private static final String OBC_DURATION_COMMENT = "How long the 'Shrunk' effect is applied to entities when they touch miniaturization fluid. Set to 0 to disable.";
+        private static final String OBC_DURATION_LABEL = "Fluid contact - Effect duration";
+
+        private static final String OBC_AMPLIFIER_NAME = "onBlockContactAmplifier";
+        private static final int OBC_AMPLIFIER_DEFAULT = 1;
+        private static final String OBC_AMPLIFIER_COMMENT = "How strong the 'Shrunk' effect is when applied to entities touching miniaturization fluid";
+        private static final String OBC_AMPLIFIER_LABEL = "Fluid contact - Effect Amplifier";
     }
 
     public static class Settings {
