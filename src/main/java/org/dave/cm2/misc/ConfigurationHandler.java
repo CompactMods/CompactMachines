@@ -51,6 +51,15 @@ public class ConfigurationHandler {
                 Settings.FORCELOADCHUNKS_LABEL
         );
 
+        Settings.chanceForBrokenCube = configuration.getFloat(
+                Settings.WORLDGEN_CHANCE_NAME,
+                CATEGORY_INTERNAL,
+                Settings.WORLDGEN_CHANCE_DEFAULT,
+                0.0f, 1.0f,
+                Settings.WORLDGEN_CHANCE_COMMENT,
+                Settings.WORLDGEN_CHANCE_LABEL
+        );
+
         PotionSettings.onBlockContactAmplifier = configuration.getInt(
                 PotionSettings.OBC_AMPLIFIER_NAME,
                 CATEGORY_MINIATURIZATION,
@@ -107,6 +116,7 @@ public class ConfigurationHandler {
         public static int dimensionId;
         public static int dimensionTypeId;
         public static boolean forceLoadChunks;
+        public static float chanceForBrokenCube;
 
         private static final String DIMENSION_ID_NAME = "dimensionId";
         private static final int DIMENSION_ID_DEFAULT = 144;
@@ -122,5 +132,10 @@ public class ConfigurationHandler {
         private static final boolean FORCELOADCHUNKS_DEFAULT = false;
         private static final String FORCELOADCHUNKS_COMMENT = "Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.";
         private static final String FORCELOADCHUNKS_LABEL = "Force chunk load";
+
+        private static final String WORLDGEN_CHANCE_NAME = "worldgenChance";
+        private static final float WORLDGEN_CHANCE_DEFAULT = 0.0005f;
+        private static final String WORLDGEN_CHANCE_COMMENT = "The chance a chunk in the overworld contains a broken compact machine";
+        private static final String WORLDGEN_CHANCE_LABEL = "Worldgen Chance";
     }
 }

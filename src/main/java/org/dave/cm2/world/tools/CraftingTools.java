@@ -73,7 +73,6 @@ public class CraftingTools {
         for(BlockPos pos : StructureTools.getCubePositions(cornerPos, width, height, depth, requireFloor)) {
             IBlockState state = world.getBlockState(pos);
             if (state.getBlock() != block) {
-                // TODO: Maybe notify the player about missing blocks?
                 return false;
             }
         }

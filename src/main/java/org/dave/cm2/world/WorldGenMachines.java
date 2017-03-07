@@ -8,6 +8,7 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import org.dave.cm2.init.Blockss;
+import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.tools.StructureTools;
@@ -22,11 +23,12 @@ public class WorldGenMachines implements IWorldGenerator {
         if(world.provider.getDimension() != 0) {
             return;
         }
-        // TODO: Add config option to disable world gen
 
-        // TODO: Make chance configurable
-        //if(random.nextInt(100) <= 66) {
-        if(random.nextInt(1000) != 0) {
+        if(ConfigurationHandler.Settings.chanceForBrokenCube == 0.0f) {
+            return;
+        }
+
+        if(random.nextFloat() > ConfigurationHandler.Settings.chanceForBrokenCube) {
             return;
         }
 
