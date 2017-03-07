@@ -23,7 +23,9 @@ public class CraftingTools {
         // 1c: Go to the highest x and z values that still have the same block,
         //     this is the most south-west corner possible
         BlockPos craftingCornerPos = contactPos.down();
-        while(true) {
+
+        int maxSearchSteps = 32;
+        for(int searchStep = 0; searchStep < maxSearchSteps; searchStep++) {
             boolean moving = false;
             if(world.getBlockState(craftingCornerPos.south()).getBlock() == initialBlock) {
                 craftingCornerPos = craftingCornerPos.south();
