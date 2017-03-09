@@ -25,6 +25,7 @@ public class ClientProxy extends CommonProxy {
 
         registerItemRenderer(Itemss.psd);
         registerItemRenderer(Itemss.tunnelTool);
+        registerItemRenderer(Itemss.miniFluidDrop);
         registerFluidModels();
     }
 

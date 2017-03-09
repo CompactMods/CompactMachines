@@ -60,6 +60,24 @@ public class ConfigurationHandler {
                 Settings.WORLDGEN_CHANCE_LABEL
         );
 
+        PotionSettings.onEatAmplifier = configuration.getInt(
+                PotionSettings.ON_EAT_AMPLIFIER_NAME,
+                CATEGORY_MINIATURIZATION,
+                PotionSettings.ON_EAT_AMPLIFIER_DEFAULT,
+                0, 3,
+                PotionSettings.ON_EAT_AMPLIFIER_COMMENT,
+                PotionSettings.ON_EAT_AMPLIFIER_LABEL
+        );
+
+        PotionSettings.onEatDuration = configuration.getInt(
+                PotionSettings.ON_EAT_DURATION_NAME,
+                CATEGORY_MINIATURIZATION,
+                PotionSettings.ON_EAT_DURATION_DEFAULT,
+                0, 12000,
+                PotionSettings.ON_EAT_DURATION_COMMENT,
+                PotionSettings.ON_EAT_DURATION_LABEL
+        );
+
         PotionSettings.onBlockContactAmplifier = configuration.getInt(
                 PotionSettings.OBC_AMPLIFIER_NAME,
                 CATEGORY_MINIATURIZATION,
@@ -100,6 +118,18 @@ public class ConfigurationHandler {
     public static class PotionSettings {
         public static int onBlockContactDuration;
         public static int onBlockContactAmplifier;
+        public static int onEatDuration;
+        public static int onEatAmplifier;
+
+        private static final String ON_EAT_DURATION_NAME = "onEatDuration";
+        private static final int ON_EAT_DURATION_DEFAULT = 400;
+        private static final String ON_EAT_DURATION_COMMENT = "How long the 'Shrunk' effect is applied to players, when they eat a Miniaturization Fluid Drop.";
+        private static final String ON_EAT_DURATION_LABEL = "Eating fluid drops - Effect duration";
+
+        private static final String ON_EAT_AMPLIFIER_NAME = "onEatAmplifier";
+        private static final int ON_EAT_AMPLIFIER_DEFAULT = 3;
+        private static final String ON_EAT_AMPLIFIER_COMMENT = "How strong the 'Shrunk' effect is when applied to entities eating Miniaturization Fluid Drops";
+        private static final String ON_EAT_AMPLIFIER_LABEL = "Eating fluid drops - Effect Amplifier";
 
         private static final String OBC_DURATION_NAME = "onBlockContactDuration";
         private static final int OBC_DURATION_DEFAULT = 200;

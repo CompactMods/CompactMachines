@@ -64,7 +64,9 @@ public class MiniaturizationPotion extends Potion {
         if(scaleAttribute != null) {
             scaleAttribute.removeModifier(SCALE_MODIFIER[amplifier]);
         }
-        //scaleAttribute.removeAllModifiers();
+
+        // TODO: Without this players might get stuck in a shrunken state, what's up with that?
+        // scaleAttribute.removeAllModifiers();
     }
 
     public static final AttributeModifier[] SCALE_MODIFIER = {
