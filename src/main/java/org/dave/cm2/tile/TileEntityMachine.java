@@ -22,6 +22,7 @@ import org.dave.cm2.world.tools.StructureTools;
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
     public int coords = -1;
     private boolean initialized = false;
+    public long lastNeighborUpdateTick = 0;
 
     public TileEntityMachine() {
         super();

@@ -70,7 +70,14 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return;
         }
 
+        // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
+        // Just ensure only a single notification happens per tick.
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        if(te.lastNeighborUpdateTick == world.getTotalWorldTime()) {
+            return;
+        }
+
+        te.lastNeighborUpdateTick = world.getTotalWorldTime();
         for(EnumFacing side : EnumFacing.values()) {
             BlockPos neighborPos = te.getTunnelForSide(side);
             if(neighborPos == null) {
@@ -79,7 +86,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
             WorldServer machineWorld = DimensionTools.getServerMachineWorld();
             if(!(machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel)) {
-                return;
+                continue;
             }
 
             machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel);
