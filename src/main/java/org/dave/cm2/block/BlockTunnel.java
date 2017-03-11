@@ -1,5 +1,6 @@
 package org.dave.cm2.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
@@ -15,11 +16,15 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.init.Itemss;
-import org.dave.cm2.world.tools.StructureTools;
+import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.tile.TileEntityTunnel;
+import org.dave.cm2.utility.DimensionBlockPos;
 import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.DimensionTools;
+import org.dave.cm2.world.tools.StructureTools;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -94,7 +99,37 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
             nextDirection = StructureTools.getNextDirection(nextDirection);
         }
 
+        notifyOverworldNeighbor(pos);
         return true;
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+        super.neighborChanged(state, world, pos, blockIn);
+
+        if(world.isRemote) {
+            return;
+        }
+
+        if(!(world.getTileEntity(pos) instanceof TileEntityTunnel)) {
+            return;
+        }
+
+        notifyOverworldNeighbor(pos);
+    }
+
+    public void notifyOverworldNeighbor(BlockPos pos) {
+        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(pos));
+        if(dimpos == null) {
+            return;
+        }
+
+        WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
+        if(realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+            return;
+        }
+
+        realWorld.notifyNeighborsOfStateChange(dimpos.getBlockPos(), Blockss.machine);
     }
 
     @Override

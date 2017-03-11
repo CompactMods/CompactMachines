@@ -7,6 +7,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.dave.cm2.block.BlockTunnel;
+import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.utility.DimensionBlockPos;
 import org.dave.cm2.world.tools.DimensionTools;
@@ -36,12 +37,14 @@ public class TileEntityTunnel extends TileEntity implements ICapabilityProvider 
 
         EnumFacing machineSide = this.getMachineSide();
         BlockPos outsetPos = dimpos.getBlockPos().offset(machineSide);
-
         if(!(realWorld.getTileEntity(outsetPos) instanceof ICapabilityProvider)) {
             return false;
         }
 
-        return realWorld.getTileEntity(outsetPos).hasCapability(capability, facing);
+        boolean hasCap = realWorld.getTileEntity(outsetPos).hasCapability(capability, machineSide.getOpposite());
+        Logz.debug("- Machine neighbor %s on side %s has capability '%s': %s", realWorld.getBlockState(outsetPos), machineSide.getOpposite(), capability.getName(), hasCap);
+
+        return hasCap;
     }
 
     @Override

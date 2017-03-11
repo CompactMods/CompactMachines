@@ -1,5 +1,6 @@
 package org.dave.cm2.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
@@ -22,6 +23,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,8 +33,10 @@ import org.dave.cm2.item.ItemPersonalShrinkingDevice;
 import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
+import org.dave.cm2.tile.TileEntityTunnel;
 import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.DimensionTools;
 import org.dave.cm2.world.tools.TeleportationTools;
 
 import javax.annotation.Nullable;
@@ -52,6 +56,34 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         this.setCreativeTab(CreativeTabCM2.CM2_TAB);
 
         setDefaultState(blockState.getBaseState().withProperty(SIZE, EnumMachineSize.TINY));
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+        super.neighborChanged(state, world, pos, blockIn);
+
+        if(world.isRemote) {
+            return;
+        }
+
+        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
+            return;
+        }
+
+        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        for(EnumFacing side : EnumFacing.values()) {
+            BlockPos neighborPos = te.getTunnelForSide(side);
+            if(neighborPos == null) {
+                continue;
+            }
+
+            WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+            if(!(machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel)) {
+                return;
+            }
+
+            machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel);
+        }
     }
 
     @Override
