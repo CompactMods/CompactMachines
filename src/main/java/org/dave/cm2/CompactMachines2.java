@@ -11,10 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.dave.cm2.init.Blockss;
-import org.dave.cm2.init.Fluidss;
-import org.dave.cm2.init.Itemss;
-import org.dave.cm2.init.Potionss;
+import org.dave.cm2.init.*;
 import org.dave.cm2.miniaturization.MiniaturizationEvents;
 import org.dave.cm2.miniaturization.MiniaturizationRecipes;
 import org.dave.cm2.misc.ConfigurationHandler;
@@ -59,6 +56,7 @@ public class CompactMachines2
         Itemss.init();
         Potionss.init();
         MiniaturizationRecipes.init();
+        Recipes.init();
 
         proxy.preInit(event);
     }
