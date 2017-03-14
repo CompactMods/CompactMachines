@@ -54,6 +54,10 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
             return;
         }
 
+        if(world.isRemote) {
+            return;
+        }
+
         int duration = ConfigurationHandler.PotionSettings.onBlockContactDuration;
         int amplifier = ConfigurationHandler.PotionSettings.onBlockContactAmplifier;
 

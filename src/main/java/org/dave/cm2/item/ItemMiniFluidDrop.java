@@ -11,6 +11,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -25,6 +26,7 @@ public class ItemMiniFluidDrop extends ItemFood {
     public ItemMiniFluidDrop() {
         super(1, 0.1F, false);
 
+        this.setAlwaysEdible();
         this.setCreativeTab(CreativeTabCM2.CM2_TAB);
     }
 
@@ -41,8 +43,12 @@ public class ItemMiniFluidDrop extends ItemFood {
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
             return super.onItemRightClick(itemStack, world, player, hand);
         }
+        Vec3d eyeVec = new Vec3d(player.posX, player.posY + (double)player.getEyeHeight(), player.posZ);
+        Vec3d lookVec = player.getLook(0.0f);
+        Vec3d maxVec = eyeVec.addVector(lookVec.xCoord * 4.5d, lookVec.yCoord * 4.5d, lookVec.zCoord * 4.5d);
 
-        RayTraceResult trace = player.rayTrace(4.5d, 0.0f);
+        RayTraceResult trace = world.rayTraceBlocks(eyeVec, maxVec, false, false, true);
+
         if(trace == null || trace.getBlockPos() == null) {
             return super.onItemRightClick(itemStack, world, player, hand);
         }
@@ -63,6 +69,10 @@ public class ItemMiniFluidDrop extends ItemFood {
     @Override
     protected void onFoodEaten(ItemStack stack, World worldIn, EntityPlayer player) {
         super.onFoodEaten(stack, worldIn, player);
+
+        if(worldIn.isRemote) {
+            return;
+        }
 
         int duration = ConfigurationHandler.PotionSettings.onEatDuration;
         int amplifier = ConfigurationHandler.PotionSettings.onEatAmplifier;
