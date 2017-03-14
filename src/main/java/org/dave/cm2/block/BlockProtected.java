@@ -5,12 +5,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import org.dave.cm2.init.Itemss;
 
 public abstract class BlockProtected extends BlockBase {
     public BlockProtected(Material material) {
@@ -29,8 +29,7 @@ public abstract class BlockProtected extends BlockBase {
         if(!world.isRemote && player instanceof EntityPlayerMP && player.capabilities.isCreativeMode) {
             ItemStack playerStack = player.getHeldItemMainhand();
 
-            // TODO: Check for a CM2 item
-            if(playerStack != null && playerStack.getItem() == Items.CARROT) {
+            if(playerStack != null && playerStack.getItem() == Itemss.miniFluidDrop) {
                 return super.removedByPlayer(state, world, pos, player, willHarvest);
             }
         }
