@@ -21,6 +21,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
         super();
 
         this.setCreativeTab(CreativeTabCM2.CM2_TAB);
+        this.setMaxStackSize(1);
     }
 
     @Override
