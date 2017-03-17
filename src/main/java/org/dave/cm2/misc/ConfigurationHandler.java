@@ -13,6 +13,7 @@ public class ConfigurationHandler {
 
     private static final String CATEGORY_INTERNAL = "Internal";
     private static final String CATEGORY_MINIATURIZATION = "Miniaturization";
+    private static final String CATEGORY_MACHINES = "Machines";
 
     public static void init(File configFile) {
         if(configuration != null) {
@@ -96,6 +97,14 @@ public class ConfigurationHandler {
                 PotionSettings.OBC_DURATION_LABEL
         );
 
+        MachineSettings.allowRespawning = configuration.getBoolean(
+                MachineSettings.ALLOW_RESPAWN_NAME,
+                CATEGORY_MACHINES,
+                MachineSettings.ALLOW_RESPAWN_DEFAULT,
+                MachineSettings.ALLOW_RESPAWN_COMMENT,
+                MachineSettings.ALLOW_RESPAWN_LABEL
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -113,6 +122,15 @@ public class ConfigurationHandler {
         }
 
         loadConfiguration();
+    }
+
+    public static class MachineSettings {
+        public static boolean allowRespawning;
+
+        private static final String ALLOW_RESPAWN_NAME = "allowRespawning";
+        private static final boolean ALLOW_RESPAWN_DEFAULT = true;
+        private static final String ALLOW_RESPAWN_COMMENT = "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there";
+        private static final String ALLOW_RESPAWN_LABEL = "Allow Respawning";
     }
 
     public static class PotionSettings {

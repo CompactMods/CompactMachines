@@ -62,6 +62,7 @@ public class TeleportationTools {
             playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(DimensionTools.getWorldServerForDimension(oldDimension)));
             player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
         } else {
+            // TODO: We can do better now, since we know where the Machine block is -> Find a good nearby spawn position
             BlockPos spawnPoint = DimensionTools.getWorldServerForDimension(0).provider.getRandomizedSpawnPoint();
 
             playerList.transferPlayerToDimension(player, 0, new TeleporterMachines(DimensionTools.getWorldServerForDimension(0)));

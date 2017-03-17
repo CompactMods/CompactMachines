@@ -35,6 +35,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
     public BlockTunnel(Material material) {
         super(material);
         this.setLightOpacity(1);
+        this.setLightLevel(1.0f);
 
         this.setDefaultState(blockState.getBaseState().withProperty(MACHINE_SIDE, EnumFacing.DOWN));
     }
