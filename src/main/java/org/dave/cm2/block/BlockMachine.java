@@ -34,6 +34,7 @@ import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.tile.TileEntityTunnel;
+import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.DimensionTools;
@@ -175,8 +176,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         if(te.hasOwner()) {
             compound.setUniqueId("owner", te.getOwner());
         }
-        compound.setString("CustomName", te.getCustomName());
         stack.setTagCompound(compound);
+
+        if(te.getCustomName().length() > 0) {
+            stack.setStackDisplayName(te.getCustomName());
+        }
 
         EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY() + 0.5, pos.getZ(), stack);
         entityItem.lifespan = 1200;
