@@ -8,14 +8,15 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.block.BlockMachine;
 import org.dave.cm2.block.BlockTunnel;
-import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.utility.Logz;
 
@@ -85,8 +86,10 @@ public class WailaProvider {
             }
 
             TileEntityMachine te = (TileEntityMachine)accessor.getTileEntity();
-            if(te.coords < 0) {
+            if(te.coords < 0 && te.getCustomName().length() == 0) {
                 currenttip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines2.MODID + ".machine.coords.unused") + TextFormatting.RESET);
+            } else if(te.getCustomName().length() > 0) {
+                currenttip.add(TextFormatting.DARK_GREEN + te.getCustomName() + TextFormatting.RESET);
             } else {
                 currenttip.add(TextFormatting.DARK_GREEN + I18n.format("tooltip." + CompactMachines2.MODID + ".machine.coords", te.coords) + TextFormatting.RESET);
             }

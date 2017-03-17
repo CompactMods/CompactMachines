@@ -156,7 +156,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 
         // TODO: Think about adding harvesting CMs functionality back in
-        BlockMachine.spawnItemWithCoords(world, pos, state.getValue(BlockMachine.SIZE), te.coords);
+        BlockMachine.spawnItemWithNBT(world, pos, state.getValue(BlockMachine.SIZE), te);
 
         ChunkLoadingMachines.unforceChunk(te.coords);
         world.removeTileEntity(pos);
@@ -164,14 +164,18 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         super.breakBlock(world, pos, state);
     }
 
-    public static void spawnItemWithCoords(World world, BlockPos pos, EnumMachineSize size, int coords) {
+    public static void spawnItemWithNBT(World world, BlockPos pos, EnumMachineSize size, TileEntityMachine te) {
         if(world.isRemote) {
            return;
         }
 
         ItemStack stack = new ItemStack(Blockss.machine, 1, size.getMeta());
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("coords", coords);
+        compound.setInteger("coords", te.coords);
+        if(te.hasOwner()) {
+            compound.setUniqueId("owner", te.getOwner());
+        }
+        compound.setString("CustomName", te.getCustomName());
         stack.setTagCompound(compound);
 
         EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY() + 0.5, pos.getZ(), stack);
@@ -190,17 +194,6 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
 
-        if(!stack.hasTagCompound() || !stack.getTagCompound().hasKey("coords")) {
-            // Stack has no coordinates stored as it is missing the tag compound
-            return;
-        }
-
-        int coords = stack.getTagCompound().getInteger("coords");
-        if(coords == -1) {
-            // Coord stored in the tag compound is -1, i.e. the "unassigned" machine. We can skip this.
-            return;
-        }
-
         if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
             // Not a tile entity machine. Should not happen.
             return;
@@ -212,7 +205,27 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return;
         }
 
-        tileEntityMachine.coords = coords;
+        if(stack.hasTagCompound()) {
+            if(stack.getTagCompound().hasKey("coords")) {
+                int coords = stack.getTagCompound().getInteger("coords");
+                if (coords != -1) {
+                    tileEntityMachine.coords = coords;
+                }
+            }
+
+            if(stack.hasDisplayName()) {
+                tileEntityMachine.setCustomName(stack.getDisplayName());
+            }
+
+            if(stack.getTagCompound().hasKey("owner")) {
+                tileEntityMachine.setOwner(stack.getTagCompound().getUniqueId("owner"));
+            }
+        }
+
+        if(!tileEntityMachine.hasOwner() && placer instanceof EntityPlayer) {
+            tileEntityMachine.setOwner((EntityPlayer)placer);
+        }
+
         tileEntityMachine.markDirty();
     }
 
