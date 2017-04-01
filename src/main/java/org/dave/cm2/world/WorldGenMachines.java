@@ -1,9 +1,10 @@
 package org.dave.cm2.world;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.IWorldGenerator;
@@ -40,6 +41,12 @@ public class WorldGenMachines implements IWorldGenerator {
         int x = (chunkX << 4) + random.nextInt(16-dim) + dim;
         int z = (chunkZ << 4) + random.nextInt(16-dim) + dim;
         int y = world.getHeightmapHeight(x, z) + dim;
+
+        // Do not generate on OCEAN type biomes
+        Biome worldBiome = world.getBiome(new BlockPos(x, y, z));
+        if(worldBiome == Biomes.OCEAN || worldBiome == Biomes.DEEP_OCEAN || worldBiome == Biomes.FROZEN_OCEAN) {
+            return;
+        }
 
         // Select one of the four top corners
         int cxSphere = x - (random.nextBoolean() ? dim : 0);
