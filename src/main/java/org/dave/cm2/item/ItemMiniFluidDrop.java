@@ -1,5 +1,6 @@
 package org.dave.cm2.item;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -19,6 +20,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Potionss;
+import org.dave.cm2.miniaturization.MiniaturizationPotion;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
 
@@ -76,17 +78,6 @@ public class ItemMiniFluidDrop extends ItemFood {
 
         int duration = ConfigurationHandler.PotionSettings.onEatDuration;
         int amplifier = ConfigurationHandler.PotionSettings.onEatAmplifier;
-
-        if(duration > 0) {
-            PotionEffect active = player.getActivePotionEffect(Potionss.miniaturizationPotion);
-
-            PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
-            if (active != null) {
-                active.combine(effect);
-            } else {
-                player.addPotionEffect(effect);
-            }
-        }
-
+        MiniaturizationPotion.applyPotion(player, duration, amplifier);
     }
 }

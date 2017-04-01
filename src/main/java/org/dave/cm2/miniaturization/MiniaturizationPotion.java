@@ -5,13 +5,27 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 import org.dave.cm2.init.Potionss;
+import org.dave.cm2.utility.Logz;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 
 public class MiniaturizationPotion extends Potion {
+    public static final AttributeModifier[] SCALE_MODIFIER = {
+            new AttributeModifier("Scale 75%", -0.25, 0),
+            new AttributeModifier("Scale 50%", -0.50, 0),
+            new AttributeModifier("Scale 25%", -0.75, 0),
+            new AttributeModifier("Scale 12.5%", -0.875, 0)
+    };
+
     public MiniaturizationPotion(boolean isBadEffectIn, int liquidColorIn) {
         super(isBadEffectIn, liquidColorIn);
 
@@ -64,24 +78,46 @@ public class MiniaturizationPotion extends Potion {
         if(scaleAttribute != null) {
             scaleAttribute.removeModifier(SCALE_MODIFIER[amplifier]);
         }
-
-        // TODO: Without this players might get stuck in a shrunken state, what's up with that?
-        // scaleAttribute.removeAllModifiers();
     }
 
-    public static final AttributeModifier[] SCALE_MODIFIER = {
-            new AttributeModifier("Scale 75%", -0.25, 0),
-            new AttributeModifier("Scale 50%", -0.50, 0),
-            new AttributeModifier("Scale 25%", -0.75, 0),
-            new AttributeModifier("Scale 12.5%", -0.875, 0)
-    };
+    private static class BaseSize {
+        float width;
+        float height;
+
+        public BaseSize(float width, float height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    private static BaseSize getBaseValues(EntityLivingBase entity) {
+        if(entity instanceof EntityPlayer) {
+            return new BaseSize(0.6f, 1.8f);
+        }
+
+        try {
+            Constructor<?> c = entity.getClass().getDeclaredConstructor(World.class);
+            c.setAccessible(true);
+            EntityLivingBase copy = (EntityLivingBase) c.newInstance(new Object[] { entity.getEntityWorld() });
+
+            return new BaseSize(copy.width, copy.height);
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
+        } catch (InstantiationException e) {
+        } catch (IllegalAccessException e) {
+        }
+
+        return new BaseSize(0.6f, 1.8f);
+    }
 
     public static void setEntitySize(EntityLivingBase entity, float scale) {
-        float baseWidth = 0.6F;
-        float baseHeight = 1.8F;
+        BaseSize baseSize = getBaseValues(entity);
+        float baseWidth = baseSize.width;
+        float baseHeight = baseSize.height;
 
         float newWidth = baseWidth * scale;
         float newHeight = baseHeight * scale;
+
 
         AxisAlignedBB originalBB = entity.getEntityBoundingBox();
         entity.width = newWidth;
@@ -97,5 +133,20 @@ public class MiniaturizationPotion extends Potion {
         if(entity instanceof EntityPlayer) {
             ((EntityPlayer)entity).eyeHeight = ((EntityPlayer)entity).getDefaultEyeHeight() * scale;
         }
+    }
+
+    public static void applyPotion(EntityLivingBase entity, int duration, int amplifier) {
+        if(duration <= 0) {
+            return;
+        }
+
+        PotionEffect active = entity.getActivePotionEffect(Potionss.miniaturizationPotion);
+        PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
+        if (active != null) {
+            active.combine(effect);
+        } else {
+            entity.addPotionEffect(effect);
+        }
+
     }
 }

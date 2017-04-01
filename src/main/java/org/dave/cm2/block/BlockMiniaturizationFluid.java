@@ -7,7 +7,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
-import org.dave.cm2.init.Potionss;
+import org.dave.cm2.miniaturization.MiniaturizationPotion;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.world.tools.CraftingTools;
 
@@ -60,18 +59,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
 
         int duration = ConfigurationHandler.PotionSettings.onBlockContactDuration;
         int amplifier = ConfigurationHandler.PotionSettings.onBlockContactAmplifier;
-
-        if(duration > 0) {
-            EntityLivingBase living = (EntityLivingBase) entity;
-            PotionEffect active = living.getActivePotionEffect(Potionss.miniaturizationPotion);
-
-            PotionEffect effect = new PotionEffect(Potionss.miniaturizationPotion, duration, amplifier, false, false);
-            if (active != null) {
-                active.combine(effect);
-            } else {
-                living.addPotionEffect(effect);
-            }
-        }
+        MiniaturizationPotion.applyPotion((EntityLivingBase) entity, duration, amplifier);
     }
 
     @Override
