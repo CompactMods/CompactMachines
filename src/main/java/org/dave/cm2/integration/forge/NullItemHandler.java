@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.dave.cm2.integration.AbstractNullHandler;
 import org.dave.cm2.integration.CapabilityNullHandler;
 
 @CapabilityNullHandler

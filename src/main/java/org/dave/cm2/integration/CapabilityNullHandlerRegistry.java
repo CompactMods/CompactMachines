@@ -2,7 +2,6 @@ package org.dave.cm2.integration;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import org.dave.cm2.integration.forge.AbstractNullHandler;
 import org.dave.cm2.utility.AnnotatedInstanceUtil;
 import org.dave.cm2.utility.Logz;
 

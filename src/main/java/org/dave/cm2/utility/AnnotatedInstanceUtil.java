@@ -2,7 +2,7 @@ package org.dave.cm2.utility;
 
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.dave.cm2.integration.CapabilityNullHandler;
-import org.dave.cm2.integration.forge.AbstractNullHandler;
+import org.dave.cm2.integration.AbstractNullHandler;
 
 import java.util.ArrayList;
 import java.util.List;

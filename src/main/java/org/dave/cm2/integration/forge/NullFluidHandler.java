@@ -5,6 +5,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import org.dave.cm2.integration.AbstractNullHandler;
 import org.dave.cm2.integration.CapabilityNullHandler;
 
 import javax.annotation.Nullable;

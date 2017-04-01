@@ -3,6 +3,7 @@ package org.dave.cm2.integration.forge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.dave.cm2.integration.AbstractNullHandler;
 import org.dave.cm2.integration.CapabilityNullHandler;
 
 @CapabilityNullHandler

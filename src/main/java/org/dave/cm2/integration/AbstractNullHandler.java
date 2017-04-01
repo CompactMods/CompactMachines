@@ -1,4 +1,4 @@
-package org.dave.cm2.integration.forge;
+package org.dave.cm2.integration;
 
 import net.minecraftforge.common.capabilities.Capability;
 
