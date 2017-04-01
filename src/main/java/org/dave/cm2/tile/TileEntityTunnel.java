@@ -7,11 +7,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.dave.cm2.block.BlockTunnel;
-import org.dave.cm2.utility.Logz;
-import org.dave.cm2.world.tools.StructureTools;
+import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.utility.DimensionBlockPos;
-import org.dave.cm2.world.tools.DimensionTools;
 import org.dave.cm2.world.WorldSavedDataMachines;
+import org.dave.cm2.world.tools.DimensionTools;
+import org.dave.cm2.world.tools.StructureTools;
 
 public class TileEntityTunnel extends TileEntity implements ICapabilityProvider {
 
@@ -21,7 +21,11 @@ public class TileEntityTunnel extends TileEntity implements ICapabilityProvider 
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if(this.getWorld().isRemote) {
+        if(this.getWorld().isRemote || facing == null) {
+            if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+                return true;
+            }
+
             return super.hasCapability(capability, facing);
         }
 
@@ -37,19 +41,26 @@ public class TileEntityTunnel extends TileEntity implements ICapabilityProvider 
 
         EnumFacing machineSide = this.getMachineSide();
         BlockPos outsetPos = dimpos.getBlockPos().offset(machineSide);
-        if(!(realWorld.getTileEntity(outsetPos) instanceof ICapabilityProvider)) {
-            return false;
+
+        TileEntity te = realWorld.getTileEntity(outsetPos);
+        if(te instanceof ICapabilityProvider && te.hasCapability(capability, machineSide.getOpposite())) {
+            return true;
         }
 
-        boolean hasCap = realWorld.getTileEntity(outsetPos).hasCapability(capability, machineSide.getOpposite());
-        Logz.debug("- Machine neighbor %s on side %s has capability '%s': %s", realWorld.getBlockState(outsetPos), machineSide.getOpposite(), capability.getName(), hasCap);
+        if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+            return true;
+        }
 
-        return hasCap;
+        return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if(this.getWorld().isRemote) {
+            if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+                return CapabilityNullHandlerRegistry.getNullHandler(capability);
+            }
+
             return super.getCapability(capability, facing);
         }
 
@@ -66,11 +77,16 @@ public class TileEntityTunnel extends TileEntity implements ICapabilityProvider 
         EnumFacing machineSide = this.getMachineSide();
         BlockPos outsetPos = dimpos.getBlockPos().offset(machineSide);
 
-        if(!(realWorld.getTileEntity(outsetPos) instanceof ICapabilityProvider)) {
-            return null;
+        TileEntity te = realWorld.getTileEntity(outsetPos);
+        if(te instanceof ICapabilityProvider && te.hasCapability(capability, machineSide.getOpposite())) {
+            return realWorld.getTileEntity(outsetPos).getCapability(capability, machineSide.getOpposite());
         }
 
-        return realWorld.getTileEntity(outsetPos).getCapability(capability, facing);
+        if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+            return CapabilityNullHandlerRegistry.getNullHandler(capability);
+        }
+
+        return null;
     }
 
 }

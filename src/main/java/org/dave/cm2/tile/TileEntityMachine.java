@@ -11,9 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.cm2.block.BlockMachine;
+import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.world.ChunkLoadingMachines;
@@ -161,16 +161,16 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if(this.getWorld().isRemote) {
+        if(this.getWorld().isRemote || facing == null) {
+            if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+                return true;
+            }
+
             return super.hasCapability(capability, facing);
         }
 
         BlockPos tunnelPos = this.getTunnelForSide(facing);
         if(tunnelPos == null) {
-            if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-                return true;
-            }
-
             return false;
         }
 
@@ -182,16 +182,25 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
-        if(!(machineWorld.getTileEntity(insetPos) instanceof ICapabilityProvider)) {
-            return false;
+        TileEntity te = machineWorld.getTileEntity(insetPos);
+        if(te != null && te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
+            return true;
         }
 
-        return machineWorld.getTileEntity(insetPos).hasCapability(capability, insetDirection.getOpposite());
+        if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if(this.getWorld().isRemote) {
+            if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+                return CapabilityNullHandlerRegistry.getNullHandler(capability);
+            }
+
             return super.getCapability(capability, facing);
         }
 
@@ -208,10 +217,15 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
-        if(!(machineWorld.getTileEntity(insetPos) instanceof ICapabilityProvider)) {
-            return null;
+        TileEntity te = machineWorld.getTileEntity(insetPos);
+        if(te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
+            return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
         }
 
-        return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
+        if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
+            return CapabilityNullHandlerRegistry.getNullHandler(capability);
+        }
+
+        return null;
     }
 }
