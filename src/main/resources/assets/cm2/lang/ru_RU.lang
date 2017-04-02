@@ -1,0 +1,29 @@
+itemGroup.cm2=Compact Machines 2
+
+tile.cm2.machine.tiny.name=Крошечный компактный механизм
+tile.cm2.machine.small.name=Маленький компактный механизм
+tile.cm2.machine.normal.name=Средний компактный механизм
+tile.cm2.machine.large.name=Большой компактный механизм
+tile.cm2.machine.giant.name=Гигантский компактный механизм
+tile.cm2.machine.maximum.name=Максимальный компактный механизм
+
+tile.cm2.tunnel.name=Туннель
+tile.cm2.wallbreakable.name=Стена компактного механизма
+tile.cm2.wall.name=Твёрдая стена компактного механизма
+
+item.cm2.psd.name=Личное устройство сжатия
+item.cm2.tunneltool.name=Туннель
+item.cm2.minifluiddrop.name=Drop of Miniaturization Fluid
+
+effect.shrink=Сжатие
+effect.shrink.postfix=Зелье сжатия
+
+tooltip.cm2.machine.coords=Механизм #%d
+tooltip.cm2.machine.coords.unused=Неиспользуемый
+
+enumfacing.up=Верх
+enumfacing.down=Низ
+enumfacing.north=Север
+enumfacing.south=Юг
+enumfacing.west=Запад
+enumfacing.east=Восток

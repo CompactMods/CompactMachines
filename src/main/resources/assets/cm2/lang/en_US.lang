@@ -1,0 +1,32 @@
+itemGroup.cm2=Compact Machines 2
+
+tile.cm2.machine.tiny.name=Tiny Compact Machine
+tile.cm2.machine.small.name=Small Compact Machine
+tile.cm2.machine.normal.name=Normal Compact Machine
+tile.cm2.machine.large.name=Large Compact Machine
+tile.cm2.machine.giant.name=Giant Compact Machine
+tile.cm2.machine.maximum.name=Maximum Compact Machine
+
+tile.cm2.tunnel.name=Tunnel
+tile.cm2.wallbreakable.name=Compact Machine Wall
+tile.cm2.wall.name=Solid Compact Machine Wall
+
+item.cm2.psd.name=Personal Shrinking Device
+item.cm2.tunneltool.name=Tunnel
+item.cm2.minifluiddrop.name=Drop of Miniaturization Fluid
+
+effect.shrink=Shrunk
+effect.shrink.postfix=Potion of Shrinkage
+
+tooltip.cm2.machine.coords=Machine #%d
+tooltip.cm2.machine.coords.unused=Unused
+
+enumfacing.up=Up
+enumfacing.down=Down
+enumfacing.north=North
+enumfacing.south=South
+enumfacing.west=West
+enumfacing.east=East
+
+
+

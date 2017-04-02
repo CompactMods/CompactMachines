@@ -1,52 +1,52 @@
 buildscript {
     repositories {
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
+apply plugin: 'net.minecraftforge.gradle.forge'
 
-apply plugin: 'forge'
-apply plugin: 'curseforge'
 
-ext.config = parseConfig(file('build.properties'))
-ext.modVersion = "${config.version.mod.major}.${config.version.mod.minor}"
+file "build.properties" withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
 
-version = "${config.version.minecraft}-${modVersion}"
-group= "com.dave.compactmachines" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "compactmachines"
+version = "${config.mod.version}"
+group= "org.dave.cm2" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "cm2"
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
 
 minecraft {
-    version = "${config.version.minecraft}-${config.version.forge}-${config.version.minecraft}"
-    assetDir = "eclipse/assets"
+    version = "${config.minecraft.version}-${config.forge.version}"
+    runDir = "run"
 
-    replaceIn "reference/Reference.java"
-    replace "@MAJOR@", config.version.mod.major
-    replace "@MINOR@", config.version.mod.minor
+    // the mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   snapshot are built nightly.
+    // stable_#            stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not allways work.
+    // simply re-run your setup task after changing the mappings to update your workspace.
+    mappings = "snapshot_20161111"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 repositories {
-    maven {
-        name = "IGW"
-        url = "http://maven.k-4u.nl/"
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
     }
 
-
-    maven {
-        name "FireBall API Depot"
-        url "http://dl.tsr.me/artifactory/libs-release-local"
+    maven { // location of the maven that hosts JEI files
+        name "Progwml Repo"
+        url "http://dvs1.progwml6.com/files/maven"
     }
 }
 
@@ -59,19 +59,29 @@ dependencies {
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-    compile "igwmod:IGW-Mod-1.7.10:1.1.1-17:userdev"
+
+    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
+    // except that these dependencies get remapped to your current MCP mappings
+    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
+    runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
+
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4:dev"
 }
 
 allprojects {
     if (System.getenv("TRAVIS") != null) {
         def tag = System.getenv("TRAVIS_TAG");
-        if (tag != null && !tag.isEmpty()) {
-            project.ext.releaseType = tag.contains("pre") ? "beta" : "release"
-            version += tag.contains("pre") ? "-b${System.getenv("TRAVIS_BUILD_NUMBER")}" : ""
+        if (tag != null && !tag.isEmpty() && tag.contains("release")) {
+            project.ext.releaseType = "release"
         } else {
             version += "-b${System.getenv("TRAVIS_BUILD_NUMBER")}"
             project.ext.releaseType = "beta"
@@ -96,37 +106,5 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
-    }
-}
-
-curse {
-    onlyIf {
-        (!System.env.TRAVIS_TAG.isEmpty() || getCommitMsg.commitMsg().contains("[cf push]")) && System.env.CFKEY != null
-    }
-
-    apiKey = System.env.CFKEY
-    projectId = "224218"
-    changelog = """
-            See https://github.com/thraaawn/CompactMachines
-    """
-    releaseType = project.hasProperty('releaseType') ? project.releaseType : ""
-}
-
-task getCommitMsg(type: Exec) {
-    def commit = System.env.TRAVIS_COMMIT != null ? System.env.TRAVIS_COMMIT : ""
-    commandLine "git log --format=%B -n 1 ${commit}".split(' ')
-    standardOutput = new ByteArrayOutputStream()
-    ext.commitMsg = {
-        return standardOutput.toString()
-    }
-}
-
-curse.dependsOn getCommitMsg
-
-def parseConfig(File config) {
-    config.withReader {
-        def prop = new Properties()
-        prop.load(it)
-        return (new ConfigSlurper().parse(prop))
     }
 }

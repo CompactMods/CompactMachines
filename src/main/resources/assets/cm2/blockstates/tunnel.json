@@ -1,0 +1,21 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube_all",
+    "textures": {
+      "all": "cm2:blocks/tunnel"
+    }
+  },
+  "variants": {
+    "machineside": {
+      "down":  { "textures": { "all": "cm2:blocks/tunnel_down" }},
+      "up":    { "textures": { "all": "cm2:blocks/tunnel_up" }},
+      "north": { "textures": { "all": "cm2:blocks/tunnel_north" }},
+      "south": { "textures": { "all": "cm2:blocks/tunnel_south" }},
+      "west":  { "textures": { "all": "cm2:blocks/tunnel_west" }},
+      "east":  { "textures": { "all": "cm2:blocks/tunnel_east" }}
+    },
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}
