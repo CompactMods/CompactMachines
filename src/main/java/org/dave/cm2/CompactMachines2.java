@@ -6,11 +6,9 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.dave.cm2.command.CommandCM2;
 import org.dave.cm2.init.*;
 import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.miniaturization.MiniaturizationEvents;
@@ -22,6 +20,8 @@ import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldGenMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.DimensionTools;
+
+import java.io.File;
 
 @Mod(modid = CompactMachines2.MODID, version = CompactMachines2.VERSION)
 public class CompactMachines2
@@ -35,6 +35,8 @@ public class CompactMachines2
     @SidedProxy(clientSide = "org.dave.cm2.proxy.ClientProxy", serverSide = "org.dave.cm2.proxy.ServerProxy")
     public static CommonProxy proxy;
 
+    public static File cfgDirectory;
+
     static {
         FluidRegistry.enableUniversalBucket();
     }
@@ -46,6 +48,10 @@ public class CompactMachines2
 
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
         MinecraftForge.EVENT_BUS.register(MiniaturizationEvents.class);
+
+        // Create paths
+        cfgDirectory = new File(event.getModConfigurationDirectory(), "cm2-schemas");
+        cfgDirectory.mkdirs();
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
@@ -76,5 +82,10 @@ public class CompactMachines2
         proxy.postInit(event);
 
         ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
+    }
+
+    @Mod.EventHandler
+    public void onServerStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandCM2());
     }
 }

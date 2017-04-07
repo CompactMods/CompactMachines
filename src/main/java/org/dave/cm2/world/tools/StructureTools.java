@@ -1,11 +1,15 @@
 package org.dave.cm2.world.tools;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.dave.cm2.init.Blockss;
+import org.dave.cm2.schema.BlockInformation;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.WorldSavedDataMachines;
@@ -106,5 +110,57 @@ public class StructureTools {
         }
 
         return list;
+    }
+
+    public static List<BlockInformation> getSchema(int coords) {
+        TileEntity machine = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();
+        if(machine != null && machine instanceof TileEntityMachine) {
+            return getSchema((TileEntityMachine) machine);
+        }
+
+        return null;
+    }
+
+    public static List<BlockInformation> getSchema(TileEntityMachine machine) {
+        List<BlockInformation> blockList = new ArrayList<>();
+
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        int size = machine.getSize().getDimension();
+
+        int startX = machine.coords * 1024 + size;
+        int startY = 40 + size;
+        int startZ = size;
+
+        for (int x = 1; x <= size-1; x++) {
+            for (int y = 1; y <= size-1; y++) {
+                for (int z = 1; z <= size-1; z++) {
+                    BlockPos absolutePos = new BlockPos(startX - x, startY - y, startZ - z);
+                    BlockPos relativePos = new BlockPos(x-1, y-1, z-1);
+
+                    if(!machineWorld.isAirBlock(absolutePos)) {
+                        IBlockState state = machineWorld.getBlockState(absolutePos);
+                        Block block = state.getBlock();
+                        NBTTagCompound nbt = null;
+                        boolean writePositionData = false;
+                        if(block.hasTileEntity(state)) {
+                            TileEntity te = machineWorld.getTileEntity(absolutePos);
+                            nbt = new NBTTagCompound();
+                            te.writeToNBT(nbt);
+
+                            boolean storedX = nbt.hasKey("x") && nbt.getInteger("x") == absolutePos.getX();
+                            boolean storedY = nbt.hasKey("y") && nbt.getInteger("y") == absolutePos.getY();
+                            boolean storedZ = nbt.hasKey("z") && nbt.getInteger("z") == absolutePos.getZ();
+
+                            if(storedX && storedY && storedZ) {
+                                writePositionData = true;
+                            }
+                        }
+                        blockList.add(new BlockInformation(relativePos, block, block.getMetaFromState(state), nbt, writePositionData));
+                    }
+                }
+            }
+        }
+
+        return blockList;
     }
 }

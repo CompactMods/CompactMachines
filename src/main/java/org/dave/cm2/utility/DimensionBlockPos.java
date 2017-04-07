@@ -1,6 +1,9 @@
 package org.dave.cm2.utility;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.dave.cm2.world.tools.DimensionTools;
 
 public class DimensionBlockPos  {
     private BlockPos pos;
@@ -13,4 +16,9 @@ public class DimensionBlockPos  {
 
     public BlockPos getBlockPos() { return this.pos; }
     public int getDimension() { return this.dimension; }
+
+    public TileEntity getTileEntity() {
+        World world = DimensionTools.getWorldServerForDimension(this.dimension);
+        return world.getTileEntity(pos);
+    }
 }
