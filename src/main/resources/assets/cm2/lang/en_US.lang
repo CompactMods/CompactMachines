@@ -20,6 +20,7 @@ effect.shrink.postfix=Potion of Shrinkage
 
 tooltip.cm2.machine.coords=Machine #%d
 tooltip.cm2.machine.coords.unused=Unused
+tooltip.cm2.psd.charge=Charge: %d%%
 
 enumfacing.up=Up
 enumfacing.down=Down

@@ -4,18 +4,22 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.cm2.init.Itemss;
 import org.dave.cm2.init.Potionss;
+import org.dave.cm2.item.psd.PSDFluidStorage;
 
 
 public class MiniaturizationEvents {
@@ -43,6 +47,30 @@ public class MiniaturizationEvents {
         GlStateManager.popMatrix();
     }
 
+    @SubscribeEvent
+    public static void onPlayerTick_CheckOffhand(TickEvent.PlayerTickEvent event) {
+        if(event.side != Side.SERVER) {
+            return;
+        }
+
+        EntityPlayer player = event.player;
+        ItemStack offHandItemStack = player.getHeldItemOffhand();
+        if(offHandItemStack == null || offHandItemStack.getItem() != Itemss.psd) {
+            return;
+        }
+
+        PSDFluidStorage tank = (PSDFluidStorage) offHandItemStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+        if(tank == null) {
+            return;
+        }
+
+        if(player.getActivePotionEffect(Potionss.miniaturizationPotion) == null) {
+            FluidStack drainedStack = tank.drainInternal(40, true);
+            if(drainedStack != null && drainedStack.amount > 0) {
+                MiniaturizationPotion.applyPotion(player, drainedStack.amount, 3);
+            }
+        }
+    }
 
 
     @SubscribeEvent
