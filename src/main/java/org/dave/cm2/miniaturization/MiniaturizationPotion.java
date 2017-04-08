@@ -1,5 +1,6 @@
 package org.dave.cm2.miniaturization;
 
+import com.google.common.collect.Lists;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
@@ -16,6 +17,7 @@ import org.dave.cm2.utility.Logz;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 
 public class MiniaturizationPotion extends Potion {
@@ -55,10 +57,11 @@ public class MiniaturizationPotion extends Potion {
         IAttributeInstance scaleAttribute = attributeMap.getAttributeInstance(Potionss.scaleAttribute);
         if(scaleAttribute != null) {
             // These should not stack -> remove all previous modifiers
-            scaleAttribute.removeModifier(SCALE_MODIFIER[0]);
-            scaleAttribute.removeModifier(SCALE_MODIFIER[1]);
-            scaleAttribute.removeModifier(SCALE_MODIFIER[2]);
-            scaleAttribute.removeModifier(SCALE_MODIFIER[3]);
+            Collection<AttributeModifier> collection = scaleAttribute.getModifiers();
+
+            if (collection != null) {
+                Lists.newArrayList(collection).forEach(scaleAttribute::removeModifier);
+            }
 
             scaleAttribute.applyModifier(SCALE_MODIFIER[amplifier]);
         }
