@@ -1,18 +1,19 @@
 package org.dave.cm2.command;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class CommandMenu extends CommandBaseExt {
     private List<CommandBaseExt> subcommands = new ArrayList<>();
@@ -35,20 +36,10 @@ public abstract class CommandMenu extends CommandBaseExt {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "commands.cm2.usage";
-    }
-
-    @Override
-    public String getCommandSuffix() {
-        return I18n.format("commands.cm2.menu.usage");
-    }
-
-    @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         boolean found = false;
         if(args.length > 0) {
-            for(CommandBase cmd : subcommands) {
+            for(CommandBaseExt cmd : subcommands) {
                 if(cmd.getCommandName().equalsIgnoreCase(args[0]) && cmd.checkPermission(server, sender)) {
                     found = true;
                     String[] remaining = Arrays.copyOfRange(args, 1, args.length);
@@ -58,8 +49,20 @@ public abstract class CommandMenu extends CommandBaseExt {
         }
 
         if(args.length == 0 || found == false) {
-            String commandList = subcommands.stream().map(c -> "\n - " + c.getCommandName() + " " + c.getCommandSuffix()).collect(Collectors.joining());
-            sender.addChatMessage(new TextComponentString(I18n.format("commands.cm2.available", this.getCommandPrefix()) + commandList));
+            TextComponentTranslation tc = new TextComponentTranslation("commands.cm2.available");
+            tc.getStyle().setUnderlined(true);
+            tc.appendText("\n");
+
+            for(CommandBaseExt cmd : subcommands) {
+                tc.appendSibling(new TextComponentString("\n" + TextFormatting.GREEN + cmd.getCommandName() + " "));
+                TextComponentTranslation tt = new TextComponentTranslation(cmd.getCommandDescription(sender));
+                tt.getStyle().setColor(TextFormatting.GRAY);
+                tt.getStyle().setUnderlined(false);
+                tc.appendSibling(tt);
+                tc.appendSibling(new TextComponentString("" + TextFormatting.RESET));
+            }
+
+            sender.addChatMessage(tc);
         }
     }
 

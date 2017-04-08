@@ -29,19 +29,25 @@ enumfacing.west=West
 enumfacing.east=East
 
 commands.cm2.usage=/cm2 [subcommand, leave empty for list of commands]
-commands.cm2.menu.usage=[subcommand, leave empty for list of commands]
-commands.cm2.available=Available commands for %s
 
-commands.cm2.schema.save.usage=<name>
+commands.cm2.available=Available sub-commands:
+
+commands.cm2.schema.description=Save/load the contents of machines
+commands.cm2.schema.save.usage=/cm2 schema save <name>
+commands.cm2.schema.save.description=Saves the machine you are in to disk
 commands.cm2.schema.save.exception.not_in_machine_dimension=You must be in the machine dimension for this command to work.
 commands.cm2.schema.save.exception.invalid_file=Could not open file '%s' for writing! Schema is not saved!
 commands.cm2.schema.save.exception.not_serializable=Could not serialize machine! Schema is not saved!
 
-commands.cm2.schema.load.usage=<name>
+commands.cm2.schema.load.usage=/cm2 schema load <name>
+commands.cm2.schema.load.description=Loads the specified schema from disk and places it in the room you are in.
 commands.cm2.schema.load.exception.not_in_machine_dimension=You must be in the machine dimension for this command to work.
 commands.cm2.schema.load.exception.invalid_file=Invalid schema. File '%s' does not exist or is invalid!
-commands.cm2.schema.save.exception.not_deserializable=Could not deserialize schema! Schema is not loaded!
+commands.cm2.schema.load.exception.not_deserializable=Could not deserialize schema! Schema is not loaded!
 
-commands.cm2.entity-size.reset.usage=[<player>]
+commands.cm2.entity-size.description=Various commands for handling miniaturization effects
+commands.cm2.entity-size.reset.usage=/cm2 entity-size reset [<player>]
+commands.cm2.entity-size.reset.description=Restores a players size if something went wrong
 
-commands.cm2.entity-size.set.usage=[<player>] <scale>
+commands.cm2.entity-size.set.usage=/cm2 entity-size reset [<player>] <scale>
+commands.cm2.entity-size.set.description=Set the size of a player

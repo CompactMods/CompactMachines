@@ -31,17 +31,13 @@ public abstract class CommandBaseExt extends CommandBase {
         return result;
     }
 
-    public String getCommandPrefix() {
-        return "/" + this.getParentConcatenation(" ") + " ";
-    }
-
-    public String getCommandSuffix() {
-        return I18n.format("commands." + this.getFullCommandName() + ".usage");
+    public String getCommandDescription(ICommandSender sender) {
+        return "commands." + this.getFullCommandName() + ".description";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return this.getCommandPrefix() + this.getCommandSuffix();
+        return "commands." + this.getFullCommandName() + ".usage";
     }
 
     public WrongUsageException getUsageException(ICommandSender sender) {
