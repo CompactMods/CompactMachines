@@ -105,6 +105,15 @@ public class ConfigurationHandler {
                 MachineSettings.ALLOW_RESPAWN_LABEL
         );
 
+        MachineSettings.fluidCostForEntering = configuration.getInt(
+                MachineSettings.FLUID_COST_NAME,
+                CATEGORY_MACHINES,
+                MachineSettings.FLUID_COST_DEFAULT,
+                0, 4000,
+                MachineSettings.FLUID_COST_COMMENT,
+                MachineSettings.FLUID_COST_LABEL
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -126,11 +135,17 @@ public class ConfigurationHandler {
 
     public static class MachineSettings {
         public static boolean allowRespawning;
+        public static int fluidCostForEntering;
 
         private static final String ALLOW_RESPAWN_NAME = "allowRespawning";
         private static final boolean ALLOW_RESPAWN_DEFAULT = true;
         private static final String ALLOW_RESPAWN_COMMENT = "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there";
         private static final String ALLOW_RESPAWN_LABEL = "Allow Respawning";
+
+        private static final String FLUID_COST_NAME = "fluidCostForEntering";
+        private static final int FLUID_COST_DEFAULT = 250;
+        private static final String FLUID_COST_COMMENT = "How much miniaturization fluid needs to be in the PSD to be able to enter a machine in mB";
+        private static final String FLUID_COST_LABEL = "Required fluid to enter machine";
     }
 
     public static class PotionSettings {

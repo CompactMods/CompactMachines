@@ -20,16 +20,20 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.item.ItemPersonalShrinkingDevice;
+import org.dave.cm2.item.psd.PSDFluidStorage;
+import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
@@ -255,10 +259,22 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
             if(playerItem instanceof ItemPersonalShrinkingDevice) {
-                TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
+                PSDFluidStorage tank = (PSDFluidStorage) playerStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+                boolean freeToGo = ConfigurationHandler.MachineSettings.fluidCostForEntering == 0 || player.capabilities.isCreativeMode;
+                if(!freeToGo && tank != null && tank.getFluidAmount() >= 250) {
+                    tank.drainInternal(250, true);
+                    freeToGo = true;
+                }
 
-                WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
-                player.addChatComponentMessage(new TextComponentString(TextFormatting.GREEN + "Teleporting to machine: " + machine.coords));
+                if(freeToGo) {
+                    TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
+
+                    WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
+                } else {
+                    TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.not_enough_fluid");
+                    tc.getStyle().setColor(TextFormatting.DARK_RED);
+                    player.addChatComponentMessage(tc);
+                }
             } else if(playerStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
                 if(!FluidUtil.interactWithFluidHandler(playerStack, machine.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side), player)) {
                     return false;
