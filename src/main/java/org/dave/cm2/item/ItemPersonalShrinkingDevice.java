@@ -20,6 +20,8 @@ import org.dave.cm2.item.psd.PSDCapabilityProvider;
 import org.dave.cm2.item.psd.PSDFluidStorage;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
+import org.dave.cm2.reference.GuiIds;
+import org.dave.cm2.reference.Resources;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.world.tools.TeleportationTools;
@@ -79,11 +81,12 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             return new ActionResult(EnumActionResult.FAIL, itemStack);
         }
 
-        if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-            return new ActionResult(EnumActionResult.FAIL, itemStack);
+        if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
+            player.openGui(CompactMachines2.instance, GuiIds.PSD_WELCOME.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
+            return new ActionResult(EnumActionResult.SUCCESS, itemStack);
         }
 
-        if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
+        if(world.isRemote || !(player instanceof EntityPlayerMP)) {
             return new ActionResult(EnumActionResult.FAIL, itemStack);
         }
 

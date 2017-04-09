@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.cm2.command.CommandCM2;
+import org.dave.cm2.gui.GuiHandler;
 import org.dave.cm2.init.*;
 import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.miniaturization.MiniaturizationEvents;
@@ -58,6 +59,7 @@ public class CompactMachines2
 
         GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
 
+        GuiHandler.init();
         Fluidss.init();
         Blockss.init();
         Itemss.init();

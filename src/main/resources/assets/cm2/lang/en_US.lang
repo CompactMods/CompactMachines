@@ -55,3 +55,16 @@ commands.cm2.entity-size.reset.description=Restores a players size if something 
 
 commands.cm2.entity-size.set.usage=/cm2 entity-size reset [<player>] <scale>
 commands.cm2.entity-size.set.description=Set the size of a player
+
+
+
+gui.cm2.psd.welcome.intro=Compact Machines 2 allows you to build<br/>complex machine contraptions within a single<br/>block!<br/><br/>Available chapters:
+
+gui.cm2.psd.fluid.label=Miniaturization Fluid
+gui.cm2.psd.fluid.intro=Miniaturization Fluid has several uses:<br/><br/>Crafting: Shrink down multiblock structures<br/>   to single items. Please use JEI to look up<br/>   all the recipes.<br/><br/>Shrinking: Drink the fluid, bath in it or equip<br/>   a filled Personal Shrinking Device in your<br/>   off hand to shrink yourself and get into<br/>   those cable shafts without breaking the<br/>   surrounding blocks.<br/><br/>You can obtain it either by searching for<br/>old broken machines found in the overworld<br/>or by killing entities that are under the<br/>effects of the miniaturization fluid.
+
+gui.cm2.psd.machines.label=Compact Machines
+gui.cm2.psd.machines.intro=Compact Machines are the core mechanic of<br/>this mod. They allow you to build large rooms<br/>in a single block space connected to the<br/>outside world.<br/><br/>They come in various sizes ranging from<br/>3x3x3 to 13x13x13.<br/><br/>You can use Tunnels to connect the outside<br/>block faces with any of the inside walls to<br/>transport items, fluids etc.<br/><br/>You can enter a Compact Machine by right-<br/>clicking it with a charged Personal Shrinking<br/>Device.<br/><br/>Please use JEI to look up crafting recipes.
+
+gui.cm2.psd.tunnels.label=Tunnels
+gui.cm2.psd.tunnels.intro=Tunnels are used to connect inside wall<br/>faces to outside block faces.<br/>Only one connection for each outside face,<br/>this means a total of 6 tunnels per machine.<br/><br/>Right click a Compact Machine Wall with a<br/>Tunnel Tool to place a tunnel. Right click it<br/>again to cycle through the outside faces it<br/>is connected to.<br/><br/>Tunnels are using the Forge Capability<br/>system to "connect" the two blocks. Other<br/>mods need to use this system for tunnels to<br/>work properly.<br/>This is the case for most storage, but<br/>rarely for multiblock systems, so expect<br/>some pipes etc to not work as expected.
