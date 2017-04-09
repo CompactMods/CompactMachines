@@ -16,6 +16,8 @@ item.cm2.tunneltool.name=Tunnel
 item.cm2.minifluiddrop.name=Drop of Miniaturization Fluid
 item.cm2.psd.not_enough_fluid=Not enough miniaturization fluid!
 
+fluid.miniaturization_fluid=Miniaturization Fluid
+
 effect.shrink=Shrunk
 effect.shrink.postfix=Potion of Shrinkage
 
