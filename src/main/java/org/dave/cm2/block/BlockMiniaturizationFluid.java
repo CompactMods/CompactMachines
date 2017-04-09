@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -15,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.miniaturization.MiniaturizationPotion;
+import org.dave.cm2.miniaturization.MiniaturizationRecipes;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.world.tools.CraftingTools;
 
@@ -36,9 +38,10 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
 
         if(!(entity instanceof EntityLivingBase)) {
             if(entity instanceof EntityItem) {
-                if(((EntityItem) entity).getEntityItem().getItem() == Items.REDSTONE) {
+                Item item = ((EntityItem) entity).getEntityItem().getItem();
+                if(MiniaturizationRecipes.isCatalystItem(item)) {
                     if(!world.isRemote) {
-                        CraftingTools.tryCrafting(world, pos);
+                        CraftingTools.tryCrafting(world, pos, item);
                         entity.setDead();
                     } else {
                         Vec3d entityPosition = entity.getPositionVector();

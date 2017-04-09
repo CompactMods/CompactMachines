@@ -9,7 +9,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -21,7 +21,6 @@ import org.dave.cm2.item.psd.PSDFluidStorage;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.GuiIds;
-import org.dave.cm2.reference.Resources;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.world.tools.TeleportationTools;
@@ -97,8 +96,9 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             Vec3d pos = player.getPositionVector();
             WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.xCoord, pos.yCoord, pos.zCoord);
 
-            // TODO: Add localization
-            player.addChatComponentMessage(new TextComponentString(TextFormatting.GREEN + "Entry point set!"));
+            TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.spawnpoint_set");
+            tc.getStyle().setColor(TextFormatting.GREEN);
+            player.addChatComponentMessage(tc);
 
             return new ActionResult(EnumActionResult.SUCCESS, itemStack);
         }

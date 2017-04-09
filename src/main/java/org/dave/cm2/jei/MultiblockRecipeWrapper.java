@@ -5,13 +5,10 @@ import mezz.jei.api.recipe.BlankRecipeWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fluids.UniversalBucket;
 import org.dave.cm2.init.Fluidss;
-import org.dave.cm2.init.Itemss;
 import org.dave.cm2.miniaturization.MiniaturizationRecipe;
 
 import java.util.ArrayList;
@@ -29,6 +26,7 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
 
         this.input.add(new ItemStack(this.recipe.getSourceBlock(), this.recipe.getRequiredSourceBlockCount()));
         this.input.add(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid));
+        this.input.add(this.recipe.getCatalystStack());
     }
 
     @Override
@@ -58,22 +56,6 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
                 mc.fontRendererObj.drawStringWithShadow("" + requiredBuckets, 12, 28, 0xFFFFFF);
             } else {
                 mc.fontRendererObj.drawStringWithShadow("" + requiredBuckets, 6, 28, 0xFFFFFF);
-            }
-
-            GlStateManager.popMatrix();
-        }
-
-        if(this.recipe.getTargetStack().getItem() == Itemss.psd) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0F, 0F, 216.5F);
-
-            String translated = I18n.format("jei.cm2.crafting_trigger");
-            String[] lines = translated.split("<br/>");
-
-            int y = 70;
-            for(String line : lines) {
-                mc.fontRendererObj.drawString(TextFormatting.DARK_GREEN + line, 2, y, 0xFFFFFF);
-                y += 10;
             }
 
             GlStateManager.popMatrix();

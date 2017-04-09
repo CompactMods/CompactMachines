@@ -21,7 +21,10 @@ public class MiniaturizationRecipe {
     private int targetMeta;
     private boolean requiresFloor;
 
-    public MiniaturizationRecipe(Block sourceBlock, int width, int height, int depth, Item targetItem, int targetQuantity, int targetMeta, boolean requiresFloor) {
+    private Item catalyst;
+    private int catalystMeta;
+
+    public MiniaturizationRecipe(Block sourceBlock, Item catalyst, int catalystMeta, int width, int height, int depth, Item targetItem, int targetQuantity, int targetMeta, boolean requiresFloor) {
         this.depth = depth;
         this.sourceBlock = sourceBlock;
         this.width = width;
@@ -30,9 +33,11 @@ public class MiniaturizationRecipe {
         this.targetMeta = targetMeta;
         this.targetItem = targetItem;
         this.requiresFloor = requiresFloor;
+        this.catalyst = catalyst;
+        this.catalystMeta = catalystMeta;
     }
 
-    public MiniaturizationRecipe(Block sourceBlock, int width, int height, int depth, Block targetBlock, int targetQuantity, int targetMeta, boolean requiresFloor) {
+    public MiniaturizationRecipe(Block sourceBlock, Item catalyst, int catalystMeta, int width, int height, int depth, Block targetBlock, int targetQuantity, int targetMeta, boolean requiresFloor) {
         this.depth = depth;
         this.sourceBlock = sourceBlock;
         this.width = width;
@@ -41,6 +46,8 @@ public class MiniaturizationRecipe {
         this.targetMeta = targetMeta;
         this.targetBlock = targetBlock;
         this.requiresFloor = requiresFloor;
+        this.catalyst = catalyst;
+        this.catalystMeta = catalystMeta;
     }
 
     public ItemStack getTargetStack() {
@@ -49,6 +56,14 @@ public class MiniaturizationRecipe {
         } else {
             return new ItemStack(targetBlock, targetQuantity, targetMeta);
         }
+    }
+
+    public Item getCatalyst() {
+        return catalyst;
+    }
+
+    public ItemStack getCatalystStack() {
+        return new ItemStack(catalyst, 1, catalystMeta);
     }
 
     public void spawnResultInWorld(World world, BlockPos pos) {

@@ -2,6 +2,7 @@ package org.dave.cm2.world.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.dave.cm2.block.BlockMiniaturizationFluid;
@@ -15,14 +16,42 @@ import java.util.List;
 public class CraftingTools {
     private static final List<BlockPos> craftingLocks = new ArrayList<>();
 
-    public static void tryCrafting(World world, BlockPos contactPos) {
+    public static boolean tryCrafting(World world, BlockPos contactPos, Item catalyst) {
+        // Step 0: Find the most top left corner of the miniaturization fluid
+        int maxSearchStepsFluid = 32;
+
+        BlockPos iterationPos = contactPos;
+        for(int searchStep = 0; searchStep < maxSearchStepsFluid; searchStep++) {
+            boolean moving = false;
+            if(world.getBlockState(iterationPos.north()).getBlock() == Blockss.miniaturizationFluidBlock) {
+                iterationPos = iterationPos.north();
+                moving = true;
+            }
+
+            if(world.getBlockState(iterationPos.west()).getBlock() == Blockss.miniaturizationFluidBlock) {
+                iterationPos = iterationPos.west();
+                moving = true;
+            }
+
+            if(world.getBlockState(iterationPos.up()).getBlock() == Blockss.miniaturizationFluidBlock) {
+                iterationPos = iterationPos.up();
+                moving = true;
+            }
+
+            if(!moving) {
+                break;
+            }
+        }
+
+        BlockPos topNorthWestCornerPos = iterationPos.down().south().east();
+
         // Step 1: Find top left corner of crafting area
         // 1a: Get the block one level down
-        Block initialBlock = world.getBlockState(contactPos.down()).getBlock();
+        Block initialBlock = world.getBlockState(topNorthWestCornerPos).getBlock();
 
         // 1c: Go to the highest x and z values that still have the same block,
         //     this is the most south-west corner possible
-        BlockPos craftingCornerPos = contactPos.down();
+        BlockPos craftingCornerPos = topNorthWestCornerPos;
 
         int maxSearchSteps = 32;
         for(int searchStep = 0; searchStep < maxSearchSteps; searchStep++) {
@@ -43,19 +72,28 @@ public class CraftingTools {
         }
 
         if(craftingLocks.contains(craftingCornerPos)) {
-            return;
+            return false;
         }
 
         craftingLocks.add(craftingCornerPos);
 
         // Step 2: Depending on the recipe we need to check a few blocks
+        boolean success = false;
         for(MiniaturizationRecipe recipe : MiniaturizationRecipes.getRecipes()) {
+            if(recipe.getCatalyst() != catalyst) {
+                continue;
+            }
+
             if(testAndConsumeRecipe(world, craftingCornerPos, recipe.getSourceBlock(), recipe.getWidth(), recipe.getHeight(), recipe.getDepth(), recipe.isRequiresFloor())) {
                 recipe.spawnResultInWorld(world, craftingCornerPos);
+                success = true;
+                break;
             }
         }
 
         craftingLocks.remove(craftingCornerPos);
+
+        return success;
     }
 
     private static void drainRecipeFluid(World world, BlockPos cornerPos, int width, int height, int depth) {

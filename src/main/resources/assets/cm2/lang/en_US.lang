@@ -14,7 +14,9 @@ tile.cm2.wall.name=Solid Compact Machine Wall
 item.cm2.psd.name=Personal Shrinking Device
 item.cm2.tunneltool.name=Tunnel
 item.cm2.minifluiddrop.name=Drop of Miniaturization Fluid
+
 item.cm2.psd.not_enough_fluid=Not enough miniaturization fluid!
+item.cm2.psd.spawnpoint_set=Entry point set!
 
 fluid.miniaturization_fluid=Miniaturization Fluid
 
@@ -25,7 +27,10 @@ tooltip.cm2.machine.coords=Machine #%d
 tooltip.cm2.machine.coords.unused=Unused
 tooltip.cm2.psd.charge=Charge: %d%%
 
-jei.cm2.crafting_trigger=Throw a piece of redstone<br/>on top of the structure<br/>to trigger the crafting.
+tooltip.cm2.jei.crafting_trigger=Throw this into the fluid to start the crafting.
+tooltip.cm2.jei.hollow_cube=Use these to build a (hollow) multiblock
+tooltip.cm2.jei.fluid=Pour over the the multiblock.
+tooltip.cm2.jei.fluid.warning=The surrounding fluid must not extend more than one block from the multiblock!
 
 enumfacing.up=Up
 enumfacing.down=Down
