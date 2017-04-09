@@ -25,6 +25,8 @@ tooltip.cm2.machine.coords=Machine #%d
 tooltip.cm2.machine.coords.unused=Unused
 tooltip.cm2.psd.charge=Charge: %d%%
 
+jei.cm2.crafting_trigger=Throw a piece of redstone<br/>on top of the structure<br/>to trigger the crafting.
+
 enumfacing.up=Up
 enumfacing.down=Down
 enumfacing.north=North
