@@ -32,6 +32,8 @@ tooltip.cm2.jei.hollow_cube=Use these to build a (hollow) multiblock
 tooltip.cm2.jei.fluid=Pour over the the multiblock.
 tooltip.cm2.jei.fluid.warning=The surrounding fluid must not extend more than one block from the multiblock!
 
+cm2.jei.minifluiddrop.description=Obtain these by killing entities that are under the effects of the miniaturization fluid.\n\nTo get miniaturization fluid in the first place find a broken compact machine somewhere in the overworld. Bring buckets.
+
 enumfacing.up=Up
 enumfacing.down=Down
 enumfacing.north=North
