@@ -67,6 +67,10 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
     @Override
     public boolean isDamaged(ItemStack stack) {
+        PSDFluidStorage tank = (PSDFluidStorage) stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+        if(tank.getFluidAmount() == 0) {
+            return false;
+        }
         return true;
     }
 
