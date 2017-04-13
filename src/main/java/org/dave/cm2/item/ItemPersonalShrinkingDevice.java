@@ -1,6 +1,7 @@
 package org.dave.cm2.item;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -62,6 +63,10 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
         PSDFluidStorage tank = (PSDFluidStorage) stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
         tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".psd.charge", tank.getFluidAmount() * 100 / tank.getCapacity()));
+
+        if(GuiScreen.isShiftKeyDown()) {
+            tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".psd.hint"));
+        }
     }
 
     @Override

@@ -27,6 +27,10 @@ tooltip.cm2.machine.coords=Machine #%d
 tooltip.cm2.machine.coords.unused=Unused
 tooltip.cm2.psd.charge=Charge: %d%%
 
+tooltip.cm2.psd.hint=Used to enter Compact Machines and to shrink yourself. Charged by filling with Miniaturization Fluid.
+tooltip.cm2.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
+tooltip.cm2.minifluiddrop.hint=Dropped by mobs unded the effect of miniaturization fluid.
+
 tooltip.cm2.jei.crafting_trigger=Throw this into the fluid to start the crafting.
 tooltip.cm2.jei.hollow_cube=Use these to build a (hollow) multiblock
 tooltip.cm2.jei.fluid=Pour over the the multiblock.

@@ -1,12 +1,12 @@
 package org.dave.cm2.item;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -19,10 +19,11 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.init.Fluidss;
-import org.dave.cm2.init.Potionss;
 import org.dave.cm2.miniaturization.MiniaturizationPotion;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
+
+import java.util.List;
 
 public class ItemMiniFluidDrop extends ItemFood {
     public ItemMiniFluidDrop() {
@@ -66,6 +67,15 @@ public class ItemMiniFluidDrop extends ItemFood {
         }
 
         return super.onItemRightClick(itemStack, world, player, hand);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+        super.addInformation(stack, playerIn, tooltip, advanced);
+
+        if(GuiScreen.isShiftKeyDown()) {
+            tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".minifluiddrop.hint"));
+        }
     }
 
     @Override
