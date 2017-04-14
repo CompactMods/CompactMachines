@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +29,11 @@ public class CommandSchemaLoad extends CommandBaseExt {
     @Override
     public String getCommandName() {
         return "load";
+    }
+
+    @Override
+    public boolean isAllowed(EntityPlayer player, boolean creative, boolean isOp) {
+        return creative || isOp;
     }
 
     @Override

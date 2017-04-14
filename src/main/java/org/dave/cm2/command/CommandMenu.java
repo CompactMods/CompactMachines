@@ -3,6 +3,7 @@ package org.dave.cm2.command;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.Style;
@@ -11,6 +12,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
+import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,16 +38,29 @@ public abstract class CommandMenu extends CommandBaseExt {
     }
 
     @Override
+    public boolean isAllowed(EntityPlayer player, boolean creative, boolean isOp) {
+        return true;
+    }
+
+    @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         boolean found = false;
         if(args.length > 0) {
             for(CommandBaseExt cmd : subcommands) {
-                if(cmd.getCommandName().equalsIgnoreCase(args[0]) && cmd.checkPermission(server, sender)) {
+                if(cmd.getCommandName().equalsIgnoreCase(args[0])) {
                     found = true;
-                    String[] remaining = Arrays.copyOfRange(args, 1, args.length);
-                    cmd.execute(server, sender, remaining);
+                    if(cmd.checkPermission(server, sender)) {
+                        String[] remaining = Arrays.copyOfRange(args, 1, args.length);
+                        cmd.execute(server, sender, remaining);
+                        return;
+                    }
                 }
             }
+        }
+
+        if(found) {
+            sender.addChatMessage(new TextComponentTranslation("commands.cm2.denied"));
+            return;
         }
 
         if(args.length == 0 || found == false) {
@@ -54,7 +69,9 @@ public abstract class CommandMenu extends CommandBaseExt {
             tc.appendText("\n");
 
             for(CommandBaseExt cmd : subcommands) {
-                tc.appendSibling(new TextComponentString("\n" + TextFormatting.GREEN + cmd.getCommandName() + " "));
+                boolean allowed = cmd.checkPermission(server, sender);
+                String color = "" + (allowed ? TextFormatting.GREEN : TextFormatting.DARK_RED);
+                tc.appendSibling(new TextComponentString("\n" + color + cmd.getCommandName() + " "));
                 TextComponentTranslation tt = new TextComponentTranslation(cmd.getCommandDescription(sender));
                 tt.getStyle().setColor(TextFormatting.GRAY);
                 tt.getStyle().setUnderlined(false);

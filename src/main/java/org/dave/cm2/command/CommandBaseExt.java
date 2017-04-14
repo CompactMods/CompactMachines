@@ -1,16 +1,33 @@
 package org.dave.cm2.command;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 
 public abstract class CommandBaseExt extends CommandBase {
     public CommandBaseExt parentCommand;
 
     public CommandBaseExt getParentCommand() {
         return parentCommand;
+    }
+
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        if(sender.getCommandSenderEntity() instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
+            boolean creative = player.capabilities.isCreativeMode;
+            boolean isOp = server.getPlayerList().canSendCommands(player.getGameProfile());
+            return isAllowed(player, creative, isOp);
+        }
+
+        return super.checkPermission(server, sender);
+    }
+
+    public boolean isAllowed(EntityPlayer player, boolean creative, boolean isOp) {
+        return creative && isOp;
     }
 
     public void setParentCommand(CommandBaseExt parentCommand) {

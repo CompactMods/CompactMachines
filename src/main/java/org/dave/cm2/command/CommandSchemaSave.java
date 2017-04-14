@@ -3,6 +3,7 @@ package org.dave.cm2.command;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import org.dave.cm2.CompactMachines2;
@@ -23,6 +24,11 @@ public class CommandSchemaSave extends CommandBaseExt {
     @Override
     public String getCommandName() {
         return "save";
+    }
+
+    @Override
+    public boolean isAllowed(EntityPlayer player, boolean creative, boolean isOp) {
+        return creative || isOp;
     }
 
     @Override
