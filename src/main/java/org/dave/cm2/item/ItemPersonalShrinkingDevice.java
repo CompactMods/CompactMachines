@@ -121,7 +121,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             return new ActionResult(EnumActionResult.SUCCESS, itemStack);
         }
 
-        if(world.isRemote && world.provider.getDimension() == ConfigurationHandler.Settings.dimensionId && player instanceof EntityPlayerMP) {
+        if(!world.isRemote && world.provider.getDimension() == ConfigurationHandler.Settings.dimensionId && player instanceof EntityPlayerMP) {
             EntityPlayerMP serverPlayer = (EntityPlayerMP)player;
 
             if(player.isSneaking()) {
