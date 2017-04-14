@@ -50,6 +50,7 @@ enumfacing.east=East
 commands.cm2.usage=/cm2 [subcommand, leave empty for list of commands]
 
 commands.cm2.available=Available sub-commands:
+commands.cm2.denied=You do not have the permission to use this command.
 
 commands.cm2.schema.description=Save/load the contents of machines
 commands.cm2.schema.save.usage=/cm2 schema save <name>
