@@ -23,13 +23,15 @@ fluid.miniaturization_fluid=Miniaturization Fluid
 effect.shrink=Shrunk
 effect.shrink.postfix=Potion of Shrinkage
 
-tooltip.cm2.machine.coords=Machine #%d
+tooltip.cm2.machine.coords=Machine: %s
 tooltip.cm2.machine.coords.unused=Unused
 tooltip.cm2.psd.charge=Charge: %d%%
 
 tooltip.cm2.psd.hint=Used to enter Compact Machines and to shrink yourself. Charged by filling with Miniaturization Fluid.
 tooltip.cm2.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
 tooltip.cm2.minifluiddrop.hint=Dropped by mobs unded the effect of miniaturization fluid.
+tooltip.cm2.wall.hint=Warning! Unbreakable for non-creative players!
+tooltip.cm2.machine.hint=A %s provides a %s room.
 
 tooltip.cm2.jei.crafting_trigger=Throw this into the fluid to start the crafting.
 tooltip.cm2.jei.hollow_cube=Use these to build a (hollow) multiblock
@@ -38,6 +40,7 @@ tooltip.cm2.jei.fluid.warning=The surrounding fluid must not extend more than on
 
 cm2.jei.minifluiddrop.description=Obtain these by killing entities that are under the effects of the miniaturization fluid.\n\nTo get miniaturization fluid in the first place find a broken compact machine somewhere in the overworld. Bring buckets.
 
+enumfacing.side=Side: %s
 enumfacing.up=Up
 enumfacing.down=Down
 enumfacing.north=North

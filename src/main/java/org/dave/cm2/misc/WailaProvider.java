@@ -19,6 +19,7 @@ import org.dave.cm2.block.BlockMachine;
 import org.dave.cm2.block.BlockTunnel;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.utility.Logz;
+import org.dave.cm2.utility.TextFormattingHelper;
 
 import java.util.List;
 
@@ -85,14 +86,19 @@ public class WailaProvider {
                 return currenttip;
             }
 
+            String nameOrId = "";
             TileEntityMachine te = (TileEntityMachine)accessor.getTileEntity();
             if(te.coords < 0 && te.getCustomName().length() == 0) {
-                currenttip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines2.MODID + ".machine.coords.unused") + TextFormatting.RESET);
+                nameOrId = I18n.format("tooltip.cm2.machine.coords.unused");
             } else if(te.getCustomName().length() > 0) {
-                currenttip.add(TextFormatting.DARK_GREEN + te.getCustomName() + TextFormatting.RESET);
+                nameOrId = te.getCustomName();
             } else {
-                currenttip.add(TextFormatting.DARK_GREEN + I18n.format("tooltip." + CompactMachines2.MODID + ".machine.coords", te.coords) + TextFormatting.RESET);
+                nameOrId = "#" + te.coords;
             }
+            currenttip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.cm2.machine.coords", nameOrId)));
+
+            String sideString = I18n.format("enumfacing.side", I18n.format("enumfacing." + accessor.getSide().getName()));
+            currenttip.add(TextFormattingHelper.colorizeKeyValue(sideString));
 
             return currenttip;
         }

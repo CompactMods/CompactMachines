@@ -1,10 +1,17 @@
 package org.dave.cm2.item;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
+import org.dave.cm2.block.BlockMachine;
 import org.dave.cm2.block.IMetaBlockName;
+import org.dave.cm2.init.Blockss;
+import org.dave.cm2.reference.EnumMachineSize;
+import org.dave.cm2.utility.TextFormattingHelper;
 
 import java.util.List;
 
@@ -41,9 +48,15 @@ public class ItemBlockMachine extends ItemBlock {
         if(stack.hasTagCompound() && stack.getTagCompound().hasKey("coords")) {
             int coords = stack.getTagCompound().getInteger("coords");
             if(coords > -1) {
-                // TODO: Localization
-                tooltip.add("Machine: " + coords);
+                tooltip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.cm2.machine.coords", "#" + coords)));
             }
+        }
+
+        if(GuiScreen.isShiftKeyDown()) {
+            int size = Blockss.machine.getStateFromMeta(stack.getItemDamage()).getValue(BlockMachine.SIZE).getDimension() - 1;
+            String sizeString = size + "x" + size + "x" + size;
+            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.cm2.machine.hint", I18n.format(this.getUnlocalizedName(stack) + ".name"), sizeString));
+
         }
     }
 }

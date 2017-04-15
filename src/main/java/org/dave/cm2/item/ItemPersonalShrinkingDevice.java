@@ -31,6 +31,7 @@ import org.dave.cm2.item.psd.PSDFluidStorage;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.GuiIds;
+import org.dave.cm2.utility.TextFormattingHelper;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.StructureTools;
 import org.dave.cm2.world.tools.TeleportationTools;
@@ -62,10 +63,12 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
         super.addInformation(stack, playerIn, tooltip, advanced);
 
         PSDFluidStorage tank = (PSDFluidStorage) stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-        tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".psd.charge", tank.getFluidAmount() * 100 / tank.getCapacity()));
+
+        String chargeToolTip = I18n.format("tooltip." + CompactMachines2.MODID + ".psd.charge", tank.getFluidAmount() * 100 / tank.getCapacity());
+        tooltip.add(TextFormattingHelper.colorizeKeyValue(chargeToolTip));
 
         if(GuiScreen.isShiftKeyDown()) {
-            tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".psd.hint"));
+            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines2.MODID + ".psd.hint"));
         }
     }
 

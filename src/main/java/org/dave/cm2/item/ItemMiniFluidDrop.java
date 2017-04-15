@@ -13,6 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -74,7 +75,7 @@ public class ItemMiniFluidDrop extends ItemFood {
         super.addInformation(stack, playerIn, tooltip, advanced);
 
         if(GuiScreen.isShiftKeyDown()) {
-            tooltip.add(I18n.format("tooltip." + CompactMachines2.MODID + ".minifluiddrop.hint"));
+            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines2.MODID + ".minifluiddrop.hint"));
         }
     }
 
