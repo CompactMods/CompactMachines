@@ -10,7 +10,7 @@ import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.schema.BlockInformation;
 import org.dave.cm2.schema.Schema;
-import org.dave.cm2.schema.SerializationHelper;
+import org.dave.cm2.utility.SerializationHelper;
 import org.dave.cm2.world.tools.StructureTools;
 
 import java.io.BufferedWriter;

@@ -9,7 +9,7 @@ import net.minecraftforge.fluids.UniversalBucket;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.init.Itemss;
-import org.dave.cm2.miniaturization.MiniaturizationRecipes;
+import org.dave.cm2.miniaturization.MultiblockRecipes;
 
 @JEIPlugin
 public class CM2JEIPlugin implements IModPlugin {
@@ -33,7 +33,7 @@ public class CM2JEIPlugin implements IModPlugin {
         registry.addRecipeHandlers(new MultiblockRecipeHandler());
         registry.addRecipeHandlers(new ChargeRecipeHandler());
         registry.addRecipeCategoryCraftingItem(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid), MultiblockRecipeCategory.UID);
-        registry.addRecipes(MiniaturizationRecipes.getRecipes());
+        registry.addRecipes(MultiblockRecipes.getRecipes());
         registry.addDescription(new ItemStack(Itemss.miniFluidDrop), "cm2.jei.minifluiddrop.description");
 
         IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();

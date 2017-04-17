@@ -23,8 +23,7 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
     private final IDrawableStatic slotDrawable;
 
     public MultiblockRecipeCategory(IGuiHelper guiHelper) {
-        // TODO: Localization
-        localizedName = "Multiblock Miniaturization";
+        localizedName = I18n.format("cm2.jei.category.multiblock_miniaturization");
         background = guiHelper.createBlankDrawable(150, 110);
         slotDrawable = guiHelper.getSlotDrawable();
     }
@@ -46,18 +45,33 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
 
     @Override
     public void drawExtras(Minecraft minecraft) {
-        slotDrawable.draw(minecraft, 0, 0);
-        slotDrawable.draw(minecraft, 0, 19);
+        slotDrawable.draw(minecraft, 0, 19 * 0);
+        slotDrawable.draw(minecraft, 0, 19 * 1);
+        slotDrawable.draw(minecraft, 0, 19 * 2);
+        slotDrawable.draw(minecraft, 0, 19 * 3);
+        slotDrawable.draw(minecraft, 0, 19 * 4);
+        slotDrawable.draw(minecraft, 0, 19 * 5);
+
+        slotDrawable.draw(minecraft, 135, 19 * 4);
+        slotDrawable.draw(minecraft, 135, 19 * 5);
+
         slotDrawable.draw(minecraft, 135, 0);
-        slotDrawable.draw(minecraft, 0, 38);
     }
 
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, IRecipeWrapper recipeWrapper, IIngredients ingredients) {
-        recipeLayout.getItemStacks().init(0, true, 0, 0);
-        recipeLayout.getItemStacks().init(1, true, 0, 19);
-        recipeLayout.getItemStacks().init(2, false, 135, 0);
-        recipeLayout.getItemStacks().init(3, true, 0, 38);
+        recipeLayout.getItemStacks().init(0, true, 0, 19 * 0);
+        recipeLayout.getItemStacks().init(1, true, 0, 19 * 1);
+        recipeLayout.getItemStacks().init(2, true, 0, 19 * 2);
+        recipeLayout.getItemStacks().init(3, true, 0, 19 * 3);
+        recipeLayout.getItemStacks().init(4, true, 0, 19 * 4);
+        recipeLayout.getItemStacks().init(5, true, 0, 19 * 5);
+
+        recipeLayout.getItemStacks().init(6, true, 135, 19 * 4);
+        recipeLayout.getItemStacks().init(7, true, 135, 19 * 5);
+
+        recipeLayout.getItemStacks().init(8, false, 135, 0);
+
         recipeLayout.getItemStacks().addTooltipCallback(this);
         recipeLayout.getItemStacks().set(ingredients);
     }
@@ -66,14 +80,14 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
     public void onTooltip(int slotIndex, boolean input, ItemStack ingredient, List<String> tooltip) {
         String last = tooltip.get(tooltip.size()-1);
         tooltip.remove(tooltip.size()-1);
-        if(slotIndex == 0) {
-            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.cm2.jei.hollow_cube"));
+        if(slotIndex >= 0 && slotIndex <= 5) {
+            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.cm2.jei.shape"));
         }
-        if(slotIndex == 1) {
+        if(slotIndex == 6) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.cm2.jei.fluid"));
             tooltip.add(TextFormatting.RED + I18n.format("tooltip.cm2.jei.fluid.warning"));
         }
-        if(slotIndex == 3) {
+        if(slotIndex == 7) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.cm2.jei.crafting_trigger"));
         }
         tooltip.add(last);

@@ -1,0 +1,16 @@
+{
+  "target-block": "cm2:wallbreakable",
+  "target-count": 64,
+
+  "input-types": {
+    "i": { "id": "minecraft:iron_block" }
+  },
+
+  "shape": [
+    [
+      ["i", "i", "i"],
+      ["i", "i", "i"],
+      ["i", "i", "i"]
+    ]
+  ]
+}

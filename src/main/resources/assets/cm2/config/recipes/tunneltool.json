@@ -1,0 +1,22 @@
+{
+  "target-item": "cm2:tunneltool",
+  "target-count": 12,
+
+  "input-types": {
+    "i": { "id": "minecraft:iron_block" },
+    "r": { "id": "minecraft:redstone_block" }
+  },
+
+  "shape": [
+    [
+      ["_", "_", "_"],
+      ["_", "r", "_"],
+      ["_", "_", "_"]
+    ],
+    [
+      ["_", "i", "_"],
+      ["i", "r", "i"],
+      ["_", "i", "_"]
+    ]
+  ]
+}

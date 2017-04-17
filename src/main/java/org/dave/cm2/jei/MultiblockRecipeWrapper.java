@@ -2,29 +2,57 @@ package org.dave.cm2.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fluids.UniversalBucket;
 import org.dave.cm2.init.Fluidss;
-import org.dave.cm2.miniaturization.MiniaturizationRecipe;
+import org.dave.cm2.miniaturization.MiniaturizationEvents;
+import org.dave.cm2.miniaturization.MultiblockRecipe;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
-    public final MiniaturizationRecipe recipe;
+    public final MultiblockRecipe recipe;
     private final List<ItemStack> input = new ArrayList<>();
     private int requiredBuckets;
 
-    public MultiblockRecipeWrapper(MiniaturizationRecipe recipe) {
+    public MultiblockRecipeWrapper(MultiblockRecipe recipe) {
         this.recipe = recipe;
-        this.requiredBuckets = (int) Math.ceil(this.recipe.getWidth() / 2.0f);
-        this.requiredBuckets *= this.requiredBuckets;
 
-        this.input.add(new ItemStack(this.recipe.getSourceBlock(), this.recipe.getRequiredSourceBlockCount()));
+        // Guess the number of required buckets
+        BlockPos minPos = recipe.getMinPos();
+        BlockPos maxPos = recipe.getMaxPos();
+        int diffX = maxPos.getX() - minPos.getX() + 1;
+        int diffZ = maxPos.getZ() - minPos.getZ() + 1;
+
+        int reqX = (int) Math.ceil(diffX / 2.0f);
+        int reqZ = (int) Math.ceil(diffZ / 2.0f);
+        this.requiredBuckets = reqX * reqZ;
+
+        int added = 0;
+        for(ItemStack stack : this.recipe.getRequiredItemStacks()) {
+            this.input.add(stack);
+            added++;
+        }
+
+        for(int emptySlot = 0; emptySlot < 6 - added; emptySlot++) {
+            this.input.add(null);
+        }
+
         this.input.add(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid));
         this.input.add(this.recipe.getCatalystStack());
     }
@@ -35,114 +63,144 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
         ingredients.setOutput(ItemStack.class, this.recipe.getTargetStack());
     }
 
-    private void drawBucket(Minecraft mc) {
-        ItemStack fluidBucket = UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid);
+    public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, VertexBuffer buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
+        for (BlockPos pos : toRender) {
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0F, 0.45F, 0.9F);
-        GlStateManager.scale(0.5, 0.5, 0.5);
+            IBlockState state = recipe.getStateAtBlockPos(pos);
+            if (!state.getBlock().canRenderInLayer(state, renderLayer)) {
+                continue;
+            }
 
-        mc.getRenderItem().renderItem(fluidBucket, ItemCameraTransforms.TransformType.GUI);
-        GlStateManager.popMatrix();
+
+            ForgeHooksClient.setRenderLayer(renderLayer);
+            try {
+                blockrendererdispatcher.renderBlock(state, pos, recipe.getBlockAccess(), buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ForgeHooksClient.setRenderLayer(null);
+        }
     }
 
     @Override
     public void drawInfo(Minecraft mc, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+        BlockPos minPos = recipe.getMinPos();
+        BlockPos maxPos = recipe.getMaxPos();
+
+        int reqX = (int) Math.ceil((float)(maxPos.getX() - minPos.getX() +2) / 2.0f);
+        int reqZ = (int) Math.ceil((float)(maxPos.getZ() - minPos.getZ() +2) / 2.0f);
+        this.requiredBuckets = reqX * reqZ;
+
+        // This was the code used to draw the bucket count previously.
+        // At the moment we do not estimate the required amount of buckets, so we can not display anything.
         if(requiredBuckets > 1) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0F, 0F, 216.5F);
 
             if (requiredBuckets < 10) {
-                mc.fontRendererObj.drawStringWithShadow("" + requiredBuckets, 12, 28, 0xFFFFFF);
+                mc.fontRendererObj.drawStringWithShadow("~" + requiredBuckets, 135+6, 19 * 4 + 10, 0xFFFFFF);
             } else {
-                mc.fontRendererObj.drawStringWithShadow("" + requiredBuckets, 6, 28, 0xFFFFFF);
+                mc.fontRendererObj.drawStringWithShadow("~" + requiredBuckets, 135, 19 * 4 + 10, 0xFFFFFF);
             }
 
             GlStateManager.popMatrix();
         }
 
-        ItemStack sourceBlock = new ItemStack(this.recipe.getSourceBlock());
+        List<BlockPos> toRender = recipe.getShapeAsBlockPosList();
+        if(toRender.isEmpty()) {
+            return;
+        }
+
+        float angle = MiniaturizationEvents.renderTicks * 45.0f / 128.0f;
+
+        // When we want to render translucent blocks we might need this
+        //double c = MathHelper.cos((float)(Math.PI * (double)angle / 180.0));
+        //double s = MathHelper.sin((float)(Math.PI * (double)angle / 180.0));
+        //Collections.sort(toRender, (a,b) -> - Double.compare((double)a.getZ() * c - (double)a.getX() * s, (double)b.getX() * c - (double)b.getX() * s));
+        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+
+        // Init GlStateManager
+        TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
+        textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.disableFog();
+        GlStateManager.disableLighting();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.enableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.enableAlpha();
+        if (Minecraft.isAmbientOcclusionEnabled()) {
+            GlStateManager.shadeModel(7425);
+        } else {
+            GlStateManager.shadeModel(7424);
+        }
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(75F, 0F, 16.5F);
-        GlStateManager.scale(20, -20, 20);
 
-        float totalHeight = Math.max(5, this.recipe.getWidth()) * 0.45F + 0.45F;
-        totalHeight += (this.recipe.getHeight()) * 0.45F;
+        // Center on recipe area
+        GlStateManager.translate((float)(recipeWidth / 2), (float)(recipeHeight / 2), 100.0f);
 
-        float hRatio = recipeHeight / (20*totalHeight);
-        GlStateManager.scale(hRatio, hRatio, hRatio);
+        // Shift it a bit down so one can properly see 3d
+        GlStateManager.rotate(-25.0f, 1.0f, 0.0f, 0.0f);
 
-        if(totalHeight < 4) {
-            GlStateManager.translate(0, -0.3f * (totalHeight), 0);
+        // Rotate per our calculated time
+        GlStateManager.rotate(angle, 0.0f, 1.0f, 0.0f);
+
+        // Scale down to gui scale
+        GlStateManager.scale(16.0f, -16.0f, 16.0f);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer buffer = tessellator.getBuffer();
+
+        // Calculate the maximum size the shape has
+        BlockPos mn = recipe.getMinPos();
+        BlockPos mx = recipe.getMaxPos();
+        int diffX = mx.getX() - mn.getX();
+        int diffY = mx.getY() - mn.getY();
+        int diffZ = mx.getZ() - mn.getZ();
+
+        // We have big recipes, we need to adjust the size accordingly.
+        int maxDiff = Math.max(Math.max(diffZ, diffX), diffY) + 1;
+        float scale = 1.0f / ((float)maxDiff / 4.0f);
+
+        GlStateManager.enableCull();
+        GlStateManager.scale(scale, scale, scale);
+
+        // Move the shape to the center of the crafting window
+        GlStateManager.translate(
+            (diffX + 1) / -2.0f,
+            (diffY + 1) / -2.0f,
+            (diffZ + 1) / -2.0f
+        );
+
+        // If the client holds down the shift button, render everything as wireframe
+        boolean renderWireframe = false;
+        if(GuiScreen.isShiftKeyDown()) {
+            renderWireframe = true;
+            GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         }
 
-        // Top layer, back
-        boolean isBucketRow = true;
-        for(int stacksToDraw = 1; stacksToDraw <= this.recipe.getWidth(); stacksToDraw++) {
-            boolean isBucketCell = true;
-            for(int stackNum = 0; stackNum < stacksToDraw; stackNum++) {
-                mc.getRenderItem().renderItem(sourceBlock, ItemCameraTransforms.TransformType.GUI);
-                if(isBucketRow && isBucketCell) {
-                    drawBucket(mc);
-                }
-                GlStateManager.translate(0.9F, 0F, 0F);
-                isBucketCell = !isBucketCell;
-            }
+        // Aaaand render
+        buffer.begin(7, DefaultVertexFormats.BLOCK);
+        GlStateManager.disableAlpha();
+        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRender);
+        GlStateManager.enableAlpha();
+        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRender);
+        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRender);
+        GlStateManager.shadeModel(7425);
+        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRender);
+        tessellator.draw();
 
-            // CR+LF
-            GlStateManager.translate((-0.9F * stacksToDraw) - 0.45F, -0.225F, 0F);
-
-            // Next row needs to be a bit more in the front
-            GlStateManager.translate(0, 0, 0.45F);
-            isBucketRow = !isBucketRow;
-        }
-
-        // Top layer, front
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.9F, 0F, 0F);
-        for(int stacksToDraw = this.recipe.getWidth()-1; stacksToDraw > 0; stacksToDraw--) {
-            boolean isBucketCell = true;
-            for(int stackNum = 0; stackNum < stacksToDraw; stackNum++) {
-                mc.getRenderItem().renderItem(sourceBlock, ItemCameraTransforms.TransformType.GUI);
-                if(isBucketRow && isBucketCell) {
-                    drawBucket(mc);
-                }
-                GlStateManager.translate(0.9F, 0F, 0F);
-                isBucketCell = !isBucketCell;
-            }
-
-            // CR+LF
-            GlStateManager.translate((-0.9F * (stacksToDraw-1) ) - 0.45F, -0.225F, 0F);
-
-            // Next row needs to be a bit more in the front
-            GlStateManager.translate(0, 0, 0.45F);
-            isBucketRow = !isBucketRow;
-        }
-        GlStateManager.popMatrix();
-
-        // The remaining layers
-        GlStateManager.translate(0.45F, -0.315F, -0.9F);
-        for(int layer = 1; layer < this.recipe.getHeight(); layer++) {
-            GlStateManager.pushMatrix();
-
-            // Left side
-            for(int stackNum = 0; stackNum < this.recipe.getWidth(); stackNum++) {
-                mc.getRenderItem().renderItem(sourceBlock, ItemCameraTransforms.TransformType.GUI);
-                GlStateManager.translate(0.45F, -0.225F, 0.45F);
-            }
-
-            // Right side
-            GlStateManager.translate(0, 0.45F, -0.9F);
-            for(int stackNum = 0; stackNum < this.recipe.getWidth()-1; stackNum++) {
-                mc.getRenderItem().renderItem(sourceBlock, ItemCameraTransforms.TransformType.GUI);
-                GlStateManager.translate(0.45F, 0.225F, -0.45F);
-            }
-
-            GlStateManager.popMatrix();
-
-            // One layer down
-            GlStateManager.translate(0, -0.55F, -0.45F);
+        // Stop wireframe rendering
+        if(renderWireframe) {
+            GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         }
 
         GlStateManager.popMatrix();

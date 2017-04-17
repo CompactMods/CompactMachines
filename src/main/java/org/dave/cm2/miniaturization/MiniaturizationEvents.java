@@ -23,6 +23,7 @@ import org.dave.cm2.item.psd.PSDFluidStorage;
 
 
 public class MiniaturizationEvents {
+    public static int renderTicks = 0;
     /*
      * Render living entities smaller according to their scale attribute
      */
@@ -85,6 +86,12 @@ public class MiniaturizationEvents {
     }
 
 
+    @SubscribeEvent
+    public static void onRenderTick(TickEvent.RenderTickEvent event) {
+        if(event.phase == TickEvent.RenderTickEvent.Phase.START) {
+            renderTicks++;
+        }
+    }
 
     /*
      * If an entity has been shrunk, scale and limit its upward motion when jumping

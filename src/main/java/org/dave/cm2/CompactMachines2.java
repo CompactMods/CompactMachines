@@ -13,7 +13,7 @@ import org.dave.cm2.gui.GuiHandler;
 import org.dave.cm2.init.*;
 import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.miniaturization.MiniaturizationEvents;
-import org.dave.cm2.miniaturization.MiniaturizationRecipes;
+import org.dave.cm2.miniaturization.MultiblockRecipes;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.network.PackageHandler;
 import org.dave.cm2.proxy.CommonProxy;
@@ -64,7 +64,7 @@ public class CompactMachines2
         Blockss.init();
         Itemss.init();
         Potionss.init();
-        MiniaturizationRecipes.init();
+        MultiblockRecipes.init();
         Recipes.init();
         CapabilityNullHandlerRegistry.registerNullHandlers(event.getAsmData());
 

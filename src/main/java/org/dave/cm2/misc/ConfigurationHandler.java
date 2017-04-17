@@ -1,15 +1,20 @@
 package org.dave.cm2.misc;
 
+import com.google.common.io.ByteStreams;
+import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.utility.Logz;
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigurationHandler {
     public static Configuration configuration;
+    public static File cmDirectory;
 
     private static final String CATEGORY_INTERNAL = "Internal";
     private static final String CATEGORY_MINIATURIZATION = "Miniaturization";
@@ -20,8 +25,55 @@ public class ConfigurationHandler {
             return;
         }
 
-        configuration = new Configuration(configFile, null);
+        cmDirectory = new File(configFile.getParentFile(), "cm2");
+        if(!cmDirectory.exists()) {
+            cmDirectory.mkdir();
+        }
+
+        configuration = new Configuration(new File(cmDirectory, "settings.cfg"), null);
         loadConfiguration();
+
+        // TODO: Add command to extract these directories, so people can overwrite them
+        //extractJarDirectory("assets/cm2/config/recipes", new File(cmDirectory, "recipes"), false);
+    }
+
+    private static void extractJarDirectory(String resourcePath, File targetDirectory, boolean overwrite) {
+        if(!targetDirectory.exists()) {
+            targetDirectory.mkdir();
+        }
+
+        List<String> files = new ArrayList<>();
+        try {
+            InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourcePath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            String resource;
+            while((resource = br.readLine()) != null){
+                files.add(resource);
+            }
+        } catch (IOException e1) {
+            Logz.error("Could not list files in jar path: %s.", resourcePath);
+            return;
+        }
+
+        for(String filename : files) {
+            File targetFile = new File(targetDirectory, filename);
+            if(targetFile.exists() && !overwrite) {
+                continue;
+            }
+
+            String resourceName = resourcePath + "/" + filename;
+            InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourceName);
+            try {
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
+                ByteStreams.copy(in, out);
+                out.close();
+                in.close();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to unpack resource \'" + resourceName + "\'", e);
+            }
+        }
+
     }
 
     private static void loadConfiguration() {

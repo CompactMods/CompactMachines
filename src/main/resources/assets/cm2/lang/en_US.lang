@@ -34,10 +34,11 @@ tooltip.cm2.wall.hint=Warning! Unbreakable for non-creative players!
 tooltip.cm2.machine.hint=A %s provides a %s room.
 
 tooltip.cm2.jei.crafting_trigger=Throw this into the fluid to start the crafting.
-tooltip.cm2.jei.hollow_cube=Use these to build a (hollow) multiblock
-tooltip.cm2.jei.fluid=Pour over the the multiblock.
-tooltip.cm2.jei.fluid.warning=The surrounding fluid must not extend more than one block from the multiblock!
+tooltip.cm2.jei.shape=Use these to build the multiblock as shown
+tooltip.cm2.jei.fluid=Pour over the the multiblock. The needed amount is just an estimate.
+tooltip.cm2.jei.fluid.warning=The whole multiblock must be covered with a exactly one layer thick fluid!
 
+cm2.jei.category.multiblock_miniaturization=Multiblock Miniaturization
 cm2.jei.minifluiddrop.description=Obtain these by killing entities that are under the effects of the miniaturization fluid.\n\nTo get miniaturization fluid in the first place find a broken compact machine somewhere in the overworld. Bring buckets.
 
 enumfacing.side=Side: %s

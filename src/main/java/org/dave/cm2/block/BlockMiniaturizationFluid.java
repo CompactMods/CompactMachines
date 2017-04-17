@@ -5,9 +5,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -16,14 +16,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import org.dave.cm2.init.Fluidss;
 import org.dave.cm2.miniaturization.MiniaturizationPotion;
-import org.dave.cm2.miniaturization.MiniaturizationRecipes;
+import org.dave.cm2.miniaturization.MultiblockRecipes;
 import org.dave.cm2.misc.ConfigurationHandler;
-import org.dave.cm2.world.tools.CraftingTools;
 
 import java.util.Random;
 
 public class BlockMiniaturizationFluid extends BlockFluidClassic {
-
     public BlockMiniaturizationFluid() {
         super(Fluidss.miniaturizationFluid, Material.WATER);
         this.setUnlocalizedName("miniaturization_fluid_block");
@@ -39,10 +37,26 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
         if(!(entity instanceof EntityLivingBase)) {
             if(entity instanceof EntityItem) {
                 Item item = ((EntityItem) entity).getEntityItem().getItem();
-                if(MiniaturizationRecipes.isCatalystItem(item)) {
+                if(MultiblockRecipes.isCatalystItem(item)) {
                     if(!world.isRemote) {
-                        CraftingTools.tryCrafting(world, pos, item);
+                        if(entity.isDead) {
+                            return;
+                        }
+
                         entity.setDead();
+                        ItemStack result = MultiblockRecipes.tryCrafting(world, pos, item);
+                        if(result != null) {
+                            Vec3d entityPosition = entity.getPositionVector();
+                            EntityItem entityItem = new EntityItem(world, entityPosition.xCoord, entityPosition.yCoord, entityPosition.zCoord, result);
+                            entityItem.lifespan = 2400;
+                            entityItem.setPickupDelay(10);
+
+                            entityItem.motionX = 0.0f;
+                            entityItem.motionY = 0.55F;
+                            entityItem.motionZ = 0.0f;
+
+                            world.spawnEntityInWorld(entityItem);
+                        }
                     } else {
                         Vec3d entityPosition = entity.getPositionVector();
                         world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord, entityPosition.yCoord+0.05f, entityPosition.zCoord, 0.0D, 0.0D, 0.0D, new int[0]);

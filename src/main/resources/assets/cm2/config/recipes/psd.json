@@ -1,0 +1,22 @@
+{
+  "target-item": "cm2:psd",
+  "target-count": 1,
+  "target-meta": 0,
+
+  "catalyst": "minecraft:redstone",
+  "catalst-meta": 0,
+
+  "input-types": {
+    "g": { "id": "minecraft:gold_block", "meta": 0 }
+  },
+
+  "shape":
+  [
+    [
+      ["g"]
+    ],
+    [
+      ["g"]
+    ]
+  ]
+}
