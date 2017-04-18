@@ -76,7 +76,9 @@ commands.cm2.entity-size.reset.description=Restores a players size if something 
 commands.cm2.entity-size.set.usage=/cm2 entity-size reset [<player>] <scale>
 commands.cm2.entity-size.set.description=Set the size of a player
 
-
+commands.cm2.recipe.description=Stuff related to Multiblock Miniaturization recipes
+commands.cm2.recipe.unpack-defaults.usage=/cm2 recipe unpack-defaults [force]
+commands.cm2.recipe.unpack-defaults.description=Extract the default recipes from the .jar to the config folder. Append "force" to overwrite existing files.
 
 gui.cm2.psd.welcome.intro=Compact Machines 2 allows you to build<br/>complex machine contraptions within a single<br/>block!<br/><br/>Available chapters:
 

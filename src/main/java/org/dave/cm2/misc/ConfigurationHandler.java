@@ -1,7 +1,6 @@
 package org.dave.cm2.misc;
 
 import com.google.common.io.ByteStreams;
-import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,12 +31,9 @@ public class ConfigurationHandler {
 
         configuration = new Configuration(new File(cmDirectory, "settings.cfg"), null);
         loadConfiguration();
-
-        // TODO: Add command to extract these directories, so people can overwrite them
-        //extractJarDirectory("assets/cm2/config/recipes", new File(cmDirectory, "recipes"), false);
     }
 
-    private static void extractJarDirectory(String resourcePath, File targetDirectory, boolean overwrite) {
+    public static int extractJarDirectory(String resourcePath, File targetDirectory, boolean overwrite) {
         if(!targetDirectory.exists()) {
             targetDirectory.mkdir();
         }
@@ -53,9 +49,10 @@ public class ConfigurationHandler {
             }
         } catch (IOException e1) {
             Logz.error("Could not list files in jar path: %s.", resourcePath);
-            return;
+            return 0;
         }
 
+        int count = 0;
         for(String filename : files) {
             File targetFile = new File(targetDirectory, filename);
             if(targetFile.exists() && !overwrite) {
@@ -69,11 +66,13 @@ public class ConfigurationHandler {
                 ByteStreams.copy(in, out);
                 out.close();
                 in.close();
+                count++;
             } catch (Exception e) {
                 throw new RuntimeException("Failed to unpack resource \'" + resourceName + "\'", e);
             }
         }
 
+        return count;
     }
 
     private static void loadConfiguration() {

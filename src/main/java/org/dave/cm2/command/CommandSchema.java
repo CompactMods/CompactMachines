@@ -1,7 +1,5 @@
 package org.dave.cm2.command;
 
-import net.minecraft.entity.player.EntityPlayer;
-
 public class CommandSchema extends CommandMenu {
 
     @Override

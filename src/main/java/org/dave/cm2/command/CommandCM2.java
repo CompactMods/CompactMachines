@@ -5,6 +5,7 @@ public class CommandCM2 extends CommandMenu {
     @Override
     public void initEntries() {
         this.addSubcommand(new CommandSchema());
+        this.addSubcommand(new CommandRecipe());
         this.addSubcommand(new CommandEntitySize());
     }
 
