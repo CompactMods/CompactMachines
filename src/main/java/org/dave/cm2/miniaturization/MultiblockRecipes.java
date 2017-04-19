@@ -6,11 +6,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.block.BlockMiniaturizationFluid;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.misc.ConfigurationHandler;
-import org.dave.cm2.utility.SerializationHelper;
 import org.dave.cm2.utility.Logz;
+import org.dave.cm2.utility.SerializationHelper;
 import org.dave.cm2.world.tools.RecursiveSearch;
 
 import java.io.*;
@@ -86,19 +87,18 @@ public class MultiblockRecipes {
 
     private static void loadRecipes() {
         String resourcePath = "assets/cm2/config/recipes";
-        List<String> files = new ArrayList<>();
-        try {
-            InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourcePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-            String resource;
-            while((resource = br.readLine()) != null){
-                files.add(resource);
-            }
-        } catch (IOException e1) {
-            Logz.error("Could not list files in jar path: %s.", resourcePath);
-            return;
-        }
+        // TODO: Fix me, do not hardcode recipes!
+        List<String> files = new ArrayList<>();
+        files.add("psd.json");
+        files.add("wallbreakable.json");
+        files.add("tunneltool.json");
+        files.add("machine-tiny.json");
+        files.add("machine-small.json");
+        files.add("machine-normal.json");
+        files.add("machine-large.json");
+        files.add("machine-giant.json");
+        files.add("machine-maximum.json");
 
         File localRecipeDir = new File(ConfigurationHandler.cmDirectory, "recipes");
         for(String filename : files) {
@@ -114,7 +114,7 @@ public class MultiblockRecipes {
                 }
                 Logz.info("Loaded recipe \"%s\" from disk!", filename);
             } else {
-                InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourcePath + "/" + filename);
+                InputStream in = CompactMachines2.instance.getClass().getClassLoader().getResourceAsStream(resourcePath + "/" + filename);
                 recipe = SerializationHelper.GSON.fromJson(new InputStreamReader(in), MultiblockRecipe.class);
 
                 if(recipe == null) {

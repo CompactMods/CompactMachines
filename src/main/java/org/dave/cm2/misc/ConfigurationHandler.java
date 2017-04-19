@@ -38,19 +38,18 @@ public class ConfigurationHandler {
             targetDirectory.mkdir();
         }
 
+        // TODO: Fix me, do not hardcode recipes!
         List<String> files = new ArrayList<>();
-        try {
-            InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourcePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        files.add("psd.json");
+        files.add("wallbreakable.json");
+        files.add("tunneltool.json");
+        files.add("machine-tiny.json");
+        files.add("machine-small.json");
+        files.add("machine-normal.json");
+        files.add("machine-large.json");
+        files.add("machine-giant.json");
+        files.add("machine-maximum.json");
 
-            String resource;
-            while((resource = br.readLine()) != null){
-                files.add(resource);
-            }
-        } catch (IOException e1) {
-            Logz.error("Could not list files in jar path: %s.", resourcePath);
-            return 0;
-        }
 
         int count = 0;
         for(String filename : files) {
