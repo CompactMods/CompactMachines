@@ -49,7 +49,8 @@ enumfacing.south=South
 enumfacing.west=West
 enumfacing.east=East
 
-
+entity.Villager.cm2.builder=Compact Machine Builder
+entity.Villager.cm2.chemist=Compact Machine Chemist
 
 commands.cm2.usage=/cm2 [subcommand, leave empty for list of commands]
 

@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.cm2.init.Itemss;
 import org.dave.cm2.init.Potionss;
 import org.dave.cm2.item.psd.PSDFluidStorage;
+import org.dave.cm2.misc.Villager;
 
 
 public class MiniaturizationEvents {
@@ -125,6 +127,18 @@ public class MiniaturizationEvents {
 
         EntityLivingBase entity = (EntityLivingBase) event.getEntity();
         entity.getAttributeMap().registerAttribute(Potionss.scaleAttribute);
+    }
+
+    @SubscribeEvent
+    public static void onLivingEnterChunk(EntityEvent.EnteringChunk event) {
+        if(!(event.getEntity() instanceof EntityVillager)) {
+            return;
+        }
+
+        EntityVillager villager = (EntityVillager) event.getEntity();
+        if(villager.getProfessionForge().equals(Villager.shrinker)) {
+            MiniaturizationPotion.applyPotion(villager, Integer.MAX_VALUE, 2);
+        }
     }
 
     @SubscribeEvent

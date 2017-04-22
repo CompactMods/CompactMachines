@@ -15,6 +15,7 @@ import org.dave.cm2.integration.CapabilityNullHandlerRegistry;
 import org.dave.cm2.miniaturization.MiniaturizationEvents;
 import org.dave.cm2.miniaturization.MultiblockRecipes;
 import org.dave.cm2.misc.ConfigurationHandler;
+import org.dave.cm2.misc.Villager;
 import org.dave.cm2.network.PackageHandler;
 import org.dave.cm2.proxy.CommonProxy;
 import org.dave.cm2.world.ChunkLoadingMachines;
@@ -59,6 +60,7 @@ public class CompactMachines2
 
         GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
 
+
         GuiHandler.init();
         Fluidss.init();
         Blockss.init();
@@ -66,6 +68,7 @@ public class CompactMachines2
         Potionss.init();
         MultiblockRecipes.init();
         Recipes.init();
+        Villager.init();
         CapabilityNullHandlerRegistry.registerNullHandlers(event.getAsmData());
 
         proxy.preInit(event);
