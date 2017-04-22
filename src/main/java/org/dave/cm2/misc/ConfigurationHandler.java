@@ -8,8 +8,13 @@ import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.utility.Logz;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class ConfigurationHandler {
     public static Configuration configuration;
@@ -38,37 +43,64 @@ public class ConfigurationHandler {
             targetDirectory.mkdir();
         }
 
-        // TODO: Fix me, do not hardcode recipes!
-        List<String> files = new ArrayList<>();
-        files.add("psd.json");
-        files.add("wallbreakable.json");
-        files.add("tunneltool.json");
-        files.add("machine-tiny.json");
-        files.add("machine-small.json");
-        files.add("machine-normal.json");
-        files.add("machine-large.json");
-        files.add("machine-giant.json");
-        files.add("machine-maximum.json");
+        // Get a Path object to either the folder in the jar or the disk, if we are in a development environment
+        Path myPath = null;
+        try {
+            URI uri = CompactMachines2.class.getResource("/" + resourcePath).toURI();
+            if(uri.getScheme().equals("jar")) {
+                FileSystem fs = FileSystems.getFileSystem(uri);
+                if(fs == null) {
+                    fs = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+                }
 
+                myPath = fs.getPath("/" + resourcePath);
+            } else {
+                myPath = Paths.get(uri);
+            }
+        } catch (URISyntaxException e) {
+        } catch (IOException e) {
+        }
 
+        if(myPath == null) {
+            throw new RuntimeException("Could not list files in path: \"" + resourcePath + "\"");
+        }
+
+        // Lastly iterate over the found resources and load recipes either from the development
+        // folder, or from the jar.
         int count = 0;
-        for(String filename : files) {
-            File targetFile = new File(targetDirectory, filename);
-            if(targetFile.exists() && !overwrite) {
-                continue;
-            }
+        try {
+            Stream<Path> walk = Files.walk(myPath, 1);
+            for (Iterator<Path> it = walk.iterator(); it.hasNext();){
+                Path path = it.next();
 
-            String resourceName = resourcePath + "/" + filename;
-            InputStream in = ConfigurationHandler.class.getClassLoader().getResourceAsStream(resourceName);
-            try {
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
-                ByteStreams.copy(in, out);
-                out.close();
-                in.close();
-                count++;
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to unpack resource \'" + resourceName + "\'", e);
+                // Sadly, this does not work inside jar files: path.endsWith(new File(resourcePath).toPath())
+                // So we have to check manually that we are not testing the directory itself
+                String pathWithForeslash = path.toString().replace('\\', '/');
+                if(pathWithForeslash.endsWith(resourcePath)) {
+                    continue;
+                }
+
+                String filename = path.getFileName().toString();
+
+                File targetFile = new File(targetDirectory, filename);
+                if(targetFile.exists() && !overwrite) {
+                    continue;
+                }
+
+                String resourceName = resourcePath + "/" + filename;
+                InputStream in = CompactMachines2.class.getClassLoader().getResourceAsStream(resourceName);
+                try {
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
+                    ByteStreams.copy(in, out);
+                    out.close();
+                    in.close();
+                    count++;
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to unpack resource \'" + resourceName + "\'", e);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return count;
