@@ -16,7 +16,7 @@ public class RecursiveSearch {
 
     private World world;
     private Block type;
-    private int limit = 1024;
+    private int limit = 2048;
     private int lowestY = -1;
     private boolean matchBlock = true;
     private BlockPos startPos;
