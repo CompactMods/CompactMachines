@@ -1,18 +1,17 @@
 package org.dave.cm2.command;
 
+import mcjty.lib.tools.ChatTools;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
-import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +33,7 @@ public abstract class CommandMenu extends CommandBaseExt {
 
         subcommand.setParentCommand(this);
         this.subcommands.add(subcommand);
-        this.commands.add(subcommand.getCommandName());
+        this.commands.add(subcommand.getName());
     }
 
     @Override
@@ -47,7 +46,7 @@ public abstract class CommandMenu extends CommandBaseExt {
         boolean found = false;
         if(args.length > 0) {
             for(CommandBaseExt cmd : subcommands) {
-                if(cmd.getCommandName().equalsIgnoreCase(args[0])) {
+                if(cmd.getName().equalsIgnoreCase(args[0])) {
                     found = true;
                     if(cmd.checkPermission(server, sender)) {
                         String[] remaining = Arrays.copyOfRange(args, 1, args.length);
@@ -59,7 +58,7 @@ public abstract class CommandMenu extends CommandBaseExt {
         }
 
         if(found) {
-            sender.addChatMessage(new TextComponentTranslation("commands.cm2.denied"));
+            ChatTools.addChatMessage(sender, new TextComponentTranslation("commands.cm2.denied"));
             return;
         }
 
@@ -71,7 +70,7 @@ public abstract class CommandMenu extends CommandBaseExt {
             for(CommandBaseExt cmd : subcommands) {
                 boolean allowed = cmd.checkPermission(server, sender);
                 String color = "" + (allowed ? TextFormatting.GREEN : TextFormatting.DARK_RED);
-                tc.appendSibling(new TextComponentString("\n" + color + cmd.getCommandName() + " "));
+                tc.appendSibling(new TextComponentString("\n" + color + cmd.getName() + " "));
                 TextComponentTranslation tt = new TextComponentTranslation(cmd.getCommandDescription(sender));
                 tt.getStyle().setColor(TextFormatting.GRAY);
                 tt.getStyle().setUnderlined(false);
@@ -79,23 +78,23 @@ public abstract class CommandMenu extends CommandBaseExt {
                 tc.appendSibling(new TextComponentString("" + TextFormatting.RESET));
             }
 
-            sender.addChatMessage(tc);
+            ChatTools.addChatMessage(sender, tc);
         }
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, commands);
         } else if(args.length > 1) {
             for(CommandBase cmd : subcommands) {
-                if (cmd.getCommandName().equalsIgnoreCase(args[0]) && cmd.checkPermission(server, sender)) {
+                if (cmd.getName().equalsIgnoreCase(args[0]) && cmd.checkPermission(server, sender)) {
                     String[] remaining = Arrays.copyOfRange(args, 1, args.length);
-                    return cmd.getTabCompletionOptions(server, sender, remaining, pos);
+                    return cmd.getTabCompletions(server, sender, remaining, pos);
                 }
             }
         }
 
-        return super.getTabCompletionOptions(server, sender, args, pos);
+        return super.getTabCompletions(server, sender, args, pos);
     }
 }

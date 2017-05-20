@@ -1,5 +1,7 @@
 package org.dave.cm2.block;
 
+import mcjty.lib.tools.ChatTools;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,8 +34,14 @@ public class BlockWall extends BlockProtected {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if(heldItem == null || !(heldItem.getItem() instanceof ItemTunnelTool && heldItem.stackSize > 0)) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack playerStack = player.getHeldItemMainhand();
+
+        if(!ItemStackTools.isValid(playerStack) || ItemStackTools.isEmpty(playerStack)) {
+            return false;
+        }
+
+        if(!(playerStack.getItem() instanceof ItemTunnelTool)) {
             return false;
         }
 
@@ -64,11 +72,11 @@ public class BlockWall extends BlockProtected {
             IBlockState blockState = Blockss.tunnel.getDefaultState().withProperty(BlockTunnel.MACHINE_SIDE, tunnelSide);
             world.setBlockState(pos, blockState);
 
-            heldItem.stackSize--;
+            ItemStackTools.setStackSize(playerStack, ItemStackTools.getStackSize(playerStack)-1);
             WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
         } else {
             // TODO: Localization
-            player.addChatComponentMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"));
+            ChatTools.addChatMessage(player, new TextComponentString(TextFormatting.RED + "All tunnels already used up"));
         }
 
         return true;

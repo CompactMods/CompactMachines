@@ -1,5 +1,6 @@
 package org.dave.cm2.misc;
 
+import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -49,8 +50,11 @@ public class Villager {
             this.output = output;
         }
 
-        @Override
         public void modifyMerchantRecipeList(MerchantRecipeList recipeList, Random random) {
+            recipeList.add(new MerchantRecipe(inputOne, inputTwo, output));
+        }
+
+        public void addMerchantRecipe(IMerchant merchant, MerchantRecipeList recipeList, Random random) {
             recipeList.add(new MerchantRecipe(inputOne, inputTwo, output));
         }
     }

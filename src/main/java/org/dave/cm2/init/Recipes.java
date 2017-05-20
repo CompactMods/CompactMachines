@@ -15,8 +15,8 @@ public class Recipes {
 
     private static void registerRecipes() {
         ItemStack outputStack = UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid);
-        ItemStack fd = new ItemStack(Itemss.miniFluidDrop);
-        ItemStack bucket = new ItemStack(Items.BUCKET);
+        ItemStack fd = new ItemStack(Itemss.miniFluidDrop, 1, 0);
+        ItemStack bucket = new ItemStack(Items.BUCKET, 1, 0);
         GameRegistry.addRecipe(new ShapedRecipes(3, 3, new ItemStack[] {fd, fd, fd, fd, bucket, fd, fd, fd, fd}, outputStack));
         GameRegistry.addRecipe(new PSDChargeRecipe());
     }

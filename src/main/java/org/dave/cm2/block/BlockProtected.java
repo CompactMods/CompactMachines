@@ -1,5 +1,6 @@
 package org.dave.cm2.block;
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -29,7 +30,7 @@ public abstract class BlockProtected extends BlockBase {
         if(!world.isRemote && player instanceof EntityPlayerMP && player.capabilities.isCreativeMode) {
             ItemStack playerStack = player.getHeldItemMainhand();
 
-            if(playerStack != null && playerStack.getItem() == Itemss.miniFluidDrop) {
+            if(ItemStackTools.isValid(playerStack) && !ItemStackTools.isEmpty(playerStack) && playerStack.getItem() == Itemss.miniFluidDrop) {
                 return super.removedByPlayer(state, world, pos, player, willHarvest);
             }
         }

@@ -10,7 +10,7 @@ public class CommandCM2 extends CommandMenu {
     }
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "cm2";
     }
 }

@@ -1,12 +1,13 @@
 package org.dave.cm2.world;
 
+import mcjty.lib.compat.CompatWorldProvider;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.world.tools.DimensionTools;
 
-public class WorldProviderMachines extends WorldProvider {
+public class WorldProviderMachines extends CompatWorldProvider {
     public WorldProviderMachines() {
 
     }
@@ -18,8 +19,7 @@ public class WorldProviderMachines extends WorldProvider {
 
     @Override
     public IChunkGenerator createChunkGenerator() {
-
-        return new ChunkGeneratorMachines(this.worldObj);
+        return new ChunkGeneratorMachines(this.getWorld());
     }
 
     @Override

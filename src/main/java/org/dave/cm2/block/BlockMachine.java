@@ -1,5 +1,8 @@
 package org.dave.cm2.block;
 
+import mcjty.lib.tools.ChatTools;
+import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -17,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -64,8 +68,8 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
-        super.neighborChanged(state, world, pos, blockIn);
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos what) {
+        super.neighborChanged(state, world, pos, blockIn, what);
 
         if(world.isRemote) {
             return;
@@ -94,15 +98,15 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 continue;
             }
 
-            machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel);
+            WorldTools.notifyNeighborsOfStateChange(machineWorld, neighborPos, Blockss.tunnel);
         }
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
         for(EnumMachineSize size : EnumMachineSize.values()) {
-            list.add(new ItemStack(this, 1, size.getMeta()));
+            subItems.add(new ItemStack(this, 1, size.getMeta()));
         }
     }
 
@@ -195,7 +199,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         entityItem.motionY = (float) world.rand.nextGaussian() * motionMultiplier + 0.1F;
         entityItem.motionZ = (float) world.rand.nextGaussian() * motionMultiplier;
 
-        world.spawnEntityInWorld(entityItem);
+        WorldTools.spawnEntity(world, entityItem);
     }
 
     @Override
@@ -238,7 +242,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if(player.isSneaking()) {
             return false;
         }
@@ -254,7 +258,8 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
 
         ItemStack playerStack = player.getHeldItemMainhand();
-        if(playerStack != null) {
+
+        if(ItemStackTools.isValid(playerStack) && !ItemStackTools.isEmpty(playerStack)) {
             Item playerItem = playerStack.getItem();
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
@@ -273,15 +278,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 } else {
                     TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.not_enough_fluid");
                     tc.getStyle().setColor(TextFormatting.DARK_RED);
-                    player.addChatComponentMessage(tc);
+                    ChatTools.addChatMessage(player, tc);
                 }
-            } else if(playerStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
-                if(!FluidUtil.interactWithFluidHandler(playerStack, machine.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side), player)) {
-                    return false;
-                }
-
-                machine.markDirty();
             }
+            // TODO: Readd ability to pick up fluids from tanks by right-clicking the machine.
+            //       -> Create a pull request for compat-layer that has interactWithFluidHandler support
         }
 
         return true;

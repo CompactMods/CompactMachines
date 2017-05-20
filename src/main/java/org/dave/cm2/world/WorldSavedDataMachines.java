@@ -1,5 +1,6 @@
 package org.dave.cm2.world;
 
+import mcjty.lib.tools.WorldTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -84,7 +85,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         Logz.info(" > Next machine id: %d", wsd.nextCoord);
 
         WorldSavedDataMachines.INSTANCE = wsd;
-        event.getWorld().getMapStorage().setData("WorldSavedDataMachines", wsd);
+        WorldTools.saveData(event.getWorld(), "WorldSavedDataMachines", wsd);
     }
 
     public void removeTunnel(BlockPos pos) {

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class CommandEntitySizeSet extends CommandBaseExt {
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "set";
     }
 
@@ -48,9 +48,9 @@ public class CommandEntitySizeSet extends CommandBaseExt {
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
         if(args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, server.getAllUsernames());
+            return getListOfStringsMatchingLastWord(args, server.getPlayerList().getOnlinePlayerNames());
         }
         if(args.length == 2) {
             return Arrays.asList("1.0");

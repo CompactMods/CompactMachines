@@ -1,6 +1,7 @@
 package org.dave.cm2.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,7 +55,7 @@ public class MessageEntitySizeChange implements IMessage, IMessageHandler<Messag
      */
     @Override
     public IMessage onMessage(MessageEntitySizeChange message, MessageContext ctx) {
-        Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.entityId);
+        Entity entity = MinecraftTools.getWorld(Minecraft.getMinecraft()).getEntityByID(message.entityId);
         if(!(entity instanceof EntityPlayer)) {
             return null;
         }

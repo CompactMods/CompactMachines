@@ -1,5 +1,6 @@
 package org.dave.cm2.item;
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,10 +43,13 @@ public class ItemMiniFluidDrop extends ItemFood {
         return super.setUnlocalizedName(name);
     }
 
+    // TODO: PR for compat layer: CompatItemFood
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStack, World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack itemStack = player.getHeldItem(hand);
+
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-            return super.onItemRightClick(itemStack, world, player, hand);
+            return super.onItemRightClick(world, player, hand);
         }
         Vec3d eyeVec = new Vec3d(player.posX, player.posY + (double)player.getEyeHeight(), player.posZ);
         Vec3d lookVec = player.getLook(0.0f);
@@ -54,7 +58,7 @@ public class ItemMiniFluidDrop extends ItemFood {
         RayTraceResult trace = world.rayTraceBlocks(eyeVec, maxVec, false, false, true);
 
         if(trace == null || trace.getBlockPos() == null) {
-            return super.onItemRightClick(itemStack, world, player, hand);
+            return super.onItemRightClick(world, player, hand);
         }
 
         TileEntity te = world.getTileEntity(trace.getBlockPos());
@@ -62,12 +66,12 @@ public class ItemMiniFluidDrop extends ItemFood {
             IFluidHandler fluidHandler = world.getTileEntity(trace.getBlockPos()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, trace.sideHit);
             if(fluidHandler.fill(new FluidStack(Fluidss.miniaturizationFluid, 125), false) == 125) {
                 fluidHandler.fill(new FluidStack(Fluidss.miniaturizationFluid, 125), true);
-                itemStack.stackSize--;
+                ItemStackTools.setStackSize(itemStack, ItemStackTools.getStackSize(itemStack) - 1);
                 return new ActionResult(EnumActionResult.SUCCESS, itemStack);
             }
         }
 
-        return super.onItemRightClick(itemStack, world, player, hand);
+        return super.onItemRightClick(world, player, hand);
     }
 
     @Override

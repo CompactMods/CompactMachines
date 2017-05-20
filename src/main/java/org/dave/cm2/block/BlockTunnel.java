@@ -1,5 +1,6 @@
 package org.dave.cm2.block;
 
+import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -26,7 +27,6 @@ import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.DimensionTools;
 import org.dave.cm2.world.tools.StructureTools;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
@@ -45,8 +45,9 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
         return true;
     }
 
+
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if(player.isSneaking()) {
             return false;
         }
@@ -80,7 +81,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
                 entityItem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
                 entityItem.motionZ = (float) world.rand.nextGaussian() * f3;
 
-                world.spawnEntityInWorld(entityItem);
+                WorldTools.spawnEntity(world, entityItem);
 
                 WorldSavedDataMachines.INSTANCE.removeTunnel(pos);
                 break;
@@ -105,8 +106,8 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
-        super.neighborChanged(state, world, pos, blockIn);
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos whatblock) {
+        super.neighborChanged(state, world, pos, blockIn, whatblock);
 
         if(world.isRemote) {
             return;
@@ -130,7 +131,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
             return;
         }
 
-        realWorld.notifyNeighborsOfStateChange(dimpos.getBlockPos(), Blockss.machine);
+        WorldTools.notifyNeighborsOfStateChange(realWorld, dimpos.getBlockPos(), Blockss.machine);
     }
 
     @Override

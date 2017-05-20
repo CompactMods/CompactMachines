@@ -1,6 +1,7 @@
 package org.dave.cm2.miniaturization;
 
 import com.google.gson.stream.JsonReader;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -61,7 +62,6 @@ public class MultiblockRecipes {
         }
 
         // 3. Use the previously gathered information to search for all connected blocks on the inside of the fluid
-        Logz.info("starting search at %s", insidePos.down());
         ArrayList<BlockPos> insideBlocks = new RecursiveSearch(world, insidePos.down(), Blockss.miniaturizationFluidBlock, lowestY, false).getResult();
 
         // 4. Find a recipe that matches the given blocks on the inside of the mini fluid
@@ -84,7 +84,7 @@ public class MultiblockRecipes {
             }
         }
 
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     private static void loadRecipes() {

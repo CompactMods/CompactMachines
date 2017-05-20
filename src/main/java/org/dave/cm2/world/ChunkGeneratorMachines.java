@@ -1,6 +1,7 @@
 package org.dave.cm2.world;
 
 import com.google.common.collect.ImmutableList;
+import mcjty.lib.compat.CompatChunkGenerator;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -12,7 +13,7 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ChunkGeneratorMachines implements IChunkGenerator {
+public class ChunkGeneratorMachines implements CompatChunkGenerator {
     private final World world;
 
     public ChunkGeneratorMachines(World worldIn) {
@@ -41,13 +42,12 @@ public class ChunkGeneratorMachines implements IChunkGenerator {
         return ImmutableList.of();
     }
 
-    @Nullable
     @Override
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
-        return null;
+    public void recreateStructures(Chunk chunkIn, int x, int z) {
     }
 
     @Override
-    public void recreateStructures(Chunk chunkIn, int x, int z) {
+    public BlockPos clGetStrongholdGen(World worldIn, String structureName, BlockPos position) {
+        return null;
     }
 }

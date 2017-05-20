@@ -1,10 +1,11 @@
 package org.dave.cm2.block;
 
+import mcjty.lib.compat.CompatBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import org.dave.cm2.CompactMachines2;
 
-public class BlockBase extends Block {
+public class BlockBase extends CompatBlock {
     public BlockBase(Material material) {
         super(material);
     }

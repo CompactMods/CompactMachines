@@ -34,14 +34,15 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20161111"
+    mappings = "snapshot_20170411"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 repositories {
     maven { // The repo from which to get waila
         name "Mobius Repo"
-        url "http://mobiusstrip.eu/maven"
+        // url "http://mobiusstrip.eu/maven"
+        url "http://tehnut.info/maven"
     }
 
     maven { // location of the maven that hosts JEI files
@@ -71,10 +72,12 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    deobfCompile "com.github.mcjty:compatlayer:${config.minecraft.version}-${config.compatlayer.version}"
+
     deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
     runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
 
-    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4:dev"
+    deobfCompile "mcp.mobius.waila:Hwyla:${config.waila.version}:api"
 }
 
 allprojects {

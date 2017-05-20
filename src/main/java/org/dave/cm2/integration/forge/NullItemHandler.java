@@ -33,4 +33,9 @@ public class NullItemHandler extends AbstractNullHandler implements IItemHandler
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         return null;
     }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return 0;
+    }
 }

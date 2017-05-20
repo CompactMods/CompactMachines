@@ -4,7 +4,7 @@ public class CommandEntitySize extends CommandMenu {
 
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "entity-size";
     }
 

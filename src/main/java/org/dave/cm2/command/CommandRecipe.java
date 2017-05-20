@@ -8,7 +8,7 @@ public class CommandRecipe extends CommandMenu {
     }
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "recipe";
     }
 }

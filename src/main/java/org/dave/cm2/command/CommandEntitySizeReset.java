@@ -8,14 +8,13 @@ import net.minecraft.util.math.BlockPos;
 import org.dave.cm2.miniaturization.MiniaturizationPotion;
 import org.dave.cm2.network.MessageEntitySizeChange;
 import org.dave.cm2.network.PackageHandler;
-import org.dave.cm2.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class CommandEntitySizeReset extends CommandBaseExt {
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "reset";
     }
 
@@ -35,9 +34,9 @@ public class CommandEntitySizeReset extends CommandBaseExt {
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
         if(args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, server.getAllUsernames());
+            return getListOfStringsMatchingLastWord(args, server.getPlayerList().getOnlinePlayerNames());
         }
         return null;
     }

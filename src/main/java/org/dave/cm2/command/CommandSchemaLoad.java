@@ -27,7 +27,7 @@ import java.util.List;
 
 public class CommandSchemaLoad extends CommandBaseExt {
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "load";
     }
 

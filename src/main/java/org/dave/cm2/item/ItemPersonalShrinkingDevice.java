@@ -1,5 +1,6 @@
 package org.dave.cm2.item;
 
+import mcjty.lib.tools.ChatTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -96,32 +97,33 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStack, World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
         if(hand == EnumHand.OFF_HAND) {
-            return new ActionResult(EnumActionResult.FAIL, itemStack);
+            return new ActionResult(EnumActionResult.FAIL, stack);
         }
 
-        PSDFluidStorage tank = (PSDFluidStorage) itemStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+        PSDFluidStorage tank = (PSDFluidStorage) stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
         if (tank.getFluidAmount() <= 3500) {
             RayTraceResult raytraceresult = this.rayTrace(world, player, true);
             if (raytraceresult != null && raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
                 BlockPos tracepos = raytraceresult.getBlockPos();
                 IBlockState state = world.getBlockState(tracepos);
-                boolean allowed = world.isBlockModifiable(player, tracepos) && player.canPlayerEdit(tracepos.offset(raytraceresult.sideHit), raytraceresult.sideHit, itemStack);
+                boolean allowed = world.isBlockModifiable(player, tracepos) && player.canPlayerEdit(tracepos.offset(raytraceresult.sideHit), raytraceresult.sideHit, stack);
 
                 if (allowed && state.getBlock() == Blockss.miniaturizationFluidBlock && state.getValue(BlockMiniaturizationFluid.LEVEL).intValue() == 0) {
                     world.setBlockState(tracepos, Blocks.AIR.getDefaultState(), 11);
                     player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
 
                     tank.fill(new FluidStack(Fluidss.miniaturizationFluid, 1000), true);
-                    return new ActionResult(EnumActionResult.SUCCESS, itemStack);
+                    return new ActionResult(EnumActionResult.SUCCESS, stack);
                 }
             }
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
             player.openGui(CompactMachines2.instance, GuiIds.PSD_WELCOME.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
-            return new ActionResult(EnumActionResult.SUCCESS, itemStack);
+            return new ActionResult(EnumActionResult.SUCCESS, stack);
         }
 
         if(!world.isRemote && world.provider.getDimension() == ConfigurationHandler.Settings.dimensionId && player instanceof EntityPlayerMP) {
@@ -134,16 +136,16 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
                 TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.spawnpoint_set");
                 tc.getStyle().setColor(TextFormatting.GREEN);
-                player.addChatComponentMessage(tc);
+                ChatTools.addChatMessage(player, tc);
 
-                return new ActionResult(EnumActionResult.SUCCESS, itemStack);
+                return new ActionResult(EnumActionResult.SUCCESS, stack);
             }
 
             TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
-            return new ActionResult(EnumActionResult.SUCCESS, itemStack);
+            return new ActionResult(EnumActionResult.SUCCESS, stack);
         }
 
-        return new ActionResult(EnumActionResult.FAIL, itemStack);
+        return new ActionResult(EnumActionResult.FAIL, stack);
     }
 
 

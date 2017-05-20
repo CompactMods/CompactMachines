@@ -1,9 +1,12 @@
 package org.dave.cm2.item.psd;
 
+import mcjty.lib.compat.CompatIRecipe;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -12,7 +15,7 @@ import org.dave.cm2.init.Itemss;
 
 import javax.annotation.Nullable;
 
-public class PSDChargeRecipe implements IRecipe {
+public class PSDChargeRecipe implements CompatIRecipe {
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -20,7 +23,7 @@ public class PSDChargeRecipe implements IRecipe {
         boolean hasPsd = false;
         for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
             ItemStack stack = inv.getStackInSlot(slot);
-            if(stack == null) {
+            if(!ItemStackTools.isValid(stack) || ItemStackTools.isEmpty(stack)) {
                 continue;
             }
 
@@ -50,10 +53,10 @@ public class PSDChargeRecipe implements IRecipe {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         int totalFluidDrops = 0;
-        ItemStack psdCopy = null;
+        ItemStack psdCopy = ItemStackTools.getEmptyStack();
         for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
             ItemStack stack = inv.getStackInSlot(slot);
-            if(stack == null) {
+            if(!ItemStackTools.isValid(stack) || ItemStackTools.isEmpty(stack)) {
                 continue;
             }
 
@@ -76,14 +79,8 @@ public class PSDChargeRecipe implements IRecipe {
         return 9;
     }
 
-    @Nullable
     @Override
     public ItemStack getRecipeOutput() {
-        return null;
-    }
-
-    @Override
-    public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-        return new ItemStack[9];
+        return ItemStackTools.getEmptyStack();
     }
 }

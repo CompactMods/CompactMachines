@@ -26,7 +26,7 @@ import org.dave.cm2.world.tools.DimensionTools;
 
 import java.io.File;
 
-@Mod(modid = CompactMachines2.MODID, version = CompactMachines2.VERSION)
+@Mod(modid = CompactMachines2.MODID, version = CompactMachines2.VERSION, acceptedMinecraftVersions = "[1.10,1.12)")
 public class CompactMachines2
 {
     public static final String MODID = "cm2";

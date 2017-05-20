@@ -28,7 +28,8 @@ public class GuiPSDSelector extends GuiPSDScreen {
 
             RenderHelper.enableStandardItemLighting();
             itemRender.renderItemAndEffectIntoGUI(entry.getStack(), offsetX, y);
-            fontRendererObj.drawString(entry.getText(), offsetX+20, y+4, color);
+            // TODO: 1.10.2 fontRendererObj vs fontRenderer 1.11.2
+            this.fontRenderer.drawString(entry.getText(), offsetX+20, y+4, color);
 
             y += 16;
         }

@@ -1,5 +1,6 @@
 package org.dave.cm2.command;
 
+import mcjty.lib.compat.CompatCommandBase;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
@@ -7,7 +8,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-public abstract class CommandBaseExt extends CommandBase {
+public abstract class CommandBaseExt extends CompatCommandBase {
     public CommandBaseExt parentCommand;
 
     public CommandBaseExt getParentCommand() {
@@ -44,7 +45,7 @@ public abstract class CommandBaseExt extends CommandBase {
             result += this.getParentCommand().getParentConcatenation(delim) + delim;
         }
 
-        result += this.getCommandName();
+        result += getCommandName(this);
         return result;
     }
 
@@ -53,12 +54,12 @@ public abstract class CommandBaseExt extends CommandBase {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender) {
+    public String getUsage(ICommandSender sender) {
         return "commands." + this.getFullCommandName() + ".usage";
     }
 
     public WrongUsageException getUsageException(ICommandSender sender) {
-        return new WrongUsageException(this.getCommandUsage(sender));
+        return new WrongUsageException(this.getUsage(sender));
     }
 
     public SyntaxErrorException getException(ICommandSender sender, String type) {

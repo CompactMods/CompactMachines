@@ -9,7 +9,7 @@ public class CommandSchema extends CommandMenu {
     }
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "schema";
     }
 }
