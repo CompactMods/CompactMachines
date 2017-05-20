@@ -5,7 +5,9 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.misc.ConfigurationHandler;
+import org.dave.cm2.utility.JarExtract;
 
 import java.io.File;
 
@@ -22,9 +24,7 @@ public class CommandRecipeUnpackDefaults extends CommandBaseExt {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        boolean force = args.length > 0 && args[0].equals("force");
-        int extracted = ConfigurationHandler.extractJarDirectory("assets/cm2/config/recipes", new File(ConfigurationHandler.cmDirectory, "recipes"), force);
-
+        int extracted = JarExtract.copy("assets/cm2/config/recipes", ConfigurationHandler.recipeDirectory);
         sender.addChatMessage(new TextComponentString("Extracted " + extracted + " recipes to the config folder"));
     }
 }

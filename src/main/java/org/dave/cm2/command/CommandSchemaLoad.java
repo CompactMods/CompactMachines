@@ -43,7 +43,7 @@ public class CommandSchemaLoad extends CommandBaseExt {
         }
         String sane = args[0].replaceAll("[^a-zA-Z0-9\\._]+", "_") + ".json";
 
-        File schemaFile = new File(CompactMachines2.cfgDirectory, sane);
+        File schemaFile = new File(ConfigurationHandler.schemaDirectory, sane);
         Schema schema = null;
         try {
             schema = SerializationHelper.GSON.fromJson(new JsonReader(new FileReader(schemaFile)), Schema.class);

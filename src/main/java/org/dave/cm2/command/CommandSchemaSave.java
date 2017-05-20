@@ -52,7 +52,7 @@ public class CommandSchemaSave extends CommandBaseExt {
                 Schema schema = new Schema(args[0], blockList);
 
                 try {
-                    File schemaFile = new File(CompactMachines2.cfgDirectory, sane);
+                    File schemaFile = new File(ConfigurationHandler.schemaDirectory, sane);
                     BufferedWriter writer = new BufferedWriter(new FileWriter(schemaFile));
                     String json = SerializationHelper.GSON.toJson(schema);
                     writer.write(json);

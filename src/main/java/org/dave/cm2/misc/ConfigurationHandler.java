@@ -5,6 +5,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.cm2.CompactMachines2;
+import org.dave.cm2.utility.JarExtract;
 import org.dave.cm2.utility.Logz;
 
 import java.io.*;
@@ -24,6 +25,9 @@ public class ConfigurationHandler {
     private static final String CATEGORY_MINIATURIZATION = "Miniaturization";
     private static final String CATEGORY_MACHINES = "Machines";
 
+    public static File schemaDirectory;
+    public static File recipeDirectory;
+
     public static void init(File configFile) {
         if(configuration != null) {
             return;
@@ -36,74 +40,20 @@ public class ConfigurationHandler {
 
         configuration = new Configuration(new File(cmDirectory, "settings.cfg"), null);
         loadConfiguration();
-    }
 
-    public static int extractJarDirectory(String resourcePath, File targetDirectory, boolean overwrite) {
-        if(!targetDirectory.exists()) {
-            targetDirectory.mkdir();
+        // Extract recipes if the folder does not exist
+        recipeDirectory = new File(cmDirectory, "recipes");
+        if(!recipeDirectory.exists()) {
+            recipeDirectory.mkdir();
+            int count = JarExtract.copy("assets/cm2/config/recipes", recipeDirectory);
+            Logz.info("Extracted %d recipes to config folder", count);
         }
 
-        // Get a Path object to either the folder in the jar or the disk, if we are in a development environment
-        Path myPath = null;
-        try {
-            URI uri = CompactMachines2.class.getResource("/" + resourcePath).toURI();
-            if(uri.getScheme().equals("jar")) {
-                FileSystem fs = FileSystems.getFileSystem(uri);
-                if(fs == null) {
-                    fs = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-                }
-
-                myPath = fs.getPath("/" + resourcePath);
-            } else {
-                myPath = Paths.get(uri);
-            }
-        } catch (URISyntaxException e) {
-        } catch (IOException e) {
+        schemaDirectory = new File(cmDirectory, "schemas");
+        if(!schemaDirectory.exists()) {
+            schemaDirectory.mkdir();
         }
 
-        if(myPath == null) {
-            throw new RuntimeException("Could not list files in path: \"" + resourcePath + "\"");
-        }
-
-        // Lastly iterate over the found resources and load recipes either from the development
-        // folder, or from the jar.
-        int count = 0;
-        try {
-            Stream<Path> walk = Files.walk(myPath, 1);
-            for (Iterator<Path> it = walk.iterator(); it.hasNext();){
-                Path path = it.next();
-
-                // Sadly, this does not work inside jar files: path.endsWith(new File(resourcePath).toPath())
-                // So we have to check manually that we are not testing the directory itself
-                String pathWithForeslash = path.toString().replace('\\', '/');
-                if(pathWithForeslash.endsWith(resourcePath)) {
-                    continue;
-                }
-
-                String filename = path.getFileName().toString();
-
-                File targetFile = new File(targetDirectory, filename);
-                if(targetFile.exists() && !overwrite) {
-                    continue;
-                }
-
-                String resourceName = resourcePath + "/" + filename;
-                InputStream in = CompactMachines2.class.getClassLoader().getResourceAsStream(resourceName);
-                try {
-                    OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
-                    ByteStreams.copy(in, out);
-                    out.close();
-                    in.close();
-                    count++;
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to unpack resource \'" + resourceName + "\'", e);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return count;
     }
 
     private static void loadConfiguration() {

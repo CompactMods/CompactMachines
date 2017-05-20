@@ -14,16 +14,11 @@ import org.dave.cm2.utility.Logz;
 import org.dave.cm2.utility.SerializationHelper;
 import org.dave.cm2.world.tools.RecursiveSearch;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.FileSystem;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class MultiblockRecipes {
     private static List<MultiblockRecipe> recipes = new ArrayList<>();
@@ -93,14 +88,10 @@ public class MultiblockRecipes {
     }
 
     private static void loadRecipes() {
-        String resourcePath = "assets/cm2/config/recipes";
-
         // First load local recipes, keep track of what we loaded though
         ArrayList<String> loadedLocalRecipes = new ArrayList<>();
-        File localRecipeDir = new File(ConfigurationHandler.cmDirectory, "recipes");
-
-        if(localRecipeDir.exists()) {
-            for (File file : localRecipeDir.listFiles()) {
+        if(ConfigurationHandler.recipeDirectory.exists()) {
+            for (File file : ConfigurationHandler.recipeDirectory.listFiles()) {
                 MultiblockRecipe recipe = null;
                 try {
                     recipe = SerializationHelper.GSON.fromJson(new JsonReader(new FileReader(file)), MultiblockRecipe.class);
@@ -116,74 +107,6 @@ public class MultiblockRecipes {
                 recipes.add(recipe);
                 loadedLocalRecipes.add(file.getName());
             }
-        }
-
-        // Then try to figure out whether we have to look inside the jar or the filesystem
-        boolean isJar = false;
-        Path myPath = null;
-        try {
-            URI uri = CompactMachines2.class.getResource("/" + resourcePath).toURI();
-            if(uri.getScheme().equals("jar")) {
-                FileSystem fs = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-                myPath = fs.getPath("/" + resourcePath);
-                isJar = true;
-            } else {
-                myPath = Paths.get(uri);
-            }
-        } catch (URISyntaxException e) {
-        } catch (IOException e) {
-        }
-
-        if(myPath == null) {
-            throw new RuntimeException("Could not list recipes from path: \"" + resourcePath + "\"");
-        }
-
-        // Lastly iterate over the found resources and load recipes either from the development
-        // folder, or from the jar.
-        try {
-            Stream<Path> walk = Files.walk(myPath, 1);
-            for (Iterator<Path> it = walk.iterator(); it.hasNext();){
-                Path path = it.next();
-
-                // Sadly, this does not work inside jar files: path.endsWith(new File(resourcePath).toPath())
-                // So we have to check manually that we are not testing the directory itself
-                String pathWithForeslash = path.toString().replace('\\', '/');
-                if(pathWithForeslash.endsWith(resourcePath)) {
-                    continue;
-                }
-
-                if(loadedLocalRecipes.contains(path.getFileName().toString())) {
-                    continue;
-                }
-
-                MultiblockRecipe recipe = null;
-                if(isJar) {
-                    InputStream in = CompactMachines2.instance.getClass().getClassLoader().getResourceAsStream(resourcePath + "/" + path.getFileName());
-                    recipe = SerializationHelper.GSON.fromJson(new InputStreamReader(in), MultiblockRecipe.class);
-
-                    if(recipe == null) {
-                        throw new RuntimeException("Could not deserialize recipe from jar: \"" + path.toString() + "\"");
-                    }
-
-                    Logz.info("Loaded recipe \"%s\" from jar", path.getFileName());
-                } else {
-                    try {
-                        recipe = SerializationHelper.GSON.fromJson(new JsonReader(new FileReader(path.toFile())), MultiblockRecipe.class);
-                    } catch (FileNotFoundException e) {}
-
-                    if(recipe == null) {
-                        throw new RuntimeException("Could not deserialize recipe from file: \"" + path.toString() + "\"");
-                    }
-
-                    Logz.info("Loaded recipe \"%s\" from disk (dev environment?)", path.getFileName());
-                }
-
-                if(recipe != null) {
-                    recipes.add(recipe);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

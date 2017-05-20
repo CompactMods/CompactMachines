@@ -18,6 +18,7 @@ import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.misc.Villager;
 import org.dave.cm2.network.PackageHandler;
 import org.dave.cm2.proxy.CommonProxy;
+import org.dave.cm2.utility.JarExtract;
 import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldGenMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
@@ -37,8 +38,6 @@ public class CompactMachines2
     @SidedProxy(clientSide = "org.dave.cm2.proxy.ClientProxy", serverSide = "org.dave.cm2.proxy.ServerProxy")
     public static CommonProxy proxy;
 
-    public static File cfgDirectory;
-
     static {
         FluidRegistry.enableUniversalBucket();
     }
@@ -51,15 +50,10 @@ public class CompactMachines2
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
         MinecraftForge.EVENT_BUS.register(MiniaturizationEvents.class);
 
-        // Create paths
-        cfgDirectory = new File(event.getModConfigurationDirectory(), "cm2-schemas");
-        cfgDirectory.mkdirs();
-
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
 
         GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
-
 
         GuiHandler.init();
         Fluidss.init();
