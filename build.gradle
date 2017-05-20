@@ -16,7 +16,7 @@ file "build.properties" withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
-version = "${config.mod.version}"
+version = "${config.minecraft.version}-${config.mod.version}"
 group= "org.dave.cm2" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "cm2"
 
