@@ -1,6 +1,5 @@
 package org.dave.cm2.item;
 
-import mcjty.lib.tools.ChatTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -136,7 +135,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
                 TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.spawnpoint_set");
                 tc.getStyle().setColor(TextFormatting.GREEN);
-                ChatTools.addChatMessage(player, tc);
+                player.sendStatusMessage(tc, false);
 
                 return new ActionResult(EnumActionResult.SUCCESS, stack);
             }

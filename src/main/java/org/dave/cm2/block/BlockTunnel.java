@@ -1,6 +1,5 @@
 package org.dave.cm2.block;
 
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -81,7 +80,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
                 entityItem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
                 entityItem.motionZ = (float) world.rand.nextGaussian() * f3;
 
-                WorldTools.spawnEntity(world, entityItem);
+                world.spawnEntity(entityItem);
 
                 WorldSavedDataMachines.INSTANCE.removeTunnel(pos);
                 break;
@@ -131,7 +130,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
             return;
         }
 
-        WorldTools.notifyNeighborsOfStateChange(realWorld, dimpos.getBlockPos(), Blockss.machine);
+        realWorld.notifyNeighborsOfStateChange(dimpos.getBlockPos(), Blockss.machine, false);
     }
 
     @Override

@@ -40,7 +40,6 @@ public class WorldGenMachines implements IWorldGenerator {
         int dim = size.getDimension();
         int x = (chunkX << 4) + random.nextInt(16-dim) + dim;
         int z = (chunkZ << 4) + random.nextInt(16-dim) + dim;
-        // TODO: 1.10.2 getHeightMapHeight vs getHeight 1.11.2
         int y = world.getHeight(x, z) + dim;
 
         // Do not generate on OCEAN type biomes

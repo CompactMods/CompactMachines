@@ -1,7 +1,6 @@
 package org.dave.cm2.miniaturization;
 
 import com.google.gson.*;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
@@ -48,7 +47,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             targetStack = new ItemStack(targetItem, targetCount, targetMeta);
         }
 
-        if(!ItemStackTools.isValid(targetStack) || ItemStackTools.isEmpty(targetStack)) {
+        if(targetStack.isEmpty()) {
             return null;
         }
 

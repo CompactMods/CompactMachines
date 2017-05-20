@@ -1,10 +1,9 @@
 package org.dave.cm2.item;
 
-import mcjty.lib.compat.CompatItem;
 import net.minecraft.item.Item;
 import org.dave.cm2.CompactMachines2;
 
-public class ItemBase extends CompatItem {
+public class ItemBase extends Item {
     public ItemBase() {
         super();
     }

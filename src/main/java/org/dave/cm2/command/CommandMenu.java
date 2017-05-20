@@ -1,6 +1,5 @@
 package org.dave.cm2.command;
 
-import mcjty.lib.tools.ChatTools;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -58,7 +57,7 @@ public abstract class CommandMenu extends CommandBaseExt {
         }
 
         if(found) {
-            ChatTools.addChatMessage(sender, new TextComponentTranslation("commands.cm2.denied"));
+            sender.sendMessage(new TextComponentTranslation("commands.cm2.denied"));
             return;
         }
 
@@ -78,7 +77,7 @@ public abstract class CommandMenu extends CommandBaseExt {
                 tc.appendSibling(new TextComponentString("" + TextFormatting.RESET));
             }
 
-            ChatTools.addChatMessage(sender, tc);
+            sender.sendMessage(tc);
         }
     }
 

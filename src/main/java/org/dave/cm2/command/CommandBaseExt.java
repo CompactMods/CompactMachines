@@ -1,6 +1,5 @@
 package org.dave.cm2.command;
 
-import mcjty.lib.compat.CompatCommandBase;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
@@ -8,7 +7,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-public abstract class CommandBaseExt extends CompatCommandBase {
+public abstract class CommandBaseExt extends CommandBase {
     public CommandBaseExt parentCommand;
 
     public CommandBaseExt getParentCommand() {
@@ -45,7 +44,7 @@ public abstract class CommandBaseExt extends CompatCommandBase {
             result += this.getParentCommand().getParentConcatenation(delim) + delim;
         }
 
-        result += getCommandName(this);
+        result += this.getName();
         return result;
     }
 

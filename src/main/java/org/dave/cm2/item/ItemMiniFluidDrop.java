@@ -1,6 +1,5 @@
 package org.dave.cm2.item;
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,7 +42,6 @@ public class ItemMiniFluidDrop extends ItemFood {
         return super.setUnlocalizedName(name);
     }
 
-    // TODO: PR for compat layer: CompatItemFood
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemStack = player.getHeldItem(hand);
@@ -66,7 +64,8 @@ public class ItemMiniFluidDrop extends ItemFood {
             IFluidHandler fluidHandler = world.getTileEntity(trace.getBlockPos()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, trace.sideHit);
             if(fluidHandler.fill(new FluidStack(Fluidss.miniaturizationFluid, 125), false) == 125) {
                 fluidHandler.fill(new FluidStack(Fluidss.miniaturizationFluid, 125), true);
-                ItemStackTools.setStackSize(itemStack, ItemStackTools.getStackSize(itemStack) - 1);
+                itemStack.setCount(itemStack.getCount()-1);
+
                 return new ActionResult(EnumActionResult.SUCCESS, itemStack);
             }
         }

@@ -1,8 +1,5 @@
 package org.dave.cm2.block;
 
-import mcjty.lib.tools.ChatTools;
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -23,14 +20,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -42,13 +36,11 @@ import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.reference.EnumMachineSize;
 import org.dave.cm2.tile.TileEntityMachine;
 import org.dave.cm2.tile.TileEntityTunnel;
-import org.dave.cm2.utility.Logz;
 import org.dave.cm2.world.ChunkLoadingMachines;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.DimensionTools;
 import org.dave.cm2.world.tools.TeleportationTools;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +90,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 continue;
             }
 
-            WorldTools.notifyNeighborsOfStateChange(machineWorld, neighborPos, Blockss.tunnel);
+            world.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
         }
     }
 
@@ -199,7 +191,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         entityItem.motionY = (float) world.rand.nextGaussian() * motionMultiplier + 0.1F;
         entityItem.motionZ = (float) world.rand.nextGaussian() * motionMultiplier;
 
-        WorldTools.spawnEntity(world, entityItem);
+        world.spawnEntity(entityItem);
     }
 
     @Override
@@ -258,8 +250,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
 
         ItemStack playerStack = player.getHeldItemMainhand();
-
-        if(ItemStackTools.isValid(playerStack) && !ItemStackTools.isEmpty(playerStack)) {
+        if(!playerStack.isEmpty()) {
             Item playerItem = playerStack.getItem();
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
@@ -278,11 +269,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 } else {
                     TextComponentTranslation tc = new TextComponentTranslation("item.cm2.psd.not_enough_fluid");
                     tc.getStyle().setColor(TextFormatting.DARK_RED);
-                    ChatTools.addChatMessage(player, tc);
+                    player.sendStatusMessage(tc, false);
                 }
             }
-            // TODO: Readd ability to pick up fluids from tanks by right-clicking the machine.
-            //       -> Create a pull request for compat-layer that has interactWithFluidHandler support
         }
 
         return true;

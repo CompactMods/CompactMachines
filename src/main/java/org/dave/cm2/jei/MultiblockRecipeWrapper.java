@@ -98,7 +98,6 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
             GlStateManager.translate(0F, 0F, 216.5F);
 
             if (requiredBuckets < 10) {
-                // TODO: Fontrenderer compat
                 mc.fontRenderer.drawStringWithShadow("~" + requiredBuckets, 135+6, 19 * 4 + 10, 0xFFFFFF);
             } else {
                 mc.fontRenderer.drawStringWithShadow("~" + requiredBuckets, 135, 19 * 4 + 10, 0xFFFFFF);

@@ -1,6 +1,5 @@
 package org.dave.cm2.command;
 
-import mcjty.lib.tools.ChatTools;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +22,7 @@ public class CommandRecipeUnpackDefaults extends CommandBaseExt {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         int extracted = JarExtract.copy("assets/cm2/config/recipes", ConfigurationHandler.recipeDirectory);
-        ChatTools.addChatMessage(sender, new TextComponentString("Extracted " + extracted + " recipes to the config folder"));
+
+        sender.sendMessage(new TextComponentString("Extracted " + extracted + " recipes to the config folder"));
     }
 }

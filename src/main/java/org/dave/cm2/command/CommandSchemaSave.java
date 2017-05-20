@@ -1,13 +1,11 @@
 package org.dave.cm2.command;
 
-import mcjty.lib.tools.ChatTools;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
-import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.misc.ConfigurationHandler;
 import org.dave.cm2.schema.BlockInformation;
 import org.dave.cm2.schema.Schema;
@@ -60,7 +58,7 @@ public class CommandSchemaSave extends CommandBaseExt {
                     writer.close();
 
                     // TODO: Localization
-                    ChatTools.addChatMessage(sender, new TextComponentString("Wrote schema to file: " + sane));
+                    sender.sendMessage(new TextComponentString("Wrote schema to file: " + sane));
                 } catch (IOException e) {
                     throw this.getException(sender, "invalid_file");
                 }

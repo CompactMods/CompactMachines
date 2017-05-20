@@ -1,19 +1,20 @@
 package org.dave.cm2.jei;
 
-import mcjty.lib.jei.CompatRecipeHandler;
+import mezz.jei.api.recipe.IRecipeHandler;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import org.dave.cm2.item.psd.PSDChargeRecipe;
 
-public class ChargeRecipeHandler extends CompatRecipeHandler<PSDChargeRecipe> {
-
-    public ChargeRecipeHandler() {
-        super(VanillaRecipeCategoryUid.CRAFTING);
-    }
+public class ChargeRecipeHandler implements IRecipeHandler<PSDChargeRecipe> {
 
     @Override
     public Class<PSDChargeRecipe> getRecipeClass() {
         return PSDChargeRecipe.class;
+    }
+
+    @Override
+    public String getRecipeCategoryUid(PSDChargeRecipe recipe) {
+        return VanillaRecipeCategoryUid.CRAFTING;
     }
 
     @Override

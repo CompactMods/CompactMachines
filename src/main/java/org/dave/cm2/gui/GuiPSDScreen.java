@@ -42,7 +42,6 @@ public abstract class GuiPSDScreen extends GuiScreen {
             String[] lines = translated.split("<br/>");
 
             for(String line : lines) {
-                // TODO: 1.10.2 fontRendererObj vs fontRenderer 1.11.2
                 this.fontRenderer.drawString(line, offsetX, this.offsetY, 0xDDDDDD);
                 this.offsetY += 10;
             }

@@ -1,7 +1,5 @@
 package org.dave.cm2.miniaturization;
 
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.MathTools;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -60,7 +58,7 @@ public class MiniaturizationEvents {
 
         EntityPlayer player = event.player;
         ItemStack offHandItemStack = player.getHeldItemOffhand();
-        if(!ItemStackTools.isValid(offHandItemStack) || ItemStackTools.isEmpty(offHandItemStack) || offHandItemStack.getItem() != Itemss.psd) {
+        if(offHandItemStack.isEmpty() || offHandItemStack.getItem() != Itemss.psd) {
             return;
         }
 
@@ -110,7 +108,7 @@ public class MiniaturizationEvents {
 
         double scale = scaleAttribute.getAttributeValue();
         if(entity.motionY >= 0) {
-            entity.motionY *= MathTools.clamp(scale*2d, 0.50f, 1.0f);
+            entity.motionY *= MathHelper.clamp(scale*2d, 0.50f, 1.0f);
         }
     }
 

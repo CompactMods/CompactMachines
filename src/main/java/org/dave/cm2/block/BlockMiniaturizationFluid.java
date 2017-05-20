@@ -1,7 +1,5 @@
 package org.dave.cm2.block;
 
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -47,7 +45,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
 
                         entity.setDead();
                         ItemStack result = MultiblockRecipes.tryCrafting(world, pos, item);
-                        if(ItemStackTools.isValid(result) && !ItemStackTools.isEmpty(result)) {
+                        if(!result.isEmpty()) {
                             Vec3d entityPosition = entity.getPositionVector();
                             EntityItem entityItem = new EntityItem(world, entityPosition.xCoord, entityPosition.yCoord, entityPosition.zCoord, result);
                             entityItem.lifespan = 2400;
@@ -57,7 +55,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
                             entityItem.motionY = 0.55F;
                             entityItem.motionZ = 0.0f;
 
-                            WorldTools.spawnEntity(world, entityItem);
+                            world.spawnEntity(entityItem);
                         }
                     } else {
                         Vec3d entityPosition = entity.getPositionVector();
@@ -115,7 +113,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
                 int quantaRemaining = quantaPerBlock - state.getValue(LEVEL);
                 if(quantaRemaining > 0) {
                     world.setBlockState(pos, this.getBlockState().getBaseState().withProperty(LEVEL, state.getValue(LEVEL) + 1));
-                    WorldTools.notifyNeighborsOfStateChange(world, pos.down(), this);
+                    world.notifyNeighborsOfStateChange(pos.down(), this, false);
                 } else if(quantaRemaining <= 0) {
                     world.setBlockToAir(pos);
                 }

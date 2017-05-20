@@ -1,7 +1,5 @@
 package org.dave.cm2.block;
 
-import mcjty.lib.tools.ChatTools;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,7 +18,6 @@ import org.dave.cm2.misc.CreativeTabCM2;
 import org.dave.cm2.world.WorldSavedDataMachines;
 import org.dave.cm2.world.tools.StructureTools;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class BlockWall extends BlockProtected {
@@ -37,7 +34,7 @@ public class BlockWall extends BlockProtected {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack playerStack = player.getHeldItemMainhand();
 
-        if(!ItemStackTools.isValid(playerStack) || ItemStackTools.isEmpty(playerStack)) {
+        if(playerStack.isEmpty()) {
             return false;
         }
 
@@ -72,11 +69,11 @@ public class BlockWall extends BlockProtected {
             IBlockState blockState = Blockss.tunnel.getDefaultState().withProperty(BlockTunnel.MACHINE_SIDE, tunnelSide);
             world.setBlockState(pos, blockState);
 
-            ItemStackTools.setStackSize(playerStack, ItemStackTools.getStackSize(playerStack)-1);
+            playerStack.setCount(playerStack.getCount()-1);
             WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
         } else {
             // TODO: Localization
-            ChatTools.addChatMessage(player, new TextComponentString(TextFormatting.RED + "All tunnels already used up"));
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
         }
 
         return true;

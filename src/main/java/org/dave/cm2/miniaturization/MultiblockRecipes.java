@@ -1,13 +1,11 @@
 package org.dave.cm2.miniaturization;
 
 import com.google.gson.stream.JsonReader;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.dave.cm2.CompactMachines2;
 import org.dave.cm2.block.BlockMiniaturizationFluid;
 import org.dave.cm2.init.Blockss;
 import org.dave.cm2.misc.ConfigurationHandler;
@@ -84,7 +82,7 @@ public class MultiblockRecipes {
             }
         }
 
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
     }
 
     private static void loadRecipes() {

@@ -1,7 +1,5 @@
 package org.dave.cm2.item.psd;
 
-import mcjty.lib.compat.CompatIRecipe;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,7 +13,7 @@ import org.dave.cm2.init.Itemss;
 
 import javax.annotation.Nullable;
 
-public class PSDChargeRecipe implements CompatIRecipe {
+public class PSDChargeRecipe implements IRecipe {
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -23,7 +21,7 @@ public class PSDChargeRecipe implements CompatIRecipe {
         boolean hasPsd = false;
         for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
             ItemStack stack = inv.getStackInSlot(slot);
-            if(!ItemStackTools.isValid(stack) || ItemStackTools.isEmpty(stack)) {
+            if(stack.isEmpty()) {
                 continue;
             }
 
@@ -53,10 +51,10 @@ public class PSDChargeRecipe implements CompatIRecipe {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         int totalFluidDrops = 0;
-        ItemStack psdCopy = ItemStackTools.getEmptyStack();
+        ItemStack psdCopy = ItemStack.EMPTY;
         for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
             ItemStack stack = inv.getStackInSlot(slot);
-            if(!ItemStackTools.isValid(stack) || ItemStackTools.isEmpty(stack)) {
+            if(stack.isEmpty()) {
                 continue;
             }
 
@@ -81,6 +79,11 @@ public class PSDChargeRecipe implements CompatIRecipe {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+        return NonNullList.create();
     }
 }
