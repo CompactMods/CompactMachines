@@ -56,7 +56,7 @@ public class MultiblockRecipes {
 
         // No source block with a not mini fluid block below found
         if(insidePos == null) {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         // 3. Use the previously gathered information to search for all connected blocks on the inside of the fluid
