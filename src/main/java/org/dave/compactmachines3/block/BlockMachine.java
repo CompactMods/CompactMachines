@@ -7,6 +7,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -56,7 +58,10 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        Item itemBlockMachine = Item.getItemFromBlock(Blockss.machine);
+        for(EnumMachineSize size : EnumMachineSize.values()) {
+            ModelLoader.setCustomModelResourceLocation(itemBlockMachine, size.getMeta(), new ModelResourceLocation(itemBlockMachine.getRegistryName(), "size=" + size.getName()));
+        }
     }
 
     @Override
@@ -94,15 +99,13 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
     }
 
-    /*
     @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> items) {
         for(EnumMachineSize size : EnumMachineSize.values()) {
-            subItems.add(new ItemStack(this, 1, size.getMeta()));
+            items.add(new ItemStack(this, 1, size.getMeta()));
         }
+
     }
-    */
 
     @Override
     public int damageDropped(IBlockState state) {
