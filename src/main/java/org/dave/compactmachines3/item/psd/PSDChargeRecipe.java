@@ -13,6 +13,7 @@ import org.dave.compactmachines3.init.Itemss;
 
 import javax.annotation.Nullable;
 
+/*
 public class PSDChargeRecipe implements IRecipe {
 
     @Override
@@ -87,3 +88,4 @@ public class PSDChargeRecipe implements IRecipe {
         return NonNullList.create();
     }
 }
+*/

@@ -1,51 +1,31 @@
 package org.dave.compactmachines3.init;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemBlock;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.dave.compactmachines3.CompactMachines3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.block.*;
-import org.dave.compactmachines3.item.ItemBlockMachine;
-import org.dave.compactmachines3.item.ItemBlockWall;
-import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.tile.TileEntityTunnel;
 
 public class Blockss {
-    public static Block tunnel;
-    public static Block wall;
-    public static Block wallBreakable;
-    public static Block machine;
-    public static Block miniaturizationFluidBlock;
+    @GameRegistry.ObjectHolder("compactmachines3:tunnel")
+    public static BlockTunnel tunnel;
 
-    public static void init() {
-        tunnel = new BlockTunnel(Material.IRON).setUnlocalizedName("tunnel").setRegistryName(CompactMachines3.MODID, "tunnel");
-        wall = new BlockWall(Material.IRON).setUnlocalizedName("wall").setRegistryName(CompactMachines3.MODID, "wall");
-        wallBreakable = new BlockWallBreakable(Material.IRON).setUnlocalizedName("wallbreakable").setRegistryName(CompactMachines3.MODID, "wallbreakable");
+    @GameRegistry.ObjectHolder("compactmachines3:wall")
+    public static BlockWall wall;
 
-        machine = new BlockMachine(Material.IRON).setUnlocalizedName("machine").setRegistryName(CompactMachines3.MODID, "machine");
-        miniaturizationFluidBlock = new BlockMiniaturizationFluid().setRegistryName(CompactMachines3.MODID, "miniaturization_fluid_block");
+    @GameRegistry.ObjectHolder("compactmachines3:wallbreakable")
+    public static BlockWallBreakable wallBreakable;
 
-        registerBlocks();
+    @GameRegistry.ObjectHolder("compactmachines3:machine")
+    public static BlockMachine machine;
+
+    @GameRegistry.ObjectHolder("compactmachines3:miniaturization_fluid_block")
+    public static BlockMiniaturizationFluid miniaturizationFluidBlock;
+
+    @SideOnly(Side.CLIENT)
+    public static void initModels() {
+        tunnel.initModel();
+        wall.initModel();
+        wallBreakable.initModel();
     }
 
-    private static void registerBlocks() {
-        GameRegistry.register(tunnel);
-        GameRegistry.register(new ItemBlock(tunnel).setRegistryName(tunnel.getRegistryName()));
-        GameRegistry.registerTileEntity(TileEntityTunnel.class, "TileEntityTunnel");
-
-        GameRegistry.register(wall);
-        GameRegistry.register(new ItemBlockWall(wall).setRegistryName(wall.getRegistryName()));
-
-        GameRegistry.register(wallBreakable);
-        GameRegistry.register(new ItemBlock(wallBreakable).setRegistryName(wallBreakable.getRegistryName()));
-
-
-        GameRegistry.register(machine);
-        GameRegistry.register(new ItemBlockMachine(machine).setRegistryName(machine.getRegistryName()));
-        GameRegistry.registerTileEntity(TileEntityMachine.class, "TileEntityMachine");
-
-        GameRegistry.register(miniaturizationFluidBlock);
-        GameRegistry.register(new ItemBlock(miniaturizationFluidBlock).setRegistryName(miniaturizationFluidBlock.getRegistryName()));
-    }
 }

@@ -19,11 +19,10 @@ import org.dave.compactmachines3.init.Itemss;
 import java.util.Random;
 
 public class Villager {
+    @GameRegistry.ObjectHolder("compactmachines3:shrinker")
     public static VillagerProfession shrinker;
-    public static void init() {
-        shrinker = new VillagerProfession("compactmachines3:shrinker", "compactmachines3:textures/entities/villager.png", "compactmachines3:textures/entities/villager.png");
-        GameRegistry.register(shrinker);
 
+    public static void init() {
         VillagerCareer builder = new VillagerCareer(shrinker, "compactmachines3.builder");
 
         // 10-20 blocks are worth 1 emeralds

@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.jei;
 
+/*
 import mezz.jei.api.recipe.IRecipeHandler;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
@@ -27,3 +28,4 @@ public class ChargeRecipeHandler implements IRecipeHandler<PSDChargeRecipe> {
         return true;
     }
 }
+*/

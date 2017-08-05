@@ -1,28 +1,26 @@
 package org.dave.compactmachines3.init;
 
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.dave.compactmachines3.CompactMachines3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.item.ItemMiniFluidDrop;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 
 public class Itemss {
-    public static Item psd;
-    public static Item tunnelTool;
-    public static Item miniFluidDrop;
+    @GameRegistry.ObjectHolder("compactmachines3:psd")
+    public static ItemPersonalShrinkingDevice psd;
 
-    public static void init() {
-        psd = new ItemPersonalShrinkingDevice().setUnlocalizedName("psd").setRegistryName(CompactMachines3.MODID, "psd");
-        tunnelTool = new ItemTunnelTool().setUnlocalizedName("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool");
-        miniFluidDrop = new ItemMiniFluidDrop().setUnlocalizedName("minifluiddrop").setRegistryName(CompactMachines3.MODID, "minifluiddrop");
+    @GameRegistry.ObjectHolder("compactmachines3:tunneltool")
+    public static ItemTunnelTool tunnelTool;
 
-        registerItems();
-    }
+    @GameRegistry.ObjectHolder("compactmachines3:minifluiddrop")
+    public static ItemMiniFluidDrop miniFluidDrop;
 
-    private static void registerItems() {
-        GameRegistry.register(psd);
-        GameRegistry.register(tunnelTool);
-        GameRegistry.register(miniFluidDrop);
+    @SideOnly(Side.CLIENT)
+    public static void initModels() {
+        psd.initModel();
+        tunnelTool.initModel();
+        miniFluidDrop.initModel();
     }
 }

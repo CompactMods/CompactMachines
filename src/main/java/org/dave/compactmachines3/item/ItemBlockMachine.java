@@ -3,15 +3,18 @@ package org.dave.compactmachines3.item;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.IMetaBlockName;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.utility.TextFormattingHelper;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /*
@@ -41,8 +44,8 @@ public class ItemBlockMachine extends ItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, playerIn, tooltip, advanced);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
 
         if(stack.hasTagCompound() && stack.getTagCompound().hasKey("coords")) {
             int coords = stack.getTagCompound().getInteger("coords");
@@ -55,7 +58,6 @@ public class ItemBlockMachine extends ItemBlock {
             int size = Blockss.machine.getStateFromMeta(stack.getItemDamage()).getValue(BlockMachine.SIZE).getDimension() - 1;
             String sizeString = size + "x" + size + "x" + size;
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.machine.hint", I18n.format(this.getUnlocalizedName(stack) + ".name"), sizeString));
-
         }
     }
 }

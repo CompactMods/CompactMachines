@@ -14,6 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import org.dave.compactmachines3.CompactMachines3;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITooltipCallback<ItemStack> {
@@ -38,9 +40,33 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
         return localizedName;
     }
 
+    /**
+     * Return the name of the mod associated with this recipe category.
+     * Used for the recipe category tab's tooltip.
+     *
+     * @since JEI 4.5.0
+     */
+    @Override
+    public String getModName() {
+        return CompactMachines3.MODID;
+    }
+
     @Override
     public IDrawable getBackground() {
         return background;
+    }
+
+    /**
+     * Optional icon for the category tab.
+     * If no icon is defined here, JEI will use first item registered with {@link IModRegistry#addRecipeCatalyst(Object, String...)}
+     *
+     * @return icon to draw on the category tab, max size is 16x16 pixels.
+     * @since 3.13.1
+     */
+    @Nullable
+    @Override
+    public IDrawable getIcon() {
+        return null;
     }
 
     @Override
@@ -74,6 +100,23 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
 
         recipeLayout.getItemStacks().addTooltipCallback(this);
         recipeLayout.getItemStacks().set(ingredients);
+    }
+
+    /**
+     * Get the tooltip for whatever's under the mouse.
+     * ItemStack and fluid tooltips are already handled by JEI, this is for anything else.
+     * <p>
+     * To add to ingredient tooltips, see {@link IGuiIngredientGroup#addTooltipCallback(ITooltipCallback)}
+     * To add tooltips for a recipe wrapper, see {@link IRecipeWrapper#getTooltipStrings(int, int)}
+     *
+     * @param mouseX the X position of the mouse, relative to the recipe.
+     * @param mouseY the Y position of the mouse, relative to the recipe.
+     * @return tooltip strings. If there is no tooltip at this position, return an empty list.
+     * @since JEI 4.2.5
+     */
+    @Override
+    public List<String> getTooltipStrings(int mouseX, int mouseY) {
+        return Collections.emptyList();
     }
 
     @Override

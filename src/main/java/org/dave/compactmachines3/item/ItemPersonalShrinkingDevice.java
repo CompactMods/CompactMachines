@@ -2,7 +2,9 @@ package org.dave.compactmachines3.item;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -18,10 +20,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.BlockMiniaturizationFluid;
 import org.dave.compactmachines3.init.Blockss;
@@ -36,6 +41,7 @@ import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemPersonalShrinkingDevice extends ItemBase {
@@ -45,6 +51,11 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
         this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
         this.setMaxStackSize(1);
         this.setMaxDamage(Fluid.BUCKET_VOLUME * 4);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
@@ -59,8 +70,8 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, playerIn, tooltip, advanced);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
 
         PSDFluidStorage tank = (PSDFluidStorage) stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
 
@@ -131,7 +142,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             if(player.isSneaking()) {
                 int coords = StructureTools.getCoordsForPos(player.getPosition());
                 Vec3d pos = player.getPositionVector();
-                WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.xCoord, pos.yCoord, pos.zCoord);
+                WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.x, pos.y, pos.z);
 
                 TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines3.psd.spawnpoint_set");
                 tc.getStyle().setColor(TextFormatting.GREEN);

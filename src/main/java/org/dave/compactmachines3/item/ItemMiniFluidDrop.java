@@ -1,7 +1,9 @@
 package org.dave.compactmachines3.item;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -15,15 +17,19 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Fluidss;
 import org.dave.compactmachines3.miniaturization.MiniaturizationPotion;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemMiniFluidDrop extends ItemFood {
@@ -32,6 +38,11 @@ public class ItemMiniFluidDrop extends ItemFood {
 
         this.setAlwaysEdible();
         this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
@@ -51,7 +62,7 @@ public class ItemMiniFluidDrop extends ItemFood {
         }
         Vec3d eyeVec = new Vec3d(player.posX, player.posY + (double)player.getEyeHeight(), player.posZ);
         Vec3d lookVec = player.getLook(0.0f);
-        Vec3d maxVec = eyeVec.addVector(lookVec.xCoord * 4.5d, lookVec.yCoord * 4.5d, lookVec.zCoord * 4.5d);
+        Vec3d maxVec = eyeVec.addVector(lookVec.x * 4.5d, lookVec.y * 4.5d, lookVec.z * 4.5d);
 
         RayTraceResult trace = world.rayTraceBlocks(eyeVec, maxVec, false, false, true);
 
@@ -74,8 +85,8 @@ public class ItemMiniFluidDrop extends ItemFood {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, playerIn, tooltip, advanced);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
 
         if(GuiScreen.isShiftKeyDown()) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines3.MODID + ".minifluiddrop.hint"));

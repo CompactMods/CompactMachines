@@ -36,7 +36,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
 
         if(!(entity instanceof EntityLivingBase)) {
             if(entity instanceof EntityItem) {
-                Item item = ((EntityItem) entity).getEntityItem().getItem();
+                Item item = ((EntityItem) entity).getItem().getItem();
                 if(MultiblockRecipes.isCatalystItem(item)) {
                     if(!world.isRemote) {
                         if(entity.isDead) {
@@ -47,7 +47,7 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
                         ItemStack result = MultiblockRecipes.tryCrafting(world, pos, item);
                         if(!result.isEmpty()) {
                             Vec3d entityPosition = entity.getPositionVector();
-                            EntityItem entityItem = new EntityItem(world, entityPosition.xCoord, entityPosition.yCoord, entityPosition.zCoord, result);
+                            EntityItem entityItem = new EntityItem(world, entityPosition.x, entityPosition.y, entityPosition.z, result);
                             entityItem.lifespan = 2400;
                             entityItem.setPickupDelay(10);
 
@@ -59,11 +59,11 @@ public class BlockMiniaturizationFluid extends BlockFluidClassic {
                         }
                     } else {
                         Vec3d entityPosition = entity.getPositionVector();
-                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord, entityPosition.yCoord+0.05f, entityPosition.zCoord, 0.0D, 0.0D, 0.0D, new int[0]);
-                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord+0.05f, entityPosition.yCoord, entityPosition.zCoord, 0.0D, 0.0D, 0.0D, new int[0]);
-                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.xCoord, entityPosition.yCoord-0.05f, entityPosition.zCoord+0.05f, 0.0D, 0.0D, 0.0D, new int[0]);
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.x, entityPosition.y+0.05f, entityPosition.z, 0.0D, 0.0D, 0.0D, new int[0]);
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.x+0.05f, entityPosition.y, entityPosition.z, 0.0D, 0.0D, 0.0D, new int[0]);
+                        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, entityPosition.x, entityPosition.y-0.05f, entityPosition.z+0.05f, 0.0D, 0.0D, 0.0D, new int[0]);
 
-                        world.playSound(entityPosition.xCoord, entityPosition.yCoord, entityPosition.zCoord, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2F, 1.0F, false);
+                        world.playSound(entityPosition.x, entityPosition.y, entityPosition.z, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2F, 1.0F, false);
                     }
                 }
             }

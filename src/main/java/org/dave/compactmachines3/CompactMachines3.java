@@ -54,12 +54,7 @@ public class CompactMachines3
 
         GuiHandler.init();
         Fluidss.init();
-        Blockss.init();
-        Itemss.init();
-        Potionss.init();
-        MultiblockRecipes.init();
-        Recipes.init();
-        Villager.init();
+
         CapabilityNullHandlerRegistry.registerNullHandlers(event.getAsmData());
 
         proxy.preInit(event);
@@ -71,6 +66,10 @@ public class CompactMachines3
         FMLInterModComms.sendMessage("Waila", "register", "org.dave.compactmachines3.misc.WailaProvider.register");
 
         proxy.init(event);
+
+        MultiblockRecipes.init();
+        Recipes.init();
+        Villager.init();
     }
 
     @EventHandler

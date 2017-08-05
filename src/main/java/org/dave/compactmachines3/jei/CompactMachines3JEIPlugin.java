@@ -29,7 +29,7 @@ public class CompactMachines3JEIPlugin implements IModPlugin {
     public void register(IModRegistry registry) {
         registry.addRecipeCategories(new MultiblockRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeHandlers(new MultiblockRecipeHandler());
-        registry.addRecipeHandlers(new ChargeRecipeHandler());
+        //registry.addRecipeHandlers(new ChargeRecipeHandler());
         registry.addRecipeCategoryCraftingItem(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid), MultiblockRecipeCategory.UID);
         registry.addRecipes(MultiblockRecipes.getRecipes());
         registry.addDescription(new ItemStack(Itemss.miniFluidDrop), "compactmachines3.jei.minifluiddrop.description");

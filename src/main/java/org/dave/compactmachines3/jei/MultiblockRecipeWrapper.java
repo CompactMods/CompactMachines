@@ -61,7 +61,7 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
         ingredients.setOutput(ItemStack.class, this.recipe.getTargetStack());
     }
 
-    public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, VertexBuffer buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
+    public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
         for (BlockPos pos : toRender) {
 
             IBlockState state = recipe.getStateAtBlockPos(pos);
@@ -155,7 +155,7 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
         GlStateManager.scale(16.0f, -16.0f, 16.0f);
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
 
         // Calculate the maximum size the shape has
         BlockPos mn = recipe.getMinPos();
