@@ -1,7 +1,7 @@
 [
 {
-  "modid": "cm2",
-  "name": "Compact Machines 2",
+  "modid": "compactmachines3",
+  "name": "Compact Machines 3",
   "description": "It's all so tiny!",
   "version": "${version}",
   "mcversion": "${mcversion}",
