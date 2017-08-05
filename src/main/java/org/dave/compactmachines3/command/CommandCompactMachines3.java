@@ -6,7 +6,6 @@ public class CommandCompactMachines3 extends CommandMenu {
     public void initEntries() {
         this.addSubcommand(new CommandSchema());
         this.addSubcommand(new CommandRecipe());
-        this.addSubcommand(new CommandEntitySize());
     }
 
     @Override

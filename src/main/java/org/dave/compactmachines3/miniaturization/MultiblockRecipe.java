@@ -212,7 +212,7 @@ public class MultiblockRecipe {
                 return false;
             }
 
-            // Ignore "_", i.e. air blocks. These are either air or mini fluid.
+            // Ignore "_", i.e. air blocks. These are air.
             if(map[map.length - y - 1][z][x].equals("_")) {
                 continue;
             }

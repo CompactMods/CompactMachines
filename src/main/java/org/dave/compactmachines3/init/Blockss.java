@@ -18,14 +18,12 @@ public class Blockss {
     @GameRegistry.ObjectHolder("compactmachines3:machine")
     public static BlockMachine machine;
 
-    @GameRegistry.ObjectHolder("compactmachines3:miniaturization_fluid_block")
-    public static BlockMiniaturizationFluid miniaturizationFluidBlock;
-
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         tunnel.initModel();
         wall.initModel();
         wallBreakable.initModel();
+        machine.initModel();
     }
 
 }

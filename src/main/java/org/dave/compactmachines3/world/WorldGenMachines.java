@@ -2,6 +2,7 @@ package org.dave.compactmachines3.world;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -55,7 +56,7 @@ public class WorldGenMachines implements IWorldGenerator {
         int rSphere  = dim - random.nextInt(3);
 
         IBlockState state = Blockss.wallBreakable.getDefaultState();
-        IBlockState fluidState = Blockss.miniaturizationFluidBlock.getDefaultState();
+        IBlockState fluidState = Blocks.LAVA.getDefaultState();
         for(BlockPos pos : StructureTools.getCubePositions(new BlockPos(x, y, z), dim+1, dim+1, dim+1, true)) {
             // Cut out a sphere at the selected corner
             float xx = pos.getX() - cxSphere;

@@ -85,57 +85,12 @@ public class ConfigurationHandler {
                 Settings.WORLDGEN_CHANCE_LABEL
         );
 
-        PotionSettings.onEatAmplifier = configuration.getInt(
-                PotionSettings.ON_EAT_AMPLIFIER_NAME,
-                CATEGORY_MINIATURIZATION,
-                PotionSettings.ON_EAT_AMPLIFIER_DEFAULT,
-                0, 3,
-                PotionSettings.ON_EAT_AMPLIFIER_COMMENT,
-                PotionSettings.ON_EAT_AMPLIFIER_LABEL
-        );
-
-        PotionSettings.onEatDuration = configuration.getInt(
-                PotionSettings.ON_EAT_DURATION_NAME,
-                CATEGORY_MINIATURIZATION,
-                PotionSettings.ON_EAT_DURATION_DEFAULT,
-                0, 12000,
-                PotionSettings.ON_EAT_DURATION_COMMENT,
-                PotionSettings.ON_EAT_DURATION_LABEL
-        );
-
-        PotionSettings.onBlockContactAmplifier = configuration.getInt(
-                PotionSettings.OBC_AMPLIFIER_NAME,
-                CATEGORY_MINIATURIZATION,
-                PotionSettings.OBC_AMPLIFIER_DEFAULT,
-                0, 3,
-                PotionSettings.OBC_AMPLIFIER_COMMENT,
-                PotionSettings.OBC_AMPLIFIER_LABEL
-        );
-
-        PotionSettings.onBlockContactDuration = configuration.getInt(
-                PotionSettings.OBC_DURATION_NAME,
-                CATEGORY_MINIATURIZATION,
-                PotionSettings.OBC_DURATION_DEFAULT,
-                0, 12000,
-                PotionSettings.OBC_DURATION_COMMENT,
-                PotionSettings.OBC_DURATION_LABEL
-        );
-
         MachineSettings.allowRespawning = configuration.getBoolean(
                 MachineSettings.ALLOW_RESPAWN_NAME,
                 CATEGORY_MACHINES,
                 MachineSettings.ALLOW_RESPAWN_DEFAULT,
                 MachineSettings.ALLOW_RESPAWN_COMMENT,
                 MachineSettings.ALLOW_RESPAWN_LABEL
-        );
-
-        MachineSettings.fluidCostForEntering = configuration.getInt(
-                MachineSettings.FLUID_COST_NAME,
-                CATEGORY_MACHINES,
-                MachineSettings.FLUID_COST_DEFAULT,
-                0, 4000,
-                MachineSettings.FLUID_COST_COMMENT,
-                MachineSettings.FLUID_COST_LABEL
         );
 
         if(configuration.hasChanged()) {
@@ -159,44 +114,11 @@ public class ConfigurationHandler {
 
     public static class MachineSettings {
         public static boolean allowRespawning;
-        public static int fluidCostForEntering;
 
         private static final String ALLOW_RESPAWN_NAME = "allowRespawning";
         private static final boolean ALLOW_RESPAWN_DEFAULT = true;
         private static final String ALLOW_RESPAWN_COMMENT = "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there";
         private static final String ALLOW_RESPAWN_LABEL = "Allow Respawning";
-
-        private static final String FLUID_COST_NAME = "fluidCostForEntering";
-        private static final int FLUID_COST_DEFAULT = 250;
-        private static final String FLUID_COST_COMMENT = "How much miniaturization fluid needs to be in the PSD to be able to enter a machine in mB";
-        private static final String FLUID_COST_LABEL = "Required fluid to enter machine";
-    }
-
-    public static class PotionSettings {
-        public static int onBlockContactDuration;
-        public static int onBlockContactAmplifier;
-        public static int onEatDuration;
-        public static int onEatAmplifier;
-
-        private static final String ON_EAT_DURATION_NAME = "onEatDuration";
-        private static final int ON_EAT_DURATION_DEFAULT = 400;
-        private static final String ON_EAT_DURATION_COMMENT = "How long the 'Shrunk' effect is applied to players, when they eat a Miniaturization Fluid Drop.";
-        private static final String ON_EAT_DURATION_LABEL = "Eating fluid drops - Effect duration";
-
-        private static final String ON_EAT_AMPLIFIER_NAME = "onEatAmplifier";
-        private static final int ON_EAT_AMPLIFIER_DEFAULT = 3;
-        private static final String ON_EAT_AMPLIFIER_COMMENT = "How strong the 'Shrunk' effect is when applied to entities eating Miniaturization Fluid Drops";
-        private static final String ON_EAT_AMPLIFIER_LABEL = "Eating fluid drops - Effect Amplifier";
-
-        private static final String OBC_DURATION_NAME = "onBlockContactDuration";
-        private static final int OBC_DURATION_DEFAULT = 200;
-        private static final String OBC_DURATION_COMMENT = "How long the 'Shrunk' effect is applied to entities when they touch miniaturization fluid. Set to 0 to disable.";
-        private static final String OBC_DURATION_LABEL = "Fluid contact - Effect duration";
-
-        private static final String OBC_AMPLIFIER_NAME = "onBlockContactAmplifier";
-        private static final int OBC_AMPLIFIER_DEFAULT = 1;
-        private static final String OBC_AMPLIFIER_COMMENT = "How strong the 'Shrunk' effect is when applied to entities touching miniaturization fluid";
-        private static final String OBC_AMPLIFIER_LABEL = "Fluid contact - Effect Amplifier";
     }
 
     public static class Settings {

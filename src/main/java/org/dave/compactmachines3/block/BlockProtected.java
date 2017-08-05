@@ -29,7 +29,7 @@ public abstract class BlockProtected extends BlockBase {
         if(!world.isRemote && player instanceof EntityPlayerMP && player.capabilities.isCreativeMode) {
             ItemStack playerStack = player.getHeldItemMainhand();
 
-            if(!playerStack.isEmpty() && playerStack.getItem() == Itemss.miniFluidDrop) {
+            if(!playerStack.isEmpty() && playerStack.getItem() == Itemss.psd) {
                 return super.removedByPlayer(state, world, pos, player, willHarvest);
             }
         }

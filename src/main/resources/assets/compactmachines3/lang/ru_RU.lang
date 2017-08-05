@@ -13,25 +13,24 @@ tile.compactmachines3.wall.name=Твёрдая стена компактного
 
 item.compactmachines3.psd.name=Личное устройство сжатия
 item.compactmachines3.tunneltool.name=Туннель
-item.compactmachines3.minifluiddrop.name=Капля миниатюризационной жидкости
 
-item.compactmachines3.psd.not_enough_fluid=Недостаточно миниатюризационной жидкости!
 item.compactmachines3.psd.spawnpoint_set=Entry point set!
-
-fluid.miniaturization_fluid=Miniaturization Fluid
-
-effect.shrink=Сжатие
-effect.shrink.postfix=Зелье сжатия
 
 tooltip.compactmachines3.machine.coords=Механизм #%d
 tooltip.compactmachines3.machine.coords.unused=Неиспользуемый
-tooltip.compactmachines3.psd.charge=Заряд: %d%%
 
-tooltip.compactmachines3.jei.crafting_trigger=Throw this into the fluid to start the crafting.
-tooltip.compactmachines3.jei.hollow_cube=Use these to build a (hollow) multiblock
-tooltip.compactmachines3.jei.fluid=Pour over the the multiblock.
-tooltip.compactmachines3.jei.fluid.warning=The surrounding fluid must not extend more than one block from the multiblock!
+tooltip.compactmachines3.psd.hint=Used as documentation and to enter Compact Machines.
+tooltip.compactmachines3.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
+tooltip.compactmachines3.wall.hint=Warning! Unbreakable for non-creative players!
+tooltip.compactmachines3.machine.hint=A %s provides a %s room.
 
+tooltip.compactmachines3.jei.crafting_trigger=Throw this into the shrinking zone to start the crafting.
+tooltip.compactmachines3.jei.shape=Use these to build the multiblock
+
+compactmachines3.jei.category.multiblock_miniaturization=Multiblock Miniaturization
+
+
+enumfacing.side=Side: %s
 enumfacing.up=Верх
 enumfacing.down=Низ
 enumfacing.north=Север
@@ -43,6 +42,7 @@ enumfacing.east=Восток
 commands.compactmachines3.usage=/compactmachines3 [subcommand, leave empty for list of commands]
 
 commands.compactmachines3.available=Доступные подкоманды:
+commands.compactmachines3.denied=You do not have the permission to use this command.
 
 commands.compactmachines3.schema.description=Save/load the contents of machines
 commands.compactmachines3.schema.save.usage=/compactmachines3 schema save <name>
@@ -57,18 +57,11 @@ commands.compactmachines3.schema.load.exception.not_in_machine_dimension=You mus
 commands.compactmachines3.schema.load.exception.invalid_file=Invalid schema. File '%s' does not exist or is invalid!
 commands.compactmachines3.schema.load.exception.not_deserializable=Could not deserialize schema! Schema is not loaded!
 
-commands.compactmachines3.entity-size.description=Various commands for handling miniaturization effects
-commands.compactmachines3.entity-size.reset.usage=/compactmachines3 entity-size reset [<player>]
-commands.compactmachines3.entity-size.reset.description=Restores a players size if something went wrong
-
-commands.compactmachines3.entity-size.set.usage=/compactmachines3 entity-size reset [<player>] <scale>
-commands.compactmachines3.entity-size.set.description=Set the size of a player
-
+commands.compactmachines3.recipe.description=Stuff related to Multiblock Miniaturization recipes
+commands.compactmachines3.recipe.unpack-defaults.usage=/compactmachines3 recipe unpack-defaults [force]
+commands.compactmachines3.recipe.unpack-defaults.description=Extract the default recipes from the .jar to the config folder. Append "force" to overwrite existing files.
 
 gui.compactmachines3.psd.welcome.intro=Compact Machines 2 allows you to build<br/>complex machine contraptions within a single<br/>block!<br/><br/>Available chapters:
-
-gui.compactmachines3.psd.fluid.label=Miniaturization Fluid
-gui.compactmachines3.psd.fluid.intro=Miniaturization Fluid has several uses:<br/><br/>Crafting: Shrink down multiblock structures<br/>   to single items. Please use JEI to look up<br/>   all the recipes.<br/><br/>Shrinking: Drink the fluid, bath in it or equip<br/>   a filled Personal Shrinking Device in your<br/>   off hand to shrink yourself and get into<br/>   those cable shafts without breaking the<br/>   surrounding blocks.<br/><br/>You can obtain it either by searching for<br/>old broken machines found in the overworld<br/>or by killing entities that are under the<br/>effects of the miniaturization fluid.
 
 gui.compactmachines3.psd.machines.label=Compact Machines
 gui.compactmachines3.psd.machines.intro=Compact Machines are the core mechanic of<br/>this mod. They allow you to build large rooms<br/>in a single block space connected to the<br/>outside world.<br/><br/>They come in various sizes ranging from<br/>3x3x3 to 13x13x13.<br/><br/>You can use Tunnels to connect the outside<br/>block faces with any of the inside walls to<br/>transport items, fluids etc.<br/><br/>You can enter a Compact Machine by right-<br/>clicking it with a charged Personal Shrinking<br/>Device.<br/><br/>Please use JEI to look up crafting recipes.

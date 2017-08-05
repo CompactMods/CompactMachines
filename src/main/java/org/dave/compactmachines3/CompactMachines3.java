@@ -2,7 +2,6 @@ package org.dave.compactmachines3;
 
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -10,12 +9,10 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
 import org.dave.compactmachines3.gui.GuiHandler;
-import org.dave.compactmachines3.init.*;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
-import org.dave.compactmachines3.miniaturization.MiniaturizationEvents;
+import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.misc.Villager;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
@@ -35,17 +32,13 @@ public class CompactMachines3
     @SidedProxy(clientSide = "org.dave.compactmachines3.proxy.ClientProxy", serverSide = "org.dave.compactmachines3.proxy.ServerProxy")
     public static CommonProxy proxy;
 
-    static {
-        FluidRegistry.enableUniversalBucket();
-    }
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
         MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
 
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
-        MinecraftForge.EVENT_BUS.register(MiniaturizationEvents.class);
+        MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
@@ -53,7 +46,6 @@ public class CompactMachines3
         GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
 
         GuiHandler.init();
-        Fluidss.init();
 
         CapabilityNullHandlerRegistry.registerNullHandlers(event.getAsmData());
 
@@ -68,8 +60,6 @@ public class CompactMachines3
         proxy.init(event);
 
         MultiblockRecipes.init();
-        Recipes.init();
-        Villager.init();
     }
 
     @EventHandler

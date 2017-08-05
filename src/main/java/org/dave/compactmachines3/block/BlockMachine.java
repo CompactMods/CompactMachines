@@ -7,7 +7,6 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,22 +17,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
-import org.dave.compactmachines3.item.psd.PSDFluidStorage;
-import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.tile.TileEntityMachine;
@@ -264,22 +257,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
             if(playerItem instanceof ItemPersonalShrinkingDevice) {
-                PSDFluidStorage tank = (PSDFluidStorage) playerStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-                boolean freeToGo = ConfigurationHandler.MachineSettings.fluidCostForEntering == 0 || player.capabilities.isCreativeMode;
-                if(!freeToGo && tank != null && tank.getFluidAmount() >= 250) {
-                    tank.drainInternal(250, true);
-                    freeToGo = true;
-                }
+                TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
 
-                if(freeToGo) {
-                    TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
-
-                    WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
-                } else {
-                    TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines3.psd.not_enough_fluid");
-                    tc.getStyle().setColor(TextFormatting.DARK_RED);
-                    player.sendStatusMessage(tc, false);
-                }
+                WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
             }
         }
 

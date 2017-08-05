@@ -1,7 +1,7 @@
 package org.dave.compactmachines3.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeWrapper;
+import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -13,33 +13,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.common.ForgeModContainer;
-import net.minecraftforge.fluids.UniversalBucket;
-import org.dave.compactmachines3.init.Fluidss;
-import org.dave.compactmachines3.miniaturization.MiniaturizationEvents;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
+import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
+public class MultiblockRecipeWrapper implements IRecipeWrapper {
     public final MultiblockRecipe recipe;
     private final List<ItemStack> input = new ArrayList<>();
-    private int requiredBuckets;
 
     public MultiblockRecipeWrapper(MultiblockRecipe recipe) {
         this.recipe = recipe;
-
-        // Guess the number of required buckets
-        BlockPos minPos = recipe.getMinPos();
-        BlockPos maxPos = recipe.getMaxPos();
-        int diffX = maxPos.getX() - minPos.getX() + 1;
-        int diffZ = maxPos.getZ() - minPos.getZ() + 1;
-
-        int reqX = (int) Math.ceil(diffX / 2.0f);
-        int reqZ = (int) Math.ceil(diffZ / 2.0f);
-        this.requiredBuckets = reqX * reqZ;
 
         int added = 0;
         for(ItemStack stack : this.recipe.getRequiredItemStacks()) {
@@ -51,7 +37,6 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
             this.input.add(null);
         }
 
-        this.input.add(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, Fluidss.miniaturizationFluid));
         this.input.add(this.recipe.getCatalystStack());
     }
 
@@ -87,29 +72,13 @@ public class MultiblockRecipeWrapper extends BlankRecipeWrapper {
 
         int reqX = (int) Math.ceil((float)(maxPos.getX() - minPos.getX() +2) / 2.0f);
         int reqZ = (int) Math.ceil((float)(maxPos.getZ() - minPos.getZ() +2) / 2.0f);
-        this.requiredBuckets = reqX * reqZ;
-
-        // This was the code used to draw the bucket count previously.
-        // At the moment we do not estimate the required amount of buckets, so we can not display anything.
-        if(requiredBuckets > 1) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0F, 0F, 216.5F);
-
-            if (requiredBuckets < 10) {
-                mc.fontRenderer.drawStringWithShadow("~" + requiredBuckets, 135+6, 19 * 4 + 10, 0xFFFFFF);
-            } else {
-                mc.fontRenderer.drawStringWithShadow("~" + requiredBuckets, 135, 19 * 4 + 10, 0xFFFFFF);
-            }
-
-            GlStateManager.popMatrix();
-        }
 
         List<BlockPos> toRender = recipe.getShapeAsBlockPosList();
         if(toRender.isEmpty()) {
             return;
         }
 
-        float angle = MiniaturizationEvents.renderTicks * 45.0f / 128.0f;
+        float angle = RenderTickCounter.renderTicks * 45.0f / 128.0f;
 
         // When we want to render translucent blocks we might need this
         //double c = MathHelper.cos((float)(Math.PI * (double)angle / 180.0));

@@ -2,11 +2,11 @@ package org.dave.compactmachines3.miniaturization;
 
 import com.google.gson.stream.JsonReader;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.dave.compactmachines3.block.BlockMiniaturizationFluid;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.utility.Logz;
@@ -31,57 +31,7 @@ public class MultiblockRecipes {
     }
 
     public static ItemStack tryCrafting(World world, BlockPos contactPos, Item item) {
-        // 1. Get all connected fluid blocks. This by rules is a layer exact 1 block wide around the crafting
-        //    structure. (IDEA: we might be able to stop the search once we found a source block, because that
-        //    is all we need?)
-        ArrayList<BlockPos> fluidBlocks = new RecursiveSearch(world, contactPos, Blockss.miniaturizationFluidBlock, -1, true).getResult();
-
-        // 2. a) Find the y-highest of any source block inside of this list of fluid blocks, i.e. with meta == 0
-        //    b) Find the y-lowest level of any fluid blocks, does not matter if source or not
-        BlockPos insidePos = null;
-        int lowestY = 255;
-        for(BlockPos pos : fluidBlocks) {
-            IBlockState state = world.getBlockState(pos);
-            if(pos.getY() < lowestY) {
-                lowestY = pos.getY();
-            }
-
-            IBlockState stateBelow = world.getBlockState(pos.down());
-            if(state.getBlock().getMetaFromState(state) == 0 && stateBelow.getBlock() != Blockss.miniaturizationFluidBlock) {
-                if(insidePos == null || insidePos.getY() < pos.getY()) {
-                    insidePos = pos;
-                }
-            }
-        }
-
-        // No source block with a not mini fluid block below found
-        if(insidePos == null) {
-            return ItemStack.EMPTY;
-        }
-
-        // 3. Use the previously gathered information to search for all connected blocks on the inside of the fluid
-        ArrayList<BlockPos> insideBlocks = new RecursiveSearch(world, insidePos.down(), Blockss.miniaturizationFluidBlock, lowestY, false).getResult();
-
-        // 4. Find a recipe that matches the given blocks on the inside of the mini fluid
-        for(MultiblockRecipe recipe : recipes) {
-            if(recipe.tryCrafting(world, insideBlocks, item)) {
-
-                // 5. Drain the fluid
-                for(BlockPos fluidPos : fluidBlocks) {
-                    IBlockState state = world.getBlockState(fluidPos);
-                    if (state.getBlock() == Blockss.miniaturizationFluidBlock && state.getValue(BlockMiniaturizationFluid.LEVEL) == 0) {
-                        world.setBlockState(fluidPos, state.withProperty(BlockMiniaturizationFluid.LEVEL, 1));
-                    }
-                }
-
-                // 6. Remove all blocks
-                insideBlocks.forEach(world::setBlockToAir);
-
-                // 7. return success with the itemstack to spawn in the world
-                return recipe.getTargetStack();
-            }
-        }
-
+        // TODO: All of this is broken obviously
         return ItemStack.EMPTY;
     }
 

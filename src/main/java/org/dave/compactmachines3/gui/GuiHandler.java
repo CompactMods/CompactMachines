@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Blockss;
-import org.dave.compactmachines3.init.Itemss;
 import org.dave.compactmachines3.reference.GuiIds;
 
 public class GuiHandler implements IGuiHandler {
@@ -25,12 +24,6 @@ public class GuiHandler implements IGuiHandler {
         if(ID == GuiIds.PSD_WELCOME.ordinal()) {
             GuiPSDSelector welcomeScreen = new GuiPSDSelector("welcome");
             welcomeScreen.setDisplayIntro(true);
-            welcomeScreen.addEntry(new GuiPSDSelectorEntry(new ItemStack(Itemss.miniFluidDrop, 1), "Miniaturization Fluid") {
-                @Override
-                public void performAction() {
-                    player.openGui(CompactMachines3.instance, GuiIds.PSD_MINIATURIZATION_FLUID.ordinal(), world, x, y, z);
-                }
-            });
 
             welcomeScreen.addEntry(new GuiPSDSelectorEntry(new ItemStack(Blockss.machine, 1), "Compact Machines") {
                 @Override
@@ -47,10 +40,6 @@ public class GuiHandler implements IGuiHandler {
             });
 
             return welcomeScreen;
-        } else if(ID == GuiIds.PSD_MINIATURIZATION_FLUID.ordinal()) {
-            GuiPSDSelector fluidScreen = new GuiPSDSelector("fluid");
-            fluidScreen.setDisplayIntro(true);
-            return fluidScreen;
         } else if(ID == GuiIds.PSD_MACHINES.ordinal()) {
             GuiPSDSelector machinesScreen = new GuiPSDSelector("machines");
             machinesScreen.setDisplayIntro(true);

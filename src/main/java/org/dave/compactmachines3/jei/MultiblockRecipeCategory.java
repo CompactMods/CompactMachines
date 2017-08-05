@@ -6,7 +6,7 @@ import mezz.jei.api.gui.IDrawableStatic;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ITooltipCallback;
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeCategory;
+import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITooltipCallback<ItemStack> {
+public class MultiblockRecipeCategory implements IRecipeCategory, ITooltipCallback<ItemStack> {
     public static final String UID = CompactMachines3.MODID + ".MultiblockMiniaturization";
     private final String localizedName;
     private final IDrawableStatic background;
@@ -125,10 +125,6 @@ public class MultiblockRecipeCategory extends BlankRecipeCategory implements ITo
         tooltip.remove(tooltip.size()-1);
         if(slotIndex >= 0 && slotIndex <= 5) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.jei.shape"));
-        }
-        if(slotIndex == 6) {
-            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.jei.fluid"));
-            tooltip.add(TextFormatting.RED + I18n.format("tooltip.compactmachines3.jei.fluid.warning"));
         }
         if(slotIndex == 7) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.jei.crafting_trigger"));
