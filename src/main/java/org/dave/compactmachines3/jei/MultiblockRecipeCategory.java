@@ -79,7 +79,7 @@ public class MultiblockRecipeCategory implements IRecipeCategory, ITooltipCallba
         slotDrawable.draw(minecraft, 0, 19 * 5);
 
         slotDrawable.draw(minecraft, 135, 19 * 4);
-        slotDrawable.draw(minecraft, 135, 19 * 5);
+        //slotDrawable.draw(minecraft, 135, 19 * 5);
 
         slotDrawable.draw(minecraft, 135, 0);
     }

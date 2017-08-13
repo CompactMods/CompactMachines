@@ -12,15 +12,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.block.BlockMachine;
-import org.dave.compactmachines3.block.BlockTunnel;
-import org.dave.compactmachines3.block.BlockWall;
-import org.dave.compactmachines3.block.BlockWallBreakable;
+import org.dave.compactmachines3.block.*;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemBlockMachine;
 import org.dave.compactmachines3.item.ItemBlockWall;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.item.ItemTunnelTool;
+import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 
@@ -37,6 +35,9 @@ public class CommonProxy {
 
         event.getRegistry().register(new BlockMachine(Material.IRON).setUnlocalizedName("machine").setRegistryName(CompactMachines3.MODID, "machine"));
         GameRegistry.registerTileEntity(TileEntityMachine.class, "TileEntityMachine");
+
+        event.getRegistry().register(new BlockFieldProjector(Material.IRON).setUnlocalizedName("fieldprojector").setRegistryName(CompactMachines3.MODID, "fieldprojector"));
+        GameRegistry.registerTileEntity(TileEntityFieldProjector.class, "TileEntityFieldProjector");
     }
 
     @SubscribeEvent
@@ -45,6 +46,7 @@ public class CommonProxy {
         event.getRegistry().register(new ItemBlockWall(Blockss.wall).setRegistryName(Blockss.wall.getRegistryName()));
         event.getRegistry().register(new ItemBlock(Blockss.wallBreakable).setRegistryName(Blockss.wallBreakable.getRegistryName()));
         event.getRegistry().register(new ItemBlockMachine(Blockss.machine).setRegistryName(Blockss.machine.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(Blockss.fieldProjector).setRegistryName(Blockss.fieldProjector.getRegistryName()));
 
         event.getRegistry().register(new ItemPersonalShrinkingDevice().setUnlocalizedName("psd").setRegistryName(CompactMachines3.MODID, "psd"));
         event.getRegistry().register(new ItemTunnelTool().setUnlocalizedName("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool"));

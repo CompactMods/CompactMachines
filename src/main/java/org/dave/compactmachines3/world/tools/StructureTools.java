@@ -101,7 +101,11 @@ public class StructureTools {
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    if (x == minX || z == minZ || x == maxX || y == maxY || z == maxZ || (y == minY && includeFloor)) {
+                    if (x == minX || z == minZ || x == maxX || y == maxY || z == maxZ || y == minY) {
+                        if(!includeFloor && y == minY) {
+                            continue;
+                        }
+
                         BlockPos pos = new BlockPos(x, y, z);
                         list.add(pos);
                     }

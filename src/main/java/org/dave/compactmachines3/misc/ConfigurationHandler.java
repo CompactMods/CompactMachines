@@ -85,6 +85,24 @@ public class ConfigurationHandler {
                 Settings.WORLDGEN_CHANCE_LABEL
         );
 
+        Settings.maximumCraftingAreaSize = configuration.getInt(
+                "maximumCraftingAreaSize",
+                CATEGORY_MINIATURIZATION,
+                15,
+                5, 20,
+                "Maximum size the field projectors can cover",
+                "Maximum Crafting Area Size"
+        );
+
+        Settings.maximumCraftingCatalystAge = configuration.getInt(
+                "maximumCraftingCatalystAge",
+                CATEGORY_MINIATURIZATION,
+                60,
+                20, Integer.MAX_VALUE,
+                "Maximum age in ticks in which an item is valid for acting as a catalyst",
+                "Maximum Crafting Catalyst Age"
+        );
+
         MachineSettings.allowRespawning = configuration.getBoolean(
                 MachineSettings.ALLOW_RESPAWN_NAME,
                 CATEGORY_MACHINES,
@@ -126,6 +144,12 @@ public class ConfigurationHandler {
         public static int dimensionTypeId;
         public static boolean forceLoadChunks;
         public static float chanceForBrokenCube;
+        public static int maximumCraftingAreaSize;
+        public static int maximumCraftingCatalystAge;
+
+        public static int getMaximumMagnitude() {
+            return ConfigurationHandler.Settings.maximumCraftingAreaSize-1 / 2;
+        }
 
         private static final String DIMENSION_ID_NAME = "dimensionId";
         private static final int DIMENSION_ID_DEFAULT = 144;
@@ -146,5 +170,7 @@ public class ConfigurationHandler {
         private static final float WORLDGEN_CHANCE_DEFAULT = 0.0005f;
         private static final String WORLDGEN_CHANCE_COMMENT = "The chance a chunk in the overworld contains a broken compact machine";
         private static final String WORLDGEN_CHANCE_LABEL = "Worldgen Chance";
+
+
     }
 }

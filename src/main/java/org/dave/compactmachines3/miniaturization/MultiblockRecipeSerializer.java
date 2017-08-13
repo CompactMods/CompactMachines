@@ -27,6 +27,17 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             return null;
         }
 
+        if(!jsonRoot.has("name")) {
+            Logz.info("Invalid recipe! Missing recipe name!");
+            return null;
+        }
+
+        String name = jsonRoot.get("name").getAsString();
+        if(MultiblockRecipes.getRecipeByName(name) != null) {
+            Logz.info("Duplicate recipe with name: %s", name);
+            return null;
+        }
+
         // Verify we've got a valid target itemstack
         ItemStack targetStack = null;
         int targetCount = jsonRoot.has("target-count") ? jsonRoot.get("target-count").getAsInt() : 1;
@@ -65,7 +76,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             catalystMeta = jsonRoot.get("catalyst-meta").getAsInt();
         }
 
-        MultiblockRecipe result = new MultiblockRecipe(targetStack, catalystItem, catalystMeta);
+        MultiblockRecipe result = new MultiblockRecipe(name, targetStack, catalystItem, catalystMeta);
 
         // Read reference map
         JsonObject jsonReferenceMap = jsonRoot.get("input-types").getAsJsonObject();

@@ -1,0 +1,54 @@
+{
+	"credit": "Made with Blockbench, a free, modern block model editor by JannisX11",
+	"textures": {
+		"0": "compactmachines3:blocks/fieldprojector",
+		"particle": "compactmachines3:blocks/fieldprojector"
+	},
+	"elements": [
+		{
+			"name": "Base",
+			"from": [0, 0, 0],
+			"to": [16, 6, 16],
+			"shade": true,
+			"faces": {
+				"north": {"uv": [0, 8, 8, 11], "texture": "#0"},
+				"east": {"uv": [0, 8, 8, 11], "texture": "#0"},
+				"south": {"uv": [0, 8, 8, 11], "texture": "#0"},
+				"west": {"uv": [0, 8, 8, 11], "texture": "#0"},
+				"up": {"uv": [0, 0, 8, 8], "texture": "#0"},
+				"down": {"uv": [8, 0, 16, 8], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Pole",
+			"from": [7, 6, 7],
+			"to": [9, 12, 9],
+			"shade": true,
+			"faces": {
+				"north": {
+					"uv": [0, 11, 3, 12],
+					"texture": "#0",
+					"rotation": 270
+				},
+				"east": {
+					"uv": [0, 11, 3, 12],
+					"texture": "#0",
+					"rotation": 270
+				},
+				"south": {
+					"uv": [0, 11, 3, 12],
+					"texture": "#0",
+					"rotation": 270
+				},
+				"west": {
+					"uv": [0, 11, 3, 12],
+					"texture": "#0",
+					"rotation": 270
+				},
+				"up": {"uv": [3, 11, 4, 12], "texture": "#0"},
+				"down": {"uv": [0, 0, 2, 2], "texture": "#0"}
+			}
+		}
+	],
+	"display": {"thirdperson_righthand": {}}
+}

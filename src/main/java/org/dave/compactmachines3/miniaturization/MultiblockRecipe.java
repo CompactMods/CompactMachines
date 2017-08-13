@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MultiblockRecipe {
+    private String name;
+
     private String[][][] map;
     private String[][][] map90;
     private String[][][] map180;
@@ -36,7 +38,8 @@ public class MultiblockRecipe {
     private int catalystMeta;
     private int count;
 
-    public MultiblockRecipe(ItemStack targetStack, Item catalyst, int catalystMeta) {
+    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta) {
+        this.name = name;
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
         this.targetStack = targetStack;
@@ -46,6 +49,10 @@ public class MultiblockRecipe {
 
     public void addBlockReference(String ref, IBlockState state) {
         this.reference.put(ref, state);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<ItemStack> getRequiredItemStacks() {
@@ -154,14 +161,18 @@ public class MultiblockRecipe {
         };
     }
 
-    public boolean tryCrafting(World world, ArrayList<BlockPos> insideBlocks, Item item) {
+    public boolean tryCrafting(World world, List<BlockPos> insideBlocks) {
+        return tryCrafting(world, insideBlocks, null);
+    }
+
+    public boolean tryCrafting(World world, List<BlockPos> insideBlocks, Item item) {
         // If the number of inside blocks does not even match, abort immediately
         if(insideBlocks.size() != this.count) {
             return false;
         }
 
         // Wrong catalyst -> abort
-        if(item != this.catalyst) {
+        if(item != null && item != this.catalyst) {
             return false;
         }
 
@@ -193,7 +204,7 @@ public class MultiblockRecipe {
         );
     }
 
-    private boolean testRotation(World world, ArrayList<BlockPos> insideBlocks, int minX, int minY, int minZ, String[][][] map) {
+    private boolean testRotation(World world, List<BlockPos> insideBlocks, int minX, int minY, int minZ, String[][][] map) {
         // Perform a few tests for each of the inside blocks
         for(BlockPos pos : insideBlocks) {
             BlockPos relativePos = pos.add(-minX, -minY, -minZ);
@@ -252,6 +263,22 @@ public class MultiblockRecipe {
 
     public BlockPos getMaxPos() {
         return maxPos;
+    }
+
+    public String getDimensionsString() {
+        return String.format("%dx%dx%d", getWidth(), getHeight(), getDepth());
+    }
+
+    public int getWidth() {
+        return getMaxPos().getX() - getMinPos().getX() +1;
+    }
+
+    public int getHeight() {
+        return getMaxPos().getY() - getMinPos().getY() +1;
+    }
+
+    public int getDepth() {
+        return getMaxPos().getZ() - getMinPos().getZ() +1;
     }
 
     public ItemStack getCatalystStack() {

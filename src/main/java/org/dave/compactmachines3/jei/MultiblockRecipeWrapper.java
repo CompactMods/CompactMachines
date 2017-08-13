@@ -78,6 +78,14 @@ public class MultiblockRecipeWrapper implements IRecipeWrapper {
             return;
         }
 
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0F, 0F, 216.5F);
+
+
+        mc.fontRenderer.drawString(recipe.getDimensionsString(), 153-mc.fontRenderer.getStringWidth(recipe.getDimensionsString()), 19 * 5 + 10, 0x444444);
+
+        GlStateManager.popMatrix();
+
         float angle = RenderTickCounter.renderTicks * 45.0f / 128.0f;
 
         // When we want to render translucent blocks we might need this

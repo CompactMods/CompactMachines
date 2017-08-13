@@ -18,12 +18,16 @@ public class Blockss {
     @GameRegistry.ObjectHolder("compactmachines3:machine")
     public static BlockMachine machine;
 
+    @GameRegistry.ObjectHolder("compactmachines3:fieldprojector")
+    public static BlockFieldProjector fieldProjector;
+
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         tunnel.initModel();
         wall.initModel();
         wallBreakable.initModel();
         machine.initModel();
+        fieldProjector.initModel();
     }
 
 }
