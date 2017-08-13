@@ -54,7 +54,6 @@ public class MultiblockRecipeWrapper implements IRecipeWrapper {
                 continue;
             }
 
-
             ForgeHooksClient.setRenderLayer(renderLayer);
             try {
                 blockrendererdispatcher.renderBlock(state, pos, recipe.getBlockAccess(), buffer);
