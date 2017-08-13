@@ -14,9 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -28,8 +27,6 @@ import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.render.TESRFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
-import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -75,7 +72,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
 
         int magnitude = teProjector.getCraftingAreaMagnitude();
         if(magnitude <= 0) {
-            player.sendMessage(new TextComponentString("Missing opposite field projector! It is required to determine the field size!"));
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_opposite_projector"));
             return true;
         }
 
@@ -85,30 +82,22 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
                 int x = missingPos.getX() - pos.getX();
                 int y = missingPos.getY() - pos.getY();
                 int z = missingPos.getZ() - pos.getZ();
-                player.sendMessage(new TextComponentString("Missing field projector at " + x + ", " + y + ", " + z));
+                player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_projector_at", x, y, z));
             }
             return true;
         }
 
-        /*
-        int distance = teProjector.getMaximumFieldDistance();
-        if(distance == 0) {
-            player.sendMessage(new TextComponentString("Something is blocking the field projector!"));
-            return true;
-        }
-        */
-
         TileEntityFieldProjector master = teProjector.getMasterProjector();
         if(!master.getActiveCraftingResult().isEmpty()) {
-            player.sendMessage(new TextComponentString("Currently crafting: " + master.getActiveCraftingResult().getDisplayName() + " (progress: " + master.getCraftingProgress() + ")"));
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.currently_crafting", master.getActiveCraftingResult().getDisplayName(), master.getCraftingProgress()));
             return true;
         }
 
         MultiblockRecipe result = MultiblockRecipes.tryCrafting(world, pos, null);
         if(result == null) {
-            player.sendMessage(new TextComponentString("No valid recipe found"));
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.no_recipe_found"));
         } else {
-            player.sendMessage(new TextComponentString("Recipe for: " + result.getTargetStack().getDisplayName()));
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.found_recipe_for", result.getTargetStack().getDisplayName()));
         }
 
         return true;

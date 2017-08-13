@@ -17,6 +17,12 @@ item.compactmachines3.tunneltool.name=Tunnel
 
 item.compactmachines3.psd.spawnpoint_set=Entry point set!
 
+hint.compactmachines3.missing_opposite_projector=Missing opposite field projector! It is required to determine the field size!
+hint.compactmachines3.missing_projector_at=Missing field projector at %d,%d,%d
+hint.compactmachines3.currently_crafting=Currently crafting: %s (progress: %s%%)
+hint.compactmachines3.no_recipe_found=No valid recipe found
+hint.compactmachines3.found_recipe_for=Recipe for: %s
+
 tooltip.compactmachines3.machine.coords=Machine: %s
 tooltip.compactmachines3.machine.coords.unused=Unused
 
