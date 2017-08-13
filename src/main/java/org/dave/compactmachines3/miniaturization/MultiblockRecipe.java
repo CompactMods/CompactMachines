@@ -12,6 +12,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
+import org.dave.compactmachines3.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -38,13 +39,16 @@ public class MultiblockRecipe {
     private int catalystMeta;
     private int count;
 
-    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta) {
+    private boolean symmetrical;
+
+    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta, boolean symmetrical) {
         this.name = name;
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
         this.targetStack = targetStack;
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
+        this.symmetrical = symmetrical;
     }
 
     public void addBlockReference(String ref, IBlockState state) {
@@ -75,9 +79,11 @@ public class MultiblockRecipe {
 
         // Prerotate the maps, so we do this only when the recipes are being loaded
         // and not with every check whether a recipe is valid.
-        this.map90 = this.rotateMapCW(this.map);
-        this.map180 = this.rotateMapCW(this.map90);
-        this.map270 = this.rotateMapCW(this.map180);
+        if(!symmetrical) {
+            this.map90 = this.rotateMapCW(this.map);
+            this.map180 = this.rotateMapCW(this.map90);
+            this.map270 = this.rotateMapCW(this.map180);
+        }
 
         // Count blocks, we can use this to quickly skip this recipe if the crafting
         // area is of a different size.
@@ -194,9 +200,12 @@ public class MultiblockRecipe {
             }
         }
 
+        // If its a symmetrical recipe we only need to test one rotation
+        if(symmetrical) {
+            return testRotation(world, insideBlocks, minX, minY, minZ, this.map);
+        }
+
         // Test each possible rotation of the crafting recipe
-        // TODO: Detect symmetry and skip rotations accordingly, e.g. for cubes this might be useful.
-        //       maybe just integrate this into the recipe file.
         return (testRotation(world, insideBlocks, minX, minY, minZ, this.map) ||
                 testRotation(world, insideBlocks, minX, minY, minZ, this.map90) ||
                 testRotation(world, insideBlocks, minX, minY, minZ, this.map180) ||
@@ -230,7 +239,7 @@ public class MultiblockRecipe {
 
             // Test whether the block is the type it should be
             IBlockState state = world.getBlockState(pos);
-            IBlockState wanted = reference.get(map[map.length - y - 1][z][x]);
+            IBlockState wanted = reference.get(map[y][z][x]);
             if(wanted == null || state.getBlock() != wanted.getBlock() || state.getBlock().getMetaFromState(state) != wanted.getBlock().getMetaFromState(wanted)) {
                 return false;
             }

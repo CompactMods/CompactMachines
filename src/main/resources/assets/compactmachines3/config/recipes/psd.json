@@ -8,9 +8,10 @@
   "catalst-meta": 0,
 
   "input-types": {
-    "g": { "id": "minecraft:gold_block", "meta": 0 }
+    "g": { "id": "compactmachines3:wallbreakable", "meta": 0 }
   },
 
+  "symmetrical": true,
   "shape":
   [
     [

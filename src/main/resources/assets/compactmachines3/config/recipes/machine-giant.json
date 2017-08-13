@@ -11,6 +11,7 @@
     "X": { "id": "minecraft:gold_block"}
   },
 
+  "symmetrical": true,
   "shape": [
     [
       ["X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"],

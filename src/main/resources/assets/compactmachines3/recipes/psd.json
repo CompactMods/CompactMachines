@@ -1,0 +1,17 @@
+{
+  "result": {
+    "item": "compactmachines3:psd"
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "compactmachines3:wallbreakable"
+    },
+    {
+      "item": "minecraft:ender_pearl"
+    }
+  ]
+}

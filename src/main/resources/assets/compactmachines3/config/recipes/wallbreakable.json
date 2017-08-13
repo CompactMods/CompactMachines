@@ -1,12 +1,13 @@
 {
   "name": "compactmachines3:wallbreakable",
   "target-block": "compactmachines3:wallbreakable",
-  "target-count": 64,
+  "target-count": 32,
 
   "input-types": {
     "i": { "id": "minecraft:iron_block" }
   },
 
+  "symmetrical": true,
   "shape": [
     [
       ["i", "i", "i"],

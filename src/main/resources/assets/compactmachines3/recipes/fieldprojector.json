@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "compactmachines3:fieldprojector",
+    "count": 3
+  },
+  "pattern": [
+    "eee",
+    "rrr",
+    "dwd"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "w": {
+      "item": "compactmachines3:wallbreakable"
+    },
+    "r": {
+      "item": "minecraft:redstone_torch"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    }
+  }
+}

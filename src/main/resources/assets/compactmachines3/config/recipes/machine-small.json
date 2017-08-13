@@ -10,6 +10,7 @@
     "w": { "id": "compactmachines3:wallbreakable" }
   },
 
+  "symmetrical": true,
   "shape": [
     [
       ["w", "w", "w", "w", "w", "w", "w"],
