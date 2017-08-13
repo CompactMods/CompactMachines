@@ -1,13 +1,15 @@
 package org.dave.compactmachines3.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
@@ -15,10 +17,23 @@ import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 
 public class WorldGenMachines implements IWorldGenerator {
+    private static final Set<Block> allowedBlocksToSpawnOn;
+
+    static {
+        allowedBlocksToSpawnOn = new HashSet<>();
+        allowedBlocksToSpawnOn.add(Blocks.SAND);
+        allowedBlocksToSpawnOn.add(Blocks.SANDSTONE);
+        allowedBlocksToSpawnOn.add(Blocks.DIRT);
+        allowedBlocksToSpawnOn.add(Blocks.GRASS);
+        allowedBlocksToSpawnOn.add(Blocks.STONE);
+        allowedBlocksToSpawnOn.add(Blocks.COBBLESTONE);
+    }
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
@@ -43,9 +58,28 @@ public class WorldGenMachines implements IWorldGenerator {
         int z = (chunkZ << 4) + random.nextInt(16-dim) + dim;
         int y = world.getHeight(x, z) + dim;
 
+        BlockPos startingCornerPos = new BlockPos(x, y, z);
+
         // Do not generate on OCEAN type biomes
-        Biome worldBiome = world.getBiome(new BlockPos(x, y, z));
+        Biome worldBiome = world.getBiome(startingCornerPos);
         if(worldBiome == Biomes.OCEAN || worldBiome == Biomes.DEEP_OCEAN || worldBiome == Biomes.FROZEN_OCEAN) {
+            return;
+        }
+
+
+        // Only generate on the allowed blocks
+        BlockPos foundationPos = startingCornerPos.offset(EnumFacing.DOWN);
+        Block foundationBlock;
+        do {
+            foundationBlock = world.getBlockState(foundationPos).getBlock();
+            if(!world.isAirBlock(foundationPos) && !(foundationBlock.isFoliage(world, foundationPos) || foundationBlock.isReplaceable(world, foundationPos))) {
+                break;
+            }
+
+            foundationPos = foundationPos.offset(EnumFacing.DOWN);
+        } while(true);
+
+        if(!allowedBlocksToSpawnOn.contains(foundationBlock)) {
             return;
         }
 
@@ -67,7 +101,8 @@ public class WorldGenMachines implements IWorldGenerator {
                 continue;
             }
 
-            if(random.nextInt(100) <= 5) {
+            // Replace a few blocks with lava
+            if(random.nextInt(100) <= 1) {
                 world.setBlockState(pos, fluidState);
             } else {
                 world.setBlockState(pos, state);
