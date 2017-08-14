@@ -21,6 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.BlockFieldProjector;
+import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.utility.Logz;
@@ -78,7 +79,11 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         GlStateManager.translate(0.5, 0.0, 0.5);
 
         // Rotate to face the proper direction
-        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockFieldProjector.FACING);
+        EnumFacing facing = EnumFacing.NORTH;
+        if(te.getWorld().getBlockState(te.getPos()).getBlock() == Blockss.fieldProjector) {
+            facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockFieldProjector.FACING);
+        }
+
         int xyAngle = (facing.getHorizontalIndex()-1) * -90;
         GlStateManager.rotate(xyAngle, 0, 1, 0);
 
