@@ -45,9 +45,19 @@ repositories {
         url "http://tehnut.info/maven"
     }
 
+    maven { // TheOneProbe
+        name 'tterrag maven'
+        url "http://maven.tterrag.com/"
+    }
+
     maven { // location of the maven that hosts JEI files
         name "Progwml Repo"
         url "http://dvs1.progwml6.com/files/maven"
+    }
+
+    maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
     }
 }
 
@@ -76,6 +86,8 @@ dependencies {
     runtime "mezz.jei:jei_${config.compatmc.version}:${config.jei.version}"
 
     deobfCompile "mcp.mobius.waila:Hwyla:${config.waila.version}:api"
+
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.14-7"
 }
 
 allprojects {

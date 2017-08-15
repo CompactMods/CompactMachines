@@ -23,6 +23,9 @@ hint.compactmachines3.currently_crafting=Currently crafting: %s (progress: %s%%)
 hint.compactmachines3.no_recipe_found=No valid recipe found
 hint.compactmachines3.found_recipe_for=Recipe for: %s
 
+top.compactmachines3.currently_crafting=Crafting:
+top.compactmachines3.found_recipe_for=Recipe for:
+
 tooltip.compactmachines3.machine.coords=Machine: %s
 tooltip.compactmachines3.machine.coords.unused=Unused
 

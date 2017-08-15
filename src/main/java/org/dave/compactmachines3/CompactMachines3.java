@@ -55,7 +55,6 @@ public class CompactMachines3
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PackageHandler.init();
-        FMLInterModComms.sendMessage("Waila", "register", "org.dave.compactmachines3.misc.WailaProvider.register");
 
         proxy.init(event);
 

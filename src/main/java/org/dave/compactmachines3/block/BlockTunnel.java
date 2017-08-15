@@ -1,5 +1,8 @@
 package org.dave.compactmachines3.block;
 
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -10,18 +13,21 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.init.Itemss;
 import org.dave.compactmachines3.tile.TileEntityMachine;
@@ -33,7 +39,7 @@ import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
 
-public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
+public class BlockTunnel extends BlockProtected implements ITileEntityProvider, ITopInfoProvider {
     public static final PropertyDirection MACHINE_SIDE = PropertyDirection.create("machineside");
 
     public BlockTunnel(Material material) {
@@ -160,5 +166,18 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider {
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileEntityTunnel();
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        TileEntity te = world.getTileEntity(data.getPos());
+        if(te instanceof TileEntityTunnel) {
+            TileEntityTunnel tnt = (TileEntityTunnel) te;
+
+            String translate = "enumfacing." + blockState.getValue(BlockTunnel.MACHINE_SIDE).getName();
+            probeInfo.horizontal()
+                    .item(new ItemStack(Items.COMPASS))
+                    .text(TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET);
+        }
     }
 }

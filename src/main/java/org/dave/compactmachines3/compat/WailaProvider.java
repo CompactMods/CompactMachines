@@ -1,4 +1,4 @@
-package org.dave.compactmachines3.misc;
+package org.dave.compactmachines3.compat;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -15,12 +15,14 @@ import net.minecraft.world.World;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.BlockTunnel;
 import org.dave.compactmachines3.tile.TileEntityMachine;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.TextFormattingHelper;
 
 import java.util.List;
 
 public class WailaProvider {
     public static void register(IWailaRegistrar registry) {
+        Logz.info("Enabled support for Waila/Hwyla");
         MachineProvider mpInstance = new MachineProvider();
         TunnelProvider tpInstance = new TunnelProvider();
 

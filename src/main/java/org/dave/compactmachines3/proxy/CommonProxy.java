@@ -18,6 +18,7 @@ import org.dave.compactmachines3.item.ItemBlockMachine;
 import org.dave.compactmachines3.item.ItemBlockWall;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.item.ItemTunnelTool;
+import org.dave.compactmachines3.compat.CompatHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
@@ -53,6 +54,7 @@ public class CommonProxy {
     }
 
     public void preInit(FMLPreInitializationEvent event) {
+        CompatHandler.registerCompat();
     }
 
     public void init(FMLInitializationEvent event) {

@@ -1,5 +1,8 @@
 package org.dave.compactmachines3.block;
 
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
@@ -22,6 +25,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
@@ -31,7 +35,7 @@ import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockFieldProjector extends BlockBase implements ITileEntityProvider {
+public class BlockFieldProjector extends BlockBase implements ITileEntityProvider, ITopInfoProvider {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
     public BlockFieldProjector(Material material) {
@@ -160,5 +164,32 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, FACING);
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        TileEntity te = world.getTileEntity(data.getPos());
+        if(te instanceof TileEntityFieldProjector) {
+            TileEntityFieldProjector tfp = (TileEntityFieldProjector) te;
+            TileEntityFieldProjector master = tfp.getMasterProjector();
+
+            if(master == null) {
+                return;
+            }
+
+            ItemStack crafting = master.getActiveCraftingResult();
+            if(!crafting.isEmpty()) {
+                probeInfo.horizontal().text("{*top.compactmachines3.currently_crafting*}").item(crafting).itemLabel(crafting);
+                probeInfo.horizontal().progress(master.getCraftingProgress(), 100);
+                return;
+            }
+
+            MultiblockRecipe result = MultiblockRecipes.tryCrafting(world, data.getPos(), null);
+            if(result == null) {
+                probeInfo.horizontal().text("{*hint.compactmachines3.no_recipe_found*}");
+            } else {
+                probeInfo.horizontal().text("{*top.compactmachines3.found_recipe_for*}").item(result.getTargetStack()).itemLabel(result.getTargetStack());
+            }
+        }
     }
 }
