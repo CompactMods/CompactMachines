@@ -196,7 +196,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if(this.getWorld().isRemote) {
+        if(this.getWorld().isRemote || facing == null) {
             if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
                 return CapabilityNullHandlerRegistry.getNullHandler(capability);
             }
