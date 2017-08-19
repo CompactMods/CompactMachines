@@ -15,7 +15,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.dave.compactmachines3.block.BlockFieldProjector;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
@@ -274,8 +273,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, centerBB);
         // TODO: Master also needs to check the top of the cube
         for(EntityItem item : items) {
-            int age = ObfuscationReflectionHelper.getPrivateValue(EntityItem.class, item, "age");
-            if(age > ConfigurationHandler.Settings.maximumCraftingCatalystAge) {
+            if(item.ticksExisted > ConfigurationHandler.Settings.maximumCraftingCatalystAge) {
                 continue;
             }
 
