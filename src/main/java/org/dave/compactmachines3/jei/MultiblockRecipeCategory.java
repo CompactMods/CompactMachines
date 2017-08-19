@@ -126,7 +126,7 @@ public class MultiblockRecipeCategory implements IRecipeCategory, ITooltipCallba
         if(slotIndex >= 0 && slotIndex <= 5) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.jei.shape"));
         }
-        if(slotIndex == 7) {
+        if(slotIndex == 6) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.jei.crafting_trigger"));
         }
         tooltip.add(last);

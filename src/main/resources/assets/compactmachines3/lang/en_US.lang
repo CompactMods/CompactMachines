@@ -35,7 +35,7 @@ tooltip.compactmachines3.tunneltool.hint=Used to connect Wall blocks with outsid
 tooltip.compactmachines3.wall.hint=Warning! Unbreakable for non-creative players!
 tooltip.compactmachines3.machine.hint=A %s provides a %s room.
 
-tooltip.compactmachines3.jei.crafting_trigger=Throw this into the shrinking zone to start the crafting.
+tooltip.compactmachines3.jei.crafting_trigger=Throw this into the miniaturization field to start the crafting process.
 tooltip.compactmachines3.jei.shape=Use these to build the multiblock
 
 compactmachines3.jei.category.multiblock_miniaturization=Multiblock Miniaturization
