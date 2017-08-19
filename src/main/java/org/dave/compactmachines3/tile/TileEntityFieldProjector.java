@@ -275,7 +275,6 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         // TODO: Master also needs to check the top of the cube
         for(EntityItem item : items) {
             int age = ObfuscationReflectionHelper.getPrivateValue(EntityItem.class, item, "age");
-
             if(age > ConfigurationHandler.Settings.maximumCraftingCatalystAge) {
                 continue;
             }

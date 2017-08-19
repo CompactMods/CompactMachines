@@ -27,7 +27,7 @@ hint.compactmachines3.invalid_block_in_field=Invalid block in field area @ %d,%d
 top.compactmachines3.currently_crafting=Crafting:
 top.compactmachines3.found_recipe_for=Recipe for:
 
-tooltip.compactmachines3.machine.coords=Machine: %s
+tooltip.compactmachines3.machine.coords=Machine:
 tooltip.compactmachines3.machine.coords.unused=Unused
 
 tooltip.compactmachines3.psd.hint=Used as documentation and to enter Compact Machines.

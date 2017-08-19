@@ -1,5 +1,8 @@
 package org.dave.compactmachines3.block;
 
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -7,11 +10,13 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,12 +26,14 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
@@ -41,7 +48,7 @@ import org.dave.compactmachines3.world.tools.TeleportationTools;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEntityProvider {
+public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEntityProvider, ITopInfoProvider {
 
     public static final PropertyEnum<EnumMachineSize> SIZE = PropertyEnum.create("size", EnumMachineSize.class);
 
@@ -267,5 +274,28 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         return true;
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        TileEntity te = world.getTileEntity(data.getPos());
+        if(te instanceof TileEntityMachine) {
+            TileEntityMachine machine = (TileEntityMachine) te;
+            String nameOrId = "";
+            if(machine.coords < 0 && machine.getCustomName().length() == 0) {
+                nameOrId = "{*tooltip.compactmachines3.machine.coords.unused*}";
+            } else if(machine.getCustomName().length() > 0) {
+                nameOrId = machine.getCustomName();
+            } else {
+                nameOrId = "#" + machine.coords;
+            }
+
+            probeInfo.horizontal().text(TextFormatting.GREEN + "{*tooltip.compactmachines3.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET);
+
+            String translate = "enumfacing." + data.getSideHit().getName();
+            probeInfo.horizontal()
+                    .item(new ItemStack(Items.COMPASS))
+                    .text(TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET);
+        }
     }
 }

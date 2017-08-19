@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -50,7 +49,7 @@ public class ItemBlockMachine extends ItemBlock {
         if(stack.hasTagCompound() && stack.getTagCompound().hasKey("coords")) {
             int coords = stack.getTagCompound().getInteger("coords");
             if(coords > -1) {
-                tooltip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords", "#" + coords)));
+                tooltip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords") + " #" + coords));
             }
         }
 

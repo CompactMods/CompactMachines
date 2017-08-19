@@ -97,7 +97,7 @@ public class WailaProvider {
             } else {
                 nameOrId = "#" + te.coords;
             }
-            currenttip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords", nameOrId)));
+            currenttip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords") + " " + nameOrId));
 
             String sideString = I18n.format("enumfacing.side", I18n.format("enumfacing." + accessor.getSide().getName()));
             currenttip.add(TextFormattingHelper.colorizeKeyValue(sideString));
