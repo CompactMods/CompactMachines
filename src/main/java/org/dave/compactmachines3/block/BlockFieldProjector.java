@@ -3,6 +3,7 @@ package org.dave.compactmachines3.block;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
@@ -17,10 +18,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -77,6 +80,11 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
         int magnitude = teProjector.getCraftingAreaMagnitude();
         if(magnitude <= 0) {
             player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_opposite_projector"));
+            for(int testMagn = 1; testMagn <= 7; testMagn++) {
+                BlockPos opposite = teProjector.getPos().offset(teProjector.getDirection(), testMagn*4);
+                ((WorldServer)world).spawnParticle(EnumParticleTypes.BARRIER, true, opposite.getX() + 0.5d, opposite.getY() + 0.5d, opposite.getZ() + 0.5d, 1, 0.0d, 0.0d, 0.0d, 0);
+            }
+
             return true;
         }
 
@@ -87,11 +95,31 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
                 int y = missingPos.getY() - pos.getY();
                 int z = missingPos.getZ() - pos.getZ();
                 player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_projector_at", x, y, z));
+                ((WorldServer)world).spawnParticle(EnumParticleTypes.BARRIER, true, missingPos.getX() + 0.5d, missingPos.getY() + 0.5d, missingPos.getZ() + 0.5d, 1, 0.0d, 0.0d, 0.0d, 0);
             }
             return true;
         }
 
         TileEntityFieldProjector master = teProjector.getMasterProjector();
+        BlockPos invalidBlock = master.getInvalidBlockInField(magnitude);
+        if(invalidBlock != null) {
+            IBlockState blockState = world.getBlockState(invalidBlock);
+            Block block = blockState.getBlock();
+            String blockName = block.getUnlocalizedName();
+
+            Item item = Item.getItemFromBlock(block);
+            if(item != null) {
+                ItemStack stack = new ItemStack(item, 1, block.getMetaFromState(blockState));
+                if(stack != null) {
+                    blockName = stack.getDisplayName();
+                }
+            }
+
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.invalid_block_in_field", invalidBlock.getX(), invalidBlock.getY(), invalidBlock.getZ(), blockName));
+            return true;
+        }
+
+
         if(!master.getActiveCraftingResult().isEmpty()) {
             player.sendMessage(new TextComponentTranslation("hint.compactmachines3.currently_crafting", master.getActiveCraftingResult().getDisplayName(), master.getCraftingProgress()));
             return true;

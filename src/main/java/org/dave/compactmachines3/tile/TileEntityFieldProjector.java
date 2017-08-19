@@ -171,6 +171,18 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
             return false;
         }
 
+        if(getInvalidBlockInField(magnitude) == null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public BlockPos getInvalidBlockInField(int magnitude) {
+        if(!isMaster()) {
+            return null;
+        }
+
         int fieldDimension = (magnitude+1) * 2 - 1;
 
         BlockPos center = this.getPos().offset(this.getDirection(), magnitude);
@@ -178,13 +190,12 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
 
         List<BlockPos> positionsToCheck = StructureTools.getCubePositions(topLeft, fieldDimension, fieldDimension, fieldDimension, false);
         for(BlockPos pos : positionsToCheck) {
-            // getWorld().spawnParticle(EnumParticleTypes.REDSTONE, true, pos.getX() + 0.5d, pos.getY() + 0.5d, pos.getZ() + 0.5d, 0.0d, 0.0d, 0.0d, 0);
             if(!getWorld().isAirBlock(pos)) {
-                return false;
+                return pos;
             }
         }
 
-        return true;
+        return null;
     }
 
     @Override
