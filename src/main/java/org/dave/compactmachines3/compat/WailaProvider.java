@@ -12,12 +12,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import org.dave.compactmachines3.block.BlockFieldProjector;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.BlockTunnel;
+import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
+import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
+import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.TextFormattingHelper;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class WailaProvider {
@@ -25,43 +30,54 @@ public class WailaProvider {
         Logz.info("Enabled support for Waila/Hwyla");
         MachineProvider mpInstance = new MachineProvider();
         TunnelProvider tpInstance = new TunnelProvider();
+        FieldProvider fpInstance = new FieldProvider();
 
         registry.registerBodyProvider(mpInstance, BlockMachine.class);
         registry.registerBodyProvider(tpInstance, BlockTunnel.class);
+        registry.registerBodyProvider(fpInstance, BlockFieldProjector.class);
 
         registry.registerStackProvider(mpInstance, BlockMachine.class);
         registry.registerStackProvider(tpInstance, BlockTunnel.class);
+        registry.registerStackProvider(fpInstance, BlockFieldProjector.class);
+    }
+
+    public static class FieldProvider implements IWailaDataProvider {
+        @Nonnull
+        @Override
+        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+            TileEntity te = accessor.getTileEntity();
+            if(te instanceof TileEntityFieldProjector) {
+                TileEntityFieldProjector tfp = (TileEntityFieldProjector) te;
+                TileEntityFieldProjector master = tfp.getMasterProjector();
+
+                if(master == null) {
+                    return currenttip;
+                }
+
+                ItemStack crafting = master.getActiveCraftingResult();
+                if(!crafting.isEmpty()) {
+                    currenttip.add(TextFormatting.YELLOW + I18n.format("top.compactmachines3.currently_crafting") + TextFormatting.RESET + " " + crafting.getDisplayName());
+                    return currenttip;
+                }
+
+                MultiblockRecipe result = MultiblockRecipes.tryCrafting(accessor.getWorld(), accessor.getPosition(), null);
+                if(result == null) {
+                    currenttip.add(TextFormatting.RED + I18n.format("hint.compactmachines3.no_recipe_found") + TextFormatting.RESET);
+                } else {
+                    currenttip.add(TextFormatting.GREEN + I18n.format("top.compactmachines3.found_recipe_for") + TextFormatting.RESET + " " + result.getTargetStack().getDisplayName());
+                }
+            }
+
+            return currenttip;
+        }
     }
 
     public static class TunnelProvider implements IWailaDataProvider {
-
-        @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
-            return new ItemStack(accessor.getBlock(), 1, 0);
-        }
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-            return currenttip;
-        }
-
-
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
             String translate = "enumfacing." + accessor.getBlockState().getValue(BlockTunnel.MACHINE_SIDE).getName();
             currenttip.add(TextFormatting.YELLOW + I18n.format(translate) + TextFormatting.RESET);
             return currenttip;
-        }
-
-
-        @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-            return currenttip;
-        }
-
-        @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-            return tag;
         }
     }
 
@@ -70,12 +86,6 @@ public class WailaProvider {
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
             return new ItemStack(accessor.getBlock(), 1, accessor.getMetadata());
-        }
-
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-            return currenttip;
         }
 
         @Override
@@ -99,16 +109,6 @@ public class WailaProvider {
             currenttip.add(TextFormattingHelper.colorizeKeyValue(sideString));
 
             return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-            return currenttip;
-        }
-
-        @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-            return tag;
         }
     }
 }
