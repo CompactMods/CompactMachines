@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -19,12 +20,17 @@ import org.dave.compactmachines3.item.ItemBlockWall;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.compat.CompatHandler;
+import org.dave.compactmachines3.misc.SoundHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
+    @SubscribeEvent
+    public static void onSoundRegistry(RegistryEvent.Register<SoundEvent> event) {
+        SoundHandler.init(event.getRegistry());
+    }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {

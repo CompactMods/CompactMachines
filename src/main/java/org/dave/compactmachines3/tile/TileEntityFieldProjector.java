@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
@@ -20,6 +21,8 @@ import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.misc.SoundHandler;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.*;
@@ -236,11 +239,15 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         }
 
         if(isMaster() && activeRecipe != null) {
+            BlockPos center = this.getPos().offset(this.getDirection(), magnitude * 2);
+
+            if (progress % 20 == 0 && progress < 40) {
+                world.playSound(null, center, SoundHandler.crafting, SoundCategory.BLOCKS, 0.4f, 1.0f);
+            }
+
             if (progress > 100) {
                 // Crafting has finished, spawn the created item
                 // TODO: Make it possible to craft multiple items per recipe
-
-                BlockPos center = this.getPos().offset(this.getDirection(), magnitude * 2);
 
                 EntityItem entityItem = new EntityItem(world, center.getX(), center.getY(), center.getZ(), activeRecipe.getTargetStack());
                 entityItem.lifespan = 2400;
