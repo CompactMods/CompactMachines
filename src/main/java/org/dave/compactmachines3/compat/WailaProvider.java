@@ -5,13 +5,9 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import org.dave.compactmachines3.block.BlockFieldProjector;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.BlockTunnel;
@@ -61,9 +57,7 @@ public class WailaProvider {
                 }
 
                 MultiblockRecipe result = MultiblockRecipes.tryCrafting(accessor.getWorld(), accessor.getPosition(), null);
-                if(result == null) {
-                    currenttip.add(TextFormatting.RED + I18n.format("hint.compactmachines3.no_recipe_found") + TextFormatting.RESET);
-                } else {
+                if(result != null) {
                     currenttip.add(TextFormatting.GREEN + I18n.format("top.compactmachines3.found_recipe_for") + TextFormatting.RESET + " " + result.getTargetStack().getDisplayName());
                 }
             }

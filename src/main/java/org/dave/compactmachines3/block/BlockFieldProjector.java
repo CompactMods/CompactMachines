@@ -213,9 +213,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
             }
 
             MultiblockRecipe result = MultiblockRecipes.tryCrafting(world, data.getPos(), null);
-            if(result == null) {
-                probeInfo.horizontal().text("{*hint.compactmachines3.no_recipe_found*}");
-            } else {
+            if(result != null) {
                 probeInfo.horizontal().text("{*top.compactmachines3.found_recipe_for*}").item(result.getTargetStack()).itemLabel(result.getTargetStack());
             }
         }
