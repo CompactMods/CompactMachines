@@ -53,7 +53,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
-            player.openGui(CompactMachines3.instance, GuiIds.PSD_WELCOME.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
+            player.openGui(CompactMachines3.instance, GuiIds.PSD_GUIDE.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
             return new ActionResult(EnumActionResult.SUCCESS, stack);
         }
 
