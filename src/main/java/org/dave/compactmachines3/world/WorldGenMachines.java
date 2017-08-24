@@ -72,6 +72,10 @@ public class WorldGenMachines implements IWorldGenerator {
         Block foundationBlock;
         do {
             foundationBlock = world.getBlockState(foundationPos).getBlock();
+            if(foundationPos.getY() <= 0) {
+                break;
+            }
+
             if(!world.isAirBlock(foundationPos) && !(foundationBlock.isFoliage(world, foundationPos) || foundationBlock.isReplaceable(world, foundationPos))) {
                 break;
             }
