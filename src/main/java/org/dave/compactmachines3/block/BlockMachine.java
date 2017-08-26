@@ -282,7 +282,6 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             }
         }
 
-        Logz.info("Opening player GUI");
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
 
         MessageMachineContent message = new MessageMachineContent();
