@@ -1,4 +1,4 @@
-package org.dave.compactmachines3.gui;
+package org.dave.compactmachines3.gui.psd;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,6 +19,7 @@ public class GuiPSDScreen extends GuiScreen {
     public int offsetX;
 
     public static Pages pages;
+
     public GuiPSDScreen() {
     }
 

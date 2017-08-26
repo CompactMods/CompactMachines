@@ -4,9 +4,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
-import org.dave.compactmachines3.gui.GuiPSDScreen;
+import org.dave.compactmachines3.gui.psd.GuiPSDScreen;
 import org.dave.compactmachines3.gui.psd.Pages;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.init.Itemss;
+import org.dave.compactmachines3.misc.CubeTools;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
@@ -58,6 +59,16 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider, 
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return CubeTools.shouldSideBeRendered(blockAccess, pos, side);
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
     }
 
     @Override

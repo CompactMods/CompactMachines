@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import org.dave.compactmachines3.gui.GuiPSDScreen;
+import org.dave.compactmachines3.gui.psd.GuiPSDScreen;
 
 public class ImageSegment extends Segment {
     String location;

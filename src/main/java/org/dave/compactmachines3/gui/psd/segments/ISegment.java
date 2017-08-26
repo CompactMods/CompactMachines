@@ -2,7 +2,7 @@ package org.dave.compactmachines3.gui.psd.segments;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderItem;
-import org.dave.compactmachines3.gui.GuiPSDScreen;
+import org.dave.compactmachines3.gui.psd.GuiPSDScreen;
 
 public interface ISegment {
     boolean isMouseInSegment(int mouseX, int mouseY);

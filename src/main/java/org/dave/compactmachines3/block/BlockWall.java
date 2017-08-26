@@ -12,6 +12,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,6 +21,7 @@ import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.misc.CubeTools;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
@@ -38,6 +40,16 @@ public class BlockWall extends BlockProtected {
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return CubeTools.shouldSideBeRendered(blockAccess, pos, side);
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
     }
 
     @Override

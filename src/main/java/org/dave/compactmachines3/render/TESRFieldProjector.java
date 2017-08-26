@@ -48,25 +48,6 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         return bakedModel;
     }
 
-    public void renderLayer(TileEntityFieldProjector te, BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
-        for (BlockPos pos : toRender) {
-            IBlockState state = te.getActiveRecipe().getStateAtBlockPos(pos);
-            if (!state.getBlock().canRenderInLayer(state, renderLayer)) {
-                continue;
-            }
-
-
-            ForgeHooksClient.setRenderLayer(renderLayer);
-            try {
-                blockrendererdispatcher.renderBlock(state, pos, te.getActiveRecipe().getBlockAccess(), buffer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ForgeHooksClient.setRenderLayer(null);
-        }
-    }
-
-
     @Override
     public void render(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         GlStateManager.pushAttrib();

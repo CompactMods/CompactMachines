@@ -10,7 +10,6 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -30,16 +29,23 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.network.MessageMachineContent;
+import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
+import org.dave.compactmachines3.utility.ChunkUtils;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
@@ -245,6 +251,8 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         tileEntityMachine.markDirty();
     }
 
+
+
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if(player.isSneaking()) {
@@ -255,7 +263,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return true;
         }
 
-        if(!(world.getTileEntity(pos)instanceof TileEntityMachine)) {
+        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
             return false;
         }
 
@@ -270,8 +278,17 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
 
                 WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
+                return true;
             }
         }
+
+        Logz.info("Opening player GUI");
+        player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
+
+        MessageMachineContent message = new MessageMachineContent();
+        Chunk chunk = DimensionTools.getServerMachineWorld().getChunkFromBlockCoords(new BlockPos(machine.coords * 1024, 40, 0));
+        message.setData(ChunkUtils.writeChunkToNBT(chunk, machine.getWorld(), new NBTTagCompound()));
+        PackageHandler.instance.sendTo(message, (EntityPlayerMP)player);
 
         return true;
     }
