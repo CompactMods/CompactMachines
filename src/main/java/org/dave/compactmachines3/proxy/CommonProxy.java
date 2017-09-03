@@ -23,6 +23,7 @@ import org.dave.compactmachines3.compat.CompatHandler;
 import org.dave.compactmachines3.misc.SoundHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
+import org.dave.compactmachines3.tile.TileEntityCraftingHologram;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 
 @Mod.EventBusSubscriber
@@ -45,6 +46,9 @@ public class CommonProxy {
 
         event.getRegistry().register(new BlockFieldProjector(Material.IRON).setUnlocalizedName("fieldprojector").setRegistryName(CompactMachines3.MODID, "fieldprojector"));
         GameRegistry.registerTileEntity(TileEntityFieldProjector.class, "TileEntityFieldProjector");
+
+        event.getRegistry().register(new BlockCraftingHologram(Material.IRON).setUnlocalizedName("craftinghologram").setRegistryName(CompactMachines3.MODID, "craftinghologram"));
+        GameRegistry.registerTileEntity(TileEntityCraftingHologram.class, "TileEntityCraftingHologram");
     }
 
     @SubscribeEvent

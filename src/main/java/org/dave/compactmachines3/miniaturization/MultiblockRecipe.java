@@ -40,9 +40,11 @@ public class MultiblockRecipe {
     private int catalystMeta;
     private int count;
 
+    private int ticks;
+
     private boolean symmetrical;
 
-    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta, boolean symmetrical) {
+    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta, boolean symmetrical, int ticks) {
         this.name = name;
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
@@ -50,10 +52,15 @@ public class MultiblockRecipe {
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
         this.symmetrical = symmetrical;
+        this.ticks = ticks;
     }
 
     public void addBlockReference(String ref, IBlockState state) {
         this.reference.put(ref, state);
+    }
+
+    public int getTicks() {
+        return ticks;
     }
 
     public String getName() {
@@ -136,7 +143,7 @@ public class MultiblockRecipe {
 
             @Override
             public int getCombinedLight(BlockPos pos, int lightValue) {
-                return 15;
+                return 255;
             }
 
             @Override

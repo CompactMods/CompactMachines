@@ -4,6 +4,8 @@
   "target-meta": 1,
   "target-count": 1,
 
+  "duration": 440,
+
   "catalyst": "minecraft:ender_pearl",
 
   "input-types": {

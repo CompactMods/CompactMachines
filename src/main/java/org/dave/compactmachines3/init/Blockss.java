@@ -21,6 +21,9 @@ public class Blockss {
     @GameRegistry.ObjectHolder("compactmachines3:fieldprojector")
     public static BlockFieldProjector fieldProjector;
 
+    @GameRegistry.ObjectHolder("compactmachines3:craftinghologram")
+    public static BlockCraftingHologram craftingHologram;
+
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         tunnel.initModel();
@@ -28,6 +31,7 @@ public class Blockss {
         wallBreakable.initModel();
         machine.initModel();
         fieldProjector.initModel();
+        craftingHologram.initModel();
     }
 
 }

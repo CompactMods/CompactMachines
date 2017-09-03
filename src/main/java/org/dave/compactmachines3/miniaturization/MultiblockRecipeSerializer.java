@@ -81,7 +81,12 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             symmetrical = jsonRoot.get("symmetrical").getAsBoolean();
         }
 
-        MultiblockRecipe result = new MultiblockRecipe(name, targetStack, catalystItem, catalystMeta, symmetrical);
+        int ticks = 100;
+        if(jsonRoot.has("duration")) {
+            ticks = jsonRoot.get("duration").getAsInt();
+        }
+
+        MultiblockRecipe result = new MultiblockRecipe(name, targetStack, catalystItem, catalystMeta, symmetrical, ticks);
 
         // Read reference map
         JsonObject jsonReferenceMap = jsonRoot.get("input-types").getAsJsonObject();

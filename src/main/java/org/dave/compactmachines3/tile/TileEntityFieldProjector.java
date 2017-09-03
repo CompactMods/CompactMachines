@@ -11,7 +11,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
@@ -21,8 +20,6 @@ import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.misc.SoundHandler;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.*;
@@ -32,9 +29,6 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
     private Random rand = new Random();
 
     private int activeMagnitude = 0;
-
-    private MultiblockRecipe activeRecipe;
-    private int progress = 0;
 
     protected UUID owner;
 
@@ -47,20 +41,43 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         return this.getWorld().getBlockState(this.pos).getValue(BlockFieldProjector.FACING);
     }
 
+    public TileEntityCraftingHologram getCraftingHologram() {
+        if(activeMagnitude == 0) {
+            return null;
+        }
+
+        BlockPos center = this.getPos().offset(this.getDirection(), activeMagnitude * 2);
+        if(getWorld().getTileEntity(center) instanceof TileEntityCraftingHologram) {
+            return (TileEntityCraftingHologram) getWorld().getTileEntity(center);
+        }
+
+        return null;
+    }
+
     public int getCraftingProgress() {
-        return progress;
+        TileEntityCraftingHologram te = getCraftingHologram();
+        if(te == null) {
+            return 0;
+        }
+
+        return te.getProgress();
     }
 
     public MultiblockRecipe getActiveRecipe() {
-        return activeRecipe;
+        TileEntityCraftingHologram te = getCraftingHologram();
+        if(te == null) {
+            return null;
+        }
+
+        return te.getRecipe();
     }
 
     public ItemStack getActiveCraftingResult() {
-        if(activeRecipe == null) {
+        if(getActiveRecipe() == null) {
             return ItemStack.EMPTY;
         }
 
-        return activeRecipe.getTargetStack();
+        return getActiveRecipe().getTargetStack();
     }
 
     public List<BlockPos> getInsideBlocks() {
@@ -238,39 +255,12 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
             return;
         }
 
-        if(isMaster() && activeRecipe != null) {
-            BlockPos center = this.getPos().offset(this.getDirection(), magnitude * 2);
-
-            if (progress % 20 == 0 && progress < 40) {
-                world.playSound(null, center, SoundHandler.crafting, SoundCategory.BLOCKS, 0.4f, 1.0f);
-            }
-
-            if (progress > 100) {
-                // Crafting has finished, spawn the created item
-                // TODO: Make it possible to craft multiple items per recipe
-
-                EntityItem entityItem = new EntityItem(world, center.getX(), center.getY(), center.getZ(), activeRecipe.getTargetStack());
-                entityItem.lifespan = 2400;
-                entityItem.setPickupDelay(10);
-
-                entityItem.motionX = 0.0f;
-                entityItem.motionY = 0.1f;
-                entityItem.motionZ = 0.0f;
-
-                world.spawnEntity(entityItem);
-
-                progress = 0;
-                activeRecipe = null;
-                markDirty();
-            }
-
-            progress++;
-        }
+        BlockPos center = this.getPos().offset(this.getDirection(), magnitude * 2);
 
         // Determine whether there is a catalyst item inside this projectors field
         double growWD = (magnitude*2+1)/2;
-        BlockPos center = this.getPos().offset(this.getDirection(), magnitude);
-        AxisAlignedBB centerBB = new AxisAlignedBB(center).grow(0, growWD, 0);
+        BlockPos centerPosOfField = this.getPos().offset(this.getDirection(), magnitude);
+        AxisAlignedBB centerBB = new AxisAlignedBB(centerPosOfField).grow(0, growWD, 0);
         if(getDirection() == EnumFacing.NORTH || getDirection() == EnumFacing.SOUTH) {
             centerBB = centerBB.grow(growWD, 0, 0);
         } else {
@@ -295,12 +285,13 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
                 ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 10, 0.5D, 0.5D, 0.5D, 0.01D, new int[0]);
             }
             item.setDead();
-            // TODO: Sound effects: zzzzaaap
 
-            // Tell the master field projector that it is now crafting
-            master.activeRecipe = multiblockRecipe;
-            master.progress = 0;
-            master.markDirty();
+            // Create recipe hologram
+            world.setBlockState(center, Blockss.craftingHologram.getDefaultState());
+            TileEntityCraftingHologram teHologram = (TileEntityCraftingHologram) world.getTileEntity(center);
+            if(teHologram != null) {
+                teHologram.setRecipe(multiblockRecipe);
+            }
         }
     }
 
@@ -317,47 +308,68 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         BlockPos center = this.getPos().offset(this.getDirection(), activeMagnitude);
         BlockPos topLeft = center.offset(EnumFacing.UP, activeMagnitude).offset(this.getDirection().rotateY(), activeMagnitude);
 
+        float baseParticleChance = 0.9f;
+
+        boolean isCrafting = false;
         EnumParticleTypes particle = EnumParticleTypes.END_ROD;
-        if(getMasterProjector() != null && getMasterProjector().activeRecipe != null) {
+        if(getActiveRecipe() != null) {
+            isCrafting = true;
             particle = EnumParticleTypes.EXPLOSION_LARGE;
         }
 
-        for(int x = 0; x < activeMagnitude*2; x++) {
-            for(int y = 0; y < activeMagnitude*2; y++) {
-                BlockPos pos = topLeft.offset(EnumFacing.DOWN, y).offset(this.getDirection().rotateYCCW(), x);
-                if(getWorld().isAirBlock(pos)) {
-                    // There is chance we will do nothing this tick
-                    if(rand.nextFloat() >= 0.6) {
+        if(isCrafting) {
+            BlockPos centerCraftingArea = center.offset(this.getDirection(), activeMagnitude);
+            double xPos = centerCraftingArea.getX() + rand.nextDouble();
+            double yPos = centerCraftingArea.getY() + rand.nextDouble();
+            double zPos = centerCraftingArea.getZ() + rand.nextDouble();
+            double xPos2 = this.getPos().getX() + 0.5f;
+            double yPos2 = this.getPos().getY() + 0.66f;
+            double zPos2 = this.getPos().getZ() + 0.5f;
+
+            double speedMultiplier = 0.09d;
+            double xSpeed = (xPos-xPos2) * speedMultiplier;
+            double ySpeed = (yPos-yPos2) * speedMultiplier;
+            double zSpeed = (zPos-zPos2) * speedMultiplier;
+
+            getWorld().spawnParticle(EnumParticleTypes.END_ROD, true, xPos2, yPos2, zPos2, xSpeed, ySpeed, zSpeed, new int[0]);
+        } else {
+            for(int x = 0; x < activeMagnitude*2; x++) {
+                for(int y = 0; y < activeMagnitude*2; y++) {
+                    BlockPos pos = topLeft.offset(EnumFacing.DOWN, y).offset(this.getDirection().rotateYCCW(), x);
+                    if(getWorld().isAirBlock(pos)) {
+                        // There is chance we will do nothing this tick
+                        if(rand.nextFloat() >= baseParticleChance) {
+                            double xPos = pos.getX() + rand.nextDouble();
+                            double yPos = pos.getY() + rand.nextDouble();
+                            double zPos = pos.getZ() + rand.nextDouble();
+                            getWorld().spawnParticle(particle, true, xPos, yPos, zPos, 0.0D, 0.01D, 0.0D, new int[0]);
+
+                            // There is an even lesser chance we spawn the "creation" particles, the ones flying to the field...
+                            if(rand.nextFloat() >= 0.8) {
+                                double xPos2 = this.getPos().getX() + 0.5f;
+                                double yPos2 = this.getPos().getY() + 0.66f;
+                                double zPos2 = this.getPos().getZ() + 0.5f;
+
+                                double speedMultiplier = 0.09d;
+                                double xSpeed = (xPos-xPos2) * speedMultiplier;
+                                double ySpeed = (yPos-yPos2) * speedMultiplier;
+                                double zSpeed = (zPos-zPos2) * speedMultiplier;
+
+                                getWorld().spawnParticle(EnumParticleTypes.END_ROD, true, xPos2, yPos2, zPos2, xSpeed, ySpeed, zSpeed, new int[0]);
+                            }
+                        }
+                    }
+
+                    // Master takes care of topping off the cube
+                    if(isMaster() && y < activeMagnitude*2-1 && x < activeMagnitude*2-1) {
+                        pos = topLeft.offset(getDirection(), y+1).offset(this.getDirection().rotateYCCW(), x+1);
+                        if(rand.nextFloat() < baseParticleChance) continue;
+
                         double xPos = pos.getX() + rand.nextDouble();
                         double yPos = pos.getY() + rand.nextDouble();
                         double zPos = pos.getZ() + rand.nextDouble();
                         getWorld().spawnParticle(particle, true, xPos, yPos, zPos, 0.0D, 0.01D, 0.0D, new int[0]);
-
-                        // There is an even lesser chance we spawn the "creation" particles, the ones flying to the field...
-                        if(rand.nextFloat() >= 0.95) {
-                            double xPos2 = this.getPos().getX() + 0.5f;
-                            double yPos2 = this.getPos().getY() + 0.66f;
-                            double zPos2 = this.getPos().getZ() + 0.5f;
-
-                            double speedMultiplier = 0.09d;
-                            double xSpeed = (xPos-xPos2) * speedMultiplier;
-                            double ySpeed = (yPos-yPos2) * speedMultiplier;
-                            double zSpeed = (zPos-zPos2) * speedMultiplier;
-
-                            getWorld().spawnParticle(EnumParticleTypes.END_ROD, true, xPos2, yPos2, zPos2, xSpeed, ySpeed, zSpeed, new int[0]);
-                        }
                     }
-                }
-
-                // Master takes care of topping off the cube
-                if(isMaster() && y < activeMagnitude*2-1 && x < activeMagnitude*2-1) {
-                    pos = topLeft.offset(getDirection(), y+1).offset(this.getDirection().rotateYCCW(), x+1);
-                    //if(rand.nextFloat() < 0.5) continue;
-
-                    double xPos = pos.getX() + rand.nextDouble();
-                    double yPos = pos.getY() + rand.nextDouble();
-                    double zPos = pos.getZ() + rand.nextDouble();
-                    getWorld().spawnParticle(particle, true, xPos, yPos, zPos, 0.0D, 0.01D, 0.0D, new int[0]);
                 }
             }
         }
@@ -371,26 +383,12 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
 
-        progress = compound.getInteger("progress");
         owner = compound.getUniqueId("owner");
-        if(compound.hasKey("recipe")) {
-            activeRecipe = MultiblockRecipes.getRecipeByName(compound.getString("recipe"));
-        } else {
-            activeRecipe = null;
-        }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-
-        if(isMaster()) {
-            compound.setInteger("progress", progress);
-
-            if (activeRecipe != null) {
-                compound.setString("recipe", activeRecipe.getName());
-            }
-        }
 
         if(hasOwner()) {
             compound.setUniqueId("owner", this.owner);
