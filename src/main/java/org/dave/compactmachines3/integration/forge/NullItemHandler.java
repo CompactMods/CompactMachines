@@ -21,7 +21,7 @@ public class NullItemHandler extends AbstractNullHandler implements IItemHandler
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class NullItemHandler extends AbstractNullHandler implements IItemHandler
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
