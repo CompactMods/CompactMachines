@@ -17,7 +17,7 @@ There are 6 different sizes of machines:
 | Normal                      | 7x7x7        |
 | Large                       | 9x9x9        |
 | Giant                       | 11x11x11     |
-| Maximum                     | 3x3x3        |
+| Maximum                     | 13x13x13     |
 
 #### Spawn location
 
@@ -45,7 +45,7 @@ searches a better spawn location. And you don't want to have to break the blocks
   content.
 - Compact Machines can be nested
 - Compact Machines spawn along the x-axis in the Compact Machine dimension at y=40,
-  x=1024*machine-id, z=0.
+  x=1024*machine-id, z=0. This means they all fit in exactly one chunk.
 
 
 
