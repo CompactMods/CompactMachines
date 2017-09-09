@@ -1,7 +1,6 @@
 # Compact Machines 3
 Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
 
-
 ## Compact Machines
 
 These are the main component of this mod and they allow you to build complicated
@@ -18,6 +17,14 @@ There are 6 different sizes of machines:
 | Large                       | 9x9x9        |
 | Giant                       | 11x11x11     |
 | Maximum                     | 13x13x13     |
+
+#### Personal Shrinking Device
+
+This little tool allow you to enter your Compact Machines. Right clicking
+a Compact Machine world will teleport you inside.
+
+It also doubles as the integrated documentation. Just right click it anywhere
+else.
 
 #### Spawn location
 
@@ -111,7 +118,7 @@ Recipes are added by placing .json files in the config/compactmachines3/recipes 
 
 ## World Gen
 
-"Broken" Compact Machines sometimes spawn in the overworld. Harvest their blocks to use for
-your own usage.
+"Broken" Compact Machines sometimes generate in the overworld. Harvest their blocks to use for
+your own machines.
 
 This can be disabled in the config files.
