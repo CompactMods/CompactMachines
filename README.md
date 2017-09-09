@@ -1,4 +1,4 @@
-# CompactMachines
+# Compact Machines 3
 Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
 
 
