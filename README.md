@@ -53,7 +53,8 @@ searches a better spawn location. And you don't want to have to break the blocks
 - Compact Machines can be nested
 - Compact Machines spawn along the x-axis in the Compact Machine dimension at y=40,
   x=1024*machine-id, z=0. This means they all fit in exactly one chunk.
-
+- Currently mobs can not spawn within Compact Machines. This will probably change in
+  the future, but there will be a config option to turn this back off.
 
 
 ## Tunnels
