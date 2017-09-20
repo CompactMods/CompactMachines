@@ -112,6 +112,8 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
 
         tessellator.draw();
 
+        GlStateManager.disableBlend();
+
         GlStateManager.popMatrix();
         GlStateManager.popAttrib();
     }
