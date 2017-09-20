@@ -116,27 +116,44 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         return insideBlocks;
     }
 
-    public TileEntityFieldProjector getNextProjectorCW() {
-        for(int size = 1; size < ConfigurationHandler.Settings.getMaximumMagnitude(); size++) {
-            BlockPos pos = this.getPos()
-                    .offset(this.getDirection(), size)
-                    .offset(this.getDirection().rotateY(), size);
 
-            if(getWorld().getTileEntity(pos) instanceof TileEntityFieldProjector) {
-                return (TileEntityFieldProjector) getWorld().getTileEntity(pos);
+    private TileEntityFieldProjector getMasterByAddingDirections(EnumFacing A, EnumFacing B) {
+        for(int size = 1; size < ConfigurationHandler.Settings.getMaximumMagnitude(); size++) {
+            BlockPos pos = this.getPos().offset(A, size).offset(B, size);
+
+            if(!(getWorld().getTileEntity(pos) instanceof TileEntityFieldProjector)) {
+                continue;
             }
+            TileEntityFieldProjector te = (TileEntityFieldProjector) getWorld().getTileEntity(pos);
+
+            // It might be facing the wrong direction actually. If so, skip it
+            if(!te.isMaster()) {
+                continue;
+            }
+
+            return te;
         }
 
         return null;
     }
 
     public TileEntityFieldProjector getMasterProjector() {
-        TileEntityFieldProjector result = this;
-        while(result != null && !result.isMaster()) {
-            result = result.getNextProjectorCW();
+        if(isMaster()) {
+            return this;
         }
 
-        return result;
+        if(this.getDirection() == EnumFacing.EAST) {
+            // Master must be opposite, i.e. WEST
+            return getMasterByAddingDirections(EnumFacing.EAST, EnumFacing.EAST);
+        } else if(this.getDirection() == EnumFacing.NORTH) {
+            // Master is to the north and west
+            return getMasterByAddingDirections(EnumFacing.NORTH, EnumFacing.EAST);
+        } else if(this.getDirection() == EnumFacing.SOUTH) {
+            // Master is to the south and west
+            return getMasterByAddingDirections(EnumFacing.SOUTH, EnumFacing.EAST);
+        }
+
+        return null;
     }
 
     public boolean isMaster() {
