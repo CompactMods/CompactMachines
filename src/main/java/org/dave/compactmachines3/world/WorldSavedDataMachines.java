@@ -33,7 +33,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         this.markDirty();
     }
 
-    public int getBedCoors(EntityPlayer player) {
+    public int getBedCoords(EntityPlayer player) {
         return bedCoords.getOrDefault(player.getUniqueID(), -1);
     }
 

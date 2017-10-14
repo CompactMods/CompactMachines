@@ -1,9 +1,7 @@
 package org.dave.compactmachines3.misc;
 
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -16,8 +14,6 @@ import org.dave.compactmachines3.gui.machine.GuiMachineChunkHolder;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
-
-import java.util.List;
 
 public class PlayerEventHandler {
     @SubscribeEvent
@@ -42,7 +38,7 @@ public class PlayerEventHandler {
             return;
         }
 
-        int bedCoords = WorldSavedDataMachines.INSTANCE.getBedCoors(event.player);
+        int bedCoords = WorldSavedDataMachines.INSTANCE.getBedCoords(event.player);
         boolean bedInCM = bedCoords != -1;
 
         Logz.info("Player is allowed to spawn in CM: %s, bedcoors = %d", ConfigurationHandler.MachineSettings.allowRespawning, bedCoords);
