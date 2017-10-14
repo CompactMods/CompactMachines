@@ -14,6 +14,7 @@ import net.minecraftforge.client.ForgeHooksClient;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.ChunkUtils;
+import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class GuiMachine extends GuiScreen {
     protected static final int GUI_HEIGHT = 256;
 
     TileEntityMachine machine;
+
+    int glListId = -1;
 
     public GuiMachine(TileEntityMachine machine) {
         this.machine = machine;
@@ -39,6 +42,52 @@ public class GuiMachine extends GuiScreen {
 
         if(GuiMachineChunkHolder.rawData != null && GuiMachineChunkHolder.chunk == null) {
             GuiMachineChunkHolder.chunk = ChunkUtils.readChunkFromNBT(mc.world, GuiMachineChunkHolder.rawData);
+            IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineChunkHolder.chunk);
+            List<BlockPos> toRender = new ArrayList<>();
+            for(int x = 15; x >= 0; x--) {
+                for(int y = 15; y >= 0; y--) {
+                    for(int z = 15; z >= 0; z--) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        if(blockAccess.isAirBlock(pos)) {
+                            continue;
+                        }
+
+                        toRender.add(pos);
+                    }
+                }
+            }
+
+            if(glListId != -1) {
+                GLAllocation.deleteDisplayLists(glListId);
+            }
+
+            glListId = GLAllocation.generateDisplayLists(1);
+            GlStateManager.glNewList(glListId, GL11.GL_COMPILE);
+
+            GlStateManager.pushAttrib();
+            GlStateManager.pushMatrix();
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+
+            // Aaaand render
+            BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            GlStateManager.disableAlpha();
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRender);
+            GlStateManager.enableAlpha();
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRender);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRender);
+            GlStateManager.shadeModel(GL11.GL_FLAT);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRender);
+
+            tessellator.draw();
+
+            GlStateManager.popMatrix();
+            GlStateManager.popAttrib();
+
+            GlStateManager.glEndList();
         }
 
         // TODO: Maybe add some other useful information to the screen
@@ -48,25 +97,6 @@ public class GuiMachine extends GuiScreen {
     }
 
     public void renderChunk() {
-        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineChunkHolder.chunk);
-        List<BlockPos> toRender = new ArrayList<>();
-        for(int x = 15; x >= 0; x--) {
-            for(int y = 15; y >= 0; y--) {
-                for(int z = 15; z >= 0; z--) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    if(blockAccess.isAirBlock(pos)) {
-                        continue;
-                    }
-
-                    toRender.add(pos);
-                }
-            }
-        }
-
-        if(toRender.isEmpty()) {
-            return;
-        }
-
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
         // Init GlStateManager
@@ -93,6 +123,7 @@ public class GuiMachine extends GuiScreen {
         }
 
         GlStateManager.pushMatrix();
+        GlStateManager.pushAttrib();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -128,21 +159,14 @@ public class GuiMachine extends GuiScreen {
         GL11.glFrontFace(GL11.GL_CW);
 
         // Aaaand render
-        buffer.begin(7, DefaultVertexFormats.BLOCK);
-        GlStateManager.disableAlpha();
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRender);
-        GlStateManager.enableAlpha();
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRender);
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRender);
-
-
-        GlStateManager.shadeModel(7425);
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRender);
-
-        tessellator.draw();
+        GlStateManager.callList(glListId);
 
         GL11.glFrontFace(GL11.GL_CCW);
+
+        GlStateManager.popAttrib();
         GlStateManager.popMatrix();
+
+        GlStateManager.disableBlend();
     }
 
     public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
