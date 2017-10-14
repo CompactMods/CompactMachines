@@ -13,7 +13,7 @@ import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
 public class TeleportationTools {
-    private static void teleportPlayerToMachine(EntityPlayerMP player, int coords, boolean isReturning) {
+    public static void teleportPlayerToMachine(EntityPlayerMP player, int coords, boolean isReturning) {
         NBTTagCompound playerNBT = player.getEntityData();
         if (player.dimension != ConfigurationHandler.Settings.dimensionId) {
             playerNBT.setInteger("compactmachines3-oldDimension", player.dimension);
@@ -49,7 +49,7 @@ public class TeleportationTools {
         player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
     }
 
-    private static void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
+    public static void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
         PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
 
         NBTTagCompound playerNBT = player.getEntityData();
@@ -93,6 +93,7 @@ public class TeleportationTools {
     public static void teleportPlayerOutOfMachine(EntityPlayerMP player) {
         NBTTagCompound playerNBT = player.getEntityData();
         if (!playerNBT.hasKey("compactmachines3-coordHistory")) {
+            teleportPlayerOutOfMachineDimension(player);
             return;
         }
 

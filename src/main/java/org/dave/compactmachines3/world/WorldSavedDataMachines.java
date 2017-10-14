@@ -1,5 +1,7 @@
 package org.dave.compactmachines3.world;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -13,6 +15,7 @@ import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class WorldSavedDataMachines extends WorldSavedData {
 
@@ -20,8 +23,19 @@ public class WorldSavedDataMachines extends WorldSavedData {
     public HashMap<Integer, double[]> spawnPoints = new HashMap<>();
     public HashMap<Integer, HashMap<EnumFacing, BlockPos>> tunnels = new HashMap<>();
     public HashMap<Integer, DimensionBlockPos> machinePositions = new HashMap<>();
+    public HashMap<UUID, Integer> bedCoords = new HashMap<>();
 
     public static WorldSavedDataMachines INSTANCE;
+
+    public void setBedCoords(EntityPlayer player) {
+        int coords = StructureTools.getCoordsForPos(new BlockPos(player.posX, player.posY, player.posZ));
+        bedCoords.put(player.getUniqueID(), coords);
+        this.markDirty();
+    }
+
+    public int getBedCoors(EntityPlayer player) {
+        return bedCoords.getOrDefault(player.getUniqueID(), -1);
+    }
 
     // TODO: Cleanup this class. It's all over the place.
     public DimensionBlockPos getMachinePosition(int coord) {
@@ -82,6 +96,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
 
         Logz.info(" > %d spawn points", wsd.spawnPoints.size());
         Logz.info(" > Next machine id: %d", wsd.nextCoord);
+        Logz.info(" > Players with beds in CM dimension: %d", wsd.bedCoords.size());
 
         WorldSavedDataMachines.INSTANCE = wsd;
         event.getWorld().getMapStorage().setData("WorldSavedDataMachines", wsd);
@@ -146,6 +161,12 @@ public class WorldSavedDataMachines extends WorldSavedData {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound.setInteger("nextMachineCoord", nextCoord);
 
+        NBTTagCompound bedCoordsMap = new NBTTagCompound();
+        for(UUID playerId : bedCoords.keySet()) {
+            int coords = bedCoords.get(playerId);
+            bedCoordsMap.setInteger(playerId.toString(), coords);
+        }
+
         NBTTagList spawnPointList = new NBTTagList();
         for(int coords : spawnPoints.keySet()) {
             double[] positions = spawnPoints.get(coords);
@@ -191,6 +212,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         compound.setTag("spawnpoints", spawnPointList);
         compound.setTag("tunnels", tunnelList);
         compound.setTag("machines", machineList);
+        compound.setTag("bedcoords", bedCoordsMap);
         return compound;
     }
 
@@ -198,6 +220,16 @@ public class WorldSavedDataMachines extends WorldSavedData {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         nextCoord = nbt.getInteger("nextMachineCoord");
+
+        if(nbt.hasKey("bedcoords")) {
+            bedCoords.clear();
+            NBTTagCompound bedCoordsMap = nbt.getCompoundTag("bedcoords");
+            for(String uuidString : bedCoordsMap.getKeySet()) {
+                UUID uuid = UUID.fromString(uuidString);
+                int coords = bedCoordsMap.getInteger(uuidString);
+                bedCoords.put(uuid, coords);
+            }
+        }
 
         if(nbt.hasKey("spawnpoints")) {
             spawnPoints.clear();

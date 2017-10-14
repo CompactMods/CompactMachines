@@ -23,6 +23,8 @@ hint.compactmachines3.currently_crafting=Currently crafting: %s (progress: %s%%)
 hint.compactmachines3.no_recipe_found=No valid recipe found
 hint.compactmachines3.found_recipe_for=Recipe for: %s
 hint.compactmachines3.invalid_block_in_field=Invalid block in field area @ %d,%d,%d: %s
+hint.compactmachines3.cant_sleep_here=You can not sleep in the Compact Machines dimension
+hint.compactmachines3.bed_position_set=Respawn position set to this Machine
 
 top.compactmachines3.currently_crafting=Crafting:
 top.compactmachines3.found_recipe_for=Recipe for:

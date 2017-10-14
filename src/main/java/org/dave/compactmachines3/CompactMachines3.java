@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
 import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
+import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
@@ -37,6 +38,7 @@ public class CompactMachines3
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
         MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
 
+        MinecraftForge.EVENT_BUS.register(PlayerEventHandler.class);
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
         MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
 
