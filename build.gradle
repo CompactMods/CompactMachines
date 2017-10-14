@@ -29,13 +29,7 @@ minecraft {
     version = "${config.minecraft.version}-${config.forge.version}"
     runDir = "run"
 
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20170624"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    mappings = "snapshot_20170811"
 }
 
 repositories {
@@ -82,12 +76,14 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    deobfCompile "mezz.jei:jei_${config.compatmc.version}:${config.jei.version}:api"
-    runtime "mezz.jei:jei_${config.compatmc.version}:${config.jei.version}"
+    deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
+    runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
 
     deobfCompile "mcp.mobius.waila:Hwyla:${config.waila.version}:api"
 
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.14-7"
+    deobfCompile("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.18-10") {
+        transitive = false
+    }
 }
 
 allprojects {
