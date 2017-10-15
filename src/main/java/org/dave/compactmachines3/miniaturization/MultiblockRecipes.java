@@ -28,7 +28,7 @@ public class MultiblockRecipes {
         loadRecipes();
     }
 
-    public static MultiblockRecipe tryCrafting(World world, BlockPos projectorPos, Item item) {
+    public static MultiblockRecipe tryCrafting(World world, BlockPos projectorPos, ItemStack itemStack) {
         if(!(world.getTileEntity(projectorPos) instanceof TileEntityFieldProjector)) {
             return null;
         }
@@ -37,7 +37,7 @@ public class MultiblockRecipes {
         List<BlockPos> insideBlocks = teProjector.getInsideBlocks();
 
         for(MultiblockRecipe recipe : recipes) {
-            if(recipe.tryCrafting(world, insideBlocks, item)) {
+            if(recipe.tryCrafting(world, insideBlocks, itemStack)) {
                 return recipe;
             }
         }

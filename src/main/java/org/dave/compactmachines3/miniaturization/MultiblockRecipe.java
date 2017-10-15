@@ -6,6 +6,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -38,22 +40,25 @@ public class MultiblockRecipe {
 
     private Item catalyst;
     private int catalystMeta;
+    private NBTTagCompound catalystNbt;
     private int count;
 
     private int ticks;
 
     private boolean symmetrical;
 
-    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta, boolean symmetrical, int ticks) {
+    public MultiblockRecipe(String name, ItemStack targetStack, Item catalyst, int catalystMeta, NBTTagCompound catalystNbt, boolean symmetrical, int ticks) {
         this.name = name;
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
         this.targetStack = targetStack;
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
+        this.catalystNbt = catalystNbt;
         this.symmetrical = symmetrical;
         this.ticks = ticks;
     }
+
 
     public void addBlockReference(String ref, IBlockState state) {
         this.reference.put(ref, state);
@@ -183,15 +188,21 @@ public class MultiblockRecipe {
         return tryCrafting(world, insideBlocks, null);
     }
 
-    public boolean tryCrafting(World world, List<BlockPos> insideBlocks, Item item) {
+    public boolean tryCrafting(World world, List<BlockPos> insideBlocks, ItemStack itemStack) {
         // If the number of inside blocks does not even match, abort immediately
         if(insideBlocks.size() != this.count) {
             return false;
         }
 
         // Wrong catalyst -> abort
-        if(item != null && item != this.catalyst) {
-            return false;
+        if(itemStack != null) {
+            boolean itemMatches = this.catalyst == itemStack.getItem();
+            boolean metaMatches = this.catalystMeta == itemStack.getMetadata();
+            boolean nbtMatches = this.catalystNbt == null || NBTUtil.areNBTEquals(this.catalystNbt, itemStack.getTagCompound(), false);
+
+            if(!(itemMatches && metaMatches && nbtMatches)) {
+                return false;
+            }
         }
 
         // Normalize the crafting area to x=0, y=0, z=0. For that we first
@@ -303,7 +314,11 @@ public class MultiblockRecipe {
     }
 
     public ItemStack getCatalystStack() {
-        return new ItemStack(this.catalyst, 1, this.catalystMeta);
+        ItemStack result = new ItemStack(this.catalyst, 1, this.catalystMeta);
+        if(this.catalystNbt != null) {
+            result.setTagCompound(this.catalystNbt.copy());
+        }
+        return result;
     }
 
     public ItemStack getTargetStack() {

@@ -291,7 +291,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
                 continue;
             }
 
-            MultiblockRecipe multiblockRecipe = MultiblockRecipes.tryCrafting(world, getPos(), item.getItem().getItem());
+            MultiblockRecipe multiblockRecipe = MultiblockRecipes.tryCrafting(world, getPos(), item.getItem());
             if(multiblockRecipe == null) {
                 continue;
             }

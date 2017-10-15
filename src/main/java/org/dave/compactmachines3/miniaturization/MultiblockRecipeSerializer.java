@@ -6,8 +6,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.utility.SerializationHelper;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -76,6 +80,16 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             catalystMeta = jsonRoot.get("catalyst-meta").getAsInt();
         }
 
+        NBTTagCompound catalystNbt = null;
+        if(jsonRoot.has("catalyst-nbt")) {
+            String nbtRaw = jsonRoot.get("catalyst-nbt").getAsString();
+            try {
+                catalystNbt = JsonToNBT.getTagFromJson(nbtRaw);
+            } catch (NBTException e) {
+                Logz.warn("Unable to read NBT tag from miniaturiazation recipe: %s (exception=%s)", nbtRaw, e);
+            }
+        }
+
         boolean symmetrical = false;
         if(jsonRoot.has("symmetrical")) {
             symmetrical = jsonRoot.get("symmetrical").getAsBoolean();
@@ -86,7 +100,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             ticks = jsonRoot.get("duration").getAsInt();
         }
 
-        MultiblockRecipe result = new MultiblockRecipe(name, targetStack, catalystItem, catalystMeta, symmetrical, ticks);
+        MultiblockRecipe result = new MultiblockRecipe(name, targetStack, catalystItem, catalystMeta, catalystNbt, symmetrical, ticks);
 
         // Read reference map
         JsonObject jsonReferenceMap = jsonRoot.get("input-types").getAsJsonObject();
