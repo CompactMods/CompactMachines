@@ -167,7 +167,7 @@ public class ConfigurationHandler {
         private static final String FORCELOADCHUNKS_LABEL = "Force chunk load";
 
         private static final String WORLDGEN_CHANCE_NAME = "worldgenChance";
-        private static final float WORLDGEN_CHANCE_DEFAULT = 0.0005f;
+        private static final float WORLDGEN_CHANCE_DEFAULT = 0.0001f;
         private static final String WORLDGEN_CHANCE_COMMENT = "The chance a chunk in the overworld contains a broken compact machine";
         private static final String WORLDGEN_CHANCE_LABEL = "Worldgen Chance";
 
