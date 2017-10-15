@@ -111,6 +111,14 @@ public class ConfigurationHandler {
                 MachineSettings.ALLOW_RESPAWN_LABEL
         );
 
+        MachineSettings.keepPlayersInside = configuration.getBoolean(
+                MachineSettings.KEEP_PLAYERS_NAME,
+                CATEGORY_MACHINES,
+                MachineSettings.KEEP_PLAYERS_DEFAULT,
+                MachineSettings.KEEP_PLAYERS_COMMENT,
+                MachineSettings.KEEP_PLAYERS_LABEL
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -132,11 +140,17 @@ public class ConfigurationHandler {
 
     public static class MachineSettings {
         public static boolean allowRespawning;
+        public static boolean keepPlayersInside;
 
         private static final String ALLOW_RESPAWN_NAME = "allowRespawning";
         private static final boolean ALLOW_RESPAWN_DEFAULT = true;
         private static final String ALLOW_RESPAWN_COMMENT = "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there";
         private static final String ALLOW_RESPAWN_LABEL = "Allow Respawning";
+
+        private static final String KEEP_PLAYERS_NAME = "keepPlayersInside";
+        private static final boolean KEEP_PLAYERS_DEFAULT = true;
+        private static final String KEEP_PLAYERS_COMMENT = "Block players from leaving the Compact Machine they should currently be in";
+        private static final String KEEP_PLAYERS_LABEL = "Keep players inside of Machines";
     }
 
     public static class Settings {

@@ -1,7 +1,6 @@
 package org.dave.compactmachines3.world;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -10,9 +9,10 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.world.tools.StructureTools;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -23,6 +23,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
     public HashMap<Integer, double[]> spawnPoints = new HashMap<>();
     public HashMap<Integer, HashMap<EnumFacing, BlockPos>> tunnels = new HashMap<>();
     public HashMap<Integer, DimensionBlockPos> machinePositions = new HashMap<>();
+    public HashMap<Integer, EnumMachineSize> machineSizes = new HashMap<>();
     public HashMap<UUID, Integer> bedCoords = new HashMap<>();
 
     public static WorldSavedDataMachines INSTANCE;
@@ -42,9 +43,10 @@ public class WorldSavedDataMachines extends WorldSavedData {
         return machinePositions.get(coord);
     }
 
-    public void addMachinePosition(int coord, BlockPos pos, int dimension) {
+    public void addMachinePosition(int coord, BlockPos pos, int dimension, EnumMachineSize size) {
         machinePositions.put(coord, new DimensionBlockPos(pos, dimension));
-        Logz.debug("Adding machine position: coords=%d, pos=%s, dimension=%d", coord, pos, dimension);
+        machineSizes.put(coord, size);
+        Logz.debug("Adding machine position: coords=%d, pos=%s, dimension=%d, size=%s", coord, pos, dimension, size.getName());
         this.markDirty();
     }
 
@@ -167,6 +169,12 @@ public class WorldSavedDataMachines extends WorldSavedData {
             bedCoordsMap.setInteger(playerId.toString(), coords);
         }
 
+        NBTTagCompound machineSizesTag = new NBTTagCompound();
+        for(int coord : machineSizes.keySet()) {
+            int size = machineSizes.get(coord).getMeta();
+            machineSizesTag.setInteger("" + coord, size);
+        }
+
         NBTTagList spawnPointList = new NBTTagList();
         for(int coords : spawnPoints.keySet()) {
             double[] positions = spawnPoints.get(coords);
@@ -213,6 +221,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         compound.setTag("tunnels", tunnelList);
         compound.setTag("machines", machineList);
         compound.setTag("bedcoords", bedCoordsMap);
+        compound.setTag("sizes", machineSizesTag);
         return compound;
     }
 
@@ -228,6 +237,16 @@ public class WorldSavedDataMachines extends WorldSavedData {
                 UUID uuid = UUID.fromString(uuidString);
                 int coords = bedCoordsMap.getInteger(uuidString);
                 bedCoords.put(uuid, coords);
+            }
+        }
+
+        if(nbt.hasKey("sizes")) {
+            machineSizes.clear();
+            NBTTagCompound machineSizesTag = nbt.getCompoundTag("sizes");
+            for(String coordString : machineSizesTag.getKeySet()) {
+                int coord = Integer.parseInt(coordString);
+                int size = machineSizesTag.getInteger(coordString);
+                machineSizes.put(coord, EnumMachineSize.getFromMeta(size));
             }
         }
 

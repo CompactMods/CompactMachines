@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.world.tools;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -9,10 +10,26 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.tile.TileEntityMachine;
+import org.dave.compactmachines3.utility.DimensionBlockPos;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
 public class TeleportationTools {
+    public static int getLastKnownCoords(EntityPlayer player) {
+        NBTTagCompound playerNBT = player.getEntityData();
+        if(!playerNBT.hasKey("compactmachines3-coordHistory")) {
+            return -1;
+        }
+
+        NBTTagList coordHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10);
+        if(coordHistory.tagCount() == 0) {
+            return -1;
+        }
+
+        return coordHistory.getCompoundTagAt(coordHistory.tagCount() - 1).getInteger("coord");
+    }
+
     public static void teleportPlayerToMachine(EntityPlayerMP player, int coords, boolean isReturning) {
         NBTTagCompound playerNBT = player.getEntityData();
         if (player.dimension != ConfigurationHandler.Settings.dimensionId) {
@@ -62,12 +79,75 @@ public class TeleportationTools {
             playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(DimensionTools.getWorldServerForDimension(oldDimension)));
             player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
         } else {
-            // TODO: We can do better now, since we know where the Machine block is -> Find a good nearby spawn position
-            BlockPos spawnPoint = DimensionTools.getWorldServerForDimension(0).provider.getRandomizedSpawnPoint();
+            int coords = StructureTools.getCoordsForPos(new BlockPos(player.posX, player.posY, player.posZ));
+            if(playerNBT.hasKey("compactmachines3-coordHistory")) {
+                coords = getLastKnownCoords(player);
+                playerNBT.removeTag("compactmachines3-coordHistory");
+            }
 
-            playerList.transferPlayerToDimension(player, 0, new TeleporterMachines(DimensionTools.getWorldServerForDimension(0)));
-            player.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
+            DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
+
+            BlockPos startPoint;
+            int dimension;
+
+            if(pos != null) {
+                // The machine exists and we know its position
+                dimension = pos.getDimension();
+                startPoint = pos.getBlockPos();
+            } else {
+                // We have no idea -> use the world spawn instead
+                dimension = 0;
+                startPoint = DimensionTools.getWorldServerForDimension(0).provider.getRandomizedSpawnPoint();
+            }
+
+            WorldServer world = DimensionTools.getWorldServerForDimension(dimension);
+            BlockPos spawnPoint = pos != null ? getValidSpawnLocation(world, startPoint) : startPoint;
+
+            playerList.transferPlayerToDimension(player, dimension, new TeleporterMachines(world));
+            player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 0.2d, spawnPoint.getZ() + 0.5d);
+
         }
+    }
+
+    public static BlockPos getValidSpawnLocation(WorldServer world, BlockPos start) {
+        // Spiral outwards
+        int blocksToCheck = (5*5 - 1) * 3;
+        int radius = 1;
+        int checked = 0;
+        while(checked < blocksToCheck) {
+            for (int y = -1; y < 2; y++) {
+                for (int q = -radius + 1; q <= radius && checked < blocksToCheck; q++) {
+                    BlockPos check = start.add(radius, y, q);
+                    if (world.isAirBlock(check) && world.isAirBlock(check.up()) && !world.isAirBlock(check.down())) {
+                        return check;
+                    }
+                    checked++;
+                }
+                for (int q = radius - 1; q >= -radius && checked < blocksToCheck; q--) {
+                    BlockPos check = start.add(q, y, radius);
+                    if (world.isAirBlock(check) && world.isAirBlock(check.up()) && !world.isAirBlock(check.down())) {
+                        return check;
+                    }
+                    checked++;
+                }
+                for (int q = radius - 1; q >= -radius && checked < blocksToCheck; q--) {
+                    BlockPos check = start.add(-radius, y, q);
+                    if (world.isAirBlock(check) && world.isAirBlock(check.up()) && !world.isAirBlock(check.down())) {
+                        return check;
+                    }
+                    checked++;
+                }
+                for (int q = -radius + 1; q <= radius && checked < blocksToCheck; q++) {
+                    BlockPos check = start.add(q, y, -radius);
+                    if (world.isAirBlock(check) && world.isAirBlock(check.up()) && !world.isAirBlock(check.down())) {
+                        return check;
+                    }
+                    checked++;
+                }
+            }
+        }
+
+        return start;
     }
 
 

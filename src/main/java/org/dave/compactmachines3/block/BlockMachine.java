@@ -277,7 +277,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             if(playerItem instanceof ItemPersonalShrinkingDevice) {
                 TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
 
-                WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension());
+                WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
                 return true;
             }
         }
