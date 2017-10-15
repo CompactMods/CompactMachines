@@ -275,7 +275,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         BlockPos center = this.getPos().offset(this.getDirection(), magnitude * 2);
 
         // Determine whether there is a catalyst item inside this projectors field
-        double growWD = (magnitude*2+1)/2;
+        double growWD = magnitude + 0.5d;
         BlockPos centerPosOfField = this.getPos().offset(this.getDirection(), magnitude);
         AxisAlignedBB centerBB = new AxisAlignedBB(centerPosOfField).grow(0, growWD, 0);
         if(getDirection() == EnumFacing.NORTH || getDirection() == EnumFacing.SOUTH) {
@@ -285,7 +285,13 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         }
 
         List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, centerBB);
-        // TODO: Master also needs to check the top of the cube
+
+        if(isMaster()) {
+            BlockPos centerOfTopField = this.getPos().offset(this.getDirection(), magnitude*2).offset(EnumFacing.UP, magnitude);
+            AxisAlignedBB topBB = new AxisAlignedBB(centerOfTopField).grow(magnitude + 0.5d, 0, magnitude + 0.5d);
+            items.addAll(world.getEntitiesWithinAABB(EntityItem.class, topBB));
+        }
+
         for(EntityItem item : items) {
             if(item.ticksExisted > ConfigurationHandler.Settings.maximumCraftingCatalystAge) {
                 continue;
