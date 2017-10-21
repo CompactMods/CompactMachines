@@ -8,13 +8,13 @@ import net.minecraft.world.World;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.utility.ResourceLoader;
 import org.dave.compactmachines3.utility.SerializationHelper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class MultiblockRecipes {
@@ -54,25 +54,23 @@ public class MultiblockRecipes {
     }
 
     private static void loadRecipes() {
-        // First load local recipes, keep track of what we loaded though
-        ArrayList<String> loadedLocalRecipes = new ArrayList<>();
-        if(ConfigurationHandler.recipeDirectory.exists()) {
-            for (File file : ConfigurationHandler.recipeDirectory.listFiles()) {
-                MultiblockRecipe recipe = null;
-                try {
-                    recipe = SerializationHelper.GSON.fromJson(new JsonReader(new FileReader(file)), MultiblockRecipe.class);
-                } catch (FileNotFoundException e) {
-                }
+        ResourceLoader loader = new ResourceLoader(ConfigurationHandler.recipeDirectory, "assets/compactmachines3/config/recipes/");
+        for(Map.Entry<String, InputStream> entry : loader.getResources().entrySet()) {
+            String filename = entry.getKey();
+            InputStream is = entry.getValue();
 
-                if (recipe == null) {
-                    Logz.error("Could not deserialize recipe from file: \"" + file.getPath() + "\"");
-                    continue;
-                }
-
-                Logz.info("Loaded recipe \"%s\" from config folder", file.getName());
-                recipes.add(recipe);
-                loadedLocalRecipes.add(file.getName());
+            if (!filename.endsWith(".json")) {
+                continue;
             }
+
+            MultiblockRecipe recipe = SerializationHelper.GSON.fromJson(new JsonReader(new InputStreamReader(is)), MultiblockRecipe.class);
+            if (recipe == null) {
+                Logz.error("Could not deserialize recipe from file: \"" + filename + "\"");
+                continue;
+            }
+
+            Logz.info("Loaded recipe \"%s\"", filename);
+            recipes.add(recipe);
         }
     }
 

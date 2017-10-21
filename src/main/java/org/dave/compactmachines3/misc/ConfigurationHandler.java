@@ -33,12 +33,9 @@ public class ConfigurationHandler {
         configuration = new Configuration(new File(cmDirectory, "settings.cfg"), null);
         loadConfiguration();
 
-        // Extract recipes if the folder does not exist
         recipeDirectory = new File(cmDirectory, "recipes");
         if(!recipeDirectory.exists()) {
             recipeDirectory.mkdir();
-            int count = JarExtract.copy("assets/compactmachines3/config/recipes", recipeDirectory);
-            Logz.info("Extracted %d recipes to config folder", count);
         }
 
         schemaDirectory = new File(cmDirectory, "schemas");

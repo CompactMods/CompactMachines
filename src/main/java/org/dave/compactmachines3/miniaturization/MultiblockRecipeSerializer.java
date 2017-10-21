@@ -11,7 +11,6 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import org.dave.compactmachines3.utility.Logz;
-import org.dave.compactmachines3.utility.SerializationHelper;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -39,6 +38,11 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
         String name = jsonRoot.get("name").getAsString();
         if(MultiblockRecipes.getRecipeByName(name) != null) {
             Logz.info("Duplicate recipe with name: %s", name);
+            return null;
+        }
+
+        if(jsonRoot.has("disabled") && jsonRoot.get("disabled").getAsBoolean() == true) {
+            Logz.info("Recipe '%s' is disabled via its json file", name);
             return null;
         }
 
