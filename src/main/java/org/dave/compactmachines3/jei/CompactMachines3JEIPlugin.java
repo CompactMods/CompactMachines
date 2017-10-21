@@ -26,7 +26,7 @@ public class CompactMachines3JEIPlugin implements IModPlugin {
 
     @Override
     public void register(IModRegistry registry) {
-        registry.addRecipeCatalyst(new ItemStack(Blockss.machine), MultiblockRecipeCategory.UID);
+        registry.addRecipeCatalyst(new ItemStack(Blockss.fieldProjector), MultiblockRecipeCategory.UID);
         registry.handleRecipes(MultiblockRecipe.class, new MultiblockRecipeWrapperFactory(), MultiblockRecipeCategory.UID);
         registry.addRecipes(MultiblockRecipes.getRecipes(), MultiblockRecipeCategory.UID);
 
