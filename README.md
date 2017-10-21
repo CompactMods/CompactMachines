@@ -34,6 +34,20 @@ a Personal Shrinking Device at the location you want to set the spawn to.
 Make sure not to obstruct the spawn location, there is currently no mechanic that automatically
 searches a better spawn location. And you don't want to have to break the blocks you spawn in.
 
+#### Recovery
+
+If you accidentally deleted your Compact Machines block with all your stuff still
+inside the Machine it can be recovered using the ```/compactmachines3 machines view```
+command.
+
+It allows browsing through all existing Compact Machines and also provides a
+button to give yourself a Compact Machine Block linked to the viewed machine.
+Be aware that this breaks already existing links, i.e. if the machine should
+already exist somewhere it is being disconnected from the room.
+
+This command only works for server operators.
+
+
 #### Technical aspects
 
 - The inside of Compact Machines are rooms in another dimension (id=144 by default)
@@ -55,7 +69,12 @@ searches a better spawn location. And you don't want to have to break the blocks
   x=1024*machine-id, z=0. This means they all fit in exactly one chunk.
 - Currently mobs can not spawn within Compact Machines. This will probably change in
   the future, but there will be a config option to turn this back off.
-
+- Players can not leave the machine block they should currently be in according
+  to the last one they've entered using a Personal Shrinking Device. Trying to enter
+  a Compact Machines with other means results in the player being thrown out of
+  the machine and getting some bad status effect applied. They might even die.
+- If players die without a bed in the CM dimension or with the "allowRespawning"
+  config option disabled, they'll be teleported out of the machine dimension.
 
 ## Tunnels
 
@@ -109,12 +128,23 @@ You can disable the field projection by applying a redstone signal to any of the
 #### Creating custom recipes
 
 Recipes are added by placing .json files in the config/compactmachines3/recipes folder.
-- Only recipes in that folder are being loaded.
-- The folder is being extracted from the jar only if it does not exist. This allows
-  you to remove original recipes simply by removing the .json file.
-- The format should be intuitive enough that it does not require further explanation.
+- All recipes in that folder are being loaded additionally to the recipes shipped
+  within the jar file.
+- If you want to disable a recipe simply create a recipe json file with the same filename
+  and add a `"disabled": true,` property to the recipe object.
+- You can also extract all recipes in the jar using the ```/compactmachines3 recipe unpack-defaults```
+  command.
+- Use the ```/compactmachines3 recipe copy-shape``` command to copy the shape in the field
+  of the field projector you are looking at into your clipboard.
+- If you need to specify custom NBT data for the catalyst item, e.g. the following line
+  would make the catalyst required to be enchanted with "Holding III":
+  ```
+    "catalyst-nbt": "{StoredEnchantments: [{lvl:3s,id: 11s}]}",
+  ```
+  The value is just the JSON encoding of the nbt tag, you can view those e.g. by enabling
+  Advanced Tooltips (F3 + H) and running ActuallyAdditions.
+- The rest of the format should be intuitive enough that it does not require further explanation.
   If it isn't feel free to open an issue.
-
 
 
 ## World Gen
