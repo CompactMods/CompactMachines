@@ -45,7 +45,7 @@ import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 import org.dave.compactmachines3.utility.ChunkUtils;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
@@ -283,11 +283,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
-
-        MessageMachineContent message = new MessageMachineContent();
-        Chunk chunk = DimensionTools.getServerMachineWorld().getChunkFromBlockCoords(new BlockPos(machine.coords * 1024, 40, 0));
-        message.setData(ChunkUtils.writeChunkToNBT(chunk, machine.getWorld(), new NBTTagCompound()));
-        PackageHandler.instance.sendTo(message, (EntityPlayerMP)player);
+        PackageHandler.instance.sendTo(new MessageMachineContent(machine.coords), (EntityPlayerMP)player);
 
         return true;
     }

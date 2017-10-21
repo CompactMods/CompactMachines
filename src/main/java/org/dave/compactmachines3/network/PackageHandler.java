@@ -12,5 +12,7 @@ public class PackageHandler {
     public static void init() {
         instance.registerMessage(MessageMachineContentHandler.class, MessageMachineContent.class, 1, Side.CLIENT);
         instance.registerMessage(MessageClipboardHandler.class, MessageClipboard.class, 2, Side.CLIENT);
+        instance.registerMessage(MessageRequestMachineActionHandler.class, MessageRequestMachineAction.class, 3, Side.SERVER);
     }
 }
+

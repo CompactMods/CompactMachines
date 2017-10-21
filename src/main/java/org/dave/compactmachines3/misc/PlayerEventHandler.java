@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.dave.compactmachines3.gui.machine.GuiMachineChunkHolder;
+import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
@@ -67,8 +67,8 @@ public class PlayerEventHandler {
     @SideOnly(Side.CLIENT)
     public static void onGuiClose(GuiOpenEvent event) {
         if(event.getGui() == null) {
-            GuiMachineChunkHolder.rawData = null;
-            GuiMachineChunkHolder.chunk = null;
+            GuiMachineData.rawData = null;
+            GuiMachineData.chunk = null;
         }
     }
 

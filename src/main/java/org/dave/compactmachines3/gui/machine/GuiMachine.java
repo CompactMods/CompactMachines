@@ -2,7 +2,7 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -12,26 +12,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.dave.compactmachines3.misc.RenderTickCounter;
-import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.ChunkUtils;
-import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiMachine extends GuiScreen {
+public class GuiMachine extends GuiContainer {
 
     protected static final int GUI_WIDTH = 256;
     protected static final int GUI_HEIGHT = 256;
 
-    TileEntityMachine machine;
-
     int glListId = -1;
 
-    public GuiMachine(TileEntityMachine machine) {
-        this.machine = machine;
-
+    public GuiMachine() {
+        super(new GuiMachineContainer());
         this.width = GUI_WIDTH;
         this.height = GUI_HEIGHT;
     }
@@ -39,10 +34,11 @@ public class GuiMachine extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
+        super.drawScreen(mouseX, mouseY, partialTicks);
 
-        if(GuiMachineChunkHolder.rawData != null && GuiMachineChunkHolder.chunk == null) {
-            GuiMachineChunkHolder.chunk = ChunkUtils.readChunkFromNBT(mc.world, GuiMachineChunkHolder.rawData);
-            IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineChunkHolder.chunk);
+        if(GuiMachineData.rawData != null && GuiMachineData.chunk == null) {
+            GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(mc.world, GuiMachineData.rawData);
+            IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
             List<BlockPos> toRender = new ArrayList<>();
             for(int x = 15; x >= 0; x--) {
                 for(int y = 15; y >= 0; y--) {
@@ -91,9 +87,14 @@ public class GuiMachine extends GuiScreen {
         }
 
         // TODO: Maybe add some other useful information to the screen
-        if(GuiMachineChunkHolder.chunk != null) {
+        if(GuiMachineData.chunk != null) {
             renderChunk();
         }
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+
     }
 
     public void renderChunk() {
@@ -151,7 +152,7 @@ public class GuiMachine extends GuiScreen {
 
         // Now center at the middle (8 * inside offset)
         // 7x7x7 -> 5 -> 2.5 * 8 = 20.0f
-        float shift = (machine.getSize().getDimension()-1) * -4.0f;
+        float shift = (GuiMachineData.machineSize-1) * -4.0f;
         GlStateManager.translate(shift, shift, shift);
 
         GlStateManager.scale(8.0f, 8.0f, 8.0f);
@@ -170,7 +171,7 @@ public class GuiMachine extends GuiScreen {
     }
 
     public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
-        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineChunkHolder.chunk);
+        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
         for (BlockPos pos : toRender) {
             IBlockState state = blockAccess.getBlockState(pos);
 

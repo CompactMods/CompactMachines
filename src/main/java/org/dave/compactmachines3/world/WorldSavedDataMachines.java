@@ -206,14 +206,8 @@ public class WorldSavedDataMachines extends WorldSavedData {
         NBTTagList machineList = new NBTTagList();
         for(int coords: machinePositions.keySet()) {
             DimensionBlockPos dimpos = machinePositions.get(coords);
-            BlockPos position = dimpos.getBlockPos();
-
-            NBTTagCompound tag = new NBTTagCompound();
+            NBTTagCompound tag = dimpos.getAsNBT();
             tag.setInteger("coords", coords);
-            tag.setInteger("x", position.getX());
-            tag.setInteger("y", position.getY());
-            tag.setInteger("z", position.getZ());
-            tag.setInteger("dim", dimpos.getDimension());
             machineList.appendTag(tag);
         }
 
@@ -280,9 +274,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
             NBTTagList tagList = nbt.getTagList("machines", 10);
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound tag = tagList.getCompoundTagAt(i);
-
-                BlockPos position = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
-                machinePositions.put(tag.getInteger("coords"), new DimensionBlockPos(position, tag.getInteger("dim")));
+                machinePositions.put(tag.getInteger("coords"), new DimensionBlockPos(tag));
             }
         }
     }

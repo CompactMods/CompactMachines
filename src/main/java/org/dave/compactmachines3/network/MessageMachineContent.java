@@ -2,11 +2,45 @@ package org.dave.compactmachines3.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import org.dave.compactmachines3.tile.TileEntityMachine;
+import org.dave.compactmachines3.utility.ChunkUtils;
+import org.dave.compactmachines3.utility.DimensionBlockPos;
+import org.dave.compactmachines3.world.WorldSavedDataMachines;
+import org.dave.compactmachines3.world.tools.DimensionTools;
 
 public class MessageMachineContent implements IMessage {
     protected NBTTagCompound data;
+    protected int machineSize;
+    protected int coords;
+
+    protected DimensionBlockPos machinePos;
+    protected String owner;
+    protected String customName;
+
+    public MessageMachineContent(int coords) {
+        this.coords = coords;
+        WorldSavedDataMachines data = WorldSavedDataMachines.INSTANCE;
+
+        machinePos = data.getMachinePosition(coords);
+        machineSize = data.machineSizes.get(coords).getDimension();
+
+        Chunk chunk = DimensionTools.getServerMachineWorld().getChunkFromBlockCoords(new BlockPos(coords * 1024, 40, 0));
+        this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
+
+        if(machinePos != null) {
+            TileEntity te = DimensionTools.getWorldServerForDimension(machinePos.getDimension()).getTileEntity(machinePos.getBlockPos());
+            if (te != null && te instanceof TileEntityMachine) {
+                TileEntityMachine machine = (TileEntityMachine) te;
+                owner = machine.getOwnerName();
+                customName = machine.getCustomName();
+            }
+        }
+    }
 
     public MessageMachineContent() {
     }
@@ -15,13 +49,53 @@ public class MessageMachineContent implements IMessage {
         this.data = data;
     }
 
+    public void setMachineSize(int machineSize) {
+        this.machineSize = machineSize;
+    }
+
+    public void setCoords(int coords) {
+        this.coords = coords;
+    }
+
+    public void setMachinePos(DimensionBlockPos machinePos) {
+        this.machinePos = machinePos;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
+    }
+
     @Override
     public void fromBytes(ByteBuf buf) {
         data = ByteBufUtils.readTag(buf);
+        machineSize = buf.readInt();
+        coords = buf.readInt();
+        boolean hasMachineBlock = buf.readBoolean();
+        if(hasMachineBlock) {
+            machinePos = new DimensionBlockPos(buf);
+            owner = ByteBufUtils.readUTF8String(buf);
+            customName = ByteBufUtils.readUTF8String(buf);
+        }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeTag(buf, data);
+        buf.writeInt(machineSize);
+        buf.writeInt(coords);
+        if(machinePos != null) {
+            buf.writeBoolean(true);
+            machinePos.writeToByteBuf(buf);
+            String owner = this.owner == null ? "" : this.owner;
+            String customName = this.customName == null ? "" : this.customName;
+            ByteBufUtils.writeUTF8String(buf, owner);
+            ByteBufUtils.writeUTF8String(buf, customName);
+        } else {
+            buf.writeBoolean(false);
+        }
     }
 }
