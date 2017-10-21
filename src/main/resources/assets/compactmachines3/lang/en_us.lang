@@ -74,6 +74,11 @@ commands.compactmachines3.recipe.description=Stuff related to Multiblock Miniatu
 commands.compactmachines3.recipe.unpack-defaults.usage=/compactmachines3 recipe unpack-defaults [force]
 commands.compactmachines3.recipe.unpack-defaults.description=Extract the default recipes from the .jar to the config folder. Append "force" to overwrite existing files.
 
+commands.compactmachines3.recipe.copy-shape.usage=/compactmachines3 recipe copy-shape
+commands.compactmachines3.recipe.copy-shape.description=Copies the crafting shape of the projector you are looking at into your clipboard
+commands.compactmachines3.recipe.copy-shape.exception.not_looking_at_projector=You are not looking at a Field Projector
+commands.compactmachines3.recipe.copy-shape.success=Copied shape to clipboard!
+
 gui.compactmachines3.psd.welcome.welcome=Compact Machines 3 allows you to build complex machine contraptions within a single block!
 gui.compactmachines3.psd.welcome.chapters=Available chapters:
 
