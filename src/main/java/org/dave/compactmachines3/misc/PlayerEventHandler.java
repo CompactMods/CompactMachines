@@ -1,14 +1,17 @@
 package org.dave.compactmachines3.misc;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -112,6 +115,10 @@ public class PlayerEventHandler {
             // This should only happen after someone updated before this feature was implemented:
             // The size value will only be known once at least one player entered the machine.
             // Handle this gracefully by doing nothing
+            return;
+        }
+
+        if(event.player.isCreative() && event.player.canUseCommand(2, "")) {
             return;
         }
 
