@@ -6,6 +6,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -17,6 +18,7 @@ import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -33,15 +35,26 @@ public class WorldGenMachines implements IWorldGenerator {
         allowedBlocksToSpawnOn.add(Blocks.GRASS);
         allowedBlocksToSpawnOn.add(Blocks.STONE);
         allowedBlocksToSpawnOn.add(Blocks.COBBLESTONE);
+        allowedBlocksToSpawnOn.add(Blocks.NETHERRACK);
+        allowedBlocksToSpawnOn.add(Blocks.SOUL_SAND);
+        allowedBlocksToSpawnOn.add(Blocks.END_STONE);
     }
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-        if(world.provider.getDimension() != 0) {
+        if(ConfigurationHandler.Settings.chanceForBrokenCube == 0.0f) {
             return;
         }
 
-        if(ConfigurationHandler.Settings.chanceForBrokenCube == 0.0f) {
+        boolean allowed = false;
+        for(int dim : ConfigurationHandler.Settings.worldgenDimensions) {
+            if(dim == world.provider.getDimension()) {
+                allowed = true;
+                break;
+            }
+        }
+
+        if(!allowed) {
             return;
         }
 
@@ -49,14 +62,28 @@ public class WorldGenMachines implements IWorldGenerator {
             return;
         }
 
-        Logz.debug("Generating cube in overworld: chunkX=%d, chunkZ=%d", chunkX, chunkZ);
-
         // Choose any random machine size but the biggest three
         EnumMachineSize size = EnumMachineSize.getFromMeta(random.nextInt(EnumMachineSize.values().length - 3));
         int dim = size.getDimension();
         int x = (chunkX << 4) + random.nextInt(16-dim) + dim;
         int z = (chunkZ << 4) + random.nextInt(16-dim) + dim;
         int y = world.getHeight(x, z) + dim;
+
+        // Nether hack fix thingy because world.getHeight() is not useful there
+        if(world.provider.getDimensionType() == DimensionType.NETHER) {
+            y = 120;
+            while(y > 0 && !world.isAirBlock(new BlockPos(x, y, z))) {
+                y--;
+            }
+            while(y > 0 && world.isAirBlock(new BlockPos(x, y, z))) {
+                y--;
+            }
+            if(y == 0) {
+                return;
+            }
+
+            y+=dim;
+        }
 
         BlockPos startingCornerPos = new BlockPos(x, y, z);
 
@@ -86,6 +113,8 @@ public class WorldGenMachines implements IWorldGenerator {
         if(!allowedBlocksToSpawnOn.contains(foundationBlock)) {
             return;
         }
+
+        Logz.debug("Generating cube in dim=%d: chunkX=%d, chunkZ=%d, pos=%s", world.provider.getDimension(), chunkX, chunkZ, startingCornerPos);
 
         // Select one of the four top corners
         int cxSphere = x - (random.nextBoolean() ? dim : 0);

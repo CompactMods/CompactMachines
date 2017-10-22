@@ -72,6 +72,15 @@ public class ConfigurationHandler {
                 "Force chunk load"
         );
 
+        Settings.worldgenDimensions = configuration.get(
+                CATEGORY_INTERNAL,
+                "worldgenDimensions",
+                new int[] {0},
+                "Allowed dimensions broken Compact Machine cubes can generate in."
+        ).getIntList();
+
+        Logz.info("worldgenDimensions: size=%d", Settings.worldgenDimensions.length);
+
         Settings.chanceForBrokenCube = configuration.getFloat(
                 "worldgenChance",
                 CATEGORY_INTERNAL,
@@ -143,6 +152,7 @@ public class ConfigurationHandler {
         public static int dimensionId;
         public static int dimensionTypeId;
         public static boolean forceLoadChunks;
+        public static int[] worldgenDimensions;
         public static float chanceForBrokenCube;
         public static int maximumCraftingAreaSize;
         public static int maximumCraftingCatalystAge;
