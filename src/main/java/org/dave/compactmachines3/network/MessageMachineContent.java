@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
@@ -27,7 +28,7 @@ public class MessageMachineContent implements IMessage {
         WorldSavedDataMachines data = WorldSavedDataMachines.INSTANCE;
 
         machinePos = data.getMachinePosition(coords);
-        machineSize = data.machineSizes.get(coords).getDimension();
+        machineSize = data.machineSizes.getOrDefault(coords, EnumMachineSize.MAXIMUM).getDimension();
 
         Chunk chunk = DimensionTools.getServerMachineWorld().getChunkFromBlockCoords(new BlockPos(coords * 1024, 40, 0));
         this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
