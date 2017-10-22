@@ -49,6 +49,7 @@ import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
+import org.dave.compactmachines3.world.tools.StructureTools;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 import java.util.ArrayList;
@@ -233,6 +234,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 if (coords != -1) {
                     tileEntityMachine.coords = coords;
                 }
+                StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
             }
 
             if(stack.hasDisplayName()) {
@@ -278,6 +280,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
 
                 WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
+                StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
                 return true;
             }
         }

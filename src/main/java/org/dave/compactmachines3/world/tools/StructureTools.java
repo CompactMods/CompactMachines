@@ -8,6 +8,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.schema.BlockInformation;
 import org.dave.compactmachines3.tile.TileEntityMachine;
@@ -38,6 +40,15 @@ public class StructureTools {
         }
     }
 
+    public static void setBiomeForCoords(int coords, Biome biome) {
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        Chunk chunk = machineWorld.getChunkFromChunkCoords((coords << 10) >> 4, 0);
+        for(int x = 0; x < 16; x++) {
+            for(int z = 0; z < 16; z++) {
+                chunk.getBiomeArray()[z << 4 | x] = (byte)Biome.getIdForBiome(biome);
+            }
+        }
+    }
 
     public static void generateCubeForMachine(TileEntityMachine machine) {
         if(machine.coords != -1) {
