@@ -1,6 +1,5 @@
 package org.dave.compactmachines3.world;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -38,7 +37,7 @@ public class ChunkGeneratorMachines implements IChunkGenerator {
 
     @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
-        return ImmutableList.of();
+        return world.getBiome(pos).getSpawnableList(creatureType);
     }
 
     @Nullable

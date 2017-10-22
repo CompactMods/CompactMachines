@@ -8,7 +8,6 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 
 public class WorldProviderMachines extends WorldProvider {
     public WorldProviderMachines() {
-
     }
 
     @Override

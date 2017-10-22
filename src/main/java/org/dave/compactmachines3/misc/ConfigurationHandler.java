@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.utility.Logz;
 
+import javax.crypto.Mac;
 import java.io.File;
 
 public class ConfigurationHandler {
@@ -122,6 +123,32 @@ public class ConfigurationHandler {
                 "Keep players inside of Machines"
         );
 
+        MachineSettings.spawnRate = configuration.getInt(
+                "spawnRate",
+                CATEGORY_MACHINES,
+                1200,
+                1,
+                Integer.MAX_VALUE,
+                "How often to try spawning entities inside of machines in ticks",
+                "Spawn Rate"
+        );
+
+        MachineSettings.allowPeacefulSpawns = configuration.getBoolean(
+                "allowPeacefulSpawns",
+                CATEGORY_MACHINES,
+                true,
+                "Allow peaceful creatures to spawn inside of machines",
+                "Allow Peaceful Spawns"
+        );
+
+        MachineSettings.allowHostileSpawns = configuration.getBoolean(
+                "allowHostileSpawns",
+                CATEGORY_MACHINES,
+                true,
+                "Allow hostile creatures to spawn inside of machines",
+                "Allow Hostile Spawns"
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -144,6 +171,9 @@ public class ConfigurationHandler {
     public static class MachineSettings {
         public static boolean allowRespawning;
         public static boolean keepPlayersInside;
+        public static int spawnRate;
+        public static boolean allowPeacefulSpawns;
+        public static boolean allowHostileSpawns;
     }
 
     public static class Settings {

@@ -19,6 +19,7 @@ import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
+import org.dave.compactmachines3.world.tools.SpawnTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     public int coords = -1;
     private boolean initialized = false;
     public long lastNeighborUpdateTick = 0;
+    public long nextSpawnTick = 0;
 
     protected String customName = "";
     protected UUID owner;
@@ -48,6 +50,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         coords = compound.getInteger("coords");
         customName = compound.getString("CustomName");
         owner = compound.getUniqueId("owner");
+        nextSpawnTick = compound.getLong("spawntick");
     }
 
     @Override
@@ -59,6 +62,8 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         if(hasOwner()) {
             compound.setUniqueId("owner", this.owner);
         }
+
+        compound.setLong("spawntick", nextSpawnTick);
 
         return compound;
     }
@@ -131,6 +136,19 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         if(!this.initialized && !this.isInvalid() && this.coords != -1) {
             initialize();
             this.initialized = true;
+        }
+
+        if(nextSpawnTick == 0) {
+            nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
+        }
+
+        if(!this.getWorld().isRemote && this.coords != -1 && this.getWorld().getTotalWorldTime() > nextSpawnTick) {
+            if(ConfigurationHandler.MachineSettings.allowPeacefulSpawns || ConfigurationHandler.MachineSettings.allowHostileSpawns) {
+                SpawnTools.spawnEntitiesInMachine(coords);
+            }
+
+            nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
+            this.markDirty();
         }
     }
 
