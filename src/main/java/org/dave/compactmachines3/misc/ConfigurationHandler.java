@@ -4,10 +4,9 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.utility.JarExtract;
 import org.dave.compactmachines3.utility.Logz;
 
-import java.io.*;
+import java.io.File;
 
 public class ConfigurationHandler {
     public static Configuration configuration;
@@ -48,38 +47,38 @@ public class ConfigurationHandler {
     private static void loadConfiguration() {
         Logz.info("Loading configuration");
         Settings.dimensionId = configuration.getInt(
-                Settings.DIMENSION_ID_NAME,
+                "dimensionId",
                 CATEGORY_INTERNAL,
-                Settings.DIMENSION_ID_DEFAULT,
+                144,
                 Integer.MIN_VALUE, Integer.MAX_VALUE,
-                Settings.DIMENSION_ID_COMMENT,
-                Settings.DIMENSION_ID_LABEL
+                "Dimension used for machines. Do not change this unless it is somehow conflicting!",
+                "Dimension ID"
         );
 
         Settings.dimensionTypeId = configuration.getInt(
-                Settings.DIMENSION_TYPE_ID_NAME,
+                "dimensionTypeId",
                 CATEGORY_INTERNAL,
-                Settings.DIMENSION_TYPE_ID_DEFAULT,
+                144,
                 Integer.MIN_VALUE, Integer.MAX_VALUE,
-                Settings.DIMENSION_TYPE_ID_COMMENT,
-                Settings.DIMENSION_TYPE_ID_LABEL
+                "Dimension type used for machines. Do not change this unless it is somehow conflicting!",
+                "Dimension Type ID"
         );
 
         Settings.forceLoadChunks = configuration.getBoolean(
-                Settings.FORCELOADCHUNKS_NAME,
+                "forceLoadChunks",
                 CATEGORY_INTERNAL,
-                Settings.FORCELOADCHUNKS_DEFAULT,
-                Settings.FORCELOADCHUNKS_COMMENT,
-                Settings.FORCELOADCHUNKS_LABEL
+                false,
+                "Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.",
+                "Force chunk load"
         );
 
         Settings.chanceForBrokenCube = configuration.getFloat(
-                Settings.WORLDGEN_CHANCE_NAME,
+                "worldgenChance",
                 CATEGORY_INTERNAL,
-                Settings.WORLDGEN_CHANCE_DEFAULT,
+                0.0001f,
                 0.0f, 1.0f,
-                Settings.WORLDGEN_CHANCE_COMMENT,
-                Settings.WORLDGEN_CHANCE_LABEL
+                "The chance a chunk in the overworld contains a broken compact machine",
+                "Worldgen Chance"
         );
 
         Settings.maximumCraftingAreaSize = configuration.getInt(
@@ -101,19 +100,19 @@ public class ConfigurationHandler {
         );
 
         MachineSettings.allowRespawning = configuration.getBoolean(
-                MachineSettings.ALLOW_RESPAWN_NAME,
+                "allowRespawning",
                 CATEGORY_MACHINES,
-                MachineSettings.ALLOW_RESPAWN_DEFAULT,
-                MachineSettings.ALLOW_RESPAWN_COMMENT,
-                MachineSettings.ALLOW_RESPAWN_LABEL
+                true,
+                "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there",
+                "Allow Respawning"
         );
 
         MachineSettings.keepPlayersInside = configuration.getBoolean(
-                MachineSettings.KEEP_PLAYERS_NAME,
+                "keepPlayersInside",
                 CATEGORY_MACHINES,
-                MachineSettings.KEEP_PLAYERS_DEFAULT,
-                MachineSettings.KEEP_PLAYERS_COMMENT,
-                MachineSettings.KEEP_PLAYERS_LABEL
+                true,
+                "Block players from leaving the Compact Machine they should currently be in",
+                "Keep players inside of Machines"
         );
 
         if(configuration.hasChanged()) {
@@ -138,16 +137,6 @@ public class ConfigurationHandler {
     public static class MachineSettings {
         public static boolean allowRespawning;
         public static boolean keepPlayersInside;
-
-        private static final String ALLOW_RESPAWN_NAME = "allowRespawning";
-        private static final boolean ALLOW_RESPAWN_DEFAULT = true;
-        private static final String ALLOW_RESPAWN_COMMENT = "Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there";
-        private static final String ALLOW_RESPAWN_LABEL = "Allow Respawning";
-
-        private static final String KEEP_PLAYERS_NAME = "keepPlayersInside";
-        private static final boolean KEEP_PLAYERS_DEFAULT = true;
-        private static final String KEEP_PLAYERS_COMMENT = "Block players from leaving the Compact Machine they should currently be in";
-        private static final String KEEP_PLAYERS_LABEL = "Keep players inside of Machines";
     }
 
     public static class Settings {
@@ -161,27 +150,5 @@ public class ConfigurationHandler {
         public static int getMaximumMagnitude() {
             return ConfigurationHandler.Settings.maximumCraftingAreaSize-1 / 2;
         }
-
-        private static final String DIMENSION_ID_NAME = "dimensionId";
-        private static final int DIMENSION_ID_DEFAULT = 144;
-        private static final String DIMENSION_ID_COMMENT = "Dimension used for machines. Do not change this unless it is somehow conflicting!";
-        private static final String DIMENSION_ID_LABEL = "Dimension ID";
-
-        private static final String DIMENSION_TYPE_ID_NAME = "dimensionTypeId";
-        private static final int DIMENSION_TYPE_ID_DEFAULT = 144;
-        private static final String DIMENSION_TYPE_ID_COMMENT = "Dimension type used for machines. Do not change this unless it is somehow conflicting!";
-        private static final String DIMENSION_TYPE_ID_LABEL = "Dimension Type ID";
-
-        private static final String FORCELOADCHUNKS_NAME = "forceLoadChunks";
-        private static final boolean FORCELOADCHUNKS_DEFAULT = false;
-        private static final String FORCELOADCHUNKS_COMMENT = "Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.";
-        private static final String FORCELOADCHUNKS_LABEL = "Force chunk load";
-
-        private static final String WORLDGEN_CHANCE_NAME = "worldgenChance";
-        private static final float WORLDGEN_CHANCE_DEFAULT = 0.0001f;
-        private static final String WORLDGEN_CHANCE_COMMENT = "The chance a chunk in the overworld contains a broken compact machine";
-        private static final String WORLDGEN_CHANCE_LABEL = "Worldgen Chance";
-
-
     }
 }
