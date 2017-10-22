@@ -79,8 +79,6 @@ public class ConfigurationHandler {
                 "Allowed dimensions broken Compact Machine cubes can generate in."
         ).getIntList();
 
-        Logz.info("worldgenDimensions: size=%d", Settings.worldgenDimensions.length);
-
         Settings.chanceForBrokenCube = configuration.getFloat(
                 "worldgenChance",
                 CATEGORY_INTERNAL,
