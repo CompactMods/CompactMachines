@@ -23,6 +23,10 @@ public class SpawnTools {
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
 
         EnumMachineSize size = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
+        if(size == null) {
+            return count;
+        }
+
         BlockPos start = new BlockPos((coords << 10) + 1, 41, 1);
         BlockPos end = new BlockPos((coords << 10) + size.getDimension(), 41 + size.getDimension(), 1 + size.getDimension());
 
