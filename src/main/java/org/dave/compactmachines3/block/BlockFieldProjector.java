@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.block;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -32,8 +33,11 @@ import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.network.MessageParticleBlockMarker;
+import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.render.TESRFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
+import org.dave.compactmachines3.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -82,7 +86,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
             player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_opposite_projector"));
             for(int testMagn = 1; testMagn <= 7; testMagn++) {
                 BlockPos opposite = teProjector.getPos().offset(teProjector.getDirection(), testMagn*4);
-                ((WorldServer)world).spawnParticle(EnumParticleTypes.BARRIER, true, opposite.getX() + 0.5d, opposite.getY() + 0.5d, opposite.getZ() + 0.5d, 1, 0.0d, 0.0d, 0.0d, 0);
+                PackageHandler.instance.sendTo(new MessageParticleBlockMarker(opposite.getX() + 0.5d, opposite.getY() + 0.5d, opposite.getZ() + 0.5d), (EntityPlayerMP) player);
             }
 
             return true;
@@ -95,7 +99,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
                 int y = missingPos.getY() - pos.getY();
                 int z = missingPos.getZ() - pos.getZ();
                 player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_projector_at", x, y, z));
-                ((WorldServer)world).spawnParticle(EnumParticleTypes.BARRIER, true, missingPos.getX() + 0.5d, missingPos.getY() + 0.5d, missingPos.getZ() + 0.5d, 1, 0.0d, 0.0d, 0.0d, 0);
+                PackageHandler.instance.sendTo(new MessageParticleBlockMarker(missingPos.getX() + 0.5d, missingPos.getY() + 0.5d, missingPos.getZ() + 0.5d), (EntityPlayerMP) player);
             }
             return true;
         }

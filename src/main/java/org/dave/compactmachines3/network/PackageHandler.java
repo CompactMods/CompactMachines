@@ -13,6 +13,7 @@ public class PackageHandler {
         instance.registerMessage(MessageMachineContentHandler.class, MessageMachineContent.class, 1, Side.CLIENT);
         instance.registerMessage(MessageClipboardHandler.class, MessageClipboard.class, 2, Side.CLIENT);
         instance.registerMessage(MessageRequestMachineActionHandler.class, MessageRequestMachineAction.class, 3, Side.SERVER);
+        instance.registerMessage(MessageParticleBlockMarker.MessageParticleBlockMarkerHandler.class, MessageParticleBlockMarker.class, 4, Side.CLIENT);
     }
 }
 

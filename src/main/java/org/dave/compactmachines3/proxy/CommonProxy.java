@@ -72,4 +72,7 @@ public class CommonProxy {
 
     public void postInit(FMLPostInitializationEvent event) {
     }
+
+    public void renderBlockMarker(double x, double y, double z) {
+    }
 }
