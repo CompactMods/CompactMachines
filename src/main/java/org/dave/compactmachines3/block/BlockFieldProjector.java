@@ -1,6 +1,5 @@
 package org.dave.compactmachines3.block;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -19,12 +18,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,7 +34,6 @@ import org.dave.compactmachines3.network.MessageParticleBlockMarker;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.render.TESRFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
-import org.dave.compactmachines3.utility.Logz;
 
 import javax.annotation.Nullable;
 import java.util.List;
