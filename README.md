@@ -67,8 +67,8 @@ This command only works for server operators.
 - Compact Machines can be nested
 - Compact Machines spawn along the x-axis in the Compact Machine dimension at y=40,
   x=1024*machine-id, z=0. This means they all fit in exactly one chunk.
-- Currently mobs can not spawn within Compact Machines. This will probably change in
-  the future, but there will be a config option to turn this back off.
+- Mobs and animals will spawn inside of machine blocks if the conditions are right,
+  e.g. light-level for mobs, grass for animals...
 - Players can not leave the machine block they should currently be in according
   to the last one they've entered using a Personal Shrinking Device. Trying to enter
   a Compact Machines with other means results in the player being thrown out of
