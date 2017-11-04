@@ -1,20 +1,21 @@
 {
   "result": {
     "item": "compactmachines3:fieldprojector",
-    "count": 3
+    "count": 4
   },
   "pattern": [
-    "eee",
-    "rrr",
-    "dwd"
+    " e ",
+    " r ",
+    "dpd"
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "compactmachines3:shaped_ore_returnable",
   "key": {
     "e": {
       "item": "minecraft:ender_eye"
     },
-    "w": {
-      "item": "compactmachines3:wallbreakable"
+    "p": {
+      "item": "compactmachines3:psd",
+      "return": true
     },
     "r": {
       "item": "minecraft:redstone_torch"
