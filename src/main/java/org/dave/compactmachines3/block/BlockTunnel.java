@@ -10,7 +10,6 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -27,6 +26,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemHandlerHelper;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.init.Itemss;
@@ -95,19 +95,7 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider, 
                 IBlockState blockState = Blockss.wall.getDefaultState();
                 world.setBlockState(pos, blockState);
 
-                BlockPos inset = pos.offset(side);
-
-                EntityItem entityItem = new EntityItem(world, inset.getX(), inset.getY(), inset.getZ(), new ItemStack(Itemss.tunnelTool, 1));
-                entityItem.lifespan = 1200;
-                entityItem.setPickupDelay(10);
-
-                float f3 = 0.05F;
-                entityItem.motionX = (float) world.rand.nextGaussian() * f3;
-                entityItem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
-                entityItem.motionZ = (float) world.rand.nextGaussian() * f3;
-
-                world.spawnEntity(entityItem);
-
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Itemss.tunnelTool));
                 WorldSavedDataMachines.INSTANCE.removeTunnel(pos);
                 break;
             }
