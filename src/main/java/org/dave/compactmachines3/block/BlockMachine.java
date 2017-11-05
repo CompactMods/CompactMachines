@@ -229,8 +229,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 int coords = stack.getTagCompound().getInteger("coords");
                 if (coords != -1) {
                     tileEntityMachine.coords = coords;
+                    if(!world.isRemote) {
+                        WorldSavedDataMachines.INSTANCE.addMachinePosition(tileEntityMachine.coords, pos, world.provider.getDimension(), tileEntityMachine.getSize());
+                        StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
+                    }
                 }
-                StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
             }
 
             if(stack.hasDisplayName()) {
