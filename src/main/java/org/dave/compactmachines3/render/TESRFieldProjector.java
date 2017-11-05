@@ -110,10 +110,8 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
 
     private void renderField(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         BlockPos centerOfField = te.getPos().offset(te.getDirection(), te.getActiveMagnitude()*2);
-        AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(te.getActiveMagnitude()-0.98d).grow(0.0d, -0.03d, 0.0d);
-        if(RenderTickCounter.renderTicks % 200 == 0) {
-            //Logz.info("Cube is: %s", cube);
-        }
+        AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(te.getActiveMagnitude()-0.98d);
+
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
 
@@ -130,9 +128,9 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         double extraLength = 0.0d;
         cube = cube.offset(-te.getPos().getX(), -te.getPos().getY(), -te.getPos().getZ());
         if(te.getActiveRecipe() != null && te.getCraftingProgress() > 0) {
-            double progress = (1.0d - ((double)te.getCraftingProgress() / (double)te.getActiveRecipe().getTicks())) + 0.2d;
-            double scale = 1.0d - (progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 1000) + 1.0f) * 0.1f)));
-            scale = Math.min(scale, 0.75d) / 2;
+            double progress = (1.0d - ((double)te.getCraftingProgress() / (double)te.getActiveRecipe().getTicks()));
+            double scale = 1.0d - (progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 4000) + 1.0f) * 0.1f)));
+            scale = Math.min(scale, 0.9d);
             cube = cube.shrink(scale * te.getActiveMagnitude());
             extraLength = scale * te.getActiveMagnitude() * 2;
         }
