@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -16,11 +17,11 @@ import org.dave.compactmachines3.tile.TileEntityCraftingHologram;
 
 import javax.annotation.Nullable;
 
-public class BlockCraftingHologram extends BlockBase implements ITileEntityProvider {
+public class BlockCraftingHologram extends BlockProtected implements ITileEntityProvider {
+    private static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+
     public BlockCraftingHologram(Material material) {
         super(material);
-
-        this.setBlockUnbreakable();
     }
 
     @SideOnly(Side.CLIENT)
@@ -49,4 +50,26 @@ public class BlockCraftingHologram extends BlockBase implements ITileEntityProvi
     public boolean isOpaqueCube(IBlockState blockState) {
         return false;
     }
+
+    @Override
+    public boolean isFullBlock(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return BOUNDING_BOX;
+    }
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return BOUNDING_BOX;
+    }
+
 }

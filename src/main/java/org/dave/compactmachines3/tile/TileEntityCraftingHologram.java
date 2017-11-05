@@ -9,6 +9,8 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.SoundHandler;
@@ -35,6 +37,11 @@ public class TileEntityCraftingHologram extends TileEntity implements ITickable 
 
     public int getProgress() {
         return progress;
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.getPos()).grow(6.0d);
     }
 
     @Override
