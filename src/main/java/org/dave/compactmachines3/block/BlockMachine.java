@@ -172,7 +172,6 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
         WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 
-        // TODO: Think about adding harvesting CMs functionality back in
         BlockMachine.spawnItemWithNBT(world, pos, state.getValue(BlockMachine.SIZE), te);
 
         ChunkLoadingMachines.unforceChunk(te.coords);
@@ -203,9 +202,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         entityItem.setPickupDelay(10);
 
         float motionMultiplier = 0.02F;
-        entityItem.motionX = (float) world.rand.nextGaussian() * motionMultiplier;
+        entityItem.motionX = 0.0f;
         entityItem.motionY = (float) world.rand.nextGaussian() * motionMultiplier + 0.1F;
-        entityItem.motionZ = (float) world.rand.nextGaussian() * motionMultiplier;
+        entityItem.motionZ = 0.0f;
 
         world.spawnEntity(entityItem);
     }
