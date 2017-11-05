@@ -2,6 +2,7 @@ package org.dave.compactmachines3.world.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -70,7 +71,11 @@ public class StructureTools {
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
         IBlockState state = Blockss.wall.getDefaultState();
+        IBlockState barrier = Blocks.BARRIER.getDefaultState();
         StructureTools.generateCube(machineWorld, new BlockPos(startX, startY, startZ), size, state);
+        StructureTools.generateCube(machineWorld, new BlockPos(startX+1, startY+1, startZ+1), size+2, barrier);
+        StructureTools.generateCube(machineWorld, new BlockPos(startX+2, startY+2, startZ+2), size+4, barrier);
+        StructureTools.generateCube(machineWorld, new BlockPos(startX+3, startY+3, startZ+3), size+6, barrier);
     }
 
     public static void generateCube(World world, BlockPos cornerPos, int size, IBlockState state) {

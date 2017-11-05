@@ -197,7 +197,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             stack.setStackDisplayName(te.getCustomName());
         }
 
-        EntityItem entityItem = new EntityItem(world, pos.getX(), pos.getY() + 0.5, pos.getZ(), stack);
+        EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, stack);
         entityItem.lifespan = 1200;
         entityItem.setPickupDelay(10);
 
