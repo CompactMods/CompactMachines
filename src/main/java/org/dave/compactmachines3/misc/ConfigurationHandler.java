@@ -149,6 +149,14 @@ public class ConfigurationHandler {
                 "Allow Hostile Spawns"
         );
 
+        MachineSettings.allowEnteringWithoutPSD = configuration.getBoolean(
+                "allowEnteringWithoutPSD",
+                CATEGORY_MACHINES,
+                true,
+                "Allow players to enter machines with other means than the PSD",
+                "Allow entering without machines"
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -174,6 +182,7 @@ public class ConfigurationHandler {
         public static int spawnRate;
         public static boolean allowPeacefulSpawns;
         public static boolean allowHostileSpawns;
+        public static boolean allowEnteringWithoutPSD;
     }
 
     public static class Settings {

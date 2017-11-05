@@ -116,7 +116,7 @@ public class PlayerEventHandler {
 
         // No coord history -> out of here
         int lastCoords = TeleportationTools.getLastKnownCoords(event.player);
-        if(lastCoords == -1) {
+        if(lastCoords == -1 && ConfigurationHandler.MachineSettings.allowEnteringWithoutPSD == false) {
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:nausea"), 200, 5, false, false));
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:wither"), 160, 1, false, false));
 
