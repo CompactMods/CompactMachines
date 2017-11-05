@@ -122,13 +122,17 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             }
 
             int meta = data.has("meta") ? data.get("meta").getAsInt() : 0;
-
             IBlockState state = sourceBlock.getStateFromMeta(meta);
             if(state == null) {
                 state = sourceBlock.getDefaultState();
             }
 
             result.addBlockReference(entry.getKey(), state);
+
+            boolean ignoreMeta = data.has("ignore-meta") && data.get("ignore-meta").getAsBoolean();
+            if(ignoreMeta) {
+                result.setIgnoreMeta(entry.getKey());
+            }
         }
 
         // Determine dimensions of the shape

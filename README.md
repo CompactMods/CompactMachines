@@ -143,6 +143,8 @@ Recipes are added by placing .json files in the config/compactmachines3/recipes 
   ```
   The value is just the JSON encoding of the nbt tag, you can view those e.g. by enabling
   Advanced Tooltips (F3 + H) and running ActuallyAdditions.
+- If your want to ignore the metadata on a block you can add the ```"ignore-meta": true,```
+  flag to the corresponding input-type.
 - The rest of the format should be intuitive enough that it does not require further explanation.
   If it isn't feel free to open an issue.
 

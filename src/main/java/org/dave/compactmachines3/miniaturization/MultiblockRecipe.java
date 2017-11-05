@@ -32,6 +32,7 @@ public class MultiblockRecipe {
     private List<BlockPos> mapAsBlockPos;
     private HashMap<String, IBlockState> reference;
     private HashMap<String, Integer> referenceCount;
+    private HashMap<String, Boolean> referenceIgnoresMeta;
 
     private BlockPos minPos;
     private BlockPos maxPos;
@@ -51,6 +52,7 @@ public class MultiblockRecipe {
         this.name = name;
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
+        this.referenceIgnoresMeta = new HashMap<>();
         this.targetStack = targetStack;
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
@@ -62,6 +64,10 @@ public class MultiblockRecipe {
 
     public void addBlockReference(String ref, IBlockState state) {
         this.reference.put(ref, state);
+    }
+
+    public void setIgnoreMeta(String ref) {
+        this.referenceIgnoresMeta.put(ref, true);
     }
 
     public int getTicks() {
@@ -81,6 +87,7 @@ public class MultiblockRecipe {
                 continue;
             }
 
+            // TODO: This should be universal and not specific to redstone wire
             if(state.getBlock() == Blocks.REDSTONE_WIRE) {
                 result.add(new ItemStack(Items.REDSTONE, count));
             } else {
@@ -263,8 +270,14 @@ public class MultiblockRecipe {
             // Test whether the block is the type it should be
             IBlockState state = world.getBlockState(pos);
             IBlockState wanted = reference.get(map[y][z][x]);
-            if(wanted == null || state.getBlock() != wanted.getBlock() || state.getBlock().getMetaFromState(state) != wanted.getBlock().getMetaFromState(wanted)) {
+            if(wanted == null || state.getBlock() != wanted.getBlock()) {
                 return false;
+            }
+
+            if(!referenceIgnoresMeta.getOrDefault(map[y][z][x], false)) {
+                if(state.getBlock().getMetaFromState(state) != wanted.getBlock().getMetaFromState(wanted)) {
+                    return false;
+                }
             }
         }
 
