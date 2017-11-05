@@ -26,12 +26,9 @@ import java.util.*;
 
 public class TileEntityFieldProjector extends TileEntity implements ITickable {
     public int ticks = 0;
-    private Random rand = new Random();
-
     private int activeMagnitude = 0;
 
     protected UUID owner;
-
 
     public TileEntityFieldProjector() {
         super();
@@ -52,6 +49,10 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         }
 
         return null;
+    }
+
+    public int getActiveMagnitude() {
+        return activeMagnitude;
     }
 
     public int getCraftingProgress() {
@@ -234,6 +235,41 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         return null;
     }
 
+    public boolean shouldRenderField() {
+        if(world.isBlockPowered(getPos())) {
+            return false;
+        }
+
+        int magnitude = getCraftingAreaMagnitude();
+        if(magnitude <= 0) {
+            return false;
+        }
+
+        if(getMissingProjectors(magnitude).size() > 0) {
+            return false;
+        }
+
+        // One of the projectors must be a master projector
+        TileEntityFieldProjector master = getMasterProjector();
+        if(master == null) {
+            return false;
+        }
+
+        // Then check the crafting area is free, this is done by the master projector
+        if(!master.canGenerateFieldAtMagnitude(magnitude)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        BlockPos centerOfField = this.getPos().offset(this.getDirection(), this.getActiveMagnitude()*2);
+        AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(this.getActiveMagnitude()*2);
+        return cube;
+    }
+
     @Override
     public void update() {
         ticks++;
@@ -266,8 +302,6 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
 
         activeMagnitude = magnitude;
         if(world.isRemote) {
-            spawnFieldParticles();
-
             // The client is already done
             return;
         }
@@ -326,80 +360,6 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
             world.notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
-
-    private void spawnFieldParticles() {
-        BlockPos center = this.getPos().offset(this.getDirection(), activeMagnitude);
-        BlockPos topLeft = center.offset(EnumFacing.UP, activeMagnitude).offset(this.getDirection().rotateY(), activeMagnitude);
-
-        float baseParticleChance = 0.9f;
-
-        boolean isCrafting = false;
-        EnumParticleTypes particle = EnumParticleTypes.END_ROD;
-        if(getActiveRecipe() != null) {
-            isCrafting = true;
-            particle = EnumParticleTypes.EXPLOSION_LARGE;
-        }
-
-        if(isCrafting) {
-            BlockPos centerCraftingArea = center.offset(this.getDirection(), activeMagnitude);
-            double xPos = centerCraftingArea.getX() + rand.nextDouble();
-            double yPos = centerCraftingArea.getY() + rand.nextDouble();
-            double zPos = centerCraftingArea.getZ() + rand.nextDouble();
-            double xPos2 = this.getPos().getX() + 0.5f;
-            double yPos2 = this.getPos().getY() + 0.66f;
-            double zPos2 = this.getPos().getZ() + 0.5f;
-
-            double speedMultiplier = 0.09d;
-            double xSpeed = (xPos-xPos2) * speedMultiplier;
-            double ySpeed = (yPos-yPos2) * speedMultiplier;
-            double zSpeed = (zPos-zPos2) * speedMultiplier;
-
-            getWorld().spawnParticle(EnumParticleTypes.END_ROD, true, xPos2, yPos2, zPos2, xSpeed, ySpeed, zSpeed, new int[0]);
-        } else {
-            for(int x = 0; x < activeMagnitude*2; x++) {
-                for(int y = 0; y < activeMagnitude*2; y++) {
-                    BlockPos pos = topLeft.offset(EnumFacing.DOWN, y).offset(this.getDirection().rotateYCCW(), x);
-                    if(getWorld().isAirBlock(pos)) {
-                        // There is chance we will do nothing this tick
-                        if(rand.nextFloat() >= baseParticleChance) {
-                            double xPos = pos.getX() + rand.nextDouble();
-                            double yPos = pos.getY() + rand.nextDouble();
-                            double zPos = pos.getZ() + rand.nextDouble();
-                            getWorld().spawnParticle(particle, true, xPos, yPos, zPos, 0.0D, 0.01D, 0.0D, new int[0]);
-
-                            // There is an even lesser chance we spawn the "creation" particles, the ones flying to the field...
-                            if(rand.nextFloat() >= 0.8) {
-                                double xPos2 = this.getPos().getX() + 0.5f;
-                                double yPos2 = this.getPos().getY() + 0.66f;
-                                double zPos2 = this.getPos().getZ() + 0.5f;
-
-                                double speedMultiplier = 0.09d;
-                                double xSpeed = (xPos-xPos2) * speedMultiplier;
-                                double ySpeed = (yPos-yPos2) * speedMultiplier;
-                                double zSpeed = (zPos-zPos2) * speedMultiplier;
-
-                                getWorld().spawnParticle(EnumParticleTypes.END_ROD, true, xPos2, yPos2, zPos2, xSpeed, ySpeed, zSpeed, new int[0]);
-                            }
-                        }
-                    }
-
-                    // Master takes care of topping off the cube
-                    if(isMaster() && y < activeMagnitude*2-1 && x < activeMagnitude*2-1) {
-                        pos = topLeft.offset(getDirection(), y+1).offset(this.getDirection().rotateYCCW(), x+1);
-                        if(rand.nextFloat() < baseParticleChance) continue;
-
-                        double xPos = pos.getX() + rand.nextDouble();
-                        double yPos = pos.getY() + rand.nextDouble();
-                        double zPos = pos.getZ() + rand.nextDouble();
-                        getWorld().spawnParticle(particle, true, xPos, yPos, zPos, 0.0D, 0.01D, 0.0D, new int[0]);
-                    }
-                }
-            }
-        }
-    }
-
-
-
 
 
     @Override

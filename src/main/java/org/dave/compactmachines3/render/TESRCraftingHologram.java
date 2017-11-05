@@ -81,7 +81,9 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
 
         double progress = 1.0d - ((double)te.getProgress() / (double)recipe.getTicks());
 
-        double scale = progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 1000) + 1.0f) * 0.1f));
+        double scale = progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 2000) + 1.0f) * 0.1f));
+        scale *= 0.8d;
+
         GlStateManager.scale(scale, scale, scale);
 
         GlStateManager.translate(-rotateOffsetX, -rotateOffsetY, -rotateOffsetZ);

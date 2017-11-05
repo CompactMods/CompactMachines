@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.render;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,6 +11,8 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -42,8 +45,7 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         return bakedModel;
     }
 
-    @Override
-    public void render(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+    private void renderModel(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         GlStateManager.pushAttrib();
         GlStateManager.pushMatrix();
 
@@ -104,5 +106,216 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         RenderHelper.enableStandardItemLighting();
 
         GlStateManager.popAttrib();
+    }
+
+    private void renderField(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+        BlockPos centerOfField = te.getPos().offset(te.getDirection(), te.getActiveMagnitude()*2);
+        AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(te.getActiveMagnitude()-0.98d).grow(0.0d, -0.03d, 0.0d);
+        if(RenderTickCounter.renderTicks % 200 == 0) {
+            //Logz.info("Cube is: %s", cube);
+        }
+        GlStateManager.pushMatrix();
+        GlStateManager.pushAttrib();
+
+        GlStateManager.translate(x, y, z);
+        RenderHelper.disableStandardItemLighting();
+        Minecraft.getMinecraft().entityRenderer.disableLightmap();
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.disableLighting();
+        GlStateManager.disableAlpha();
+        GlStateManager.glLineWidth(1f);
+        GlStateManager.color(1f, 1f, 1f);
+
+        double extraLength = 0.0d;
+        cube = cube.offset(-te.getPos().getX(), -te.getPos().getY(), -te.getPos().getZ());
+        if(te.getActiveRecipe() != null && te.getCraftingProgress() > 0) {
+            double progress = (1.0d - ((double)te.getCraftingProgress() / (double)te.getActiveRecipe().getTicks())) + 0.2d;
+            double scale = 1.0d - (progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 1000) + 1.0f) * 0.1f)));
+            scale = Math.min(scale, 0.75d) / 2;
+            cube = cube.shrink(scale * te.getActiveMagnitude());
+            extraLength = scale * te.getActiveMagnitude() * 2;
+        }
+        renderOutline(cube, te);
+
+        GlStateManager.enableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.depthMask(false);
+
+        renderFaces(cube, extraLength);
+
+        GlStateManager.depthMask(true);
+        GlStateManager.glLineWidth(1f);
+        GlStateManager.color(1f, 1f, 1f, 1f);
+        GlStateManager.enableLighting();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableAlpha();
+        GlStateManager.disableBlend();
+
+        Minecraft.getMinecraft().entityRenderer.enableLightmap();
+        GlStateManager.enableTexture2D();
+
+        GlStateManager.popAttrib();
+        GlStateManager.popMatrix();
+    }
+
+    private void renderFaces(AxisAlignedBB cube, double extraLength) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        int color = 0xFF6A00;
+        float cR = (color >> 16 & 255) / 255.0f;
+        float cG = (color >> 8 & 255) / 255.0f;
+        float cB = (color & 255) / 255.0f;
+        float cA = 0.15f;
+
+        double x1 = cube.minX;
+        double x2 = cube.maxX;
+        double y1 = cube.minY;
+        double y2 = cube.maxY;
+        double z1 = cube.minZ;
+        double z2 = cube.maxZ;
+        double radius = (cube.maxY - cube.minY) / 2;
+
+        double y4 = cube.maxY - radius + 0.3d;
+
+        // Draw the faces
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+
+        // Render projection planes
+        double zAngle = ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / -5000) + 1.0d) / 2) * (cube.maxY - cube.minY);
+        double y3 = y1 + zAngle;
+        float cA2 = 0.105f;
+
+        // Ensure both sides of the plane are visible
+        GlStateManager.disableCull();
+
+        // north -> south
+        buffer.pos(x1, y3, z1).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2, y3, z1).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2-(radius-0.2f), y4, z1-(radius+0.8f+extraLength)).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x1+(radius-0.2f), y4, z1-(radius+0.8f+extraLength)).color(cR, cG, cB, cA2).endVertex();
+
+        // east -> west
+        buffer.pos(x2, y3, z1).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2, y3, z2).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2+(radius+0.8f+extraLength), y4, z2-(radius-0.2f)).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2+(radius+0.8f+extraLength), y4, z1+(radius-0.2f)).color(cR, cG, cB, cA2).endVertex();
+
+        // south -> north
+        buffer.pos(x1, y3, z2).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2, y3, z2).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x2-(radius-0.2f), y4, z2+(radius+0.8f+extraLength)).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x1+(radius-0.2f), y4, z2+(radius+0.8f+extraLength)).color(cR, cG, cB, cA2).endVertex();
+
+        // west -> east
+        buffer.pos(x1, y3, z1).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x1, y3, z2).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x1-(radius+0.8f+extraLength), y4, z2-(radius-0.2f)).color(cR, cG, cB, cA2).endVertex();
+        buffer.pos(x1-(radius+0.8f+extraLength), y4, z1+(radius-0.2f)).color(cR, cG, cB, cA2).endVertex();
+
+
+        tessellator.draw();
+        GlStateManager.enableCull();
+    }
+
+    private void renderOutline(AxisAlignedBB cube, TileEntityFieldProjector te) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+        int color = 0xFF6A00;
+        float cR = (color >> 16 & 255) / 255.0f;
+        float cG = (color >> 8 & 255) / 255.0f;
+        float cB = (color & 255) / 255.0f;
+        float cA = 0.5f;
+
+        double x1 = cube.minX;
+        double x2 = cube.maxX;
+        double y1 = cube.minY;
+        double y2 = cube.maxY;
+        double z1 = cube.minZ;
+        double z2 = cube.maxZ;
+
+        /*
+        // Draw the actual outline of the cube
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y2, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y1, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y2, z2).color(cR, cG, cB, cA).endVertex();
+        */
+
+        // Draw the up and down bouncing lines on the sides
+        double zAngle = ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / -5000) + 1.0d) / 2) * (y2 - y1);
+        double y3 = y1 + zAngle;
+        buffer.pos(x1, y3, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y3, z1).color(cR, cG, cB, cA).endVertex();
+
+        buffer.pos(x1, y3, z1).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x1, y3, z2).color(cR, cG, cB, cA).endVertex();
+
+        buffer.pos(x2, y3, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y3, z1).color(cR, cG, cB, cA).endVertex();
+
+        buffer.pos(x1, y3, z2).color(cR, cG, cB, cA).endVertex();
+        buffer.pos(x2, y3, z2).color(cR, cG, cB, cA).endVertex();
+
+        tessellator.draw();
+    }
+
+    @Override
+    public void render(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+        renderModel(te, x, y, z, partialTicks, destroyStage, alpha);
+
+        if(te.isMaster() && te.shouldRenderField()) {
+            renderField(te, x, y, z, partialTicks, destroyStage, alpha);
+        }
     }
 }
