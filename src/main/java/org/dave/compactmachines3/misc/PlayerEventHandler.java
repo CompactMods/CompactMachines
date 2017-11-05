@@ -2,6 +2,8 @@ package org.dave.compactmachines3.misc;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -10,12 +12,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
+import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
@@ -36,6 +40,30 @@ public class PlayerEventHandler {
         } else {
             TeleportationTools.teleportPlayerOutOfMachineDimension((EntityPlayerMP) event.player);
             event.player.getEntityData().removeTag("compactmachines3-coordHistory");
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlacedBlock(BlockEvent.PlaceEvent event) {
+        if(event.getWorld().provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
+            return;
+        }
+
+        ItemStack mainhandItem = event.getPlayer().getHeldItemMainhand();
+        if(!(mainhandItem.getItem() instanceof ItemBlock) || ((ItemBlock) mainhandItem.getItem()).getBlock() != Blockss.machine) {
+            return;
+        }
+
+        if(mainhandItem.hasTagCompound()) {
+            if (mainhandItem.getTagCompound().hasKey("coords")) {
+                int coords = mainhandItem.getTagCompound().getInteger("coords");
+                if (coords != -1) {
+                    int playerCoords = StructureTools.getCoordsForPos(new BlockPos(event.getPlayer().posX, event.getPlayer().posY, event.getPlayer().posZ));
+                    if(playerCoords == coords) {
+                        event.setCanceled(true);
+                    }
+                }
+            }
         }
     }
 
