@@ -35,7 +35,11 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
     }
 
     public EnumFacing getDirection() {
-        return this.getWorld().getBlockState(this.pos).getValue(BlockFieldProjector.FACING);
+        if(this.getWorld().getBlockState(this.pos).getBlock() == Blockss.fieldProjector) {
+            return this.getWorld().getBlockState(this.pos).getValue(BlockFieldProjector.FACING);
+        }
+
+        return EnumFacing.NORTH;
     }
 
     public TileEntityCraftingHologram getCraftingHologram() {
@@ -265,9 +269,13 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        BlockPos centerOfField = this.getPos().offset(this.getDirection(), this.getActiveMagnitude()*2);
-        AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(this.getActiveMagnitude()*2);
-        return cube;
+        if(this.getWorld().getBlockState(this.getPos()).getBlock() == Blockss.fieldProjector) {
+            BlockPos centerOfField = this.getPos().offset(this.getDirection(), this.getActiveMagnitude() * 2);
+            AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(this.getActiveMagnitude() * 2);
+            return cube;
+        } else {
+            return super.getRenderBoundingBox();
+        }
     }
 
     @Override
