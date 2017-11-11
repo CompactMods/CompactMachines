@@ -39,6 +39,7 @@ public class TeleportationTools {
             playerNBT.setDouble("compactmachines3-oldPosZ", player.posZ);
 
             WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+            player.addExperienceLevel(0);
             PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
             playerList.transferPlayerToDimension(player, ConfigurationHandler.Settings.dimensionId, new TeleporterMachines(machineWorld));
 
@@ -76,6 +77,7 @@ public class TeleportationTools {
             double oldPosY = playerNBT.getDouble("compactmachines3-oldPosY");
             double oldPosZ = playerNBT.getDouble("compactmachines3-oldPosZ");
 
+            player.addExperienceLevel(0);
             playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(DimensionTools.getWorldServerForDimension(oldDimension)));
             player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
         } else {
