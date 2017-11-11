@@ -22,7 +22,10 @@ import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class TileEntityFieldProjector extends TileEntity implements ITickable {
     public int ticks = 0;
@@ -271,7 +274,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
     public AxisAlignedBB getRenderBoundingBox() {
         if(this.getWorld().getBlockState(this.getPos()).getBlock() == Blockss.fieldProjector) {
             BlockPos centerOfField = this.getPos().offset(this.getDirection(), this.getActiveMagnitude() * 2);
-            AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(this.getActiveMagnitude() * 2);
+            AxisAlignedBB cube = new AxisAlignedBB(centerOfField).grow(this.getActiveMagnitude() * 3);
             return cube;
         } else {
             return super.getRenderBoundingBox();

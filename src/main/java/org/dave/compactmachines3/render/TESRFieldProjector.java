@@ -316,4 +316,9 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
             renderField(te, x, y, z, partialTicks, destroyStage, alpha);
         }
     }
+
+    @Override
+    public boolean isGlobalRenderer(TileEntityFieldProjector te) {
+        return true;
+    }
 }
