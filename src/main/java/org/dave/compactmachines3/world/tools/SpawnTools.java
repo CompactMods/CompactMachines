@@ -55,6 +55,9 @@ public class SpawnTools {
                 randomPos = randomPos.down();
             }
             Biome.SpawnListEntry spawnEntry = machineWorld.getSpawnListEntryForTypeAt(type, randomPos);
+            if(spawnEntry == null) {
+                continue;
+            }
 
             boolean canSpawnAtPos = WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.getPlacementForEntity(spawnEntry.entityClass), machineWorld, randomPos);
             if(!canSpawnAtPos) {
