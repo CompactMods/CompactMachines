@@ -149,7 +149,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
 
 
         if(!master.getActiveCraftingResult().isEmpty()) {
-            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.currently_crafting", master.getActiveCraftingResult().getDisplayName(), master.getCraftingProgress()));
+            player.sendMessage(new TextComponentTranslation("hint.compactmachines3.currently_crafting", master.getActiveCraftingResult().getDisplayName(), String.format("%.1f", master.getCraftingProgressPercent() * 100)));
             return true;
         }
 
@@ -236,7 +236,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
             ItemStack crafting = master.getActiveCraftingResult();
             if(!crafting.isEmpty()) {
                 probeInfo.horizontal().text("{*top.compactmachines3.currently_crafting*}").item(crafting).itemLabel(crafting);
-                probeInfo.horizontal().progress(master.getCraftingProgress(), 100);
+                probeInfo.horizontal().progress((int)(master.getCraftingProgressPercent() * 100), 100, probeInfo.defaultProgressStyle().suffix("%").filledColor(0xff44AA44).alternateFilledColor(0xff44AA44).backgroundColor(0xff836953));
                 return;
             }
 
