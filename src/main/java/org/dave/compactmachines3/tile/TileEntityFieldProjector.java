@@ -71,6 +71,19 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         return te.getProgress();
     }
 
+    public float getCraftingProgressPercent() {
+        TileEntityCraftingHologram te = getCraftingHologram();
+        if(te == null) {
+            return 0.0f;
+        }
+
+        if(te.getRecipe() == null) {
+            return 0.0f;
+        }
+
+        return (float)te.getProgress() / (float)te.getRecipe().getTicks();
+    }
+
     public MultiblockRecipe getActiveRecipe() {
         TileEntityCraftingHologram te = getCraftingHologram();
         if(te == null) {
@@ -314,6 +327,11 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         activeMagnitude = magnitude;
         if(world.isRemote) {
             // The client is already done
+            return;
+        }
+
+        if(master.getActiveRecipe() != null) {
+            world.updateComparatorOutputLevel(getPos(), null);
             return;
         }
 

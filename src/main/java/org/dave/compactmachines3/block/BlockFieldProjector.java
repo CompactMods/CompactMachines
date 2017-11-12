@@ -66,6 +66,34 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
     }
 
     @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
+        if(world.isRemote) {
+            return 0;
+        }
+
+        if(!(world.getTileEntity(pos) instanceof TileEntityFieldProjector)) {
+            return 0;
+        }
+
+        TileEntityFieldProjector teProjector = (TileEntityFieldProjector)world.getTileEntity(pos);
+        TileEntityFieldProjector master = teProjector.getMasterProjector();
+        if(master == null) {
+            return 0;
+        }
+
+        if(master.getActiveRecipe() == null) {
+            return 0;
+        }
+
+        return 1 + (int)(master.getCraftingProgressPercent() * 14.0f);
+    }
+
+    @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
             return true;
