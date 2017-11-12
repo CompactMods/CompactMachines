@@ -1,6 +1,8 @@
 package org.dave.compactmachines3.tile;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -175,6 +177,47 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         return WorldSavedDataMachines.INSTANCE.tunnels.get(this.coords).get(side);
+    }
+
+    public BlockPos getMachineWorldInsetPos(EnumFacing facing) {
+        BlockPos tunnelPos = this.getTunnelForSide(facing);
+        if(tunnelPos == null) {
+            return null;
+        }
+
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
+        return tunnelPos.offset(insetDirection);
+    }
+
+    public IBlockState getConnectedBlockState(EnumFacing facing) {
+        BlockPos insetPos = getMachineWorldInsetPos(facing);
+        if(insetPos == null) {
+            return null;
+        }
+
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        return machineWorld.getBlockState(insetPos);
+    }
+
+    public TileEntity getConnectedTileEntity(EnumFacing facing) {
+        BlockPos insetPos = getMachineWorldInsetPos(facing);
+        if(insetPos == null) {
+            return null;
+        }
+
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        return machineWorld.getTileEntity(insetPos);
+    }
+
+    public ItemStack getConnectedPickBlock(EnumFacing facing) {
+        BlockPos insetPos = getMachineWorldInsetPos(facing);
+        if(insetPos == null) {
+            return ItemStack.EMPTY;
+        }
+
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        IBlockState state = machineWorld.getBlockState(insetPos);
+        return state.getBlock().getItem(machineWorld, insetPos, state);
     }
 
     @Override

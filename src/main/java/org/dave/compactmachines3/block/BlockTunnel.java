@@ -177,6 +177,11 @@ public class BlockTunnel extends BlockProtected implements ITileEntityProvider, 
             probeInfo.horizontal()
                     .item(new ItemStack(Items.COMPASS))
                     .text(TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET);
+
+            ItemStack connectedStack = tnt.getConnectedPickBlock();
+            if(connectedStack != null && !connectedStack.isEmpty()) {
+                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
+            }
         }
     }
 }

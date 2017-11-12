@@ -310,6 +310,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             probeInfo.horizontal()
                     .item(new ItemStack(Items.COMPASS))
                     .text(TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET);
+
+            ItemStack connectedStack = machine.getConnectedPickBlock(data.getSideHit());
+            if(connectedStack != null && !connectedStack.isEmpty()) {
+                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
+            }
         }
     }
 }
