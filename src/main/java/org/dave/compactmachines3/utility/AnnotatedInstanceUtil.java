@@ -1,11 +1,13 @@
 package org.dave.compactmachines3.utility;
 
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.dave.compactmachines3.integration.CapabilityNullHandler;
 import org.dave.compactmachines3.integration.AbstractNullHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class AnnotatedInstanceUtil {
@@ -22,6 +24,14 @@ public class AnnotatedInstanceUtil {
 		List<T> instances = new ArrayList<T>();
 		for (ASMDataTable.ASMData asmData : asmDatas) {
 			try {
+				Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
+				if(annotationInfo.containsKey("mod")) {
+					String requiredMod = (String)annotationInfo.get("mod");
+					if(requiredMod.length() > 0 && !Loader.isModLoaded(requiredMod)) {
+						continue;
+					}
+				}
+
 				Class<?> asmClass = Class.forName(asmData.getClassName());
 				Class<? extends T> asmInstanceClass = asmClass.asSubclass(instanceClass);
 				T instance = asmInstanceClass.newInstance();
