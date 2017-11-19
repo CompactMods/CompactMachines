@@ -99,12 +99,12 @@ public abstract class BlockBaseTunnel extends BlockProtected implements ITileEnt
 
             String translate = "enumfacing." + blockState.getValue(BlockBaseTunnel.MACHINE_SIDE).getName();
             probeInfo.horizontal()
-                    .item(new ItemStack(Items.COMPASS))
+                    .item(new ItemStack(Items.COMPASS), probeInfo.defaultItemStyle().width(14).height(14))
                     .text(TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET);
 
             ItemStack connectedStack = tnt.getConnectedPickBlock();
             if(connectedStack != null && !connectedStack.isEmpty()) {
-                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
+                probeInfo.horizontal().item(connectedStack, probeInfo.defaultItemStyle().width(14).height(14)).itemLabel(connectedStack);
             }
         }
     }

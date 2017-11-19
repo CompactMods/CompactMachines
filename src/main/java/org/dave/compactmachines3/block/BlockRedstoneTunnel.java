@@ -1,16 +1,21 @@
 package org.dave.compactmachines3.block;
 
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -167,5 +172,14 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, MACHINE_SIDE, IS_OUTPUT);
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        probeInfo.horizontal()
+                .item(new ItemStack(Items.REDSTONE), probeInfo.defaultItemStyle().width(14).height(14))
+                .text(blockState.getValue(IS_OUTPUT) ? TextFormatting.DARK_GREEN + "Output" : TextFormatting.DARK_RED + "Input");
+
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
     }
 }
