@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.tile;
 
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -18,12 +19,15 @@ import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
+import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.SpawnTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
@@ -171,6 +175,14 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     /*
      * Capabilities
      */
+    public RedstoneTunnelData getRedstoneTunnelForSide(EnumFacing side) {
+        if(!WorldSavedDataMachines.INSTANCE.redstoneTunnels.containsKey(this.coords)) {
+            return null;
+        }
+
+        return WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords).get(side);
+    }
+
     public BlockPos getTunnelForSide(EnumFacing side) {
         if(!WorldSavedDataMachines.INSTANCE.tunnels.containsKey(this.coords)) {
             return null;
@@ -218,6 +230,45 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
         IBlockState state = machineWorld.getBlockState(insetPos);
         return state.getBlock().getItem(machineWorld, insetPos, state);
+    }
+
+    public int getRedstonePowerOutput(EnumFacing facing) {
+        if(this.coords == -1) {
+            return 0;
+        }
+
+        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords);
+        if(tunnelMapping == null) {
+            return 0;
+        }
+
+        RedstoneTunnelData tunnelData = tunnelMapping.get(facing);
+        if(tunnelData == null) {
+            return 0;
+        }
+
+
+        if(!tunnelData.isOutput) {
+            return 0;
+        }
+
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if(!(machineWorld.getTileEntity(tunnelData.pos) instanceof TileEntityRedstoneTunnel)) {
+            return 0;
+        }
+
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.getSize().getDimension());
+        BlockPos insetPos = tunnelData.pos.offset(insetDirection);
+        IBlockState insetBlockState = machineWorld.getBlockState(insetPos);
+
+        int power = 0;
+        if(insetBlockState.getBlock() instanceof BlockRedstoneWire) {
+            power = insetBlockState.getValue(BlockRedstoneWire.POWER);
+        } else {
+            power = machineWorld.getRedstonePower(insetPos, insetDirection);
+        }
+
+        return power;
     }
 
     @Override

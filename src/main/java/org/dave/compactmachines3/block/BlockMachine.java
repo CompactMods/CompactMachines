@@ -42,9 +42,11 @@ import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.tile.TileEntityMachine;
+import org.dave.compactmachines3.tile.TileEntityRedstoneTunnel;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
+import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
@@ -76,6 +78,26 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     }
 
     @Override
+    public boolean canProvidePower(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return 0;
+    }
+
+    @Override
+    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
+            return 0;
+        }
+
+        TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(pos);
+        return machine.getRedstonePowerOutput(side.getOpposite());
+    }
+
+    @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos what) {
         super.neighborChanged(state, world, pos, blockIn, what);
 
@@ -87,26 +109,40 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return;
         }
 
-        // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
-        // Just ensure only a single notification happens per tick.
-        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-        if(te.lastNeighborUpdateTick == world.getTotalWorldTime()) {
+        // Determine whether it's an immediate neighbor ...
+        EnumFacing facing = null;
+        for(EnumFacing dir : EnumFacing.values()) {
+            if(pos.offset(dir).equals(what)) {
+                facing = dir;
+                break;
+            }
+        }
+
+        // And do nothing if it isnt, e.g. diagonal
+        if(facing == null) {
             return;
         }
 
-        te.lastNeighborUpdateTick = world.getTotalWorldTime();
-        for(EnumFacing side : EnumFacing.values()) {
-            BlockPos neighborPos = te.getTunnelForSide(side);
-            if(neighborPos == null) {
-                continue;
-            }
+        // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
+        // Just ensure only a single notification happens per tick.
+        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
 
-            WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-            if(!(machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel)) {
-                continue;
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        BlockPos neighborPos = te.getTunnelForSide(facing);
+        if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
+            if(te.lastNeighborUpdateTick != world.getTotalWorldTime()) {
+                machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
+                te.lastNeighborUpdateTick = world.getTotalWorldTime();
             }
+        }
 
-            world.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
+
+        RedstoneTunnelData tunnelData = te.getRedstoneTunnelForSide(facing);
+        if(tunnelData != null && !tunnelData.isOutput) {
+            BlockPos redstoneNeighborPos = tunnelData.pos;
+            if(redstoneNeighborPos != null && machineWorld.getTileEntity(redstoneNeighborPos) instanceof TileEntityRedstoneTunnel) {
+                machineWorld.notifyNeighborsOfStateChange(redstoneNeighborPos, Blockss.redstoneTunnel, false);
+            }
         }
     }
 

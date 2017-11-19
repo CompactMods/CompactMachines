@@ -19,11 +19,15 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
+import org.dave.compactmachines3.item.ItemRedstoneTunnelTool;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.CubeTools;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
+import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
@@ -66,11 +70,11 @@ public class BlockWall extends BlockProtected {
             return false;
         }
 
-        if(!(playerStack.getItem() instanceof ItemTunnelTool)) {
+        if(player.isSneaking()) {
             return false;
         }
 
-        if(player.isSneaking()) {
+        if(playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
             return false;
         }
 
@@ -82,28 +86,58 @@ public class BlockWall extends BlockProtected {
             return false;
         }
 
-        EnumFacing tunnelSide = EnumFacing.DOWN;
-        int coords = StructureTools.getCoordsForPos(pos);
-        HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
-        while(sideMapping != null && tunnelSide != null) {
-            if(sideMapping.get(tunnelSide) == null) {
-                break;
+        if(playerStack.getItem() instanceof ItemTunnelTool) {
+            EnumFacing tunnelSide = EnumFacing.DOWN;
+            int coords = StructureTools.getCoordsForPos(pos);
+            HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
+            while(sideMapping != null && tunnelSide != null) {
+                if(sideMapping.get(tunnelSide) == null) {
+                    break;
+                }
+
+                tunnelSide = StructureTools.getNextDirection(tunnelSide);
             }
 
-            tunnelSide = StructureTools.getNextDirection(tunnelSide);
+            if(tunnelSide != null) {
+                IBlockState blockState = Blockss.tunnel.getDefaultState().withProperty(BlockTunnel.MACHINE_SIDE, tunnelSide);
+                world.setBlockState(pos, blockState);
+
+                playerStack.setCount(playerStack.getCount()-1);
+                WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
+            } else {
+                // TODO: Localization
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
+            }
+
+            return true;
         }
 
-        if(tunnelSide != null) {
-            IBlockState blockState = Blockss.tunnel.getDefaultState().withProperty(BlockTunnel.MACHINE_SIDE, tunnelSide);
-            world.setBlockState(pos, blockState);
+        if(playerStack.getItem() instanceof ItemRedstoneTunnelTool) {
+            EnumFacing tunnelSide = EnumFacing.DOWN;
+            int coords = StructureTools.getCoordsForPos(pos);
+            HashMap<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(coords);
+            while(sideMapping != null && tunnelSide != null) {
+                if(sideMapping.get(tunnelSide) == null) {
+                    break;
+                }
 
-            playerStack.setCount(playerStack.getCount()-1);
-            WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
-        } else {
-            // TODO: Localization
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
+                tunnelSide = StructureTools.getNextDirection(tunnelSide);
+            }
+
+            if(tunnelSide != null) {
+                IBlockState blockState = Blockss.redstoneTunnel.getDefaultState().withProperty(BlockRedstoneTunnel.MACHINE_SIDE, tunnelSide);
+                world.setBlockState(pos, blockState);
+
+                playerStack.setCount(playerStack.getCount()-1);
+                WorldSavedDataMachines.INSTANCE.addRedstoneTunnel(pos, tunnelSide, false);
+            } else {
+                // TODO: Localization
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
+            }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

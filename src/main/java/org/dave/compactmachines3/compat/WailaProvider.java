@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.TextFormatting;
 import org.dave.compactmachines3.block.BlockFieldProjector;
 import org.dave.compactmachines3.block.BlockMachine;
+import org.dave.compactmachines3.block.BlockRedstoneTunnel;
 import org.dave.compactmachines3.block.BlockTunnel;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
@@ -26,14 +27,17 @@ public class WailaProvider {
         Logz.info("Enabled support for Waila/Hwyla");
         MachineProvider mpInstance = new MachineProvider();
         TunnelProvider tpInstance = new TunnelProvider();
+        RedstoneTunnelProvider rtpInstance = new RedstoneTunnelProvider();
         FieldProvider fpInstance = new FieldProvider();
 
         registry.registerBodyProvider(mpInstance, BlockMachine.class);
         registry.registerBodyProvider(tpInstance, BlockTunnel.class);
+        registry.registerBodyProvider(rtpInstance, BlockRedstoneTunnel.class);
         registry.registerBodyProvider(fpInstance, BlockFieldProjector.class);
 
         registry.registerStackProvider(mpInstance, BlockMachine.class);
         registry.registerStackProvider(tpInstance, BlockTunnel.class);
+        registry.registerStackProvider(rtpInstance, BlockRedstoneTunnel.class);
         registry.registerStackProvider(fpInstance, BlockFieldProjector.class);
     }
 
@@ -74,6 +78,16 @@ public class WailaProvider {
             return currenttip;
         }
     }
+
+    public static class RedstoneTunnelProvider implements IWailaDataProvider {
+        @Override
+        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+            String translate = "enumfacing." + accessor.getBlockState().getValue(BlockRedstoneTunnel.MACHINE_SIDE).getName();
+            currenttip.add(TextFormatting.YELLOW + I18n.format(translate) + TextFormatting.RESET);
+            return currenttip;
+        }
+    }
+
 
     public static class MachineProvider implements IWailaDataProvider {
 

@@ -12,9 +12,11 @@ import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class WorldSavedDataMachines extends WorldSavedData {
@@ -22,6 +24,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
     public int nextCoord = 0;
     public HashMap<Integer, double[]> spawnPoints = new HashMap<>();
     public HashMap<Integer, HashMap<EnumFacing, BlockPos>> tunnels = new HashMap<>();
+    public HashMap<Integer, HashMap<EnumFacing, RedstoneTunnelData>> redstoneTunnels = new HashMap<>();
     public HashMap<Integer, DimensionBlockPos> machinePositions = new HashMap<>();
     public HashMap<Integer, EnumMachineSize> machineSizes = new HashMap<>();
     public HashMap<UUID, Integer> bedCoords = new HashMap<>();
@@ -159,6 +162,83 @@ public class WorldSavedDataMachines extends WorldSavedData {
         }
     }
 
+    public void toggleRedstoneTunnelOutput(BlockPos pos) {
+        int coords = StructureTools.getCoordsForPos(pos);
+        HashMap<EnumFacing, RedstoneTunnelData> sideMapping = redstoneTunnels.get(coords);
+        if(sideMapping == null) {
+            return;
+        }
+
+        EnumFacing sideToRemove = null;
+        for(EnumFacing side : sideMapping.keySet()) {
+            if(sideMapping.get(side).pos.equals(pos)) {
+                sideToRemove = side;
+                break;
+            }
+        }
+
+        if(sideToRemove != null) {
+            sideMapping.get(sideToRemove).isOutput = !sideMapping.get(sideToRemove).isOutput;
+            Logz.debug("Toggle tunnel output by blockpos: pos=%s --> coords=%d, side=%s, output=%s", pos, coords, sideToRemove, sideMapping.get(sideToRemove).isOutput);
+        }
+        this.markDirty();
+    }
+
+    public void removeRedstoneTunnel(BlockPos pos) {
+        int coords = StructureTools.getCoordsForPos(pos);
+        HashMap<EnumFacing, RedstoneTunnelData> sideMapping = redstoneTunnels.get(coords);
+        if(sideMapping == null) {
+            return;
+        }
+
+        EnumFacing sideToRemove = null;
+        for(EnumFacing side : sideMapping.keySet()) {
+            if(sideMapping.get(side).pos.equals(pos)) {
+                sideToRemove = side;
+                break;
+            }
+        }
+
+        if(sideToRemove != null) {
+            Logz.debug("Removing tunnel mapping by blockpos: pos=%s --> coords=%d, side=%s", pos, coords, sideToRemove);
+            sideMapping.remove(sideToRemove);
+        }
+        this.markDirty();
+    }
+
+    public void removeRedstoneTunnel(BlockPos position, EnumFacing side) {
+        int coords = StructureTools.getCoordsForPos(position);
+        HashMap<EnumFacing, RedstoneTunnelData> sideMapping = redstoneTunnels.get(coords);
+        if(sideMapping == null) {
+            return;
+        }
+
+        Logz.debug("Removing tunnel mapping by pos+side: coords=%d, side=%s", coords, side);
+        sideMapping.remove(side);
+        this.markDirty();
+    }
+
+    public void addRedstoneTunnel(BlockPos position, EnumFacing side, boolean isOutput) {
+        this.addRedstoneTunnel(position, side, isOutput, false);
+    }
+
+    private void addRedstoneTunnel(BlockPos position, EnumFacing side, boolean isOutput, boolean isLoading) {
+        int coords = StructureTools.getCoordsForPos(position);
+
+        HashMap<EnumFacing, RedstoneTunnelData> sideMapping = redstoneTunnels.get(coords);
+        if(sideMapping == null) {
+            sideMapping = new HashMap<>();
+            redstoneTunnels.put(coords, sideMapping);
+        }
+
+        sideMapping.put(side, new RedstoneTunnelData(position, isOutput));
+        Logz.debug("Adding redstone tunnel mapping: side=%s, pos=%s, isOutput=%s --> coords=%d", side, position, isOutput, coords);
+
+        if(!isLoading) {
+            this.markDirty();
+        }
+    }
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound.setInteger("nextMachineCoord", nextCoord);
@@ -203,6 +283,24 @@ public class WorldSavedDataMachines extends WorldSavedData {
             }
         }
 
+        NBTTagList redstoneTunnelList = new NBTTagList();
+        for(int coords: redstoneTunnels.keySet()) {
+            HashMap<EnumFacing, RedstoneTunnelData> sideMappings = redstoneTunnels.get(coords);
+
+            for(EnumFacing side : sideMappings.keySet()) {
+                RedstoneTunnelData info = sideMappings.get(side);
+
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setInteger("side", side.getIndex());
+                tag.setInteger("x", info.pos.getX());
+                tag.setInteger("y", info.pos.getY());
+                tag.setInteger("z", info.pos.getZ());
+                tag.setBoolean("output", info.isOutput);
+                redstoneTunnelList.appendTag(tag);
+            }
+        }
+
+
         NBTTagList machineList = new NBTTagList();
         for(int coords: machinePositions.keySet()) {
             DimensionBlockPos dimpos = machinePositions.get(coords);
@@ -216,6 +314,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         compound.setTag("machines", machineList);
         compound.setTag("bedcoords", bedCoordsMap);
         compound.setTag("sizes", machineSizesTag);
+        compound.setTag("redstoneTunnels", redstoneTunnelList);
         return compound;
     }
 
@@ -266,6 +365,20 @@ public class WorldSavedDataMachines extends WorldSavedData {
                 EnumFacing side = EnumFacing.getFront(tag.getInteger("side"));
 
                 this.addTunnel(position, side, true);
+            }
+        }
+
+        if(nbt.hasKey("redstoneTunnels")) {
+            redstoneTunnels.clear();
+            NBTTagList tagList = nbt.getTagList("redstoneTunnels", 10);
+            for (int i = 0; i < tagList.tagCount(); i++) {
+                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+
+                BlockPos position = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
+                EnumFacing side = EnumFacing.getFront(tag.getInteger("side"));
+                boolean isOutput = tag.getBoolean("output");
+
+                this.addRedstoneTunnel(position, side, isOutput, true);
             }
         }
 

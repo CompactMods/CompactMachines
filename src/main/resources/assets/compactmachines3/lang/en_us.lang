@@ -8,12 +8,14 @@ tile.compactmachines3.machine.giant.name=Giant Compact Machine
 tile.compactmachines3.machine.maximum.name=Maximum Compact Machine
 
 tile.compactmachines3.tunnel.name=Tunnel
+tile.compactmachines3.redstonetunnel.name=Redstone Tunnel
 tile.compactmachines3.wallbreakable.name=Compact Machine Wall
 tile.compactmachines3.wall.name=Solid Compact Machine Wall
 tile.compactmachines3.fieldprojector.name=Miniaturization Field Projector
 
 item.compactmachines3.psd.name=Personal Shrinking Device
 item.compactmachines3.tunneltool.name=Tunnel
+item.compactmachines3.redstonetunneltool.name=Redstone Tunnel
 
 item.compactmachines3.psd.spawnpoint_set=Entry point set!
 
@@ -34,6 +36,7 @@ tooltip.compactmachines3.machine.coords.unused=Unused
 
 tooltip.compactmachines3.psd.hint=Used as documentation and to enter Compact Machines.
 tooltip.compactmachines3.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
+tooltip.compactmachines3.redstonetunneltool.hint=Used to transfer redstone signals between wall blocks and outside Compact Machine faces.
 tooltip.compactmachines3.wall.hint=Warning! Unbreakable for non-creative players!
 tooltip.compactmachines3.machine.hint=A %s provides a %s room.
 

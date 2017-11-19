@@ -14,17 +14,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.*;
-import org.dave.compactmachines3.init.Blockss;
-import org.dave.compactmachines3.item.ItemBlockMachine;
-import org.dave.compactmachines3.item.ItemBlockWall;
-import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
-import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.compat.CompatHandler;
+import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.item.*;
 import org.dave.compactmachines3.misc.SoundHandler;
-import org.dave.compactmachines3.tile.TileEntityFieldProjector;
-import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.tile.TileEntityCraftingHologram;
-import org.dave.compactmachines3.tile.TileEntityTunnel;
+import org.dave.compactmachines3.tile.*;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
@@ -49,6 +43,9 @@ public class CommonProxy {
 
         event.getRegistry().register(new BlockCraftingHologram(Material.IRON).setUnlocalizedName("craftinghologram").setRegistryName(CompactMachines3.MODID, "craftinghologram"));
         GameRegistry.registerTileEntity(TileEntityCraftingHologram.class, "TileEntityCraftingHologram");
+
+        event.getRegistry().register(new BlockRedstoneTunnel(Material.IRON).setUnlocalizedName("redstonetunnel").setRegistryName(CompactMachines3.MODID, "redstonetunnel"));
+        GameRegistry.registerTileEntity(TileEntityRedstoneTunnel.class, "TileEntityRedstoneTunnel");
     }
 
     @SubscribeEvent
@@ -61,6 +58,7 @@ public class CommonProxy {
 
         event.getRegistry().register(new ItemPersonalShrinkingDevice().setUnlocalizedName("psd").setRegistryName(CompactMachines3.MODID, "psd"));
         event.getRegistry().register(new ItemTunnelTool().setUnlocalizedName("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool"));
+        event.getRegistry().register(new ItemRedstoneTunnelTool().setUnlocalizedName("redstonetunneltool").setRegistryName(CompactMachines3.MODID, "redstonetunneltool"));
     }
 
     public void preInit(FMLPreInitializationEvent event) {
