@@ -88,6 +88,13 @@ to - Waila/The One Probe helps with that by showing the face as well.
 No face can be connected to twice, which means you can place a total of six tunnels
 anywhere in your Machine.
 
+### Redstone Tunnels
+
+They are a separate system, meaning you can place another 6 of them, but they only
+transfer redstone signals. They are also not bidirectional, i.e. you have to specify
+whether it is an input or an output tunnel. You can change their mode by hitting
+the colored indicator square in the top right corner.
+
 #### Compatibility
 
 Tunnels are basically proxy blocks utilizing Forge Capabilities to provide a connection
@@ -95,12 +102,16 @@ between the two blocks. This means that TileEntities using capabilities to talk 
 other will work out of the box, this includes e.g. items, fluids and forge energy.
 
 Other systems, usually multiblock-structures like cables and pipes, most of the time
-require custom implementations to work properly. This is why e.g. EnderIO conduits,
-Refined Storage or Applied Energistics connections do not work. This might change in
-the future when they either switch to a fully capability based system or when this mod
-adds compatibility layers itself. Both are lots of work, so don't expect this to happen.
+require custom implementations to work properly. This is why e.g. EnderIO conduits and
+Applied Energistics connections do not work. This might change in the future when they
+either switch to a fully capability based system or when this mod adds compatibility
+layers itself. Both are lots of work, so don't expect this to happen.
 
-
+Since this is asked very frequently:
+- Refined Storage is supported directly since they are using capabilities.
+- There is a AE2 addon mod called
+  [ME Capability Adapter](https://minecraft.curseforge.com/projects/capability-adapter)
+  that adds a capability proxy block.
 
 ## Miniaturization Crafting
 
@@ -118,7 +129,7 @@ You might have to dig out the floor or place the projectors on pedestals.
 Once you placed the projectors correctly and no blocks are obstructing the miniaturization
 field, the field should visualize.
 
-Watch this youtube video for a basic crafting example:
+Watch this (outdated) youtube video for a basic crafting example:
 
 [![Watch video on youtube](https://img.youtube.com/vi/p-F8ScV3z4U/0.jpg)](https://www.youtube.com/watch?v=p-F8ScV3z4U)
 
