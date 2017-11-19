@@ -53,6 +53,11 @@ repositories {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
     }
+
+    maven {
+        name = "refinedstorage"
+        url = "https://dl.bintray.com/raoulvdberge/dev/"
+    }
 }
 
 dependencies {
@@ -84,6 +89,9 @@ dependencies {
     deobfCompile("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.19-11") {
         transitive = false
     }
+
+    deobfCompile "refinedstorage:refinedstorage:${config.rs.version}:api"
+    //runtime "refinedstorage:refinedstorage:${config.rs.version}"
 }
 
 allprojects {
