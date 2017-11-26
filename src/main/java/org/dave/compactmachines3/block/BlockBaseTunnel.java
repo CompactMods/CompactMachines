@@ -39,7 +39,7 @@ public abstract class BlockBaseTunnel extends BlockProtected implements ITileEnt
     public BlockBaseTunnel(Material material) {
         super(material);
         this.setLightOpacity(1);
-        this.setLightLevel(0.0f);
+        this.setLightLevel(1.0f);
     }
 
     @Override

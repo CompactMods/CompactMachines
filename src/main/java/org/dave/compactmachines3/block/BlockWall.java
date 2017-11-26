@@ -37,7 +37,7 @@ public class BlockWall extends BlockProtected {
     public BlockWall(Material material) {
         super(material);
         this.setLightOpacity(1);
-        this.setLightLevel(0.0f);
+        this.setLightLevel(1.0f);
 
         this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
     }
