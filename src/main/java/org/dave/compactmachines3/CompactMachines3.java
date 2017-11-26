@@ -19,6 +19,7 @@ import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldGenMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
@@ -38,6 +39,8 @@ public class CompactMachines3
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        Logz.setLogger(event.getModLog());
+
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
         MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
 
