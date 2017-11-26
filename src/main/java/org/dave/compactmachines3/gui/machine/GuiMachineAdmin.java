@@ -38,11 +38,17 @@ public class GuiMachineAdmin extends GuiMachine {
             GuiMachineData.rawData = null;
             GuiMachineData.chunk = null;
 
+            rotateX = 0.0f;
+            rotateY = -25.0f;
+
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords-1, MessageRequestMachineAction.Action.REFRESH);
             PackageHandler.instance.sendToServer(requestMessage);
         } else if(button.id == Buttons.NEXT.ordinal()) {
             GuiMachineData.rawData = null;
             GuiMachineData.chunk = null;
+
+            rotateX = 0.0f;
+            rotateY = -25.0f;
 
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords+1, MessageRequestMachineAction.Action.REFRESH);
             PackageHandler.instance.sendToServer(requestMessage);

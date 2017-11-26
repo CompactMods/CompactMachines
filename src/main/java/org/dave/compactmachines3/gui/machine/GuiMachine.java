@@ -15,6 +15,7 @@ import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,12 @@ public class GuiMachine extends GuiContainer {
 
     protected static final int GUI_WIDTH = 256;
     protected static final int GUI_HEIGHT = 256;
+
+    private int prevMouseX = -1;
+    private int prevMouseY = -1;
+
+    protected double rotateX = 0.0f;
+    protected double rotateY = -25.0f;
 
     int glListId = -1;
 
@@ -97,6 +104,36 @@ public class GuiMachine extends GuiContainer {
 
     }
 
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        prevMouseX = mouseX;
+        prevMouseY = mouseY;
+
+        if(rotateX == 0.0d && mouseX > 84) {
+            rotateX = RenderTickCounter.renderTicks * 45.0f / 128.0f;
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+
+        if(prevMouseX != mouseX || prevMouseY != mouseY) {
+            int relativeX = mouseX - prevMouseX;
+            int relativeY = mouseY - prevMouseY;
+
+            this.rotateX += relativeX;
+            this.rotateY -= relativeY;
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+        }
+
+
+    }
+
     public void renderChunk() {
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
@@ -118,9 +155,9 @@ public class GuiMachine extends GuiContainer {
         GlStateManager.enableCull();
         GlStateManager.enableAlpha();
         if (Minecraft.isAmbientOcclusionEnabled()) {
-            GlStateManager.shadeModel(7425);
+            GlStateManager.shadeModel(GL11.GL_SMOOTH);
         } else {
-            GlStateManager.shadeModel(7424);
+            GlStateManager.shadeModel(GL11.GL_FLAT);
         }
 
         GlStateManager.pushMatrix();
@@ -140,14 +177,13 @@ public class GuiMachine extends GuiContainer {
         GlStateManager.scale(-1.0f, 1.0f, 1.0f);
 
         // Tilt a bit
-        GlStateManager.rotate(-25.0f, 1.0f, 0.0f, 0.0f);
+        GlStateManager.rotate((float)rotateY, 1.0f, 0.0f, 0.0f);
 
         // Turn it around
         GlStateManager.rotate(180.0f, 0.0f, 0.0f, -1.0f);
 
         // Auto rotate
-        float angle = RenderTickCounter.renderTicks * 45.0f / 128.0f;
-        GlStateManager.rotate(angle, 0.0f, 1.0f, 0.0f);
+        GlStateManager.rotate(rotateX == 0.0d ? RenderTickCounter.renderTicks * 45.0f / 128.0f : (float)rotateX, 0.0f, 1.0f, 0.0f);
 
         // Get rid of the wall+floor
         GlStateManager.translate(-8.0f, -8.0f, -8.0f);
