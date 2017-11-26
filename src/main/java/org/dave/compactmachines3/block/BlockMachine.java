@@ -94,6 +94,10 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(pos);
+        if(machine.isInsideItself()) {
+            return 0;
+        }
+
         return machine.getRedstonePowerOutput(side.getOpposite());
     }
 
@@ -126,6 +130,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
         // Just ensure only a single notification happens per tick.
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        if(te.isInsideItself()) {
+            return;
+        }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
         BlockPos neighborPos = te.getTunnelForSide(facing);
@@ -305,6 +312,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
+        if(machine.isInsideItself()) {
+            return true;
+        }
 
         ItemStack playerStack = player.getHeldItemMainhand();
         if(!playerStack.isEmpty()) {
@@ -331,6 +341,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         TileEntity te = world.getTileEntity(data.getPos());
         if(te instanceof TileEntityMachine) {
             TileEntityMachine machine = (TileEntityMachine) te;
+            if(machine.isInsideItself()) {
+                probeInfo.horizontal().text(TextFormatting.DARK_RED + "{*tooltip.compactmachines3.machine.stopitsoaryn*}" + TextFormatting.RESET);
+                return;
+            }
+
             String nameOrId = "";
             if(machine.coords < 0 && machine.getCustomName().length() == 0) {
                 nameOrId = "{*tooltip.compactmachines3.machine.coords.unused*}";

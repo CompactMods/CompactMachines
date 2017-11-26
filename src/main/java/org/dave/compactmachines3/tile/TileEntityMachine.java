@@ -8,8 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,7 +18,6 @@ import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
@@ -148,6 +146,17 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
         }
 
+        if(!this.getWorld().isRemote && this.coords != -1 && isInsideItself()) {
+            if (this.getWorld().getTotalWorldTime() % 20 == 0) {
+                world.playSound(null, getPos(),
+                        SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.wither.spawn")),
+                        SoundCategory.MASTER,
+                        1.0f,
+                        1.0f
+                );
+            }
+        }
+
         if(!this.getWorld().isRemote && this.coords != -1 && this.getWorld().getTotalWorldTime() > nextSpawnTick) {
             if(ConfigurationHandler.MachineSettings.allowPeacefulSpawns || ConfigurationHandler.MachineSettings.allowHostileSpawns) {
                 SpawnTools.spawnEntitiesInMachine(coords);
@@ -221,6 +230,14 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         return machineWorld.getTileEntity(insetPos);
     }
 
+    public boolean isInsideItself() {
+        if(this.getWorld().provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
+            return false;
+        }
+
+        return StructureTools.getCoordsForPos(this.getPos()) == this.coords;
+    }
+
     public ItemStack getConnectedPickBlock(EnumFacing facing) {
         BlockPos insetPos = getMachineWorldInsetPos(facing);
         if(insetPos == null) {
@@ -273,6 +290,10 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        if(isInsideItself()) {
+            return false;
+        }
+
         if(this.getWorld().isRemote || facing == null) {
             if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
                 return true;
@@ -308,6 +329,10 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        if(isInsideItself()) {
+            return null;
+        }
+
         if(this.getWorld().isRemote || facing == null) {
             if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
                 return CapabilityNullHandlerRegistry.getNullHandler(capability);
