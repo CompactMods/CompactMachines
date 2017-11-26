@@ -137,6 +137,8 @@ public class GuiMachine extends GuiContainer {
         // Increase size a bit more at the end
         GlStateManager.scale(2.0f, 2.0f, 2.0f);
 
+        GlStateManager.scale(-1.0f, 1.0f, 1.0f);
+
         // Tilt a bit
         GlStateManager.rotate(-25.0f, 1.0f, 0.0f, 0.0f);
 
@@ -157,12 +159,8 @@ public class GuiMachine extends GuiContainer {
 
         GlStateManager.scale(8.0f, 8.0f, 8.0f);
 
-        GL11.glFrontFace(GL11.GL_CW);
-
         // Aaaand render
         GlStateManager.callList(glListId);
-
-        GL11.glFrontFace(GL11.GL_CCW);
 
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
