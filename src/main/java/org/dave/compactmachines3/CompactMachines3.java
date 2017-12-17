@@ -55,7 +55,7 @@ public class CompactMachines3
 
         GuiHandler.init();
 
-        CapabilityNullHandlerRegistry.registerNullHandlers(event.getAsmData());
+        CapabilityNullHandlerRegistry.setAsmData(event.getAsmData());
 
         proxy.preInit(event);
     }
@@ -72,6 +72,8 @@ public class CompactMachines3
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+
+        CapabilityNullHandlerRegistry.registerNullHandlers();
 
         ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
     }

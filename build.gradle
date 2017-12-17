@@ -58,6 +58,11 @@ repositories {
         name = "refinedstorage"
         url = "https://dl.bintray.com/raoulvdberge/dev/"
     }
+
+    maven {
+        name = "opencomputers"
+        url = "http://maven.cil.li/"
+    }
 }
 
 dependencies {
@@ -92,6 +97,9 @@ dependencies {
 
     deobfCompile "refinedstorage:refinedstorage:${config.rs.version}:api"
     //runtime "refinedstorage:refinedstorage:${config.rs.version}"
+
+    deobfCompile "li.cil.oc:OpenComputers:${config.oc.version}:api"
+    //runtime "li.cil.oc:OpenComputers:${config.oc.version}"
 }
 
 allprojects {
