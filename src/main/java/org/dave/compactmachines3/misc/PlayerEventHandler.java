@@ -67,8 +67,7 @@ public class PlayerEventHandler {
     @SideOnly(Side.CLIENT)
     public static void onGuiClose(GuiOpenEvent event) {
         if(event.getGui() == null) {
-            GuiMachineData.rawData = null;
-            GuiMachineData.chunk = null;
+            GuiMachineData.canRender = false;
         }
     }
 

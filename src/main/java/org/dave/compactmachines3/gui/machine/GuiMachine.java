@@ -2,18 +2,27 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.utility.ChunkUtils;
+import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.OpenGLException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,22 +52,12 @@ public class GuiMachine extends GuiContainer {
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        if(GuiMachineData.rawData != null && GuiMachineData.chunk == null) {
-            GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(mc.world, GuiMachineData.rawData);
-            IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
-            List<BlockPos> toRender = new ArrayList<>();
-            for(int x = 15; x >= 0; x--) {
-                for(int y = 15; y >= 0; y--) {
-                    for(int z = 15; z >= 0; z--) {
-                        BlockPos pos = new BlockPos(x, y, z);
-                        if(blockAccess.isAirBlock(pos)) {
-                            continue;
-                        }
+        if(!GuiMachineData.canRender) {
+            return;
+        }
 
-                        toRender.add(pos);
-                    }
-                }
-            }
+        if(GuiMachineData.requiresNewDisplayList) {
+            TileEntityRendererDispatcher.instance.setWorld(GuiMachineData.proxyWorld);
 
             if(glListId != -1) {
                 GLAllocation.deleteDisplayLists(glListId);
@@ -76,16 +75,19 @@ public class GuiMachine extends GuiContainer {
             // Aaaand render
             BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
+            List<BlockPos> toRenderCopy = new ArrayList<>(GuiMachineData.toRender);
+
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             GlStateManager.disableAlpha();
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRender);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRenderCopy);
             GlStateManager.enableAlpha();
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRender);
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRender);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRenderCopy);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRenderCopy);
             GlStateManager.shadeModel(GL11.GL_FLAT);
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRender);
+            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRenderCopy);
 
             tessellator.draw();
+
 
             GlStateManager.popMatrix();
             GlStateManager.popAttrib();
@@ -98,6 +100,8 @@ public class GuiMachine extends GuiContainer {
             renderChunk();
         }
     }
+
+
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -130,13 +134,9 @@ public class GuiMachine extends GuiContainer {
             prevMouseX = mouseX;
             prevMouseY = mouseY;
         }
-
-
     }
 
     public void renderChunk() {
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-
         // Init GlStateManager
         TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
         textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -162,9 +162,6 @@ public class GuiMachine extends GuiContainer {
 
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
 
         GlStateManager.enableCull();
 
@@ -198,6 +195,16 @@ public class GuiMachine extends GuiContainer {
         // Aaaand render
         GlStateManager.callList(glListId);
 
+        GlStateManager.resetColor();
+
+        if(ConfigurationHandler.MachineSettings.renderTileEntitiesInGUI) {
+            this.renderTileEntities(TileEntityRendererDispatcher.instance, new ArrayList<>(GuiMachineData.toRender));
+        }
+
+        if(ConfigurationHandler.MachineSettings.renderLivingEntitiesInGUI) {
+            this.renderEntities();
+        }
+
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
 
@@ -213,6 +220,12 @@ public class GuiMachine extends GuiContainer {
                 continue;
             }
 
+            try {
+                state = state.getActualState(blockAccess, pos);
+            } catch (Exception e) {
+                Logz.debug("Could not determine actual state of block: %s", state.getBlock());
+            }
+
             ForgeHooksClient.setRenderLayer(renderLayer);
 
             try {
@@ -223,6 +236,73 @@ public class GuiMachine extends GuiContainer {
 
             ForgeHooksClient.setRenderLayer(null);
         }
+    }
+
+    private void renderEntities() {
+        ClassInheritanceMultiMap<Entity> entities = GuiMachineData.chunk.getEntityLists()[2];
+        for(Entity entity : entities) {
+            renderEntity(entity);
+        }
+    }
+
+    private static void renderEntity(Entity entity) {
+        GlStateManager.pushMatrix();
+
+        double x = entity.posX % 1024;
+        double y = entity.posY - 40;
+        double z = entity.posZ;
+
+        RenderHelper.enableStandardItemLighting();
+
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        try {
+            Minecraft.getMinecraft().getRenderManager().doRenderEntity(entity, x, y, z, entity.rotationYaw, 1.0F, false);
+        } catch (Exception e) {
+            Logz.debug("Could not render entity '%s': %s", entity.getClass().getSimpleName(), e.getMessage());
+        }
+
+        RenderHelper.disableStandardItemLighting();
+
+        GlStateManager.popMatrix();
+    }
+
+    private void renderTileEntities(TileEntityRendererDispatcher renderer, List<BlockPos> toRender) {
+        ForgeHooksClient.setRenderLayer(BlockRenderLayer.SOLID);
+        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
+
+        for (BlockPos pos : toRender) {
+            TileEntity te = blockAccess.getTileEntity(pos);
+            if(te != null) {
+                te.setWorld(GuiMachineData.proxyWorld);
+                te.setPos(pos);
+
+                if(te instanceof ITickable) {
+                    ((ITickable) te).update();
+                }
+
+                GlStateManager.pushMatrix();
+                GlStateManager.pushAttrib();
+                renderer.renderEngine = Minecraft.getMinecraft().renderEngine;
+
+                renderer.preDrawBatch();
+                try {
+                    renderer.render(te, pos.getX(), pos.getY(), pos.getZ(), 0.0f);
+                } catch(Exception e) {
+                    Logz.warn("Could not render tile entity '%s': %s", te.getClass().getSimpleName(), e.getMessage());
+                }
+                renderer.drawBatch(0);
+
+                GlStateManager.popAttrib();
+                GlStateManager.popMatrix();
+            }
+        }
+
+        ForgeHooksClient.setRenderLayer(null);
     }
 
     @Override

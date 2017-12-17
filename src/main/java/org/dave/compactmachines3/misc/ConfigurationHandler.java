@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.utility.Logz;
 
-import javax.crypto.Mac;
 import java.io.File;
 
 public class ConfigurationHandler {
@@ -157,6 +156,22 @@ public class ConfigurationHandler {
                 "Allow entering without machines"
         );
 
+        MachineSettings.renderTileEntitiesInGUI = configuration.getBoolean(
+                "renderTileEntitiesInGUI",
+                CATEGORY_MACHINES,
+                true,
+                "Client-side option, might give a performance boost when opening a Machine GUI",
+                "Render TileEntities in GUI"
+        );
+
+        MachineSettings.renderLivingEntitiesInGUI = configuration.getBoolean(
+                "renderLivingEntitiesInGUI",
+                CATEGORY_MACHINES,
+                true,
+                "Client-side option, might give a performance boost when opening a Machine GUI",
+                "Render living entities in GUI"
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -183,6 +198,8 @@ public class ConfigurationHandler {
         public static boolean allowPeacefulSpawns;
         public static boolean allowHostileSpawns;
         public static boolean allowEnteringWithoutPSD;
+        public static boolean renderTileEntitiesInGUI;
+        public static boolean renderLivingEntitiesInGUI;
     }
 
     public static class Settings {

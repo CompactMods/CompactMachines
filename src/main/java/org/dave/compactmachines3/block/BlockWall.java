@@ -25,7 +25,6 @@ import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.CubeTools;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;

@@ -2,12 +2,9 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.DimensionManager;
 import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.PackageHandler;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.io.IOException;
 
@@ -35,27 +32,18 @@ public class GuiMachineAdmin extends GuiMachine {
         super.actionPerformed(button);
 
         if(button.id == Buttons.PREVIOUS.ordinal()) {
-            GuiMachineData.rawData = null;
-            GuiMachineData.chunk = null;
-
             rotateX = 0.0f;
             rotateY = -25.0f;
 
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords-1, MessageRequestMachineAction.Action.REFRESH);
             PackageHandler.instance.sendToServer(requestMessage);
         } else if(button.id == Buttons.NEXT.ordinal()) {
-            GuiMachineData.rawData = null;
-            GuiMachineData.chunk = null;
-
             rotateX = 0.0f;
             rotateY = -25.0f;
 
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords+1, MessageRequestMachineAction.Action.REFRESH);
             PackageHandler.instance.sendToServer(requestMessage);
         } else if(button.id == Buttons.GIVEITEM.ordinal()) {
-            GuiMachineData.rawData = null;
-            GuiMachineData.chunk = null;
-
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.GIVE_ITEM);
             PackageHandler.instance.sendToServer(requestMessage);
         }

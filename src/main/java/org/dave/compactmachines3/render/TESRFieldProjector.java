@@ -214,7 +214,7 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
 
         // Ensure both sides of the plane are visible
         GlStateManager.disableCull();
-
+        GL11.glDisable(GL11.GL_CULL_FACE);
         // north -> south
         buffer.pos(x1, y3, z1).color(cR, cG, cB, cA2).endVertex();
         buffer.pos(x2, y3, z1).color(cR, cG, cB, cA2).endVertex();

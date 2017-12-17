@@ -7,14 +7,13 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.util.List;
 
@@ -156,6 +155,7 @@ public class ChunkUtils {
         chunk.setHeightMap(compound.getIntArray("HeightMap"));
         chunk.setTerrainPopulated(compound.getBoolean("TerrainPopulated"));
         chunk.setLightPopulated(compound.getBoolean("LightPopulated"));
+
         chunk.setInhabitedTime(compound.getLong("InhabitedTime"));
         NBTTagList nbttaglist = compound.getTagList("Sections", 10);
         int k = 16;
@@ -190,6 +190,35 @@ public class ChunkUtils {
         }
 
         // End this method here and split off entity loading to another method
+        loadEntities(worldIn, compound, chunk);
+
         return chunk;
+    }
+
+
+    public static void loadEntities(World worldIn, NBTTagCompound compound, Chunk chunk)
+    {
+        NBTTagList nbttaglist1 = compound.getTagList("Entities", 10);
+
+        for (int j1 = 0; j1 < nbttaglist1.tagCount(); ++j1)
+        {
+            NBTTagCompound nbttagcompound1 = nbttaglist1.getCompoundTagAt(j1);
+            AnvilChunkLoader.readChunkEntity(nbttagcompound1, worldIn, chunk);
+            chunk.setHasEntities(true);
+        }
+
+        NBTTagList nbttaglist2 = compound.getTagList("TileEntities", 10);
+
+        for (int k1 = 0; k1 < nbttaglist2.tagCount(); ++k1)
+        {
+            NBTTagCompound nbttagcompound2 = nbttaglist2.getCompoundTagAt(k1);
+            TileEntity tileentity = TileEntity.create(worldIn, nbttagcompound2);
+            if (tileentity != null)
+            {
+                BlockPos pos = tileentity.getPos();
+                tileentity.setPos(new BlockPos(pos.getX() % 1024, pos.getY(), pos.getZ()));
+                chunk.addTileEntity(tileentity);
+            }
+        }
     }
 }
