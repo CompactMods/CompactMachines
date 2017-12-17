@@ -9,8 +9,9 @@ import java.util.HashMap;
 
 public class CapabilityNullHandlerRegistry {
     private static HashMap<Capability, AbstractNullHandler> nullHandlers = new HashMap<>();
+    private static ASMDataTable asmData;
 
-    public static void registerNullHandlers(ASMDataTable asmData) {
+    public static void registerNullHandlers() {
         for(AbstractNullHandler nh : AnnotatedInstanceUtil.getNullHandlers(asmData)) {
             if(nullHandlers.containsKey(nh.getCapability())) {
                 continue;
@@ -27,5 +28,9 @@ public class CapabilityNullHandlerRegistry {
 
     public static <T> T getNullHandler(Capability<T> capability) {
         return (T) nullHandlers.get(capability);
+    }
+
+    public static void setAsmData(ASMDataTable asmData) {
+        CapabilityNullHandlerRegistry.asmData = asmData;
     }
 }
