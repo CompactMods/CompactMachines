@@ -263,12 +263,12 @@ public class MultiblockRecipe {
             }
 
             // Ignore "_", i.e. air blocks. These are air.
-            if(map[map.length - y - 1][z][x].equals("_")) {
+            IBlockState state = world.getBlockState(pos);
+            if(map[map.length - y - 1][z][x].equals("_") && state.getBlock().isAir(state, world, pos)) {
                 continue;
             }
 
             // Test whether the block is the type it should be
-            IBlockState state = world.getBlockState(pos);
             IBlockState wanted = reference.get(map[y][z][x]);
             if(wanted == null || state.getBlock() != wanted.getBlock()) {
                 return false;
