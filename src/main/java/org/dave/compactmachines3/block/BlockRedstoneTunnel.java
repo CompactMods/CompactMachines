@@ -111,7 +111,7 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
 
                     world.setBlockState(pos, state.withProperty(MACHINE_SIDE, nextDirection));
                     WorldSavedDataMachines.INSTANCE.removeRedstoneTunnel(pos, connectedSide);
-                    WorldSavedDataMachines.INSTANCE.addRedstoneTunnel(pos, nextDirection, false);
+                    WorldSavedDataMachines.INSTANCE.addRedstoneTunnel(pos, nextDirection, state.getValue(IS_OUTPUT));
                     break;
                 }
 
