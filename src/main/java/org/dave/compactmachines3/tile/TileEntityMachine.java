@@ -254,6 +254,11 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return 0;
         }
 
+        // We don't know the actual power on the client-side, which does not have the worldsaveddatamachines instance
+        if(WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.redstoneTunnels == null) {
+            return 0;
+        }
+
         HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords);
         if(tunnelMapping == null) {
             return 0;
