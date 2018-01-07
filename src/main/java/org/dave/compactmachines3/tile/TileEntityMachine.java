@@ -85,6 +85,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public String getOwnerName() {
+        // TODO: When the save game is transferred to another server/client, the profile of the owner might be null -> null pointer exception
         return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(getOwner()).getName();
     }
 

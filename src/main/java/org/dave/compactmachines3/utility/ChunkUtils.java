@@ -14,6 +14,8 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
+import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
 import java.util.List;
 
@@ -107,6 +109,17 @@ public class ChunkUtils {
             try
             {
                 NBTTagCompound nbttagcompound3 = tileentity.writeToNBT(new NBTTagCompound());
+
+                for(Class clz : InheritanceUtil.getInheritance(tileentity.getClass())) {
+                    if(ExtraTileDataProviderRegistry.hasDataProvider(clz)) {
+                        for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(clz)) {
+                            NBTTagCompound extraData = provider.writeExtraData(tileentity);
+                            String tagName = String.format("cm3_extra:%s", provider.getApplicableClass().getCanonicalName());
+                            nbttagcompound3.setTag(tagName, extraData);
+                        }
+                    }
+                }
+
                 nbttaglist2.appendTag(nbttagcompound3);
             }
             catch (Exception e)
@@ -217,6 +230,18 @@ public class ChunkUtils {
             {
                 BlockPos pos = tileentity.getPos();
                 tileentity.setPos(new BlockPos(pos.getX() % 1024, pos.getY(), pos.getZ()));
+
+                for(Class clz : InheritanceUtil.getInheritance(tileentity.getClass())) {
+                    if(ExtraTileDataProviderRegistry.hasDataProvider(clz)) {
+                        for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(clz)) {
+                            String tagName = String.format("cm3_extra:%s", provider.getApplicableClass().getCanonicalName());
+                            if(nbttagcompound2.hasKey(tagName)) {
+                                provider.readExtraData(tileentity, (NBTTagCompound) nbttagcompound2.getTag(tagName));
+                            }
+                        }
+                    }
+                }
+
                 chunk.addTileEntity(tileentity);
             }
         }

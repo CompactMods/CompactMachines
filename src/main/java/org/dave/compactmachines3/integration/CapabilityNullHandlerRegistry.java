@@ -1,7 +1,6 @@
 package org.dave.compactmachines3.integration;
 
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 
@@ -9,10 +8,9 @@ import java.util.HashMap;
 
 public class CapabilityNullHandlerRegistry {
     private static HashMap<Capability, AbstractNullHandler> nullHandlers = new HashMap<>();
-    private static ASMDataTable asmData;
 
     public static void registerNullHandlers() {
-        for(AbstractNullHandler nh : AnnotatedInstanceUtil.getNullHandlers(asmData)) {
+        for(AbstractNullHandler nh : AnnotatedInstanceUtil.getNullHandlers()) {
             if(nullHandlers.containsKey(nh.getCapability())) {
                 continue;
             }
@@ -30,7 +28,4 @@ public class CapabilityNullHandlerRegistry {
         return (T) nullHandlers.get(capability);
     }
 
-    public static void setAsmData(ASMDataTable asmData) {
-        CapabilityNullHandlerRegistry.asmData = asmData;
-    }
 }

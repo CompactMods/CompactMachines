@@ -19,10 +19,12 @@ import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
+import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldGenMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
+import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
 @Mod(modid = CompactMachines3.MODID, version = CompactMachines3.VERSION, acceptedMinecraftVersions = "[1.12,1.13)", dependencies = "after:refinedstorage")
@@ -55,7 +57,7 @@ public class CompactMachines3
 
         GuiHandler.init();
 
-        CapabilityNullHandlerRegistry.setAsmData(event.getAsmData());
+        AnnotatedInstanceUtil.setAsmData(event.getAsmData());
 
         proxy.preInit(event);
     }
@@ -74,6 +76,7 @@ public class CompactMachines3
         proxy.postInit(event);
 
         CapabilityNullHandlerRegistry.registerNullHandlers();
+        ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
 
         ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
     }
