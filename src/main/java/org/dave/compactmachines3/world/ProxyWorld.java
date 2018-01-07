@@ -31,7 +31,7 @@ public class ProxyWorld extends World {
 
     @Override
     protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
-        return false;
+        return x == 0 && z == 0;
     }
 
     private static BlockPos getFakePos(BlockPos pos) {
@@ -61,6 +61,7 @@ public class ProxyWorld extends World {
     public boolean isOutsideBuildHeight(BlockPos pos) {
         return super.isOutsideBuildHeight(getFakePos(pos));
     }
+
 
 
 }
