@@ -2,7 +2,6 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -22,7 +21,6 @@ import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.OpenGLException;
 
 import java.io.IOException;
 import java.util.ArrayList;

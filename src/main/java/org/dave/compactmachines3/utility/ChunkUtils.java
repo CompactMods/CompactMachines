@@ -109,15 +109,10 @@ public class ChunkUtils {
             try
             {
                 NBTTagCompound nbttagcompound3 = tileentity.writeToNBT(new NBTTagCompound());
-
-                for(Class clz : InheritanceUtil.getInheritance(tileentity.getClass())) {
-                    if(ExtraTileDataProviderRegistry.hasDataProvider(clz)) {
-                        for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(clz)) {
-                            NBTTagCompound extraData = provider.writeExtraData(tileentity);
-                            String tagName = String.format("cm3_extra:%s", provider.getApplicableClass().getCanonicalName());
-                            nbttagcompound3.setTag(tagName, extraData);
-                        }
-                    }
+                for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
+                    NBTTagCompound extraData = provider.writeExtraData(tileentity);
+                    String tagName = String.format("cm3_extra:%s", provider.getName());
+                    nbttagcompound3.setTag(tagName, extraData);
                 }
 
                 nbttaglist2.appendTag(nbttagcompound3);
@@ -228,17 +223,14 @@ public class ChunkUtils {
             TileEntity tileentity = TileEntity.create(worldIn, nbttagcompound2);
             if (tileentity != null)
             {
+                tileentity.setWorld(worldIn);
                 BlockPos pos = tileentity.getPos();
                 tileentity.setPos(new BlockPos(pos.getX() % 1024, pos.getY(), pos.getZ()));
 
-                for(Class clz : InheritanceUtil.getInheritance(tileentity.getClass())) {
-                    if(ExtraTileDataProviderRegistry.hasDataProvider(clz)) {
-                        for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(clz)) {
-                            String tagName = String.format("cm3_extra:%s", provider.getApplicableClass().getCanonicalName());
-                            if(nbttagcompound2.hasKey(tagName)) {
-                                provider.readExtraData(tileentity, (NBTTagCompound) nbttagcompound2.getTag(tagName));
-                            }
-                        }
+                for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
+                    String tagName = String.format("cm3_extra:%s", provider.getName());
+                    if(nbttagcompound2.hasKey(tagName)) {
+                        provider.readExtraData(tileentity, (NBTTagCompound) nbttagcompound2.getTag(tagName));
                     }
                 }
 

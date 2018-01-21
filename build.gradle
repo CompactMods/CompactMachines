@@ -55,6 +55,11 @@ repositories {
     }
 
     maven {
+        name = "ChickenBones Maven"
+        url = "http://chickenbones.net/maven/"
+    }
+
+    maven {
         name = "refinedstorage"
         url = "https://dl.bintray.com/raoulvdberge/dev/"
     }
@@ -66,26 +71,6 @@ repositories {
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
     deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
     runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
 
@@ -96,10 +81,40 @@ dependencies {
     }
 
     deobfCompile "refinedstorage:refinedstorage:${config.rs.version}:api"
-    //runtime "refinedstorage:refinedstorage:${config.rs.version}"
 
     deobfCompile "li.cil.oc:OpenComputers:${config.oc.version}:api"
-    //runtime "li.cil.oc:OpenComputers:${config.oc.version}"
+
+
+    // All of the following are needed to make Ducts connect to each other visually
+    // in recipes and in the machine view. :(
+    deobfCompile("cofh:ThermalDynamics:${config.minecraft.version}-${config.cofh.thermaldynamics.version}:universal") {
+        transitive = false
+    }
+
+    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal") {
+        transitive = false
+    }
+
+    // And some runtime-dependencies for the above two libraries.
+    runtime("cofh:ThermalFoundation:${config.minecraft.version}-${config.cofh.thermalfoundation.version}:universal") {
+        transitive = false
+    }
+
+    runtime("cofh:ThermalExpansion:${config.minecraft.version}-${config.cofh.thermalexpansion.version}:universal") {
+        transitive = false
+    }
+
+    runtime("cofh:ThermalCultivation:${config.minecraft.version}-${config.cofh.thermalcultivation.version}:universal") {
+        transitive = false
+    }
+
+    runtime("cofh:CoFHWorld:${config.minecraft.version}-${config.cofh.world.version}:universal") {
+        transitive = false
+    }
+
+    runtime("codechicken:CodeChickenLib:${config.minecraft.version}-${config.ccl.version}:universal") {
+        transitive = false
+    }
 }
 
 allprojects {

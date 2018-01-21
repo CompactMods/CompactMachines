@@ -1,38 +1,32 @@
 package org.dave.compactmachines3.world.data.provider;
 
+import net.minecraft.tileentity.TileEntity;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExtraTileDataProviderRegistry {
-    private static HashMap<Class, List<AbstractExtraTileDataProvider>> extraTileData = new HashMap<>();
+    private static List<AbstractExtraTileDataProvider> extraTileData = new ArrayList<>();
 
     public static void registerExtraTileDataProviders() {
         for(AbstractExtraTileDataProvider etdp : AnnotatedInstanceUtil.getExtraTileDataProviders()) {
-            if(etdp.getApplicableClass() == null) {
+            if(etdp.getName() == null) {
                 continue;
             }
 
-            if(!extraTileData.containsKey(etdp.getApplicableClass())) {
-                extraTileData.put(etdp.getApplicableClass(), new ArrayList<>());
-            }
-
-            List<AbstractExtraTileDataProvider> existingProviders = extraTileData.get(etdp.getApplicableClass());
-            if(!existingProviders.contains(etdp)) {
-                Logz.info("Registered extra tile data provider for class: %s", etdp.getApplicableClass().getCanonicalName());
-                existingProviders.add(etdp);
-            }
+            Logz.info("Registered extra tile data provider '%s'", etdp.getName());
+            extraTileData.add(etdp);
         }
     }
 
-    public static boolean hasDataProvider(Class clz) {
-        return extraTileData.containsKey(clz);
+    public static boolean hasDataProvider(TileEntity tileEntity) {
+        return extraTileData.stream().anyMatch(provider -> provider.worksWith(tileEntity));
     }
 
-    public static List<AbstractExtraTileDataProvider> getDataProviders(Class clz) {
-        return extraTileData.get(clz);
+    public static List<AbstractExtraTileDataProvider> getDataProviders(TileEntity tileEntity) {
+        return extraTileData.stream().filter(provider -> provider.worksWith(tileEntity)).collect(Collectors.toList());
     }
 }

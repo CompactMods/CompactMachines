@@ -15,7 +15,12 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
+import org.dave.compactmachines3.render.RecipeRenderManager;
+import org.dave.compactmachines3.utility.InheritanceUtil;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.world.ProxyWorld;
+import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
+import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -25,6 +30,7 @@ import java.util.List;
 public class MultiblockRecipe {
     private String name;
 
+    private String[][][] variantMap;
     private String[][][] map;
     private String[][][] map90;
     private String[][][] map180;
@@ -33,6 +39,7 @@ public class MultiblockRecipe {
     private HashMap<String, IBlockState> reference;
     private HashMap<String, Integer> referenceCount;
     private HashMap<String, Boolean> referenceIgnoresMeta;
+    private HashMap<String, NBTTagCompound> referenceTags;
 
     private BlockPos minPos;
     private BlockPos maxPos;
@@ -53,6 +60,7 @@ public class MultiblockRecipe {
         this.reference = new HashMap<>();
         this.referenceCount = new HashMap<>();
         this.referenceIgnoresMeta = new HashMap<>();
+        this.referenceTags = new HashMap<>();
         this.targetStack = targetStack;
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
@@ -64,6 +72,10 @@ public class MultiblockRecipe {
 
     public void addBlockReference(String ref, IBlockState state) {
         this.reference.put(ref, state);
+    }
+
+    public void addBlockVariation(String ref, NBTTagCompound tag) {
+        this.referenceTags.put(ref, tag);
     }
 
     public void setIgnoreMeta(String ref) {
@@ -91,11 +103,19 @@ public class MultiblockRecipe {
             if(state.getBlock() == Blocks.REDSTONE_WIRE) {
                 result.add(new ItemStack(Items.REDSTONE, count));
             } else {
-                result.add(new ItemStack(state.getBlock(), count, state.getBlock().getMetaFromState(state)));
+                if(referenceIgnoresMeta.getOrDefault(ref, false)) {
+                    result.add(new ItemStack(state.getBlock(), count, 0));
+                } else {
+                    result.add(new ItemStack(state.getBlock(), count, state.getBlock().getMetaFromState(state)));
+                }
             }
         }
 
         return result;
+    }
+
+    public void setVariantMap(String[][][] variantMap) {
+        this.variantMap = variantMap;
     }
 
     public void setPositionMap(String[][][] map) {
@@ -145,11 +165,31 @@ public class MultiblockRecipe {
         this.maxPos = new BlockPos(maxX, maxY, maxZ);
     }
 
-    public IBlockAccess getBlockAccess() {
+    public IBlockAccess getBlockAccess(ProxyWorld proxyWorld) {
         return new IBlockAccess() {
             @Nullable
             @Override
             public TileEntity getTileEntity(BlockPos pos) {
+                IBlockState state = getBlockState(pos);
+                if(state.getBlock().hasTileEntity(state)) {
+                    TileEntity tileentity = state.getBlock().createTileEntity(proxyWorld, state);
+                    tileentity.setWorld(proxyWorld);
+                    if (tileentity != null) {
+                        NBTTagCompound nbt = getVariantAtBlockPos(pos);
+                        if(nbt != null) {
+                            tileentity.readFromNBT(nbt);
+                            for (AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
+                                String tagName = String.format("cm3_extra:%s", provider.getName());
+                                if (nbt.hasKey(tagName)) {
+                                    provider.readExtraData(tileentity, (NBTTagCompound) nbt.getTag(tagName));
+                                }
+                            }
+                        }
+                    }
+
+                    return tileentity;
+                }
+
                 return null;
             }
 
@@ -351,6 +391,21 @@ public class MultiblockRecipe {
 
         String ref = this.map[pos.getY()][pos.getZ()][pos.getX()];
         return reference.getOrDefault(ref, Blocks.AIR.getDefaultState());
+    }
+
+    public NBTTagCompound getVariantAtBlockPos(BlockPos pos) {
+        if(pos.getY() < 0 || pos.getY() >= this.map.length) {
+            return null;
+        }
+        if(pos.getZ() < 0 || pos.getZ() >= this.map[pos.getY()].length) {
+            return null;
+        }
+        if(pos.getX() < 0 || pos.getX() >= this.map[pos.getY()][pos.getZ()].length) {
+            return null;
+        }
+
+        String variant = this.variantMap[pos.getY()][pos.getZ()][pos.getX()];
+        return this.referenceTags.getOrDefault(variant, null);
     }
 
     public List<BlockPos> getShapeAsBlockPosList() {

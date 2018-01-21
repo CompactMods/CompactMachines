@@ -16,6 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.tile.TileEntityCraftingHologram;
+import org.dave.compactmachines3.world.ProxyWorld;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -24,6 +25,8 @@ import java.util.List;
 public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCraftingHologram> {
     private IBlockAccess blockAccess;
     private MultiblockRecipe recipe;
+    private ProxyWorld proxyWorld;
+    private int glListId = -1;
 
     @Override
     public void render(TileEntityCraftingHologram te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -31,15 +34,6 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
         if(recipe == null) {
             return;
         }
-
-        List<BlockPos> toRender = recipe.getShapeAsBlockPosList();
-        if(toRender.isEmpty()) {
-            return;
-        }
-
-        blockAccess = recipe.getBlockAccess();
-
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
         GlStateManager.pushAttrib();
         GlStateManager.pushMatrix();
@@ -96,9 +90,6 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
         GlStateManager.rotate(angle, 0.0f, 1.0f, 0.0f);
         GlStateManager.translate(-rotateOffsetX, -rotateOffsetY, -rotateOffsetZ);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
         textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
@@ -106,22 +97,11 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
 
-        // Aaaand render
-        buffer.begin(7, DefaultVertexFormats.BLOCK);
-        GlStateManager.disableAlpha();
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRender);
-        GlStateManager.enableAlpha();
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRender);
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRender);
-        GlStateManager.shadeModel(GL11.GL_FLAT);
-        this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRender);
-
-        tessellator.draw();
-
         GlStateManager.disableBlend();
+        RecipeRenderManager.instance.renderRecipe(recipe, partialTicks);
 
-        GlStateManager.popMatrix();
         GlStateManager.popAttrib();
+        GlStateManager.popMatrix();
     }
 
     public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {

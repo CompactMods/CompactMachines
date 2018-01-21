@@ -7,11 +7,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.chunk.Chunk;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ProxyWorld;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GuiMachineData {
     public static NBTTagCompound rawData;
@@ -40,7 +40,7 @@ public class GuiMachineData {
         GuiMachineData.customName = customName;
         GuiMachineData.toRender = new ArrayList<>();
 
-        proxyWorld = new ProxyWorld(Minecraft.getMinecraft().world);
+        proxyWorld = new ProxyWorld();
         GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(proxyWorld, GuiMachineData.rawData);
 
         IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);

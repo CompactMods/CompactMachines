@@ -135,6 +135,27 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             }
         }
 
+        // Read variant map
+        if(jsonRoot.has("input-nbt")) {
+            JsonObject jsonVariantMap = jsonRoot.get("input-nbt").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : jsonVariantMap.entrySet()) {
+                JsonObject data = entry.getValue().getAsJsonObject();
+                if (!data.has("nbt")) {
+                    Logz.error("Missing nbt for variant");
+                    return null;
+                }
+
+                String rawNbtJson = data.get("nbt").getAsString();
+                try {
+                    catalystNbt = JsonToNBT.getTagFromJson(rawNbtJson);
+                    result.addBlockVariation(entry.getKey(), catalystNbt);
+                } catch (NBTException e) {
+                    Logz.warn("Unable to read NBT tag from miniaturiazation recipe: %s (exception=%s)", rawNbtJson, e);
+                    return null;
+                }
+            }
+        }
+
         // Determine dimensions of the shape
         JsonArray jsonYPosArray = jsonRoot.get("shape").getAsJsonArray();
         int height = jsonYPosArray.size();
@@ -152,6 +173,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
 
         // Read position data
         String[][][] positionMap = new String[height][depth][width];
+        String[][][] variantMap = new String[height][depth][width];
         int y = 0;
         for (JsonElement jsonYElement : jsonYPosArray) {
             int z = 0;
@@ -159,7 +181,12 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
                 int x = 0;
                 for(JsonElement jsonXElement : jsonZElement.getAsJsonArray()) {
                     String ref = jsonXElement.getAsString();
-                    positionMap[height - 1 - y][z][x] = ref;
+                    if(ref.contains(":")) {
+                        positionMap[height - 1 - y][z][x] = ref.substring(0, ref.indexOf(':'));
+                        variantMap[height - 1 - y][z][x] = ref;
+                    } else {
+                        positionMap[height - 1 - y][z][x] = ref;
+                    }
                     x++;
                 }
                 z++;
@@ -168,6 +195,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
         }
 
         result.setPositionMap(positionMap);
+        result.setVariantMap(variantMap);
 
         return result;
     }

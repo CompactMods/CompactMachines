@@ -1,11 +1,15 @@
 package org.dave.compactmachines3.command;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -14,6 +18,10 @@ import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.network.MessageClipboard;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
+import org.dave.compactmachines3.utility.InheritanceUtil;
+import org.dave.compactmachines3.utility.SerializationHelper;
+import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
+import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,14 +93,40 @@ public class CommandRecipeCopyShape extends CommandBaseExt {
         int depth = maxZ-minZ+1;
         String[][][] array = new String[width][height][depth];
 
-        String typesOutput = "\"input-types\": {\n";
+        JsonObject resultObj = new JsonObject();
+        JsonObject inputTypes = new JsonObject();
+        JsonObject variants = new JsonObject();
+        resultObj.add("input-types", inputTypes);
 
+        // Create the reference map, i.e. which character maps to which block/tile
         char nextRef = 'a';
+        HashMap<String, Character> nextVariant = new HashMap<>();
+
         HashMap<String, String> refMap = new HashMap<>();
+        HashMap<String, HashMap<String, String>> variantMap = new HashMap<>();
+
         for(BlockPos pos : insideBlocks) {
             IBlockState state = sender.getEntityWorld().getBlockState(pos);
             String blockName = state.getBlock().getRegistryName().toString();
             int meta = state.getBlock().getMetaFromState(state);
+            TileEntity te = sender.getEntityWorld().getTileEntity(pos);
+
+            String nbtDataString = null;
+            if(state.getBlock().hasTileEntity(state) && te != null) {
+                NBTTagCompound nbtData = te.writeToNBT(new NBTTagCompound());
+                nbtData.removeTag("x");
+                nbtData.removeTag("y");
+                nbtData.removeTag("z");
+
+                for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(te)) {
+                    NBTTagCompound extraData = provider.writeExtraData(te);
+                    String tagName = String.format("cm3_extra:%s", provider.getName());
+                    nbtData.setTag(tagName, extraData);
+                }
+
+                nbtDataString = nbtData.toString();
+            }
+
             String fullName = blockName + ":" + meta;
 
             String refName;
@@ -102,40 +136,75 @@ public class CommandRecipeCopyShape extends CommandBaseExt {
                 refName = "" + nextRef++;
                 refMap.put(fullName, refName);
 
-                typesOutput += String.format("  \"%s\": { \"id\": \"%s\", \"meta\": %d },\n", refName, blockName, meta);
+                JsonObject typeDescription = new JsonObject();
+                typeDescription.addProperty("id", blockName);
+                typeDescription.addProperty("meta", meta);
+
+                inputTypes.add(refName, typeDescription);
+            }
+
+            if(!nextVariant.containsKey(refName)) {
+                nextVariant.put(refName, 'A');
+            }
+
+            String variantName = null;
+            if(nbtDataString != null) {
+                if(!variantMap.containsKey(refName)) {
+                    variantMap.put(refName, new HashMap<>());
+                }
+
+                HashMap<String, String> thisRefsVariantMap = variantMap.get(refName);
+
+                if(thisRefsVariantMap.containsKey(nbtDataString)) {
+                    variantName = thisRefsVariantMap.get(nbtDataString);
+                } else {
+                    char variant = nextVariant.get(refName);
+                    variantName = "" + variant++;
+                    nextVariant.put(refName, variant);
+
+                    thisRefsVariantMap.put(nbtDataString, variantName);
+
+                    JsonObject variantData = new JsonObject();
+                    variantData.addProperty("nbt", nbtDataString);
+
+                    variants.add(refName + ":" + variantName, variantData);
+                }
             }
 
             BlockPos relative = pos.add(-minX,-minY,-minZ);
-            array[relative.getX()][relative.getY()][relative.getZ()] = refName;
-        }
-        typesOutput = typesOutput.substring(0,typesOutput.length()-2) + "\n";
-        typesOutput += "},\n";
-
-        String shapeOutput = "\"shape\": [\n";
-        for(int y = height-1; y >= 0; y--) {
-            shapeOutput += "  [\n";
-            for(int z = 0; z < depth; z++) {
-                shapeOutput += "    [";
-                for(int x = 0; x < width; x++) {
-                    if(array[x][y][z] == null) {
-                        shapeOutput += "\"_\"";
-                    } else {
-                        shapeOutput += "\"" + array[x][y][z] + "\"";
-                    }
-                    if(x != width-1)shapeOutput += ",";
-                }
-                shapeOutput += "]";
-                if(z != depth-1)shapeOutput += ",";
-                shapeOutput += "\n";
+            if(variantName != null) {
+                array[relative.getX()][relative.getY()][relative.getZ()] = refName + ":" + variantName;
+            } else {
+                array[relative.getX()][relative.getY()][relative.getZ()] = refName;
             }
-            shapeOutput += "  ]";
-            if(y > 0)shapeOutput += ",";
-            shapeOutput += "\n";
+
         }
-        shapeOutput += "]\n";
+        if(variants.size() > 0) {
+            resultObj.add("input-nbt", variants);
+        }
+
+        // Create the shape map
+        JsonArray yArr = new JsonArray();
+        for(int y = height-1; y >= 0; y--) {
+            JsonArray zArr = new JsonArray();
+            for (int z = 0; z < depth; z++) {
+                JsonArray xArr = new JsonArray();
+                for (int x = 0; x < width; x++) {
+                    if(array[x][y][z] == null) {
+                        xArr.add("_");
+                    } else {
+                        xArr.add(array[x][y][z]);
+                    }
+                }
+                zArr.add(xArr);
+            }
+            yArr.add(zArr);
+        }
+        resultObj.add("shape", yArr);
 
         MessageClipboard message = new MessageClipboard();
-        message.setClipboardContent(typesOutput + shapeOutput);
+        String rawJson = SerializationHelper.GSON.toJson(resultObj);
+        message.setClipboardContent(rawJson.substring(1, rawJson.length()-1));
         PackageHandler.instance.sendTo(message, (EntityPlayerMP) sender.getCommandSenderEntity());
 
         player.sendMessage(new TextComponentTranslation("commands.compactmachines3.recipe.copy-shape.success"));
