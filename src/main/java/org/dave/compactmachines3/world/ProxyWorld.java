@@ -4,6 +4,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -61,6 +62,9 @@ public class ProxyWorld extends World {
             return super.getTileEntity(pos);
         }
 
+        if(pos.getY() >= 40) {
+            pos = pos.offset(EnumFacing.DOWN, 40);
+        }
         return fakeWorld.getTileEntity(getFakePos(pos));
     }
 
