@@ -201,6 +201,7 @@ public class GuiMachine extends GuiContainer {
 
         if(ConfigurationHandler.MachineSettings.renderLivingEntitiesInGUI) {
             this.renderEntities();
+            GlStateManager.enableBlend();
         }
 
         GlStateManager.popAttrib();
