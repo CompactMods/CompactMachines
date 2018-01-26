@@ -1,11 +1,14 @@
 package org.dave.compactmachines3.miniaturization;
 
+import cofh.core.util.helpers.NBTHelper;
+import cofh.thermaldynamics.duct.tiles.TileGrid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
@@ -15,9 +18,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
-import org.dave.compactmachines3.render.RecipeRenderManager;
-import org.dave.compactmachines3.utility.InheritanceUtil;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ProxyWorld;
 import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
@@ -40,6 +40,8 @@ public class MultiblockRecipe {
     private HashMap<String, Integer> referenceCount;
     private HashMap<String, Boolean> referenceIgnoresMeta;
     private HashMap<String, NBTTagCompound> referenceTags;
+    //private HashMap<String, Boolean> referenceIgnoresNBT;
+    private HashMap<String, ItemStack> referenceStacks;
 
     private BlockPos minPos;
     private BlockPos maxPos;
@@ -61,6 +63,8 @@ public class MultiblockRecipe {
         this.referenceCount = new HashMap<>();
         this.referenceIgnoresMeta = new HashMap<>();
         this.referenceTags = new HashMap<>();
+        //this.referenceIgnoresNBT = new HashMap<>();
+        this.referenceStacks = new HashMap<>();
         this.targetStack = targetStack;
         this.catalyst = catalyst;
         this.catalystMeta = catalystMeta;
@@ -78,8 +82,16 @@ public class MultiblockRecipe {
         this.referenceTags.put(ref, tag);
     }
 
-    public void setIgnoreMeta(String ref) {
-        this.referenceIgnoresMeta.put(ref, true);
+    public void setIgnoreMeta(String ref, boolean value) {
+        this.referenceIgnoresMeta.put(ref, value);
+    }
+
+    /*public void setIgnoreNBT(String ref, boolean value) {
+        this.referenceIgnoresNBT.put(ref, value);
+    }*/
+
+    public void setReferenceStack(String ref, ItemStack stack) {
+        this.referenceStacks.put(ref, stack);
     }
 
     public int getTicks() {
@@ -99,8 +111,10 @@ public class MultiblockRecipe {
                 continue;
             }
 
-            // TODO: This should be universal and not specific to redstone wire
-            if(state.getBlock() == Blocks.REDSTONE_WIRE) {
+            if(referenceStacks.containsKey(ref)) {
+                result.add(referenceStacks.get(ref).copy());
+            } else if(state.getBlock() == Blocks.REDSTONE_WIRE) {
+                // TODO: 1.13: We keep this in for historic reasons. Remove in 1.13
                 result.add(new ItemStack(Items.REDSTONE, count));
             } else {
                 if(referenceIgnoresMeta.getOrDefault(ref, false)) {
@@ -319,6 +333,26 @@ public class MultiblockRecipe {
                     return false;
                 }
             }
+
+            /*
+            if(!referenceIgnoresNBT.getOrDefault(map[y][z][x], true)) {
+                NBTTagCompound wantedTag = referenceTags.getOrDefault(map[y][z][x], null);
+
+                TileEntity tileEntity = world.getTileEntity(pos);
+                if(tileEntity == null) {
+                    if(wantedTag != null) {
+                        return false;
+                    }
+                } else {
+                    NBTTagCompound actualTag = new NBTTagCompound();
+                    tileEntity.writeToNBT(actualTag);
+
+                    if(!NBTUtil.areNBTEquals(actualTag, wantedTag, true)) {
+                        return false;
+                    }
+                }
+            }
+            */
         }
 
         return true;

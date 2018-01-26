@@ -70,6 +70,16 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             return null;
         }
 
+        if(jsonRoot.has("target-nbt")) {
+            String nbtRaw = jsonRoot.get("target-nbt").getAsString();
+            try {
+                NBTTagCompound targetNBT = JsonToNBT.getTagFromJson(nbtRaw);
+                targetStack.setTagCompound(targetNBT);
+            } catch (NBTException e) {
+                Logz.warn("Unable to read target NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
+            }
+        }
+
         Item catalystItem = Items.REDSTONE;
         if(jsonRoot.has("catalyst")) {
             String itemId = jsonRoot.get("catalyst").getAsString();
@@ -90,7 +100,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             try {
                 catalystNbt = JsonToNBT.getTagFromJson(nbtRaw);
             } catch (NBTException e) {
-                Logz.warn("Unable to read NBT tag from miniaturiazation recipe: %s (exception=%s)", nbtRaw, e);
+                Logz.warn("Unable to read NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
             }
         }
 
@@ -129,9 +139,43 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
 
             result.addBlockReference(entry.getKey(), state);
 
-            boolean ignoreMeta = data.has("ignore-meta") && data.get("ignore-meta").getAsBoolean();
-            if(ignoreMeta) {
-                result.setIgnoreMeta(entry.getKey());
+            boolean ignoreMeta = false;
+            if(data.has("ignore-meta")) {
+                ignoreMeta = data.get("ignore-meta").getAsBoolean();
+            }
+            result.setIgnoreMeta(entry.getKey(), ignoreMeta);
+
+            /*
+            boolean ignoreNBT = true;
+            if(data.has("ignore-nbt")) {
+                ignoreNBT = data.get("ignore-nbt").getAsBoolean();
+            }
+            result.setIgnoreNBT(entry.getKey(), ignoreNBT);
+            */
+
+            if(data.has("item")) {
+                JsonObject stackData = data.get("item").getAsJsonObject();
+                if(stackData.has("id")) {
+                    String id = stackData.get("id").getAsString();
+                    Item stackItem = Item.getByNameOrId(id);
+                    if(stackItem != null) {
+                        int stackMeta = stackData.has("meta") ? stackData.get("meta").getAsInt() : 0;
+                        int stackCount = stackData.has("count") ? stackData.get("count").getAsInt() : 1;
+
+                        ItemStack stackStack = new ItemStack(stackItem, stackCount, stackMeta);
+                        if(stackData.has("nbt")) {
+                            String nbtRaw = stackData.get("nbt").getAsString();
+                            try {
+                                NBTTagCompound stackNbt = JsonToNBT.getTagFromJson(nbtRaw);
+                                stackStack.setTagCompound(stackNbt);
+                            } catch (NBTException e) {
+                                Logz.warn("Unable to read NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
+                            }
+                        }
+
+                        result.setReferenceStack(entry.getKey(), stackStack);
+                    }
+                }
             }
         }
 
@@ -147,8 +191,8 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
 
                 String rawNbtJson = data.get("nbt").getAsString();
                 try {
-                    catalystNbt = JsonToNBT.getTagFromJson(rawNbtJson);
-                    result.addBlockVariation(entry.getKey(), catalystNbt);
+                    NBTTagCompound variantNBT = JsonToNBT.getTagFromJson(rawNbtJson);
+                    result.addBlockVariation(entry.getKey(), variantNBT);
                 } catch (NBTException e) {
                     Logz.warn("Unable to read NBT tag from miniaturiazation recipe: %s (exception=%s)", rawNbtJson, e);
                     return null;
