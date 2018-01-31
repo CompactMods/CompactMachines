@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -73,6 +74,8 @@ public class ProxyWorld extends World {
         return super.isOutsideBuildHeight(getFakePos(pos));
     }
 
-
-
+    @Override
+    public void updateComparatorOutputLevel(BlockPos pos, Block blockIn) {
+        // NOOP
+    }
 }
