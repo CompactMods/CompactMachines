@@ -261,7 +261,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         }
 
         int magnitude = getCraftingAreaMagnitude();
-        if(magnitude <= 0) {
+        if(magnitude <= 1) {
             return false;
         }
 
@@ -303,7 +303,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         }
 
         int magnitude = getCraftingAreaMagnitude();
-        if(magnitude <= 0) {
+        if(magnitude <= 1) {
             return;
         }
 

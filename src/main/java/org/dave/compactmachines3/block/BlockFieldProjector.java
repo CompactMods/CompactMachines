@@ -106,9 +106,9 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
         TileEntityFieldProjector teProjector = (TileEntityFieldProjector)world.getTileEntity(pos);
 
         int magnitude = teProjector.getCraftingAreaMagnitude();
-        if(magnitude <= 0) {
+        if(magnitude <= 1) {
             player.sendMessage(new TextComponentTranslation("hint.compactmachines3.missing_opposite_projector"));
-            for(int testMagn = 1; testMagn <= 7; testMagn++) {
+            for(int testMagn = 2; testMagn <= 7; testMagn++) {
                 BlockPos opposite = teProjector.getPos().offset(teProjector.getDirection(), testMagn*4);
                 PackageHandler.instance.sendTo(new MessageParticleBlockMarker(opposite.getX() + 0.5d, opposite.getY() + 0.5d, opposite.getZ() + 0.5d), (EntityPlayerMP) player);
             }
