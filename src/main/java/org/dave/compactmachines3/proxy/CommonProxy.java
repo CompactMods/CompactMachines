@@ -51,10 +51,11 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new ItemBlock(Blockss.tunnel).setRegistryName(Blockss.tunnel.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(Blockss.redstoneTunnel).setRegistryName(Blockss.redstoneTunnel.getRegistryName()));
         event.getRegistry().register(new ItemBlockWall(Blockss.wall).setRegistryName(Blockss.wall.getRegistryName()));
         event.getRegistry().register(new ItemBlock(Blockss.wallBreakable).setRegistryName(Blockss.wallBreakable.getRegistryName()));
         event.getRegistry().register(new ItemBlockMachine(Blockss.machine).setRegistryName(Blockss.machine.getRegistryName()));
-        event.getRegistry().register(new ItemBlock(Blockss.fieldProjector).setRegistryName(Blockss.fieldProjector.getRegistryName()));
+        event.getRegistry().register(new ItemBlockFieldProjector(Blockss.fieldProjector).setRegistryName(Blockss.fieldProjector.getRegistryName()));
 
         event.getRegistry().register(new ItemPersonalShrinkingDevice().setUnlocalizedName("psd").setRegistryName(CompactMachines3.MODID, "psd"));
         event.getRegistry().register(new ItemTunnelTool().setUnlocalizedName("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool"));

@@ -36,6 +36,7 @@ public class CompactMachines3JEIPlugin implements IModPlugin {
 
         IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
         blacklist.addIngredientToBlacklist(new ItemStack(Blockss.tunnel));
+        blacklist.addIngredientToBlacklist(new ItemStack(Blockss.redstoneTunnel));
         blacklist.addIngredientToBlacklist(new ItemStack(Blockss.wall));
     }
 }

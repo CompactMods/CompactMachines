@@ -25,6 +25,7 @@ public class Pages {
         // TODO: Chapter labels should be localized
         chapters.addChapter(new ItemStack(Blockss.machine, 1), "Compact Machines", "machines");
         chapters.addChapter(new ItemStack(Blockss.tunnel, 1), "Tunnels", "tunnels");
+        chapters.addChapter(new ItemStack(Blockss.redstoneTunnel, 1), "Redstone Tunnels", "redstone_tunnels");
         chapters.addChapter(new ItemStack(Blockss.fieldProjector, 1), "Miniaturization Crafting", "crafting");
 
         welcomePage.addSegment(chapters);
@@ -32,6 +33,7 @@ public class Pages {
         registerPage(welcomePage);
         registerPage(new SimpleTextPage("tunnels"));
         registerPage(new SimpleTextPage("machines"));
+        registerPage(new SimpleTextPage("redstone_tunnels"));
 
         Page craftingPage = new Page("crafting");
         craftingPage.addSegment(new TextSegment("text"));
