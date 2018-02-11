@@ -15,6 +15,7 @@ public class ConfigurationHandler {
     private static final String CATEGORY_INTERNAL = "Internal";
     private static final String CATEGORY_MINIATURIZATION = "Miniaturization";
     private static final String CATEGORY_MACHINES = "Machines";
+    private static final String CATEGORY_COMPAT = "Compatibility";
 
     public static File schemaDirectory;
     public static File recipeDirectory;
@@ -172,6 +173,14 @@ public class ConfigurationHandler {
                 "Render living entities in GUI"
         );
 
+        CompatSettings.doesWaterVaporize = configuration.getBoolean(
+                "doesWaterVaporize",
+                CATEGORY_COMPAT,
+                false,
+                "Forces water to vaporize inside Compact Machines. Used for Forever Stranded: Lost Souls.",
+                "Force water to vaporize"
+        );
+
         if(configuration.hasChanged()) {
             configuration.save();
         }
@@ -189,6 +198,10 @@ public class ConfigurationHandler {
         }
 
         loadConfiguration();
+    }
+
+    public static class CompatSettings {
+        public static boolean doesWaterVaporize;
     }
 
     public static class MachineSettings {

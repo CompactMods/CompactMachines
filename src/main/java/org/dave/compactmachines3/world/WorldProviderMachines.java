@@ -4,6 +4,7 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.IChunkGenerator;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
 public class WorldProviderMachines extends WorldProvider {
@@ -38,5 +39,10 @@ public class WorldProviderMachines extends WorldProvider {
     @Override
     public WorldBorder createWorldBorder() {
         return new WorldBorderMachines();
+    }
+
+    @Override
+    public boolean doesWaterVaporize() {
+        return ConfigurationHandler.CompatSettings.doesWaterVaporize;
     }
 }
