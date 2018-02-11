@@ -35,7 +35,8 @@ tooltip.compactmachines3.machine.coords=Machine:
 tooltip.compactmachines3.machine.coords.unused=Unused
 tooltip.compactmachines3.machine.stopitsoaryn=Feedbackloop detected
 
-tooltip.compactmachines3.psd.hint=Used as documentation and to enter Compact Machines.
+tooltip.compactmachines3.hold_shift.hint=Hold shift for details.
+tooltip.compactmachines3.psd.hint=Used as ingame documentation and to enter Compact Machines.
 tooltip.compactmachines3.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
 tooltip.compactmachines3.redstonetunneltool.hint=Used to transfer redstone signals between wall blocks and outside Compact Machine faces.
 tooltip.compactmachines3.wall.hint=Warning! Unbreakable for non-creative players!

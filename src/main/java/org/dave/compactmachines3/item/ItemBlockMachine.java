@@ -8,6 +8,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.IMetaBlockName;
 import org.dave.compactmachines3.init.Blockss;
@@ -57,6 +58,8 @@ public class ItemBlockMachine extends ItemBlock {
             int size = Blockss.machine.getStateFromMeta(stack.getItemDamage()).getValue(BlockMachine.SIZE).getDimension() - 1;
             String sizeString = size + "x" + size + "x" + size;
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.machine.hint", I18n.format(this.getUnlocalizedName(stack) + ".name"), sizeString));
+        } else {
+            tooltip.add(TextFormatting.GRAY + I18n.format("tooltip." + CompactMachines3.MODID + ".hold_shift.hint"));
         }
     }
 }

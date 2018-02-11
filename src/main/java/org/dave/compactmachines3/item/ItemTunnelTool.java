@@ -34,6 +34,8 @@ public class ItemTunnelTool extends ItemBase {
 
         if(GuiScreen.isShiftKeyDown()) {
             tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip." + CompactMachines3.MODID + ".tunneltool.hint"));
+        } else {
+            tooltip.add(TextFormatting.GRAY + I18n.format("tooltip." + CompactMachines3.MODID + ".hold_shift.hint"));
         }
     }
 }
