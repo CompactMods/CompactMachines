@@ -194,6 +194,10 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public BlockPos getTunnelForSide(EnumFacing side) {
+        if(WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.tunnels == null) {
+            return null;
+        }
+
         if(!WorldSavedDataMachines.INSTANCE.tunnels.containsKey(this.coords)) {
             return null;
         }
