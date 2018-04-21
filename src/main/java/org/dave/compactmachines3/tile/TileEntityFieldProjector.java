@@ -365,12 +365,20 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
                 continue;
             }
 
-            // Remove blocks and item from the world
+            // Remove blocks from the world
             for(BlockPos pos : getInsideBlocks()) {
                 world.setBlockToAir(pos);
                 ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 10, 0.5D, 0.5D, 0.5D, 0.01D, new int[0]);
             }
-            item.setDead();
+
+            // Reduce the number of items in the stack
+            ItemStack stack = item.getItem();
+            if(stack.getCount() == 1) {
+                item.setDead();
+            } else if(stack.getCount() > 1) {
+                stack.setCount(stack.getCount() - 1);
+                item.setItem(stack.copy());
+            }
 
             // Create recipe hologram
             world.setBlockState(center, Blockss.craftingHologram.getDefaultState());
