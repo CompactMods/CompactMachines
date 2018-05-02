@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.world;
 
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -9,13 +10,17 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChunkGeneratorMachines implements IChunkGenerator {
     private final World world;
+    private final byte[] voidBiomeArray;
 
     public ChunkGeneratorMachines(World worldIn) {
         this.world = worldIn;
+        voidBiomeArray = new byte[256];
+        Arrays.fill(voidBiomeArray, (byte) Biome.getIdForBiome(Biomes.VOID));
     }
 
     @Override
@@ -23,6 +28,7 @@ public class ChunkGeneratorMachines implements IChunkGenerator {
         ChunkPrimer cp = new ChunkPrimer();
         Chunk chunk = new Chunk(this.world, cp, x, z);
         chunk.generateSkylightMap();
+        chunk.setBiomeArray(voidBiomeArray);
         return chunk;
     }
 
