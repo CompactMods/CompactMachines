@@ -28,10 +28,10 @@ import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFieldProjector> {
-    private IModel model;
-    private IBakedModel bakedModel;
+    private static IModel model;
+    private static IBakedModel bakedModel;
 
-    private IBakedModel getBakedModel() {
+    public static void prebakeModel() {
         if(bakedModel == null) {
             try {
                 model = ModelLoaderRegistry.getModel(new ResourceLocation(CompactMachines3.MODID, "block/fieldprojectordish"));
@@ -41,8 +41,6 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
 
             bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("compactmachines3:blocks/fieldprojector"));
         }
-
-        return bakedModel;
     }
 
     private void renderModel(TileEntityFieldProjector te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -94,7 +92,7 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
 
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
                 world,
-                getBakedModel(),
+                TESRFieldProjector.bakedModel,
                 world.getBlockState(te.getPos()),
                 te.getPos(),
                 Tessellator.getInstance().getBuffer(),

@@ -19,6 +19,7 @@ import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
+import org.dave.compactmachines3.render.BakeryHandler;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
@@ -49,6 +50,7 @@ public class CompactMachines3
         MinecraftForge.EVENT_BUS.register(PlayerEventHandler.class);
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
         MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
+        MinecraftForge.EVENT_BUS.register(BakeryHandler.class);
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
