@@ -33,7 +33,7 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 public class CompactMachines3
 {
     public static final String MODID = "compactmachines3";
-    public static final String VERSION = "3.0.10";
+    public static final String VERSION = "3.0.11";
 
     @Mod.Instance(CompactMachines3.MODID)
     public static CompactMachines3 instance;
