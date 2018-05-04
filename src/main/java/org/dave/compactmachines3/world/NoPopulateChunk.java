@@ -4,6 +4,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
@@ -12,15 +13,11 @@ public class NoPopulateChunk extends Chunk {
     private static Field isLightPopulatedField;
 
     public static void initReflection() {
-        try {
-            isTerrainPopulatedField = Chunk.class.getDeclaredField("isTerrainPopulated");
-            isTerrainPopulatedField.setAccessible(true);
+        isTerrainPopulatedField = ReflectionHelper.findField(Chunk.class, "field_76646_k", "isTerrainPopulated");
+        isTerrainPopulatedField.setAccessible(true);
 
-            isLightPopulatedField = Chunk.class.getDeclaredField("isLightPopulated");
-            isLightPopulatedField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
+        isLightPopulatedField = ReflectionHelper.findField(Chunk.class, "field_150814_l", "isLightPopulated");
+        isLightPopulatedField.setAccessible(true);
     }
 
     public static void setChunkPopulatedFields(Chunk chunk) {
