@@ -1,13 +1,11 @@
 package org.dave.compactmachines3.gui.machine;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.chunk.Chunk;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ProxyWorld;
 
 import java.util.ArrayList;

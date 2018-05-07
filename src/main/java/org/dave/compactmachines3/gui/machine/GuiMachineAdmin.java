@@ -5,6 +5,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.PackageHandler;
+import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 import java.io.IOException;
 
@@ -12,6 +13,8 @@ public class GuiMachineAdmin extends GuiMachine {
     private GuiButton buttonPrevious;
     private GuiButton buttonNext;
     private GuiButton buttonGiveItem;
+    private GuiButton buttonTeleportOutside;
+    private GuiButton buttonTeleportInside;
 
     @Override
     public void initGui() {
@@ -21,10 +24,14 @@ public class GuiMachineAdmin extends GuiMachine {
         buttonPrevious = new GuiButton(Buttons.PREVIOUS.ordinal(), 4, height - 23, 80, 20, "Previous");
         buttonNext = new GuiButton(Buttons.NEXT.ordinal(), 4, height - 46, 80, 20, "Next");
         buttonGiveItem = new GuiButton(Buttons.GIVEITEM.ordinal(), 4, height - 92, 80, 20, TextFormatting.RED + "Give Item");
+        buttonTeleportOutside = new GuiButton(Buttons.TELEPORT_OUTSIDE.ordinal(), 4, height - 115, 80, 20, "Teleport: out");
+        buttonTeleportInside = new GuiButton(Buttons.TELEPORT_INSIDE.ordinal(), 4, height - 138, 80, 20, "Teleport: in");
 
         this.buttonList.add(buttonPrevious);
         this.buttonList.add(buttonNext);
         this.buttonList.add(buttonGiveItem);
+        this.buttonList.add(buttonTeleportInside);
+        this.buttonList.add(buttonTeleportOutside);
     }
 
     @Override
@@ -45,6 +52,12 @@ public class GuiMachineAdmin extends GuiMachine {
             PackageHandler.instance.sendToServer(requestMessage);
         } else if(button.id == Buttons.GIVEITEM.ordinal()) {
             MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.GIVE_ITEM);
+            PackageHandler.instance.sendToServer(requestMessage);
+        } else if(button.id == Buttons.TELEPORT_OUTSIDE.ordinal()) {
+            MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TELEPORT_OUTSIDE);
+            PackageHandler.instance.sendToServer(requestMessage);
+        } else if(button.id == Buttons.TELEPORT_INSIDE.ordinal()) {
+            MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TELEPORT_INSIDE);
             PackageHandler.instance.sendToServer(requestMessage);
         }
     }
@@ -76,6 +89,8 @@ public class GuiMachineAdmin extends GuiMachine {
     enum Buttons {
         PREVIOUS,
         NEXT,
-        GIVEITEM
+        GIVEITEM,
+        TELEPORT_OUTSIDE,
+        TELEPORT_INSIDE
     }
 }

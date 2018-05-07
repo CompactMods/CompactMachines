@@ -37,6 +37,8 @@ public class MessageRequestMachineAction implements IMessage {
 
     public enum Action {
         REFRESH,
-        GIVE_ITEM
+        GIVE_ITEM,
+        TELEPORT_INSIDE,
+        TELEPORT_OUTSIDE
     }
 }
