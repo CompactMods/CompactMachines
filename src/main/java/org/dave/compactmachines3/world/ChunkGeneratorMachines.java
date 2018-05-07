@@ -26,7 +26,7 @@ public class ChunkGeneratorMachines implements IChunkGenerator {
     @Override
     public Chunk generateChunk(int x, int z) {
         ChunkPrimer cp = new ChunkPrimer();
-        Chunk chunk = new NoPopulateChunk(this.world, cp, x, z);
+        Chunk chunk = new Chunk(this.world, cp, x, z);
         chunk.generateSkylightMap();
         chunk.setBiomeArray(voidBiomeArray);
         return chunk;

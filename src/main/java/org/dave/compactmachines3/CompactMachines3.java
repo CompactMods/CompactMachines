@@ -23,7 +23,6 @@ import org.dave.compactmachines3.render.BakeryHandler;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
-import org.dave.compactmachines3.world.NoPopulateChunk;
 import org.dave.compactmachines3.world.WorldGenMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
@@ -76,8 +75,6 @@ public class CompactMachines3
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        NoPopulateChunk.initReflection();
-
         CapabilityNullHandlerRegistry.registerNullHandlers();
         ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
 
