@@ -1,6 +1,8 @@
 # Compact Machines 3
 Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
 
+You can grab the latest Travis build from [here](https://www.dropbox.com/sh/7yyd9dgii1epibu/AADARWLwgjOBu9wU-zZVHp-ra?dl=0)
+
 ## Compact Machines
 
 These are the main component of this mod and they allow you to build complicated
