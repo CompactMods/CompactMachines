@@ -17,7 +17,7 @@ public class DimensionTools {
 
         Logz.info("Registering Compact Machines 3 dimension: " + ConfigurationHandler.Settings.dimensionId);
         DimensionManager.registerDimension(ConfigurationHandler.Settings.dimensionId, DimensionTools.baseType);
-
+        DimensionManager.keepDimensionLoaded(ConfigurationHandler.Settings.dimensionId, true);
     }
 
     public static WorldServer getWorldServerForDimension(int dim) {

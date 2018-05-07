@@ -36,5 +36,6 @@ public class NoPopulateChunk extends Chunk {
     @Override
     protected void populate(IChunkGenerator generator) {
         setChunkPopulatedFields(this);
+        this.markDirty();
     }
 }
