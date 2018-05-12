@@ -65,21 +65,25 @@ public class TeleportationTools {
             playerNBT.setTag("compactmachines3-coordHistory", coordHistory);
         }
 
-        double[] destination = WorldSavedDataMachines.INSTANCE.spawnPoints.get(coords);
-        player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
-
         TileEntityMachine machine = WorldSavedDataMachines.INSTANCE.getMachine(coords);
         if(machine.hasNewSchema()) {
             Schema schema = SchemaRegistry.instance.getSchema(machine.getSchemaName());
             if(schema == null) {
                 Logz.warn("Unknown schema used by Compact Machine @ %s", WorldSavedDataMachines.INSTANCE.getMachinePosition(coords));
-                return;
+            } else {
+                StructureTools.restoreSchema(schema, coords);
+                double[] adjustedSpawnPosition = schema.getSpawnPosition();
+                adjustedSpawnPosition[0] += coords * 1024;
+                adjustedSpawnPosition[1] += 40;
+                WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, adjustedSpawnPosition);
+                machine.setSchema(null);
+                machine.markDirty();
             }
-
-            StructureTools.restoreSchema(schema, coords);
-            machine.setSchema(null);
-            machine.markDirty();
         }
+
+        double[] destination = WorldSavedDataMachines.INSTANCE.spawnPoints.get(coords);
+        player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
+
     }
 
     public static void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {

@@ -187,7 +187,7 @@ public class StructureTools {
     }
 
     public static void restoreSchema(Schema schema, int coords) {
-        List<BlockInformation> blockList = schema.blocks;
+        List<BlockInformation> blockList = schema.getBlocks();
 
         TileEntity te = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();
 

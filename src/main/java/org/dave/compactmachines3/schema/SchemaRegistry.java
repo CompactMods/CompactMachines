@@ -48,13 +48,13 @@ public class SchemaRegistry {
                 continue;
             }
 
-            Logz.info("Loaded schema: %s [size=%s, blocks=%d]", schema.name, schema.size, schema.blocks.size());
+            Logz.info("Loaded schema: %s [size=%s, blocks=%d]", schema.getName(), schema.getSize(), schema.getBlocks().size());
             addSchema(schema);
         }
     }
 
     public void addSchema(Schema schema) {
-        schemas.put(schema.name, schema);
+        schemas.put(schema.getName(), schema);
     }
 
     public boolean hasSchema(String name) {

@@ -5,13 +5,40 @@ import org.dave.compactmachines3.reference.EnumMachineSize;
 import java.util.List;
 
 public class Schema {
-    public String name;
-    public List<BlockInformation> blocks;
-    public EnumMachineSize size;
+    private String name;
+    private List<BlockInformation> blocks;
+    private EnumMachineSize size;
+    private double[] spawnPosition;
 
-    public Schema(String name, List<BlockInformation> blocks, EnumMachineSize size) {
+    public Schema(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<BlockInformation> getBlocks() {
+        return blocks;
+    }
+
+    public void setBlocks(List<BlockInformation> blocks) {
         this.blocks = blocks;
+    }
+
+    public EnumMachineSize getSize() {
+        return size;
+    }
+
+    public void setSize(EnumMachineSize size) {
         this.size = size;
+    }
+
+    public void setSpawnPosition(double[] spawnPosition) {
+        this.spawnPosition = spawnPosition;
+    }
+
+    public double[] getSpawnPosition() {
+        return spawnPosition;
     }
 }

@@ -18,15 +18,34 @@ public class SchemaSerializer implements JsonSerializer<Schema>, JsonDeserialize
         JsonObject jsonRoot = json.getAsJsonObject();
         Type type = new TypeToken<List<BlockInformation>>() {}.getType();
         EnumMachineSize size = EnumMachineSize.getFromMeta(jsonRoot.get("size").getAsInt());
-        return new Schema(jsonRoot.get("name").getAsString(), context.deserialize(jsonRoot.get("blocks").getAsJsonArray(), type), size);
+        Schema result = new Schema(jsonRoot.get("name").getAsString());
+        result.setBlocks(context.deserialize(jsonRoot.get("blocks").getAsJsonArray(), type));
+        result.setSize(size);
+
+        JsonArray spawnPos = jsonRoot.getAsJsonArray("spawn");
+        double[] spawnPosition = new double[] {
+                spawnPos.get(0).getAsDouble(),
+                spawnPos.get(1).getAsDouble(),
+                spawnPos.get(2).getAsDouble()
+        };
+        result.setSpawnPosition(spawnPosition);
+
+        return result;
     }
 
     @Override
     public JsonElement serialize(Schema src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
-        root.addProperty("name", src.name);
-        root.addProperty("size", src.size.getMeta());
-        root.add("blocks", context.serialize(src.blocks));
+        root.addProperty("name", src.getName());
+        root.addProperty("size", src.getSize().getMeta());
+        root.add("blocks", context.serialize(src.getBlocks()));
+
+        JsonArray spawnArray = new JsonArray();
+        spawnArray.add(src.getSpawnPosition()[0]);
+        spawnArray.add(src.getSpawnPosition()[1]);
+        spawnArray.add(src.getSpawnPosition()[2]);
+
+        root.add("spawn", spawnArray);
         return root;
     }
 }

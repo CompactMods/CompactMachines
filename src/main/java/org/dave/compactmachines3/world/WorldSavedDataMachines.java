@@ -73,7 +73,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         this.markDirty();
     }
 
-    private void addSpawnPoint(int coord, double[] destination) {
+    public void addSpawnPoint(int coord, double[] destination) {
         if(destination.length != 3) {
             Logz.warn("Trying to set spawn point with invalid double[]=%s", destination);
             return;

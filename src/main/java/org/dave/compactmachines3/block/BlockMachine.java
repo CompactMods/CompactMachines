@@ -332,10 +332,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                             0.5 + machine.getSize().getDimension() / 2
                     };
 
-                    double x = machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2;
-                    double y = 42;
-                    double z = 0.5 + machine.getSize().getDimension() / 2;
-                    WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, x, y, z);
+                    WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, destination);
                 }
 
                 WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());

@@ -45,7 +45,7 @@ public class CommandSchemaLoad extends CommandBaseExt {
         Schema schema = SchemaRegistry.instance.getSchema(args[0]);
         int coords = StructureTools.getCoordsForPos(sender.getCommandSenderEntity().getPosition());
         EnumMachineSize machineSize = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
-        if(machineSize != schema.size) {
+        if(machineSize != schema.getSize()) {
             throw this.getException(sender, "machine_size_does_not_match");
         }
 

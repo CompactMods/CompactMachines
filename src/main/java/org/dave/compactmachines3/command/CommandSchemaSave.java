@@ -5,6 +5,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.schema.BlockInformation;
@@ -49,8 +50,12 @@ public class CommandSchemaSave extends CommandBaseExt {
             List<BlockInformation> blockList = StructureTools.createNewSchema(coords);
 
             if(blockList != null) {
-                // TODO: Save and process the spawn point, including look direction this time!
-                Schema schema = new Schema(args[0], blockList, WorldSavedDataMachines.INSTANCE.machineSizes.get(coords));
+                Schema schema = new Schema(args[0]);
+                schema.setBlocks(blockList);
+                schema.setSize(WorldSavedDataMachines.INSTANCE.machineSizes.get(coords));
+
+                Vec3d pos = sender.getPositionVector();
+                schema.setSpawnPosition(new double[] {pos.x % 1024, pos.y - 40, pos.z});
 
                 try {
                     File schemaFile = new File(ConfigurationHandler.schemaDirectory, sane);

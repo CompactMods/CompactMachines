@@ -58,7 +58,7 @@ public class CommandSchemaSet extends CommandBaseExt {
         }
 
         Schema schema = SchemaRegistry.instance.getSchema(schemaName);
-        if(machine.getSize() != schema.size) {
+        if(machine.getSize() != schema.getSize()) {
             throw this.getException(sender, "machine_size_does_not_match");
         }
 
