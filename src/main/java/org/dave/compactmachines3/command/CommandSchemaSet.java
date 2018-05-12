@@ -53,6 +53,9 @@ public class CommandSchemaSet extends CommandBaseExt {
         }
 
         TileEntityMachine machine = (TileEntityMachine)te;
+        if(machine.coords != -1) {
+            throw this.getException(sender, "machine_is_already_in_use");
+        }
 
         Schema schema = SchemaRegistry.instance.getSchema(schemaName);
         if(machine.getSize() != schema.size) {

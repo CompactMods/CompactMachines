@@ -85,6 +85,7 @@ commands.compactmachines3.schema.set.description=Sets the specified schema to th
 commands.compactmachines3.schema.set.exception.unknown_schema=No schema with that name exists!
 commands.compactmachines3.schema.set.exception.look_at_compact_machine=You need to look at a Compact Machine block!
 commands.compactmachines3.schema.set.exception.machine_size_does_not_match=The size of the machine does not match the schema!
+commands.compactmachines3.schema.set.exception.machine_is_already_in_use=Machine is already in use. Place a new machine!
 commands.compactmachines3.schema.set.machine_schema_set_to=Machine set to schema: %s
 
 commands.compactmachines3.schema.reload-files.usage=/compactmachines3 schema reload-files
