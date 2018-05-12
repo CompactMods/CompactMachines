@@ -6,6 +6,8 @@ public class CommandSchema extends CommandMenu {
     public void initEntries() {
         this.addSubcommand(new CommandSchemaSave());
         this.addSubcommand(new CommandSchemaLoad());
+        this.addSubcommand(new CommandSchemaSet());
+        this.addSubcommand(new CommandSchemaReloadFiles());
     }
 
     @Override

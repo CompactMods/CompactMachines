@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.utility.Logz;
@@ -54,7 +55,7 @@ public class MultiblockRecipes {
     }
 
     private static void loadRecipes() {
-        ResourceLoader loader = new ResourceLoader(ConfigurationHandler.recipeDirectory, "assets/compactmachines3/config/recipes/");
+        ResourceLoader loader = new ResourceLoader(CompactMachines3.class, ConfigurationHandler.recipeDirectory, "assets/compactmachines3/config/recipes/");
         for(Map.Entry<String, InputStream> entry : loader.getResources().entrySet()) {
             String filename = entry.getKey();
             InputStream is = entry.getValue();

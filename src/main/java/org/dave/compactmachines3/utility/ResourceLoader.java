@@ -1,7 +1,6 @@
 package org.dave.compactmachines3.utility;
 
 import net.minecraft.launchwrapper.Launch;
-import org.dave.compactmachines3.CompactMachines3;
 
 import java.io.*;
 import java.net.JarURLConnection;
@@ -15,7 +14,7 @@ import java.util.zip.ZipFile;
 /*
 Use like this:
 
-ResourceLoader loader = new ResourceLoader(new File(ConfigurationHandler.configDir, "types.d"), "assets/bonsaitrees/config/types.d/");
+ResourceLoader loader = new ResourceLoader(YourMod.class, new File(ConfigurationHandler.configDir, "types.d"), "assets/bonsaitrees/config/types.d/");
 for(Map.Entry<String, InputStream> entry : loader.getResources().entrySet()) {
         String filename = entry.getKey();
         InputStream is = entry.getValue();
@@ -27,15 +26,18 @@ public class ResourceLoader {
 
     private final String runtimePathName;
     private final String assetPathName;
+    private final Class jarClass;
 
-    public ResourceLoader(File runtimeFile, String assetPathName) {
+    public ResourceLoader(Class jarClass, File runtimeFile, String assetPathName) {
         this.assetPathName = assetPathName;
         this.runtimePathName = runtimeFile.getAbsolutePath();
+        this.jarClass = jarClass;
     }
 
-    public ResourceLoader(String runtimePathName, String assetPathName) {
+    public ResourceLoader(Class jarClass, String runtimePathName, String assetPathName) {
         this.runtimePathName = runtimePathName;
         this.assetPathName = assetPathName;
+        this.jarClass = jarClass;
     }
 
     public Map<String, InputStream> getResources() {
@@ -55,7 +57,7 @@ public class ResourceLoader {
 
         // Then search through the jar for any files we might have skipped up until now
         if(DEVELOPMENT) {
-            File assetPath = new File(CompactMachines3.class.getResource("/" + assetPathName).getFile());
+            File assetPath = new File(this.jarClass.getResource("/" + assetPathName).getFile());
             if(assetPath.exists() && assetPath.isDirectory()) {
                 for(File file : assetPath.listFiles()) {
                     if(result.keySet().contains(file.getName())) {
@@ -70,7 +72,7 @@ public class ResourceLoader {
             }
         } else {
             // We need to get an InputStream from within our jar file
-            URL srcUrl = CompactMachines3.class.getResource("/" + assetPathName);
+            URL srcUrl = this.jarClass.getResource("/" + assetPathName);
             if(srcUrl == null || !srcUrl.getProtocol().equals("jar")) {
                 Logz.error("Error while reading files from jar: unable to get Resource URL for '%s'.", assetPathName);
                 return null;

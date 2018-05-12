@@ -9,6 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.schema.Schema;
+import org.dave.compactmachines3.schema.SchemaRegistry;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
@@ -65,6 +67,19 @@ public class TeleportationTools {
 
         double[] destination = WorldSavedDataMachines.INSTANCE.spawnPoints.get(coords);
         player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
+
+        TileEntityMachine machine = WorldSavedDataMachines.INSTANCE.getMachine(coords);
+        if(machine.hasNewSchema()) {
+            Schema schema = SchemaRegistry.instance.getSchema(machine.getSchemaName());
+            if(schema == null) {
+                Logz.warn("Unknown schema used by Compact Machine @ %s", WorldSavedDataMachines.INSTANCE.getMachinePosition(coords));
+                return;
+            }
+
+            StructureTools.restoreSchema(schema, coords);
+            machine.setSchema(null);
+            machine.markDirty();
+        }
     }
 
     public static void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
@@ -154,21 +169,6 @@ public class TeleportationTools {
 
 
     public static void teleportPlayerToMachine(EntityPlayerMP player, TileEntityMachine machine) {
-        if(machine.coords == -1) {
-            StructureTools.generateCubeForMachine(machine);
-
-            double[] destination = new double[] {
-                    machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2,
-                    42,
-                    0.5 + machine.getSize().getDimension() / 2
-            };
-
-            double x = machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2;
-            double y = 42;
-            double z = 0.5 + machine.getSize().getDimension() / 2;
-            WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, x, y, z);
-        }
-
         teleportPlayerToMachine(player, machine.coords, false);
     }
 

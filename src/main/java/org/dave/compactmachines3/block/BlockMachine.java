@@ -322,10 +322,27 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
             if(playerItem instanceof ItemPersonalShrinkingDevice) {
-                TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
+                // TODO: Clean up, this belongs into a separate class
+                if(machine.coords == -1) {
+                    StructureTools.generateCubeForMachine(machine);
+
+                    double[] destination = new double[] {
+                            machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2,
+                            42,
+                            0.5 + machine.getSize().getDimension() / 2
+                    };
+
+                    double x = machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2;
+                    double y = 42;
+                    double z = 0.5 + machine.getSize().getDimension() / 2;
+                    WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, x, y, z);
+                }
 
                 WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
+
+                TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
                 StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
+
                 return true;
             }
         }
@@ -356,6 +373,12 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             }
 
             probeInfo.horizontal().text(TextFormatting.GREEN + "{*tooltip.compactmachines3.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET);
+            if(player.isCreative() && mode == ProbeMode.EXTENDED) {
+                if(machine.hasNewSchema()) {
+                    String schemaName = machine.getSchemaName();
+                    probeInfo.horizontal().text(TextFormatting.RED + "{*tooltip.compactmachines3.machine.schema*} " + TextFormatting.YELLOW + schemaName + TextFormatting.RESET);
+                }
+            }
 
             String translate = "enumfacing." + data.getSideHit().getName();
             probeInfo.horizontal()
@@ -366,6 +389,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             if(connectedStack != null && !connectedStack.isEmpty()) {
                 probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
             }
+
         }
     }
 }

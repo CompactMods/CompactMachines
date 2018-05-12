@@ -4,23 +4,23 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentTranslation;
-import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.reference.EnumMachineSize;
+import net.minecraft.world.World;
 import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.schema.SchemaRegistry;
-import org.dave.compactmachines3.world.WorldSavedDataMachines;
-import org.dave.compactmachines3.world.tools.StructureTools;
+import org.dave.compactmachines3.tile.TileEntityMachine;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CommandSchemaLoad extends CommandBaseExt {
+public class CommandSchemaSet extends CommandBaseExt {
     @Override
     public String getName() {
-        return "load";
+        return "set";
     }
 
     @Override
@@ -34,23 +34,35 @@ public class CommandSchemaLoad extends CommandBaseExt {
             throw this.getUsageException(sender);
         }
 
-        if(!SchemaRegistry.instance.hasSchema(args[0])) {
+        String schemaName = args[0];
+        if(!SchemaRegistry.instance.hasSchema(schemaName)) {
             throw this.getException(sender, "unknown_schema");
         }
 
-        if (sender.getEntityWorld().provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
-            throw this.getException(sender, "not_in_machine_dimension");
+        RayTraceResult rayTraceResult = sender.getCommandSenderEntity().rayTrace(16.0f, 0.0f);
+        if(rayTraceResult.typeOfHit != RayTraceResult.Type.BLOCK) {
+            throw this.getException(sender, "look_at_compact_machine");
         }
 
-        Schema schema = SchemaRegistry.instance.getSchema(args[0]);
-        int coords = StructureTools.getCoordsForPos(sender.getCommandSenderEntity().getPosition());
-        EnumMachineSize machineSize = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
-        if(machineSize != schema.size) {
+        BlockPos pos = rayTraceResult.getBlockPos();
+        World world = sender.getEntityWorld();
+
+        TileEntity te = world.getTileEntity(pos);
+        if(te == null || !(te instanceof TileEntityMachine)) {
+            throw this.getException(sender, "look_at_compact_machine");
+        }
+
+        TileEntityMachine machine = (TileEntityMachine)te;
+
+        Schema schema = SchemaRegistry.instance.getSchema(schemaName);
+        if(machine.getSize() != schema.size) {
             throw this.getException(sender, "machine_size_does_not_match");
         }
 
-        sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.schema.load.machine_schema_set_to", args[0]));
-        StructureTools.restoreSchema(schema, coords);
+        sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.schema.set.machine_schema_set_to", schemaName));
+
+        machine.setSchema(schemaName);
+        machine.markDirty();
     }
 
     @Override

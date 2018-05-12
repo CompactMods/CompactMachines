@@ -1,0 +1,872 @@
+{
+  "name": "example-tree",
+  "size": 2,
+  "blocks": [
+    {
+      "block": "minecraft:tallgrass",
+      "x": 0,
+      "y": 5,
+      "z": 0,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 0,
+      "y": 5,
+      "z": 1,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 0,
+      "y": 5,
+      "z": 3,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:red_flower",
+      "x": 0,
+      "y": 5,
+      "z": 5,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 0,
+      "y": 5,
+      "z": 6,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 0,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 3,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 3,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 3,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 3,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 4,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 4,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 4,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 1,
+      "y": 4,
+      "z": 5
+    },
+    {
+      "block": "minecraft:yellow_flower",
+      "x": 1,
+      "y": 5,
+      "z": 0
+    },
+    {
+      "block": "minecraft:yellow_flower",
+      "x": 1,
+      "y": 5,
+      "z": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 1,
+      "y": 5,
+      "z": 2,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 1,
+      "y": 5,
+      "z": 5,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 1,
+      "y": 5,
+      "z": 6,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 1,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 1,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 2,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 3,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 3,
+      "z": 2,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 3,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 3,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 3,
+      "z": 5
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 4,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 4,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 4,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 4,
+      "z": 4,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 2,
+      "y": 4,
+      "z": 5
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 0,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 1,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 3,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 4,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 5,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 2,
+      "y": 5,
+      "z": 6,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 2,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 1,
+      "z": 2,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 1,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 1,
+      "z": 4,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 2,
+      "z": 2
+    },
+    {
+      "block": "minecraft:log",
+      "x": 3,
+      "y": 2,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 2,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 3,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 3,
+      "z": 2,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:log",
+      "x": 3,
+      "y": 3,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 3,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 3,
+      "z": 5
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 4,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 4,
+      "z": 2,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:log",
+      "x": 3,
+      "y": 4,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 4,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 3,
+      "y": 4,
+      "z": 5
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 3,
+      "y": 5,
+      "z": 0,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:log",
+      "x": 3,
+      "y": 5,
+      "z": 3
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 3,
+      "y": 5,
+      "z": 4,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:dirt",
+      "x": 3,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 3,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 1,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 2,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 2,
+      "z": 4,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 3,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 3,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 3,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 3,
+      "z": 4,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 3,
+      "z": 5
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 4,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 4,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 4,
+      "z": 3,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 4,
+      "z": 4,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 4,
+      "y": 4,
+      "z": 5
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 1,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 2,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 3,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 4,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 5,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 4,
+      "y": 5,
+      "z": 6,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 4,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 3,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 3,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 3,
+      "z": 4
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 4,
+      "z": 1
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 4,
+      "z": 2
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 4,
+      "z": 3
+    },
+    {
+      "block": "minecraft:leaves",
+      "x": 5,
+      "y": 4,
+      "z": 4
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 5,
+      "y": 5,
+      "z": 3,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 5,
+      "y": 5,
+      "z": 4,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 5,
+      "y": 5,
+      "z": 5,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 5,
+      "y": 5,
+      "z": 6,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 5,
+      "y": 6,
+      "z": 6
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 6,
+      "y": 5,
+      "z": 3,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:tallgrass",
+      "x": 6,
+      "y": 5,
+      "z": 4,
+      "meta": 1
+    },
+    {
+      "block": "minecraft:red_flower",
+      "x": 6,
+      "y": 5,
+      "z": 5,
+      "meta": 8
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 0
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 1
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 2
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 3
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 4
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 5
+    },
+    {
+      "block": "minecraft:grass",
+      "x": 6,
+      "y": 6,
+      "z": 6
+    }
+  ]
+}

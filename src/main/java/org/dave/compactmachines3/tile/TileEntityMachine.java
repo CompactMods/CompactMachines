@@ -36,6 +36,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     protected String customName = "";
     protected UUID owner;
+    protected String schema;
 
     public TileEntityMachine() {
         super();
@@ -55,6 +56,11 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         customName = compound.getString("CustomName");
         owner = compound.getUniqueId("owner");
         nextSpawnTick = compound.getLong("spawntick");
+        if(compound.hasKey("schema")) {
+            schema = compound.getString("schema");
+        } else {
+            schema = null;
+        }
     }
 
     @Override
@@ -68,8 +74,23 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         compound.setLong("spawntick", nextSpawnTick);
+        if(schema != null) {
+            compound.setString("schema", schema);
+        }
 
         return compound;
+    }
+
+    public boolean hasNewSchema() {
+        return schema != null && schema.length() > 0;
+    }
+
+    public String getSchemaName() {
+        return schema;
+    }
+
+    public void setSchema(String schemaName) {
+        this.schema = schemaName;
     }
 
     public String getCustomName() {

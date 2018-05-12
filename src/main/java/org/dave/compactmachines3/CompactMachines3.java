@@ -20,6 +20,7 @@ import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
 import org.dave.compactmachines3.render.BakeryHandler;
+import org.dave.compactmachines3.schema.SchemaRegistry;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
@@ -71,6 +72,7 @@ public class CompactMachines3
         proxy.init(event);
 
         MultiblockRecipes.init();
+        SchemaRegistry.init();
     }
 
     @EventHandler

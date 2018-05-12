@@ -12,7 +12,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.schema.BlockInformation;
+import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
@@ -132,16 +134,16 @@ public class StructureTools {
         return list;
     }
 
-    public static List<BlockInformation> getSchema(int coords) {
+    public static List<BlockInformation> createNewSchema(int coords) {
         TileEntity machine = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();
         if(machine != null && machine instanceof TileEntityMachine) {
-            return getSchema((TileEntityMachine) machine);
+            return createNewSchema((TileEntityMachine) machine);
         }
 
         return null;
     }
 
-    public static List<BlockInformation> getSchema(TileEntityMachine machine) {
+    public static List<BlockInformation> createNewSchema(TileEntityMachine machine) {
         List<BlockInformation> blockList = new ArrayList<>();
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
@@ -182,5 +184,48 @@ public class StructureTools {
         }
 
         return blockList;
+    }
+
+    public static void restoreSchema(Schema schema, int coords) {
+        List<BlockInformation> blockList = schema.blocks;
+
+        TileEntity te = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();
+
+        if(te != null && te instanceof TileEntityMachine) {
+            WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+
+            TileEntityMachine machine = (TileEntityMachine) te;
+            int size = machine.getSize().getDimension();
+            int startX = machine.coords * 1024 + size - 1;
+            int startY = 40 + size - 1;
+            int startZ = 0 + size - 1;
+
+            for(BlockInformation bi : blockList) {
+                BlockPos absolutePos = new BlockPos(
+                        startX - bi.position.getX(),
+                        startY - bi.position.getY(),
+                        startZ - bi.position.getZ()
+                );
+
+                IBlockState state = bi.block.getStateFromMeta(bi.meta);
+                machineWorld.setBlockState(absolutePos, state);
+
+                if(bi.nbt != null) {
+                    TileEntity restoredTe = machineWorld.getTileEntity(absolutePos);
+                    if (restoredTe == null) {
+                        restoredTe = bi.block.createTileEntity(machineWorld, state);
+                    }
+
+                    if(bi.writePositionData) {
+                        bi.nbt.setInteger("x", absolutePos.getX());
+                        bi.nbt.setInteger("y", absolutePos.getY());
+                        bi.nbt.setInteger("z", absolutePos.getZ());
+                    }
+
+                    restoredTe.readFromNBT(bi.nbt);
+                    restoredTe.markDirty();
+                }
+            }
+        }
     }
 }

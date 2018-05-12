@@ -3,16 +3,20 @@ package org.dave.compactmachines3.world;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
+import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
@@ -44,6 +48,22 @@ public class WorldSavedDataMachines extends WorldSavedData {
     // TODO: Cleanup this class. It's all over the place.
     public DimensionBlockPos getMachinePosition(int coord) {
         return machinePositions.get(coord);
+    }
+
+    public TileEntityMachine getMachine(int coord) {
+        if(!machinePositions.containsKey(coord)) {
+            return null;
+        }
+
+        DimensionBlockPos dimPos = getMachinePosition(coord);
+        WorldServer world = DimensionTools.getWorldServerForDimension(dimPos.getDimension());
+        TileEntity result = world.getTileEntity(dimPos.getBlockPos());
+        if(result == null || !(result instanceof TileEntityMachine)) {
+            return null;
+        }
+
+        return (TileEntityMachine)result;
+
     }
 
     public void addMachinePosition(int coord, BlockPos pos, int dimension, EnumMachineSize size) {

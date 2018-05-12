@@ -5,11 +5,13 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.schema.BlockInformation;
 import org.dave.compactmachines3.schema.Schema;
+import org.dave.compactmachines3.schema.SchemaRegistry;
 import org.dave.compactmachines3.utility.SerializationHelper;
+import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.io.BufferedWriter;
@@ -27,7 +29,7 @@ public class CommandSchemaSave extends CommandBaseExt {
 
     @Override
     public boolean isAllowed(EntityPlayer player, boolean creative, boolean isOp) {
-        return creative || isOp;
+        return creative && isOp;
     }
 
     @Override
@@ -44,11 +46,11 @@ public class CommandSchemaSave extends CommandBaseExt {
 
             int coords = StructureTools.getCoordsForPos(sender.getCommandSenderEntity().getPosition());
 
-
-            List<BlockInformation> blockList = StructureTools.getSchema(coords);
+            List<BlockInformation> blockList = StructureTools.createNewSchema(coords);
 
             if(blockList != null) {
-                Schema schema = new Schema(args[0], blockList);
+                // TODO: Save and process the spawn point, including look direction this time!
+                Schema schema = new Schema(args[0], blockList, WorldSavedDataMachines.INSTANCE.machineSizes.get(coords));
 
                 try {
                     File schemaFile = new File(ConfigurationHandler.schemaDirectory, sane);
@@ -57,11 +59,12 @@ public class CommandSchemaSave extends CommandBaseExt {
                     writer.write(json);
                     writer.close();
 
-                    // TODO: Localization
-                    sender.sendMessage(new TextComponentString("Wrote schema to file: " + sane));
+                    sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.schema.save.success", sane));
                 } catch (IOException e) {
                     throw this.getException(sender, "invalid_file");
                 }
+
+                SchemaRegistry.instance.addSchema(schema);
             } else {
                 throw this.getException(sender, "not_serializable");
             }
