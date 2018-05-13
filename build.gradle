@@ -129,6 +129,11 @@ allprojects {
     }
 }
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
 processResources
 {
     // this will ensure that this task is redone when the versions change.
