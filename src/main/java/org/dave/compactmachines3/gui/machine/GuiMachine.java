@@ -280,8 +280,11 @@ public class GuiMachine extends GuiContainer {
                 te.setWorld(GuiMachineData.proxyWorld);
                 te.setPos(pos);
 
-                if(te instanceof ITickable) {
-                    ((ITickable) te).update();
+                if (te instanceof ITickable) {
+                    try {
+                        ((ITickable) te).update();
+                    } catch (Exception e) {
+                    }
                 }
 
                 GlStateManager.pushMatrix();
