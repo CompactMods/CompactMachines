@@ -125,6 +125,9 @@ public class MultiblockRecipeWrapper implements IRecipeWrapper {
             GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         }
 
+        textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+
         GlStateManager.popMatrix();
     }
 }
