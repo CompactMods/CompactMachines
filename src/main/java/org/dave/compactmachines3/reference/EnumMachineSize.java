@@ -8,7 +8,7 @@ public enum EnumMachineSize implements IStringSerializable {
     NORMAL  (2, "normal", 8),
     LARGE   (3, "large", 10),
     GIANT   (4, "giant", 12),
-    MAXIMUM (5, "maximum", 14);
+    MAXIMUM (5, "maximum", 20);
 
     private int meta;
     private String name;
