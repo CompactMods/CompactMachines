@@ -9,7 +9,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
 import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
@@ -24,7 +23,6 @@ import org.dave.compactmachines3.schema.SchemaRegistry;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
-import org.dave.compactmachines3.world.WorldGenMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 import org.dave.compactmachines3.world.tools.DimensionTools;
@@ -55,8 +53,6 @@ public class CompactMachines3
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
-
-        GameRegistry.registerWorldGenerator(new WorldGenMachines(), -1024);
 
         GuiHandler.init();
 

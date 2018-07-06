@@ -80,15 +80,6 @@ public class ConfigurationHandler {
                 "Allowed dimensions broken Compact Machine cubes can generate in."
         ).getIntList();
 
-        Settings.chanceForBrokenCube = configuration.getFloat(
-                "worldgenChance",
-                CATEGORY_INTERNAL,
-                0.0001f,
-                0.0f, 1.0f,
-                "The chance a chunk in the overworld contains a broken compact machine",
-                "Worldgen Chance"
-        );
-
         Settings.maximumCraftingAreaSize = configuration.getInt(
                 "maximumCraftingAreaSize",
                 CATEGORY_MINIATURIZATION,
@@ -220,7 +211,6 @@ public class ConfigurationHandler {
         public static int dimensionTypeId;
         public static boolean forceLoadChunks;
         public static int[] worldgenDimensions;
-        public static float chanceForBrokenCube;
         public static int maximumCraftingAreaSize;
         public static int maximumCraftingCatalystAge;
 
