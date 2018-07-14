@@ -13,12 +13,15 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -30,6 +33,7 @@ import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.misc.RotationTools;
 import org.dave.compactmachines3.network.MessageParticleBlockMarker;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.render.TESRFieldProjector;
@@ -180,15 +184,29 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
+        // Make sure the block is rotated properly
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        float blockReachDistance = 6.0F;
 
+        Vec3d posVec = placer.getPositionEyes(1.0f);
+        Vec3d lookVec = placer.getLook(1.0f);
+        Vec3d endVec = posVec.add(lookVec.scale(blockReachDistance));
+        RayTraceResult trace = world.rayTraceBlocks(posVec, endVec);
+
+        Vec3d hitPosition = trace.hitVec;
+        hitPosition = hitPosition.subtract(new Vec3d(trace.getBlockPos()));
+        hitPosition = hitPosition.subtract(0.5d, 0.5d, 0.5d);
+
+        world.setBlockState(pos, state.withProperty(FACING, RotationTools.getFacingByTriangle(hitPosition)), 2);
+
+        // Then copy tile entity data to the block
         if(!(world.getTileEntity(pos) instanceof TileEntityFieldProjector)) {
             return;
         }
 
         TileEntityFieldProjector teProjector = (TileEntityFieldProjector) world.getTileEntity(pos);
         if(stack.hasTagCompound()) {
-            if(stack.getTagCompound().hasKey("owner")) {
+            if(stack.getTagCompound().hasKey("ownerLeast") && stack.getTagCompound().hasKey("ownerMost")) {
                 teProjector.setOwner(stack.getTagCompound().getUniqueId("owner"));
             }
         }
