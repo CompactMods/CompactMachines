@@ -10,6 +10,7 @@ import org.dave.compactmachines3.world.ProxyWorld;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GuiMachineData {
     public static NBTTagCompound rawData;
@@ -19,6 +20,8 @@ public class GuiMachineData {
     public static DimensionBlockPos machinePos;
     public static String owner;
     public static String customName;
+    public static ArrayList<String> playerWhiteList;
+    public static boolean locked;
 
     public static Chunk chunk;
     public static ProxyWorld proxyWorld;
@@ -28,7 +31,7 @@ public class GuiMachineData {
     public static boolean requiresNewDisplayList = false;
     public static boolean canRender = false;
 
-    public static void updateGuiMachineData(NBTTagCompound rawData, int machineSize, int coords, DimensionBlockPos machinePos, String owner, String customName) {
+    public static void updateGuiMachineData(NBTTagCompound rawData, int machineSize, int coords, DimensionBlockPos machinePos, String owner, String customName, Set<String> playerWhiteList, boolean locked) {
         canRender = false;
         GuiMachineData.rawData = rawData;
         GuiMachineData.machineSize = machineSize;
@@ -37,6 +40,8 @@ public class GuiMachineData {
         GuiMachineData.owner = owner;
         GuiMachineData.customName = customName;
         GuiMachineData.toRender = new ArrayList<>();
+        GuiMachineData.playerWhiteList = new ArrayList<>(playerWhiteList);
+        GuiMachineData.locked = locked;
 
         proxyWorld = new ProxyWorld();
         GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(proxyWorld, GuiMachineData.rawData);

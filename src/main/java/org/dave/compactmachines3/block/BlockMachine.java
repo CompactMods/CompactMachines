@@ -283,7 +283,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 tileEntityMachine.setCustomName(stack.getDisplayName());
             }
 
-            if(stack.getTagCompound().hasKey("owner")) {
+            if(stack.getTagCompound().hasKey("ownerLeast") && stack.getTagCompound().hasKey("ownerMost")) {
                 tileEntityMachine.setOwner(stack.getTagCompound().getUniqueId("owner"));
             }
         }
@@ -317,7 +317,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         ItemStack playerStack = player.getHeldItemMainhand();
-        if(!playerStack.isEmpty()) {
+        if(!playerStack.isEmpty() && machine.isAllowedToEnter(player)) {
             Item playerItem = playerStack.getItem();
 
             // TODO: Convert the ability to teleport into a machine into an itemstack capability
@@ -339,6 +339,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
                 TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
                 StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
+
+                if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
+                    machine.setOwner(player);
+                    machine.markDirty();
+                }
 
                 return true;
             }

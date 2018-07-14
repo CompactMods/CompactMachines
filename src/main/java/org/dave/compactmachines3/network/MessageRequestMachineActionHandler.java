@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
@@ -58,6 +60,18 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
             PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
             playerList.transferPlayerToDimension(serverPlayer, pos.getDimension(), new TeleporterMachines(world));
             serverPlayer.setPositionAndUpdate(spawnPos.getX() + 0.5f, spawnPos.getY() + 0.5f, spawnPos.getZ() + 0.5f);
+        }
+
+        if(message.action == MessageRequestMachineAction.Action.TOGGLE_LOCKED) {
+            serverPlayer.getServerWorld().addScheduledTask(() -> {
+                DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(finalCoords);
+                TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
+                if (te != null && te instanceof TileEntityMachine) {
+                    TileEntityMachine machine = (TileEntityMachine) te;
+                    machine.toggleLocked();
+                    machine.markDirty();
+                }
+            });
         }
 
         serverPlayer.getServerWorld().addScheduledTask(() -> {

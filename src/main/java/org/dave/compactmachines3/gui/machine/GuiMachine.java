@@ -2,24 +2,38 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.fml.client.config.GuiCheckBox;
+import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.gui.GUIHelper;
+import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
+import org.dave.compactmachines3.network.MessagePlayerWhiteListToggle;
+import org.dave.compactmachines3.network.MessageRequestMachineAction;
+import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.Logz;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -27,9 +41,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiMachine extends GuiContainer {
+    protected ResourceLocation bgImage;
+    protected ResourceLocation tabIcons;
 
-    protected static final int GUI_WIDTH = 256;
-    protected static final int GUI_HEIGHT = 256;
+    private int windowWidth = 200;
+    private int windowHeight = 212;
 
     private int prevMouseX = -1;
     private int prevMouseY = -1;
@@ -37,18 +53,62 @@ public class GuiMachine extends GuiContainer {
     protected double rotateX = 0.0f;
     protected double rotateY = -25.0f;
 
+    private GuiTextField guiWhiteListInput;
+    private GuiMachinePlayerWhitelist guiWhiteList;
+    private GuiButton guiWhiteListAddButton;
+    private GuiCheckBox guiMachineLockedButton;
+
     int glListId = -1;
+    int activeTab = 0;  // TODO: This should not be an integer, but rather a GuiTab object or something like that
 
     public GuiMachine() {
         super(new GuiMachineContainer());
-        this.width = GUI_WIDTH;
-        this.height = GUI_HEIGHT;
+    }
+
+    private boolean shouldShowTabs() {
+        boolean isOwner = mc.player.getName().equals(GuiMachineData.owner);
+        boolean isCreative = mc.player.isCreative();
+
+        // TODO: Add server-side operator & isCreative check
+        return isOwner || isCreative;
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+
+        this.bgImage = new ResourceLocation("minecraft", "textures/gui/container/crafting_table.png");
+        this.tabIcons =  new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
+
+        int offsetX = (int)((this.width - this.windowWidth) / 2.0f);
+        int offsetY = (int)((this.height - this.windowHeight) / 2.0f);
+
+        this.buttonList.clear();
+        this.guiWhiteListAddButton = new GuiButton(0, offsetX+5+windowWidth-30, offsetY+44, 20, 20, "+");
+        this.buttonList.add(this.guiWhiteListAddButton);
+
+        this.guiMachineLockedButton = new GuiCheckBox(1, offsetX+7, offsetY + 7, "", GuiMachineData.locked);
+        this.buttonList.add(this.guiMachineLockedButton);
+
+        this.guiWhiteListInput = new GuiTextField(0, this.fontRenderer, offsetX+6, offsetY+45, windowWidth-33, 18);
+
+        this.guiWhiteList = new GuiMachinePlayerWhitelist(this,
+                offsetY+65, offsetY+windowHeight - 5,
+                offsetX+5,
+                20,
+                windowWidth - 10,
+                windowHeight);
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
+
+        // Do not draw the buttons automatically
+        List<GuiButton> buttonListTemp = this.buttonList;
+        this.buttonList = new ArrayList<>();
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.buttonList = buttonListTemp;
 
         if(!GuiMachineData.canRender) {
             return;
@@ -93,22 +153,215 @@ public class GuiMachine extends GuiContainer {
             GlStateManager.glEndList();
         }
 
-        // TODO: Maybe add some other useful information to the screen
-        if(GuiMachineData.chunk != null) {
+        if(GuiMachineData.chunk != null && activeTab == 0) {
             renderChunk();
+
+            drawOwner(partialTicks, mouseX, mouseY);
+        } else {
+            // TODO: Draw unused screen and help information; account for future updates with loot compact machines
+        }
+
+        if(activeTab == 1) {
+            drawWhitelist(partialTicks, mouseX, mouseY);
         }
     }
 
+    protected void drawOwner(float partialTicks, int mouseX, int mouseY) {
+        float offsetX = (this.width - this.windowWidth) / 2.0f;
+        float offsetY = (this.height - this.windowHeight) / 2.0f;
 
+        if(GuiMachineData.owner != null) {
+            mc.fontRenderer.drawString(GuiMachineData.owner, offsetX + 8, offsetY + this.windowHeight - 16, 0xFF1f2429, false);
+        } else {
+            mc.fontRenderer.drawString(I18n.format("tooltip.compactmachines3.machine.coords.unused"), offsetX + 8, offsetY + this.windowHeight - 16, 0xFF1f2429, false);
+        }
+    }
+
+    protected void drawWhitelist(float partialTicks, int mouseX, int mouseY) {
+        guiWhiteListInput.drawTextBox();
+        guiWhiteListAddButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        guiMachineLockedButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        guiWhiteList.drawScreen(mouseX, mouseY, partialTicks);
+
+        int offsetX = (int)((this.width - this.windowWidth) / 2.0f);
+        int offsetY = (int)((this.height - this.windowHeight) / 2.0f);
+
+        fontRenderer.drawString("Lock for other players", offsetX+20, offsetY+9, 0x1f2429);
+        fontRenderer.drawString("Whitelist:", offsetX+6, offsetY+34, 0x1f2429);
+
+    }
+
+    protected void drawTabs(float partialTicks, int mouseX, int mouseY) {
+        if(!shouldShowTabs()) {
+            return;
+        }
+
+        float offsetX = (this.width - this.windowWidth) / 2.0f;
+        float offsetY = (this.height - this.windowHeight) / 2.0f;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(offsetX-28, offsetY, 0);
+
+        mc.getTextureManager().bindTexture(tabIcons);
+
+        GlStateManager.disableLighting();
+        GlStateManager.color(1F, 1F, 1F); //Forge: Reset color in case Items change it.
+        GlStateManager.enableBlend(); //Forge: Make sure blend is enabled else tabs show a white border.
+
+        for(int index = 0; index < 2; index++) {
+            int xOffset = 0;
+            int yOffset = index * 28;
+
+            int buttonWidth = 32;
+            if(activeTab != index) {
+                buttonWidth = 28;
+            }
+
+            int textureY = index > 0 ? 28*2 : 28;
+
+            drawTexturedModalRect(xOffset, yOffset+0, activeTab == index ? 32 : 0, textureY, buttonWidth, 28);
+        }
+
+        drawTexturedModalRect(10, 36, 64, 0, 12, 11);
+
+        ItemStack itemstack = new ItemStack(Blockss.wall);
+        GlStateManager.pushAttrib();
+        RenderHelper.enableGUIStandardItemLighting();
+        this.itemRender.renderItemAndEffectIntoGUI(itemstack, 8, 6);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.popAttrib();
+
+
+        GlStateManager.popMatrix();
+    }
+
+    protected void drawWindow(float partialTicks, int mouseX, int mouseY) {
+        GlStateManager.color(1f, 1f, 1f, 1f);
+        mc.renderEngine.bindTexture(bgImage);
+
+        float offsetX = (this.width - this.windowWidth) / 2.0f;
+        float offsetY = (this.height - this.windowHeight) / 2.0f;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(offsetX, offsetY, 0);
+
+        // Top Left corner
+        drawTexturedModalRect(0, 0, 0, 0, 4, 4);
+
+        // Top right corner
+        drawTexturedModalRect(this.windowWidth - 4, 0, 172, 0, 4, 4);
+
+        // Bottom Left corner
+        drawTexturedModalRect(0, this.windowHeight - 4, 0, 162, 4, 4);
+
+        // Bottom Right corner
+        drawTexturedModalRect(this.windowWidth - 4, this.windowHeight - 4, 172, 162, 4, 4);
+
+        // Top edge
+        GUIHelper.drawStretchedTexture(4, 0, this.windowWidth - 8, 4, 4, 0, 4, 4);
+
+        // Bottom edge
+        GUIHelper.drawStretchedTexture(4, this.windowHeight - 4, this.windowWidth - 8, 4, 4, 162, 4, 4);
+
+        // Left edge
+        GUIHelper.drawStretchedTexture(0, 4, 4, this.windowHeight - 8, 0, 4, 4, 4);
+
+        // Right edge
+        GUIHelper.drawStretchedTexture(this.windowWidth - 4, 4, 4, this.windowHeight - 8, 172, 4, 4, 4);
+
+        GUIHelper.drawStretchedTexture(4, 4, this.windowWidth - 8, this.windowHeight - 8, 4, 4, 1, 1);
+
+        GlStateManager.popMatrix();
+    }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        drawWindow(partialTicks, mouseX, mouseY);
+        drawTabs(partialTicks, mouseX, mouseY);
+
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        super.actionPerformed(button);
+
+        if(button.id == 0) {
+            String playerName = this.guiWhiteListInput.getText();
+            if(playerName.length() == 0) {
+                return;
+            }
+
+            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.coords, playerName));
+            this.guiWhiteListInput.setText("");
+        }
+
+        if(button.id == 1) {
+            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TOGGLE_LOCKED));
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        boolean typed = false;
+        if(activeTab == 1) {
+            typed = this.guiWhiteListInput.textboxKeyTyped(typedChar, keyCode);
+
+            if (keyCode == 28 || keyCode == 156) {
+                this.guiWhiteListAddButton.playPressSound(this.mc.getSoundHandler());
+                this.actionPerformed(this.guiWhiteListAddButton);
+            }
+        }
+
+        if (keyCode == 1 || (this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode) && !typed)) {
+            this.mc.player.closeScreen();
+        }
 
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+
+        // Do not click the buttons automatically, they might be on a different tab
+        List<GuiButton> buttonListTemp = this.buttonList;
+        this.buttonList = new ArrayList<>();
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        this.buttonList = buttonListTemp;
+
+        this.guiWhiteListInput.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if(activeTab == 1 && mouseButton == 0) {
+            if (this.guiWhiteListAddButton.mousePressed(this.mc, mouseX, mouseY)) {
+                this.guiWhiteListAddButton.playPressSound(this.mc.getSoundHandler());
+                this.actionPerformed(this.guiWhiteListAddButton);
+            }
+
+            if(this.guiMachineLockedButton.mousePressed(this.mc, mouseX, mouseY)) {
+                this.guiMachineLockedButton.playPressSound(this.mc.getSoundHandler());
+                this.actionPerformed(this.guiMachineLockedButton);
+            }
+        }
+
+        if(shouldShowTabs()) {
+            float offsetX = ((this.width - this.windowWidth) / 2.0f) - 28;
+            float offsetY = (this.height - this.windowHeight) / 2.0f;
+
+            for(int tabIndex = 0; tabIndex < 2; tabIndex++) {
+                int tabY = (int)offsetY + (tabIndex * 28);
+
+                if(mouseX < offsetX || mouseX > offsetX + 28) {
+                    continue;
+                }
+
+                if(tabY < mouseY && mouseY < tabY + 28) {
+                    this.activeTab = tabIndex;
+
+                    if(tabIndex == 0) {
+                        this.rotateX = 0.0d;
+                        mouseX = 0;
+                    }
+                }
+            }
+        }
 
         prevMouseX = mouseX;
         prevMouseY = mouseY;
@@ -131,6 +384,20 @@ public class GuiMachine extends GuiContainer {
 
             prevMouseX = mouseX;
             prevMouseY = mouseY;
+        }
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+
+        if(activeTab == 1) {
+            int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+            int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+
+            if (this.guiWhiteList != null) {
+                this.guiWhiteList.handleMouseInput(mouseX, mouseY);
+            }
         }
     }
 
@@ -165,6 +432,10 @@ public class GuiMachine extends GuiContainer {
 
         // Center on screen
         GlStateManager.translate(width / 2, height / 2, 180.0f);
+
+        double scaleToWindow = 1.0d / GuiMachineData.machineSize;
+        scaleToWindow *= 8.0d;
+        GlStateManager.scale(scaleToWindow, scaleToWindow, scaleToWindow);
 
         // Increase size a bit more at the end
         GlStateManager.scale(2.0f, 2.0f, 2.0f);
@@ -203,6 +474,9 @@ public class GuiMachine extends GuiContainer {
             this.renderEntities();
             GlStateManager.enableBlend();
         }
+
+        textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();

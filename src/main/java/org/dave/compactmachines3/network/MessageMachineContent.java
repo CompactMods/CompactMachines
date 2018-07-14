@@ -14,6 +14,8 @@ import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
+import java.util.*;
+
 public class MessageMachineContent implements IMessage {
     protected NBTTagCompound data;
     protected int machineSize;
@@ -22,6 +24,8 @@ public class MessageMachineContent implements IMessage {
     protected DimensionBlockPos machinePos;
     protected String owner;
     protected String customName;
+    protected Set<String> playerWhiteList;
+    protected boolean locked;
 
     public MessageMachineContent(int coords) {
         this.coords = coords;
@@ -39,6 +43,8 @@ public class MessageMachineContent implements IMessage {
                 TileEntityMachine machine = (TileEntityMachine) te;
                 owner = machine.getOwnerName();
                 customName = machine.getCustomName();
+                playerWhiteList = machine.getWhiteList();
+                locked = machine.isLocked();
             }
         }
     }
@@ -80,6 +86,15 @@ public class MessageMachineContent implements IMessage {
             machinePos = new DimensionBlockPos(buf);
             owner = ByteBufUtils.readUTF8String(buf);
             customName = ByteBufUtils.readUTF8String(buf);
+            locked = buf.readBoolean();
+        }
+
+        int whiteListSize = buf.readInt();
+        playerWhiteList = new HashSet<>();
+        for(int i = 0; i < whiteListSize; i++) {
+            String name = ByteBufUtils.readUTF8String(buf);
+
+            playerWhiteList.add(name);
         }
     }
 
@@ -95,8 +110,18 @@ public class MessageMachineContent implements IMessage {
             String customName = this.customName == null ? "" : this.customName;
             ByteBufUtils.writeUTF8String(buf, owner);
             ByteBufUtils.writeUTF8String(buf, customName);
+            buf.writeBoolean(locked);
         } else {
             buf.writeBoolean(false);
+        }
+
+        if(playerWhiteList == null) {
+            buf.writeInt(0);
+        } else {
+            buf.writeInt(playerWhiteList.size());
+            for (String playerName : playerWhiteList) {
+                ByteBufUtils.writeUTF8String(buf, playerName);
+            }
         }
     }
 }

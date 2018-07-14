@@ -39,6 +39,7 @@ public class MessageRequestMachineAction implements IMessage {
         REFRESH,
         GIVE_ITEM,
         TELEPORT_INSIDE,
-        TELEPORT_OUTSIDE
+        TELEPORT_OUTSIDE,
+        TOGGLE_LOCKED
     }
 }

@@ -1,10 +1,14 @@
 package org.dave.compactmachines3.tile;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -13,11 +17,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
@@ -25,8 +31,7 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.SpawnTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
     public int coords = -1;
@@ -37,9 +42,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     protected String customName = "";
     protected UUID owner;
     protected String schema;
+    protected boolean locked = false;
+    protected Set<String> playerWhiteList;
 
     public TileEntityMachine() {
         super();
+        playerWhiteList = new HashSet<>();
     }
 
     public EnumMachineSize getSize() {
@@ -54,12 +62,32 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         super.readFromNBT(compound);
         coords = compound.getInteger("coords");
         customName = compound.getString("CustomName");
-        owner = compound.getUniqueId("owner");
+        if(compound.hasKey("ownerLeast") && compound.hasKey("ownerMost")) {
+            owner = compound.getUniqueId("owner");
+        } else {
+            owner = null;
+        }
+
         nextSpawnTick = compound.getLong("spawntick");
         if(compound.hasKey("schema")) {
             schema = compound.getString("schema");
         } else {
             schema = null;
+        }
+
+        if(compound.hasKey("locked")) {
+            locked = compound.getBoolean("locked");
+        } else {
+            locked = false;
+        }
+
+        playerWhiteList = new HashSet<>();
+        if(compound.hasKey("playerWhiteList")) {
+            NBTTagList list = compound.getTagList("playerWhiteList", Constants.NBT.TAG_STRING);
+            for(NBTBase nameTagBase : list) {
+                NBTTagString nameTag = (NBTTagString) nameTagBase;
+                playerWhiteList.add(nameTag.getString());
+            }
         }
     }
 
@@ -78,7 +106,85 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             compound.setString("schema", schema);
         }
 
+        compound.setBoolean("locked", locked);
+
+        if(playerWhiteList.size() > 0) {
+            NBTTagList list = new NBTTagList();
+            for(String playerName : playerWhiteList) {
+                NBTTagString nameTag = new NBTTagString(playerName);
+                list.appendTag(nameTag);
+            }
+
+            compound.setTag("playerWhiteList", list);
+        }
+
         return compound;
+    }
+
+    public boolean isAllowedToEnter(EntityPlayer player) {
+        if(!isLocked()) {
+            return true;
+        }
+
+        if(!hasOwner()) {
+            return true;
+        }
+
+        if(player.getUniqueID().equals(owner)) {
+            return true;
+        }
+
+        if(isOnWhiteList(player)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOnWhiteList(EntityPlayer player) {
+        return playerWhiteList.contains(player.getName());
+    }
+
+    public boolean isOnWhiteList(String name) {
+        return playerWhiteList.contains(name);
+    }
+
+    public void addToWhiteList(EntityPlayer player) {
+        playerWhiteList.add(player.getName());
+    }
+
+    public void addToWhiteList(String playerName) {
+        playerWhiteList.add(playerName);
+    }
+
+    public void removeFromWhiteList(EntityPlayer player) {
+        playerWhiteList.remove(player.getName());
+    }
+
+    public void removeFromWhiteList(String playerName) {
+        playerWhiteList.remove(playerName);
+    }
+
+    public Set<String> getWhiteList() {
+        HashSet<String> result = new HashSet<>();
+        if(world.isRemote) {
+            Logz.warn("The TileEntityMachine#getWhiteList method should not be called on the client. Please report this to the mod author here: https://github.com/thraaawn/CompactMachines/issues/ Thanks!");
+            return result;
+        }
+
+        for(String name : playerWhiteList) {
+            result.add(name);
+        }
+
+        return result;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void toggleLocked() {
+        this.locked = !this.locked;
     }
 
     public boolean hasNewSchema() {
@@ -106,8 +212,13 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public String getOwnerName() {
-        // TODO: When the save game is transferred to another server/client, the profile of the owner might be null -> null pointer exception
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(getOwner()).getName();
+        GameProfile profile = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(getOwner());
+        if(profile == null) {
+            Logz.warn("Profile not found for owner: %s", getOwner());
+            return "Unknown";
+        }
+
+        return profile.getName();
     }
 
     public boolean hasOwner() {
