@@ -43,10 +43,6 @@ public class TeleportationTools {
         if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
             machine.setOwner(player);
             machine.markDirty();
-
-            if(world.getWorldType() instanceof SkyWorldType) {
-                SkyWorldSavedData.instance.addToHubMachineOwners(player);
-            }
         }
 
         return true;
