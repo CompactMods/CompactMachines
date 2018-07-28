@@ -33,9 +33,9 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.capability.PlayerShrinkingCapability;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
-import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
@@ -312,41 +312,10 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
-        if(machine.isInsideItself()) {
-            return true;
-        }
-
         ItemStack playerStack = player.getHeldItemMainhand();
-        if(!playerStack.isEmpty() && machine.isAllowedToEnter(player)) {
-            Item playerItem = playerStack.getItem();
-
-            // TODO: Convert the ability to teleport into a machine into an itemstack capability
-            if(playerItem instanceof ItemPersonalShrinkingDevice) {
-                // TODO: Clean up, this belongs into a separate class
-                if(machine.coords == -1) {
-                    StructureTools.generateCubeForMachine(machine);
-
-                    double[] destination = new double[] {
-                            machine.coords * 1024 + 0.5 + machine.getSize().getDimension() / 2,
-                            42,
-                            0.5 + machine.getSize().getDimension() / 2
-                    };
-
-                    WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, destination);
-                }
-
-                WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
-
-                TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
-                StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
-
-                if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
-                    machine.setOwner(player);
-                    machine.markDirty();
-                }
-
-                return true;
-            }
+        if(PlayerShrinkingCapability.isShrinkingDevice(playerStack)) {
+            TeleportationTools.tryToEnterMachine(player, machine);
+            return true;
         }
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());

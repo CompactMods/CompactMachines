@@ -18,7 +18,7 @@ public class GuiMachineAdmin extends GuiMachine {
     private GuiButton buttonTeleportInside;
 
     private List<GuiButton> adminButtons;
-    private int buttonIdOffset = 2;
+    private int buttonIdOffset = 3;
 
     @Override
     public void initGui() {

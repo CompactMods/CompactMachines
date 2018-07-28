@@ -9,10 +9,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import org.dave.compactmachines3.capability.PlayerShrinkingCapability;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
 import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
+import org.dave.compactmachines3.misc.CapabilityEventHandler;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
@@ -50,6 +52,7 @@ public class CompactMachines3
         MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
         MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
         MinecraftForge.EVENT_BUS.register(BakeryHandler.class);
+        MinecraftForge.EVENT_BUS.register(CapabilityEventHandler.class);
 
         // Insist on keeping an already registered dimension by registering in pre-registerDimension.
         DimensionTools.registerDimension();
@@ -73,6 +76,7 @@ public class CompactMachines3
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        PlayerShrinkingCapability.init();
         CapabilityNullHandlerRegistry.registerNullHandlers();
         ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
 

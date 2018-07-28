@@ -6,6 +6,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
@@ -18,6 +20,38 @@ import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
 public class TeleportationTools {
+    public static boolean tryToEnterMachine(EntityPlayer player, TileEntityMachine machine) {
+        BlockPos pos = machine.getPos();
+        World world = machine.getWorld();
+
+        if(machine.isInsideItself()) {
+            return false;
+        }
+
+        if(!machine.isAllowedToEnter(player)) {
+            player.sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.not_permitted_to_enter"), true);
+            return false;
+        }
+
+        machine.initStructure();
+
+        WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
+
+        TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
+        StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
+
+        if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
+            machine.setOwner(player);
+            machine.markDirty();
+
+            if(world.getWorldType() instanceof SkyWorldType) {
+                SkyWorldSavedData.instance.addToHubMachineOwners(player);
+            }
+        }
+
+        return true;
+    }
+
     public static int getLastKnownCoords(EntityPlayer player) {
         NBTTagCompound playerNBT = player.getEntityData();
         if(!playerNBT.hasKey("compactmachines3-coordHistory")) {

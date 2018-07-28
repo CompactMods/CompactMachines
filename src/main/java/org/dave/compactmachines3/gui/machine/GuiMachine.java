@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -24,8 +23,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.capability.PlayerShrinkingCapability;
 import org.dave.compactmachines3.gui.GUIHelper;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.init.Itemss;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.MessagePlayerWhiteListToggle;
@@ -57,6 +58,7 @@ public class GuiMachine extends GuiContainer {
     private GuiMachinePlayerWhitelist guiWhiteList;
     private GuiButton guiWhiteListAddButton;
     private GuiCheckBox guiMachineLockedButton;
+    private GuiButton guiEnterButton;
 
     int glListId = -1;
     int activeTab = 0;  // TODO: This should not be an integer, but rather a GuiTab object or something like that
@@ -67,10 +69,9 @@ public class GuiMachine extends GuiContainer {
 
     private boolean shouldShowTabs() {
         boolean isOwner = mc.player.getName().equals(GuiMachineData.owner);
-        boolean isCreative = mc.player.isCreative();
 
         // TODO: Add server-side operator & isCreative check
-        return isOwner || isCreative;
+        return isOwner;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class GuiMachine extends GuiContainer {
         super.initGui();
 
         this.bgImage = new ResourceLocation("minecraft", "textures/gui/container/crafting_table.png");
-        this.tabIcons =  new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
+        this.tabIcons = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
 
         int offsetX = (int)((this.width - this.windowWidth) / 2.0f);
         int offsetY = (int)((this.height - this.windowHeight) / 2.0f);
@@ -98,6 +99,9 @@ public class GuiMachine extends GuiContainer {
                 20,
                 windowWidth - 10,
                 windowHeight);
+
+        this.guiEnterButton = new GuiButton(2, offsetX+5+windowWidth-30, offsetY+windowHeight-25, 20, 20, "");
+        this.buttonList.add(this.guiEnterButton);
     }
 
     @Override
@@ -157,6 +161,7 @@ public class GuiMachine extends GuiContainer {
             renderChunk();
 
             drawOwner(partialTicks, mouseX, mouseY);
+            drawEnterButton(partialTicks, mouseX, mouseY);
         } else {
             // TODO: Draw unused screen and help information; account for future updates with loot compact machines
         }
@@ -164,6 +169,30 @@ public class GuiMachine extends GuiContainer {
         if(activeTab == 1) {
             drawWhitelist(partialTicks, mouseX, mouseY);
         }
+    }
+
+    private void drawEnterButton(float partialTicks, int mouseX, int mouseY) {
+        if(!PlayerShrinkingCapability.hasShrinkingDeviceInInventory(mc.player)) {
+            return;
+        }
+
+        if(GuiMachineData.coords == -1) {
+            return;
+        }
+
+        if(!GuiMachineData.isAllowedToEnter(mc.player)) {
+            return;
+        }
+
+        guiEnterButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+
+
+        ItemStack itemstack = new ItemStack(Itemss.psd);
+        GlStateManager.pushAttrib();
+        RenderHelper.enableGUIStandardItemLighting();
+        this.itemRender.renderItemAndEffectIntoGUI(itemstack, guiEnterButton.x+2, guiEnterButton.y+1);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.popAttrib();
     }
 
     protected void drawOwner(float partialTicks, int mouseX, int mouseY) {
@@ -298,6 +327,10 @@ public class GuiMachine extends GuiContainer {
         if(button.id == 1) {
             PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TOGGLE_LOCKED));
         }
+
+        if(button.id == 2) {
+            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TRY_TO_ENTER));
+        }
     }
 
     @Override
@@ -338,6 +371,16 @@ public class GuiMachine extends GuiContainer {
             if(this.guiMachineLockedButton.mousePressed(this.mc, mouseX, mouseY)) {
                 this.guiMachineLockedButton.playPressSound(this.mc.getSoundHandler());
                 this.actionPerformed(this.guiMachineLockedButton);
+            }
+        } else if(activeTab == 0 && mouseButton == 0) {
+            boolean mousePressed = this.guiEnterButton.mousePressed(this.mc, mouseX, mouseY);
+            boolean hasDevice = PlayerShrinkingCapability.hasShrinkingDeviceInInventory(mc.player);
+            boolean validCoords = GuiMachineData.coords != -1;
+            boolean isAllowedToEnter = GuiMachineData.isAllowedToEnter(mc.player);
+
+            if(mousePressed && hasDevice && validCoords && isAllowedToEnter) {
+                this.guiEnterButton.playPressSound(this.mc.getSoundHandler());
+                this.actionPerformed(this.guiEnterButton);
             }
         }
 

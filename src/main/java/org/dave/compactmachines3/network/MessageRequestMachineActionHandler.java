@@ -24,13 +24,16 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
     @Override
     public MessageMachineContent onMessage(MessageRequestMachineAction message, MessageContext ctx) {
         int coords = message.coords;
-        if(message.coords < 0) {
-            coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;
-        }
-        if(message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
-            coords = 0;
+        if(message.action == MessageRequestMachineAction.Action.REFRESH) {
+            if(message.coords < 0) {
+                coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;
+            }
+            if(message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+                coords = 0;
+            }
         }
 
+        final boolean[] updateMachineContent = {true};
         int finalCoords = coords;
         EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
         if(message.action == MessageRequestMachineAction.Action.GIVE_ITEM) {
@@ -74,9 +77,23 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
             });
         }
 
-        serverPlayer.getServerWorld().addScheduledTask(() -> {
-            PackageHandler.instance.sendTo(new MessageMachineContent(finalCoords), serverPlayer);
-        });
+        if(message.action == MessageRequestMachineAction.Action.TRY_TO_ENTER) {
+            serverPlayer.getServerWorld().addScheduledTask(() -> {
+                DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(finalCoords);
+                TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
+                if (te != null && te instanceof TileEntityMachine) {
+                    TileEntityMachine machine = (TileEntityMachine) te;
+                    TeleportationTools.tryToEnterMachine(serverPlayer, machine);
+                    updateMachineContent[0] = false;
+                }
+            });
+        }
+
+        if(updateMachineContent[0]) {
+            serverPlayer.getServerWorld().addScheduledTask(() -> {
+                PackageHandler.instance.sendTo(new MessageMachineContent(finalCoords), serverPlayer);
+            });
+        }
 
         return null;
     }

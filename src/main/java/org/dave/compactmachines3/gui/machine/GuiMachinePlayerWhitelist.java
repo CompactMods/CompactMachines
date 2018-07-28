@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraftforge.fml.client.GuiScrollingList;
 import org.dave.compactmachines3.network.MessagePlayerWhiteListToggle;
 import org.dave.compactmachines3.network.PackageHandler;
-import org.dave.compactmachines3.utility.Logz;
 
 public class GuiMachinePlayerWhitelist extends GuiScrollingList {
     private final GuiContainer parent;

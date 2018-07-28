@@ -121,6 +121,22 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         return compound;
     }
 
+    public void initStructure() {
+        if(this.coords != -1) {
+            return;
+        }
+
+        StructureTools.generateCubeForMachine(this);
+
+        double[] destination = new double[] {
+                this.coords * 1024 + 0.5 + this.getSize().getDimension() / 2,
+                42,
+                0.5 + this.getSize().getDimension() / 2
+        };
+
+        WorldSavedDataMachines.INSTANCE.addSpawnPoint(this.coords, destination);
+    }
+
     public boolean isAllowedToEnter(EntityPlayer player) {
         if(!isLocked()) {
             return true;

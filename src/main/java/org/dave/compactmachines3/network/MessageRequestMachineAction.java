@@ -40,6 +40,7 @@ public class MessageRequestMachineAction implements IMessage {
         GIVE_ITEM,
         TELEPORT_INSIDE,
         TELEPORT_OUTSIDE,
-        TOGGLE_LOCKED
+        TOGGLE_LOCKED,
+        TRY_TO_ENTER
     }
 }
