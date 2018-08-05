@@ -23,7 +23,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.capability.PlayerShrinkingCapability;
 import org.dave.compactmachines3.gui.GUIHelper;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.init.Itemss;
@@ -34,6 +33,7 @@ import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiMachine extends GuiContainer {
-    protected ResourceLocation bgImage;
     protected ResourceLocation tabIcons;
 
     private int windowWidth = 200;
@@ -78,7 +77,6 @@ public class GuiMachine extends GuiContainer {
     public void initGui() {
         super.initGui();
 
-        this.bgImage = new ResourceLocation("minecraft", "textures/gui/container/crafting_table.png");
         this.tabIcons = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
 
         int offsetX = (int)((this.width - this.windowWidth) / 2.0f);
@@ -158,7 +156,7 @@ public class GuiMachine extends GuiContainer {
         }
 
         if(GuiMachineData.chunk != null && activeTab == 0) {
-            renderChunk();
+            renderChunk(partialTicks);
 
             drawOwner(partialTicks, mouseX, mouseY);
             drawEnterButton(partialTicks, mouseX, mouseY);
@@ -172,7 +170,7 @@ public class GuiMachine extends GuiContainer {
     }
 
     private void drawEnterButton(float partialTicks, int mouseX, int mouseY) {
-        if(!PlayerShrinkingCapability.hasShrinkingDeviceInInventory(mc.player)) {
+        if(!ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(mc.player)) {
             return;
         }
 
@@ -229,7 +227,7 @@ public class GuiMachine extends GuiContainer {
         float offsetY = (this.height - this.windowHeight) / 2.0f;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(offsetX-28, offsetY, 0);
+        GlStateManager.translate(offsetX-28, offsetY-1, 0);
 
         mc.getTextureManager().bindTexture(tabIcons);
 
@@ -266,7 +264,7 @@ public class GuiMachine extends GuiContainer {
 
     protected void drawWindow(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1f, 1f, 1f, 1f);
-        mc.renderEngine.bindTexture(bgImage);
+        mc.renderEngine.bindTexture(tabIcons);
 
         float offsetX = (this.width - this.windowWidth) / 2.0f;
         float offsetY = (this.height - this.windowHeight) / 2.0f;
@@ -274,31 +272,34 @@ public class GuiMachine extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate(offsetX, offsetY, 0);
 
+        int texOffsetY = 12;
+        int texOffsetX = 64;
+
         // Top Left corner
-        drawTexturedModalRect(0, 0, 0, 0, 4, 4);
+        drawTexturedModalRect(0, 0, texOffsetX, texOffsetY, 4, 4);
 
         // Top right corner
-        drawTexturedModalRect(this.windowWidth - 4, 0, 172, 0, 4, 4);
+        drawTexturedModalRect(this.windowWidth - 4, 0, texOffsetX + 4 + 64, texOffsetY, 4, 4);
 
         // Bottom Left corner
-        drawTexturedModalRect(0, this.windowHeight - 4, 0, 162, 4, 4);
+        drawTexturedModalRect(0, this.windowHeight - 4, texOffsetX, texOffsetY + 4 + 64, 4, 4);
 
         // Bottom Right corner
-        drawTexturedModalRect(this.windowWidth - 4, this.windowHeight - 4, 172, 162, 4, 4);
+        drawTexturedModalRect(this.windowWidth - 4, this.windowHeight - 4, texOffsetX + 4 + 64, texOffsetY + 4 + 64, 4, 4);
 
         // Top edge
-        GUIHelper.drawStretchedTexture(4, 0, this.windowWidth - 8, 4, 4, 0, 4, 4);
+        GUIHelper.drawStretchedTexture(4, 0, this.windowWidth - 8, 4, texOffsetX + 4, texOffsetY, 64, 4);
 
         // Bottom edge
-        GUIHelper.drawStretchedTexture(4, this.windowHeight - 4, this.windowWidth - 8, 4, 4, 162, 4, 4);
+        GUIHelper.drawStretchedTexture(4, this.windowHeight - 4, this.windowWidth - 8, 4, texOffsetX + 4, texOffsetY + 4 + 64, 64, 4);
 
         // Left edge
-        GUIHelper.drawStretchedTexture(0, 4, 4, this.windowHeight - 8, 0, 4, 4, 4);
+        GUIHelper.drawStretchedTexture(0, 4, 4, this.windowHeight - 8, texOffsetX, texOffsetY+4, 4, 64);
 
         // Right edge
-        GUIHelper.drawStretchedTexture(this.windowWidth - 4, 4, 4, this.windowHeight - 8, 172, 4, 4, 4);
+        GUIHelper.drawStretchedTexture(this.windowWidth - 4, 4, 4, this.windowHeight - 8, texOffsetX + 64 + 4, texOffsetY + 3, 4, 64);
 
-        GUIHelper.drawStretchedTexture(4, 4, this.windowWidth - 8, this.windowHeight - 8, 4, 4, 1, 1);
+        GUIHelper.drawStretchedTexture(4, 4, this.windowWidth - 8, this.windowHeight - 8, texOffsetX + 4, texOffsetY+4, 64, 64);
 
         GlStateManager.popMatrix();
     }
@@ -374,7 +375,7 @@ public class GuiMachine extends GuiContainer {
             }
         } else if(activeTab == 0 && mouseButton == 0) {
             boolean mousePressed = this.guiEnterButton.mousePressed(this.mc, mouseX, mouseY);
-            boolean hasDevice = PlayerShrinkingCapability.hasShrinkingDeviceInInventory(mc.player);
+            boolean hasDevice = ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(mc.player);
             boolean validCoords = GuiMachineData.coords != -1;
             boolean isAllowedToEnter = GuiMachineData.isAllowedToEnter(mc.player);
 
@@ -444,7 +445,7 @@ public class GuiMachine extends GuiContainer {
         }
     }
 
-    public void renderChunk() {
+    public void renderChunk(float partialTicks) {
         // Init GlStateManager
         TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
         textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -492,6 +493,13 @@ public class GuiMachine extends GuiContainer {
         GlStateManager.rotate(180.0f, 0.0f, 0.0f, -1.0f);
 
         // Auto rotate
+        /*
+        int rotationTime = 120; // 6 seconds to rotate one time
+        int rotationTicks = (int) (Minecraft.getMinecraft().world.getWorldTime() % rotationTime * 8);
+
+        float percent = ((rotationTicks / 8.0f) + partialTicks) / rotationTime;
+        */
+
         GlStateManager.rotate(rotateX == 0.0d ? RenderTickCounter.renderTicks * 45.0f / 128.0f : (float)rotateX, 0.0f, 1.0f, 0.0f);
 
         // Get rid of the wall+floor

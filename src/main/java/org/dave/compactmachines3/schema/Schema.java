@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Schema {
     private String name;
+    private String description;
     private List<BlockInformation> blocks;
     private EnumMachineSize size;
     private double[] spawnPosition;
@@ -16,6 +17,14 @@ public class Schema {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description != null ? description : "";
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<BlockInformation> getBlocks() {

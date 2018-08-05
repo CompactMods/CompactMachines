@@ -9,6 +9,7 @@ import org.dave.compactmachines3.utility.SerializationHelper;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,10 @@ public class SchemaRegistry {
 
     public Set<String> getSchemaNames() {
         return schemas.keySet();
+    }
+
+    public Collection<Schema> getSchemas() {
+        return schemas.values();
     }
 
     private void loadSchemas() {

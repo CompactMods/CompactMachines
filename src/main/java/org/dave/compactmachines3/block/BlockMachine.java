@@ -33,7 +33,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.capability.PlayerShrinkingCapability;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
@@ -44,6 +43,7 @@ import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.tile.TileEntityRedstoneTunnel;
 import org.dave.compactmachines3.tile.TileEntityTunnel;
+import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
@@ -267,6 +267,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return;
         }
 
+        // TODO: Allow storing of schemas in machines
         if(stack.hasTagCompound()) {
             if(stack.getTagCompound().hasKey("coords")) {
                 int coords = stack.getTagCompound().getInteger("coords");
@@ -313,7 +314,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
         TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
         ItemStack playerStack = player.getHeldItemMainhand();
-        if(PlayerShrinkingCapability.isShrinkingDevice(playerStack)) {
+        if(ShrinkingDeviceUtils.isShrinkingDevice(playerStack)) {
             TeleportationTools.tryToEnterMachine(player, machine);
             return true;
         }

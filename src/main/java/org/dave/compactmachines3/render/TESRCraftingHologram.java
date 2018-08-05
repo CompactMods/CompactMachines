@@ -100,6 +100,10 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
         GlStateManager.disableBlend();
         RecipeRenderManager.instance.renderRecipe(recipe, partialTicks);
 
+        textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+
+
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
     }
