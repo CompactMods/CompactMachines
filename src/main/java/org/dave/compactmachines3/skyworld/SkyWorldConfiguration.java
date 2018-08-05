@@ -12,13 +12,11 @@ import java.util.Collection;
 public class SkyWorldConfiguration {
     public Schema schema;
     public boolean startLocked;
-    public boolean voidDimensions;
 
     public SkyWorldConfiguration() {
         Collection<Schema> allSchemas = SchemaRegistry.instance.getSchemas();
         this.schema = allSchemas.stream().findFirst().orElse(null);
         startLocked = true;
-        voidDimensions = false;
     }
 
     public SkyWorldConfiguration(String chunkProviderSettingsJson) {
@@ -42,10 +40,6 @@ public class SkyWorldConfiguration {
                 this.schema = SchemaRegistry.instance.getSchema(schemaName);
             }
         }
-
-        if(rootObject.has("voidDimensions")) {
-            this.voidDimensions = rootObject.get("voidDimensions").getAsBoolean();
-        }
     }
 
     public String getAsJsonString() {
@@ -56,7 +50,6 @@ public class SkyWorldConfiguration {
         }
 
         rootObject.add("startLocked", new JsonPrimitive(startLocked));
-        rootObject.add("voidDimensions", new JsonPrimitive(voidDimensions));
 
         return rootObject.toString();
     }
