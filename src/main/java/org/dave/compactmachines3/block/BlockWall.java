@@ -19,7 +19,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.init.Blockss;
-import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.item.ItemRedstoneTunnelTool;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
