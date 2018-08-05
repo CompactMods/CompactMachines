@@ -2,16 +2,13 @@ package org.dave.compactmachines3;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
-import org.dave.compactmachines3.compat.YUNoMakeGoodMap;
 import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
@@ -79,10 +76,6 @@ public class CompactMachines3
 
         MultiblockRecipes.init();
         SchemaRegistry.init();
-
-        if(Loader.isModLoaded("yunomakegoodmap")) {
-            YUNoMakeGoodMap.init();
-        }
     }
 
     @EventHandler

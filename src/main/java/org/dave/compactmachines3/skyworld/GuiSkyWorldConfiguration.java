@@ -18,7 +18,6 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
     private SkyWorldConfiguration config;
 
     private GuiCheckBox lockedButton;
-    private GuiCheckBox voidDimsButton;
     private GuiButton closeButton;
     private SchemaScrollingList guiSchemaList;
 
@@ -44,10 +43,6 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
         this.buttonList.add(lockedButton);
         yOffset += 14;
 
-        //voidDimsButton = new GuiCheckBox(1, 8, yOffset, I18n.format("gui.compactmachines3.compactsky.configuration.voidDimensions"), config.voidDimensions);
-        //this.buttonList.add(voidDimsButton);
-        //yOffset += 14;
-
         int listHeight = this.height - 52 - yOffset;
         guiSchemaList = new SchemaScrollingList(this, 8, yOffset, 200, listHeight, 20);
 
@@ -61,9 +56,6 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
         super.actionPerformed(button);
         if(button.id == 0) {
             this.config.startLocked = !this.config.startLocked;
-        }
-        if(button.id == 1) {
-            this.config.voidDimensions = !this.config.voidDimensions;
         }
 
         parent.chunkProviderSettingsJson = this.config.getAsJsonString();
