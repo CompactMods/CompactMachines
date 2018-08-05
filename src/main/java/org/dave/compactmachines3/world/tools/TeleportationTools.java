@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.schema.SchemaRegistry;
+import org.dave.compactmachines3.skyworld.SkyWorldSavedData;
+import org.dave.compactmachines3.skyworld.SkyWorldType;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.utility.Logz;
@@ -33,6 +35,16 @@ public class TeleportationTools {
             return false;
         }
 
+        // Logz.info("Trying to enter machine. coords=%d, owner=%s, world is skyworld=%s", machine.coords, machine.getOwner(), world.getWorldType() instanceof SkyWorldType);
+        // Prevent players from claiming more than one machine in the SkyWorld Machine Hub
+        if(!machine.hasOwner() && world.getWorldType() instanceof SkyWorldType) {
+            boolean playerHasHubMachine = SkyWorldSavedData.instance.isHubMachineOwner(player);
+            if(playerHasHubMachine) {
+                player.sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.skyworld.only_one_machine_claim"), true);
+                return false;
+            }
+        }
+
         machine.initStructure();
 
         WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
@@ -43,6 +55,10 @@ public class TeleportationTools {
         if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
             machine.setOwner(player);
             machine.markDirty();
+
+            if(world.getWorldType() instanceof SkyWorldType) {
+                SkyWorldSavedData.instance.addToHubMachineOwners(player);
+            }
         }
 
         return true;

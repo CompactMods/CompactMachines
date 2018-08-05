@@ -22,6 +22,10 @@ public class SchemaSerializer implements JsonSerializer<Schema>, JsonDeserialize
         result.setBlocks(context.deserialize(jsonRoot.get("blocks").getAsJsonArray(), type));
         result.setSize(size);
 
+        if(jsonRoot.has("description")) {
+            result.setDescription(jsonRoot.get("description").getAsString());
+        }
+
         JsonArray spawnPos = jsonRoot.getAsJsonArray("spawn");
         double[] spawnPosition = new double[] {
                 spawnPos.get(0).getAsDouble(),
@@ -37,6 +41,7 @@ public class SchemaSerializer implements JsonSerializer<Schema>, JsonDeserialize
     public JsonElement serialize(Schema src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
         root.addProperty("name", src.getName());
+        root.addProperty("description", src.getDescription());
         root.addProperty("size", src.getSize().getMeta());
         root.add("blocks", context.serialize(src.getBlocks()));
 

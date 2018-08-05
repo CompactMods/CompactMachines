@@ -203,6 +203,10 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         this.locked = !this.locked;
     }
 
+    public void setLocked(boolean state) {
+        this.locked = state;
+    }
+
     public boolean hasNewSchema() {
         return schema != null && schema.length() > 0;
     }
