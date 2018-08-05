@@ -234,11 +234,16 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         if(te.hasOwner()) {
             compound.setUniqueId("owner", te.getOwner());
         }
+        if(te.hasNewSchema()) {
+            compound.setString("schema", te.getSchemaName());
+        }
         stack.setTagCompound(compound);
 
         if(te.getCustomName().length() > 0) {
             stack.setStackDisplayName(te.getCustomName());
         }
+
+
 
         EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, stack);
         entityItem.lifespan = 1200;
@@ -278,6 +283,10 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                         StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
                     }
                 }
+            }
+
+            if(stack.getTagCompound().hasKey("schema")) {
+                tileEntityMachine.setSchema(stack.getTagCompound().getString("schema"));
             }
 
             if(stack.hasDisplayName()) {
