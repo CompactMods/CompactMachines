@@ -7,9 +7,33 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.dave.compactmachines3.utility.Logz;
 
 public class SkyWorldEvents {
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        World world = event.player.world;
+        if(world.isRemote || !(world instanceof WorldServer)) {
+            return;
+        }
+
+        if(event.player.isCreative() || event.player.isSpectator()) {
+            return;
+        }
+
+        WorldServer worldServer = (WorldServer)world;
+        if(!(worldServer.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator)) {
+            return;
+        }
+
+        if(event.player.posY > 49.0f || event.player.posY < 39.5f) {
+            BlockPos spawnPoint = worldServer.getSpawnPoint();
+            event.player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 0.2d, spawnPoint.getZ() + 0.5d);
+            return;
+        }
+    }
+
     @SubscribeEvent
     public static void createSpawnPoint(WorldEvent.CreateSpawnPosition event) {
         World world = event.getWorld();
