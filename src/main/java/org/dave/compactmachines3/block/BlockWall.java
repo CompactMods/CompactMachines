@@ -25,6 +25,7 @@ import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.CubeTools;
+import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;
@@ -66,19 +67,19 @@ public class BlockWall extends BlockProtected {
         ItemStack playerStack = player.getHeldItemMainhand();
 
         if(playerStack.isEmpty()) {
-            return false;
+            return true;
         }
 
         if(player.isSneaking()) {
             return false;
         }
 
-        if(playerStack.getItem() instanceof ItemPersonalShrinkingDevice) {
+        if(ShrinkingDeviceUtils.isShrinkingDevice(playerStack)) {
             return false;
         }
 
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-            return true;
+            return false;
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
