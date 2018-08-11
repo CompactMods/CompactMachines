@@ -21,11 +21,13 @@ public class SkyWorldSavedData extends WorldSavedData {
     public static SkyWorldSavedData instance;
 
     private Set<UUID> hubMachineOwners;
+    private Set<UUID> startingInventoryReceivers;
 
     public SkyWorldSavedData(String name) {
         super(name);
 
         hubMachineOwners = new HashSet<>();
+        startingInventoryReceivers = new HashSet<>();
     }
 
     public boolean isHubMachineOwner(EntityPlayer player) {
@@ -34,6 +36,15 @@ public class SkyWorldSavedData extends WorldSavedData {
 
     public void addToHubMachineOwners(EntityPlayer player) {
         hubMachineOwners.add(player.getUniqueID());
+        this.markDirty();
+    }
+
+    public boolean hasReceivedStartingInventory(EntityPlayer player) {
+        return startingInventoryReceivers.contains(player.getUniqueID());
+    }
+
+    public void addToStartingInventoryReceiverSet(EntityPlayer player) {
+        startingInventoryReceivers.add(player.getUniqueID());
         this.markDirty();
     }
 
@@ -68,6 +79,17 @@ public class SkyWorldSavedData extends WorldSavedData {
                 hubMachineOwners.add(uuid);
             }
         }
+
+        startingInventoryReceivers.clear();
+        if(nbt.hasKey("startingInventoryReceivers")) {
+            NBTTagList tagList = nbt.getTagList("startingInventoryReceivers", Constants.NBT.TAG_COMPOUND);
+            for(NBTBase baseUUID : tagList) {
+                NBTTagCompound compoundUUID = (NBTTagCompound)baseUUID;
+                UUID uuid = compoundUUID.getUniqueId("");
+
+                startingInventoryReceivers.add(uuid);
+            }
+        }
     }
 
     @Override
@@ -80,6 +102,15 @@ public class SkyWorldSavedData extends WorldSavedData {
         }
 
         compound.setTag("hubMachineOwners", hubMachineOwnersTagList);
+
+        NBTTagList startingInventoryReceiversTagList = new NBTTagList();
+        for(UUID uuid : startingInventoryReceivers) {
+            NBTTagCompound compoundUUID = new NBTTagCompound();
+            compoundUUID.setUniqueId("", uuid);
+            startingInventoryReceiversTagList.appendTag(compoundUUID);
+        }
+
+        compound.setTag("startingInventoryReceivers", startingInventoryReceiversTagList);
 
         return compound;
     }
