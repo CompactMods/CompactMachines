@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.skyworld;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -9,13 +10,19 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.dave.compactmachines3.init.Itemss;
+import org.dave.compactmachines3.init.Triggerss;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public class SkyWorldEvents {
+    private static Set<UUID> alreadyTriggered = new HashSet<>();
+
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         World world = event.player.world;
@@ -25,6 +32,11 @@ public class SkyWorldEvents {
 
         if(event.player.isSpectator()) {
             return;
+        }
+
+        if(world.getWorldType() instanceof SkyWorldType && !alreadyTriggered.contains(event.player.getUniqueID())) {
+            Triggerss.IS_SKYWORLD.trigger((EntityPlayerMP) event.player);
+            alreadyTriggered.add(event.player.getUniqueID());
         }
 
         WorldServer worldServer = (WorldServer)world;

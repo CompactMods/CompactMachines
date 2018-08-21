@@ -1,5 +1,7 @@
 package org.dave.compactmachines3.proxy;
 
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -12,13 +14,18 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.*;
 import org.dave.compactmachines3.compat.CompatHandler;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.init.Triggerss;
 import org.dave.compactmachines3.item.*;
 import org.dave.compactmachines3.misc.SoundHandler;
 import org.dave.compactmachines3.tile.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
@@ -62,11 +69,23 @@ public class CommonProxy {
         event.getRegistry().register(new ItemRedstoneTunnelTool().setUnlocalizedName("redstonetunneltool").setRegistryName(CompactMachines3.MODID, "redstonetunneltool"));
     }
 
+    void registerTriggers() {
+        Method method;
+        try {
+            method = ReflectionHelper.findMethod(CriteriaTriggers.class, "register", "func_192118_a", ICriterionTrigger.class);
+            method.setAccessible(true);
+            method.invoke(null, Triggerss.IS_SKYWORLD);
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void preInit(FMLPreInitializationEvent event) {
         CompatHandler.registerCompat();
     }
 
     public void init(FMLInitializationEvent event) {
+        registerTriggers();
     }
 
     public void postInit(FMLPostInitializationEvent event) {
