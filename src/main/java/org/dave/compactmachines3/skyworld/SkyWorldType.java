@@ -7,6 +7,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SkyWorldType extends WorldType {
     public SkyWorldType() {
@@ -38,6 +40,7 @@ public class SkyWorldType extends WorldType {
         return true;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void onCustomizeButton(Minecraft mc, GuiCreateWorld guiCreateWorld) {
         mc.displayGuiScreen(new GuiSkyWorldConfiguration(guiCreateWorld));
