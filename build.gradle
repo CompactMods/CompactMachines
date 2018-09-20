@@ -61,7 +61,7 @@ repositories {
 
     maven {
         name = "refinedstorage"
-        url = "https://dl.bintray.com/raoulvdberge/dev/"
+        url = "https://repo.raoulvdberge.com/"
     }
 
     maven {
