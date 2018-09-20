@@ -67,7 +67,7 @@ public class PlayerEventHandler {
         event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.bed_position_set", new Object[0]), true);
         WorldSavedDataMachines.INSTANCE.setBedCoords(event.getEntityPlayer());
 
-        event.setResult(EntityPlayer.SleepResult.OK);
+        event.setResult(EntityPlayer.SleepResult.NOT_POSSIBLE_HERE);
     }
 
 
