@@ -36,22 +36,22 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().register(new BlockTunnel(Material.IRON).setUnlocalizedName("tunnel").setRegistryName(CompactMachines3.MODID, "tunnel"));
+        event.getRegistry().register(new BlockTunnel(Material.IRON).setTranslationKey("tunnel").setRegistryName(CompactMachines3.MODID, "tunnel"));
         GameRegistry.registerTileEntity(TileEntityTunnel.class, "TileEntityTunnel");
 
-        event.getRegistry().register(new BlockWall(Material.IRON).setUnlocalizedName("wall").setRegistryName(CompactMachines3.MODID, "wall"));
-        event.getRegistry().register(new BlockWallBreakable(Material.IRON).setUnlocalizedName("wallbreakable").setRegistryName(CompactMachines3.MODID, "wallbreakable"));
+        event.getRegistry().register(new BlockWall(Material.IRON).setTranslationKey("wall").setRegistryName(CompactMachines3.MODID, "wall"));
+        event.getRegistry().register(new BlockWallBreakable(Material.IRON).setTranslationKey("wallbreakable").setRegistryName(CompactMachines3.MODID, "wallbreakable"));
 
-        event.getRegistry().register(new BlockMachine(Material.IRON).setUnlocalizedName("machine").setRegistryName(CompactMachines3.MODID, "machine"));
+        event.getRegistry().register(new BlockMachine(Material.IRON).setTranslationKey("machine").setRegistryName(CompactMachines3.MODID, "machine"));
         GameRegistry.registerTileEntity(TileEntityMachine.class, "TileEntityMachine");
 
-        event.getRegistry().register(new BlockFieldProjector(Material.IRON).setUnlocalizedName("fieldprojector").setRegistryName(CompactMachines3.MODID, "fieldprojector"));
+        event.getRegistry().register(new BlockFieldProjector(Material.IRON).setTranslationKey("fieldprojector").setRegistryName(CompactMachines3.MODID, "fieldprojector"));
         GameRegistry.registerTileEntity(TileEntityFieldProjector.class, "TileEntityFieldProjector");
 
-        event.getRegistry().register(new BlockCraftingHologram(Material.IRON).setUnlocalizedName("craftinghologram").setRegistryName(CompactMachines3.MODID, "craftinghologram"));
+        event.getRegistry().register(new BlockCraftingHologram(Material.IRON).setTranslationKey("craftinghologram").setRegistryName(CompactMachines3.MODID, "craftinghologram"));
         GameRegistry.registerTileEntity(TileEntityCraftingHologram.class, "TileEntityCraftingHologram");
 
-        event.getRegistry().register(new BlockRedstoneTunnel(Material.IRON).setUnlocalizedName("redstonetunnel").setRegistryName(CompactMachines3.MODID, "redstonetunnel"));
+        event.getRegistry().register(new BlockRedstoneTunnel(Material.IRON).setTranslationKey("redstonetunnel").setRegistryName(CompactMachines3.MODID, "redstonetunnel"));
         GameRegistry.registerTileEntity(TileEntityRedstoneTunnel.class, "TileEntityRedstoneTunnel");
     }
 
@@ -64,9 +64,9 @@ public class CommonProxy {
         event.getRegistry().register(new ItemBlockMachine(Blockss.machine).setRegistryName(Blockss.machine.getRegistryName()));
         event.getRegistry().register(new ItemBlockFieldProjector(Blockss.fieldProjector).setRegistryName(Blockss.fieldProjector.getRegistryName()));
 
-        event.getRegistry().register(new ItemPersonalShrinkingDevice().setUnlocalizedName("psd").setRegistryName(CompactMachines3.MODID, "psd"));
-        event.getRegistry().register(new ItemTunnelTool().setUnlocalizedName("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool"));
-        event.getRegistry().register(new ItemRedstoneTunnelTool().setUnlocalizedName("redstonetunneltool").setRegistryName(CompactMachines3.MODID, "redstonetunneltool"));
+        event.getRegistry().register(new ItemPersonalShrinkingDevice().setTranslationKey("psd").setRegistryName(CompactMachines3.MODID, "psd"));
+        event.getRegistry().register(new ItemTunnelTool().setTranslationKey("tunneltool").setRegistryName(CompactMachines3.MODID, "tunneltool"));
+        event.getRegistry().register(new ItemRedstoneTunnelTool().setTranslationKey("redstonetunneltool").setRegistryName(CompactMachines3.MODID, "redstonetunneltool"));
     }
 
     void registerTriggers() {

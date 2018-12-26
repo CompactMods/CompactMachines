@@ -29,7 +29,7 @@ minecraft {
     version = "${config.minecraft.version}-${config.forge.version}"
     runDir = "run"
 
-    mappings = "snapshot_20170811"
+    mappings = "stable_39"
 }
 
 repositories {
@@ -72,7 +72,7 @@ repositories {
 
 dependencies {
     deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
-    runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
+    //runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
 
     deobfCompile "mcp.mobius.waila:Hwyla:${config.waila.version}:api"
 
@@ -91,9 +91,7 @@ dependencies {
         transitive = false
     }
 
-    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal") {
-        transitive = false
-    }
+    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal")
 
     // And some runtime-dependencies for the above two libraries.
     runtime("cofh:ThermalFoundation:${config.minecraft.version}-${config.cofh.thermalfoundation.version}:universal") {

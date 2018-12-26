@@ -29,10 +29,10 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.RotationTools;
 import org.dave.compactmachines3.network.MessageParticleBlockMarker;
 import org.dave.compactmachines3.network.PackageHandler;
@@ -51,7 +51,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
         this.setHardness(8.0F);
         this.setResistance(20.0F);
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
 
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setDefaultState(blockState.getBaseState());
@@ -137,7 +137,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
         if(invalidBlock != null) {
             IBlockState blockState = world.getBlockState(invalidBlock);
             Block block = blockState.getBlock();
-            String blockName = block.getUnlocalizedName();
+            String blockName = block.getTranslationKey();
 
             Item item = Item.getItemFromBlock(block);
             if(item != null) {
@@ -227,7 +227,7 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(FACING, EnumFacing.getFront(meta & 7));
+        return getDefaultState().withProperty(FACING, EnumFacing.byIndex(meta & 7));
     }
 
     @Override

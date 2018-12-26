@@ -34,7 +34,7 @@ public class MessageMachineContent implements IMessage {
         machinePos = data.getMachinePosition(coords);
         machineSize = data.machineSizes.getOrDefault(coords, EnumMachineSize.MAXIMUM).getDimension();
 
-        Chunk chunk = DimensionTools.getServerMachineWorld().getChunkFromBlockCoords(new BlockPos(coords * 1024, 40, 0));
+        Chunk chunk = DimensionTools.getServerMachineWorld().getChunk(new BlockPos(coords * 1024, 40, 0));
         this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
 
         if(machinePos != null) {

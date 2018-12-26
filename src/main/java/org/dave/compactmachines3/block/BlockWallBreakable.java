@@ -6,7 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.CompactMachines3;
 
 public class BlockWallBreakable extends BlockBase {
 
@@ -16,7 +16,7 @@ public class BlockWallBreakable extends BlockBase {
         this.setHardness(3.0f);
         this.setResistance(128.0f);
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
     }
 
     @SideOnly(Side.CLIENT)

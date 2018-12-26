@@ -382,7 +382,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
                 NBTTagCompound tag = tagList.getCompoundTagAt(i);
 
                 BlockPos position = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
-                EnumFacing side = EnumFacing.getFront(tag.getInteger("side"));
+                EnumFacing side = EnumFacing.byIndex(tag.getInteger("side"));
 
                 this.addTunnel(position, side, true);
             }
@@ -395,7 +395,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
                 NBTTagCompound tag = tagList.getCompoundTagAt(i);
 
                 BlockPos position = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
-                EnumFacing side = EnumFacing.getFront(tag.getInteger("side"));
+                EnumFacing side = EnumFacing.byIndex(tag.getInteger("side"));
                 boolean isOutput = tag.getBoolean("output");
 
                 this.addRedstoneTunnel(position, side, isOutput, true);

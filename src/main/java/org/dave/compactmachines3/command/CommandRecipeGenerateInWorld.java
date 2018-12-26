@@ -50,7 +50,7 @@ public class CommandRecipeGenerateInWorld extends CommandBaseExt {
 
         Vec3d vec3d = player.getPositionEyes(1.0F);
         Vec3d vec3d1 = player.getLook(1.0F);
-        Vec3d vec3d2 = vec3d.addVector(vec3d1.x * 32.0d, vec3d1.y * 32.0d, vec3d1.z * 32.0d);
+        Vec3d vec3d2 = vec3d.add(vec3d1.x * 32.0d, vec3d1.y * 32.0d, vec3d1.z * 32.0d);
 
         RayTraceResult result = player.world.rayTraceBlocks(vec3d, vec3d2);
         if(result.typeOfHit != RayTraceResult.Type.BLOCK) {

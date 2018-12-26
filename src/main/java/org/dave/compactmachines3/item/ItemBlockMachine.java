@@ -26,7 +26,7 @@ public class ItemBlockMachine extends ItemBlock {
     public ItemBlockMachine(Block block) {
         super(block);
         if (!(block instanceof IMetaBlockName)) {
-            throw new IllegalArgumentException(String.format("The given block %s is not an instance of IMetaBlockName!", block.getUnlocalizedName()));
+            throw new IllegalArgumentException(String.format("The given block %s is not an instance of IMetaBlockName!", block.getTranslationKey()));
         }
 
         this.setMaxDamage(0);
@@ -38,9 +38,10 @@ public class ItemBlockMachine extends ItemBlock {
         return damage;
     }
 
+
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName(stack) + "." + ((IMetaBlockName)this.block).getSpecialName(stack);
+    public String getTranslationKey(ItemStack stack) {
+        return super.getTranslationKey(stack) + "." + ((IMetaBlockName)this.block).getSpecialName(stack);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ItemBlockMachine extends ItemBlock {
         if(GuiScreen.isShiftKeyDown()) {
             int size = Blockss.machine.getStateFromMeta(stack.getItemDamage()).getValue(BlockMachine.SIZE).getDimension() - 1;
             String sizeString = size + "x" + size + "x" + size;
-            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.machine.hint", I18n.format(this.getUnlocalizedName(stack) + ".name"), sizeString));
+            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.machine.hint", I18n.format(this.getTranslationKey(stack) + ".name"), sizeString));
         } else {
             tooltip.add(TextFormatting.GRAY + I18n.format("tooltip." + CompactMachines3.MODID + ".hold_shift.hint"));
         }

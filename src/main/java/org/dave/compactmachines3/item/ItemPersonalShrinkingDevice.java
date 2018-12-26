@@ -19,7 +19,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
@@ -32,7 +31,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
     public ItemPersonalShrinkingDevice() {
         super();
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
         this.setMaxStackSize(1);
     }
 

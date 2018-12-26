@@ -70,9 +70,6 @@ public class TESRCraftingHologram extends TileEntitySpecialRenderer<TileEntityCr
         float rotateOffsetY = 0.0f;
         float rotateOffsetZ = (float)recipe.getDepth() / 2.0f;
 
-        GlStateManager.translate(0.5f, 0.0f, 0.5f);
-
-
         double progress = 1.0d - ((double)te.getProgress() / (double)recipe.getTicks());
 
         double scale = progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 2000) + 1.0f) * 0.1f));
