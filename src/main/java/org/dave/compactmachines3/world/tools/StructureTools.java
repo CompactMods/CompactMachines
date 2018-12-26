@@ -45,7 +45,7 @@ public class StructureTools {
 
     public static void setBiomeForCoords(int coords, Biome biome) {
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        Chunk chunk = machineWorld.getChunkFromChunkCoords((coords << 10) >> 4, 0);
+        Chunk chunk = machineWorld.getChunk((coords << 10) >> 4, 0);
         for(int x = 0; x < 16; x++) {
             for(int z = 0; z < 16; z++) {
                 chunk.getBiomeArray()[z << 4 | x] = (byte)Biome.getIdForBiome(biome);

@@ -35,7 +35,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
@@ -64,7 +63,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         this.setHardness(8.0F);
         this.setResistance(20.0F);
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
 
         setDefaultState(blockState.getBaseState().withProperty(SIZE, EnumMachineSize.TINY));
     }

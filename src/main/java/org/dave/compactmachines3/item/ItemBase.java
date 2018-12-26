@@ -9,10 +9,10 @@ public class ItemBase extends Item {
     }
 
     @Override
-    public Item setUnlocalizedName(String name) {
+    public Item setTranslationKey(String name) {
         if(!name.startsWith(CompactMachines3.MODID + ".")) {
             name = CompactMachines3.MODID + "." + name;
         }
-        return super.setUnlocalizedName(name);
+        return super.setTranslationKey(name);
     }
 }

@@ -154,10 +154,10 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
     public IBlockState getStateFromMeta(int meta) {
         IBlockState state = getDefaultState();
         if(meta >= 6) {
-            state = state.withProperty(MACHINE_SIDE, EnumFacing.getFront(meta-6));
+            state = state.withProperty(MACHINE_SIDE, EnumFacing.byIndex(meta-6));
             state = state.withProperty(IS_OUTPUT, true);
         } else {
-            state = state.withProperty(MACHINE_SIDE, EnumFacing.getFront(meta));
+            state = state.withProperty(MACHINE_SIDE, EnumFacing.byIndex(meta));
             state = state.withProperty(IS_OUTPUT, false);
         }
 

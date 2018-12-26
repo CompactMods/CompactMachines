@@ -82,7 +82,7 @@ public class BlockTunnel extends BlockBaseTunnel {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(MACHINE_SIDE, EnumFacing.getFront(meta));
+        return getDefaultState().withProperty(MACHINE_SIDE, EnumFacing.byIndex(meta));
     }
 
     @Override

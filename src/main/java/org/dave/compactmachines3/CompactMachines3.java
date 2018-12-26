@@ -13,6 +13,7 @@ import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.PlayerEventHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
@@ -38,6 +39,8 @@ public class CompactMachines3
 
     @Mod.Instance(CompactMachines3.MODID)
     public static CompactMachines3 instance;
+
+    public static final CreativeTabCompactMachines3 CREATIVE_TAB = new CreativeTabCompactMachines3();
 
     @SidedProxy(clientSide = "org.dave.compactmachines3.proxy.ClientProxy", serverSide = "org.dave.compactmachines3.proxy.ServerProxy")
     public static CommonProxy proxy;

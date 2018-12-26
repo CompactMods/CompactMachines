@@ -585,7 +585,7 @@ public class GuiMachine extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         try {
-            Minecraft.getMinecraft().getRenderManager().doRenderEntity(entity, x, y, z, entity.rotationYaw, 1.0F, false);
+            Minecraft.getMinecraft().getRenderManager().renderEntity(entity, x, y, z, entity.rotationYaw, 1.0F, false);
         } catch (Exception e) {
             Logz.debug("Could not render entity '%s': %s", entity.getClass().getSimpleName(), e.getMessage());
         }

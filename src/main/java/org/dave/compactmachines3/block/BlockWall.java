@@ -18,11 +18,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.item.ItemRedstoneTunnelTool;
 import org.dave.compactmachines3.item.ItemTunnelTool;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 import org.dave.compactmachines3.misc.CubeTools;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
@@ -38,7 +38,7 @@ public class BlockWall extends BlockProtected {
         this.setLightOpacity(1);
         this.setLightLevel(1.0f);
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
     }
 
     @SideOnly(Side.CLIENT)

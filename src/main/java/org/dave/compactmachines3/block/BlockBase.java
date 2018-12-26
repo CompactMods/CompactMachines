@@ -14,10 +14,10 @@ public class BlockBase extends Block {
     }
 
     @Override
-    public Block setUnlocalizedName(String name) {
+    public Block setTranslationKey(String name) {
         if(!name.startsWith(CompactMachines3.MODID + ".")) {
             name = CompactMachines3.MODID + "." + name;
         }
-        return super.setUnlocalizedName(name);
+        return super.setTranslationKey(name);
     }
 }

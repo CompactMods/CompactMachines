@@ -11,7 +11,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -20,7 +19,7 @@ public class ItemRedstoneTunnelTool extends ItemBase {
     public ItemRedstoneTunnelTool() {
         super();
 
-        this.setCreativeTab(CreativeTabCompactMachines3.COMPACTMACHINES3_TAB);
+        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
     }
 
     @SideOnly(Side.CLIENT)
