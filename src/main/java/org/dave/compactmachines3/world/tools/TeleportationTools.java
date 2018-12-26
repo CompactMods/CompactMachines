@@ -118,7 +118,7 @@ public class TeleportationTools {
                 Logz.warn("Unknown schema used by Compact Machine @ %s", WorldSavedDataMachines.INSTANCE.getMachinePosition(coords));
             } else {
                 StructureTools.restoreSchema(schema, coords);
-                double[] adjustedSpawnPosition = schema.getSpawnPosition();
+                double[] adjustedSpawnPosition = schema.getSpawnPosition().clone();
                 adjustedSpawnPosition[0] += coords * 1024;
                 adjustedSpawnPosition[1] += 40;
                 WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, adjustedSpawnPosition);

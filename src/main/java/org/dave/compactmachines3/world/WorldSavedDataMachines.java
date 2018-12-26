@@ -20,7 +20,6 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class WorldSavedDataMachines extends WorldSavedData {
