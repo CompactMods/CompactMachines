@@ -51,6 +51,15 @@ public abstract class BlockProtected extends BlockBase {
     }
 
     @Override
+    public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
+        if(isBlockProtected(world.getBlockState(pos), world, pos)) {
+            return false;
+        }
+
+        return super.isReplaceable(world, pos);
+    }
+
+    @Override
     public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
         if(isBlockProtected(state, world, pos)) {
             return false;
