@@ -64,7 +64,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             return new ActionResult(EnumActionResult.SUCCESS, stack);
         }
 
-        if(!world.isRemote && world.provider.getDimension() == ConfigurationHandler.Settings.dimensionId && player instanceof EntityPlayerMP) {
+        if(!world.isRemote && player instanceof EntityPlayerMP) {
             EntityPlayerMP serverPlayer = (EntityPlayerMP)player;
 
             if(player.isSneaking()) {
@@ -75,15 +75,12 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
                 TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines3.psd.spawnpoint_set");
                 tc.getStyle().setColor(TextFormatting.GREEN);
                 player.sendStatusMessage(tc, false);
-
-                return new ActionResult(EnumActionResult.SUCCESS, stack);
+            } else {
+                TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
             }
-
-            TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
-            return new ActionResult(EnumActionResult.SUCCESS, stack);
         }
 
-        return new ActionResult(EnumActionResult.FAIL, stack);
+        return new ActionResult(EnumActionResult.SUCCESS, stack);
     }
 
 
