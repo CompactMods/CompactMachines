@@ -66,7 +66,7 @@ public class BlockWall extends BlockProtected {
         ItemStack playerStack = player.getHeldItemMainhand();
 
         if(playerStack.isEmpty()) {
-            return true;
+            return false;
         }
 
         if(player.isSneaking()) {
@@ -78,7 +78,7 @@ public class BlockWall extends BlockProtected {
         }
 
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-            return false;
+            return playerStack.getItem() instanceof ItemTunnelTool;
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
