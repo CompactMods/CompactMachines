@@ -116,8 +116,9 @@ public class GuiMachine extends GuiContainer {
             return;
         }
 
-        if(GuiMachineData.requiresNewDisplayList) {
-            TileEntityRendererDispatcher.instance.setWorld(GuiMachineData.proxyWorld);
+        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
+        if(GuiMachineData.requiresNewDisplayList && toRenderCopy != null) {
+            TileEntityRendererDispatcher.instance.setWorld(CompactMachines3.clientWorldData.worldClone);
 
             if(glListId != -1) {
                 GLAllocation.deleteDisplayLists(glListId);
@@ -129,13 +130,15 @@ public class GuiMachine extends GuiContainer {
             GlStateManager.pushAttrib();
             GlStateManager.pushMatrix();
 
+            GlStateManager.translate(-GuiMachineData.coords*1024, -40, 0);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
 
             // Aaaand render
             BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
-            List<BlockPos> toRenderCopy = new ArrayList<>(GuiMachineData.toRender);
+            //List<BlockPos> toRenderCopy = new ArrayList<>(GuiMachineData.toRender);
+
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
             GlStateManager.disableAlpha();
@@ -155,7 +158,7 @@ public class GuiMachine extends GuiContainer {
             GlStateManager.glEndList();
         }
 
-        if(GuiMachineData.chunk != null && activeTab == 0) {
+        if(CompactMachines3.clientWorldData.worldClone != null && activeTab == 0) {
             renderChunk(partialTicks);
 
             drawOwner(partialTicks, mouseX, mouseY);
@@ -517,8 +520,9 @@ public class GuiMachine extends GuiContainer {
 
         GlStateManager.resetColor();
 
+        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 1024, 0);
         if(ConfigurationHandler.MachineSettings.renderTileEntitiesInGUI) {
-            this.renderTileEntities(TileEntityRendererDispatcher.instance, new ArrayList<>(GuiMachineData.toRender));
+            this.renderTileEntities(TileEntityRendererDispatcher.instance, toRenderCopy);
         }
 
         if(ConfigurationHandler.MachineSettings.renderLivingEntitiesInGUI) {
@@ -536,6 +540,31 @@ public class GuiMachine extends GuiContainer {
     }
 
     public void renderLayer(BlockRendererDispatcher blockrendererdispatcher, BufferBuilder buffer, BlockRenderLayer renderLayer, List<BlockPos> toRender) {
+        for (BlockPos pos : toRender) {
+            IBlockState state = CompactMachines3.clientWorldData.worldClone.getBlockState(pos);
+
+            if (!state.getBlock().canRenderInLayer(state, renderLayer)) {
+                continue;
+            }
+
+            try {
+                state = state.getActualState(CompactMachines3.clientWorldData.worldClone, pos);
+            } catch (Exception e) {
+                Logz.debug("Could not determine actual state of block: %s", state.getBlock());
+            }
+
+            ForgeHooksClient.setRenderLayer(renderLayer);
+
+            try {
+                blockrendererdispatcher.renderBlock(state, pos, CompactMachines3.clientWorldData.worldClone, buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ForgeHooksClient.setRenderLayer(null);
+        }
+
+        /*
         IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
         for (BlockPos pos : toRender) {
             IBlockState state = blockAccess.getBlockState(pos);
@@ -560,10 +589,11 @@ public class GuiMachine extends GuiContainer {
 
             ForgeHooksClient.setRenderLayer(null);
         }
+        */
     }
 
     private void renderEntities() {
-        ClassInheritanceMultiMap<Entity> entities = GuiMachineData.chunk.getEntityLists()[2];
+        ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(GuiMachineData.coords * 16, 0).getEntityLists()[2];
         for(Entity entity : entities) {
             renderEntity(entity);
         }
@@ -596,13 +626,14 @@ public class GuiMachine extends GuiContainer {
     }
 
     private void renderTileEntities(TileEntityRendererDispatcher renderer, List<BlockPos> toRender) {
+        if(toRender == null) {
+            return;
+        }
         ForgeHooksClient.setRenderLayer(BlockRenderLayer.SOLID);
-        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
-
         for (BlockPos pos : toRender) {
-            TileEntity te = blockAccess.getTileEntity(pos);
+            TileEntity te = CompactMachines3.clientWorldData.worldClone.getTileEntity(pos);
             if(te != null) {
-                te.setWorld(GuiMachineData.proxyWorld);
+                te.setWorld(CompactMachines3.clientWorldData.worldClone);
                 te.setPos(pos);
 
                 if (te instanceof ITickable) {

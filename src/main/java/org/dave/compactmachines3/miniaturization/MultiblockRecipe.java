@@ -1,14 +1,12 @@
 package org.dave.compactmachines3.miniaturization;
 
-import cofh.core.util.helpers.NBTHelper;
-import cofh.thermaldynamics.duct.tiles.TileGrid;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;

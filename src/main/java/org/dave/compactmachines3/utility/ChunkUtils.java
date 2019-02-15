@@ -224,8 +224,8 @@ public class ChunkUtils {
             if (tileentity != null)
             {
                 tileentity.setWorld(worldIn);
-                BlockPos pos = tileentity.getPos();
-                tileentity.setPos(new BlockPos(pos.getX() % 1024, pos.getY(), pos.getZ()));
+                //BlockPos pos = tileentity.getPos();
+                //tileentity.setPos(new BlockPos(pos.getX() % 1024, pos.getY(), pos.getZ()));
 
                 for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
                     String tagName = String.format("cm3_extra:%s", provider.getName());

@@ -14,14 +14,19 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.network.MessageMachineChunk;
+import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
@@ -318,6 +323,10 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
             this.markDirty();
         }
+
+        if(!this.getWorld().isRemote && this.getWorld().getTotalWorldTime() % 20 == 0 && this.coords != -1) {
+            PackageHandler.instance.sendToAllAround(new MessageMachineChunk(this.coords), new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 32.0f));
+        }
     }
 
     @Override
@@ -456,7 +465,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        if(this.getWorld().isRemote || facing == null) {
+        if(world.isRemote || facing == null) {
             if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
                 return true;
             }
@@ -469,7 +478,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        World machineWorld = DimensionTools.getServerMachineWorld();
         if(!(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
             return false;
         }

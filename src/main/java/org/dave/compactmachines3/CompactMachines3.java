@@ -27,6 +27,7 @@ import org.dave.compactmachines3.skyworld.SkyWorldSavedData;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
+import org.dave.compactmachines3.world.ClientWorldData;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 import org.dave.compactmachines3.world.tools.DimensionTools;
@@ -39,6 +40,8 @@ public class CompactMachines3
 
     @Mod.Instance(CompactMachines3.MODID)
     public static CompactMachines3 instance;
+
+    public static ClientWorldData clientWorldData;
 
     public static final CreativeTabCompactMachines3 CREATIVE_TAB = new CreativeTabCompactMachines3();
 
