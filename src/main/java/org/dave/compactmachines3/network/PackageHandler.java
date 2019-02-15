@@ -15,6 +15,8 @@ public class PackageHandler {
         instance.registerMessage(MessageRequestMachineActionHandler.class, MessageRequestMachineAction.class, 3, Side.SERVER);
         instance.registerMessage(MessageParticleBlockMarker.MessageParticleBlockMarkerHandler.class, MessageParticleBlockMarker.class, 4, Side.CLIENT);
         instance.registerMessage(MessagePlayerWhiteListToggleHandler.class, MessagePlayerWhiteListToggle.class, 5, Side.SERVER);
+        instance.registerMessage(MessageWorldInfo.class, MessageWorldInfo.class, 6, Side.CLIENT);
+        instance.registerMessage(MessageMachineChunk.class, MessageMachineChunk.class, 7, Side.CLIENT);
     }
 }
 

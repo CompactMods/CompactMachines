@@ -1,23 +1,19 @@
 package org.dave.compactmachines3.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MessageMachineContent implements IMessage {
-    protected NBTTagCompound data;
     protected int machineSize;
     protected int coords;
 
@@ -34,9 +30,6 @@ public class MessageMachineContent implements IMessage {
         machinePos = data.getMachinePosition(coords);
         machineSize = data.machineSizes.getOrDefault(coords, EnumMachineSize.MAXIMUM).getDimension();
 
-        Chunk chunk = DimensionTools.getServerMachineWorld().getChunk(new BlockPos(coords * 1024, 40, 0));
-        this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
-
         if(machinePos != null) {
             TileEntity te = DimensionTools.getWorldServerForDimension(machinePos.getDimension()).getTileEntity(machinePos.getBlockPos());
             if (te != null && te instanceof TileEntityMachine) {
@@ -50,10 +43,6 @@ public class MessageMachineContent implements IMessage {
     }
 
     public MessageMachineContent() {
-    }
-
-    public void setData(NBTTagCompound data) {
-        this.data = data;
     }
 
     public void setMachineSize(int machineSize) {
@@ -78,7 +67,6 @@ public class MessageMachineContent implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        data = ByteBufUtils.readTag(buf);
         machineSize = buf.readInt();
         coords = buf.readInt();
         boolean hasMachineBlock = buf.readBoolean();
@@ -100,7 +88,6 @@ public class MessageMachineContent implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeTag(buf, data);
         buf.writeInt(machineSize);
         buf.writeInt(coords);
         if(machinePos != null) {
