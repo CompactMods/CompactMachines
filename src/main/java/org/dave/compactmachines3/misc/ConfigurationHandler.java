@@ -164,6 +164,14 @@ public class ConfigurationHandler {
                 "Render living entities in GUI"
         );
 
+        MachineSettings.renderInGUI = configuration.getBoolean(
+                "renderInGUI",
+                CATEGORY_MACHINES,
+                true,
+                "Client-side option, might give a performance boost when opening a Machine GUI",
+                "Render the contents of the machine in the GUI"
+        );
+
         CompatSettings.doesWaterVaporize = configuration.getBoolean(
                 "doesWaterVaporize",
                 CATEGORY_COMPAT,
@@ -204,6 +212,7 @@ public class ConfigurationHandler {
         public static boolean allowEnteringWithoutPSD;
         public static boolean renderTileEntitiesInGUI;
         public static boolean renderLivingEntitiesInGUI;
+        public static boolean renderInGUI;
     }
 
     public static class Settings {

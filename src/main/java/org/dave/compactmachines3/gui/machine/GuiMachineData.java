@@ -5,6 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.chunk.Chunk;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.ProxyWorld;
@@ -64,25 +65,26 @@ public class GuiMachineData {
         GuiMachineData.playerWhiteList = new ArrayList<>(playerWhiteList);
         GuiMachineData.locked = locked;
 
-        proxyWorld = new ProxyWorld();
-        GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(proxyWorld, GuiMachineData.rawData);
+        if (ConfigurationHandler.MachineSettings.renderInGUI) {
+            proxyWorld = new ProxyWorld();
+            GuiMachineData.chunk = ChunkUtils.readChunkFromNBT(proxyWorld, GuiMachineData.rawData);
 
-        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
-        proxyWorld.setFakeWorld(blockAccess);
+            IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
+            proxyWorld.setFakeWorld(blockAccess);
 
-        for(int x = 15; x >= 0; x--) {
-            for(int y = 15; y >= 0; y--) {
-                for(int z = 15; z >= 0; z--) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    if(blockAccess.isAirBlock(pos)) {
-                        continue;
+            for(int x = 15; x >= 0; x--) {
+                for(int y = 15; y >= 0; y--) {
+                    for(int z = 15; z >= 0; z--) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        if(blockAccess.isAirBlock(pos)) {
+                            continue;
+                        }
+
+                        toRender.add(pos);
                     }
-
-                    toRender.add(pos);
                 }
             }
         }
-
         requiresNewDisplayList = true;
         canRender = true;
     }
