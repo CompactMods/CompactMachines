@@ -49,6 +49,11 @@ repositories {
         url "http://dvs1.progwml6.com/files/maven"
     }
 
+    maven { // jei by ip, because travis couldn't resolve it?!
+        name "Progwml Repo"
+        url "http://104.168.20.187/files/maven"
+    }
+
     maven {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
@@ -91,7 +96,9 @@ dependencies {
         transitive = false
     }
 
-    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal")
+    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal") {
+        transitive = false
+    }
 
     // And some runtime-dependencies for the above two libraries.
     runtime("cofh:ThermalFoundation:${config.minecraft.version}-${config.cofh.thermalfoundation.version}:universal") {
