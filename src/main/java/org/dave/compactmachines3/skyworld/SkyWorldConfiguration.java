@@ -12,11 +12,13 @@ import java.util.Collection;
 public class SkyWorldConfiguration {
     public Schema schema;
     public boolean startLocked;
+    public boolean givePSD;
 
     public SkyWorldConfiguration() {
         Collection<Schema> allSchemas = SchemaRegistry.instance.getSchemas();
         this.schema = allSchemas.stream().findFirst().orElse(null);
         startLocked = true;
+        givePSD = true;
     }
 
     public SkyWorldConfiguration(String chunkProviderSettingsJson) {
@@ -40,6 +42,10 @@ public class SkyWorldConfiguration {
                 this.schema = SchemaRegistry.instance.getSchema(schemaName);
             }
         }
+
+        if(rootObject.has("givePSD")) {
+            this.givePSD = rootObject.get("givePSD").getAsBoolean();
+        }
     }
 
     public String getAsJsonString() {
@@ -50,6 +56,7 @@ public class SkyWorldConfiguration {
         }
 
         rootObject.add("startLocked", new JsonPrimitive(startLocked));
+        rootObject.add("givePSD", new JsonPrimitive(givePSD));
 
         return rootObject.toString();
     }

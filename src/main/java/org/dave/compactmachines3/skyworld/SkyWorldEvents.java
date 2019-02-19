@@ -50,7 +50,11 @@ public class SkyWorldEvents {
             return;
         }
 
-        if(!ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(event.player) && !SkyWorldSavedData.instance.hasReceivedStartingInventory(event.player)) {
+        boolean givePSD = ((SkyChunkGenerator) worldServer.getChunkProvider().chunkGenerator).config.givePSD;
+        boolean hasPSD = ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(event.player);
+        boolean hasAlreadyReceivedPSD = SkyWorldSavedData.instance.hasReceivedStartingInventory(event.player);
+
+        if(givePSD && !hasPSD && !hasAlreadyReceivedPSD) {
             ItemStack psdStack = new ItemStack(Itemss.psd, 1, 0);
             if(!event.player.addItemStackToInventory(psdStack)) {
                 EntityItem entityItem = new EntityItem(world, event.player.posX, event.player.posY + event.player.getEyeHeight() + 0.5f, event.player.posZ, psdStack);
