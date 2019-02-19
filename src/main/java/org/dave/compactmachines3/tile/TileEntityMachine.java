@@ -324,9 +324,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             this.markDirty();
         }
 
+        /*
+        // Use this once we render in world or use the proxy world to determine client side capabilities.
         if(!this.getWorld().isRemote && this.getWorld().getTotalWorldTime() % 20 == 0 && this.coords != -1) {
             PackageHandler.instance.sendToAllAround(new MessageMachineChunk(this.coords), new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 32.0f));
         }
+        */
     }
 
     @Override

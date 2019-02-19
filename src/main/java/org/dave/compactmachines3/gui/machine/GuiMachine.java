@@ -116,46 +116,45 @@ public class GuiMachine extends GuiContainer {
             return;
         }
 
-        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
-        if(GuiMachineData.requiresNewDisplayList && toRenderCopy != null) {
-            TileEntityRendererDispatcher.instance.setWorld(CompactMachines3.clientWorldData.worldClone);
+        if(GuiMachineData.requiresNewDisplayList) {
+            List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
+            if(toRenderCopy != null) {
+                TileEntityRendererDispatcher.instance.setWorld(CompactMachines3.clientWorldData.worldClone);
 
-            if(glListId != -1) {
-                GLAllocation.deleteDisplayLists(glListId);
+                if (glListId != -1) {
+                    GLAllocation.deleteDisplayLists(glListId);
+                }
+
+                glListId = GLAllocation.generateDisplayLists(1);
+                GlStateManager.glNewList(glListId, GL11.GL_COMPILE);
+
+                GlStateManager.pushAttrib();
+                GlStateManager.pushMatrix();
+
+                GlStateManager.translate(-GuiMachineData.coords * 1024, -40, 0);
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder buffer = tessellator.getBuffer();
+
+                // Aaaand render
+                BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                GlStateManager.disableAlpha();
+                this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRenderCopy);
+                GlStateManager.enableAlpha();
+                this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRenderCopy);
+                this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRenderCopy);
+                GlStateManager.shadeModel(GL11.GL_FLAT);
+                this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRenderCopy);
+
+                tessellator.draw();
+
+
+                GlStateManager.popMatrix();
+                GlStateManager.popAttrib();
+
+                GlStateManager.glEndList();
             }
-
-            glListId = GLAllocation.generateDisplayLists(1);
-            GlStateManager.glNewList(glListId, GL11.GL_COMPILE);
-
-            GlStateManager.pushAttrib();
-            GlStateManager.pushMatrix();
-
-            GlStateManager.translate(-GuiMachineData.coords*1024, -40, 0);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-
-            // Aaaand render
-            BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-
-            //List<BlockPos> toRenderCopy = new ArrayList<>(GuiMachineData.toRender);
-
-
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-            GlStateManager.disableAlpha();
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.SOLID, toRenderCopy);
-            GlStateManager.enableAlpha();
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT_MIPPED, toRenderCopy);
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.CUTOUT, toRenderCopy);
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-            this.renderLayer(blockrendererdispatcher, buffer, BlockRenderLayer.TRANSLUCENT, toRenderCopy);
-
-            tessellator.draw();
-
-
-            GlStateManager.popMatrix();
-            GlStateManager.popAttrib();
-
-            GlStateManager.glEndList();
         }
 
         if(CompactMachines3.clientWorldData.worldClone != null && activeTab == 0) {
@@ -563,36 +562,13 @@ public class GuiMachine extends GuiContainer {
 
             ForgeHooksClient.setRenderLayer(null);
         }
-
-        /*
-        IBlockAccess blockAccess = ChunkUtils.getBlockAccessFromChunk(GuiMachineData.chunk);
-        for (BlockPos pos : toRender) {
-            IBlockState state = blockAccess.getBlockState(pos);
-
-            if (!state.getBlock().canRenderInLayer(state, renderLayer)) {
-                continue;
-            }
-
-            try {
-                state = state.getActualState(blockAccess, pos);
-            } catch (Exception e) {
-                Logz.debug("Could not determine actual state of block: %s", state.getBlock());
-            }
-
-            ForgeHooksClient.setRenderLayer(renderLayer);
-
-            try {
-                blockrendererdispatcher.renderBlock(state, pos, blockAccess, buffer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            ForgeHooksClient.setRenderLayer(null);
-        }
-        */
     }
 
     private void renderEntities() {
+        if(CompactMachines3.clientWorldData == null || CompactMachines3.clientWorldData.worldClone == null) {
+            return;
+        }
+
         ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(GuiMachineData.coords * 16, 0).getEntityLists()[2];
         for(Entity entity : entities) {
             renderEntity(entity);
