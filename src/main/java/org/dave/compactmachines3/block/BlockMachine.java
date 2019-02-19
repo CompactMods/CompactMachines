@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.network.MessageMachineChunk;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
@@ -329,6 +330,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
         PackageHandler.instance.sendTo(new MessageMachineContent(machine.coords), (EntityPlayerMP)player);
+        PackageHandler.instance.sendTo(new MessageMachineChunk(machine.coords), (EntityPlayerMP)player);
 
         return true;
     }

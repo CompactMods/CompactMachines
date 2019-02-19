@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.network.MessageMachineChunk;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.GuiIds;
@@ -41,5 +42,6 @@ public class CommandMachinesView extends CommandBaseExt {
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_ADMIN.ordinal(), player.world, 0,0,0);
         PackageHandler.instance.sendTo(new MessageMachineContent(coords), player);
+        PackageHandler.instance.sendTo(new MessageMachineChunk(coords), player);
     }
 }

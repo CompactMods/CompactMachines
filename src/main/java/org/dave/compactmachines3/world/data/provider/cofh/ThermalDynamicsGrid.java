@@ -1,6 +1,5 @@
 package org.dave.compactmachines3.world.data.provider.cofh;
 
-
 import cofh.thermaldynamics.block.BlockDuct;
 import cofh.thermaldynamics.duct.tiles.TileGrid;
 import net.minecraft.nbt.NBTTagCompound;
