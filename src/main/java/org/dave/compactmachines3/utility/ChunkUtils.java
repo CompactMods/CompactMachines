@@ -4,9 +4,9 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
@@ -41,6 +41,7 @@ public class ChunkUtils {
         ExtendedBlockStorage[] aextendedblockstorage = chunkIn.getBlockStorageArray();
         NBTTagList nbttaglist = new NBTTagList();
         boolean flag = worldIn.provider.hasSkyLight();
+
 
         for (ExtendedBlockStorage extendedblockstorage : aextendedblockstorage)
         {
@@ -113,6 +114,12 @@ public class ChunkUtils {
                     NBTTagCompound extraData = provider.writeExtraData(tileentity);
                     String tagName = String.format("cm3_extra:%s", provider.getName());
                     nbttagcompound3.setTag(tagName, extraData);
+                }
+
+                SPacketUpdateTileEntity updatePacket = tileentity.getUpdatePacket();
+                if(updatePacket != null && updatePacket.getNbtCompound() != null) {
+                    NBTTagCompound updateData = updatePacket.getNbtCompound();
+                    nbttagcompound3.setTag("cm3_update", updateData);
                 }
 
                 nbttaglist2.appendTag(nbttagcompound3);
@@ -233,6 +240,16 @@ public class ChunkUtils {
                 }
 
                 chunk.addTileEntity(tileentity);
+
+                if(nbttagcompound2.hasKey("cm3_update")) {
+                    NBTTagCompound tag = nbttagcompound2.getCompoundTag("cm3_update");
+
+                    try {
+                        tileentity.onDataPacket(null, new SPacketUpdateTileEntity(tileentity.getPos(), 1, tag));
+                    } catch (NullPointerException npe) {
+                        Logz.debug("TileEntity '%s' is unable to read data packet without a network manager instance.", tileentity.getClass().getName());
+                    }
+                }
             }
         }
     }
