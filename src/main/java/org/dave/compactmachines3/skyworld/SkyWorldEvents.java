@@ -87,6 +87,7 @@ public class SkyWorldEvents {
         float centerPos = 16.0f - (SkyTerrainGenerator.ROOM_DIMENSION / 2.0f);
         int heightPos = SkyTerrainGenerator.ROOM_FLOOR_HEIGHT - SkyTerrainGenerator.ROOM_DIMENSION + 2;
 
+        Logz.info("World generator settings are: %s", ((SkyChunkGenerator) worldServer.getChunkProvider().chunkGenerator).config.getAsJsonString());
         Logz.info("Overriding world spawn point");
         event.getWorld().setSpawnPoint(new BlockPos(centerPos, heightPos, centerPos));
         event.setCanceled(true);
