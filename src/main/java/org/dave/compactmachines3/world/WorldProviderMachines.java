@@ -1,7 +1,10 @@
 package org.dave.compactmachines3.world;
 
+import net.minecraft.init.Biomes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.IChunkGenerator;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
@@ -44,5 +47,14 @@ public class WorldProviderMachines extends WorldProvider {
     @Override
     public boolean doesWaterVaporize() {
         return ConfigurationHandler.CompatSettings.doesWaterVaporize;
+    }
+
+    @Override
+    public Biome getBiomeForCoords(BlockPos pos) {
+        if(world == null) {
+            return Biomes.PLAINS;
+        }
+
+        return super.getBiomeForCoords(pos);
     }
 }
