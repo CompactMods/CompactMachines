@@ -29,6 +29,7 @@ public class ChunkGeneratorMachines implements IChunkGenerator {
         Chunk chunk = new Chunk(this.world, cp, x, z);
         chunk.generateSkylightMap();
         chunk.setBiomeArray(voidBiomeArray);
+        chunk.setTerrainPopulated(true);
         return chunk;
     }
 
