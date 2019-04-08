@@ -6,7 +6,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.schema.SchemaRegistry;
+import org.dave.compactmachines3.utility.Logz;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 public class SkyWorldConfiguration {
@@ -14,11 +16,14 @@ public class SkyWorldConfiguration {
     public boolean startLocked;
     public boolean givePSD;
 
+    public EnumSkyWorldSize size;
+
     public SkyWorldConfiguration() {
         Collection<Schema> allSchemas = SchemaRegistry.instance.getSchemas();
         this.schema = allSchemas.stream().findFirst().orElse(null);
         startLocked = true;
         givePSD = true;
+        size = EnumSkyWorldSize.SMALL;
     }
 
     public SkyWorldConfiguration(String chunkProviderSettingsJson) {
@@ -46,6 +51,16 @@ public class SkyWorldConfiguration {
         if(rootObject.has("givePSD")) {
             this.givePSD = rootObject.get("givePSD").getAsBoolean();
         }
+
+        if(rootObject.has("size")) {
+            String size = rootObject.get("size").getAsString();
+            if(!Arrays.stream(EnumSkyWorldSize.values()).anyMatch(s -> s.name().equals(size))) {
+                Logz.warn("Invalid size value specified: %s. Falling back to SMALL.", size);
+                this.size = EnumSkyWorldSize.SMALL;
+            } else {
+                this.size = EnumSkyWorldSize.valueOf(size);
+            }
+        }
     }
 
     public String getAsJsonString() {
@@ -57,6 +72,7 @@ public class SkyWorldConfiguration {
 
         rootObject.add("startLocked", new JsonPrimitive(startLocked));
         rootObject.add("givePSD", new JsonPrimitive(givePSD));
+        rootObject.add("size", new JsonPrimitive(size.name()));
 
         return rootObject.toString();
     }

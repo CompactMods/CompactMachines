@@ -22,6 +22,9 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
     private GuiButton closeButton;
     private SchemaScrollingList guiSchemaList;
 
+    private GuiCheckBox smallButton;
+    private GuiCheckBox mediumButton;
+    private GuiCheckBox largeButton;
 
     public GuiSkyWorldConfiguration(GuiCreateWorld parent) {
         this.parent = parent;
@@ -48,6 +51,17 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
         this.buttonList.add(givePsdButton);
         yOffset += 14;
 
+        smallButton = new GuiCheckBox(2, 8, yOffset, I18n.format("gui.compactmachines3.compactsky.configuration.small"), config.size == EnumSkyWorldSize.SMALL);
+        this.buttonList.add(smallButton);
+
+        mediumButton = new GuiCheckBox(3, 100, yOffset, I18n.format("gui.compactmachines3.compactsky.configuration.medium"), config.size == EnumSkyWorldSize.MEDIUM);
+        this.buttonList.add(mediumButton);
+
+        largeButton = new GuiCheckBox(4, 192, yOffset, I18n.format("gui.compactmachines3.compactsky.configuration.large"), config.size == EnumSkyWorldSize.LARGE);
+        this.buttonList.add(largeButton);
+
+        yOffset += 14;
+
         int listHeight = this.height - 52 - yOffset;
         guiSchemaList = new SchemaScrollingList(this, 8, yOffset, 200, listHeight, 20);
 
@@ -65,6 +79,24 @@ public class GuiSkyWorldConfiguration extends GuiScreen {
 
         if(button.id == 1) {
             this.config.givePSD = !this.config.givePSD;
+        }
+
+        if(button.id == 2) {
+            this.config.size = EnumSkyWorldSize.SMALL;
+            mediumButton.setIsChecked(false);
+            largeButton.setIsChecked(false);
+        }
+
+        if(button.id == 3) {
+            this.config.size = EnumSkyWorldSize.MEDIUM;
+            smallButton.setIsChecked(false);
+            largeButton.setIsChecked(false);
+        }
+
+        if(button.id == 4) {
+            this.config.size = EnumSkyWorldSize.LARGE;
+            smallButton.setIsChecked(false);
+            mediumButton.setIsChecked(false);
         }
 
         parent.chunkProviderSettingsJson = this.config.getAsJsonString();

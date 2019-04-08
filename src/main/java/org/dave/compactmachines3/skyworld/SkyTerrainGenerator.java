@@ -18,10 +18,6 @@ public class SkyTerrainGenerator {
     private final World world;
     private final SkyChunkGenerator chunkGenerator;
 
-    // Make configurable?
-    private final static int ROWS = 4;
-    private final static int COLS = 4;
-
     public final static int ROOM_DIMENSION = 9;
     public final static int ROOM_PADDING = 16-ROOM_DIMENSION;
     public final static int ROOM_FLOOR_HEIGHT = 50;
@@ -74,8 +70,27 @@ public class SkyTerrainGenerator {
         cp.setBlockState(machinePos.getX(), machinePos.getY(), machinePos.getZ(), Blockss.machine.getDefaultState().withProperty(BlockMachine.SIZE, startSize));
     }
 
+    @SuppressWarnings("deprecation")
     private void generateLighting(int chunkX, int chunkZ, ChunkPrimer cp) {
-        int meta = chunkZ * 4 + chunkX;
+        IBlockState carpetCornerState;
+        IBlockState carpetCrossState;
+
+        switch (chunkGenerator.config.size) {
+            default:
+            case SMALL:
+                carpetCornerState = Blocks.CARPET.getStateFromMeta(chunkZ * 4 + chunkX);
+                carpetCrossState = carpetCornerState;
+                break;
+            case MEDIUM:
+                carpetCornerState = Blocks.CARPET.getStateFromMeta(chunkX);
+                carpetCrossState = Blocks.CARPET.getStateFromMeta(chunkZ+8);
+                break;
+            case LARGE:
+                carpetCornerState = Blocks.CARPET.getStateFromMeta(chunkX);
+                carpetCrossState = Blocks.CARPET.getStateFromMeta(chunkZ);
+                break;
+        }
+
         int center = (int) Math.floor(ROOM_DIMENSION / 2.0f);
 
         BlockPos floorCenter = new BlockPos(15-center, ROOM_FLOOR_HEIGHT-ROOM_DIMENSION+1, 15-center);
@@ -88,9 +103,10 @@ public class SkyTerrainGenerator {
 
                 BlockPos thisPos = floorCenter.add(x, 0, z);
 
-                @SuppressWarnings("deprecation") IBlockState carpetState = Blocks.CARPET.getStateFromMeta(meta);
+                IBlockState carpetStateToUse = x == 0 || z == 0 ? carpetCrossState : carpetCornerState;
+
                 cp.setBlockState(thisPos.getX(), thisPos.getY(), thisPos.getZ(), Blocks.GLOWSTONE.getDefaultState());
-                cp.setBlockState(thisPos.getX(), thisPos.getY()+1, thisPos.getZ(), carpetState);
+                cp.setBlockState(thisPos.getX(), thisPos.getY()+1, thisPos.getZ(), carpetStateToUse);
             }
         }
 
@@ -230,11 +246,11 @@ public class SkyTerrainGenerator {
     }
 
     private boolean isOutside(int offsetChunkX, int offsetChunkZ) {
-        if(offsetChunkX < 0 || offsetChunkX >= COLS) {
+        if(offsetChunkX < 0 || offsetChunkX >= chunkGenerator.config.size.cols) {
             return true;
         }
 
-        if(offsetChunkZ < 0 || offsetChunkZ >= ROWS) {
+        if(offsetChunkZ < 0 || offsetChunkZ >= chunkGenerator.config.size.rows) {
             return true;
         }
 
@@ -246,7 +262,7 @@ public class SkyTerrainGenerator {
     }
 
     private boolean hasRightNeighbor(int offsetChunkX) {
-        return offsetChunkX < COLS-1;
+        return offsetChunkX < chunkGenerator.config.size.cols-1;
     }
 
     private boolean hasTopNeighbor(int offsetChunkZ) {
@@ -254,7 +270,7 @@ public class SkyTerrainGenerator {
     }
 
     private boolean hasBottomNeighbor(int offsetChunkZ) {
-        return offsetChunkZ < ROWS-1;
+        return offsetChunkZ < chunkGenerator.config.size.rows-1;
     }
 
 
