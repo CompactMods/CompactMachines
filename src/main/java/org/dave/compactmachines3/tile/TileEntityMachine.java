@@ -43,6 +43,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     private boolean initialized = false;
     public long lastNeighborUpdateTick = 0;
     public long nextSpawnTick = 0;
+    public boolean alreadyNotifiedOnTick;
 
     protected String customName = "";
     protected UUID owner;

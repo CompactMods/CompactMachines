@@ -53,6 +53,7 @@ import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEntityProvider, ITopInfoProvider {
 
@@ -130,9 +131,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
         // Just ensure only a single notification happens per tick.
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-        if(te.isInsideItself()) {
+        if(te.isInsideItself() || te.alreadyNotifiedOnTick) {
             return;
         }
+
+        te.alreadyNotifiedOnTick = true;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
         BlockPos neighborPos = te.getTunnelForSide(facing);
@@ -151,6 +154,12 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 machineWorld.notifyNeighborsOfStateChange(redstoneNeighborPos, Blockss.redstoneTunnel, false);
             }
         }
+    }
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        te.alreadyNotifiedOnTick = false;
     }
 
     @Override
