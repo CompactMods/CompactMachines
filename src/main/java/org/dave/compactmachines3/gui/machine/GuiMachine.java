@@ -19,7 +19,6 @@ import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import org.dave.compactmachines3.CompactMachines3;
@@ -31,7 +30,6 @@ import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.MessagePlayerWhiteListToggle;
 import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.PackageHandler;
-import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.lwjgl.input.Mouse;
@@ -519,7 +517,7 @@ public class GuiMachine extends GuiContainer {
 
         GlStateManager.resetColor();
 
-        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 1024, 0);
+        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
         if(ConfigurationHandler.MachineSettings.renderTileEntitiesInGUI) {
             this.renderTileEntities(TileEntityRendererDispatcher.instance, toRenderCopy);
         }
@@ -625,7 +623,7 @@ public class GuiMachine extends GuiContainer {
 
                 renderer.preDrawBatch();
                 try {
-                    renderer.render(te, pos.getX(), pos.getY(), pos.getZ(), 0.0f);
+                    renderer.render(te, pos.getX() % 1024, pos.getY()-40, pos.getZ(), 0.0f);
                 } catch(Exception e) {
                     Logz.warn("Could not render tile entity '%s': %s", te.getClass().getSimpleName(), e.getMessage());
                 }
