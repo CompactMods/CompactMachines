@@ -1,12 +1,16 @@
 package org.dave.compactmachines3.misc;
 
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.utility.Logz;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigurationHandler {
     public static Configuration configuration;
@@ -72,13 +76,6 @@ public class ConfigurationHandler {
                 "Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.",
                 "Force chunk load"
         );
-
-        Settings.worldgenDimensions = configuration.get(
-                CATEGORY_INTERNAL,
-                "worldgenDimensions",
-                new int[] {0},
-                "Allowed dimensions broken Compact Machine cubes can generate in."
-        ).getIntList();
 
         Settings.maximumCraftingAreaSize = configuration.getInt(
                 "maximumCraftingAreaSize",
@@ -191,12 +188,22 @@ public class ConfigurationHandler {
     }
 
     @SubscribeEvent
-    public void onConfigurationChanged(ConfigChangedEvent event) {
+    public static void onConfigurationChanged(ConfigChangedEvent event) {
         if(!event.getModID().equalsIgnoreCase(CompactMachines3.MODID)) {
             return;
         }
 
         loadConfiguration();
+    }
+
+    public static List<IConfigElement> getConfigElements() {
+        List<IConfigElement> result = new ArrayList<>();
+        result.add(new ConfigElement(configuration.getCategory(CATEGORY_MINIATURIZATION)));
+        result.add(new ConfigElement(configuration.getCategory(CATEGORY_MACHINES)));
+        result.add(new ConfigElement(configuration.getCategory(CATEGORY_COMPAT)));
+        result.add(new ConfigElement(configuration.getCategory(CATEGORY_INTERNAL)));
+
+        return result;
     }
 
     public static class CompatSettings {
@@ -219,7 +226,6 @@ public class ConfigurationHandler {
         public static int dimensionId;
         public static int dimensionTypeId;
         public static boolean forceLoadChunks;
-        public static int[] worldgenDimensions;
         public static int maximumCraftingAreaSize;
         public static int maximumCraftingCatalystAge;
 
