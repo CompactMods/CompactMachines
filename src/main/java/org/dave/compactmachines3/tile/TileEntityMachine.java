@@ -41,7 +41,7 @@ import java.util.*;
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
     public int coords = -1;
     private boolean initialized = false;
-    public long lastNeighborUpdateTick = 0;
+    public boolean alreadyNotifiedOnTick = false;
     public long nextSpawnTick = 0;
 
     protected String customName = "";
@@ -299,6 +299,8 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             initialize();
             this.initialized = true;
         }
+
+        this.alreadyNotifiedOnTick = false;
 
         if(nextSpawnTick == 0) {
             nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;

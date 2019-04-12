@@ -130,17 +130,15 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
         // Just ensure only a single notification happens per tick.
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-        if(te.isInsideItself()) {
+        if(te.isInsideItself() || te.alreadyNotifiedOnTick) {
             return;
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
         BlockPos neighborPos = te.getTunnelForSide(facing);
         if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
-            if(te.lastNeighborUpdateTick != world.getTotalWorldTime()) {
-                machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
-                te.lastNeighborUpdateTick = world.getTotalWorldTime();
-            }
+            machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
+            te.alreadyNotifiedOnTick = true;
         }
 
 
