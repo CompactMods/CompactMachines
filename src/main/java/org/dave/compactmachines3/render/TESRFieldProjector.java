@@ -127,7 +127,7 @@ public class TESRFieldProjector extends TileEntitySpecialRenderer<TileEntityFiel
         cube = cube.offset(-te.getPos().getX(), -te.getPos().getY(), -te.getPos().getZ());
         if(te.getActiveRecipe() != null && te.getCraftingProgress() > 0) {
             double progress = (1.0d - ((double)te.getCraftingProgress() / (double)te.getActiveRecipe().getTicks()));
-            double scale = 1.0d - (progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 4000) + 1.0f) * 0.1f)));
+            double scale = 0.8d - (progress * (1.0f - ((Math.sin(Math.toDegrees(RenderTickCounter.renderTicks) / 4000) + 1.0f) * 0.1f)));
             scale = Math.min(scale, 0.9d);
             cube = cube.shrink(scale * te.getActiveMagnitude());
             extraLength = scale * te.getActiveMagnitude() * 2;
