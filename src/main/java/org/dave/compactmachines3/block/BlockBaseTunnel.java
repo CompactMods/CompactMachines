@@ -74,6 +74,12 @@ public abstract class BlockBaseTunnel extends BlockProtected implements ITileEnt
             return;
         }
 
+        BaseTileEntityTunnel tunnel = (BaseTileEntityTunnel)world.getTileEntity(pos);
+        if(tunnel.alreadyNotifiedOnTick) {
+            return;
+        }
+
+        tunnel.alreadyNotifiedOnTick = true;
         notifyOverworldNeighbor(pos);
     }
 
