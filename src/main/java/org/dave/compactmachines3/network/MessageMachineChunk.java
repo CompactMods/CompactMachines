@@ -40,14 +40,15 @@ public class MessageMachineChunk implements IMessage, IMessageHandler<MessageMac
         ByteBuf tmpBuf = Unpooled.buffer();
         ByteBufUtils.writeTag(tmpBuf, data);
 
-        if(tmpBuf.writerIndex() >= 2097152 - 8) {
+        if(tmpBuf.writerIndex() >= 1900000 - 8) {
             Logz.debug("Chunk data to big to send. Stripping TileEntity nbt data!");
+
             data.removeTag("TileEntities");
 
             ByteBuf tmpBufNoTiles = Unpooled.buffer();
             ByteBufUtils.writeTag(tmpBufNoTiles, data);
 
-            if(tmpBufNoTiles.writerIndex() >= 2097152 - 8) {
+            if(tmpBufNoTiles.writerIndex() >= 1900000 - 8) {
                 Logz.warn("Chunk data to big even without nbt data. Sending no chunk data!");
                 ByteBufUtils.writeTag(buf, new NBTTagCompound());
             } else {
