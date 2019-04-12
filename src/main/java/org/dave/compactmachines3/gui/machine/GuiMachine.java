@@ -567,7 +567,7 @@ public class GuiMachine extends GuiContainer {
             return;
         }
 
-        ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(GuiMachineData.coords * 16, 0).getEntityLists()[2];
+        ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(GuiMachineData.coords * 64, 0).getEntityLists()[2];
         for(Entity entity : entities) {
             renderEntity(entity);
         }
