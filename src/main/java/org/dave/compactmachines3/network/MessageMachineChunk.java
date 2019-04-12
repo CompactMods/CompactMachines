@@ -30,36 +30,18 @@ public class MessageMachineChunk implements IMessage, IMessageHandler<MessageMac
     @Override
     public void fromBytes(ByteBuf buf) {
         coords = buf.readInt();
-        data = ByteBufUtils.readTag(buf);
+        try {
+            data = ByteBufUtils.readTag(buf);
+        } catch (Exception e) {
+            Logz.debug("Unable to read nbt data from buffer: %s", e.getMessage());
+            data = new NBTTagCompound();
+        }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(coords);
-
-        ByteBuf tmpBuf = Unpooled.buffer();
-        ByteBufUtils.writeTag(tmpBuf, data);
-
-        if(tmpBuf.writerIndex() >= 1900000 - 8) {
-            Logz.debug("Chunk data to big to send. Stripping TileEntity nbt data!");
-
-            data.removeTag("TileEntities");
-
-            ByteBuf tmpBufNoTiles = Unpooled.buffer();
-            ByteBufUtils.writeTag(tmpBufNoTiles, data);
-
-            if(tmpBufNoTiles.writerIndex() >= 1900000 - 8) {
-                Logz.warn("Chunk data to big even without nbt data. Sending no chunk data!");
-                ByteBufUtils.writeTag(buf, new NBTTagCompound());
-            } else {
-                buf.writeBytes(tmpBufNoTiles.readerIndex(0));
-            }
-            tmpBufNoTiles.release();
-        } else {
-            buf.writeBytes(tmpBuf.readerIndex(0));
-        }
-
-        tmpBuf.release();
+        ByteBufUtils.writeTag(buf, data);
     }
 
     @Override
