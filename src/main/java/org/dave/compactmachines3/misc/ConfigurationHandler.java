@@ -164,6 +164,14 @@ public class ConfigurationHandler {
                 "Render living entities in GUI"
         );
 
+        MachineSettings.autoUpdateRate = configuration.getInt(
+                "autoUpdateRate",
+                CATEGORY_MACHINES,
+                20,
+                0, Integer.MAX_VALUE,
+                "Update the machine view GUI every n ticks. Set to 0 to disable. Lower values decrease performance significantly!"
+        );
+
         CompatSettings.doesWaterVaporize = configuration.getBoolean(
                 "doesWaterVaporize",
                 CATEGORY_COMPAT,
@@ -204,6 +212,7 @@ public class ConfigurationHandler {
         public static boolean allowEnteringWithoutPSD;
         public static boolean renderTileEntitiesInGUI;
         public static boolean renderLivingEntitiesInGUI;
+        public static int autoUpdateRate;
     }
 
     public static class Settings {

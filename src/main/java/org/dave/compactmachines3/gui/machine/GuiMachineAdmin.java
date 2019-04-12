@@ -2,7 +2,9 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.PackageHandler;
 
@@ -19,6 +21,10 @@ public class GuiMachineAdmin extends GuiMachine {
 
     private List<GuiButton> adminButtons;
     private int buttonIdOffset = 3;
+
+    public GuiMachineAdmin(World world, BlockPos pos) {
+        super(world, pos);
+    }
 
     @Override
     public void initGui() {

@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -20,7 +21,7 @@ public class GuiHandler implements IGuiHandler {
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if(ID == GuiIds.MACHINE_VIEW.ordinal() || ID == GuiIds.MACHINE_ADMIN.ordinal()) {
-            return new GuiMachineContainer();
+            return new GuiMachineContainer(world, new BlockPos(x, y, z));
         }
 
         return null;
@@ -33,9 +34,9 @@ public class GuiHandler implements IGuiHandler {
             Pages.activePageOnClient = "welcome";
             return new GuiPSDScreen();
         } else if(ID == GuiIds.MACHINE_VIEW.ordinal()) {
-            return new GuiMachine();
+            return new GuiMachine(world, new BlockPos(x, y, z));
         } else if(ID == GuiIds.MACHINE_ADMIN.ordinal()) {
-            return new GuiMachineAdmin();
+            return new GuiMachineAdmin(world, new BlockPos(x, y, z));
         }
 
         return null;

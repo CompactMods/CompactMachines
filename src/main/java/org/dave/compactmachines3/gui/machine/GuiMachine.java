@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.gui.machine;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -19,6 +20,7 @@ import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import org.dave.compactmachines3.CompactMachines3;
@@ -60,8 +62,8 @@ public class GuiMachine extends GuiContainer {
     int glListId = -1;
     int activeTab = 0;  // TODO: This should not be an integer, but rather a GuiTab object or something like that
 
-    public GuiMachine() {
-        super(new GuiMachineContainer());
+    public GuiMachine(World world, BlockPos pos) {
+        super(new GuiMachineContainer(world, pos));
     }
 
     private boolean shouldShowTabs() {
