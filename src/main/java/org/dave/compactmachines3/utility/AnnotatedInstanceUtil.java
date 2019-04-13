@@ -12,6 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * This code is in large parts copied from the JustEnoughItems mod, which is MIT licensed.
+ * You can find the original implementation here:
+ * https://github.com/mezz/JustEnoughItems/blob/68242be874/src/main/java/mezz/jei/startup/AnnotatedInstanceUtil.java
+ *
+ * Thanks to Mezz for originally implementing this.
+ *
+ * When the time comes for 1.13, Mezz also already ported this. Find an updated version here:
+ * https://github.com/mezz/JustEnoughItems/blob/582eb87925032083f54e0903d0afefeeae238dd5/src/main/java/mezz/jei/util/AnnotatedInstanceUtil.java
+ */
 public class AnnotatedInstanceUtil {
     public static ASMDataTable asmData;
 
