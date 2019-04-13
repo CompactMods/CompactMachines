@@ -50,6 +50,7 @@ tooltip.compactmachines3.redstonetunneltool.hint=Used to transfer redstone signa
 tooltip.compactmachines3.wall.hint=Warning! Unbreakable for non-creative players!
 tooltip.compactmachines3.machine.hint=A %s provides a %s room.
 
+tooltip.compactmachines3.lockforotherplayers.checkbox=Lock for other players
 
 tooltip.compactmachines3.jei.crafting_trigger=Throw this into the miniaturization field to start the crafting process.
 tooltip.compactmachines3.jei.shape=Use these to build the multiblock

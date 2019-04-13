@@ -12,15 +12,16 @@ import org.dave.compactmachines3.network.MessageMachineChunk;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.utility.Logz;
 
 public class GuiMachineContainer extends Container {
     World world;
     BlockPos pos;
+    EntityPlayer player;
 
-    public GuiMachineContainer(World world, BlockPos pos) {
+    public GuiMachineContainer(World world, BlockPos pos, EntityPlayer player) {
         this.world = world;
         this.pos = pos;
+        this.player = player;
     }
 
     @Override

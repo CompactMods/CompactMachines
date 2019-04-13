@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiMachineAdmin extends GuiMachine {
+public class GuiMachineOldAdmin extends GuiMachineOld {
     private GuiButton buttonPrevious;
     private GuiButton buttonNext;
     private GuiButton buttonGiveItem;
@@ -22,7 +22,7 @@ public class GuiMachineAdmin extends GuiMachine {
     private List<GuiButton> adminButtons;
     private int buttonIdOffset = 3;
 
-    public GuiMachineAdmin(World world, BlockPos pos) {
+    public GuiMachineOldAdmin(World world, BlockPos pos) {
         super(world, pos);
     }
 
