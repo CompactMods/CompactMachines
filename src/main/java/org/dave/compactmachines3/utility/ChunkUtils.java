@@ -257,6 +257,8 @@ public class ChunkUtils {
                         tileentity.onDataPacket(null, new SPacketUpdateTileEntity(tileentity.getPos(), 1, tag));
                     } catch (NullPointerException npe) {
                         Logz.debug("TileEntity '%s' is unable to read data packet without a network manager instance.", tileentity.getClass().getName());
+                    } catch (Exception e) {
+                        Logz.debug("TileEntity '%s' is unable to read data packet. Probably because of internally saved block positions or dimension. Report this to the Compact Machines author, not the blocks mod author!", tileentity.getClass().getName());
                     }
                 }
             }
