@@ -192,6 +192,9 @@ public class BlockFieldProjector extends BlockBase implements ITileEntityProvide
         Vec3d lookVec = placer.getLook(1.0f);
         Vec3d endVec = posVec.add(lookVec.scale(blockReachDistance));
         RayTraceResult trace = world.rayTraceBlocks(posVec, endVec);
+        if(trace == null) {
+            return;
+        }
 
         Vec3d hitPosition = trace.hitVec;
         hitPosition = hitPosition.subtract(new Vec3d(trace.getBlockPos()));
