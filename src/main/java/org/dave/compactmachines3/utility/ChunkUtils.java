@@ -14,12 +14,16 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class ChunkUtils {
+    private static Field updatePacketNBTField;
+
     public static IBlockAccess getBlockAccessFromChunk(Chunk chunk) {
         return new ChunkBlockAccess(chunk);
     }
@@ -96,15 +100,20 @@ public class ChunkUtils {
                 }
                 catch (Exception e)
                 {
-                    net.minecraftforge.fml.common.FMLLog.log.error("An Entity type {} has thrown an exception trying to write state. It will not persist. Report this to the mod author",
+                    net.minecraftforge.fml.common.FMLLog.log.error("An Entity type {} has thrown an exception trying to write state. It will not be visible in compact machines. Report this to the Compact Machines author.",
                             entity.getClass().getName(), e);
                 }
             }
         }
 
         compound.setTag("Entities", nbttaglist1);
-        NBTTagList nbttaglist2 = new NBTTagList();
 
+        if(updatePacketNBTField == null) {
+            updatePacketNBTField = ReflectionHelper.findField(SPacketUpdateTileEntity.class, "nbt", "field_148860_e");
+            updatePacketNBTField.setAccessible(true);
+        }
+
+        NBTTagList nbttaglist2 = new NBTTagList();
         for (TileEntity tileentity : chunkIn.getTileEntityMap().values())
         {
             try
@@ -117,8 +126,8 @@ public class ChunkUtils {
                 }
 
                 SPacketUpdateTileEntity updatePacket = tileentity.getUpdatePacket();
-                if(updatePacket != null && updatePacket.getNbtCompound() != null) {
-                    NBTTagCompound updateData = updatePacket.getNbtCompound();
+                if(updatePacket != null) {
+                    NBTTagCompound updateData = (NBTTagCompound) updatePacketNBTField.get(updatePacket);
                     nbttagcompound3.setTag("cm3_update", updateData);
                 }
 
@@ -126,14 +135,14 @@ public class ChunkUtils {
             }
             catch (Exception e)
             {
-                net.minecraftforge.fml.common.FMLLog.log.error("A TileEntity type {} has throw an exception trying to write state. It will not persist. Report this to the mod author",
+                net.minecraftforge.fml.common.FMLLog.log.error("A TileEntity type {} has throw an exception trying to write state. It will not be visible in compact machines. Report this to the Compact Machines author.",
                         tileentity.getClass().getName(), e);
             }
         }
-
         compound.setTag("TileEntities", nbttaglist2);
-        List<NextTickListEntry> list = worldIn.getPendingBlockUpdates(chunkIn, false);
 
+
+        List<NextTickListEntry> list = worldIn.getPendingBlockUpdates(chunkIn, false);
         if (list != null)
         {
             long j = worldIn.getTotalWorldTime();
