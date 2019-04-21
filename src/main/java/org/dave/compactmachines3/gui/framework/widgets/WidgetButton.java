@@ -1,5 +1,7 @@
 package org.dave.compactmachines3.gui.framework.widgets;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -9,9 +11,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.gui.framework.GUIHelper;
+import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
 import org.dave.compactmachines3.gui.framework.event.MouseEnterEvent;
 import org.dave.compactmachines3.gui.framework.event.MouseExitEvent;
 import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
@@ -22,7 +26,7 @@ import static org.lwjgl.opengl.GL11.GL_QUADS;
 public class WidgetButton extends Widget {
     protected String unlocalizedLabel;
     public boolean hovered = false;
-    public ResourceLocation backgroundTexture = new ResourceLocation("minecraft", "textures/blocks/concrete_silver.png");
+    public ResourceLocation backgroundTexture = new ResourceLocation("minecraft", "textures/blocks/concrete_powder_silver.png");
     public TextureAtlasSprite atlasSprite;
 
     protected static final ResourceLocation BUTTON_TEXTURES = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
@@ -33,6 +37,11 @@ public class WidgetButton extends Widget {
 
         this.setId("Button[" + unlocalizedLabel + "]");
         this.unlocalizedLabel = unlocalizedLabel;
+
+        this.addListener(MouseClickEvent.class, ((event, widget) -> {
+            Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            return WidgetEventResult.CONTINUE_PROCESSING;
+        }));
 
         this.addListener(MouseEnterEvent.class, (event, widget) -> {((WidgetButton)widget).hovered = true; return WidgetEventResult.CONTINUE_PROCESSING; });
         this.addListener(MouseExitEvent.class, (event, widget) -> {((WidgetButton)widget).hovered = false; return WidgetEventResult.CONTINUE_PROCESSING; });

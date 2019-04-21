@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.gui.machine;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -31,9 +32,8 @@ public class GuiMachineWidgetGui extends GUI {
         tabs.setWidth(width);
         tabs.setHeight(height);
 
-        // TODO: Translation
-        tabs.addPage(createPreviewPanel(), new ItemStack(Blockss.wall), Collections.singletonList("Preview"));
-        tabs.addPage(createWhitelistPanel(), new ItemStack(Items.FILLED_MAP), Collections.singletonList("Whitelist"));
+        tabs.addPage(createPreviewPanel(), new ItemStack(Blockss.wall), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.preview")));
+        tabs.addPage(createWhitelistPanel(), new ItemStack(Items.FILLED_MAP), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.whitelist")));
 
         this.add(tabs);
 

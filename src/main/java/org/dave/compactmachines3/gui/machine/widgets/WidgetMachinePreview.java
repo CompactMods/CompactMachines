@@ -16,8 +16,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
 import org.dave.compactmachines3.gui.framework.event.MouseClickMoveEvent;
-import org.dave.compactmachines3.gui.framework.event.MouseMoveEvent;
 import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
 import org.dave.compactmachines3.gui.framework.widgets.Widget;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
@@ -40,6 +40,15 @@ public class WidgetMachinePreview extends Widget {
     long lastClickTime = Long.MAX_VALUE;
 
     public WidgetMachinePreview() {
+
+        this.addListener(MouseClickEvent.class, (event, widget) -> {
+            if(rotateX == 0.0d) {
+                rotateX = RenderTickCounter.renderTicks * 45.0f / 128.0f;
+            }
+
+
+            return WidgetEventResult.CONTINUE_PROCESSING;
+        });
 
         this.addListener(MouseClickMoveEvent.class, (event, widget) -> {
             int mouseX = event.x;

@@ -20,8 +20,6 @@ public class GUI extends WidgetPanel {
         this.setY(y);
         this.setWidth(width);
         this.setHeight(height);
-        this.setPadding(3);
-        this.setPaddingBottom(0);
 
         this.tabIcons = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
     }

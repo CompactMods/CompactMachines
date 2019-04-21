@@ -12,7 +12,7 @@ public class WidgetTextBox extends Widget {
         this.setId("TextBox");
         this.text = text;
         this.setWidth(40);
-        this.setHeight(12);
+        this.setHeight(10);
     }
 
     public WidgetTextBox(String text, int textColor) {
@@ -20,7 +20,7 @@ public class WidgetTextBox extends Widget {
         this.text = text;
         this.textColor = textColor;
         this.setWidth(40);
-        this.setHeight(12);
+        this.setHeight(10);
     }
 
     public void setText(String text) {

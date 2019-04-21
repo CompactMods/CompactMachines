@@ -3,7 +3,6 @@ package org.dave.compactmachines3.gui.framework.widgets;
 import com.google.common.collect.Sets;
 import net.minecraft.client.gui.GuiScreen;
 import org.dave.compactmachines3.gui.framework.event.*;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,11 +12,6 @@ import java.util.Set;
 public class WidgetPanel extends Widget {
     List<Widget> children;
     List<Widget> previouslyHovered;
-
-    public int paddingTop = 0;
-    public int paddingBottom = 0;
-    public int paddingLeft = 0;
-    public int paddingRight = 0;
 
     public WidgetPanel() {
         this.children = new LinkedList<>();
@@ -111,36 +105,6 @@ public class WidgetPanel extends Widget {
 
     public void remove(Widget widget) {
         children.remove(widget);
-    }
-
-    public void setPadding(int padding) {
-        this.paddingTop = padding;
-        this.paddingBottom = padding;
-        this.paddingLeft = padding;
-        this.paddingRight = padding;
-    }
-
-    public void setPadding(int top, int bottom, int left, int right) {
-        this.paddingTop = top;
-        this.paddingBottom = bottom;
-        this.paddingLeft = left;
-        this.paddingRight = right;
-    }
-
-    public void setPaddingTop(int paddingTop) {
-        this.paddingTop = paddingTop;
-    }
-
-    public void setPaddingBottom(int paddingBottom) {
-        this.paddingBottom = paddingBottom;
-    }
-
-    public void setPaddingLeft(int paddingLeft) {
-        this.paddingLeft = paddingLeft;
-    }
-
-    public void setPaddingRight(int paddingRight) {
-        this.paddingRight = paddingRight;
     }
 
     public List<Widget> getHoveredWidgets() {

@@ -146,6 +146,9 @@ gui.compactmachines3.psd.redstone_tunnels.text=These can be used to transfer red
 gui.compactmachines3.psd.crafting.label=Miniaturization Crafting
 gui.compactmachines3.psd.crafting.text=To craft Compact Machines you will need to set up a miniaturization crafting structure.\nGrab 4 Miniaturization Field Projectors and place them opposite of each other, with 7, 11 or 15 spaces between them. All of them need to face the center.\nOnce placed correctly they will start emitting a miniaturization field. Build a recipe like specified in JEI and throw the catalyst item inside the field to start the crafting process.
 
+gui.compactmachines3.compactsky.whitelist=Whitelist
+gui.compactmachines3.compactsky.preview=Preview
+gui.compactmachines3.compactsky.enter=Enter machine
 
 gui.compactmachines3.compactsky.configuration.startLocked=Start machines in locked state
 gui.compactmachines3.compactsky.configuration.givePSD=Give players a Shrinking Device on first spawn

@@ -5,21 +5,28 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
+import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetButton;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetPanel;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetTextBox;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.init.Itemss;
+import org.dave.compactmachines3.network.MessageRequestMachineAction;
+import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 
 public class WidgetPreviewPanel extends WidgetPanel {
 
     public WidgetPreviewPanel(EntityPlayer player, int width, int height) {
+        super();
+        this.setWidth(width);
+        this.setHeight(height);
         this.setId("PreviewPanel");
 
         WidgetMachinePreview preview = new WidgetMachinePreview();
-        preview.setX(width / 2);
-        preview.setY(height / 2);
+        preview.setWidth(width);
+        preview.setHeight(height);
         this.add(preview);
 
         if(ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(player) && GuiMachineData.coords != -1 && GuiMachineData.isAllowedToEnter(player)) {
@@ -36,7 +43,21 @@ public class WidgetPreviewPanel extends WidgetPanel {
             enterButton.setWidth(20);
             enterButton.setHeight(20);
             // TODO: Investigate why the tooltip wont show
-            enterButton.setTooltipLines("Enter machine");
+            enterButton.setTooltipLines(I18n.format("gui.compactmachines3.compactsky.enter"));
+
+            enterButton.addListener(MouseClickEvent.class, (event, widget) -> {
+                boolean hasDevice = ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(player);
+                boolean validCoords = GuiMachineData.coords != -1;
+                boolean isAllowedToEnter = GuiMachineData.isAllowedToEnter(player);
+                if(!hasDevice || !validCoords || !isAllowedToEnter) {
+                    return WidgetEventResult.CONTINUE_PROCESSING;
+                }
+
+                PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TRY_TO_ENTER));
+                player.closeScreen();
+
+                return WidgetEventResult.HANDLED;
+            });
 
             this.add(enterButton);
         }

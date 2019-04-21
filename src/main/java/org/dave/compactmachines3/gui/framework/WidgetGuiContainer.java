@@ -4,6 +4,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import org.dave.compactmachines3.gui.framework.event.*;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 
@@ -12,6 +13,7 @@ public abstract class WidgetGuiContainer extends GuiContainer {
 
     private int previousMouseX = Integer.MAX_VALUE;
     private int previousMouseY = Integer.MAX_VALUE;
+    public boolean dataUpdated = false;
 
     public WidgetGuiContainer(Container container) {
         super(container);
@@ -21,6 +23,17 @@ public abstract class WidgetGuiContainer extends GuiContainer {
     public void updateScreen() {
         super.updateScreen();
         gui.fireEvent(new UpdateScreenEvent());
+        this.resetMousePositions();
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+
+        int wheelValue = Mouse.getEventDWheel();
+        if(wheelValue != 0) {
+            gui.fireEvent(new MouseScrollEvent(wheelValue));
+        }
     }
 
     @Override
@@ -46,6 +59,11 @@ public abstract class WidgetGuiContainer extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if(dataUpdated) {
+            dataUpdated = false;
+            gui.fireEvent(new GuiDataUpdatedEvent());
+        }
+
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if(mouseX != previousMouseX || mouseY != previousMouseY) {
@@ -70,5 +88,9 @@ public abstract class WidgetGuiContainer extends GuiContainer {
     protected void resetMousePositions() {
         this.previousMouseX = Integer.MIN_VALUE;
         this.previousMouseY = Integer.MIN_VALUE;
+    }
+
+    public void fireDataUpdateEvent() {
+        dataUpdated = true;
     }
 }
