@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.math.MathHelper;
 import org.dave.compactmachines3.gui.framework.event.*;
-import org.dave.compactmachines3.utility.Logz;
 
 
 public class WidgetInputField extends WidgetWithValue<String> {
@@ -69,6 +68,7 @@ public class WidgetInputField extends WidgetWithValue<String> {
             @Override
             public WidgetEventResult call(KeyTypedEvent event, Widget widget) {
                 WidgetInputField self = (WidgetInputField) widget;
+
                 if (!self.focused) {
                     return WidgetEventResult.CONTINUE_PROCESSING;
                 }
@@ -121,6 +121,11 @@ public class WidgetInputField extends WidgetWithValue<String> {
                                 self.deleteFromCursor(-1);
                             }
 
+                            return WidgetEventResult.HANDLED;
+                        case 28:
+                            if(self.enabled) {
+                                self.fireEvent(new WidgetExecuteEvent());
+                            }
                             return WidgetEventResult.HANDLED;
                         case 199:
 
@@ -244,6 +249,10 @@ public class WidgetInputField extends WidgetWithValue<String> {
      */
     public void setText(String textIn)
     {
+        if(textIn == null) {
+            return;
+        }
+
         if (this.validator.apply(textIn))
         {
             String oldText = this.text;

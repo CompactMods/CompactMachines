@@ -1,10 +1,7 @@
 package org.dave.compactmachines3.gui.machine.widgets;
 
 import net.minecraft.client.resources.I18n;
-import org.dave.compactmachines3.gui.framework.event.GuiDataUpdatedEvent;
-import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
-import org.dave.compactmachines3.gui.framework.event.ValueChangedEvent;
-import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
+import org.dave.compactmachines3.gui.framework.event.*;
 import org.dave.compactmachines3.gui.framework.widgets.*;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.network.MessagePlayerWhiteListToggle;
@@ -57,6 +54,17 @@ public class WidgetWhitelistPanel extends WidgetPanel {
         inputField.setY(162);
         inputField.setWidth(width-32);
         inputField.setHeight(18);
+        inputField.addListener(WidgetExecuteEvent.class, (event, widget) -> {
+            String playerName = inputField.getText();
+            if(playerName.length() == 0) {
+                return WidgetEventResult.HANDLED;
+            }
+
+            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.coords, playerName));
+            inputField.setText("");
+
+            return WidgetEventResult.HANDLED;
+        });
 
         listPanel.add(inputField);
 

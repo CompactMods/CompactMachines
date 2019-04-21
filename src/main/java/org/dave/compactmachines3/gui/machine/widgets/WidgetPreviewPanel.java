@@ -12,6 +12,7 @@ import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.gui.framework.event.GuiDataUpdatedEvent;
 import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
 import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
+import org.dave.compactmachines3.gui.framework.event.WidgetExecuteEvent;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetButton;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetInputField;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetPanel;
@@ -111,10 +112,23 @@ public class WidgetPreviewPanel extends WidgetPanel {
                 return WidgetEventResult.HANDLED;
             });
 
+            renameInput.addListener(WidgetExecuteEvent.class, (event, widget) -> {
+                renameButton.setVisible(true);
+                machineNameTextBox.setVisible(true);
+                renamePanel.setVisible(false);
+                if(GuiMachineData.isUsedCube() && GuiMachineData.isOwner(player)) {
+                    PackageHandler.instance.sendToServer(new MessageSetMachineName(GuiMachineData.coords, renameInput.getText()));
+                }
+                return WidgetEventResult.HANDLED;
+            });
+
             renameButton.addListener(MouseClickEvent.class, (event, widget) -> {
                 renameButton.setVisible(false);
                 machineNameTextBox.setVisible(false);
                 renamePanel.setVisible(true);
+                renameInput.setCursorPositionEnd();
+                renameInput.setSelectionPos(0);
+                renameInput.setFocused(true);
                 return WidgetEventResult.HANDLED;
             });
 

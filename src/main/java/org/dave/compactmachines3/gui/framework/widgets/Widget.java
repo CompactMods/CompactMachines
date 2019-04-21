@@ -176,6 +176,10 @@ public class Widget {
         this.parent = parent;
     }
 
+    public void setFocused(boolean focused) {
+        this.focused = focused;
+    }
+
     public Widget getRootWidget() {
         if(this.parent == null) {
             return this;
