@@ -60,7 +60,9 @@ public class WidgetPanel extends Widget {
                 }
 
                 //Logz.info("Passing along to child=%s with %d,%d", child.toString(), innerX, innerY);
-                child.fireEvent(new MouseClickEvent(event.x, event.y, event.button));
+                if(child.fireEvent(new MouseClickEvent(event.x, event.y, event.button)) == WidgetEventResult.HANDLED) {
+                    return WidgetEventResult.HANDLED;
+                }
             }
 
             return WidgetEventResult.CONTINUE_PROCESSING;

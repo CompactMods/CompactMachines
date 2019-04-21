@@ -37,6 +37,10 @@ public class WidgetTextBox extends Widget {
 
     @Override
     public void draw(GuiScreen screen) {
+        if(text == null) {
+            return;
+        }
+
         GlStateManager.pushMatrix();
         GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);

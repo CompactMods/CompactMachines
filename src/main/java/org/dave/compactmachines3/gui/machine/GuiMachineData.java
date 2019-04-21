@@ -22,6 +22,22 @@ public class GuiMachineData {
     public static boolean requiresNewDisplayList = false;
     public static boolean canRender = false;
 
+    public static boolean isOwner(EntityPlayer player) {
+        if(owner == null || owner.length() <= 0) {
+            return true;
+        }
+
+        if(!player.getName().equals(owner)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isUsedCube() {
+        return coords != -1;
+    }
+
     public static boolean isAllowedToEnter(EntityPlayer player) {
         if(!locked) {
             return true;

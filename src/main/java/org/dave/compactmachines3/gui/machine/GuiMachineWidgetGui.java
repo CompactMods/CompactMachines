@@ -33,7 +33,10 @@ public class GuiMachineWidgetGui extends GUI {
         tabs.setHeight(height);
 
         tabs.addPage(createPreviewPanel(), new ItemStack(Blockss.wall), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.preview")));
-        tabs.addPage(createWhitelistPanel(), new ItemStack(Items.FILLED_MAP), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.whitelist")));
+
+        if(GuiMachineData.coords != -1 && GuiMachineData.isOwner(player)) {
+            tabs.addPage(createWhitelistPanel(), new ItemStack(Items.FILLED_MAP), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.whitelist")));
+        }
 
         this.add(tabs);
 

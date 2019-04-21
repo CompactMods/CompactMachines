@@ -149,6 +149,7 @@ gui.compactmachines3.psd.crafting.text=To craft Compact Machines you will need t
 gui.compactmachines3.compactsky.whitelist=Whitelist
 gui.compactmachines3.compactsky.preview=Preview
 gui.compactmachines3.compactsky.enter=Enter machine
+gui.compactmachines3.compactsky.rename=Rename
 
 gui.compactmachines3.compactsky.configuration.startLocked=Start machines in locked state
 gui.compactmachines3.compactsky.configuration.givePSD=Give players a Shrinking Device on first spawn
