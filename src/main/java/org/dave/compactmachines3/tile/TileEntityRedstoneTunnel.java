@@ -17,12 +17,28 @@ public class TileEntityRedstoneTunnel extends BaseTileEntityTunnel {
 
     public int getRedstonePowerInput(EnumFacing facing) {
         int coords = StructureTools.getCoordsForPos(this.getPos());
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
-        if(dimpos == null) {
+
+        WorldSavedDataMachines wsd = WorldSavedDataMachines.INSTANCE;
+        if (wsd == null) {
             return 0;
         }
 
-        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(coords);
+        HashMap<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
+        if (machinePositions == null) {
+            return 0;
+        }
+
+        DimensionBlockPos dimpos = machinePositions.get(coords);
+        if (dimpos == null) {
+            return 0;
+        }
+
+        HashMap<Integer, HashMap<EnumFacing, RedstoneTunnelData>> redstoneTunnels = wsd.redstoneTunnels;
+        if (redstoneTunnels == null) {
+            return 0;
+        }
+
+        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = redstoneTunnels.get(coords);
         if(tunnelMapping == null) {
             return 0;
         }
