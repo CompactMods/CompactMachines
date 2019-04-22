@@ -11,9 +11,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.dave.compactmachines3.utility.Logz;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class SkyWorldSavedData extends WorldSavedData {
     private static final String SAVED_DATA_NAME = "CompactSkiesSavedData";
@@ -22,21 +20,32 @@ public class SkyWorldSavedData extends WorldSavedData {
 
     private Set<UUID> hubMachineOwners;
     private Set<UUID> startingInventoryReceivers;
+    private Map<UUID, Integer> homeOwnerMapping;
 
     public SkyWorldSavedData(String name) {
         super(name);
 
         hubMachineOwners = new HashSet<>();
         startingInventoryReceivers = new HashSet<>();
+        homeOwnerMapping = new HashMap<>();
     }
 
     public boolean isHubMachineOwner(EntityPlayer player) {
         return hubMachineOwners.contains(player.getUniqueID());
     }
 
-    public void addToHubMachineOwners(EntityPlayer player) {
+    public void setHomeOwner(EntityPlayer player, int coords) {
+        homeOwnerMapping.put(player.getUniqueID(), coords);
         hubMachineOwners.add(player.getUniqueID());
         this.markDirty();
+    }
+
+    public boolean hasSkyworldHome(EntityPlayer player) {
+        return homeOwnerMapping.containsKey(player.getUniqueID());
+    }
+
+    public int getSkyworldHome(EntityPlayer player) {
+        return homeOwnerMapping.get(player.getUniqueID());
     }
 
     public boolean hasReceivedStartingInventory(EntityPlayer player) {
@@ -90,6 +99,16 @@ public class SkyWorldSavedData extends WorldSavedData {
                 startingInventoryReceivers.add(uuid);
             }
         }
+
+        homeOwnerMapping.clear();
+        if(nbt.hasKey("homeOwnerMapping")) {
+            NBTTagCompound tagCompound = nbt.getCompoundTag("homeOwnerMapping");
+            for(String key : tagCompound.getKeySet()) {
+                int coord = Integer.parseInt(key);
+                UUID owner = tagCompound.getUniqueId(key);
+                homeOwnerMapping.put(owner, coord);
+            }
+        }
     }
 
     @Override
@@ -111,6 +130,14 @@ public class SkyWorldSavedData extends WorldSavedData {
         }
 
         compound.setTag("startingInventoryReceivers", startingInventoryReceiversTagList);
+
+        NBTTagCompound homeMapping = new NBTTagCompound();
+        for(UUID owner : homeOwnerMapping.keySet()) {
+            int coords = homeOwnerMapping.get(owner);
+            homeMapping.setUniqueId("" + coords, owner);
+        }
+
+        compound.setTag("homeOwnerMapping", homeMapping);
 
         return compound;
     }

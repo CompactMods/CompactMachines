@@ -15,6 +15,7 @@ import org.dave.compactmachines3.init.Itemss;
 import org.dave.compactmachines3.init.Triggerss;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
+import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +47,11 @@ public class SkyWorldEvents {
 
         if(!event.player.isCreative() && (event.player.posY > 49.0f || event.player.posY < 39.5f)) {
             BlockPos spawnPoint = worldServer.getSpawnPoint();
-            event.player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 0.2d, spawnPoint.getZ() + 0.5d);
+            if(SkyWorldSavedData.instance.isHubMachineOwner(event.player)) {
+                TeleportationTools.teleportToSkyworldHome(event.player);
+            } else {
+                event.player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 1.0d, spawnPoint.getZ() + 0.5d);
+            }
             return;
         }
 

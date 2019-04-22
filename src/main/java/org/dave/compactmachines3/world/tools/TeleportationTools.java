@@ -57,11 +57,26 @@ public class TeleportationTools {
             machine.markDirty();
 
             if(world.getWorldType() instanceof SkyWorldType) {
-                SkyWorldSavedData.instance.addToHubMachineOwners(player);
+                SkyWorldSavedData.instance.setHomeOwner(player, machine.coords);
             }
         }
 
         return true;
+    }
+
+    public static void teleportToSkyworldHome(EntityPlayer player) {
+        if(!SkyWorldSavedData.instance.hasSkyworldHome(player)) {
+            return;
+        }
+
+        int coords = SkyWorldSavedData.instance.getSkyworldHome(player);
+        DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
+        if(pos == null) {
+            return;
+        }
+
+        BlockPos spawnPoint = pos.getBlockPos();
+        player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 1.2d, spawnPoint.getZ() + 0.5d);
     }
 
     public static int getLastKnownCoords(EntityPlayer player) {
