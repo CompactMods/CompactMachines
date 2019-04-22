@@ -96,6 +96,9 @@ public class WidgetWhitelistPanel extends WidgetPanel {
         usernameList.setHeight(height-62);
 
         this.addListener(GuiDataUpdatedEvent.class, (event, widget) -> {
+            checkbox.setValue(GuiMachineData.locked, false);
+            listPanel.setVisible(GuiMachineData.locked);
+
             usernameList.clear();
 
             ArrayList<String> sortedPlayerNames = (ArrayList<String>) GuiMachineData.playerWhiteList.clone();

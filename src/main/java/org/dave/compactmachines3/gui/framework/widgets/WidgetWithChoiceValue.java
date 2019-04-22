@@ -21,7 +21,15 @@ public class WidgetWithChoiceValue<T> extends Widget {
     }
 
     public void setValue(T choice) {
+        this.setValue(choice, true);
+    }
+
+    public void setValue(T choice, boolean fireEvent) {
+        T oldValue = choices.getPointedElement();
         choices.setPointerTo(choice);
+        if(fireEvent) {
+            this.fireEvent(new ValueChangedEvent<T>(oldValue, choice));
+        }
     }
 
     public void addChoice(T... newChoices) {

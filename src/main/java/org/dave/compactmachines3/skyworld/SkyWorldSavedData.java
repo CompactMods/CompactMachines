@@ -105,7 +105,8 @@ public class SkyWorldSavedData extends WorldSavedData {
             NBTTagCompound tagCompound = nbt.getCompoundTag("homeOwnerMapping");
             for(String key : tagCompound.getKeySet()) {
                 int coord = Integer.parseInt(key);
-                UUID owner = tagCompound.getUniqueId(key);
+                NBTTagCompound innerCompound = tagCompound.getCompoundTag(key);
+                UUID owner = innerCompound.getUniqueId("");
                 homeOwnerMapping.put(owner, coord);
             }
         }
@@ -133,8 +134,11 @@ public class SkyWorldSavedData extends WorldSavedData {
 
         NBTTagCompound homeMapping = new NBTTagCompound();
         for(UUID owner : homeOwnerMapping.keySet()) {
+            NBTTagCompound innerKey = new NBTTagCompound();
+            innerKey.setUniqueId("", owner);
+
             int coords = homeOwnerMapping.get(owner);
-            homeMapping.setUniqueId("" + coords, owner);
+            homeMapping.setTag("" + coords, innerKey);
         }
 
         compound.setTag("homeOwnerMapping", homeMapping);

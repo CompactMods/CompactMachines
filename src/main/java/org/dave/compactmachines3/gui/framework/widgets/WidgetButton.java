@@ -26,7 +26,7 @@ import static org.lwjgl.opengl.GL11.GL_QUADS;
 public class WidgetButton extends Widget {
     protected String unlocalizedLabel;
     public boolean hovered = false;
-    public ResourceLocation backgroundTexture = new ResourceLocation("minecraft", "textures/blocks/concrete_powder_silver.png");
+    public ResourceLocation backgroundTexture = new ResourceLocation("minecraft", "textures/blocks/stone.png");
     public TextureAtlasSprite atlasSprite;
 
     protected static final ResourceLocation BUTTON_TEXTURES = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");

@@ -70,7 +70,6 @@ public class TileEntityCraftingHologram extends TileEntity implements ITickable 
 
             world.spawnEntity(entityItem);
             world.setBlockToAir(getPos());
-            return;
         }
 
         progress++;
