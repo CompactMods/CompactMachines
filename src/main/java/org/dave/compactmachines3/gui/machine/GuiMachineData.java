@@ -1,7 +1,10 @@
 package org.dave.compactmachines3.gui.machine;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import org.dave.compactmachines3.gui.framework.WidgetGuiContainer;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
+import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -18,6 +21,22 @@ public class GuiMachineData {
 
     public static boolean requiresNewDisplayList = false;
     public static boolean canRender = false;
+
+    public static boolean isOwner(EntityPlayer player) {
+        if(owner == null || owner.length() <= 0) {
+            return true;
+        }
+
+        if(!player.getName().equals(owner)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isUsedCube() {
+        return coords != -1;
+    }
 
     public static boolean isAllowedToEnter(EntityPlayer player) {
         if(!locked) {
@@ -51,5 +70,14 @@ public class GuiMachineData {
 
         requiresNewDisplayList = true;
         canRender = true;
+
+        if(Minecraft.getMinecraft().currentScreen instanceof WidgetGuiContainer) {
+            WidgetGuiContainer widgetGuiContainer = (WidgetGuiContainer)Minecraft.getMinecraft().currentScreen;
+            if(widgetGuiContainer == null) {
+                return;
+            }
+
+            widgetGuiContainer.fireDataUpdateEvent();
+        }
     }
 }
