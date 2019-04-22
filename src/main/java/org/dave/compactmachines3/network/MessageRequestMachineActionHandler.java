@@ -91,6 +91,7 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
 
         if(updateMachineContent[0]) {
             serverPlayer.getServerWorld().addScheduledTask(() -> {
+                PackageHandler.instance.sendTo(new MessageMachineChunk(finalCoords), serverPlayer);
                 PackageHandler.instance.sendTo(new MessageMachineContent(finalCoords), serverPlayer);
             });
         }
