@@ -111,16 +111,13 @@ public class WorldSavedDataMachines extends WorldSavedData {
             return;
         }
 
-        Logz.info("Loading saved data for machine world");
         WorldSavedDataMachines wsd = (WorldSavedDataMachines)event.getWorld().getMapStorage().getOrLoadData(WorldSavedDataMachines.class, "WorldSavedDataMachines");
         if(wsd == null) {
             wsd = new WorldSavedDataMachines("WorldSavedDataMachines");
             wsd.markDirty();
         }
 
-        Logz.info(" > %d spawn points", wsd.spawnPoints.size());
-        Logz.info(" > Next machine id: %d", wsd.nextCoord);
-        Logz.info(" > Players with beds in CM dimension: %d", wsd.bedCoords.size());
+        Logz.info("Loaded data for compact machine world: %d spawn points, next machine id is %d, players with beds: %d", wsd.spawnPoints.size(), wsd.nextCoord, wsd.bedCoords.size());
 
         WorldSavedDataMachines.INSTANCE = wsd;
         event.getWorld().getMapStorage().setData("WorldSavedDataMachines", wsd);
