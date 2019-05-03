@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.world;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -23,5 +24,10 @@ public class WorldClone extends World {
     @Override
     protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
         return this.providerClient.isChunkGeneratedAt(x, z);
+    }
+
+    @Override
+    public long getWorldTime() {
+        return Minecraft.getMinecraft().world.getWorldTime();
     }
 }
