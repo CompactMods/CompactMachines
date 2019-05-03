@@ -19,10 +19,13 @@ import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvid
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChunkUtils {
     private static Field updatePacketNBTField;
+
+    public static List<String> erroneousTiles = new ArrayList<>();
 
     public static IBlockAccess getBlockAccessFromChunk(Chunk chunk) {
         return new ChunkBlockAccess(chunk);
@@ -239,13 +242,27 @@ public class ChunkUtils {
             TileEntity tileentity = TileEntity.create(worldIn, nbttagcompound2);
             if (tileentity != null)
             {
-                tileentity.setWorld(worldIn);
+                if(erroneousTiles.contains(tileentity.getClass().getName())) {
+                    continue;
+                }
 
-                for(AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
-                    String tagName = String.format("cm3_extra:%s", provider.getName());
-                    if(nbttagcompound2.hasKey(tagName)) {
-                        provider.readExtraData(tileentity, (NBTTagCompound) nbttagcompound2.getTag(tagName));
+                try {
+                    tileentity.setWorld(worldIn);
+                } catch (Exception e) {
+                    Logz.warn("Unable to render tile-entity %s in a fake world. Skipping.", tileentity.getClass().getName());
+                    erroneousTiles.add(tileentity.getClass().getName());
+                    continue;
+                }
+
+                try {
+                    for (AbstractExtraTileDataProvider provider : ExtraTileDataProviderRegistry.getDataProviders(tileentity)) {
+                        String tagName = String.format("cm3_extra:%s", provider.getName());
+                        if (nbttagcompound2.hasKey(tagName)) {
+                            provider.readExtraData(tileentity, (NBTTagCompound) nbttagcompound2.getTag(tagName));
+                        }
                     }
+                } catch (Exception e) {
+                    Logz.warn("Unable to provide extra tile-entity data for %s", tileentity.getClass().getName());
                 }
 
                 chunk.addTileEntity(tileentity);

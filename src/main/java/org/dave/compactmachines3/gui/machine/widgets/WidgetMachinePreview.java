@@ -23,6 +23,7 @@ import org.dave.compactmachines3.gui.framework.widgets.Widget;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
+import org.dave.compactmachines3.utility.ChunkUtils;
 import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
 
@@ -240,9 +241,18 @@ public class WidgetMachinePreview extends Widget {
             ForgeHooksClient.setRenderLayer(renderLayer);
 
             try {
+                TileEntity te = CompactMachines3.clientWorldData.worldClone.getTileEntity(pos);
+                if (te != null && ChunkUtils.erroneousTiles.contains(te.getClass().getName())) {
+                    continue;
+                }
+            } catch(Exception e) {
+                continue;
+            }
+
+            try {
                 blockrendererdispatcher.renderBlock(state, pos, CompactMachines3.clientWorldData.worldClone, buffer);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                Logz.debug("Failed rendering of block: %s", state.getBlock());
             }
 
             ForgeHooksClient.setRenderLayer(null);
@@ -292,7 +302,13 @@ public class WidgetMachinePreview extends Widget {
         }
         ForgeHooksClient.setRenderLayer(BlockRenderLayer.SOLID);
         for (BlockPos pos : toRender) {
-            TileEntity te = CompactMachines3.clientWorldData.worldClone.getTileEntity(pos);
+            TileEntity te;
+            try {
+                te = CompactMachines3.clientWorldData.worldClone.getTileEntity(pos);
+            } catch (Exception e) {
+                continue;
+            }
+
             if(te != null) {
                 te.setWorld(CompactMachines3.clientWorldData.worldClone);
                 te.setPos(pos);
