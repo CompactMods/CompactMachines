@@ -20,13 +20,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.api.IRemoteBlockProvider;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.network.MessageMachineChunk;
-import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
@@ -36,9 +33,12 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.SpawnTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
+public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable, IRemoteBlockProvider {
     public int coords = -1;
     private boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
@@ -359,7 +359,13 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         return WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords).get(side);
     }
 
-    public BlockPos getTunnelForSide(EnumFacing side) {
+    @Override
+    public int getConnectedDimensionId(EnumFacing side) {
+        return ConfigurationHandler.Settings.dimensionId;
+    }
+
+    @Override
+    public BlockPos getConnectedBlockPosition(EnumFacing side) {
         if(WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.tunnels == null) {
             return null;
         }
@@ -372,7 +378,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public BlockPos getMachineWorldInsetPos(EnumFacing facing) {
-        BlockPos tunnelPos = this.getTunnelForSide(facing);
+        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
         if(tunnelPos == null) {
             return null;
         }
@@ -478,7 +484,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return super.hasCapability(capability, facing);
         }
 
-        BlockPos tunnelPos = this.getTunnelForSide(facing);
+        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
         if(tunnelPos == null) {
             return false;
         }
@@ -517,7 +523,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return super.getCapability(capability, facing);
         }
 
-        BlockPos tunnelPos = this.getTunnelForSide(facing);
+        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
         if(tunnelPos == null) {
             return null;
         }

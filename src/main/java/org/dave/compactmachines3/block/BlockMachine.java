@@ -135,7 +135,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        BlockPos neighborPos = te.getTunnelForSide(facing);
+        BlockPos neighborPos = te.getConnectedBlockPosition(facing);
         if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
             machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
             te.alreadyNotifiedOnTick = true;

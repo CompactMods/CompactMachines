@@ -6,13 +6,40 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import org.dave.compactmachines3.api.IRemoteBlockProvider;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilityProvider {
+public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilityProvider, IRemoteBlockProvider {
+
+    @Override
+    public BlockPos getConnectedBlockPosition(EnumFacing side) {
+        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        if(dimpos == null) {
+            return null;
+        }
+
+        WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
+        if(realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+            return null;
+        }
+
+        EnumFacing machineSide = this.getMachineSide();
+        return dimpos.getBlockPos().offset(machineSide);
+    }
+
+    @Override
+    public int getConnectedDimensionId(EnumFacing side) {
+        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        if(dimpos == null) {
+            return 0;
+        }
+
+        return dimpos.getDimension();
+    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
