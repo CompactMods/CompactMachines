@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -95,6 +96,40 @@ public class SkyWorldEvents {
         Logz.info("World generator settings are: %s", ((SkyChunkGenerator) worldServer.getChunkProvider().chunkGenerator).config.getAsJsonString());
         Logz.info("Overriding world spawn point");
         event.getWorld().setSpawnPoint(new BlockPos(centerPos, heightPos, centerPos));
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void preventUsingItemsInHub(PlayerInteractEvent.RightClickItem event) {
+        World world = event.getWorld();
+        if(world.isRemote || !(world instanceof WorldServer)) {
+            return;
+        }
+
+        WorldServer worldServer = (WorldServer)world;
+        if(!(worldServer.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator)) {
+            return;
+        }
+
+        if(ShrinkingDeviceUtils.isShrinkingDevice(event.getItemStack())) {
+            return;
+        }
+
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void preventFlowingFluidsInHub(BlockEvent.FluidPlaceBlockEvent event) {
+        World world = event.getWorld();
+        if(world.isRemote || !(world instanceof WorldServer)) {
+            return;
+        }
+
+        WorldServer worldServer = (WorldServer)world;
+        if(!(worldServer.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator)) {
+            return;
+        }
+
         event.setCanceled(true);
     }
 
