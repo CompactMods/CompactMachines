@@ -1,6 +1,5 @@
 **Read then remove this section**:
-Please read [this](https://vazkii.us/br101/) and follow there instructions in there before creating an issue.
-Most importantly, do not create an issue if you have not tried fixing it by using the latest version of the mod!
+Do not create an issue if you have not tried fixing it by using the latest version of the mod!
 
 Also make sure you've read the full readme [here](https://github.com/thraaawn/CompactMachines/blob/1.12.1/README.md) on github.
 
