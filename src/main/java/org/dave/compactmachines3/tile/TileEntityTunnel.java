@@ -13,6 +13,8 @@ import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
+import java.util.HashMap;
+
 public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilityProvider, IRemoteBlockProvider {
 
     @Override
@@ -50,8 +52,18 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
 
             return super.hasCapability(capability, facing);
         }
+        
+        WorldSavedDataMachines wsd = WorldSavedDataMachines.INSTANCE;
+        if (wsd == null) {
+        	return false;
+        }
+        
+        HashMap<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
+        if (machinePositions == null) {
+        	return false;
+        }
 
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
         if(dimpos == null) {
             return false;
         }
