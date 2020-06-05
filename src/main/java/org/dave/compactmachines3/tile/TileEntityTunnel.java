@@ -98,7 +98,17 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
             return super.getCapability(capability, facing);
         }
 
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        WorldSavedDataMachines wsd = WorldSavedDataMachines.INSTANCE;
+        if (wsd == null) {
+            return null;
+        }
+
+        HashMap<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
+        if (machinePositions == null) {
+            return null;
+        }
+
+        DimensionBlockPos dimpos = machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
         if(dimpos == null) {
             return null;
         }
