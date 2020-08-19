@@ -66,7 +66,7 @@ repositories {
 
     maven {
         name = "refinedstorage"
-        url = "https://repo.raoulvdberge.com/"
+        url = "https://repo.refinedmods.com/"
     }
 
     maven {
