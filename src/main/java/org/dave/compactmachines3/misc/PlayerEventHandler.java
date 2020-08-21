@@ -48,7 +48,9 @@ public class PlayerEventHandler {
         if(event.player.getEntityWorld().provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
             return;
         }
-
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
         int bedCoords = WorldSavedDataMachines.INSTANCE.getBedCoords(event.player);
         boolean bedInCM = bedCoords != -1;
 
@@ -171,6 +173,9 @@ public class PlayerEventHandler {
         }
 
         int actualCoords = StructureTools.getCoordsForPos(new BlockPos(event.player.posX, event.player.posY, event.player.posZ));
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
         EnumMachineSize enumSize = WorldSavedDataMachines.INSTANCE.machineSizes.getOrDefault(lastCoords, null);
         if(enumSize == null) {
             // This should only happen after someone updated before this feature was implemented:

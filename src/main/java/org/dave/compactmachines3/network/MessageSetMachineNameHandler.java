@@ -14,7 +14,7 @@ public class MessageSetMachineNameHandler implements IMessageHandler<MessageSetM
     @Override
     public MessageSetMachineName onMessage(MessageSetMachineName message, MessageContext ctx) {
         int coords = message.coords;
-        if(message.coords < 0 || message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+        if(message.coords < 0 || WorldSavedDataMachines.INSTANCE == null || message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
             return null;
         }
 

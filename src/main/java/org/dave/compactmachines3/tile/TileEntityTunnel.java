@@ -19,6 +19,9 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
 
     @Override
     public BlockPos getConnectedBlockPosition(EnumFacing side) {
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return null;
+        }
         DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
         if(dimpos == null) {
             return null;
@@ -35,6 +38,9 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
 
     @Override
     public int getConnectedDimensionId(EnumFacing side) {
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return 0;
+        }
         DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
         if(dimpos == null) {
             return 0;
@@ -97,7 +103,9 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
 
             return super.getCapability(capability, facing);
         }
-
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return null;
+        }
         DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
         if(dimpos == null) {
             return null;

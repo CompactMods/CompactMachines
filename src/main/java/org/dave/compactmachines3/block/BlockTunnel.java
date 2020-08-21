@@ -46,6 +46,9 @@ public class BlockTunnel extends BlockBaseTunnel {
         EnumFacing connectedSide = state.getValue(MACHINE_SIDE);
         EnumFacing nextDirection = StructureTools.getNextDirection(connectedSide);
 
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return false;
+        }
         int coords = StructureTools.getCoordsForPos(pos);
         HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
         while(sideMapping != null) {

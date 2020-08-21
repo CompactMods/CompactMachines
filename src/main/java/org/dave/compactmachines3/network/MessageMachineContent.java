@@ -26,7 +26,9 @@ public class MessageMachineContent implements IMessage {
     public MessageMachineContent(int coords) {
         this.coords = coords;
         WorldSavedDataMachines data = WorldSavedDataMachines.INSTANCE;
-
+        if (data == null) {
+            return;
+        }
         machinePos = data.getMachinePosition(coords);
         machineSize = data.machineSizes.getOrDefault(coords, EnumMachineSize.MAXIMUM).getDimension();
 

@@ -352,7 +352,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
      * Capabilities
      */
     public RedstoneTunnelData getRedstoneTunnelForSide(EnumFacing side) {
-        if(!WorldSavedDataMachines.INSTANCE.redstoneTunnels.containsKey(this.coords)) {
+        if(WorldSavedDataMachines.INSTANCE == null || !WorldSavedDataMachines.INSTANCE.redstoneTunnels.containsKey(this.coords)) {
             return null;
         }
 

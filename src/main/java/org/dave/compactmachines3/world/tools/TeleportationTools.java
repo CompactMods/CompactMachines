@@ -47,6 +47,10 @@ public class TeleportationTools {
 
         machine.initStructure();
 
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return false;
+        }
+
         WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
 
         TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
@@ -66,6 +70,9 @@ public class TeleportationTools {
 
     public static void teleportToSkyworldHome(EntityPlayer player) {
         if(!SkyWorldSavedData.instance.hasSkyworldHome(player)) {
+            return;
+        }
+        if (WorldSavedDataMachines.INSTANCE == null) {
             return;
         }
 
@@ -125,7 +132,9 @@ public class TeleportationTools {
             coordHistory.appendTag(toAppend);
             playerNBT.setTag("compactmachines3-coordHistory", coordHistory);
         }
-
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
         TileEntityMachine machine = WorldSavedDataMachines.INSTANCE.getMachine(coords);
         if(machine.hasNewSchema()) {
             Schema schema = SchemaRegistry.instance.getSchema(machine.getSchemaName());
@@ -166,7 +175,9 @@ public class TeleportationTools {
                 coords = getLastKnownCoords(player);
                 playerNBT.removeTag("compactmachines3-coordHistory");
             }
-
+            if (WorldSavedDataMachines.INSTANCE == null) {
+                return;
+            }
             DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
 
             BlockPos startPoint;

@@ -86,6 +86,9 @@ public class BlockWall extends BlockProtected {
         }
 
         if(playerStack.getItem() instanceof ItemTunnelTool) {
+            if (WorldSavedDataMachines.INSTANCE == null) {
+                return false;
+            }
             EnumFacing tunnelSide = EnumFacing.DOWN;
             int coords = StructureTools.getCoordsForPos(pos);
             HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
@@ -114,6 +117,9 @@ public class BlockWall extends BlockProtected {
         if(playerStack.getItem() instanceof ItemRedstoneTunnelTool) {
             EnumFacing tunnelSide = EnumFacing.DOWN;
             int coords = StructureTools.getCoordsForPos(pos);
+            if (WorldSavedDataMachines.INSTANCE == null) {
+                return false;
+            }
             HashMap<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(coords);
             while(sideMapping != null && tunnelSide != null) {
                 if(sideMapping.get(tunnelSide) == null) {

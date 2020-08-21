@@ -135,6 +135,9 @@ public class StructureTools {
     }
 
     public static List<BlockInformation> createNewSchema(int coords) {
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return null;
+        }
         TileEntity machine = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();
         if(machine != null && machine instanceof TileEntityMachine) {
             return createNewSchema((TileEntityMachine) machine);
@@ -187,6 +190,9 @@ public class StructureTools {
     }
 
     public static void restoreSchema(Schema schema, int coords) {
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
         List<BlockInformation> blockList = schema.getBlocks();
 
         TileEntity te = WorldSavedDataMachines.INSTANCE.getMachinePosition(coords).getTileEntity();

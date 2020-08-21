@@ -24,6 +24,9 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
     @Override
     public MessageMachineContent onMessage(MessageRequestMachineAction message, MessageContext ctx) {
         int coords = message.coords;
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return null;
+        }
         if(message.action == MessageRequestMachineAction.Action.REFRESH) {
             if(message.coords < 0) {
                 coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;

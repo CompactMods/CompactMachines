@@ -210,6 +210,10 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             return;
         }
 
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
+
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
         WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 
@@ -277,6 +281,9 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
                 if (coords != -1) {
                     tileEntityMachine.coords = coords;
                     if(!world.isRemote) {
+                        if (WorldSavedDataMachines.INSTANCE == null) {
+                            return;
+                        }
                         WorldSavedDataMachines.INSTANCE.addMachinePosition(tileEntityMachine.coords, pos, world.provider.getDimension(), tileEntityMachine.getSize());
                         StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
                     }

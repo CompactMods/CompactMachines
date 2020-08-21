@@ -28,7 +28,9 @@ public class CommandMachinesView extends CommandBaseExt {
         if(!(sender.getCommandSenderEntity() instanceof EntityPlayerMP)) {
             return;
         }
-
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return;
+        }
         int coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;
         if(args.length == 1) {
             coords = Integer.parseInt(args[0]);

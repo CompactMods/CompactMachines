@@ -21,6 +21,9 @@ public class SpawnTools {
         int count = 0;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return 0;
+        }
 
         EnumMachineSize size = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
         if(size == null) {

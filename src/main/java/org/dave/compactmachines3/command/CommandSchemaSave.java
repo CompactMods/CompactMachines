@@ -49,7 +49,7 @@ public class CommandSchemaSave extends CommandBaseExt {
 
             List<BlockInformation> blockList = StructureTools.createNewSchema(coords);
 
-            if(blockList != null) {
+            if(blockList != null && WorldSavedDataMachines.INSTANCE != null) {
                 Schema schema = new Schema(args[0]);
                 schema.setBlocks(blockList);
                 schema.setSize(WorldSavedDataMachines.INSTANCE.machineSizes.get(coords));

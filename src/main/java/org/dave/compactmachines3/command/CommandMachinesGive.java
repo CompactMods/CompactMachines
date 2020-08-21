@@ -35,7 +35,7 @@ public class CommandMachinesGive extends CommandBaseExt {
 
         EntityPlayerMP player = (EntityPlayerMP) sender.getCommandSenderEntity();
         int coords = Integer.parseInt(args[0]);
-        if(coords < 0 || coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+        if( coords < 0 || WorldSavedDataMachines.INSTANCE == null || coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
             return;
         }
 

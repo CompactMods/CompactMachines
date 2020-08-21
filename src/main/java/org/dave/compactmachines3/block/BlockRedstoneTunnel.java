@@ -78,7 +78,9 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
                 faceX = hitX;
             }
         }
-
+        if (WorldSavedDataMachines.INSTANCE == null) {
+            return false;
+        }
         if(faceX >= 0.69d && faceX <= 0.94d && faceY >= 0.69d && faceY <= 0.94d) {
             world.setBlockState(pos, state.withProperty(IS_OUTPUT, !state.getValue(IS_OUTPUT)));
             WorldSavedDataMachines.INSTANCE.toggleRedstoneTunnelOutput(pos);
