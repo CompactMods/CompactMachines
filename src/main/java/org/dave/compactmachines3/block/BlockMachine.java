@@ -43,14 +43,6 @@ public class BlockMachine extends Block implements IProbeInfoProvider {
         super(Block.Properties
                 .create(Material.IRON)
                 .hardnessAndResistance(8.0F, 20.0F));
-//
-//        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
-
-        BlockState defState = getStateContainer()
-                .getBaseState()
-                .with(SIZE, EnumMachineSize.TINY);
-
-        setDefaultState(defState);
     }
 
     // TODO Rendering

@@ -1,6 +1,5 @@
 package org.dave.compactmachines3;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,6 +13,8 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dave.compactmachines3.core.Registrations;
+
 import java.util.stream.Collectors;
 
 @Mod(CompactMachines3.MODID)
@@ -32,6 +33,9 @@ public class CompactMachines3
 
     public CompactMachines3() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        // Register blocks and items
+        Registrations.init();
 
         // Register the setup method for modloading
         modBus.addListener(this::setup);
