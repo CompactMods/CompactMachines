@@ -11,6 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.dave.compactmachines3.block.machines.BlockCompactMachine;
 import org.dave.compactmachines3.block.BlockWall;
 import org.dave.compactmachines3.block.BlockWallBreakable;
+import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 
 import static org.dave.compactmachines3.CompactMachines3.MODID;
 
@@ -24,6 +25,9 @@ public class Registrations {
 
     public static final RegistryObject<BlockWall> WALL_BLOCK = BLOCKS.register("wall", BlockWall::new);
     public static final RegistryObject<BlockWallBreakable> BREAKABLE_WALL_BLOCK = BLOCKS.register("breakable_wall", BlockWallBreakable::new);
+
+    public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
+            () -> new ItemPersonalShrinkingDevice(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)));
 
     public static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());

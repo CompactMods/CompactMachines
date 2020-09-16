@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.state.EnumProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -44,6 +45,15 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
         super(Block.Properties
                 .create(Material.IRON)
                 .hardnessAndResistance(8.0F, 20.0F));
+
+        setDefaultState(getStateContainer().getBaseState()
+                .with(SIZE, EnumMachineSize.TINY));
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(SIZE);
     }
 
     // TODO Rendering
@@ -86,7 +96,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
         super.onNeighborChange(state, world, pos, neighbor);
 
-        if(world.isRemote()) {
+        if (world.isRemote()) {
             return;
         }
 
@@ -97,15 +107,15 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
         // Determine whether it's an immediate neighbor ...
         Direction facing = null;
-        for(Direction dir : Direction.values()) {
-            if(pos.offset(dir).equals(neighbor)) {
+        for (Direction dir : Direction.values()) {
+            if (pos.offset(dir).equals(neighbor)) {
                 facing = dir;
                 break;
             }
         }
 
         // And do nothing if it isnt, e.g. diagonal
-        if(facing == null) {
+        if (facing == null) {
             return;
         }
 
@@ -168,7 +178,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public void onPlayerDestroy(IWorld world, BlockPos pos, BlockState state) {
-        if(world.isRemote()) {
+        if (world.isRemote()) {
             super.onPlayerDestroy(world, pos, state);
             return;
         }
@@ -276,7 +286,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 
-        if(player.isSneaking())
+        if (player.isSneaking())
             return ActionResultType.PASS;
 
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);

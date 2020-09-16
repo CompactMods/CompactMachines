@@ -5,5 +5,7 @@
   "compactmachines3.machines.sizes.normal": "Normal",
   "compactmachines3.machines.sizes.large": "Large",
   "compactmachines3.machines.sizes.giant": "Giant",
-  "compactmachines3.machines.sizes.maximum": "Maximum"
+  "compactmachines3.machines.sizes.maximum": "Maximum",
+
+  "item.compactmachines3.personal_shrinking_device": "Personal Shrinking Device"
 }

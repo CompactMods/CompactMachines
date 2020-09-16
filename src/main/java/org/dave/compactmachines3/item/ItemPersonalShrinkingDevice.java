@@ -15,9 +15,8 @@ import java.util.List;
 
 public class ItemPersonalShrinkingDevice extends Item {
 
-    public ItemPersonalShrinkingDevice() {
-        super(new Item.Properties().maxStackSize(1));
-        // TODO: Creative tab
+    public ItemPersonalShrinkingDevice(Properties props) {
+        super(props);
     }
 
 //    TODO Model locations

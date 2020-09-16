@@ -7,7 +7,6 @@ tile.compactmachines3.wallbreakable.name=Compact Machine Wall
 tile.compactmachines3.wall.name=Solid Compact Machine Wall
 tile.compactmachines3.fieldprojector.name=Miniaturization Field Projector
 
-item.compactmachines3.psd.name=Personal Shrinking Device
 item.compactmachines3.tunneltool.name=Tunnel
 item.compactmachines3.redstonetunneltool.name=Redstone Tunnel
 

@@ -1,18 +1,31 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "cube_all",
-    "uvlock": true,
-    "textures": {}
-  },
   "variants": {
-    "size": {
-      "tiny":    { "textures": { "all": "compactmachines3:blocks/machine_0" }},
-      "small":   { "textures": { "all": "compactmachines3:blocks/machine_1" }},
-      "normal":  { "textures": { "all": "compactmachines3:blocks/machine_2" }},
-      "large":   { "textures": { "all": "compactmachines3:blocks/machine_3" }},
-      "giant":   { "textures": { "all": "compactmachines3:blocks/machine_4" }},
-      "maximum": { "textures": { "all": "compactmachines3:blocks/machine_5" }}
+    "inventory": {
+      "model": "compactmachines3:item/machine/machine_tiny"
+    },
+
+    "size=tiny": {
+      "model": "compactmachines3:block/machine/machine_tiny"
+    },
+
+    "size=small": {
+      "model": "compactmachines3:block/machine/machine_small"
+    },
+
+    "size=normal": {
+      "model": "compactmachines3:block/machine/machine_normal"
+    },
+
+    "size=large": {
+      "model": "compactmachines3:block/machine/machine_large"
+    },
+
+    "size=giant": {
+      "model": "compactmachines3:block/machine/machine_giant"
+    },
+
+    "size=maximum": {
+      "model": "compactmachines3:block/machine/machine_maximum"
     }
   }
 }
