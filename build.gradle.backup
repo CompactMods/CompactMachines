@@ -45,9 +45,9 @@ repositories {
     }
 
     maven { // location of the maven that hosts JEI files
-        name "Progwml Repo"
-        url "http://dvs1.progwml6.com/files/maven"
-    }
+            name "Progwml Repo"
+            url "http://dvs1.progwml6.com/files/maven"
+        }
 
     maven { // jei by ip, because travis couldn't resolve it?!
         name "Progwml Repo"
