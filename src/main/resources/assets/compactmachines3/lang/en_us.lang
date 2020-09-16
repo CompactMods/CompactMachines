@@ -1,13 +1,6 @@
 itemGroup.compactmachines3=Compact Machines 3
 generator.compactsky=Compact Sky
 
-tile.compactmachines3.machine.tiny.name=Tiny Compact Machine
-tile.compactmachines3.machine.small.name=Small Compact Machine
-tile.compactmachines3.machine.normal.name=Normal Compact Machine
-tile.compactmachines3.machine.large.name=Large Compact Machine
-tile.compactmachines3.machine.giant.name=Giant Compact Machine
-tile.compactmachines3.machine.maximum.name=Maximum Compact Machine
-
 tile.compactmachines3.tunnel.name=Tunnel
 tile.compactmachines3.redstonetunnel.name=Redstone Tunnel
 tile.compactmachines3.wallbreakable.name=Compact Machine Wall

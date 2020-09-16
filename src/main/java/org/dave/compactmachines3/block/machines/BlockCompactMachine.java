@@ -1,4 +1,4 @@
-package org.dave.compactmachines3.block;
+package org.dave.compactmachines3.block.machines;
 
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -9,7 +9,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.loot.LootContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.tileentity.TileEntity;
@@ -19,11 +18,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
+import org.dave.compactmachines3.core.Registrations;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 
 import javax.annotation.Nullable;
@@ -35,11 +36,11 @@ import java.util.List;
 //import org.dave.compactmachines3.tile.TileEntityTunnel;
 
 // TODO TOP Integration
-public class BlockMachine extends Block implements IProbeInfoProvider {
+public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
     public static final EnumProperty<EnumMachineSize> SIZE = EnumProperty.create("size", EnumMachineSize.class);
 
-    public BlockMachine() {
+    public BlockCompactMachine() {
         super(Block.Properties
                 .create(Material.IRON)
                 .hardnessAndResistance(8.0F, 20.0F));
@@ -144,8 +145,7 @@ public class BlockMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        // TODO: Return an actual item for the machine
-        return new ItemStack(Items.IRON_BLOCK, 1);
+        return new ItemStack(Registrations.MACHINE_BLOCK_ITEM.get(), 1);
     }
 
 //    @Override
@@ -313,11 +313,14 @@ public class BlockMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public String getID() {
-        return CompactMachines3.MODID + ":" + "compact_machine";
+        return CompactMachines3.MODID + ":" + "machine";
     }
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+        String size = blockState.get(SIZE).getName();
+        probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
+
 //        TileEntity te = world.getTileEntity(data.getPos());
 //        if(te instanceof TileEntityMachine) {
 //            TileEntityMachine machine = (TileEntityMachine) te;
