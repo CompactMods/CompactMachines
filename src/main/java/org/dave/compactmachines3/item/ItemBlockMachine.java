@@ -4,10 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.IMetaBlockName;
@@ -44,9 +41,10 @@ public class ItemBlockMachine extends BlockItem {
         if (stack.hasTag() && stack.getTag().contains("coords")) {
             int coords = stack.getTag().getInt("coords");
             if (coords > -1) {
-                TranslationTextComponent coordstc = new TranslationTextComponent("tooltip.compactmachines3.machine.coords");
-                StringTextComponent coordstc2 = new StringTextComponent(" #" + coords);
-                // tooltip.add(coordstc + coordstc2);
+                IFormattableTextComponent coordsTC= new TranslationTextComponent("tooltip.compactmachines3.machine.coords")
+                        .append(new StringTextComponent(" #" + coords));
+
+                tooltip.add(coordsTC);
             }
         }
 
@@ -56,7 +54,10 @@ public class ItemBlockMachine extends BlockItem {
             // String sizeString = size + "x" + size + "x" + size;
             // tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines3.machine.hint", I18n.format(this.getTranslationKey(stack) + ".name"), sizeString));
         } else {
-            tooltip.add(new TranslationTextComponent((TextFormatting.GRAY + "tooltip." + CompactMachines3.MODID + ".hold_shift.hint")));
+            IFormattableTextComponent text = new StringTextComponent("" + TextFormatting.GRAY)
+                    .append(new TranslationTextComponent("tooltip." + CompactMachines3.MODID + ".hold_shift.hint"));
+
+            tooltip.add(text);
         }
     }
 }

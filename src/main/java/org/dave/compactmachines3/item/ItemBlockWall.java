@@ -21,7 +21,7 @@ public class ItemBlockWall extends BlockItem {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         IFormattableTextComponent text = new StringTextComponent(""  + TextFormatting.RED)
-                .func_230529_a_(new TranslationTextComponent("tooltip.compactmachines3.wall.hint"));
+                .append(new TranslationTextComponent("tooltip.compactmachines3.wall.hint"));
 
         tooltip.add(text);
     }
