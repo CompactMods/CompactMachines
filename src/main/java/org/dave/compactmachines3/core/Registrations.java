@@ -8,7 +8,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.dave.compactmachines3.block.machines.BlockCompactMachine;
+import org.dave.compactmachines3.block.BlockCompactMachine;
 import org.dave.compactmachines3.block.BlockWall;
 import org.dave.compactmachines3.block.BlockWallBreakable;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;

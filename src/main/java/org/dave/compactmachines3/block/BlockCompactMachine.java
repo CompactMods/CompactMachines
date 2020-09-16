@@ -1,4 +1,4 @@
-package org.dave.compactmachines3.block.machines;
+package org.dave.compactmachines3.block;
 
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -7,9 +7,11 @@ import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
@@ -27,6 +29,7 @@ import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.core.Registrations;
 import org.dave.compactmachines3.reference.EnumMachineSize;
+import org.dave.compactmachines3.util.CompactMachineUtil;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -155,7 +158,14 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return new ItemStack(Registrations.MACHINE_BLOCK_ITEM.get(), 1);
+        ItemStack stack = new ItemStack(Registrations.MACHINE_BLOCK_ITEM.get(), 1);
+
+        CompoundNBT nbt = stack.getOrCreateTag();
+        nbt.putString("size", state.get(SIZE).getName());
+
+        stack.setTag(nbt);
+
+        return stack;
     }
 
 //    @Override
@@ -233,6 +243,19 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 ////
 ////        world.spawnEntity(entityItem);
 //    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+
+        // Load size information
+        CompoundNBT nbt = stack.getOrCreateTag();
+        EnumMachineSize size = CompactMachineUtil.getMachineSizeFromNBT(nbt);
+
+        BlockState newState = state.with(SIZE, size);
+        worldIn.setBlockState(pos, newState);
+    }
+
 
 //    @Override
 //    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {

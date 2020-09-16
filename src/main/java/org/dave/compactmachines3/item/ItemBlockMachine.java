@@ -27,13 +27,6 @@ public class ItemBlockMachine extends BlockItem {
         }
     }
 
-
-//    @Override
-//    public String getTranslationKey(ItemStack stack) {
-//        return super.getTranslationKey(stack) + "." + ((IMetaBlockName)this.block).getSpecialName(stack);
-//    }
-
-
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
