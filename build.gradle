@@ -1,160 +1,147 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
+version = "${minecraft_version}-${mod_version}"
+group = 'org.dave.compactmachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'compactmachines3'
 
-file "build.properties" withReader {
-    def prop = new Properties()
-    prop.load(it)
-    ext.config = new ConfigSlurper().parse prop
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
-version = "${config.minecraft.version}-${config.mod.version}"
-group= "org.dave.compactmachines3" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "compactmachines3"
-
-sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
-
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    version = "${config.minecraft.version}-${config.forge.version}"
-    runDir = "run"
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: '20200514-1.16'
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    mappings = "stable_39"
-}
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        // url "http://mobiusstrip.eu/maven"
-        url "http://tehnut.info/maven"
-    }
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-    maven { // TheOneProbe
-        name 'tterrag maven'
-        url "http://maven.tterrag.com/"
-    }
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-    maven { // location of the maven that hosts JEI files
-        name "Progwml Repo"
-        url "http://dvs1.progwml6.com/files/maven"
-    }
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
 
-    maven { // jei by ip, because travis couldn't resolve it?!
-        name "Progwml Repo"
-        url "http://104.168.20.187/files/maven"
-    }
+        server {
+            workingDirectory project.file('run')
 
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-    maven {
-        name = "ChickenBones Maven"
-        url = "http://chickenbones.net/maven/"
-    }
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-    maven {
-        name = "refinedstorage"
-        url = "https://repo.raoulvdberge.com/"
-    }
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
 
-    maven {
-        name = "opencomputers"
-        url = "http://maven.cil.li/"
-    }
-}
+        data {
+            workingDirectory project.file('run')
 
-dependencies {
-    deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}:api"
-    //runtime "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-    deobfCompile "mcp.mobius.waila:Hwyla:${config.waila.version}:api"
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-    deobfCompile("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.19-11") {
-        transitive = false
-    }
+            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
 
-    deobfCompile "refinedstorage:refinedstorage:${config.rs.version}:api"
-
-    deobfCompile "li.cil.oc:OpenComputers:${config.oc.version}:api"
-
-
-    // All of the following are needed to make Ducts connect to each other visually
-    // in recipes and in the machine view. :(
-    deobfCompile("cofh:ThermalDynamics:${config.minecraft.version}-${config.cofh.thermaldynamics.version}:universal") {
-        transitive = false
-    }
-
-    deobfCompile("cofh:CoFHCore:${config.minecraft.version}-${config.cofh.core.version}:universal") {
-        transitive = false
-    }
-
-    // And some runtime-dependencies for the above two libraries.
-    runtime("cofh:ThermalFoundation:${config.minecraft.version}-${config.cofh.thermalfoundation.version}:universal") {
-        transitive = false
-    }
-
-    runtime("cofh:ThermalExpansion:${config.minecraft.version}-${config.cofh.thermalexpansion.version}:universal") {
-        transitive = false
-    }
-
-    runtime("cofh:ThermalCultivation:${config.minecraft.version}-${config.cofh.thermalcultivation.version}:universal") {
-        transitive = false
-    }
-
-    runtime("cofh:CoFHWorld:${config.minecraft.version}-${config.cofh.world.version}:universal") {
-        transitive = false
-    }
-
-    runtime("codechicken:CodeChickenLib:${config.minecraft.version}-${config.ccl.version}:universal") {
-        transitive = false
-    }
-}
-
-allprojects {
-    if (System.getenv("TRAVIS") != null) {
-        def tag = System.getenv("TRAVIS_TAG");
-        if (tag != null && !tag.isEmpty() && tag.contains("release")) {
-            project.ext.releaseType = "release"
-        } else {
-            version += "-b${System.getenv("TRAVIS_BUILD_NUMBER")}"
-            project.ext.releaseType = "beta"
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
+dependencies {
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
+
+    // You may put jars on which you depend on in ./libs or you may define them like so..
+    // compile "some.group:artifact:version:classifier"
+    // compile "some.group:artifact:version"
+
+    // Real examples
+    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // These dependencies get remapped to your current MCP mappings
+    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
 }
 
-processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "examplemod",
+            "Specification-Vendor": "examplemodsareus",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"examplemodsareus",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
+}
 
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
     }
 }

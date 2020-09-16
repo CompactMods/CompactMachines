@@ -1,109 +1,132 @@
 package org.dave.compactmachines3;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
-import org.dave.compactmachines3.command.CommandCompactMachines3;
-import org.dave.compactmachines3.gui.GuiHandler;
-import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
-import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
-import org.dave.compactmachines3.misc.*;
-import org.dave.compactmachines3.network.PackageHandler;
-import org.dave.compactmachines3.proxy.CommonProxy;
-import org.dave.compactmachines3.render.BakeryHandler;
-import org.dave.compactmachines3.schema.SchemaRegistry;
-import org.dave.compactmachines3.skyworld.SkyChunkGenerator;
-import org.dave.compactmachines3.skyworld.SkyDimension;
-import org.dave.compactmachines3.skyworld.SkyWorldEvents;
-import org.dave.compactmachines3.skyworld.SkyWorldSavedData;
-import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
-import org.dave.compactmachines3.utility.Logz;
-import org.dave.compactmachines3.world.ChunkLoadingMachines;
-import org.dave.compactmachines3.world.ClientWorldData;
-import org.dave.compactmachines3.world.WorldSavedDataMachines;
-import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
-import org.dave.compactmachines3.world.tools.DimensionTools;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import java.util.stream.Collectors;
 
-@Mod(modid = CompactMachines3.MODID, version = CompactMachines3.VERSION, acceptedMinecraftVersions = "[1.12,1.13)", dependencies = "after:refinedstorage;after:yunomakegoodmap", guiFactory = CompactMachines3.GUI_FACTORY)
+@Mod(CompactMachines3.MODID)
 public class CompactMachines3
 {
     public static final String MODID = "compactmachines3";
     public static final String VERSION = "3.0.18";
     public static final String GUI_FACTORY = "org.dave.compactmachines3.misc.ConfigGuiFactory";
 
-    @Mod.Instance(CompactMachines3.MODID)
-    public static CompactMachines3 instance;
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    public static ClientWorldData clientWorldData;
+//    @Mod.Instance(CompactMachines3.MODID)
+//    public static CompactMachines3 instance;
+//    public static ClientWorldData clientWorldData;
+//    public static final CreativeTabCompactMachines3 CREATIVE_TAB = new CreativeTabCompactMachines3();
 
-    public static final CreativeTabCompactMachines3 CREATIVE_TAB = new CreativeTabCompactMachines3();
+    public CompactMachines3() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-    @SidedProxy(clientSide = "org.dave.compactmachines3.proxy.ClientProxy", serverSide = "org.dave.compactmachines3.proxy.ServerProxy")
-    public static CommonProxy proxy;
+        // Register the setup method for modloading
+        modBus.addListener(this::setup);
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        Logz.setLogger(event.getModLog());
+        // Register the enqueueIMC method for modloading
+        modBus.addListener(this::enqueueIMC);
 
-        ConfigurationHandler.init(event.getSuggestedConfigurationFile());
-        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
+        // Register the processIMC method for modloading
+        modBus.addListener(this::processIMC);
 
-        MinecraftForge.EVENT_BUS.register(MachineEventHandler.class);
-        MinecraftForge.EVENT_BUS.register(PlayerEventHandler.class);
-        MinecraftForge.EVENT_BUS.register(SkyWorldSavedData.class);
-        MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
-        MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
-        MinecraftForge.EVENT_BUS.register(BakeryHandler.class);
-        MinecraftForge.EVENT_BUS.register(SkyWorldEvents.class);
+        // Register the doClientStuff method for modloading
+        modBus.addListener(this::doClientStuff);
 
-        // Insist on keeping an already registered dimension by registering in pre-registerDimension.
-        DimensionTools.registerDimension();
-
-        GuiHandler.init();
-
-        AnnotatedInstanceUtil.setAsmData(event.getAsmData());
-
-        proxy.preInit(event);
+        // Register ourselves for server and other game events we are interested in
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @EventHandler
-    public void init(FMLInitializationEvent event) {
-        PackageHandler.init();
-
-        proxy.init(event);
-
-        SkyDimension.init();
-
-        MultiblockRecipes.init();
-        SchemaRegistry.init();
+    private void setup(final FMLCommonSetupEvent event)
+    {
+        // Pre-Initialize Code
+        // ConfigurationHandler.init(event.getSuggestedConfigurationFile());
+//        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
+//
+//        MinecraftForge.EVENT_BUS.register(MachineEventHandler.class);
+//        MinecraftForge.EVENT_BUS.register(PlayerEventHandler.class);
+//        MinecraftForge.EVENT_BUS.register(SkyWorldSavedData.class);
+//        MinecraftForge.EVENT_BUS.register(WorldSavedDataMachines.class);
+//        MinecraftForge.EVENT_BUS.register(RenderTickCounter.class);
+//        MinecraftForge.EVENT_BUS.register(BakeryHandler.class);
+//        MinecraftForge.EVENT_BUS.register(SkyWorldEvents.class);
+//
+//        // Insist on keeping an already registered dimension by registering in pre-registerDimension.
+//        DimensionTools.registerDimension();
+//
+//        GuiHandler.init();
+//
+//        AnnotatedInstanceUtil.setAsmData(event.getAsmData());
+//
+//        proxy.preInit(event);
     }
 
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        CapabilityNullHandlerRegistry.registerNullHandlers();
-        ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
-
-        ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
-
-        proxy.postInit(event);
+    private void doClientStuff(final FMLClientSetupEvent event) {
+        // do something that can only be done on the client
+        LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
     }
 
-    @EventHandler
-    public void onServerAboutToStart(FMLServerAboutToStartEvent event) {
-        for(WorldServer world : event.getServer().worlds) {
-            if(world.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator) {
-                world.setSpawnPoint(new BlockPos(0,0,0));
-            }
-        }
+    private void enqueueIMC(final InterModEnqueueEvent event)
+    {
+        // some example code to dispatch IMC to another mod
+        InterModComms.sendTo("examplemod", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
 
-    @Mod.EventHandler
+    private void processIMC(final InterModProcessEvent event)
+    {
+        // some example code to receive and process InterModComms from other mods
+        LOGGER.info("Got IMC {}", event.getIMCStream().
+                map(m->m.getMessageSupplier().get()).
+                collect(Collectors.toList()));
+    }
+    // You can use SubscribeEvent and let the Event Bus discover methods to call
+    @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new CommandCompactMachines3());
+        // do something when the server starts
+        // TODO: Register compact machines command here?
+        // event.registerCommand(new CommandCompactMachines3());
     }
+
+//    @EventHandler
+//    public void init(FMLInitializationEvent event) {
+//        PackageHandler.init();
+//
+//        proxy.init(event);
+//
+//        SkyDimension.init();
+//
+//        MultiblockRecipes.init();
+//        SchemaRegistry.init();
+//    }
+//
+//    @EventHandler
+//    public void postInit(FMLPostInitializationEvent event) {
+//        CapabilityNullHandlerRegistry.registerNullHandlers();
+//        ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
+//
+//        ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
+//
+//        proxy.postInit(event);
+//    }
+//
+//    @EventHandler
+//    public void onServerAboutToStart(FMLServerAboutToStartEvent event) {
+//        for(WorldServer world : event.getServer().worlds) {
+//            if(world.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator) {
+//                world.setSpawnPoint(new BlockPos(0,0,0));
+//            }
+//        }
+//    }
 }
