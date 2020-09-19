@@ -1,6 +1,8 @@
 package com.robotgryphon.compactmachines;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,6 +27,13 @@ public class CompactMachines
 
 //    public static ClientWorldData clientWorldData;
 //    public static final CreativeTabcompactmachines CREATIVE_TAB = new CreativeTabcompactmachines();
+
+    public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MODID) {
+        @Override
+        public ItemStack createIcon() {
+            return new ItemStack(Registrations.MACHINE_BLOCK_ITEM_NORMAL.get());
+        }
+    };
 
     public CompactMachines() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
