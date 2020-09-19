@@ -1,33 +1,29 @@
 package com.robotgryphon.compactmachines.item;
 
+import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
-import com.robotgryphon.compactmachines.block.IMetaBlockName;
+import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
-import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-/*
- Incorporates concepts from
-   http://bedrockminer.jimdo.com/modding-tutorials/basic-modding-1-8/blockstates-and-metadata/
- Thanks! And look there for details!
- */
 public class ItemBlockMachine extends BlockItem {
 
     public ItemBlockMachine(Block blockIn, EnumMachineSize size, Properties builder) {
         super(blockIn, builder);
-
-        if (!(blockIn instanceof IMetaBlockName)) {
-            throw new IllegalArgumentException(String.format("The given block %s is not an instance of IMetaBlockName!", blockIn.getTranslationKey()));
-        }
     }
 
     @Override
@@ -39,14 +35,33 @@ public class ItemBlockMachine extends BlockItem {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        if (stack.hasTag() && stack.getTag().contains("coords")) {
-            int coords = stack.getTag().getInt("coords");
+        // We need NBT data for the rest of this
+        if (!stack.hasTag())
+            return;
+
+        CompoundNBT nbt = stack.getTag();
+        if (nbt.contains("coords")) {
+            int coords = nbt.getInt("coords");
             if (coords > -1) {
-                IFormattableTextComponent coordsTC= new TranslationTextComponent("tooltip.compactmachines.machine.coords")
+                IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine.coords")
                         .append(new StringTextComponent(" #" + coords));
 
                 tooltip.add(coordsTC);
             }
+        }
+
+        if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
+            UUID owner = nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT);
+            Optional<GameProfile> playerProfile = PlayerUtil.getProfileByUUID(worldIn, owner);
+
+            IFormattableTextComponent player = playerProfile
+                    .map(p -> (IFormattableTextComponent) new StringTextComponent(p.getName()))
+                    .orElseGet(() -> new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".unknown_player"));
+
+            IFormattableTextComponent ownerText = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".owner")
+                    .append(player);
+
+            tooltip.add(ownerText);
         }
 
         if (false) {

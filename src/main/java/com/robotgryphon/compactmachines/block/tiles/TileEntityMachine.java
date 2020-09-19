@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.reference.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.nbt.CompoundNBT;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,8 +42,8 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
         coords = nbt.getInt("coords");
         // TODO customName = nbt.getString("CustomName");
-        if (nbt.contains("ownerLeast") && nbt.contains("ownerMost")) {
-            owner = nbt.getUniqueId("owner");
+        if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
+            owner = nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT);
         } else {
             owner = null;
         }
@@ -73,9 +75,9 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         nbt.putInt("coords", coords);
         // nbt.putString("CustomName", customName.getString());
 
-//        if (hasOwner()) {
-//            nbt.putUniqueId("owner", this.owner);
-//        }
+        if (owner != null) {
+            nbt.putUniqueId(Reference.CompactMachines.OWNER_NBT, this.owner);
+        }
 
         nbt.putLong("spawntick", nextSpawnTick);
         if (schema != null) {
@@ -198,16 +200,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 //    public String getCustomName() {
 //        return customName;
 //    }
-//
-//    public String getOwnerName() {
-//        GameProfile profile = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(getOwner());
-//        if (profile == null) {
-//            Logz.warn("Profile not found for owner: %s", getOwner());
-//            return "Unknown";
-//        }
-//
-//        return profile.getName();
-//    }
+
 
 
     @Nullable
@@ -240,12 +233,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 //        this.customName = displayName;
 //    }
 
-    public void setOwner(UUID owner) {
-        this.owner = owner;
+    public Optional<UUID> getOwnerUUID() {
+        return Optional.ofNullable(this.owner);
     }
 
-    public boolean hasOwner() {
-        return owner != null;
+    public void setOwner(UUID owner) {
+        this.owner = owner;
     }
 
     /*

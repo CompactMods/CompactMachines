@@ -5,12 +5,13 @@ import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.BlockWall;
 import com.robotgryphon.compactmachines.block.BlockWallBreakable;
 import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
+import com.robotgryphon.compactmachines.item.ItemBlockMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.ToolType;
@@ -38,6 +39,7 @@ public class Registrations {
     private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
             .create(Material.IRON)
             .hardnessAndResistance(8.0F, 20.0F)
+            .setLightLevel(state -> 1)
             .harvestLevel(1)
             .harvestTool(ToolType.PICKAXE)
             .setRequiresTool();
@@ -67,22 +69,22 @@ public class Registrations {
             new BlockCompactMachine(EnumMachineSize.MAXIMUM, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = ITEMS.register("machine_tiny",
-            () -> new BlockItem(MACHINE_BLOCK_TINY.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_TINY.get(), EnumMachineSize.TINY, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_SMALL = ITEMS.register("machine_small",
-            () -> new BlockItem(MACHINE_BLOCK_SMALL.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_SMALL.get(), EnumMachineSize.SMALL, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_NORMAL = ITEMS.register("machine_normal",
-            () -> new BlockItem(MACHINE_BLOCK_NORMAL.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_NORMAL.get(), EnumMachineSize.NORMAL, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_LARGE = ITEMS.register("machine_large",
-            () -> new BlockItem(MACHINE_BLOCK_LARGE.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_LARGE.get(), EnumMachineSize.LARGE, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_GIANT = ITEMS.register("machine_giant",
-            () -> new BlockItem(MACHINE_BLOCK_GIANT.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_GIANT.get(), EnumMachineSize.GIANT, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
-            () -> new BlockItem(MACHINE_BLOCK_MAXIMUM.get(), BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), EnumMachineSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<TileEntityType<TileEntityMachine>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
             TileEntityType.Builder.create(TileEntityMachine::new,
@@ -94,9 +96,10 @@ public class Registrations {
     //   WALLS
     // ================================================================================================================
     public static final RegistryObject<Block> WALL_BLOCK = BLOCKS.register("wall", () ->
-            new BlockWall(Block.Properties
+            new BlockWall(AbstractBlock.Properties
                     .create(Material.IRON)
                     .hardnessAndResistance(-1.0F, 3600000.8F)
+                    .setLightLevel(state -> 5)
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall_breakable", () ->

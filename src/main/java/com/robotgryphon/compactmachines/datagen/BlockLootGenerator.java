@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.datagen;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.reference.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.LootTableProvider;
@@ -63,8 +64,8 @@ public class BlockLootGenerator extends LootTableProvider {
         }
 
         private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
-                .replaceOperation("ownerid", "BlockEntityTag.ownerid")
-                .replaceOperation("ref", "BlockEntityTag.ref");
+                .replaceOperation(Reference.CompactMachines.OWNER_NBT, Reference.CompactMachines.OWNER_NBT)
+                .replaceOperation("ref", "cm.ref");
 
         private LootPool.Builder registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
 //            LootTable.builder()

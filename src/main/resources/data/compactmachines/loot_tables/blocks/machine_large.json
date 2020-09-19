@@ -21,13 +21,13 @@
           "source": "block_entity",
           "ops": [
             {
-              "source": "ownerid",
-              "target": "BlockEntityTag.ownerid",
+              "source": "owner",
+              "target": "owner",
               "op": "replace"
             },
             {
               "source": "ref",
-              "target": "BlockEntityTag.ref",
+              "target": "cm.ref",
               "op": "replace"
             }
           ]

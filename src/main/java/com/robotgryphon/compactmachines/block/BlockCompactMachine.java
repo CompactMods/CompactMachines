@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.block;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -14,6 +15,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -22,6 +24,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -29,6 +34,8 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.UUID;
 
 //import org.dave.compactmachines.tile.TileEntityMachine;
 //import org.dave.compactmachines.tile.TileEntityRedstoneTunnel;
@@ -192,11 +199,11 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
         CompoundNBT nbt = stack.getOrCreateTag();
 
-        if (nbt.contains("ownerLeast") && nbt.contains("ownerMost")) {
-            tile.setOwner(nbt.getUniqueId("owner"));
+        if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
+            tile.setOwner(nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT));
         }
 
-        if (!tile.hasOwner() && placer instanceof PlayerEntity) {
+        if (!tile.getOwnerUUID().isPresent() && placer instanceof PlayerEntity) {
             tile.setOwner(placer.getUniqueID());
         }
 
@@ -242,6 +249,12 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
         if(te == null || !(te instanceof TileEntityMachine))
             return ActionResultType.SUCCESS;
 
+        TileEntityMachine tile = (TileEntityMachine) te;
+        Optional<UUID> owner = tile.getOwnerUUID();
+        if(owner.isPresent()) {
+            player.sendStatusMessage(new StringTextComponent(owner.get().toString()), true);
+        }
+
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 
@@ -284,9 +297,9 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
         String size = this.size.getName();
         probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
 
-//        TileEntity te = world.getTileEntity(data.getPos());
-//        if(te instanceof TileEntityMachine) {
-//            TileEntityMachine machine = (TileEntityMachine) te;
+        TileEntity te = world.getTileEntity(data.getPos());
+        if(te instanceof TileEntityMachine) {
+            TileEntityMachine machine = (TileEntityMachine) te;
 //            if(machine.isInsideItself()) {
 //                String text = TextFormatting.DARK_RED + "{*tooltip.compactmachines.machine.stopitsoaryn*}" + TextFormatting.RESET;
 //                probeInfo.horizontal().text(new StringTextComponent(text));
@@ -301,11 +314,11 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 //            } else {
 //                nameOrId = "#" + machine.coords;
 //            }
-//
+
 //            String coords = TextFormatting.GREEN + "{*tooltip.compactmachines.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET;
 //            probeInfo.horizontal()
 //                    .text(new StringTextComponent(coords));
-//
+
 //            if(player.isCreative() && mode == ProbeMode.EXTENDED) {
 //                if(machine.hasNewSchema()) {
 //                    String schemaName = machine.getSchemaName();
@@ -314,17 +327,19 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 //                            .text(new StringTextComponent(text));
 //                }
 //            }
-//
-//            String translate = "enumfacing." + data.getSideHit().name();
-//            String text = TextFormatting.YELLOW + "{*" + translate + "*}" + TextFormatting.RESET;
-//            probeInfo.horizontal()
-//                    .item(new ItemStack(Items.COMPASS))
-//                    .text(new StringTextComponent(text));
-//
+
+            IFormattableTextComponent text = new StringTextComponent("" + TextFormatting.YELLOW)
+                    .append(new TranslationTextComponent(("enumfacing." + data.getSideHit().name())))
+                    .append(new StringTextComponent("" + TextFormatting.RESET));
+
+            probeInfo.horizontal()
+                    .item(new ItemStack(Items.COMPASS))
+                    .text(text);
+
 //            ItemStack connectedStack = machine.getConnectedPickBlock(data.getSideHit());
 //            if(connectedStack != null && !connectedStack.isEmpty()) {
 //                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
 //            }
-//        }
+        }
     }
 }

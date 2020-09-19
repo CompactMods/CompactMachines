@@ -34,7 +34,7 @@ public abstract class BlockProtected extends Block {
             ItemStack playerStack = player.getHeldItemMainhand();
 
             // TODO: Personal Shrinking Device in Creative Mode
-            return false;
+            return world.setBlockState(pos, fluid.getBlockState(), world.isRemote ? 11 : 3);
 //            if(!playerStack.isEmpty() && playerStack.getItem() == Itemss.psd) {
 //                return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
 //            }

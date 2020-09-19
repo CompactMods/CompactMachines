@@ -1,6 +1,9 @@
 {
   "itemGroup.compactmachines": "Compact Machines",
 
+  "tooltip.compactmachines.owner": "Owner: ",
+  "tooltip.compactmachines.unknown_player": "Unknown Player",
+
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "block.compactmachines.machine_small": "Compact Machine (Small)",
