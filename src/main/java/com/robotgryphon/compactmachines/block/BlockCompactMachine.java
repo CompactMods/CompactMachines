@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.block;
 
+import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -10,7 +11,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -24,11 +24,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import com.robotgryphon.compactmachines.CompactMachines;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 //import org.dave.compactmachines.tile.TileEntityMachine;
 //import org.dave.compactmachines.tile.TileEntityRedstoneTunnel;
@@ -167,11 +164,6 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return null;
         // return new TileEntityMachine();
-    }
-
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        return Collections.emptyList();
     }
 
     @Override
