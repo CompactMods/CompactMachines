@@ -14,6 +14,24 @@
         {
           "condition": "minecraft:survives_explosion"
         }
+      ],
+      "functions": [
+        {
+          "function": "minecraft:copy_nbt",
+          "source": "block_entity",
+          "ops": [
+            {
+              "source": "ownerid",
+              "target": "BlockEntityTag.ownerid",
+              "op": "replace"
+            },
+            {
+              "source": "ref",
+              "target": "BlockEntityTag.ref",
+              "op": "replace"
+            }
+          ]
+        }
       ]
     }
   ]

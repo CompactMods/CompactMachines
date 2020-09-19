@@ -10,6 +10,8 @@ import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.item.Item;
 import net.minecraft.loot.*;
 import net.minecraft.loot.conditions.SurvivesExplosion;
+import net.minecraft.loot.functions.CopyNbt;
+import net.minecraft.loot.functions.ILootFunction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 
@@ -41,12 +43,12 @@ public class BlockLootGenerator extends LootTableProvider {
             registerSelfDroppedBlock(Registrations.BLOCK_BREAKABLE_WALL, Registrations.ITEM_BREAKABLE_WALL);
 
             // Compact Machines
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_TINY, Registrations.MACHINE_BLOCK_ITEM_TINY);
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_SMALL, Registrations.MACHINE_BLOCK_ITEM_SMALL);
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_NORMAL, Registrations.MACHINE_BLOCK_ITEM_NORMAL);
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_LARGE, Registrations.MACHINE_BLOCK_ITEM_LARGE);
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_GIANT, Registrations.MACHINE_BLOCK_ITEM_GIANT);
-            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_MAXIMUM, Registrations.MACHINE_BLOCK_ITEM_MAXIMUM);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_TINY, Registrations.MACHINE_BLOCK_ITEM_TINY);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_SMALL, Registrations.MACHINE_BLOCK_ITEM_SMALL);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_NORMAL, Registrations.MACHINE_BLOCK_ITEM_NORMAL);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_LARGE, Registrations.MACHINE_BLOCK_ITEM_LARGE);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_GIANT, Registrations.MACHINE_BLOCK_ITEM_GIANT);
+            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_MAXIMUM, Registrations.MACHINE_BLOCK_ITEM_MAXIMUM);
         }
 
         private LootPool.Builder registerSelfDroppedBlock(RegistryObject<Block> block, RegistryObject<Item> item) {
@@ -54,6 +56,33 @@ public class BlockLootGenerator extends LootTableProvider {
                     .name(block.get().getRegistryName().toString())
                     .rolls(ConstantRange.of(1))
                     .acceptCondition(SurvivesExplosion.builder())
+                    .addEntry(ItemLootEntry.builder(item.get()));
+
+            this.registerLootTable(block.get(), LootTable.builder().addLootPool(builder));
+            return builder;
+        }
+
+        private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
+                .replaceOperation("ownerid", "BlockEntityTag.ownerid")
+                .replaceOperation("ref", "BlockEntityTag.ref");
+
+        private LootPool.Builder registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
+//            LootTable.builder()
+//                    .addLootPool(withSurvivesExplosion(shulker, LootPool.builder()
+//                            .rolls(ConstantRange.of(1))
+//                            .addEntry(ItemLootEntry.builder(shulker)
+//                                    .acceptFunction(CopyName.builder(CopyName.Source.BLOCK_ENTITY))
+//                                    .acceptFunction(CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
+//                                            .replaceOperation("Lock", "BlockEntityTag.Lock")
+//                                            .replaceOperation("LootTable", "BlockEntityTag.LootTable")
+//                                            .replaceOperation("LootTableSeed", "BlockEntityTag.LootTableSeed"))
+//                                    .acceptFunction(SetContents.builderIn().addLootEntry(DynamicLootEntry.func_216162_a(ShulkerBoxBlock.CONTENTS))))));
+
+            LootPool.Builder builder = LootPool.builder()
+                    .name(block.get().getRegistryName().toString())
+                    .rolls(ConstantRange.of(1))
+                    .acceptCondition(SurvivesExplosion.builder())
+                    .acceptFunction(CopyOwnerAndReferenceFunction)
                     .addEntry(ItemLootEntry.builder(item.get()));
 
             this.registerLootTable(block.get(), LootTable.builder().addLootPool(builder));
