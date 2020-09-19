@@ -3,8 +3,6 @@ generator.compactsky=Compact Sky
 
 tile.compactmachines3.tunnel.name=Tunnel
 tile.compactmachines3.redstonetunnel.name=Redstone Tunnel
-tile.compactmachines3.wallbreakable.name=Compact Machine Wall
-tile.compactmachines3.wall.name=Solid Compact Machine Wall
 tile.compactmachines3.fieldprojector.name=Miniaturization Field Projector
 
 item.compactmachines3.tunneltool.name=Tunnel

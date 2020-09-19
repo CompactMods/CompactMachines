@@ -7,6 +7,9 @@
   "block.compactmachines3.machine_giant": "Compact Machine (Giant)",
   "block.compactmachines3.machine_maximum": "Compact Machine (Maximum)",
 
+  "block.compactmachines3.wall": "Solid Compact Machine Wall",
+  "block.compactmachines3.wall_breakable": "Compact Machine Wall",
+
   "item.compactmachines3.machine_tiny": "Compact Machine (Tiny)",
   "item.compactmachines3.machine_small": "Compact Machine (Small)",
   "item.compactmachines3.machine_normal": "Compact Machine (Normal)",
