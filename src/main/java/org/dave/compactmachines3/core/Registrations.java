@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -66,7 +67,12 @@ public class Registrations {
             new BlockWall(Block.Properties.create(Material.IRON).hardnessAndResistance(-1.0F, 3600000.8F).noDrops()));
 
     public static final RegistryObject<BlockWallBreakable> BREAKABLE_WALL_BLOCK = BLOCKS.register("wall_breakable", () ->
-            new BlockWallBreakable(Block.Properties.create(Material.IRON).hardnessAndResistance(3.0f, 128.0f)));
+            new BlockWallBreakable(Block.Properties
+                    .create(Material.IRON)
+                    .hardnessAndResistance(3.0f, 128.0f)
+                    .setRequiresTool()
+                    .harvestTool(ToolType.PICKAXE)
+                    .harvestLevel(1)));
 
     public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
             () -> new ItemPersonalShrinkingDevice(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)));
