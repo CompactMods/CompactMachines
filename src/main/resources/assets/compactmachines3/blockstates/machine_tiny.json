@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "compactmachines3:block/machine/machine_tiny"
+    }
+  }
+}

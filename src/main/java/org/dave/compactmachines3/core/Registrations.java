@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.core;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -12,6 +13,7 @@ import org.dave.compactmachines3.block.BlockCompactMachine;
 import org.dave.compactmachines3.block.BlockWall;
 import org.dave.compactmachines3.block.BlockWallBreakable;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 
 import static org.dave.compactmachines3.CompactMachines3.MODID;
 
@@ -19,9 +21,45 @@ public class Registrations {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
-    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK = BLOCKS.register("machine", BlockCompactMachine::new);
-    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM = ITEMS.register("machine",
-            () -> new BlockItem(MACHINE_BLOCK.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+    private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
+            .create(Material.IRON)
+            .hardnessAndResistance(8.0F, 20.0F);
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_TINY = BLOCKS.register("machine_tiny", () ->
+            new BlockCompactMachine(EnumMachineSize.TINY, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_SMALL = BLOCKS.register("machine_small", () ->
+            new BlockCompactMachine(EnumMachineSize.SMALL, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_NORMAL = BLOCKS.register("machine_normal", () ->
+            new BlockCompactMachine(EnumMachineSize.NORMAL, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_LARGE = BLOCKS.register("machine_large", () ->
+            new BlockCompactMachine(EnumMachineSize.LARGE, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_GIANT = BLOCKS.register("machine_giant", () ->
+            new BlockCompactMachine(EnumMachineSize.GIANT, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<BlockCompactMachine> MACHINE_BLOCK_MAXIMUM = BLOCKS.register("machine_maximum", () ->
+            new BlockCompactMachine(EnumMachineSize.MAXIMUM, MACHINE_BLOCK_PROPS));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = ITEMS.register("machine_tiny",
+            () -> new BlockItem(MACHINE_BLOCK_TINY.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_SMALL = ITEMS.register("machine_small",
+            () -> new BlockItem(MACHINE_BLOCK_SMALL.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_NORMAL = ITEMS.register("machine_normal",
+            () -> new BlockItem(MACHINE_BLOCK_NORMAL.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_LARGE = ITEMS.register("machine_large",
+            () -> new BlockItem(MACHINE_BLOCK_LARGE.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_GIANT = ITEMS.register("machine_giant",
+            () -> new BlockItem(MACHINE_BLOCK_GIANT.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
+
+    public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
+            () -> new BlockItem(MACHINE_BLOCK_MAXIMUM.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
 
     public static final RegistryObject<BlockWall> WALL_BLOCK = BLOCKS.register("wall", BlockWall::new);
     public static final RegistryObject<BlockWallBreakable> BREAKABLE_WALL_BLOCK = BLOCKS.register("breakable_wall", BlockWallBreakable::new);

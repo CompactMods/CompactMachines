@@ -3,11 +3,14 @@ package org.dave.compactmachines3.item;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.IMetaBlockName;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -19,12 +22,17 @@ import java.util.List;
  */
 public class ItemBlockMachine extends BlockItem {
 
-    public ItemBlockMachine(Block blockIn, Properties builder) {
+    public ItemBlockMachine(Block blockIn, EnumMachineSize size, Properties builder) {
         super(blockIn, builder);
 
         if (!(blockIn instanceof IMetaBlockName)) {
             throw new IllegalArgumentException(String.format("The given block %s is not an instance of IMetaBlockName!", blockIn.getTranslationKey()));
         }
+    }
+
+    @Override
+    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemGroup(group, items);
     }
 
     @Override

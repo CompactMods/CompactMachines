@@ -6,14 +6,10 @@ import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -27,7 +23,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
-import org.dave.compactmachines3.core.Registrations;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.util.CompactMachineUtil;
 
@@ -42,21 +37,11 @@ import java.util.List;
 // TODO TOP Integration
 public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
-    public static final EnumProperty<EnumMachineSize> SIZE = EnumProperty.create("size", EnumMachineSize.class);
+    private final EnumMachineSize size;
 
-    public BlockCompactMachine() {
-        super(Block.Properties
-                .create(Material.IRON)
-                .hardnessAndResistance(8.0F, 20.0F));
-
-        setDefaultState(getStateContainer().getBaseState()
-                .with(SIZE, EnumMachineSize.TINY));
-    }
-
-    @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
-        builder.add(SIZE);
+    public BlockCompactMachine(EnumMachineSize size, Block.Properties props) {
+        super(props);
+        this.size = size;
     }
 
     // TODO Rendering
@@ -158,15 +143,18 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        ItemStack stack = new ItemStack(Registrations.MACHINE_BLOCK_ITEM.get(), 1);
+        Block given = CompactMachineUtil.getMachineBlockBySize(this.size);
+        ItemStack stack = new ItemStack(given, 1);
 
         CompoundNBT nbt = stack.getOrCreateTag();
-        nbt.putString("size", state.get(SIZE).getName());
+        nbt.putString("size", this.size.getName());
 
         stack.setTag(nbt);
 
         return stack;
     }
+
+
 
 //    @Override
 //    public String getSpecialName(ItemStack stack) {
@@ -244,17 +232,17 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 ////        world.spawnEntity(entityItem);
 //    }
 
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-
-        // Load size information
-        CompoundNBT nbt = stack.getOrCreateTag();
-        EnumMachineSize size = CompactMachineUtil.getMachineSizeFromNBT(nbt);
-
-        BlockState newState = state.with(SIZE, size);
-        worldIn.setBlockState(pos, newState);
-    }
+//    @Override
+//    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+//        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+//
+//        // Load size information
+//        CompoundNBT nbt = stack.getOrCreateTag();
+//        EnumMachineSize size = CompactMachineUtil.getMachineSizeFromNBT(nbt);
+//
+//        BlockState newState = state.with(this.size, size);
+//        worldIn.setBlockState(pos, newState);
+//    }
 
 
 //    @Override
@@ -351,7 +339,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
-        String size = blockState.get(SIZE).getName();
+        String size = this.size.getName();
         probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
 
 //        TileEntity te = world.getTileEntity(data.getPos());

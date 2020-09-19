@@ -1,11 +1,18 @@
 {
   "block.compactmachines3.machine": "Compact Machine",
-  "compactmachines3.machines.sizes.tiny": "Tiny",
-  "compactmachines3.machines.sizes.small": "Small",
-  "compactmachines3.machines.sizes.normal": "Normal",
-  "compactmachines3.machines.sizes.large": "Large",
-  "compactmachines3.machines.sizes.giant": "Giant",
-  "compactmachines3.machines.sizes.maximum": "Maximum",
+  "block.compactmachines3.machine_tiny": "Compact Machine (Tiny)",
+  "block.compactmachines3.machine_small": "Compact Machine (Small)",
+  "block.compactmachines3.machine_normal": "Compact Machine (Normal)",
+  "block.compactmachines3.machine_large": "Compact Machine (Large)",
+  "block.compactmachines3.machine_giant": "Compact Machine (Giant)",
+  "block.compactmachines3.machine_maximum": "Compact Machine (Maximum)",
+
+  "item.compactmachines3.machine_tiny": "Compact Machine (Tiny)",
+  "item.compactmachines3.machine_small": "Compact Machine (Small)",
+  "item.compactmachines3.machine_normal": "Compact Machine (Normal)",
+  "item.compactmachines3.machine_large": "Compact Machine (Large)",
+  "item.compactmachines3.machine_giant": "Compact Machine (Giant)",
+  "item.compactmachines3.machine_maximum": "Compact Machine (Maximum)",
 
   "item.compactmachines3.personal_shrinking_device": "Personal Shrinking Device"
 }
