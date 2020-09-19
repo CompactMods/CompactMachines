@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = "${minecraft_version}-${mod_version}"
-group = 'org.dave.compactmachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'compactmachines3'
+group = 'com.robotgryphon.compactmachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'compactmachines'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -39,7 +39,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                compactmachines {
                     source sourceSets.main
                 }
             }
@@ -55,7 +55,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                compactmachines {
                     source sourceSets.main
                 }
             }
@@ -70,10 +70,10 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'compactmachines', '--all', '--output', file('src/generated/resources/')
 
             mods {
-                examplemod {
+                compactmachines {
                     source sourceSets.main
                 }
             }
@@ -115,7 +115,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "compactmachines3",
+            "Specification-Title": "compactmachines",
             "Specification-Vendor": "",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,

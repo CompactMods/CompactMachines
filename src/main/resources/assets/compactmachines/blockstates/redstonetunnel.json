@@ -1,0 +1,27 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube_all",
+    "textures": {
+      "all": "compactmachines:blocks/redstonetunnel_down_out"
+    }
+  },
+  "variants": {
+    "machineside=down,output=true":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_down_out" } }],
+    "machineside=up,output=true":    [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_up_out" } }],
+    "machineside=north,output=true": [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_north_out" } }],
+    "machineside=south,output=true": [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_south_out" } }],
+    "machineside=east,output=true":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_east_out" } }],
+    "machineside=west,output=true":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_west_out" } }],
+
+    "machineside=down,output=false":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_down_in" } }],
+    "machineside=up,output=false":    [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_up_in" } }],
+    "machineside=north,output=false": [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_north_in" } }],
+    "machineside=south,output=false": [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_south_in" } }],
+    "machineside=east,output=false":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_east_in" } }],
+    "machineside=west,output=false":  [{ "textures": { "all": "compactmachines:blocks/redstonetunnel_west_in" } }],
+
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

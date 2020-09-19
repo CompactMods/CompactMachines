@@ -1,0 +1,21 @@
+{
+  "block.compactmachines.machine": "Compact Machine",
+  "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
+  "block.compactmachines.machine_small": "Compact Machine (Small)",
+  "block.compactmachines.machine_normal": "Compact Machine (Normal)",
+  "block.compactmachines.machine_large": "Compact Machine (Large)",
+  "block.compactmachines.machine_giant": "Compact Machine (Giant)",
+  "block.compactmachines.machine_maximum": "Compact Machine (Maximum)",
+
+  "block.compactmachines.wall": "Solid Compact Machine Wall",
+  "block.compactmachines.wall_breakable": "Compact Machine Wall",
+
+  "item.compactmachines.machine_tiny": "Compact Machine (Tiny)",
+  "item.compactmachines.machine_small": "Compact Machine (Small)",
+  "item.compactmachines.machine_normal": "Compact Machine (Normal)",
+  "item.compactmachines.machine_large": "Compact Machine (Large)",
+  "item.compactmachines.machine_giant": "Compact Machine (Giant)",
+  "item.compactmachines.machine_maximum": "Compact Machine (Maximum)",
+
+  "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device"
+}

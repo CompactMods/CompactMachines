@@ -13,9 +13,9 @@ license="All rights reserved"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
-    modId="compactmachines3"
+    modId="compactmachines"
     version="${file.jarVersion}"
-    displayName="Compact Machines 3"
+    displayName="Compact Machines 4"
     credits="Thanks for this example mod goes to Java" #optional
     authors="Davenonymous, RobotGryphon" #optional
     description="It's all so tiny!"
@@ -35,7 +35,7 @@ license="All rights reserved"
     # logoFile="examplemod.png" #optional
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.compactmachines3]] #optional
+[[dependencies.compactmachines]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -48,7 +48,7 @@ license="All rights reserved"
     side="BOTH"
 
 # Here's another dependency
-[[dependencies.compactmachines3]]
+[[dependencies.compactmachines]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.16.1]"

@@ -1,0 +1,34 @@
+{
+  "name": "compactmachines:machine-normal",
+  "target-item": "compactmachines:machine",
+  "target-meta": 2,
+  "target-count": 1,
+
+  "duration": 480,
+
+  "catalyst": "minecraft:ender_pearl",
+
+  "input-types": {
+    "w": { "id": "compactmachines:wallbreakable" },
+    "g": { "id": "minecraft:gold_block"}
+  },
+
+  "symmetrical": true,
+  "shape": [
+    [
+      ["w","w","w"],
+      ["w","w","w"],
+      ["w","w","w"]
+    ],
+    [
+      ["w","w","w"],
+      ["w","g","w"],
+      ["w","w","w"]
+    ],
+    [
+      ["w","w","w"],
+      ["w","w","w"],
+      ["w","w","w"]
+    ]
+  ]
+}
