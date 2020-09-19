@@ -21,6 +21,6 @@ public class DataGeneration {
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
         ExistingFileHelper helper = event.getExistingFileHelper();
-        generator.addProvider(new LootTableGenerator(generator));
+        generator.addProvider(new BlockLootGenerator(generator));
     }
 }

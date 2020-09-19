@@ -19,8 +19,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LootTableGenerator extends LootTableProvider {
-    public LootTableGenerator(DataGenerator dataGeneratorIn) {
+public class BlockLootGenerator extends LootTableProvider {
+
+    public BlockLootGenerator(DataGenerator dataGeneratorIn) {
         super(dataGeneratorIn);
     }
 
@@ -38,6 +39,14 @@ public class LootTableGenerator extends LootTableProvider {
         @Override
         protected void addTables() {
             registerSelfDroppedBlock(Registrations.BLOCK_BREAKABLE_WALL, Registrations.ITEM_BREAKABLE_WALL);
+
+            // Compact Machines
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_TINY, Registrations.MACHINE_BLOCK_ITEM_TINY);
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_SMALL, Registrations.MACHINE_BLOCK_ITEM_SMALL);
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_NORMAL, Registrations.MACHINE_BLOCK_ITEM_NORMAL);
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_LARGE, Registrations.MACHINE_BLOCK_ITEM_LARGE);
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_GIANT, Registrations.MACHINE_BLOCK_ITEM_GIANT);
+            registerSelfDroppedBlock(Registrations.MACHINE_BLOCK_MAXIMUM, Registrations.MACHINE_BLOCK_ITEM_MAXIMUM);
         }
 
         private LootPool.Builder registerSelfDroppedBlock(RegistryObject<Block> block, RegistryObject<Item> item) {
@@ -54,13 +63,16 @@ public class LootTableGenerator extends LootTableProvider {
         @Override
         protected Iterable<Block> getKnownBlocks() {
             return ImmutableList.of(
-                    Registrations.BLOCK_BREAKABLE_WALL.get()
-//                    Registrations.MACHINE_BLOCK_TINY.get(),
-//                    Registrations.MACHINE_BLOCK_SMALL.get(),
-//                    Registrations.MACHINE_BLOCK_NORMAL.get(),
-//                    Registrations.MACHINE_BLOCK_LARGE.get(),
-//                    Registrations.MACHINE_BLOCK_GIANT.get(),
-//                    Registrations.MACHINE_BLOCK_MAXIMUM.get()
+                    // Breakable Walls
+                    Registrations.BLOCK_BREAKABLE_WALL.get(),
+
+                    // Compact Machines
+                    Registrations.MACHINE_BLOCK_TINY.get(),
+                    Registrations.MACHINE_BLOCK_SMALL.get(),
+                    Registrations.MACHINE_BLOCK_NORMAL.get(),
+                    Registrations.MACHINE_BLOCK_LARGE.get(),
+                    Registrations.MACHINE_BLOCK_GIANT.get(),
+                    Registrations.MACHINE_BLOCK_MAXIMUM.get()
                 );
         }
     }
