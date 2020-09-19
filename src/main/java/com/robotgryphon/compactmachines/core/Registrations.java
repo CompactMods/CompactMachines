@@ -4,6 +4,7 @@ import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.BlockWall;
 import com.robotgryphon.compactmachines.block.BlockWallBreakable;
+import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
@@ -11,7 +12,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -22,9 +25,16 @@ import java.util.function.Supplier;
 import static com.robotgryphon.compactmachines.CompactMachines.MODID;
 
 public class Registrations {
+    // ================================================================================================================
+    //   REGISTRIES
+    // ================================================================================================================
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    public static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
 
+    // ================================================================================================================
+    //   PROPERTIES
+    // ================================================================================================================
     private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
             .create(Material.IRON)
             .hardnessAndResistance(8.0F, 20.0F)
@@ -35,6 +45,9 @@ public class Registrations {
     private static Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
             .group(CompactMachines.COMPACT_MACHINES_ITEMS);
 
+    // ================================================================================================================
+    //   COMPACT MACHINE BLOCKS
+    // ================================================================================================================
     public static final RegistryObject<Block> MACHINE_BLOCK_TINY = BLOCKS.register("machine_tiny", () ->
             new BlockCompactMachine(EnumMachineSize.TINY, MACHINE_BLOCK_PROPS));
 
@@ -71,6 +84,15 @@ public class Registrations {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
             () -> new BlockItem(MACHINE_BLOCK_MAXIMUM.get(), BASIC_ITEM_PROPS.get()));
 
+    public static final RegistryObject<TileEntityType<TileEntityMachine>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
+            TileEntityType.Builder.create(TileEntityMachine::new,
+                    MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
+                    MACHINE_BLOCK_NORMAL.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
+                    .build(null));
+
+    // ================================================================================================================
+    //   WALLS
+    // ================================================================================================================
     public static final RegistryObject<Block> WALL_BLOCK = BLOCKS.register("wall", () ->
             new BlockWall(Block.Properties
                     .create(Material.IRON)
@@ -95,8 +117,14 @@ public class Registrations {
     public static final RegistryObject<Item> ITEM_BREAKABLE_WALL = ITEMS.register("wall_breakable", () ->
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
 
+    // ================================================================================================================
+    //   INITIALIZATION
+    // ================================================================================================================
     public static void init() {
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        TILES_ENTITIES.register(eventBus);
     }
 }

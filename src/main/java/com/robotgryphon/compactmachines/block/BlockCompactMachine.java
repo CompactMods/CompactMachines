@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.block;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -9,6 +10,8 @@ import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -40,16 +43,6 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
         super(props);
         this.size = size;
     }
-
-    // TODO Rendering
-//    @SideOnly(Side.CLIENT)
-//    public void initModel() {
-//        Item itemBlockMachine = Item.getItemFromBlock(Blockss.machine);
-//        for(EnumMachineSize size : EnumMachineSize.values()) {
-//            ModelLoader.setCustomModelResourceLocation(itemBlockMachine, size.getMeta(), new ModelResourceLocation(itemBlockMachine.getRegistryName(), "size=" + size.getName()));
-//        }
-//    }
-
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
@@ -128,16 +121,6 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 //        }
     }
 
-//    TODO: Other creative tab versions
-//    @Override
-//    public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> items) {
-//        for(EnumMachineSize size : EnumMachineSize.values()) {
-//            items.add(new ItemStack(this, 1, size.getMeta()));
-//        }
-//
-//    }
-
-
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
         Block given = CompactMachineUtil.getMachineBlockBySize(this.size);
@@ -152,18 +135,21 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     }
 
 
-
 //    @Override
 //    public String getSpecialName(ItemStack stack) {
 //        return this.getStateFromMeta(stack.getItemDamage()).getValue(SIZE).getName();
 //    }
 
 
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
+    }
+
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return null;
-        // return new TileEntityMachine();
+        return new TileEntityMachine();
     }
 
     @Override
@@ -173,85 +159,50 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
             return;
         }
 
-//        TODO: Tile Entity
-//        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
-//            return;
-//        }
-//
-//        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        if (!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
+            return;
+        }
+
+        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
 //        WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 //
 //        BlockMachine.spawnItemWithNBT(world, pos, state.get(BlockMachine.SIZE), te);
 //
 //        ChunkLoadingMachines.unforceChunk(te.coords);
-        // world.removeTileEntity(pos);
 
         super.onPlayerDestroy(world, pos, state);
     }
 
-//    public static void spawnItemWithNBT(IWorld world, BlockPos pos, EnumMachineSize size, TileEntityMachine te) {
-//        if(world.isRemote()) {
-//           return;
-//        }
-//
-//        ItemStack stack = new ItemStack(Blockss.machine, 1, size.getMeta());
-//
-//        CompoundNBT compound = new CompoundNBT();
-//        compound.putInt("coords", te.coords);
-//        if(te.hasOwner()) {
-//            compound.putUniqueId("owner", te.getOwner());
-//        }
-//        if(te.hasNewSchema()) {
-//            compound.putString("schema", te.getSchemaName());
-//        }
-//
-//        stack.setTag(compound);
-//
-//        if(te.getCustomName().length() > 0) {
-//            stack.setDisplayName( te.getCustomName());
-//        }
-//
-////        TODO Spawn machine item entity in world
-////        ItemEntity entityItem = new ItemEntity(world, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, stack);
-////        entityItem.lifespan = 1200;
-////        entityItem.setPickupDelay(10);
-////
-////        float motionMultiplier = 0.02F;
-////        entityItem.motionX = 0.0f;
-////        entityItem.motionY = (float) world.rand.nextGaussian() * motionMultiplier + 0.1F;
-////        entityItem.motionZ = 0.0f;
-////
-////        world.spawnEntity(entityItem);
-//    }
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 
-//    @Override
-//    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-//        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-//
-//        // Load size information
-//        CompoundNBT nbt = stack.getOrCreateTag();
-//        EnumMachineSize size = CompactMachineUtil.getMachineSizeFromNBT(nbt);
-//
-//        BlockState newState = state.with(this.size, size);
-//        worldIn.setBlockState(pos, newState);
-//    }
+        boolean hasProperTile = worldIn.getTileEntity(pos) instanceof TileEntityMachine;
+        if (!hasProperTile)
+            return;
 
+        TileEntityMachine tile = (TileEntityMachine) worldIn.getTileEntity(pos);
 
-//    @Override
-//    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-//        super.onBlockPlacedBy(world, pos, state, placer, stack);
-//
-//        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
-//            // Not a tile entity machine. Should not happen.
-//            return;
+        // The machine already has data for some reason
+        if(tile.coords != -1)
+            return;
+
+//        if (stack.hasDisplayName()) {
+//            tile.setCustomName(stack.getDisplayName());
 //        }
-//
-//        TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(pos);
-//        if(tileEntityMachine.coords != -1) {
-//            // The machine already has data for some reason
-//            return;
-//        }
-//
+
+        CompoundNBT nbt = stack.getOrCreateTag();
+
+        if (nbt.contains("ownerLeast") && nbt.contains("ownerMost")) {
+            tile.setOwner(nbt.getUniqueId("owner"));
+        }
+
+        if (!tile.hasOwner() && placer instanceof PlayerEntity) {
+            tile.setOwner(placer.getUniqueID());
+        }
+
+        tile.markDirty();
+    }
+
 //        // TODO: Allow storing of schemas in machines
 //        if(stack.hasTag()) {
 //            if(stack.getTag().contains("coords")) {
@@ -269,18 +220,10 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 //                tileEntityMachine.setSchema(stack.getTag().getString("schema"));
 //            }
 //
-//            if(stack.hasDisplayName()) {
-//                tileEntityMachine.setCustomName(stack.getDisplayName());
-//            }
-//
-//            if(stack.getTag().contains("ownerLeast") && stack.getTag().contains("ownerMost")) {
-//                tileEntityMachine.setOwner(stack.getTag().getUniqueId("owner"));
-//            }
+
 //        }
 //
-//        if(!tileEntityMachine.hasOwner() && placer instanceof PlayerEntity) {
-//            tileEntityMachine.setOwner((PlayerEntity) placer);
-//        }
+
 //
 //        tileEntityMachine.markDirty();
 //    }
@@ -290,7 +233,14 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 
         if (player.isSneaking())
-            return ActionResultType.PASS;
+            return ActionResultType.SUCCESS;
+
+        if(worldIn.isRemote || player instanceof ClientPlayerEntity)
+            return ActionResultType.SUCCESS;
+
+        TileEntity te = worldIn.getTileEntity(pos);
+        if(te == null || !(te instanceof TileEntityMachine))
+            return ActionResultType.SUCCESS;
 
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
