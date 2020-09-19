@@ -2,7 +2,6 @@ package org.dave.compactmachines3.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,12 +17,8 @@ import javax.annotation.Nullable;
 
 public class BlockWall extends BlockProtected {
 
-    public BlockWall() {
-        super(Block.Properties.create(Material.IRON));
-//        this.setLightOpacity(1);
-//        this.setLightLevel(1.0f);
-//
-//        this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
+    public BlockWall(Block.Properties props) {
+        super(props);
     }
 
 //    @SideOnly(Side.CLIENT)

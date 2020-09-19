@@ -1,16 +1,11 @@
 package org.dave.compactmachines3.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 
 public class BlockWallBreakable extends Block {
 
-    public BlockWallBreakable() {
-        super(Block.Properties
-                .create(Material.IRON)
-                .hardnessAndResistance(3.0f, 128.0f));
-
-        // this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
+    public BlockWallBreakable(Block.Properties props) {
+        super(props);
     }
 
 //    @SideOnly(Side.CLIENT)

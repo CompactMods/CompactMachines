@@ -12,6 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.dave.compactmachines3.block.BlockCompactMachine;
 import org.dave.compactmachines3.block.BlockWall;
 import org.dave.compactmachines3.block.BlockWallBreakable;
+import org.dave.compactmachines3.item.ItemBlockWall;
 import org.dave.compactmachines3.item.ItemPersonalShrinkingDevice;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 
@@ -61,11 +62,20 @@ public class Registrations {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
             () -> new BlockItem(MACHINE_BLOCK_MAXIMUM.get(), new Item.Properties().group(ItemGroup.REDSTONE)));
 
-    public static final RegistryObject<BlockWall> WALL_BLOCK = BLOCKS.register("wall", BlockWall::new);
-    public static final RegistryObject<BlockWallBreakable> BREAKABLE_WALL_BLOCK = BLOCKS.register("breakable_wall", BlockWallBreakable::new);
+    public static final RegistryObject<BlockWall> WALL_BLOCK = BLOCKS.register("wall", () ->
+            new BlockWall(Block.Properties.create(Material.IRON).hardnessAndResistance(-1.0F, 3600000.8F).noDrops()));
+
+    public static final RegistryObject<BlockWallBreakable> BREAKABLE_WALL_BLOCK = BLOCKS.register("wall_breakable", () ->
+            new BlockWallBreakable(Block.Properties.create(Material.IRON).hardnessAndResistance(3.0f, 128.0f)));
 
     public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
             () -> new ItemPersonalShrinkingDevice(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)));
+
+    public static final RegistryObject<ItemBlockWall> ITEM_WALL = ITEMS.register("wall", () ->
+            new ItemBlockWall(WALL_BLOCK.get(), new Item.Properties().group(ItemGroup.BUILDING_BLOCKS)));
+
+    public static final RegistryObject<ItemBlockWall> ITEM_WALL_BREAKABLE = ITEMS.register("wall_breakable", () ->
+            new ItemBlockWall(BREAKABLE_WALL_BLOCK.get(), new Item.Properties().group(ItemGroup.DECORATIONS)));
 
     public static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
