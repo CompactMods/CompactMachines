@@ -4,7 +4,7 @@ import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.BlockWall;
 import com.robotgryphon.compactmachines.block.BlockWallBreakable;
-import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
+import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.item.ItemBlockMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
@@ -14,6 +14,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
@@ -31,7 +35,8 @@ public class Registrations {
     // ================================================================================================================
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
+    private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
+    // private static final DeferredRegister<Dimension> DIMENSIONS = DeferredRegister.create(ForgeRegistries.WORLD_CARVERS, MODID);;
 
     // ================================================================================================================
     //   PROPERTIES
@@ -86,8 +91,8 @@ public class Registrations {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
             () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), EnumMachineSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
 
-    public static final RegistryObject<TileEntityType<TileEntityMachine>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
-            TileEntityType.Builder.create(TileEntityMachine::new,
+    public static final RegistryObject<TileEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
+            TileEntityType.Builder.create(CompactMachineTile::new,
                     MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
                     MACHINE_BLOCK_NORMAL.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
                     .build(null));
@@ -121,6 +126,11 @@ public class Registrations {
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
 
     // ================================================================================================================
+    //   DIMENSION
+    // ================================================================================================================
+    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation("compact_world"));
+
+    // ================================================================================================================
     //   INITIALIZATION
     // ================================================================================================================
     public static void init() {
@@ -129,5 +139,8 @@ public class Registrations {
         BLOCKS.register(eventBus);
         ITEMS.register(eventBus);
         TILES_ENTITIES.register(eventBus);
+
+
+
     }
 }

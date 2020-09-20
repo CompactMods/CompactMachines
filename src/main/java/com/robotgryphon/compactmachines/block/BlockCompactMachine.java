@@ -1,10 +1,13 @@
 package com.robotgryphon.compactmachines.block;
 
+import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
-import com.robotgryphon.compactmachines.block.tiles.TileEntityMachine;
+import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
+import com.robotgryphon.compactmachines.util.PlayerUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
@@ -21,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -32,6 +36,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -156,7 +161,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new TileEntityMachine();
+        return new CompactMachineTile();
     }
 
     @Override
@@ -166,11 +171,11 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
             return;
         }
 
-        if (!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
+        if (!(world.getTileEntity(pos) instanceof CompactMachineTile)) {
             return;
         }
 
-        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
+        CompactMachineTile te = (CompactMachineTile) world.getTileEntity(pos);
 //        WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 //
 //        BlockMachine.spawnItemWithNBT(world, pos, state.get(BlockMachine.SIZE), te);
@@ -183,11 +188,11 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 
-        boolean hasProperTile = worldIn.getTileEntity(pos) instanceof TileEntityMachine;
+        boolean hasProperTile = worldIn.getTileEntity(pos) instanceof CompactMachineTile;
         if (!hasProperTile)
             return;
 
-        TileEntityMachine tile = (TileEntityMachine) worldIn.getTileEntity(pos);
+        CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
 
         // The machine already has data for some reason
         if(tile.coords != -1)
@@ -246,13 +251,25 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
             return ActionResultType.SUCCESS;
 
         TileEntity te = worldIn.getTileEntity(pos);
-        if(te == null || !(te instanceof TileEntityMachine))
+        if(te == null || !(te instanceof CompactMachineTile))
             return ActionResultType.SUCCESS;
 
-        TileEntityMachine tile = (TileEntityMachine) te;
+        CompactMachineTile tile = (CompactMachineTile) te;
         Optional<UUID> owner = tile.getOwnerUUID();
         if(owner.isPresent()) {
-            player.sendStatusMessage(new StringTextComponent(owner.get().toString()), true);
+            Optional<GameProfile> playerProf = PlayerUtil.getProfileByUUID(worldIn, owner.get());
+            player.sendStatusMessage(new StringTextComponent(playerProf
+                    .map(p -> p.getName())
+                    .orElse(new TranslationTextComponent("tooltip.compactmachines.unknown_player").getString())
+                ), true);
+        }
+
+        // Try teleport to compact machine dimension
+        RegistryKey<World> registrykey = worldIn.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
+        ServerWorld serverworld = ((ServerWorld)worldIn).getServer().getWorld(registrykey);
+
+        if (serverworld != null) {
+            player.changeDimension(serverworld);
         }
 
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
@@ -298,8 +315,8 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
         probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
 
         TileEntity te = world.getTileEntity(data.getPos());
-        if(te instanceof TileEntityMachine) {
-            TileEntityMachine machine = (TileEntityMachine) te;
+        if(te instanceof CompactMachineTile) {
+            CompactMachineTile machine = (CompactMachineTile) te;
 //            if(machine.isInsideItself()) {
 //                String text = TextFormatting.DARK_RED + "{*tooltip.compactmachines.machine.stopitsoaryn*}" + TextFormatting.RESET;
 //                probeInfo.horizontal().text(new StringTextComponent(text));

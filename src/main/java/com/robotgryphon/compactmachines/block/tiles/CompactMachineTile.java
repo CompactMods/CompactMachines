@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable {
+public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickable {
     public int coords = -1;
     private boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
@@ -30,7 +30,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     protected boolean locked = false;
     protected Set<String> playerWhiteList;
 
-    public TileEntityMachine() {
+    public CompactMachineTile() {
         super(Registrations.MACHINE_TILE_ENTITY.get());
 
         playerWhiteList = new HashSet<>();

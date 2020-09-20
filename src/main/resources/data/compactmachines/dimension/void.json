@@ -1,0 +1,35 @@
+{
+  "type": {
+    "name": "compactmachines:void",
+    "ultrawarm": false,
+    "natural": false,
+    "piglin_safe": false,
+    "respawn_anchor_works": false,
+    "bed_works": false,
+    "has_raids": false,
+    "has_skylight": true,
+    "has_ceiling": false,
+    "coordinate_scale": 1,
+    "ambient_light": 0,
+    "logical_height": 256,
+    "infiniburn": "minecraft:infiniburn_overworld"
+  },
+  "generator": {
+    "type": "compactmachines:void",
+    "seed": -757179154,
+    "settings": {
+      "biome": "minecraft:the_void",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 1
+        }
+      ],
+      "structures": {
+        "structures": {}
+      }
+    }
+  }
+}
