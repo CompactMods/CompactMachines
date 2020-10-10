@@ -128,7 +128,7 @@ public class Registrations {
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation("compact_world"));
+    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation("compact_world"));
 
     // ================================================================================================================
     //   INITIALIZATION

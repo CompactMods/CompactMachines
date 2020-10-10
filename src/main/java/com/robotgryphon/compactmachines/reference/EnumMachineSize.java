@@ -3,27 +3,27 @@ package com.robotgryphon.compactmachines.reference;
 import net.minecraft.util.IStringSerializable;
 
 public enum EnumMachineSize implements IStringSerializable {
-    TINY    ("tiny", 4),
-    SMALL   ("small", 6),
-    NORMAL  ("normal", 8),
-    LARGE   ("large", 10),
-    GIANT   ("giant", 12),
-    MAXIMUM ("maximum", 14);
+    TINY    ("tiny", 3),
+    SMALL   ("small", 5),
+    NORMAL  ("normal", 7),
+    LARGE   ("large", 9),
+    GIANT   ("giant", 11),
+    MAXIMUM ("maximum", 13);
 
     private String name;
-    private int dimension;
+    private int internalSize;
 
-    EnumMachineSize(String name, int dimension) {
+    EnumMachineSize(String name, int internalSize) {
         this.name = name;
-        this.dimension = dimension;
+        this.internalSize = internalSize;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public int getDimension() {
-        return this.dimension;
+    public int getInternalSize() {
+        return this.internalSize;
     }
 
     public static EnumMachineSize getFromSize(String size) {

@@ -35,7 +35,7 @@ public class BlockLootGenerator extends LootTableProvider {
 
     @Override
     protected void validate(Map<ResourceLocation, LootTable> map, ValidationTracker validationtracker) {
-        map.forEach((name, table) -> LootTableManager.func_227508_a_(validationtracker, name, table));
+        map.forEach((name, table) -> LootTableManager.validateLootTable(validationtracker, name, table));
     }
 
     private static class Blocks extends BlockLootTables {

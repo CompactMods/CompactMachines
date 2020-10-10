@@ -1,24 +1,18 @@
 package com.robotgryphon.compactmachines.block;
 
 import com.mojang.authlib.GameProfile;
-import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.IProbeInfoProvider;
-import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -28,9 +22,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -42,12 +34,17 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
+//import mcjty.theoneprobe.api.IProbeHitData;
+//import mcjty.theoneprobe.api.IProbeInfo;
+//import mcjty.theoneprobe.api.IProbeInfoProvider;
+//import mcjty.theoneprobe.api.ProbeMode;
+
 //import org.dave.compactmachines.tile.TileEntityMachine;
 //import org.dave.compactmachines.tile.TileEntityRedstoneTunnel;
 //import org.dave.compactmachines.tile.TileEntityTunnel;
 
 // TODO TOP Integration
-public class BlockCompactMachine extends Block implements IProbeInfoProvider {
+public class BlockCompactMachine extends Block {
 
     private final EnumMachineSize size;
 
@@ -304,59 +301,59 @@ public class BlockCompactMachine extends Block implements IProbeInfoProvider {
 //    }
 
 
-    @Override
-    public String getID() {
-        return CompactMachines.MODID + ":" + "machine";
-    }
-
-    @Override
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
-        String size = this.size.getName();
-        probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
-
-        TileEntity te = world.getTileEntity(data.getPos());
-        if(te instanceof CompactMachineTile) {
-            CompactMachineTile machine = (CompactMachineTile) te;
-//            if(machine.isInsideItself()) {
-//                String text = TextFormatting.DARK_RED + "{*tooltip.compactmachines.machine.stopitsoaryn*}" + TextFormatting.RESET;
-//                probeInfo.horizontal().text(new StringTextComponent(text));
-//                return;
-//            }
+//    @Override
+//    public String getID() {
+//        return CompactMachines.MODID + ":" + "machine";
+//    }
 //
-//            String nameOrId = "";
-//            if(machine.coords < 0 && machine.getCustomName().length() == 0) {
-//                nameOrId = "{*tooltip.compactmachines.machine.coords.unused*}";
-//            } else if(machine.getCustomName().length() > 0) {
-//                nameOrId = machine.getCustomName();
-//            } else {
-//                nameOrId = "#" + machine.coords;
-//            }
-
-//            String coords = TextFormatting.GREEN + "{*tooltip.compactmachines.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET;
+//    @Override
+//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+//        String size = this.size.getName();
+//        probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
+//
+//        TileEntity te = world.getTileEntity(data.getPos());
+//        if(te instanceof CompactMachineTile) {
+//            CompactMachineTile machine = (CompactMachineTile) te;
+////            if(machine.isInsideItself()) {
+////                String text = TextFormatting.DARK_RED + "{*tooltip.compactmachines.machine.stopitsoaryn*}" + TextFormatting.RESET;
+////                probeInfo.horizontal().text(new StringTextComponent(text));
+////                return;
+////            }
+////
+////            String nameOrId = "";
+////            if(machine.coords < 0 && machine.getCustomName().length() == 0) {
+////                nameOrId = "{*tooltip.compactmachines.machine.coords.unused*}";
+////            } else if(machine.getCustomName().length() > 0) {
+////                nameOrId = machine.getCustomName();
+////            } else {
+////                nameOrId = "#" + machine.coords;
+////            }
+//
+////            String coords = TextFormatting.GREEN + "{*tooltip.compactmachines.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET;
+////            probeInfo.horizontal()
+////                    .text(new StringTextComponent(coords));
+//
+////            if(player.isCreative() && mode == ProbeMode.EXTENDED) {
+////                if(machine.hasNewSchema()) {
+////                    String schemaName = machine.getSchemaName();
+////                    String text = TextFormatting.RED + "{*tooltip.compactmachines.machine.schema*} " + TextFormatting.YELLOW + schemaName + TextFormatting.RESET;
+////                    probeInfo.horizontal()
+////                            .text(new StringTextComponent(text));
+////                }
+////            }
+//
+//            IFormattableTextComponent text = new StringTextComponent("" + TextFormatting.YELLOW)
+//                    .append(new TranslationTextComponent(("enumfacing." + data.getSideHit().name())))
+//                    .append(new StringTextComponent("" + TextFormatting.RESET));
+//
 //            probeInfo.horizontal()
-//                    .text(new StringTextComponent(coords));
-
-//            if(player.isCreative() && mode == ProbeMode.EXTENDED) {
-//                if(machine.hasNewSchema()) {
-//                    String schemaName = machine.getSchemaName();
-//                    String text = TextFormatting.RED + "{*tooltip.compactmachines.machine.schema*} " + TextFormatting.YELLOW + schemaName + TextFormatting.RESET;
-//                    probeInfo.horizontal()
-//                            .text(new StringTextComponent(text));
-//                }
-//            }
-
-            IFormattableTextComponent text = new StringTextComponent("" + TextFormatting.YELLOW)
-                    .append(new TranslationTextComponent(("enumfacing." + data.getSideHit().name())))
-                    .append(new StringTextComponent("" + TextFormatting.RESET));
-
-            probeInfo.horizontal()
-                    .item(new ItemStack(Items.COMPASS))
-                    .text(text);
-
-//            ItemStack connectedStack = machine.getConnectedPickBlock(data.getSideHit());
-//            if(connectedStack != null && !connectedStack.isEmpty()) {
-//                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
-//            }
-        }
-    }
+//                    .item(new ItemStack(Items.COMPASS))
+//                    .text(text);
+//
+////            ItemStack connectedStack = machine.getConnectedPickBlock(data.getSideHit());
+////            if(connectedStack != null && !connectedStack.isEmpty()) {
+////                probeInfo.horizontal().item(connectedStack).itemLabel(connectedStack);
+////            }
+//        }
+    // }
 }
