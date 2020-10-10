@@ -11,7 +11,9 @@ import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.RegistryKey;
@@ -102,9 +104,10 @@ public class Registrations {
     // ================================================================================================================
     public static final RegistryObject<Block> WALL_BLOCK = BLOCKS.register("wall", () ->
             new BlockWall(AbstractBlock.Properties
-                    .create(Material.IRON)
+                    .create(Material.IRON, MaterialColor.CLAY)
                     .hardnessAndResistance(-1.0F, 3600000.8F)
-                    .setLightLevel(state -> 5)
+                    .sound(SoundType.METAL)
+                    .setLightLevel((state) -> 15)
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall_breakable", () ->
