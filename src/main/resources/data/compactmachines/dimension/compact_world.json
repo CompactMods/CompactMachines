@@ -1,6 +1,6 @@
 {
   "type": {
-    "name": "compactmachines:void",
+    "name": "compactmachines:compact_world",
     "ultrawarm": false,
     "natural": false,
     "piglin_safe": false,
@@ -15,12 +15,9 @@
     "infiniburn": "minecraft:infiniburn_overworld"
   },
   "generator": {
-    "type": "compactmachines:void",
-    "seed": -757179154,
+    "type": "minecraft:flat",
     "settings": {
       "biome": "minecraft:the_void",
-      "lakes": false,
-      "features": false,
       "layers": [
         {
           "block": "minecraft:air",
@@ -28,7 +25,13 @@
         }
       ],
       "structures": {
-        "structures": {}
+        "stronghold": {
+          "distance": 0,
+          "count": 0,
+          "spread": 0
+        },
+
+        "structures": []
       }
     }
   }
