@@ -46,7 +46,7 @@ public class Registrations {
     private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
             .create(Material.IRON)
             .hardnessAndResistance(8.0F, 20.0F)
-            .setLightLevel(state -> 1)
+            .setLightLevel((state) -> 3)
             .harvestLevel(1)
             .harvestTool(ToolType.PICKAXE)
             .setRequiresTool();
@@ -131,7 +131,7 @@ public class Registrations {
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation("compact_world"));
+    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation("compactmachines:compact_world"));
 
     // ================================================================================================================
     //   INITIALIZATION

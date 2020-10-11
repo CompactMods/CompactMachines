@@ -1,17 +1,15 @@
 package com.robotgryphon.compactmachines.block;
 
-import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
-import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -22,8 +20,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
@@ -31,8 +27,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.UUID;
 
 //import mcjty.theoneprobe.api.IProbeHitData;
 //import mcjty.theoneprobe.api.IProbeInfo;
@@ -241,35 +235,31 @@ public class BlockCompactMachine extends Block {
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 
-        if (player.isSneaking())
-            return ActionResultType.SUCCESS;
+        // TODO - Open GUI with machine preview
+        if (player instanceof ServerPlayerEntity) {
 
-        if(worldIn.isRemote || player instanceof ClientPlayerEntity)
-            return ActionResultType.SUCCESS;
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-        TileEntity te = worldIn.getTileEntity(pos);
-        if(te == null || !(te instanceof CompactMachineTile))
-            return ActionResultType.SUCCESS;
+            TileEntity te = worldIn.getTileEntity(pos);
+            CompactMachineTile tile = (CompactMachineTile) te;
 
-        CompactMachineTile tile = (CompactMachineTile) te;
-        Optional<UUID> owner = tile.getOwnerUUID();
-        if(owner.isPresent()) {
-            Optional<GameProfile> playerProf = PlayerUtil.getProfileByUUID(worldIn, owner.get());
-            player.sendStatusMessage(new StringTextComponent(playerProf
-                    .map(p -> p.getName())
-                    .orElse(new TranslationTextComponent("tooltip.compactmachines.unknown_player").getString())
-                ), true);
+            ItemStack mainItem = player.getHeldItemMainhand();
+            if (mainItem.isEmpty())
+                return ActionResultType.PASS;
+
+            if (mainItem.getItem() == Registrations.PERSONAL_SHRINKING_DEVICE.get()) {
+                // Try teleport to compact machine dimension
+                RegistryKey<World> registrykey = worldIn.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
+                ServerWorld serverworld = ((ServerWorld) worldIn).getServer().getWorld(registrykey);
+
+                if (serverworld != null) {
+                    ServerPlayerEntity pe = (ServerPlayerEntity) player;
+                    pe.teleport(serverworld, 8, 6, 8, 0, 0);
+                }
+            }
         }
 
-        // Try teleport to compact machine dimension
-        RegistryKey<World> registrykey = worldIn.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
-        ServerWorld serverworld = ((ServerWorld)worldIn).getServer().getWorld(registrykey);
-
-        if (serverworld != null) {
-            player.changeDimension(serverworld);
-        }
-
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        return ActionResultType.SUCCESS;
     }
 
 //    @Override
