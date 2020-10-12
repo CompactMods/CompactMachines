@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -234,6 +235,8 @@ public class BlockCompactMachine extends Block {
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if(worldIn.isRemote())
+            return ActionResultType.SUCCESS;
 
         // TODO - Open GUI with machine preview
         if (player instanceof ServerPlayerEntity) {
@@ -247,21 +250,25 @@ public class BlockCompactMachine extends Block {
             if (mainItem.isEmpty())
                 return ActionResultType.PASS;
 
-            if (mainItem.getItem() == Registrations.PERSONAL_SHRINKING_DEVICE.get()) {
+            if (mainItem.getItem() == Items.COMPASS) {
                 // Try teleport to compact machine dimension
                 RegistryKey<World> registrykey = worldIn.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
-                ServerWorld serverworld = ((ServerWorld) worldIn).getServer().getWorld(registrykey);
 
-                if (serverworld != null) {
-                    ServerPlayerEntity pe = (ServerPlayerEntity) player;
-                    pe.teleport(serverworld, 8, 6, 8, 0, 0);
-                }
+                ServerWorld s = worldIn.getServer().getWorld(registrykey);
+
+                // This just hangs completely, stuck on the loading terrain screen
+                serverPlayer.changeDimension(s);
+
+                // These two methods cause ghost blocks on the client
+                // serverPlayer.teleport(s, 8, 6, 8, 0, 0);
+                // DimensionalUtil.teleportEntity(pe, registrykey, 8, 6, 8);
             }
         }
 
         return ActionResultType.SUCCESS;
     }
 
+    // 1.12.1 code
 //    @Override
 //    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 //        if(player.isSneaking()) {
@@ -290,7 +297,7 @@ public class BlockCompactMachine extends Block {
 //        return true;
 //    }
 
-
+// TOP code
 //    @Override
 //    public String getID() {
 //        return CompactMachines.MODID + ":" + "machine";

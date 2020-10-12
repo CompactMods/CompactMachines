@@ -1,11 +1,14 @@
 package com.robotgryphon.compactmachines.item;
 
+import com.robotgryphon.compactmachines.core.Registrations;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
@@ -40,7 +43,7 @@ public class ItemPersonalShrinkingDevice extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        if(hand == Hand.OFF_HAND) {
+        if (hand == Hand.OFF_HAND) {
             return ActionResult.resultFail(stack);
         }
 
@@ -50,10 +53,20 @@ public class ItemPersonalShrinkingDevice extends Item {
 //            return new ActionResult(ActionResultType.SUCCESS, stack);
 //        }
 //
-//        if(!world.isRemote && player instanceof ServerPlayerEntity) {
-//            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-//
-//            if(player.isSneaking()) {
+        if (!world.isRemote && player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+
+            ItemStack mainItem = player.getHeldItemMainhand();
+            if (mainItem.isEmpty())
+                return ActionResult.resultPass(stack);
+
+            // Try teleport to compact machine dimension
+            RegistryKey<World> registrykey = world.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
+
+            serverPlayer.teleport(world.getServer().getWorld(registrykey), 8, 6, 8, 0, 0);
+            // DimensionalUtil.teleportEntity(pe, registrykey, 8, 6, 8);
+
+            if (player.isSneaking()) {
 //                int coords = StructureTools.getCoordsForPos(player.getPosition());
 //                Vec3d pos = player.getPositionVector();
 //                WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.x, pos.y, pos.z);
@@ -61,10 +74,10 @@ public class ItemPersonalShrinkingDevice extends Item {
 //                TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines.psd.spawnpoint_set");
 //                tc.getStyle().setColor(TextFormatting.GREEN);
 //                player.sendStatusMessage(tc, false);
-//            } else {
-//                TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
-//            }
-//        }
+            } else {
+                // TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
+            }
+        }
 
         return ActionResult.resultSuccess(stack);
     }
