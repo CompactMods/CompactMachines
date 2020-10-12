@@ -11,13 +11,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -25,7 +23,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 
@@ -187,7 +184,7 @@ public class BlockCompactMachine extends Block {
         CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
 
         // The machine already has data for some reason
-        if(tile.coords != -1)
+        if (tile.coords != -1)
             return;
 
 //        if (stack.hasDisplayName()) {
@@ -235,7 +232,7 @@ public class BlockCompactMachine extends Block {
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if(worldIn.isRemote())
+        if (worldIn.isRemote())
             return ActionResultType.SUCCESS;
 
         // TODO - Open GUI with machine preview
@@ -250,18 +247,9 @@ public class BlockCompactMachine extends Block {
             if (mainItem.isEmpty())
                 return ActionResultType.PASS;
 
-            if (mainItem.getItem() == Items.COMPASS) {
+            if (mainItem.getItem() == Registrations.PERSONAL_SHRINKING_DEVICE.get()) {
                 // Try teleport to compact machine dimension
-                RegistryKey<World> registrykey = worldIn.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
-
-                ServerWorld s = worldIn.getServer().getWorld(registrykey);
-
-                // This just hangs completely, stuck on the loading terrain screen
-                serverPlayer.changeDimension(s);
-
-                // These two methods cause ghost blocks on the client
-                // serverPlayer.teleport(s, 8, 6, 8, 0, 0);
-                // DimensionalUtil.teleportEntity(pe, registrykey, 8, 6, 8);
+                CompactMachineUtil.teleportInto(serverPlayer);
             }
         }
 

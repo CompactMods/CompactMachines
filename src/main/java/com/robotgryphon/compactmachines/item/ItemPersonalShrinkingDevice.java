@@ -8,9 +8,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -54,16 +54,7 @@ public class ItemPersonalShrinkingDevice extends Item {
 //        }
 //
         if (!world.isRemote && player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            ItemStack mainItem = player.getHeldItemMainhand();
-            if (mainItem.isEmpty())
-                return ActionResult.resultPass(stack);
-
-            // Try teleport to compact machine dimension
-            RegistryKey<World> registrykey = world.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
-
-            serverPlayer.teleport(world.getServer().getWorld(registrykey), 8, 6, 8, 0, 0);
             // DimensionalUtil.teleportEntity(pe, registrykey, 8, 6, 8);
 
             if (player.isSneaking()) {
@@ -75,6 +66,14 @@ public class ItemPersonalShrinkingDevice extends Item {
 //                tc.getStyle().setColor(TextFormatting.GREEN);
 //                player.sendStatusMessage(tc, false);
             } else {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+
+                if(serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+                    // Try teleport to compact machine dimension
+                    ServerWorld ovw = world.getServer().getWorld(World.OVERWORLD);
+                    serverPlayer.teleport(ovw, 8.5, 6, 8.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                }
+
                 // TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
             }
         }

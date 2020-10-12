@@ -1,14 +1,33 @@
 package com.robotgryphon.compactmachines.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 
 public abstract class CompactMachineUtil {
+
+    public static void teleportInto(ServerPlayerEntity serverPlayer) {
+        World serverWorld = serverPlayer.getServerWorld();
+
+        RegistryKey<World> registrykey = serverWorld.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
+
+        MinecraftServer serv = serverWorld.getServer();
+        if (serv != null) {
+            ServerWorld compactWorld = serv.getWorld(registrykey);
+            serv.deferTask(() -> {
+                serverPlayer.teleport(compactWorld, 8.5, 6, 8.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+            });
+        }
+    }
 
     public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundNBT tag) {
         try {
