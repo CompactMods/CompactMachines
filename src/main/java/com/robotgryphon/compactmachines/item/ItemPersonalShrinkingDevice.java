@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -8,12 +9,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class ItemPersonalShrinkingDevice extends Item {
 
@@ -71,7 +75,16 @@ public class ItemPersonalShrinkingDevice extends Item {
                 if(serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
                     // Try teleport to compact machine dimension
                     ServerWorld ovw = world.getServer().getWorld(World.OVERWORLD);
-                    serverPlayer.teleport(ovw, 8.5, 6, 8.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+
+                    Optional<Vector3d> lastPos = PlayerUtil.getLastPosition(serverPlayer);
+                    if(!lastPos.isPresent()) {
+                        serverPlayer.sendStatusMessage(
+                                new TranslationTextComponent("no_prev_position"),
+                                true);
+                    } else {
+                        Vector3d p = lastPos.get();
+                        serverPlayer.teleport(ovw, p.x, p.y, p.z, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                    }
                 }
 
                 // TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);

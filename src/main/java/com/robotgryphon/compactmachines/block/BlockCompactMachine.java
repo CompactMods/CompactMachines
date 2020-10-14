@@ -249,7 +249,7 @@ public class BlockCompactMachine extends Block {
 
             if (mainItem.getItem() == Registrations.PERSONAL_SHRINKING_DEVICE.get()) {
                 // Try teleport to compact machine dimension
-                CompactMachineUtil.teleportInto(serverPlayer);
+                CompactMachineUtil.teleportInto(serverPlayer, pos, size);
             }
         }
 
