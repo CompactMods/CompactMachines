@@ -31,13 +31,9 @@ tooltip.compactmachines.machine.coords.unused=Unused
 tooltip.compactmachines.machine.schema=Schema:
 tooltip.compactmachines.machine.stopitsoaryn=Feedbackloop detected
 
-tooltip.compactmachines.hold_shift.hint=Hold shift for details.
-tooltip.compactmachines.psd.hint=Used as ingame documentation and to enter Compact Machines.
 tooltip.compactmachines.fieldprojector.hint=Place 4 opposite of each other to create a Miniaturization Crafting field. Right click to get hints where the next projector needs to be!
 tooltip.compactmachines.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
 tooltip.compactmachines.redstonetunneltool.hint=Used to transfer redstone signals between wall blocks and outside Compact Machine faces.
-tooltip.compactmachines.wall.hint=Warning! Unbreakable for non-creative players!
-tooltip.compactmachines.machine.hint=A %s provides a %s room.
 
 tooltip.compactmachines.lockforotherplayers.checkbox=Lock for other players
 

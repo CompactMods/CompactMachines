@@ -3,6 +3,11 @@
 
   "tooltip.compactmachines.owner": "Owner: ",
   "tooltip.compactmachines.unknown_player": "Unknown Player",
+  "tooltip.compactmachines.machine.size": "Size: %1$sx%1$sx%1$s",
+  "tooltip.compactmachines.hold_shift.hint": "Hold shift for details.",
+  "tooltip.compactmachines.psd.hint": "Used as in-game documentation and to enter Compact Machines.",
+  "tooltip.compactmachines.wall.hint": "Warning! Unbreakable for non-creative players!",
+  "tooltip.compactmachines.machine.hint": "A %1$s provides a %2$s room.",
 
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",

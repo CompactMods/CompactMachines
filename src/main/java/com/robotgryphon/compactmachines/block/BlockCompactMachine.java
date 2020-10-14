@@ -267,6 +267,10 @@ public class BlockCompactMachine extends Block {
         return ActionResultType.SUCCESS;
     }
 
+    public EnumMachineSize getSize() {
+        return this.size;
+    }
+
     // 1.12.1 code
 //    @Override
 //    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {

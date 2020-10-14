@@ -2,10 +2,12 @@ package com.robotgryphon.compactmachines.item;
 
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
@@ -42,7 +44,7 @@ public class ItemBlockMachine extends BlockItem {
         CompoundNBT nbt = stack.getTag();
         if (nbt.contains("cm")) {
             CompoundNBT machineData = nbt.getCompound("cm");
-            if(machineData.contains("coords")) {
+            if (machineData.contains("coords")) {
                 int coords = machineData.getInt("coords");
                 if (coords > -1) {
                     IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine.coords")
@@ -67,14 +69,22 @@ public class ItemBlockMachine extends BlockItem {
             tooltip.add(ownerText);
         }
 
-        if (false) {
+        if (Screen.hasShiftDown()) {
             // TODO Show size information when sneaking
-            // int size = Blockss.machine.getStateFromMeta(stack.getItemDamage()).getValue(BlockMachine.SIZE).getDimension() - 1;
-            // String sizeString = size + "x" + size + "x" + size;
-            // tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip.compactmachines.machine.hint", I18n.format(this.getTranslationKey(stack) + ".name"), sizeString));
+
+            Block b = Block.getBlockFromItem(stack.getItem());
+            if (b instanceof BlockCompactMachine) {
+                EnumMachineSize size = ((BlockCompactMachine) b).getSize();
+                int internalSize = size.getInternalSize();
+
+                IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".machine.size", internalSize)
+                        .mergeStyle(TextFormatting.YELLOW);
+
+                tooltip.add(text);
+            }
         } else {
-            IFormattableTextComponent text = new StringTextComponent("" + TextFormatting.GRAY)
-                    .append(new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint"));
+            IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
+                    .mergeStyle(TextFormatting.GRAY);
 
             tooltip.add(text);
         }

@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.item;
 
+import com.robotgryphon.compactmachines.core.Registrations;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
@@ -20,9 +21,12 @@ public class ItemBlockWall extends BlockItem {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        IFormattableTextComponent text = new StringTextComponent(""  + TextFormatting.RED)
-                .append(new TranslationTextComponent("tooltip.compactmachines.wall.hint"));
+        if (stack.getItem() == Registrations.ITEM_WALL.get()) {
+            IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.wall.hint")
+                    .mergeStyle(TextFormatting.RED);
+            
+            tooltip.add(text);
+        }
 
-        tooltip.add(text);
     }
 }

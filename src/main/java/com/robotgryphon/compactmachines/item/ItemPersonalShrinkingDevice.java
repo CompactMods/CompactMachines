@@ -1,8 +1,10 @@
 package com.robotgryphon.compactmachines.item;
 
+import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -15,6 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -40,12 +43,16 @@ public class ItemPersonalShrinkingDevice extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-//        TODO Show tooltip when shift held
-//        if(GuiScreen.isShiftKeyDown()) {
-//            tooltip.add(TextFormatting.YELLOW + I18n.format("tooltip." + compactmachines.MODID + ".psd.hint"));
-//        } else {
-//            tooltip.add(TextFormatting.GRAY + I18n.format("tooltip." + compactmachines.MODID + ".hold_shift.hint"));
-//        }
+        if(Screen.hasShiftDown()) {
+            tooltip.add(
+                    new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".psd.hint")
+                            .mergeStyle(TextFormatting.YELLOW));
+        } else {
+            tooltip.add(
+                new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
+                    .mergeStyle(TextFormatting.GRAY));
+        }
+
     }
 
     @Override
