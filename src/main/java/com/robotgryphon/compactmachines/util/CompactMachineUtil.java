@@ -18,7 +18,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
@@ -109,8 +108,8 @@ public abstract class CompactMachineUtil {
         MinecraftServer serv = serverWorld.getServer();
         if (serv != null) {
             if (serverWorld.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
-                IFormattableTextComponent msg = new StringTextComponent(TextFormatting.RED + "")
-                        .append(new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter"));
+                IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter")
+                        .mergeStyle(TextFormatting.RED);
 
                 serverPlayer.sendStatusMessage(msg, true);
                 return;
