@@ -40,13 +40,16 @@ public class ItemBlockMachine extends BlockItem {
             return;
 
         CompoundNBT nbt = stack.getTag();
-        if (nbt.contains("coords")) {
-            int coords = nbt.getInt("coords");
-            if (coords > -1) {
-                IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine.coords")
-                        .append(new StringTextComponent(" #" + coords));
+        if (nbt.contains("cm")) {
+            CompoundNBT machineData = nbt.getCompound("cm");
+            if(machineData.contains("coords")) {
+                int coords = machineData.getInt("coords");
+                if (coords > -1) {
+                    IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine.coords")
+                            .append(new StringTextComponent(" #" + coords));
 
-                tooltip.add(coordsTC);
+                    tooltip.add(coordsTC);
+                }
             }
         }
 

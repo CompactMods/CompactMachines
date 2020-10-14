@@ -1,6 +1,9 @@
 package com.robotgryphon.compactmachines.util;
 
+import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.data.CompactMachineData;
+import com.robotgryphon.compactmachines.data.MachineData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,6 +16,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
@@ -20,6 +24,7 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.UUID;
 
 public abstract class CompactMachineUtil {
 
@@ -49,7 +54,7 @@ public abstract class CompactMachineUtil {
                     .offset(wallDirection, s + 1);
 
             wallBounds = new AxisAlignedBB(start, start)
-                    .expand(0, (s + 1) * 2, 0);
+                    .expand(0, (s * 2) + 1, 0);
         } else {
             start = cubeCenter.offset(wallDirection, s + 1);
 
@@ -66,11 +71,6 @@ public abstract class CompactMachineUtil {
             case WEST:
             case EAST:
                 wallBounds = wallBounds.grow(0, 0, s + 1);
-                break;
-
-            case UP:
-            case DOWN:
-                // NO-OP: Math was done above
                 break;
         }
 
@@ -110,14 +110,32 @@ public abstract class CompactMachineUtil {
             if (compactWorld == null)
                 return;
 
+            CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
+            if(tile == null)
+                return;
+
             PlayerUtil.setLastPosition(serverPlayer);
 
             serv.deferTask(() -> {
-                BlockPos center = new BlockPos(8, 4 + (size.getInternalSize() / 2), 8);
+                BlockPos center;
+                if(tile.machineId == -1) {
+                    int nextID = MachineData.getNextMachineId(compactWorld);
 
-                CompactMachineUtil.generateCompactStructure(compactWorld, size, center);
+                    center = getCenterOfMachineById(nextID);
 
-                serverPlayer.teleport(compactWorld, 8.5, 6, 8.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                    // Bump the center up a bit so the floor is Y = 60
+                    center = center.offset(Direction.UP, size.getInternalSize() / 2);
+
+                    CompactMachineUtil.generateCompactStructure(compactWorld, size, center);
+
+                    tile.setMachineId(nextID);
+                    MachineData.getMachineData(compactWorld)
+                            .addToMachineData(nextID, new CompactMachineData(nextID, center, serverPlayer.getUniqueID(), size));
+                } else {
+                    center = getCenterOfMachineById(tile.machineId);
+                }
+
+                serverPlayer.teleport(compactWorld, center.getX() + 0.5, 62, center.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
             });
         }
     }
@@ -183,5 +201,21 @@ public abstract class CompactMachineUtil {
         }
 
         return Registrations.MACHINE_BLOCK_ITEM_NORMAL.get();
+    }
+
+    public static BlockPos getCenterOfMachineById(int id) {
+        Vector3i location = MathUtil.getRegionPositionByIndex(id);
+        return new BlockPos(location.getX() * 1024, 60, location.getZ() * 1024);
+    }
+
+    public static int registerMachine(ServerWorld world, BlockPos center, UUID owner, EnumMachineSize size) {
+        MachineData machineData = MachineData.getMachineData(world);
+
+        int nextPosition = 0;
+
+        CompactMachineData compactMachineData = new CompactMachineData(nextPosition, center, owner, size);
+        machineData.addToMachineData(nextPosition, compactMachineData);
+
+        return nextPosition;
     }
 }

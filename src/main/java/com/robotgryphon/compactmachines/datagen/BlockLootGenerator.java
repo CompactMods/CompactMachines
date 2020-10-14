@@ -65,7 +65,7 @@ public class BlockLootGenerator extends LootTableProvider {
 
         private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
                 .replaceOperation(Reference.CompactMachines.OWNER_NBT, Reference.CompactMachines.OWNER_NBT)
-                .replaceOperation("ref", "cm.ref");
+                .replaceOperation("coords", "cm.coords");
 
         private LootPool.Builder registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
 //            LootTable.builder()

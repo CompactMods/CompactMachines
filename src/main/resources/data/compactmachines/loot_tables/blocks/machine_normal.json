@@ -26,8 +26,8 @@
               "op": "replace"
             },
             {
-              "source": "ref",
-              "target": "cm.ref",
+              "source": "coords",
+              "target": "cm.coords",
               "op": "replace"
             }
           ]

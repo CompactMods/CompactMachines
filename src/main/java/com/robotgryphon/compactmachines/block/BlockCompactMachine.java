@@ -130,6 +130,11 @@ public class BlockCompactMachine extends Block {
         CompoundNBT nbt = stack.getOrCreateTag();
         nbt.putString("size", this.size.getName());
 
+        CompactMachineTile tileEntity = (CompactMachineTile) world.getTileEntity(pos);
+        if(tileEntity != null) {
+            nbt.putInt("coords", tileEntity.machineId);
+        }
+
         stack.setTag(nbt);
 
         return stack;
@@ -184,7 +189,7 @@ public class BlockCompactMachine extends Block {
         CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
 
         // The machine already has data for some reason
-        if (tile.coords != -1)
+        if (tile.machineId != -1)
             return;
 
 //        if (stack.hasDisplayName()) {
@@ -199,6 +204,12 @@ public class BlockCompactMachine extends Block {
 
         if (!tile.getOwnerUUID().isPresent() && placer instanceof PlayerEntity) {
             tile.setOwner(placer.getUniqueID());
+        }
+
+        if(nbt.contains("cm")) {
+            CompoundNBT machineData = nbt.getCompound("cm");
+            if (machineData.contains("coords"))
+                tile.setMachineId(machineData.getInt("coords"));
         }
 
         tile.markDirty();

@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickable {
-    public int coords = -1;
+    public int machineId = -1;
     private boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
     public long nextSpawnTick = 0;
@@ -40,7 +40,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     public void read(BlockState state, CompoundNBT nbt) {
         super.read(state, nbt);
 
-        coords = nbt.getInt("coords");
+        machineId = nbt.getInt("coords");
         // TODO customName = nbt.getString("CustomName");
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
             owner = nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT);
@@ -72,7 +72,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     public CompoundNBT write(CompoundNBT nbt) {
         nbt = super.write(nbt);
 
-        nbt.putInt("coords", coords);
+        nbt.putInt("coords", machineId);
         // nbt.putString("CustomName", customName.getString());
 
         if (owner != null) {
@@ -239,6 +239,11 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
     public void setOwner(UUID owner) {
         this.owner = owner;
+    }
+
+    public void setMachineId(int id) {
+        this.machineId = id;
+        this.markDirty();
     }
 
     /*
