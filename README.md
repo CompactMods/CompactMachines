@@ -82,7 +82,7 @@ Since this is asked very frequently:
   that adds a capability proxy block.
 
 ## Miniaturization Crafting
-See the [Compact Crafting](robotgryphon/CompactCrafting) mod instead.
+See the [Compact Crafting] mod instead.
 
 #### Setup
 
@@ -101,7 +101,7 @@ You can disable the field projection by applying a redstone signal to any of the
 
 
 #### Creating custom recipes
-If you're looking for the Miniaturization Crafting system, take a look at [Compact Crafting](robotgryphon/CompactCrafting) instead.
+If you're looking for the Miniaturization Crafting system, take a look at [Compact Crafting] instead.
 
 
 ## World Gen
@@ -109,3 +109,5 @@ If you're looking for the Miniaturization Crafting system, take a look at [Compa
 "Broken" Compact Machines sometimes generate in the overworld. Harvest their blocks to use for your own machines.
 
 This can be disabled in the config files.
+
+[Compact Crafting]: https://github.com/robotgryphon/CompactCrafting
