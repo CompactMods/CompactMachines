@@ -2,9 +2,11 @@ package com.robotgryphon.compactmachines.util;
 
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 import java.util.Optional;
@@ -25,28 +27,23 @@ public abstract class PlayerUtil {
     public static void setLastPosition(PlayerEntity player) {
         CompoundNBT data = player.getPersistentData();
 
-        Vector3d positionVec = player.getPositionVec();
+        BlockPos pos = player.getPosition();
+        ResourceLocation dim = player.world.getDimensionKey().getLocation();
 
-        CompoundNBT pos = new CompoundNBT();
-        pos.putDouble("x", positionVec.x);
-        pos.putDouble("y", positionVec.y);
-        pos.putDouble("z", positionVec.z);
+        DimensionalPosition dp = new DimensionalPosition(dim, pos);
 
-        data.put(COMPACT_POSITION_NBT, pos);
+        CompoundNBT dimNbt = dp.serializeNBT();
+
+        data.put(COMPACT_POSITION_NBT, dimNbt);
     }
 
-    public static Optional<Vector3d> getLastPosition(PlayerEntity player) {
+    public static Optional<DimensionalPosition> getLastPosition(PlayerEntity player) {
         CompoundNBT data = player.getPersistentData();
         if(!data.contains(Reference.CompactMachines.COMPACT_POSITION_NBT))
             return Optional.empty();
 
         CompoundNBT pos = data.getCompound(Reference.CompactMachines.COMPACT_POSITION_NBT);
-        Vector3d posV = new Vector3d(
-                pos.getDouble("x"),
-                pos.getDouble("y"),
-                pos.getDouble("z")
-        );
 
-        return Optional.of(posV);
+        return Optional.of(DimensionalPosition.fromNBT(pos));
     }
 }

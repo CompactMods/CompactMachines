@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,7 +10,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -72,18 +76,22 @@ public class ItemPersonalShrinkingDevice extends Item {
             } else {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-                if(serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+                if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
                     // Try teleport to compact machine dimension
-                    ServerWorld ovw = world.getServer().getWorld(World.OVERWORLD);
 
-                    Optional<Vector3d> lastPos = PlayerUtil.getLastPosition(serverPlayer);
-                    if(!lastPos.isPresent()) {
+                    Optional<DimensionalPosition> lastPos = PlayerUtil.getLastPosition(serverPlayer);
+                    if (!lastPos.isPresent()) {
                         serverPlayer.sendStatusMessage(
                                 new TranslationTextComponent("no_prev_position"),
                                 true);
                     } else {
-                        Vector3d p = lastPos.get();
-                        serverPlayer.teleport(ovw, p.x, p.y, p.z, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                        DimensionalPosition p = lastPos.get();
+                        BlockPos bp = p.getPosition();
+                        ResourceLocation dimRL = p.getDimension();
+                        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
+
+                        ServerWorld ovw = world.getServer().getWorld(key);
+                        serverPlayer.teleport(ovw, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
                     }
                 }
 
