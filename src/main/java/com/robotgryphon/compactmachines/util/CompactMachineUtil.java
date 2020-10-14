@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.util;
 
+import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.CompactMachineData;
@@ -13,10 +14,13 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
@@ -102,23 +106,29 @@ public abstract class CompactMachineUtil {
     public static void teleportInto(ServerPlayerEntity serverPlayer, BlockPos machinePos, EnumMachineSize size) {
         World serverWorld = serverPlayer.getServerWorld();
 
-        RegistryKey<World> registrykey = serverWorld.getDimensionKey() == World.OVERWORLD ? Registrations.COMPACT_DIMENSION : World.OVERWORLD;
-
         MinecraftServer serv = serverWorld.getServer();
         if (serv != null) {
-            ServerWorld compactWorld = serv.getWorld(registrykey);
+            if (serverWorld.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+                IFormattableTextComponent msg = new StringTextComponent(TextFormatting.RED + "")
+                        .append(new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter"));
+
+                serverPlayer.sendStatusMessage(msg, true);
+                return;
+            }
+
+            ServerWorld compactWorld = serv.getWorld(Registrations.COMPACT_DIMENSION);
             if (compactWorld == null)
                 return;
 
             CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
-            if(tile == null)
+            if (tile == null)
                 return;
 
             PlayerUtil.setLastPosition(serverPlayer);
 
             serv.deferTask(() -> {
                 BlockPos center;
-                if(tile.machineId == -1) {
+                if (tile.machineId == -1) {
                     int nextID = MachineData.getNextMachineId(compactWorld);
 
                     center = getCenterOfMachineById(nextID);
@@ -205,7 +215,7 @@ public abstract class CompactMachineUtil {
 
     public static BlockPos getCenterOfMachineById(int id) {
         Vector3i location = MathUtil.getRegionPositionByIndex(id);
-        return new BlockPos(location.getX() * 1024, 60, location.getZ() * 1024);
+        return new BlockPos((location.getX() * 1024) + 8, 60, (location.getZ() * 1024) + 8);
     }
 
     public static int registerMachine(ServerWorld world, BlockPos center, UUID owner, EnumMachineSize size) {

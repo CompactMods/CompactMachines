@@ -22,5 +22,7 @@
   "item.compactmachines.machine_giant": "Compact Machine (Giant)",
   "item.compactmachines.machine_maximum": "Compact Machine (Maximum)",
 
-  "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device"
+  "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device",
+
+  "compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work."
 }
