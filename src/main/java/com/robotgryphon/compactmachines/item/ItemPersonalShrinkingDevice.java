@@ -75,7 +75,8 @@ public class ItemPersonalShrinkingDevice extends Item {
 
             if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
                 if (player.isSneaking()) {
-                    CompactMachineUtil.setMachineSpawn(serverPlayer.getServerWorld(), player.getPosition());
+                    ServerWorld w = serverPlayer.getServerWorld();
+                    CompactMachineUtil.setMachineSpawn(w, player.getPosition());
 
                     IFormattableTextComponent tc = new TranslationTextComponent("messages.compactmachines.psd.spawnpoint_set")
                             .mergeStyle(TextFormatting.GREEN);

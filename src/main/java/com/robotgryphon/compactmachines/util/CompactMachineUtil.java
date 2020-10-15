@@ -28,7 +28,6 @@ import net.minecraft.world.server.ServerWorld;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 public abstract class CompactMachineUtil {
 
@@ -147,11 +146,18 @@ public abstract class CompactMachineUtil {
 
                     spawnPoint = spawn.toImmutable();
                 } else {
-                    Optional<CompactMachineData> info = getMachineInfo(compactWorld, tile.machineId);
+                    MachineData md = MachineData.getMachineData(compactWorld);
+                    Optional<CompactMachineData> info = md.getMachineById(tile.machineId);
 
                     // We have no machine info here?
-                    if(!info.isPresent())
+                    if (!info.isPresent()) {
+                        IFormattableTextComponent text = new TranslationTextComponent("messages.compactmachines.no_machine_data")
+                                .mergeStyle(TextFormatting.RED)
+                                .mergeStyle(TextFormatting.BOLD);
+
+                        serverPlayer.sendStatusMessage(text, true);
                         return;
+                    }
 
                     CompactMachineData data = info.get();
                     BlockPos.Mutable center = data.getCenter().toMutable();
@@ -163,11 +169,6 @@ public abstract class CompactMachineUtil {
                 serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
             });
         }
-    }
-
-    private static Optional<CompactMachineData> getMachineInfo(ServerWorld world, int machineId) {
-        MachineData machineData = MachineData.getMachineData(world);
-        return machineData.getMachineById(machineId);
     }
 
     public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundNBT tag) {
@@ -236,23 +237,6 @@ public abstract class CompactMachineUtil {
     public static BlockPos getCenterOfMachineById(int id) {
         Vector3i location = MathUtil.getRegionPositionByIndex(id);
         return new BlockPos((location.getX() * 1024) + 8, 60, (location.getZ() * 1024) + 8);
-    }
-
-    public static int registerMachine(ServerWorld world, BlockPos center, UUID owner, EnumMachineSize size) {
-        MachineData machineData = MachineData.getMachineData(world);
-
-        int nextPosition = 0;
-
-        CompactMachineData compactMachineData = new CompactMachineData(nextPosition, center, owner, size);
-        machineData.addToMachineData(nextPosition, compactMachineData);
-
-        return nextPosition;
-    }
-
-    public static Optional<CompactMachineData> getMachineContainingPosition(ServerWorld world, BlockPos position) {
-        MachineData machineData = MachineData.getMachineData(world);
-
-        return machineData.getMachineContainingPosition(position);
     }
 
     public static void setMachineSpawn(ServerWorld world, BlockPos position) {

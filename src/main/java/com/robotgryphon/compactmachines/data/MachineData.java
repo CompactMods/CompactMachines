@@ -8,6 +8,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
@@ -29,7 +30,8 @@ public class MachineData extends WorldSavedData {
 
     @Nonnull
     public static MachineData getMachineData(ServerWorld world) {
-        return world.getSavedData().getOrCreate(MachineData::new, DATA_NAME);
+        DimensionSavedDataManager sd = world.getSavedData();
+        return sd.getOrCreate(MachineData::new, DATA_NAME);
     }
 
     @Override
@@ -46,14 +48,13 @@ public class MachineData extends WorldSavedData {
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        CompoundNBT nbt = new CompoundNBT();
         ListNBT list = new ListNBT();
 
         machineData.forEach((key, value) -> {
             list.add(value.serializeNBT());
         });
 
-        nbt.put("machines", list);
+        compound.put("machines", list);
         return compound;
     }
 
@@ -93,7 +94,7 @@ public class MachineData extends WorldSavedData {
             return;
 
         machineData.replace(id, d);
-        markDirty();
+        this.markDirty();
     }
 
     public Optional<CompactMachineData> getMachineById(int machineId) {
