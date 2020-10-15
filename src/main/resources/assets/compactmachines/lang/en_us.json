@@ -10,6 +10,7 @@
   "tooltip.compactmachines.machine.hint": "A %1$s provides a %2$s room.",
 
   "messages.compactmachines.psd.spawnpoint_set": "New spawn point set.",
+  "messages.compactmachines.no_machine_data": "No machine data loaded; report this.",
 
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",

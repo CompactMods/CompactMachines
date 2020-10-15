@@ -1,13 +1,14 @@
 {
+  "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "compactmachines:psd"
+    "item": "compactmachines:personal_shrinking_device",
+    "count": 1
   },
   "pattern": [
     " p ",
     "ebe",
     " i "
   ],
-  "type": "minecraft:crafting_shaped",
   "key": {
     "p": {
       "item": "minecraft:glass_pane"
