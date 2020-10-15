@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.item;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
+import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -16,6 +17,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -43,14 +45,14 @@ public class ItemPersonalShrinkingDevice extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        if(Screen.hasShiftDown()) {
+        if (Screen.hasShiftDown()) {
             tooltip.add(
                     new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".psd.hint")
                             .mergeStyle(TextFormatting.YELLOW));
         } else {
             tooltip.add(
-                new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
-                    .mergeStyle(TextFormatting.GRAY));
+                    new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
+                            .mergeStyle(TextFormatting.GRAY));
         }
 
     }
@@ -69,22 +71,17 @@ public class ItemPersonalShrinkingDevice extends Item {
 //        }
 //
         if (!world.isRemote && player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            // DimensionalUtil.teleportEntity(pe, registrykey, 8, 6, 8);
+            if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+                if (player.isSneaking()) {
+                    CompactMachineUtil.setMachineSpawn(serverPlayer.getServerWorld(), player.getPosition());
 
-            if (player.isSneaking()) {
-//                int coords = StructureTools.getCoordsForPos(player.getPosition());
-//                Vec3d pos = player.getPositionVector();
-//                WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.x, pos.y, pos.z);
-//
-//                TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines.psd.spawnpoint_set");
-//                tc.getStyle().setColor(TextFormatting.GREEN);
-//                player.sendStatusMessage(tc, false);
-            } else {
-                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                    IFormattableTextComponent tc = new TranslationTextComponent("messages.compactmachines.psd.spawnpoint_set")
+                            .mergeStyle(TextFormatting.GREEN);
 
-                if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
-                    // Try teleport to compact machine dimension
+                    player.sendStatusMessage(tc, true);
+                } else {
 
                     Optional<DimensionalPosition> lastPos = PlayerUtil.getLastPosition(serverPlayer);
                     if (!lastPos.isPresent()) {

@@ -1,8 +1,12 @@
 package com.robotgryphon.compactmachines.data;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
@@ -10,6 +14,7 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MachineData extends WorldSavedData {
 
@@ -67,5 +72,34 @@ public class MachineData extends WorldSavedData {
         this.machineData.put(newID, compactMachineData);
         this.markDirty();
         return true;
+    }
+
+    public Optional<CompactMachineData> getMachineContainingPosition(BlockPos position) {
+        AxisAlignedBB possibleCenters = new AxisAlignedBB(position, position).grow(EnumMachineSize.maximum().getInternalSize());
+
+        return machineData.values()
+                .stream()
+                .filter(machine -> {
+                    BlockPos center = machine.getCenter();
+                    Vector3d center3d = new Vector3d(center.getX(), center.getY(), center.getZ());
+                    return possibleCenters.contains(center3d);
+                })
+                .findFirst();
+    }
+
+    public void updateMachineData(CompactMachineData d) {
+        int id = d.getId();
+        if(!machineData.containsKey(id))
+            return;
+
+        machineData.replace(id, d);
+        markDirty();
+    }
+
+    public Optional<CompactMachineData> getMachineById(int machineId) {
+        if(!machineData.containsKey(machineId))
+            return Optional.empty();
+
+        return Optional.ofNullable(machineData.get(machineId));
     }
 }

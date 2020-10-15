@@ -9,6 +9,8 @@
   "tooltip.compactmachines.wall.hint": "Warning! Unbreakable for non-creative players!",
   "tooltip.compactmachines.machine.hint": "A %1$s provides a %2$s room.",
 
+  "messages.compactmachines.psd.spawnpoint_set": "New spawn point set.",
+
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "block.compactmachines.machine_small": "Compact Machine (Small)",

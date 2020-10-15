@@ -18,6 +18,10 @@ public enum EnumMachineSize implements IStringSerializable {
         this.internalSize = internalSize;
     }
 
+    public static EnumMachineSize maximum() {
+        return MAXIMUM;
+    }
+
     public String getName() {
         return this.name;
     }

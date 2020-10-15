@@ -27,6 +27,7 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class CompactMachineUtil {
@@ -126,11 +127,11 @@ public abstract class CompactMachineUtil {
             PlayerUtil.setLastPosition(serverPlayer);
 
             serv.deferTask(() -> {
-                BlockPos center;
+                BlockPos spawnPoint;
                 if (tile.machineId == -1) {
                     int nextID = MachineData.getNextMachineId(compactWorld);
 
-                    center = getCenterOfMachineById(nextID);
+                    BlockPos center = getCenterOfMachineById(nextID);
 
                     // Bump the center up a bit so the floor is Y = 60
                     center = center.offset(Direction.UP, size.getInternalSize() / 2);
@@ -140,13 +141,33 @@ public abstract class CompactMachineUtil {
                     tile.setMachineId(nextID);
                     MachineData.getMachineData(compactWorld)
                             .addToMachineData(nextID, new CompactMachineData(nextID, center, serverPlayer.getUniqueID(), size));
+
+                    BlockPos.Mutable spawn = center.toMutable();
+                    spawn.setY(62);
+
+                    spawnPoint = spawn.toImmutable();
                 } else {
-                    center = getCenterOfMachineById(tile.machineId);
+                    Optional<CompactMachineData> info = getMachineInfo(compactWorld, tile.machineId);
+
+                    // We have no machine info here?
+                    if(!info.isPresent())
+                        return;
+
+                    CompactMachineData data = info.get();
+                    BlockPos.Mutable center = data.getCenter().toMutable();
+                    center.setY(62);
+
+                    spawnPoint = data.getSpawnPoint().orElse(center);
                 }
 
-                serverPlayer.teleport(compactWorld, center.getX() + 0.5, 62, center.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
             });
         }
+    }
+
+    private static Optional<CompactMachineData> getMachineInfo(ServerWorld world, int machineId) {
+        MachineData machineData = MachineData.getMachineData(world);
+        return machineData.getMachineById(machineId);
     }
 
     public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundNBT tag) {
@@ -226,5 +247,21 @@ public abstract class CompactMachineUtil {
         machineData.addToMachineData(nextPosition, compactMachineData);
 
         return nextPosition;
+    }
+
+    public static Optional<CompactMachineData> getMachineContainingPosition(ServerWorld world, BlockPos position) {
+        MachineData machineData = MachineData.getMachineData(world);
+
+        return machineData.getMachineContainingPosition(position);
+    }
+
+    public static void setMachineSpawn(ServerWorld world, BlockPos position) {
+        MachineData machineData = MachineData.getMachineData(world);
+
+        Optional<CompactMachineData> compactMachineData = machineData.getMachineContainingPosition(position);
+        compactMachineData.ifPresent(d -> {
+            d.setSpawnPoint(position);
+            machineData.updateMachineData(d);
+        });
     }
 }
