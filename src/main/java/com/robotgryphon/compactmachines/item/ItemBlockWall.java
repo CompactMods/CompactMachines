@@ -21,7 +21,7 @@ public class ItemBlockWall extends BlockItem {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        if (stack.getItem() == Registrations.ITEM_WALL.get()) {
+        if (stack.getItem() == Registrations.ITEM_SOLID_WALL.get()) {
             IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.wall.hint")
                     .mergeStyle(TextFormatting.RED);
             

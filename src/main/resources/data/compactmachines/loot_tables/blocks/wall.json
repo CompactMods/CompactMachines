@@ -2,12 +2,12 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "name": "compactmachines:wall_breakable",
+      "name": "compactmachines:wall",
       "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "compactmachines:wall_breakable"
+          "name": "compactmachines:wall"
         }
       ],
       "conditions": [

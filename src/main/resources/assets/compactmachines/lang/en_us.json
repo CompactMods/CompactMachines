@@ -6,7 +6,7 @@
   "tooltip.compactmachines.machine.size": "Size: %1$sx%1$sx%1$s",
   "tooltip.compactmachines.hold_shift.hint": "Hold shift for details.",
   "tooltip.compactmachines.psd.hint": "Used as in-game documentation and to enter Compact Machines.",
-  "tooltip.compactmachines.wall.hint": "Warning! Unbreakable for non-creative players!",
+  "tooltip.compactmachines.solid_wall.hint": "Warning! Unbreakable for non-creative players!",
   "tooltip.compactmachines.machine.hint": "A %1$s provides a %2$s room.",
 
   "messages.compactmachines.psd.spawnpoint_set": "New spawn point set.",
@@ -20,8 +20,8 @@
   "block.compactmachines.machine_giant": "Compact Machine (Giant)",
   "block.compactmachines.machine_maximum": "Compact Machine (Maximum)",
 
-  "block.compactmachines.wall": "Solid Compact Machine Wall",
-  "block.compactmachines.wall_breakable": "Compact Machine Wall",
+  "block.compactmachines.solid_wall": "Solid Compact Machine Wall",
+  "block.compactmachines.wall": "Compact Machine Wall",
 
   "item.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "item.compactmachines.machine_small": "Compact Machine (Small)",

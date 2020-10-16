@@ -102,7 +102,7 @@ public class Registrations {
     // ================================================================================================================
     //   WALLS
     // ================================================================================================================
-    public static final RegistryObject<Block> WALL_BLOCK = BLOCKS.register("wall", () ->
+    public static final RegistryObject<Block> BLOCK_SOLID_WALL = BLOCKS.register("solid_wall", () ->
             new BlockWall(AbstractBlock.Properties
                     .create(Material.IRON, MaterialColor.CLAY)
                     .hardnessAndResistance(-1.0F, 3600000.8F)
@@ -110,7 +110,7 @@ public class Registrations {
                     .setLightLevel((state) -> 15)
                     .noDrops()));
 
-    public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall_breakable", () ->
+    public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall", () ->
             new BlockWallBreakable(Block.Properties
                     .create(Material.IRON)
                     .hardnessAndResistance(3.0f, 128.0f)
@@ -122,10 +122,10 @@ public class Registrations {
             () -> new ItemPersonalShrinkingDevice(BASIC_ITEM_PROPS.get()
                     .maxStackSize(1)));
 
-    public static final RegistryObject<Item> ITEM_WALL = ITEMS.register("wall", () ->
-            new ItemBlockWall(WALL_BLOCK.get(), BASIC_ITEM_PROPS.get()));
+    public static final RegistryObject<Item> ITEM_SOLID_WALL = ITEMS.register("solid_wall", () ->
+            new ItemBlockWall(BLOCK_SOLID_WALL.get(), BASIC_ITEM_PROPS.get()));
 
-    public static final RegistryObject<Item> ITEM_BREAKABLE_WALL = ITEMS.register("wall_breakable", () ->
+    public static final RegistryObject<Item> ITEM_BREAKABLE_WALL = ITEMS.register("wall", () ->
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
 
     // ================================================================================================================

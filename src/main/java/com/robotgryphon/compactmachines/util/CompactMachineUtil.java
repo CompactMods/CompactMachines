@@ -38,14 +38,14 @@ public abstract class CompactMachineUtil {
 
         BlockPos.getAllInBox(toFill)
                 .forEach(pos -> {
-                    world.setBlockState(pos, Registrations.WALL_BLOCK.get().getDefaultState(), 7);
+                    world.setBlockState(pos, Registrations.BLOCK_SOLID_WALL.get().getDefaultState(), 7);
                 });
     }
 
     public static void generateCompactWall(IWorld world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
         int s = size.getInternalSize() / 2;
 
-        BlockState unbreakableWall = Registrations.WALL_BLOCK.get().getDefaultState();
+        BlockState unbreakableWall = Registrations.BLOCK_SOLID_WALL.get().getDefaultState();
 
         BlockPos start = BlockPos.ZERO;
         AxisAlignedBB wallBounds;
@@ -95,7 +95,7 @@ public abstract class CompactMachineUtil {
                 .anyMatch(state -> state.getBlock() == Blocks.AIR);
 
         // if (anyAir) {
-        BlockState unbreakableWall = Registrations.WALL_BLOCK.get().getDefaultState();
+        BlockState unbreakableWall = Registrations.BLOCK_SOLID_WALL.get().getDefaultState();
 
         // Generate the walls
         Arrays.stream(Direction.values())
