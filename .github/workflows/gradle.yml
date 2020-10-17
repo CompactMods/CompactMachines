@@ -4,7 +4,6 @@
 name: Java CI with Gradle
 
 on:
-  - push
   - workflow_dispatch
 
 jobs:
@@ -21,21 +20,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
-    - name: Add Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: libs
-        path: build/libs/*.jar
-        
-        
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download Build Results
-        uses: actions/download-artifact@v2
-        with:
-          name: libs
-          path: buildfiles
+      run: ./gradlew publish
+      
       
