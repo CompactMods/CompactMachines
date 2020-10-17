@@ -4,7 +4,9 @@
 name: Java CI with Gradle
 
 on:
-  - workflow_dispatch
+  push: 
+    tags: v*
+  workflow_dispatch:
 
 jobs:
   build:
