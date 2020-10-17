@@ -1,4 +1,6 @@
-# Compact Machines 3
+# Compact Machines 4
+![Java CI with Gradle](https://github.com/robotgryphon/compact-machines/workflows/Java%20CI%20with%20Gradle/badge.svg)
+
 Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
 
 You can grab the latest build (tagged) in the releases tab.
