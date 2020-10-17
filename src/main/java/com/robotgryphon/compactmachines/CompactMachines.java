@@ -23,7 +23,7 @@ public class CompactMachines
 {
     public static final String MODID = "compactmachines";
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
 //    public static ClientWorldData clientWorldData;
 //    public static final CreativeTabcompactmachines CREATIVE_TAB = new CreativeTabcompactmachines();

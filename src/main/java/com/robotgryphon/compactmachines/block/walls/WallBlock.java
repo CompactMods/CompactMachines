@@ -1,5 +1,6 @@
-package com.robotgryphon.compactmachines.block;
+package com.robotgryphon.compactmachines.block.walls;
 
+import com.robotgryphon.compactmachines.block.BlockProtected;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -15,9 +16,9 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BlockWall extends BlockProtected {
+public abstract class WallBlock extends BlockProtected {
 
-    public BlockWall(Block.Properties props) {
+    public WallBlock(Block.Properties props) {
         super(props);
     }
 

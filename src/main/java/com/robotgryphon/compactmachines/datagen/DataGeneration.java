@@ -15,12 +15,17 @@ public class DataGeneration {
         if (event.includeServer())
             registerServerProviders(event.getGenerator(), event);
 
-//        if (event.includeClient())
-//            registerClientProviders(event.getGenerator(), event);
+        if (event.includeClient())
+            registerClientProviders(event.getGenerator(), event);
     }
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
-        ExistingFileHelper helper = event.getExistingFileHelper();
+
         generator.addProvider(new BlockLootGenerator(generator));
+    }
+
+    private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
+        ExistingFileHelper helper = event.getExistingFileHelper();
+        generator.addProvider(new WallStateGenerator(generator, helper));
     }
 }

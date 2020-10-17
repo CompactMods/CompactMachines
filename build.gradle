@@ -70,7 +70,7 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'compactmachines', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'compactmachines', '--existing', file('src/main/resources'), '--all', '--output', file('src/generated/resources/')
 
             mods {
                 compactmachines {

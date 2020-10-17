@@ -1,0 +1,58 @@
+{
+  "variants": {
+    "tunnel_side=down,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_down"
+    },
+    "tunnel_side=up,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_up"
+    },
+    "tunnel_side=north,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_north"
+    },
+    "tunnel_side=south,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_south"
+    },
+    "tunnel_side=west,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_west"
+    },
+    "tunnel_side=east,tunnel_type=item": {
+      "model": "compactmachines:tunnels/item/item_east"
+    },
+    "tunnel_side=down,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_down"
+    },
+    "tunnel_side=up,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_up"
+    },
+    "tunnel_side=north,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_north"
+    },
+    "tunnel_side=south,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_south"
+    },
+    "tunnel_side=west,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_west"
+    },
+    "tunnel_side=east,tunnel_type=redstone_in": {
+      "model": "compactmachines:tunnels/redstone_in/redstone_in_east"
+    },
+    "tunnel_side=down,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_down"
+    },
+    "tunnel_side=up,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_up"
+    },
+    "tunnel_side=north,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_north"
+    },
+    "tunnel_side=south,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_south"
+    },
+    "tunnel_side=west,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_west"
+    },
+    "tunnel_side=east,tunnel_type=redstone_out": {
+      "model": "compactmachines:tunnels/redstone_out/redstone_out_east"
+    }
+  }
+}

@@ -2,9 +2,10 @@ package com.robotgryphon.compactmachines.core;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
-import com.robotgryphon.compactmachines.block.BlockWall;
-import com.robotgryphon.compactmachines.block.BlockWallBreakable;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.block.walls.BreakableWallBlock;
+import com.robotgryphon.compactmachines.block.walls.SolidWallBlock;
+import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.item.ItemBlockMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
@@ -102,8 +103,16 @@ public class Registrations {
     // ================================================================================================================
     //   WALLS
     // ================================================================================================================
+    public static final RegistryObject<Block> BLOCK_TUNNEL_WALL = BLOCKS.register("tunnel_wall", () ->
+            new TunnelWallBlock(AbstractBlock.Properties
+                    .create(Material.IRON, MaterialColor.CLAY)
+                    .hardnessAndResistance(-1.0F, 3600000.8F)
+                    .sound(SoundType.METAL)
+                    .setLightLevel((state) -> 15)
+                    .noDrops()));
+
     public static final RegistryObject<Block> BLOCK_SOLID_WALL = BLOCKS.register("solid_wall", () ->
-            new BlockWall(AbstractBlock.Properties
+            new SolidWallBlock(AbstractBlock.Properties
                     .create(Material.IRON, MaterialColor.CLAY)
                     .hardnessAndResistance(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
@@ -111,7 +120,7 @@ public class Registrations {
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall", () ->
-            new BlockWallBreakable(Block.Properties
+            new BreakableWallBlock(Block.Properties
                     .create(Material.IRON)
                     .hardnessAndResistance(3.0f, 128.0f)
                     .setRequiresTool()
@@ -142,8 +151,5 @@ public class Registrations {
         BLOCKS.register(eventBus);
         ITEMS.register(eventBus);
         TILES_ENTITIES.register(eventBus);
-
-
-
     }
 }
