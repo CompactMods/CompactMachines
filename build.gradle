@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "${minecraft_version}-${mod_version}"
+version = "${mod_version}"
 group = 'com.robotgryphon.compactmachines' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'compactmachines'
 
