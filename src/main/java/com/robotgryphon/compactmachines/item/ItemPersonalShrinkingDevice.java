@@ -15,7 +15,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
@@ -91,7 +91,7 @@ public class ItemPersonalShrinkingDevice extends Item {
                                 true);
                     } else {
                         DimensionalPosition p = lastPos.get();
-                        BlockPos bp = p.getPosition();
+                        Vector3d bp = p.getPosition();
                         ResourceLocation dimRL = p.getDimension();
                         RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
 

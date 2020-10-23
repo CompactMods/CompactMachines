@@ -1,19 +1,19 @@
 package com.robotgryphon.compactmachines.teleportation;
 
+import com.robotgryphon.compactmachines.data.NbtDataUtil;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
     private ResourceLocation dimension;
-    private BlockPos position;
+    private Vector3d position;
 
     private DimensionalPosition() { }
 
-    public DimensionalPosition(ResourceLocation dim, BlockPos pos) {
+    public DimensionalPosition(ResourceLocation dim, Vector3d pos) {
         this.dimension = dim;
         this.position = pos;
     }
@@ -29,7 +29,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putString("dim", dimension.toString());
-        CompoundNBT posNbt = NBTUtil.writeBlockPos(position);
+        CompoundNBT posNbt = NbtDataUtil.writeVectorCompound(position);
         nbt.put("pos", posNbt);
         return nbt;
     }
@@ -44,7 +44,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
         if(nbt.contains("pos")) {
             CompoundNBT bPosNbt = nbt.getCompound("pos");
-            BlockPos bPos = NBTUtil.readBlockPos(bPosNbt);
+            Vector3d bPos = NbtDataUtil.readVectorCompound(bPosNbt);
             this.position = bPos;
         }
     }
@@ -53,7 +53,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         return this.dimension;
     }
 
-    public BlockPos getPosition() {
+    public Vector3d getPosition() {
         return this.position;
     }
 }
