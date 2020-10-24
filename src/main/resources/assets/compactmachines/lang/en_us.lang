@@ -4,9 +4,6 @@ tile.compactmachines.tunnel.name=Tunnel
 tile.compactmachines.redstonetunnel.name=Redstone Tunnel
 tile.compactmachines.fieldprojector.name=Miniaturization Field Projector
 
-item.compactmachines.tunneltool.name=Tunnel
-item.compactmachines.redstonetunneltool.name=Redstone Tunnel
-
 item.compactmachines.psd.spawnpoint_set=Entry point set!
 
 hint.compactmachines.missing_opposite_projector=Missing opposite field projector! It is required to determine the field size!

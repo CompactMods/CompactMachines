@@ -2,7 +2,9 @@ package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.data.CompactMachineData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
+import com.robotgryphon.compactmachines.util.CompactMachinePlayerUtil;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.gui.screen.Screen;
@@ -83,27 +85,34 @@ public class ItemPersonalShrinkingDevice extends Item {
 
                     player.sendStatusMessage(tc, true);
                 } else {
-
-                    Optional<DimensionalPosition> lastPos = PlayerUtil.getLastPosition(serverPlayer);
-                    if (!lastPos.isPresent()) {
-                        serverPlayer.sendStatusMessage(
-                                new TranslationTextComponent("no_prev_position"),
-                                true);
-                    } else {
-                        DimensionalPosition p = lastPos.get();
-                        Vector3d bp = p.getPosition();
-                        ResourceLocation dimRL = p.getDimension();
-                        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
-
-                        ServerWorld ovw = world.getServer().getWorld(key);
-                        serverPlayer.teleport(ovw, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-                    }
+                    teleportPlayerOutOfMachine(world, serverPlayer);
                 }
-
-                // TeleportationTools.teleportPlayerOutOfMachine(serverPlayer);
             }
         }
 
         return ActionResult.resultSuccess(stack);
+    }
+
+    public void teleportPlayerOutOfMachine(World world, ServerPlayerEntity serverPlayer) {
+        Optional<DimensionalPosition> lastPos = PlayerUtil.getLastPosition(serverPlayer);
+        if (!lastPos.isPresent()) {
+            serverPlayer.sendStatusMessage(
+                    new TranslationTextComponent("no_prev_position"),
+                    true);
+        } else {
+            DimensionalPosition p = lastPos.get();
+            Vector3d bp = p.getPosition();
+            ResourceLocation dimRL = p.getDimension();
+            RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
+
+            ServerWorld compactWorld = world.getServer().getWorld(Registrations.COMPACT_DIMENSION);
+            ServerWorld outsideWorld = world.getServer().getWorld(key);
+
+            Optional<CompactMachineData> machine = CompactMachineUtil.getMachineInfoByInternalPosition(compactWorld, serverPlayer.getPositionVec());
+            machine.ifPresent(m -> {
+                serverPlayer.teleport(outsideWorld, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
+            });
+        }
     }
 }

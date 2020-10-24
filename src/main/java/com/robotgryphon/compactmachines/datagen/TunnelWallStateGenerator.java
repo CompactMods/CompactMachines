@@ -12,8 +12,8 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class WallStateGenerator extends BlockStateProvider {
-    public WallStateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
+public class TunnelWallStateGenerator extends BlockStateProvider {
+    public TunnelWallStateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
         super(gen, CompactMachines.MODID, exFileHelper);
     }
 

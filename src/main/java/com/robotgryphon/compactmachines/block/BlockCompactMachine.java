@@ -23,6 +23,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +44,19 @@ public class BlockCompactMachine extends Block {
     public BlockCompactMachine(EnumMachineSize size, Block.Properties props) {
         super(props);
         this.size = size;
+    }
+
+    @Override
+    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+        CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
+        if(tile == null)
+            return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+
+        boolean hasPlayers = tile.hasPlayersInside();
+        if(hasPlayers)
+            return 0;
+
+        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
     @Override
@@ -182,6 +196,11 @@ public class BlockCompactMachine extends Block {
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 
+        if(worldIn.isRemote())
+            return;
+
+        ServerWorld serverWorld = (ServerWorld) worldIn;
+
         boolean hasProperTile = worldIn.getTileEntity(pos) instanceof CompactMachineTile;
         if (!hasProperTile)
             return;
@@ -208,8 +227,12 @@ public class BlockCompactMachine extends Block {
 
         if(nbt.contains("cm")) {
             CompoundNBT machineData = nbt.getCompound("cm");
-            if (machineData.contains("coords"))
-                tile.setMachineId(machineData.getInt("coords"));
+            if (machineData.contains("coords")) {
+                int machineID = machineData.getInt("coords");
+                tile.setMachineId(machineID);
+
+                CompactMachineUtil.updateMachineWorldPosition(serverWorld, machineID, pos);
+            }
         }
 
         tile.markDirty();

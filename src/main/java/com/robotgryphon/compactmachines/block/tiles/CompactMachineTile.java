@@ -1,7 +1,11 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.data.CompactMachineData;
+import com.robotgryphon.compactmachines.data.CompactMachinePlayerData;
+import com.robotgryphon.compactmachines.data.MachineData;
 import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.nbt.CompoundNBT;
@@ -244,6 +248,32 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     public void setMachineId(int id) {
         this.machineId = id;
         this.markDirty();
+    }
+
+    public Optional<CompactMachineData> getMachineData() {
+        if(this.machineId == 0)
+            return Optional.empty();
+
+        Optional<MachineData> machines = CompactMachineUtil.getMachineData(this.world);
+        if(!machines.isPresent())
+            return Optional.empty();
+
+        return machines.get().getMachineData(this.machineId);
+    }
+
+    public boolean hasPlayersInside() {
+        Optional<MachineData> machines = CompactMachineUtil.getMachineData(this.world);
+
+        // No machine data present - probably none generated yet
+        if(!machines.isPresent())
+            return false;
+
+        MachineData machineData = machines.get();
+        Optional<CompactMachinePlayerData> playerData = machineData.getPlayerData(this.machineId);
+
+        return playerData
+                .map(CompactMachinePlayerData::hasPlayers)
+                .orElse(false);
     }
 
     /*
