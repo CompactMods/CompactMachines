@@ -3,7 +3,6 @@ package com.robotgryphon.compactmachines.util;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -75,8 +74,7 @@ public class CompactStructureGenerator {
         AxisAlignedBB floorBlocks = new AxisAlignedBB(floorCenter, floorCenter)
                 .grow(s, 0, s);
 
-        boolean anyAir = world.getStatesInArea(floorBlocks)
-                .anyMatch(state -> state.getBlock() == Blocks.AIR);
+        boolean anyAir = BlockPos.getAllInBox(floorBlocks).anyMatch(world::isAirBlock);
 
         if (anyAir) {
             // Generate the walls
