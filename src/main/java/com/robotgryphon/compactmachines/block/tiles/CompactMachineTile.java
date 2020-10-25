@@ -1,8 +1,8 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.CompactMachineData;
-import com.robotgryphon.compactmachines.data.CompactMachinePlayerData;
+import com.robotgryphon.compactmachines.data.CompactMachineMemoryData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.MachineData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
@@ -14,6 +14,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 
@@ -250,7 +251,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.markDirty();
     }
 
-    public Optional<CompactMachineData> getMachineData() {
+    public Optional<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachineData() {
         if(this.machineId == 0)
             return Optional.empty();
 
@@ -258,22 +259,31 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         if(!machines.isPresent())
             return Optional.empty();
 
-        return machines.get().getMachineData(this.machineId);
+        return CompactMachineMemoryData.INSTANCE.getMachineData(this.machineId);
     }
 
     public boolean hasPlayersInside() {
-        Optional<MachineData> machines = CompactMachineUtil.getMachineData(this.world);
-
-        // No machine data present - probably none generated yet
-        if(!machines.isPresent())
+        if(world.isRemote())
             return false;
 
-        MachineData machineData = machines.get();
-        Optional<CompactMachinePlayerData> playerData = machineData.getPlayerData(this.machineId);
+        if(world instanceof ServerWorld) {
+            ServerWorld sw = (ServerWorld) world;
+            ServerWorld compactWorld = sw.getServer().getWorld(Registrations.COMPACT_DIMENSION);
 
-        return playerData
-                .map(CompactMachinePlayerData::hasPlayers)
-                .orElse(false);
+            Optional<MachineData> machines = CompactMachineUtil.getMachineData(compactWorld);
+
+            // No machine data present - probably none generated yet
+            if (!machines.isPresent())
+                return false;
+
+            Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(this.machineId);
+
+            return playerData
+                    .map(CompactMachinePlayerData::hasPlayers)
+                    .orElse(false);
+        }
+
+        return false;
     }
 
     /*

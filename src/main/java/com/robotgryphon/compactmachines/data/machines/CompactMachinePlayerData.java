@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.data;
+package com.robotgryphon.compactmachines.data.machines;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;

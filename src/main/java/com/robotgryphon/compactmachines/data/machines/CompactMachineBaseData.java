@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.data;
+package com.robotgryphon.compactmachines.data.machines;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

@@ -1,51 +1,28 @@
 package com.robotgryphon.compactmachines.util;
 
-import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.CompactMachinePlayerData;
-import com.robotgryphon.compactmachines.data.MachineData;
+import com.robotgryphon.compactmachines.data.CompactMachineMemoryData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.server.ServerWorld;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class CompactMachinePlayerUtil {
     public static void addPlayerToMachine(ServerPlayerEntity serverPlayer, int machineId) {
-        ServerWorld compactWorld = serverPlayer.getServer().getWorld(Registrations.COMPACT_DIMENSION);
-        Optional<MachineData> mdo = CompactMachineUtil.getMachineData(compactWorld);
+        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(machineId);
+        playerData.ifPresent(d -> {
+            d.addPlayer(serverPlayer);
 
-        mdo.ifPresent(machData -> {
-            Optional<CompactMachinePlayerData> playerData = getOrCreatePlayerData(machineId, machData);
-
-            playerData.ifPresent(d -> {
-                d.addPlayer(serverPlayer);
-                machData.updatePlayerData(d);
-            });
+            // TODO send network packet
         });
     }
 
     public static void removePlayerFromMachine(ServerPlayerEntity serverPlayer, int machineId) {
-        ServerWorld compactWorld = serverPlayer.getServer().getWorld(Registrations.COMPACT_DIMENSION);
-        Optional<MachineData> mdo = CompactMachineUtil.getMachineData(compactWorld);
-        mdo.ifPresent(machData -> {
-            Optional<CompactMachinePlayerData> playerData = getOrCreatePlayerData(machineId, machData);
+        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(machineId);
 
-            playerData.ifPresent(d -> {
-                d.removePlayer(serverPlayer);
-                machData.updatePlayerData(d);
-            });
+        playerData.ifPresent(d -> {
+            d.removePlayer(serverPlayer);
+
+            // TODO send network packet
         });
-    }
-
-    @Nonnull
-    public static Optional<CompactMachinePlayerData> getOrCreatePlayerData(int machineId, MachineData machData) {
-        Optional<CompactMachinePlayerData> playerData = machData.getPlayerData(machineId);
-        if (!playerData.isPresent()) {
-            // Something went wrong with datagen, try to recreate data
-            CompactMachinePlayerData pd = new CompactMachinePlayerData(machineId);
-            machData.updatePlayerData(pd);
-            playerData = Optional.of(pd);
-        }
-        return playerData;
     }
 }

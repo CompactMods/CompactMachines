@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.data;
+package com.robotgryphon.compactmachines.data.machines;
 
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;

@@ -52,11 +52,13 @@ public class BlockCompactMachine extends Block {
         if(tile == null)
             return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
 
-        boolean hasPlayers = tile.hasPlayersInside();
-        if(hasPlayers)
-            return 0;
+        if(worldIn instanceof ServerWorld) {
+            boolean hasPlayers = tile.hasPlayersInside();
+            if (hasPlayers)
+                return 0;
+        }
 
-        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+        return 0;
     }
 
     @Override
@@ -231,7 +233,7 @@ public class BlockCompactMachine extends Block {
                 int machineID = machineData.getInt("coords");
                 tile.setMachineId(machineID);
 
-                CompactMachineUtil.updateMachineWorldPosition(serverWorld, machineID, pos);
+                CompactMachineUtil.updateMachineInWorldPosition(serverWorld, machineID, pos);
             }
         }
 

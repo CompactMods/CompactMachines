@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.CompactMachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.util.CompactMachinePlayerUtil;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
@@ -78,7 +78,7 @@ public class ItemPersonalShrinkingDevice extends Item {
             if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
                 if (player.isSneaking()) {
                     ServerWorld w = serverPlayer.getServerWorld();
-                    CompactMachineUtil.setMachineSpawn(w, player.getPosition());
+                    CompactMachineUtil.setMachineSpawn(player.getPosition());
 
                     IFormattableTextComponent tc = new TranslationTextComponent("messages.compactmachines.psd.spawnpoint_set")
                             .mergeStyle(TextFormatting.GREEN);
@@ -108,9 +108,9 @@ public class ItemPersonalShrinkingDevice extends Item {
             ServerWorld compactWorld = world.getServer().getWorld(Registrations.COMPACT_DIMENSION);
             ServerWorld outsideWorld = world.getServer().getWorld(key);
 
-            Optional<CompactMachineData> machine = CompactMachineUtil.getMachineInfoByInternalPosition(compactWorld, serverPlayer.getPositionVec());
+            Optional<CompactMachineData> machine = CompactMachineUtil.getMachineInfoByInternalPosition(serverPlayer.getPositionVec());
             machine.ifPresent(m -> {
-                serverPlayer.teleport(outsideWorld, bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                serverPlayer.teleport(outsideWorld, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
                 CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
             });
         }

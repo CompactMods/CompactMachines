@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.tunnels.definitions;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
-import com.robotgryphon.compactmachines.data.CompactMachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
 import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
