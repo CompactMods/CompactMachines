@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.tunnels.definitions;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
@@ -42,13 +42,13 @@ public class RedstoneTunnelDefinition extends TunnelDefinition implements IRedst
         TileEntity tileEntity = world.getTileEntity(pos);
         if(tileEntity instanceof TunnelWallTile) {
             TunnelWallTile tile = (TunnelWallTile) tileEntity;
-            Optional<CompactMachineData> machineInfo = tile.getMachineInfo();
+            Optional<CompactMachineRegistrationData> machineInfo = tile.getMachineInfo();
 
             // No tile entity data for machine?
             if(!machineInfo.isPresent())
                 return 0;
 
-            CompactMachineData compactMachineData = machineInfo.get();
+            CompactMachineRegistrationData compactMachineData = machineInfo.get();
             if(!compactMachineData.isPlacedInWorld())
                 return 0;
 

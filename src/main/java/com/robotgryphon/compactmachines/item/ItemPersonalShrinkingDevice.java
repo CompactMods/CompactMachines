@@ -2,9 +2,6 @@ package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
-import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
-import com.robotgryphon.compactmachines.util.CompactMachinePlayerUtil;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,10 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -28,7 +21,6 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Optional;
 
 public class ItemPersonalShrinkingDevice extends Item {
 
@@ -72,20 +64,20 @@ public class ItemPersonalShrinkingDevice extends Item {
 //            return new ActionResult(ActionResultType.SUCCESS, stack);
 //        }
 //
-        if (!world.isRemote && player instanceof ServerPlayerEntity) {
+        if (world instanceof ServerWorld && player instanceof ServerPlayerEntity) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+                    ServerWorld serverWorld = serverPlayer.getServerWorld();
                 if (player.isSneaking()) {
-                    ServerWorld w = serverPlayer.getServerWorld();
-                    CompactMachineUtil.setMachineSpawn(player.getPosition());
+                    CompactMachineUtil.setMachineSpawn(serverWorld.getServer(), player.getPosition());
 
                     IFormattableTextComponent tc = new TranslationTextComponent("messages.compactmachines.psd.spawnpoint_set")
                             .mergeStyle(TextFormatting.GREEN);
 
                     player.sendStatusMessage(tc, true);
                 } else {
-                    teleportPlayerOutOfMachine(world, serverPlayer);
+                    PlayerUtil.teleportPlayerOutOfMachine(serverWorld, serverPlayer);
                 }
             }
         }
@@ -93,26 +85,4 @@ public class ItemPersonalShrinkingDevice extends Item {
         return ActionResult.resultSuccess(stack);
     }
 
-    public void teleportPlayerOutOfMachine(World world, ServerPlayerEntity serverPlayer) {
-        Optional<DimensionalPosition> lastPos = PlayerUtil.getLastPosition(serverPlayer);
-        if (!lastPos.isPresent()) {
-            serverPlayer.sendStatusMessage(
-                    new TranslationTextComponent("no_prev_position"),
-                    true);
-        } else {
-            DimensionalPosition p = lastPos.get();
-            Vector3d bp = p.getPosition();
-            ResourceLocation dimRL = p.getDimension();
-            RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
-
-            ServerWorld compactWorld = world.getServer().getWorld(Registrations.COMPACT_DIMENSION);
-            ServerWorld outsideWorld = world.getServer().getWorld(key);
-
-            Optional<CompactMachineData> machine = CompactMachineUtil.getMachineInfoByInternalPosition(serverPlayer.getPositionVec());
-            machine.ifPresent(m -> {
-                serverPlayer.teleport(outsideWorld, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-                CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
-            });
-        }
-    }
 }

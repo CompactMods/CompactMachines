@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * Holds information that can be used to uniquely identify a compact machine.
  */
-public class CompactMachineData extends CompactMachineBaseData {
+public class CompactMachineRegistrationData extends CompactMachineBaseData {
 
     private BlockPos center;
     private BlockPos spawnPoint;
@@ -34,20 +34,20 @@ public class CompactMachineData extends CompactMachineBaseData {
     private UUID playerUUID;
     private DimensionalPosition outsidePosition;
 
-    private CompactMachineData() {
+    private CompactMachineRegistrationData() {
         super(0);
     }
 
-    public CompactMachineData(int id, BlockPos center, UUID owner, EnumMachineSize size) {
+    public CompactMachineRegistrationData(int id, BlockPos center, UUID owner, EnumMachineSize size) {
         super(id);
         this.center = center;
         this.owner = owner;
         this.size = size;
     }
 
-    public static CompactMachineData fromNBT(INBT machine) {
+    public static CompactMachineRegistrationData fromNBT(INBT machine) {
         if (machine instanceof CompoundNBT) {
-            CompactMachineData d = new CompactMachineData();
+            CompactMachineRegistrationData d = new CompactMachineRegistrationData();
             d.deserializeNBT((CompoundNBT) machine);
 
             return d;

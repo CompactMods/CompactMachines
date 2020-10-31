@@ -3,9 +3,9 @@ package com.robotgryphon.compactmachines.util;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.CompactMachineMemoryData;
-import com.robotgryphon.compactmachines.data.MachineData;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
+import com.robotgryphon.compactmachines.data.CompactMachineServerData;
+import com.robotgryphon.compactmachines.data.SavedMachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -48,15 +48,13 @@ public abstract class CompactMachineUtil {
             if (tile == null)
                 return;
 
-            PlayerUtil.setLastPosition(serverPlayer);
-
             serv.deferTask(() -> {
                 BlockPos spawnPoint;
 
-                MachineData md = MachineData.getMachineData(compactWorld);
+                CompactMachineServerData serverData = CompactMachineServerData.getInstance(serv);
 
                 if (tile.machineId == -1) {
-                    int nextID = CompactMachineMemoryData.getNextMachineId(compactWorld);
+                    int nextID = serverData.getNextMachineId();
 
                     BlockPos center = getCenterOfMachineById(nextID);
 
@@ -66,15 +64,16 @@ public abstract class CompactMachineUtil {
                     CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
 
                     tile.setMachineId(nextID);
-                    CompactMachineMemoryData.INSTANCE.registerMachine(nextID,
-                            new CompactMachineData(nextID, center, serverPlayer.getUniqueID(), size));
+                    serverData.registerMachine(nextID,
+                            new CompactMachineRegistrationData(nextID, center, serverPlayer.getUniqueID(), size));
+                    serverData.markDirty();
 
                     BlockPos.Mutable spawn = center.toMutable();
                     spawn.setY(62);
 
                     spawnPoint = spawn.toImmutable();
                 } else {
-                    Optional<CompactMachineData> info = CompactMachineMemoryData.INSTANCE.getMachineData(tile.machineId);
+                    Optional<CompactMachineRegistrationData> info = serverData.getMachineData(tile.machineId);
 
                     // We have no machine info here?
                     if (!info.isPresent()) {
@@ -86,19 +85,26 @@ public abstract class CompactMachineUtil {
                         return;
                     }
 
-                    CompactMachineData data = info.get();
+                    CompactMachineRegistrationData data = info.get();
                     BlockPos.Mutable center = data.getCenter().toMutable();
                     center.setY(62);
 
                     spawnPoint = data.getSpawnPoint().orElse(center);
                 }
 
-                CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, tile.machineId);
+                try {
+                    // Mark the player as inside the machine, set external spawn, and yeet
+                    CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, tile.machineId);
+                }
+
+                catch(Exception ex) {
+                    CompactMachines.LOGGER.error(ex);
+                }
+
                 serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
             });
         }
     }
-
 
 
     public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundNBT tag) {
@@ -169,33 +175,31 @@ public abstract class CompactMachineUtil {
         return new BlockPos((location.getX() * 1024) + 8, 60, (location.getZ() * 1024) + 8);
     }
 
-    public static void setMachineSpawn(BlockPos position) {
-        Optional<CompactMachineData> compactMachineData = CompactMachineMemoryData.INSTANCE.getMachineContainingPosition(position);
+    public static void setMachineSpawn(MinecraftServer server, BlockPos position) {
+        CompactMachineServerData serverData = CompactMachineServerData.getInstance(server);
+        Optional<CompactMachineRegistrationData> compactMachineData = serverData.getMachineContainingPosition(position);
         compactMachineData.ifPresent(d -> {
             d.setSpawnPoint(position);
-            CompactMachineMemoryData.INSTANCE.updateMachineData(d);
+            serverData.updateMachineData(d);
         });
     }
 
-    public static Optional<MachineData> getMachineData(World world) {
+    public static Optional<SavedMachineData> getMachineData(ServerWorld world) {
         if (world == null)
             return Optional.empty();
 
-        if (world instanceof ServerWorld) {
-            ServerWorld sWorld = (ServerWorld) world;
-            MachineData md = MachineData.getMachineData(sWorld);
-            return Optional.of(md);
-        }
-
-        return Optional.empty();
+        SavedMachineData md = SavedMachineData.getMachineData(world.getServer());
+        return Optional.of(md);
     }
 
-    public static Optional<CompactMachineData> getMachineInfoByInternalPosition(Vector3d pos) {
-        return CompactMachineMemoryData.INSTANCE.getMachineContainingPosition(pos);
+    public static Optional<CompactMachineRegistrationData> getMachineInfoByInternalPosition(ServerWorld world, Vector3d pos) {
+        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
+        return data.getMachineContainingPosition(pos);
     }
 
-    public static Optional<CompactMachineData> getMachineInfoByInternalPosition(BlockPos pos) {
-        return CompactMachineMemoryData.INSTANCE.getMachineContainingPosition(pos);
+    public static Optional<CompactMachineRegistrationData> getMachineInfoByInternalPosition(ServerWorld world, BlockPos pos) {
+        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
+        return data.getMachineContainingPosition(pos);
     }
 
     /**
@@ -207,13 +211,15 @@ public abstract class CompactMachineUtil {
      * @param pos
      */
     public static void updateMachineInWorldPosition(ServerWorld world, int machineID, BlockPos pos) {
-        Optional<CompactMachineData> machineById = CompactMachineMemoryData.INSTANCE.getMachineData(machineID);
+        CompactMachineServerData serverData = CompactMachineServerData.getInstance(world.getServer());
+
+        Optional<CompactMachineRegistrationData> machineById = serverData.getMachineData(machineID);
         machineById.ifPresent(data -> {
             data.setWorldPosition(world, pos);
             data.removeFromPlayerInventory();
 
             // Write changes to disk
-            CompactMachineMemoryData.INSTANCE.updateMachineData(data);
+            serverData.updateMachineData(data);
         });
     }
 }

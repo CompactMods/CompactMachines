@@ -1,12 +1,11 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.data.CompactMachineMemoryData;
-import com.robotgryphon.compactmachines.data.MachineData;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
+import com.robotgryphon.compactmachines.data.CompactMachineCommonData;
+import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.Reference;
-import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -15,6 +14,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 
@@ -217,14 +217,23 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT base = super.getUpdateTag();
-
         base.putInt("machine", this.machineId);
 
-        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(machineId);
-        playerData.ifPresent(data -> {
-            CompoundNBT playerNbt = data.serializeNBT();
-            base.put("players", playerNbt);
-        });
+        if(world instanceof ServerWorld) {
+            Optional<CompactMachinePlayerData> playerData = Optional.empty();
+            try {
+                playerData = CompactMachineServerData
+                        .getInstance(world.getServer())
+                        .getPlayerData(machineId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            playerData.ifPresent(data -> {
+                CompoundNBT playerNbt = data.serializeNBT();
+                base.put("players", playerNbt);
+            });
+        }
 
         return base;
     }
@@ -238,7 +247,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
             CompoundNBT players = tag.getCompound("players");
             CompactMachinePlayerData playerData = CompactMachinePlayerData.fromNBT(players);
 
-            CompactMachineMemoryData.INSTANCE.updatePlayerData(playerData);
+            CompactMachineCommonData.getInstance().updatePlayerData(playerData);
         }
     }
 
@@ -274,21 +283,23 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.markDirty();
     }
 
-    public Optional<CompactMachineData> getMachineData() {
+    public Optional<CompactMachineRegistrationData> getMachineData() {
         if(this.machineId == 0)
             return Optional.empty();
 
-        Optional<MachineData> machines = CompactMachineUtil.getMachineData(this.world);
-        if(!machines.isPresent())
+        if(world instanceof ServerWorld) {
+            return CompactMachineServerData
+                    .getInstance(world.getServer())
+                    .getMachineData(this.machineId);
+        } else {
             return Optional.empty();
-
-        return CompactMachineMemoryData.INSTANCE.getMachineData(this.machineId);
+        }
     }
 
     public boolean hasPlayersInside() {
-        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(this.machineId);
-
-        return playerData
+        return CompactMachineCommonData
+                .getInstance()
+                .getPlayerData(machineId)
                 .map(CompactMachinePlayerData::hasPlayers)
                 .orElse(false);
     }
