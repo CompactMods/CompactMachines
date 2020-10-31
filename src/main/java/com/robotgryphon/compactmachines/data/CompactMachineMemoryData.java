@@ -1,6 +1,5 @@
 package com.robotgryphon.compactmachines.data;
 
-import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
@@ -125,12 +124,6 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
 
     public void updatePlayerData(CompactMachinePlayerData pd) {
         int id = pd.getId();
-
-        // Do we have a registered machine with that ID?
-        if (!machineData.containsKey(id)) {
-            CompactMachines.LOGGER.error("Tried to set player data on machine that does not have information registered.");
-            return;
-        }
 
         // Do we have an existing player data entry? If not, just add and return
         if (!playerData.containsKey(id)) {

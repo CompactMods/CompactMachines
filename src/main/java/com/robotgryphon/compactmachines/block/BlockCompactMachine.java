@@ -52,13 +52,11 @@ public class BlockCompactMachine extends Block {
         if(tile == null)
             return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
 
-        if(worldIn instanceof ServerWorld) {
-            boolean hasPlayers = tile.hasPlayersInside();
-            if (hasPlayers)
-                return 0;
-        }
+        boolean hasPlayers = tile.hasPlayersInside();
+        if (hasPlayers)
+            return 0;
 
-        return 0;
+        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
     @Override

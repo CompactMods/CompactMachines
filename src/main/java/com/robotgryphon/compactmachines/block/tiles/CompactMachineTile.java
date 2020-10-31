@@ -2,8 +2,9 @@ package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.CompactMachineMemoryData;
-import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.MachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
@@ -14,7 +15,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 
@@ -216,7 +216,30 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
     @Override
     public CompoundNBT getUpdateTag() {
-        return write(new CompoundNBT());
+        CompoundNBT base = super.getUpdateTag();
+
+        base.putInt("machine", this.machineId);
+
+        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(machineId);
+        playerData.ifPresent(data -> {
+            CompoundNBT playerNbt = data.serializeNBT();
+            base.put("players", playerNbt);
+        });
+
+        return base;
+    }
+
+    @Override
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        super.handleUpdateTag(state, tag);
+
+        this.machineId = tag.getInt("machine");
+        if(tag.contains("players")) {
+            CompoundNBT players = tag.getCompound("players");
+            CompactMachinePlayerData playerData = CompactMachinePlayerData.fromNBT(players);
+
+            CompactMachineMemoryData.INSTANCE.updatePlayerData(playerData);
+        }
     }
 
     @Override
@@ -251,7 +274,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.markDirty();
     }
 
-    public Optional<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachineData() {
+    public Optional<CompactMachineData> getMachineData() {
         if(this.machineId == 0)
             return Optional.empty();
 
@@ -263,27 +286,11 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public boolean hasPlayersInside() {
-        if(world.isRemote())
-            return false;
+        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(this.machineId);
 
-        if(world instanceof ServerWorld) {
-            ServerWorld sw = (ServerWorld) world;
-            ServerWorld compactWorld = sw.getServer().getWorld(Registrations.COMPACT_DIMENSION);
-
-            Optional<MachineData> machines = CompactMachineUtil.getMachineData(compactWorld);
-
-            // No machine data present - probably none generated yet
-            if (!machines.isPresent())
-                return false;
-
-            Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(this.machineId);
-
-            return playerData
-                    .map(CompactMachinePlayerData::hasPlayers)
-                    .orElse(false);
-        }
-
-        return false;
+        return playerData
+                .map(CompactMachinePlayerData::hasPlayers)
+                .orElse(false);
     }
 
     /*
