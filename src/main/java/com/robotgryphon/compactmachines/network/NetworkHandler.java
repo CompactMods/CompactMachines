@@ -19,8 +19,8 @@ public class NetworkHandler {
     );
 
     public static void initialize() {
-        MAIN_CHANNEL.registerMessage(index++, MachinePlayerAddedPacket.class,
-                MachinePlayerAddedPacket::encode, MachinePlayerAddedPacket::decode,
-                MachinePlayerAddedPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        MAIN_CHANNEL.registerMessage(index++, MachinePlayersChangedPacket.class,
+                MachinePlayersChangedPacket::encode, MachinePlayersChangedPacket::decode,
+                MachinePlayersChangedPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }

@@ -48,8 +48,6 @@ public abstract class CompactMachineUtil {
             if (tile == null)
                 return;
 
-            PlayerUtil.setLastPosition(serverPlayer);
-
             serv.deferTask(() -> {
                 BlockPos spawnPoint;
 
@@ -68,6 +66,7 @@ public abstract class CompactMachineUtil {
                     tile.setMachineId(nextID);
                     CompactMachineMemoryData.INSTANCE.registerMachine(nextID,
                             new CompactMachineData(nextID, center, serverPlayer.getUniqueID(), size));
+                    CompactMachineMemoryData.markDirty(serverPlayer.getServer());
 
                     BlockPos.Mutable spawn = center.toMutable();
                     spawn.setY(62);
@@ -93,7 +92,9 @@ public abstract class CompactMachineUtil {
                     spawnPoint = data.getSpawnPoint().orElse(center);
                 }
 
+                // Mark the player as inside the machine, set external spawn, and yeet
                 CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, tile.machineId);
+
                 serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
             });
         }
@@ -169,11 +170,12 @@ public abstract class CompactMachineUtil {
         return new BlockPos((location.getX() * 1024) + 8, 60, (location.getZ() * 1024) + 8);
     }
 
-    public static void setMachineSpawn(BlockPos position) {
+    public static void setMachineSpawn(MinecraftServer server, BlockPos position) {
         Optional<CompactMachineData> compactMachineData = CompactMachineMemoryData.INSTANCE.getMachineContainingPosition(position);
         compactMachineData.ifPresent(d -> {
             d.setSpawnPoint(position);
             CompactMachineMemoryData.INSTANCE.updateMachineData(d);
+            CompactMachineMemoryData.markDirty(server);
         });
     }
 
@@ -214,6 +216,7 @@ public abstract class CompactMachineUtil {
 
             // Write changes to disk
             CompactMachineMemoryData.INSTANCE.updateMachineData(data);
+            CompactMachineMemoryData.markDirty(world.getServer());
         });
     }
 }

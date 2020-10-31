@@ -1,10 +1,13 @@
 package com.robotgryphon.compactmachines.data.machines;
 
 import com.robotgryphon.compactmachines.data.NbtListCollector;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
+import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.*;
 import net.minecraftforge.common.util.Constants;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,14 +19,21 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
 
     private HashSet<UUID> internalPlayers;
 
+    /**
+     * Holds a mapping of where players entered a machine.
+     */
+    private HashMap<UUID, DimensionalPosition> externalSpawns;
+
     protected CompactMachinePlayerData() {
         super();
         this.internalPlayers = new HashSet<>(0);
+        this.externalSpawns = new HashMap<>(0);
     }
 
     public CompactMachinePlayerData(int id) {
         super(id);
         this.internalPlayers = new HashSet<>(0);
+        this.externalSpawns = new HashMap<>(0);
     }
 
     public static CompactMachinePlayerData fromNBT(INBT nbt) {
@@ -53,6 +63,24 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
                 })
                 .collect(NbtListCollector.toNbtList());
         nbt.put("players", ids);
+
+
+        ListNBT spawns = externalSpawns.entrySet()
+                .stream()
+                .map((pSpawn) -> {
+                    CompoundNBT spawn = new CompoundNBT();
+
+                    UUID playerId = pSpawn.getKey();
+                    DimensionalPosition pSpawnPos = pSpawn.getValue();
+                    spawn.put("id", NBTUtil.func_240626_a_(playerId));
+                    spawn.put("spawn", pSpawnPos.serializeNBT());
+
+                    return spawn;
+                })
+                .collect(NbtListCollector.toNbtList());
+
+        nbt.put("spawns", spawns);
+
         return nbt;
     }
 
@@ -60,15 +88,24 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
     public void deserializeNBT(CompoundNBT nbt) {
         super.deserializeNBT(nbt);
 
-        if(nbt.contains("players")) {
+        if (nbt.contains("players")) {
             ListNBT players = nbt.getList("players", Constants.NBT.TAG_COMPOUND);
             players.forEach(playerData -> {
                 CompoundNBT pd = (CompoundNBT) playerData;
-                INBT playerId = pd.get("id");
-                if(playerId != null) {
-                    UUID id = NBTUtil.readUniqueId(playerId);
-                    this.internalPlayers.add(id);
-                }
+                UUID id = pd.getUniqueId("id");
+                this.internalPlayers.add(id);
+            });
+        }
+
+        if (nbt.contains("spawns")) {
+            ListNBT spawns = nbt.getList("spawns", Constants.NBT.TAG_COMPOUND);
+            spawns.forEach(spawnData -> {
+
+                CompoundNBT spawn = (CompoundNBT) spawnData;
+                UUID playerId = spawn.getUniqueId("id");
+                DimensionalPosition pos = DimensionalPosition.fromNBT(spawn.getCompound("spawn"));
+
+                externalSpawns.put(playerId, pos);
             });
         }
     }
@@ -80,11 +117,27 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
     public void addPlayer(ServerPlayerEntity serverPlayer) {
         UUID playerUUID = serverPlayer.getGameProfile().getId();
         internalPlayers.add(playerUUID);
+
+        DimensionalPosition pos = PlayerUtil.getPlayerDimensionalPosition(serverPlayer);
+        externalSpawns.put(playerUUID, pos);
     }
 
     public void removePlayer(ServerPlayerEntity serverPlayer) {
         UUID playerUUID = serverPlayer.getGameProfile().getId();
-        if(internalPlayers.contains(playerUUID))
+        if (internalPlayers.contains(playerUUID)) {
             internalPlayers.remove(playerUUID);
+            externalSpawns.remove(playerUUID);
+        }
+    }
+
+    public Optional<DimensionalPosition> getExternalSpawn(ServerPlayerEntity serverPlayer) {
+        UUID playerUUID = serverPlayer.getGameProfile().getId();
+        if(!internalPlayers.contains(playerUUID))
+            return Optional.empty();
+
+        if(!externalSpawns.containsKey(playerUUID))
+            return Optional.empty();
+
+        return Optional.of(externalSpawns.get(playerUUID));
     }
 }

@@ -286,7 +286,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public boolean hasPlayersInside() {
-        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(this.machineId);
+        Optional<CompactMachinePlayerData> playerData = CompactMachineMemoryData.INSTANCE.getPlayerData(machineId);
 
         return playerData
                 .map(CompactMachinePlayerData::hasPlayers)

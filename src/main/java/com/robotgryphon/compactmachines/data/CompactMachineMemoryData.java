@@ -1,10 +1,12 @@
 package com.robotgryphon.compactmachines.data;
 
+import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -28,22 +30,30 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
         this.playerData = new HashMap<>();
     }
 
+    public static void markDirty(MinecraftServer server) {
+        ServerWorld compactWorld = server.getWorld(Registrations.COMPACT_DIMENSION);
+        MachineData machineData = MachineData.getMachineData(compactWorld);
+        machineData.markDirty();
+    }
+
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT compound = new CompoundNBT();
         ListNBT machineList = machineData.values()
                 .stream()
-                .map(com.robotgryphon.compactmachines.data.machines.CompactMachineData::serializeNBT)
+                .map(CompactMachineData::serializeNBT)
                 .collect(NbtListCollector.toNbtList());
 
         compound.put("machines", machineList);
 
         ListNBT playerList = playerData.values()
                 .stream()
+                .filter(CompactMachinePlayerData::hasPlayers)
                 .map(CompactMachinePlayerData::serializeNBT)
                 .collect(NbtListCollector.toNbtList());
 
-        compound.put("players", playerList);
+        if(!playerList.isEmpty())
+            compound.put("players", playerList);
 
         return compound;
     }
@@ -53,7 +63,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
         if (nbt.contains("machines")) {
             ListNBT machines = nbt.getList("machines", Constants.NBT.TAG_COMPOUND);
             machines.forEach(data -> {
-                com.robotgryphon.compactmachines.data.machines.CompactMachineData md = com.robotgryphon.compactmachines.data.machines.CompactMachineData.fromNBT(data);
+                CompactMachineData md = CompactMachineData.fromNBT(data);
                 machineData.put(md.getId(), md);
             });
         }
@@ -71,7 +81,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
         return INSTANCE.machineData.size() + 1;
     }
 
-    public boolean registerMachine(int newID, com.robotgryphon.compactmachines.data.machines.CompactMachineData compactMachineData) {
+    public boolean registerMachine(int newID, CompactMachineData compactMachineData) {
         if (machineData.containsKey(newID))
             return false;
 
@@ -86,11 +96,11 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
                         .grow(mach.getSize().getInternalSize()));
     }
 
-    public Stream<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachines() {
+    public Stream<CompactMachineData> getMachines() {
         return machineData.values().stream();
     }
 
-    public Optional<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachineContainingPosition(Vector3d position) {
+    public Optional<CompactMachineData> getMachineContainingPosition(Vector3d position) {
         return getMachines()
                 .filter(machine -> {
                     BlockPos center = machine.getCenter();
@@ -102,7 +112,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
                 .findFirst();
     }
 
-    public Optional<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachineContainingPosition(BlockPos position) {
+    public Optional<CompactMachineData> getMachineContainingPosition(BlockPos position) {
         AxisAlignedBB possibleCenters = new AxisAlignedBB(position, position).grow(EnumMachineSize.maximum().getInternalSize());
 
         return getMachines()
@@ -114,7 +124,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
                 .findFirst();
     }
 
-    public void updateMachineData(com.robotgryphon.compactmachines.data.machines.CompactMachineData d) {
+    public void updateMachineData(CompactMachineData d) {
         int id = d.getId();
         if (!machineData.containsKey(id))
             return;
@@ -135,7 +145,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
         playerData.replace(id, pd);
     }
 
-    public Optional<com.robotgryphon.compactmachines.data.machines.CompactMachineData> getMachineData(int machineId) {
+    public Optional<CompactMachineData> getMachineData(int machineId) {
         if (!machineData.containsKey(machineId))
             return Optional.empty();
 
@@ -144,7 +154,7 @@ public class CompactMachineMemoryData implements INBTSerializable<CompoundNBT> {
 
     public Optional<CompactMachinePlayerData> getPlayerData(int id) {
         if (!playerData.containsKey(id))
-            return Optional.empty();
+            playerData.put(id, new CompactMachinePlayerData(id));
 
         return Optional.ofNullable(playerData.get(id));
     }
