@@ -71,7 +71,7 @@ public abstract class PlayerUtil {
             outsideWorld.ifPresent(w -> {
                 machine.ifPresent(m -> {
                     serverPlayer.teleport(w, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
+                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, machineInfo.getOutsidePosition(w).getBlockPosition(), m.getId());
                 });
             });
 

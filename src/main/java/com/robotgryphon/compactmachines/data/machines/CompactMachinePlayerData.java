@@ -114,22 +114,33 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
         return !internalPlayers.isEmpty();
     }
 
+    public void addPlayer(UUID playerID) {
+        if(!internalPlayers.contains(playerID)) {
+            internalPlayers.add(playerID);
+        }
+    }
+
     public void addPlayer(ServerPlayerEntity serverPlayer) {
         UUID playerUUID = serverPlayer.getGameProfile().getId();
-        if(!internalPlayers.contains(playerUUID)) {
-            internalPlayers.add(playerUUID);
+        addPlayer(playerUUID);
 
+        // server support - add spawn to data
+        if(!externalSpawns.containsKey(playerUUID)) {
             DimensionalPosition pos = PlayerUtil.getPlayerDimensionalPosition(serverPlayer);
             externalSpawns.put(playerUUID, pos);
         }
     }
 
+    public void removePlayer(UUID playerID) {
+        if (internalPlayers.contains(playerID)) {
+            internalPlayers.remove(playerID);
+            externalSpawns.remove(playerID);
+        }
+    }
+
     public void removePlayer(ServerPlayerEntity serverPlayer) {
         UUID playerUUID = serverPlayer.getGameProfile().getId();
-        if (internalPlayers.contains(playerUUID)) {
-            internalPlayers.remove(playerUUID);
-            externalSpawns.remove(playerUUID);
-        }
+        removePlayer(playerUUID);
     }
 
     public Optional<DimensionalPosition> getExternalSpawn(ServerPlayerEntity serverPlayer) {

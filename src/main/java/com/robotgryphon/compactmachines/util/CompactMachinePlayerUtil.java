@@ -6,14 +6,13 @@ import com.robotgryphon.compactmachines.network.MachinePlayersChangedPacket;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class CompactMachinePlayerUtil {
-    public static void addPlayerToMachine(ServerPlayerEntity serverPlayer, int machineId) {
+    public static void addPlayerToMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos, int machineId) {
         MinecraftServer serv = serverPlayer.getServer();
         CompactMachineServerData serverData = CompactMachineServerData.getInstance(serv);
         Optional<CompactMachinePlayerData> playerData = serverData.getPlayerData(machineId);
@@ -22,19 +21,14 @@ public class CompactMachinePlayerUtil {
             d.addPlayer(serverPlayer);
             serverData.markDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serverPlayer.getUniqueID());
+            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(machineId, serverPlayer.getUniqueID(), MachinePlayersChangedPacket.EnumPlayerChangeType.ENTERED);
             NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> getPlayerChunk(serverPlayer)),
+                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getServerWorld().getChunkAt(machinePos)),
                     p);
         });
     }
 
-    @Nonnull
-    public static Chunk getPlayerChunk(ServerPlayerEntity serverPlayer) {
-        return serverPlayer.getServerWorld().getChunkAt(serverPlayer.getPosition());
-    }
-
-    public static void removePlayerFromMachine(ServerPlayerEntity serverPlayer, int machineId) {
+    public static void removePlayerFromMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos, int machineId) {
         CompactMachineServerData serverData = CompactMachineServerData.getInstance(serverPlayer.getServer());
         Optional<CompactMachinePlayerData> playerData = serverData.getPlayerData(machineId);
 
@@ -42,9 +36,9 @@ public class CompactMachinePlayerUtil {
             d.removePlayer(serverPlayer);
             serverData.markDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serverPlayer.getUniqueID());
+            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(machineId, serverPlayer.getUniqueID(), MachinePlayersChangedPacket.EnumPlayerChangeType.EXITED);
             NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> getPlayerChunk(serverPlayer)),
+                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getServerWorld().getChunkAt(machinePos)),
                     p);
         });
     }
