@@ -5,8 +5,11 @@ import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
-import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.IProbeInfoProvider;
+import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
@@ -25,12 +28,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class TunnelWallBlock extends WallBlock {
+public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
     public static Property<EnumTunnelType> TUNNEL_TYPE = EnumProperty.create("tunnel_type", EnumTunnelType.class);
 
@@ -47,16 +49,7 @@ public class TunnelWallBlock extends WallBlock {
             return Optional.empty();
 
         EnumTunnelType enumTunnelType = state.get(TUNNEL_TYPE);
-        Optional<RegistryObject<TunnelRegistration>> first = Registrations.TUNNEL_TYPES.getEntries()
-                .stream()
-                .filter(t -> t.get().getType() == enumTunnelType)
-                .findFirst();
-
-        if(!first.isPresent())
-            return Optional.empty();
-
-        TunnelRegistration reg = first.get().get();
-        return Optional.ofNullable(reg.getDefinition());
+        return TunnelHelper.getTunnelDefinitionFromType(enumTunnelType);
     }
 
     @Override
@@ -168,5 +161,15 @@ public class TunnelWallBlock extends WallBlock {
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new TunnelWallTile();
+    }
+
+    @Override
+    public String getID() {
+        return Registrations.BLOCK_TUNNEL_WALL.getId().toString();
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData iProbeHitData) {
+
     }
 }

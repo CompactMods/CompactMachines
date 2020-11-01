@@ -9,9 +9,7 @@ import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -32,7 +30,7 @@ public abstract class PlayerUtil {
 
     public static DimensionalPosition getPlayerDimensionalPosition(PlayerEntity player) {
         Vector3d pos = player.getPositionVec();
-        ResourceLocation dim = player.world.getDimensionKey().getLocation();
+        RegistryKey<World> dim = player.world.getDimensionKey();
 
         return new DimensionalPosition(dim, pos);
     }
@@ -69,15 +67,15 @@ public abstract class PlayerUtil {
         } else {
             DimensionalPosition p = lastPos.get();
             Vector3d bp = p.getPosition();
-            ResourceLocation dimRL = p.getDimension();
-            RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimRL);
-
-            ServerWorld outsideWorld = world.getServer().getWorld(key);
-
-            machine.ifPresent(m -> {
-                serverPlayer.teleport(outsideWorld, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-                CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
+            Optional<ServerWorld> outsideWorld = p.getWorld(world);
+            outsideWorld.ifPresent(w -> {
+                machine.ifPresent(m -> {
+                    serverPlayer.teleport(w, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, m.getId());
+                });
             });
+
+
         }
     }
 }

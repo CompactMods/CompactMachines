@@ -24,12 +24,12 @@ public class CompactMachineServerData extends CompactMachineCommonData {
     @Nullable
     private MinecraftServer server;
 
-    private CompactMachineServerData() {
+    CompactMachineServerData() {
         super();
         this.machineData = new HashMap<>();
     }
 
-    private CompactMachineServerData(MinecraftServer server) {
+    CompactMachineServerData(MinecraftServer server) {
         this();
         this.server = server;
     }

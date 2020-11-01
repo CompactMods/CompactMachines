@@ -71,6 +71,11 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
         IntArrayNBT ownerNbt = NBTUtil.func_240626_a_(this.owner);
         nbt.put("owner", ownerNbt);
 
+        if(this.outsidePosition != null) {
+            CompoundNBT pos = outsidePosition.serializeNBT();
+            nbt.put("outside", pos);
+        }
+
         nbt.putString("size", size.getName());
 
         return nbt;
@@ -96,6 +101,10 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
 
         if(nbt.contains("spawn")) {
             this.spawnPoint = NBTUtil.readBlockPos(nbt.getCompound("spawn"));
+        }
+
+        if(nbt.contains("outside")) {
+            this.outsidePosition = DimensionalPosition.fromNBT(nbt.getCompound("outside"));
         }
     }
 
@@ -131,7 +140,7 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
             RegistryKey<World> dimensionKey = player.world.getDimensionKey();
 
             // Player location in-world
-            return new DimensionalPosition(dimensionKey.getRegistryName(), positionVec);
+            return new DimensionalPosition(dimensionKey, positionVec);
         } else {
             return this.outsidePosition;
         }
@@ -142,7 +151,7 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
     }
 
     public void setWorldPosition(ServerWorld world, BlockPos pos) {
-        this.outsidePosition = new DimensionalPosition(world.getDimensionKey().getRegistryName(),
+        this.outsidePosition = new DimensionalPosition(world.getDimensionKey(),
                 new Vector3d(pos.getX(), pos.getY(), pos.getZ()));
     }
 

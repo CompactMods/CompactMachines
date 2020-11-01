@@ -19,7 +19,6 @@ import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
@@ -28,82 +27,80 @@ import java.util.Optional;
 public abstract class CompactMachineUtil {
 
     public static void teleportInto(ServerPlayerEntity serverPlayer, BlockPos machinePos, EnumMachineSize size) {
-        World serverWorld = serverPlayer.getServerWorld();
+        ServerWorld serverWorld = serverPlayer.getServerWorld();
 
         MinecraftServer serv = serverWorld.getServer();
-        if (serv != null) {
-            if (serverWorld.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
-                IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter")
-                        .mergeStyle(TextFormatting.RED);
+        if (serverWorld.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+            IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter")
+                    .mergeStyle(TextFormatting.RED);
 
-                serverPlayer.sendStatusMessage(msg, true);
-                return;
+            serverPlayer.sendStatusMessage(msg, true);
+            return;
+        }
+
+        ServerWorld compactWorld = serv.getWorld(Registrations.COMPACT_DIMENSION);
+        if (compactWorld == null)
+            return;
+
+        CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
+        if (tile == null)
+            return;
+
+        serv.deferTask(() -> {
+            BlockPos spawnPoint;
+
+            CompactMachineServerData serverData = CompactMachineServerData.getInstance(serv);
+
+            if (tile.machineId == -1) {
+                int nextID = serverData.getNextMachineId();
+
+                BlockPos center = getCenterOfMachineById(nextID);
+
+                // Bump the center up a bit so the floor is Y = 60
+                center = center.offset(Direction.UP, size.getInternalSize() / 2);
+
+                CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
+
+                tile.setMachineId(nextID);
+                CompactMachineRegistrationData regData = new CompactMachineRegistrationData(nextID, center, serverPlayer.getUniqueID(), size);
+                regData.setWorldPosition(serverWorld, machinePos);
+
+                serverData.registerMachine(nextID, regData);
+                serverData.markDirty();
+
+                BlockPos.Mutable spawn = center.toMutable();
+                spawn.setY(62);
+
+                spawnPoint = spawn.toImmutable();
+            } else {
+                Optional<CompactMachineRegistrationData> info = serverData.getMachineData(tile.machineId);
+
+                // We have no machine info here?
+                if (!info.isPresent()) {
+                    IFormattableTextComponent text = new TranslationTextComponent("messages.compactmachines.no_machine_data")
+                            .mergeStyle(TextFormatting.RED)
+                            .mergeStyle(TextFormatting.BOLD);
+
+                    serverPlayer.sendStatusMessage(text, true);
+                    return;
+                }
+
+                CompactMachineRegistrationData data = info.get();
+                BlockPos.Mutable center = data.getCenter().toMutable();
+                center.setY(62);
+
+                spawnPoint = data.getSpawnPoint().orElse(center);
             }
 
-            ServerWorld compactWorld = serv.getWorld(Registrations.COMPACT_DIMENSION);
-            if (compactWorld == null)
-                return;
+            try {
+                // Mark the player as inside the machine, set external spawn, and yeet
+                CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, tile.machineId);
+            } catch (Exception ex) {
+                CompactMachines.LOGGER.error(ex);
+            }
 
-            CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
-            if (tile == null)
-                return;
-
-            serv.deferTask(() -> {
-                BlockPos spawnPoint;
-
-                CompactMachineServerData serverData = CompactMachineServerData.getInstance(serv);
-
-                if (tile.machineId == -1) {
-                    int nextID = serverData.getNextMachineId();
-
-                    BlockPos center = getCenterOfMachineById(nextID);
-
-                    // Bump the center up a bit so the floor is Y = 60
-                    center = center.offset(Direction.UP, size.getInternalSize() / 2);
-
-                    CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
-
-                    tile.setMachineId(nextID);
-                    serverData.registerMachine(nextID,
-                            new CompactMachineRegistrationData(nextID, center, serverPlayer.getUniqueID(), size));
-                    serverData.markDirty();
-
-                    BlockPos.Mutable spawn = center.toMutable();
-                    spawn.setY(62);
-
-                    spawnPoint = spawn.toImmutable();
-                } else {
-                    Optional<CompactMachineRegistrationData> info = serverData.getMachineData(tile.machineId);
-
-                    // We have no machine info here?
-                    if (!info.isPresent()) {
-                        IFormattableTextComponent text = new TranslationTextComponent("messages.compactmachines.no_machine_data")
-                                .mergeStyle(TextFormatting.RED)
-                                .mergeStyle(TextFormatting.BOLD);
-
-                        serverPlayer.sendStatusMessage(text, true);
-                        return;
-                    }
-
-                    CompactMachineRegistrationData data = info.get();
-                    BlockPos.Mutable center = data.getCenter().toMutable();
-                    center.setY(62);
-
-                    spawnPoint = data.getSpawnPoint().orElse(center);
-                }
-
-                try {
-                    // Mark the player as inside the machine, set external spawn, and yeet
-                    CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, tile.machineId);
-                }
-
-                catch(Exception ex) {
-                    CompactMachines.LOGGER.error(ex);
-                }
-
-                serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-            });
-        }
+            serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+        });
     }
 
 

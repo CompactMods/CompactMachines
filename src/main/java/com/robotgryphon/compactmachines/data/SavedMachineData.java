@@ -35,6 +35,9 @@ public class SavedMachineData extends WorldSavedData {
                     .getOrCreate(SavedMachineData::new, DATA_NAME);
         }
 
+        if(SERVER_DATA == null)
+            SERVER_DATA = new CompactMachineServerData(server);
+
         DimensionSavedDataManager sd = compactWorld.getSavedData();
         return sd.getOrCreate(SavedMachineData::new, DATA_NAME);
     }

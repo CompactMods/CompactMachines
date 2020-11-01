@@ -2,20 +2,36 @@ package com.robotgryphon.compactmachines.teleportation;
 
 import com.robotgryphon.compactmachines.data.NbtDataUtil;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.INBTSerializable;
+
+import java.util.Optional;
 
 public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
-    private ResourceLocation dimension;
+    private RegistryKey<World> dimension;
     private Vector3d position;
 
     private DimensionalPosition() { }
 
-    public DimensionalPosition(ResourceLocation dim, Vector3d pos) {
+    public DimensionalPosition(RegistryKey<World> dim, Vector3d pos) {
         this.dimension = dim;
         this.position = pos;
+    }
+
+    public Optional<ServerWorld> getWorld(ServerWorld serverWorld) {
+        if(serverWorld == null)
+            return Optional.empty();
+
+        MinecraftServer serv = serverWorld.getServer();
+        return Optional.ofNullable(serv.getWorld(this.dimension));
     }
 
     public static DimensionalPosition fromNBT(CompoundNBT nbt) {
@@ -28,7 +44,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
-        nbt.putString("dim", dimension.toString());
+        nbt.putString("dim", dimension.getLocation().toString());
         CompoundNBT posNbt = NbtDataUtil.writeVectorCompound(position);
         nbt.put("pos", posNbt);
         return nbt;
@@ -39,7 +55,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         if(nbt.contains("dim"))
         {
             ResourceLocation dim = new ResourceLocation(nbt.getString("dim"));
-            this.dimension = dim;
+            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dim);
         }
 
         if(nbt.contains("pos")) {
@@ -49,11 +65,15 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         }
     }
 
-    public ResourceLocation getDimension() {
+    public RegistryKey<World> getDimension() {
         return this.dimension;
     }
 
     public Vector3d getPosition() {
         return this.position;
+    }
+
+    public BlockPos getBlockPosition() {
+        return new BlockPos(position.x, position.y, position.z);
     }
 }
