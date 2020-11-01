@@ -32,5 +32,9 @@
 
   "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device",
 
+  "item.compactmachines.item_tunnel": "Item Tunnel",
+  "item.compactmachines.redstone_in_tunnel": "Redstone Tunnel (In)",
+  "item.compactmachines.redstone_out_tunnel": "Redstone Tunnel (Out)",
+
   "compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work."
 }

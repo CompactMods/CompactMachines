@@ -22,7 +22,7 @@ public class ItemBlockWall extends BlockItem {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         if (stack.getItem() == Registrations.ITEM_SOLID_WALL.get()) {
-            IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.wall.hint")
+            IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.solid_wall.hint")
                     .mergeStyle(TextFormatting.RED);
             
             tooltip.add(text);

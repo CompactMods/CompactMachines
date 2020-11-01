@@ -1,15 +1,20 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.data.CompactMachineCommonData;
+import com.robotgryphon.compactmachines.data.CompactMachineServerData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
+import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 
@@ -19,7 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickable {
+public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
     public int machineId = -1;
     private boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
@@ -211,7 +216,39 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
     @Override
     public CompoundNBT getUpdateTag() {
-        return write(new CompoundNBT());
+        CompoundNBT base = super.getUpdateTag();
+        base.putInt("machine", this.machineId);
+
+        if(world instanceof ServerWorld) {
+            Optional<CompactMachinePlayerData> playerData = Optional.empty();
+            try {
+                playerData = CompactMachineServerData
+                        .getInstance(world.getServer())
+                        .getPlayerData(machineId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            playerData.ifPresent(data -> {
+                CompoundNBT playerNbt = data.serializeNBT();
+                base.put("players", playerNbt);
+            });
+        }
+
+        return base;
+    }
+
+    @Override
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        super.handleUpdateTag(state, tag);
+
+        this.machineId = tag.getInt("machine");
+        if(tag.contains("players")) {
+            CompoundNBT players = tag.getCompound("players");
+            CompactMachinePlayerData playerData = CompactMachinePlayerData.fromNBT(players);
+
+            CompactMachineCommonData.getInstance().updatePlayerData(playerData);
+        }
     }
 
     @Override
@@ -244,6 +281,27 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     public void setMachineId(int id) {
         this.machineId = id;
         this.markDirty();
+    }
+
+    public Optional<CompactMachineRegistrationData> getMachineData() {
+        if(this.machineId == 0)
+            return Optional.empty();
+
+        if(world instanceof ServerWorld) {
+            return CompactMachineServerData
+                    .getInstance(world.getServer())
+                    .getMachineData(this.machineId);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public boolean hasPlayersInside() {
+        return CompactMachineCommonData
+                .getInstance()
+                .getPlayerData(machineId)
+                .map(CompactMachinePlayerData::hasPlayers)
+                .orElse(false);
     }
 
     /*

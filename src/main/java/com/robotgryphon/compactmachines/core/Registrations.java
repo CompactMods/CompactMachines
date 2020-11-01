@@ -3,13 +3,21 @@ package com.robotgryphon.compactmachines.core;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.BreakableWallBlock;
 import com.robotgryphon.compactmachines.block.walls.SolidWallBlock;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.item.ItemBlockMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
+import com.robotgryphon.compactmachines.item.tunnels.ItemTunnelItem;
+import com.robotgryphon.compactmachines.item.tunnels.RedstoneInTunnelItem;
+import com.robotgryphon.compactmachines.item.tunnels.RedstoneOutTunnelItem;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import com.robotgryphon.compactmachines.reference.EnumTunnelType;
+import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
+import com.robotgryphon.compactmachines.tunnels.definitions.ItemTunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneTunnelDefinition;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -24,14 +32,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryBuilder;
 
 import java.util.function.Supplier;
 
 import static com.robotgryphon.compactmachines.CompactMachines.MODID;
 
+@Mod.EventBusSubscriber(modid = MODID)
 public class Registrations {
     // ================================================================================================================
     //   REGISTRIES
@@ -39,7 +50,7 @@ public class Registrations {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
-    // private static final DeferredRegister<Dimension> DIMENSIONS = DeferredRegister.create(ForgeRegistries.WORLD_CARVERS, MODID);;
+    public static final DeferredRegister<TunnelRegistration> TUNNEL_TYPES = DeferredRegister.create(TunnelRegistration.class, MODID);
 
     // ================================================================================================================
     //   PROPERTIES
@@ -138,6 +149,38 @@ public class Registrations {
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
 
     // ================================================================================================================
+    //   TUNNELS
+    // ================================================================================================================
+
+    public static final RegistryObject<Item> ITEM_ITEM_TUNNEL = ITEMS.register("item_tunnel", () ->
+            new ItemTunnelItem(BASIC_ITEM_PROPS.get()));
+
+    public static final RegistryObject<Item> ITEM_REDSTONEIN_TUNNEL = ITEMS.register("redstone_in_tunnel", () ->
+            new RedstoneInTunnelItem(BASIC_ITEM_PROPS.get()));
+
+    public static final RegistryObject<Item> ITEM_REDSTONEOUT_TUNNEL = ITEMS.register("redstone_out_tunnel", () ->
+            new RedstoneOutTunnelItem(BASIC_ITEM_PROPS.get()));
+
+    public static final RegistryObject<TileEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = TILES_ENTITIES.register("tunnel_wall", () ->
+            TileEntityType.Builder.create(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
+                    .build(null));
+
+    // ================================================================================================================
+    //   TUNNEL TYPE DEFINITIONS
+    // ================================================================================================================
+    public static final RegistryObject<TunnelRegistration> ITEM_TUNNEL = TUNNEL_TYPES.register("items", () ->
+        new TunnelRegistration(EnumTunnelType.ITEM, new ItemTunnelDefinition(ITEM_ITEM_TUNNEL.get()))
+    );
+
+    public static final RegistryObject<TunnelRegistration> REDSTONE_IN_TUNNEL = TUNNEL_TYPES.register("redstone_in", () ->
+            new TunnelRegistration(EnumTunnelType.REDSTONE_IN, new RedstoneTunnelDefinition(EnumTunnelType.REDSTONE_IN, ITEM_REDSTONEIN_TUNNEL.get()))
+    );
+
+    public static final RegistryObject<TunnelRegistration> REDSTONE_OUT_TUNNEL = TUNNEL_TYPES.register("redstone_out", () ->
+            new TunnelRegistration(EnumTunnelType.REDSTONE_OUT, new RedstoneTunnelDefinition(EnumTunnelType.REDSTONE_OUT, ITEM_REDSTONEOUT_TUNNEL.get()))
+    );
+
+    // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
     public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation("compactmachines:compact_world"));
@@ -151,5 +194,10 @@ public class Registrations {
         BLOCKS.register(eventBus);
         ITEMS.register(eventBus);
         TILES_ENTITIES.register(eventBus);
+
+        TUNNEL_TYPES.makeRegistry("tunnel_types", () -> new RegistryBuilder<TunnelRegistration>()
+                .tagFolder("tunnel_types"));
+
+        TUNNEL_TYPES.register(eventBus);
     }
 }

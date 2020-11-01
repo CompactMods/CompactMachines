@@ -21,7 +21,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'snapshot', version: '20200916-1.16.2'
+    mappings channel: 'snapshot', version: mappings_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -81,7 +81,44 @@ minecraft {
     }
 }
 
+def getModVersion(filename) {
+    // println(filename);
+    def pattern = /^(?<modid>[^-]+)(?:-(?<mcversion>[0-9.]+))?(?:-(?<modver>[0-9.\-]+))\.jar$/;
+
+    def matcher = filename =~ pattern
+
+    def found = matcher.find()
+
+    if(found) {
+        def mod = matcher.group("modid");
+
+        // Extract MC version or default
+        def mcVersion = matcher.group("mcversion");
+
+        // Extract mod version
+        def version = matcher.group("modver");
+
+        // println("> mod: ${mod}; mc: ${mcVersion}; version: ${version}");
+
+        if(mcVersion == null)
+            return "${mod}:${mod}:${version}";
+        else
+            return "${mod}:${mod}-${mcVersion}:${version}";
+
+    } else {
+        println("> not a mod filename")
+        return filename;
+    }
+}
+
+def dev_mods_dir = "mods"
+
 repositories {
+    // Built mods
+    flatDir {
+        dirs dev_mods_dir
+    }
+
     // location of the maven that hosts JEI files
     maven {
         name "Progwml Repo"
@@ -89,11 +126,13 @@ repositories {
     }
 
     // TheOneProbe
-//    maven {
-//        name 'tterrag maven'
-//        url "http://maven.tterrag.com/"
-//    }
+    maven {
+        name 'tterrag maven'
+        url "http://maven.tterrag.com/"
+    }
 }
+
+def dev_mods = fileTree(dev_mods_dir).filter { it -> it.isFile() }.files.name.collect( { getModVersion(it) } )
 
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
@@ -101,13 +140,19 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
+    // Deobfuscate each dev mod for runtime
+    dev_mods.each {
+        compileOnly fg.deobf(it)
+        runtimeOnly fg.deobf(it)
+    }
+
     // JEI
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
     // The One Probe
-//    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
-//    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
+    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
 }
 

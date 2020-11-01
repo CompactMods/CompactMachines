@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines;
 
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.network.NetworkHandler;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -59,6 +60,8 @@ public class CompactMachines
 
     private void setup(final FMLCommonSetupEvent event)
     {
+        NetworkHandler.initialize();
+
         // Pre-Initialize Code
         // ConfigurationHandler.init(event.getSuggestedConfigurationFile());
 //        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
