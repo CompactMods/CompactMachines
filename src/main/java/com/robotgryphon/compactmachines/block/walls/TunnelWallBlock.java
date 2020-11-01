@@ -1,21 +1,22 @@
 package com.robotgryphon.compactmachines.block.walls;
 
+import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.reference.EnumTunnelType;
+import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.IProbeInfoProvider;
-import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.Property;
@@ -26,13 +27,14 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
+public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
     public static Property<EnumTunnelType> TUNNEL_TYPE = EnumProperty.create("tunnel_type", EnumTunnelType.class);
 
@@ -45,7 +47,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     }
 
     public Optional<TunnelDefinition> getTunnelInfo(BlockState state) {
-        if(!(state.getBlock() instanceof TunnelWallBlock))
+        if (!(state.getBlock() instanceof TunnelWallBlock))
             return Optional.empty();
 
         EnumTunnelType enumTunnelType = state.get(TUNNEL_TYPE);
@@ -55,11 +57,11 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
-        if(!tunnelInfo.isPresent())
+        if (!tunnelInfo.isPresent())
             return false;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if(definition instanceof IRedstoneTunnel) {
+        if (definition instanceof IRedstoneTunnel) {
             return ((IRedstoneTunnel) definition).canConnectRedstone(world, state, pos, side);
         }
 
@@ -69,11 +71,11 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     @Override
     public boolean canProvidePower(BlockState state) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
-        if(!tunnelInfo.isPresent())
+        if (!tunnelInfo.isPresent())
             return false;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if(definition instanceof IRedstoneTunnel) {
+        if (definition instanceof IRedstoneTunnel) {
             return ((IRedstoneTunnel) definition).canProvidePower(state);
         }
 
@@ -83,11 +85,11 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     @Override
     public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
-        if(!tunnelInfo.isPresent())
+        if (!tunnelInfo.isPresent())
             return 0;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if(definition instanceof IRedstoneTunnel) {
+        if (definition instanceof IRedstoneTunnel) {
             return ((IRedstoneTunnel) definition).getStrongPower(world, state, pos, side);
         }
 
@@ -97,11 +99,11 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     @Override
     public int getWeakPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
-        if(!tunnelInfo.isPresent())
+        if (!tunnelInfo.isPresent())
             return 0;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if(definition instanceof IRedstoneTunnel) {
+        if (definition instanceof IRedstoneTunnel) {
             return ((IRedstoneTunnel) definition).getWeakPower(world, state, pos, side);
         }
 
@@ -164,12 +166,27 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoProvider {
     }
 
     @Override
-    public String getID() {
-        return Registrations.BLOCK_TUNNEL_WALL.getId().toString();
-    }
+    public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData iProbeHitData) {
+        Direction side = blockState.get(TUNNEL_SIDE);
+        ILayoutStyle center = info.defaultLayoutStyle()
+                .alignment(ElementAlignment.ALIGN_CENTER);
 
-    @Override
-    public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData iProbeHitData) {
+        IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
+        String sideTranslated = I18n.format(CompactMachines.MODID.concat(".direction.").concat(side.getName2()));
+        v
+                .horizontal(center)
+                .item(new ItemStack(Items.COMPASS))
+                .text(new TranslationTextComponent(CompactMachines.MODID + ".direction.side", sideTranslated));
+
+        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(iProbeHitData.getPos());
+        Optional<BlockState> connected = TunnelHelper.getConnectedState(world, tile, EnumTunnelSide.OUTSIDE);
+        connected.ifPresent(state -> {
+            String blockName = state.getBlock().getTranslatedName().getString();
+            v
+                    .horizontal(center)
+                    .item(new ItemStack(state.getBlock().asItem()))
+                    .text(new TranslationTextComponent(CompactMachines.MODID.concat(".connected_block"), blockName));
+        });
     }
 }

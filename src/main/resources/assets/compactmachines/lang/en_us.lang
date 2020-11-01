@@ -40,15 +40,6 @@ tooltip.compactmachines.jei.shape=Use these to build the multiblock
 compactmachines.jei.category.multiblock_miniaturization=Multiblock Miniaturization
 
 
-enumfacing.side=Side: %s
-enumfacing.up=Up
-enumfacing.down=Down
-enumfacing.north=North
-enumfacing.south=South
-enumfacing.west=West
-enumfacing.east=East
-
-
 commands.compactmachines.usage=/compactmachines [subcommand, leave empty for list of commands]
 
 commands.compactmachines.available=Available sub-commands:

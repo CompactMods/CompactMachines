@@ -6,6 +6,7 @@ import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -15,8 +16,9 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class TunnelHelper {
+    @Nonnull
     public static Direction getNextDirection(Direction in) {
-        switch(in) {
+        switch (in) {
             case UP:
                 return Direction.DOWN;
 
@@ -34,9 +36,9 @@ public class TunnelHelper {
 
             case EAST:
                 return Direction.UP;
-
-            default: return null;
         }
+
+        return Direction.UP;
     }
 
     @Nonnull
@@ -46,19 +48,37 @@ public class TunnelHelper {
                 .filter(t -> t.get().getType() == enumTunnelType)
                 .findFirst();
 
-        if(!first.isPresent())
+        if (!first.isPresent())
             return Optional.empty();
 
         TunnelRegistration reg = first.get().get();
         return Optional.ofNullable(reg.getDefinition());
     }
 
-    public static Optional<BlockState> getConnectedState(World world, TunnelWallTile twt) {
-        Optional<DimensionalPosition> connectedPosition = twt.getConnectedPosition();
-        if (!connectedPosition.isPresent())
+    @Nonnull
+    public static Optional<DimensionalPosition> getTunnelConnectedPosition(TunnelWallTile tunnel, EnumTunnelSide side) {
+        switch (side) {
+            case OUTSIDE:
+                return tunnel.getConnectedPosition();
+
+            case INSIDE:
+                RegistryKey<World> world = Registrations.COMPACT_DIMENSION;
+                BlockPos offsetInside = tunnel.getPos().offset(tunnel.getTunnelSide().getOpposite());
+
+                DimensionalPosition pos = new DimensionalPosition(world, offsetInside);
+                return Optional.of(pos);
+        }
+
+        return Optional.empty();
+    }
+
+    @Nonnull
+    public static Optional<BlockState> getConnectedState(World world, TunnelWallTile twt, EnumTunnelSide side) {
+        Optional<DimensionalPosition> connectedPosition = getTunnelConnectedPosition(twt, side);
+        if(!connectedPosition.isPresent())
             return Optional.empty();
 
-        if(world instanceof ServerWorld) {
+        if (world instanceof ServerWorld) {
             ServerWorld sw = (ServerWorld) world;
 
             DimensionalPosition dimensionalPosition = connectedPosition.get();

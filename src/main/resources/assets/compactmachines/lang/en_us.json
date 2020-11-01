@@ -1,7 +1,8 @@
 {
   "itemGroup.compactmachines": "Compact Machines",
 
-  "tooltip.compactmachines.owner": "Owner: ",
+  "tooltip.compactmachines.machine_id": "Machine: %s",
+  "tooltip.compactmachines.owner": "Owner: %s",
   "tooltip.compactmachines.unknown_player": "Unknown Player",
   "tooltip.compactmachines.machine.size": "Size: %1$sx%1$sx%1$s",
   "tooltip.compactmachines.hold_shift.hint": "Hold shift for details.",
@@ -22,6 +23,7 @@
 
   "block.compactmachines.solid_wall": "Solid Compact Machine Wall",
   "block.compactmachines.wall": "Compact Machine Wall",
+  "block.compactmachines.tunnel_wall": "Tunnel",
 
   "item.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "item.compactmachines.machine_small": "Compact Machine (Small)",
@@ -36,5 +38,14 @@
   "item.compactmachines.redstone_in_tunnel": "Redstone Tunnel (In)",
   "item.compactmachines.redstone_out_tunnel": "Redstone Tunnel (Out)",
 
-  "compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work."
+  "compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work.",
+
+  "compactmachines.connected_block": "Connected: %s",
+  "compactmachines.direction.side": "Side: %s",
+  "compactmachines.direction.up": "Up",
+  "compactmachines.direction.down": "Down",
+  "compactmachines.direction.north": "North",
+  "compactmachines.direction.south": "South",
+  "compactmachines.direction.west": "West",
+  "compactmachines.direction.east": "East"
 }

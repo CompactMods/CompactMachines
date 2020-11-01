@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.tunnels.definitions;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
+import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.tunnels.api.IItemTunnel;
@@ -37,7 +38,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
         if (te instanceof TunnelWallTile) {
             TunnelWallTile twt = (TunnelWallTile) te;
 
-            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(world, twt);
+            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(world, twt, EnumTunnelSide.OUTSIDE);
             if (!connectedState.isPresent())
                 return LazyOptional.empty();
 

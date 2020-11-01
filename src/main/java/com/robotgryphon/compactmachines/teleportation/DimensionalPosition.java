@@ -26,6 +26,11 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         this.position = pos;
     }
 
+    public DimensionalPosition(RegistryKey<World> world, BlockPos positionBlock) {
+        this.dimension = world;
+        this.position = new Vector3d(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
+    }
+
     public Optional<ServerWorld> getWorld(ServerWorld serverWorld) {
         if(serverWorld == null)
             return Optional.empty();
