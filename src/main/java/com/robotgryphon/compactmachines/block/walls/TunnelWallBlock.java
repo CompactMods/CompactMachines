@@ -3,7 +3,6 @@ package com.robotgryphon.compactmachines.block.walls;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
@@ -17,9 +16,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -36,27 +34,27 @@ import java.util.Optional;
 
 public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
-    public static Property<EnumTunnelType> TUNNEL_TYPE = EnumProperty.create("tunnel_type", EnumTunnelType.class);
+    public static BooleanProperty REDSTONE = BooleanProperty.create("redstone");
 
     public TunnelWallBlock(Properties props) {
         super(props);
         setDefaultState(getStateContainer().getBaseState()
                 .with(TUNNEL_SIDE, Direction.UP)
-                .with(TUNNEL_TYPE, EnumTunnelType.ITEM)
+                .with(REDSTONE, false)
         );
     }
 
-    public Optional<TunnelDefinition> getTunnelInfo(BlockState state) {
-        if (!(state.getBlock() instanceof TunnelWallBlock))
+    public Optional<TunnelDefinition> getTunnelInfo(IBlockReader world, BlockPos pos) {
+        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(pos);
+        if(tile == null)
             return Optional.empty();
 
-        EnumTunnelType enumTunnelType = state.get(TUNNEL_TYPE);
-        return TunnelHelper.getTunnelDefinitionFromType(enumTunnelType);
+        return tile.getTunnelDefinition();
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
+        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
         if (!tunnelInfo.isPresent())
             return false;
 
@@ -70,21 +68,12 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
     @Override
     public boolean canProvidePower(BlockState state) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
-        if (!tunnelInfo.isPresent())
-            return false;
-
-        TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).canProvidePower(state);
-        }
-
-        return false;
+        return state.get(REDSTONE);
     }
 
     @Override
     public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
+        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
         if (!tunnelInfo.isPresent())
             return 0;
 
@@ -98,7 +87,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
     @Override
     public int getWeakPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(state);
+        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
         if (!tunnelInfo.isPresent())
             return 0;
 
@@ -118,7 +107,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
         if (player.isSneaking()) {
             // TODO Remove tunnelDef and return
-            Optional<TunnelDefinition> tunnelDef = getTunnelInfo(state);
+            Optional<TunnelDefinition> tunnelDef = getTunnelInfo(worldIn, pos);
 
             if (!tunnelDef.isPresent())
                 return ActionResultType.FAIL;
@@ -150,7 +139,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(TUNNEL_SIDE).add(TUNNEL_TYPE);
+        builder.add(TUNNEL_SIDE).add(REDSTONE);
         super.fillStateContainer(builder);
     }
 

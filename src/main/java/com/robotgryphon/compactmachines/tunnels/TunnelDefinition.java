@@ -1,14 +1,11 @@
 package com.robotgryphon.compactmachines.tunnels;
 
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import net.minecraft.item.Item;
 
-public class TunnelDefinition {
-    public EnumTunnelType type;
+public abstract class TunnelDefinition {
     public Item item;
 
-    public TunnelDefinition(EnumTunnelType type, Item item) {
-        this.type = type;
+    public TunnelDefinition(Item item) {
         this.item = item;
     }
 
@@ -16,4 +13,5 @@ public class TunnelDefinition {
         return this.item;
     }
 
+    public abstract int getTunnelColor();
 }

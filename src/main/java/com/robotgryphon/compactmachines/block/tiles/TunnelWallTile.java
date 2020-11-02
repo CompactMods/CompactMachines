@@ -3,26 +3,30 @@ package com.robotgryphon.compactmachines.block.tiles;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
-import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
+import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
 import com.robotgryphon.compactmachines.tunnels.api.ICapableTunnel;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class TunnelWallTile extends TileEntity {
+
+    private ResourceLocation tunnelType;
 
     public TunnelWallTile() {
         super(Registrations.TUNNEL_WALL_TILE.get());
@@ -35,6 +39,41 @@ public class TunnelWallTile extends TileEntity {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public void read(BlockState state, CompoundNBT nbt) {
+        super.read(state, nbt);
+
+        if(nbt.contains("tunnel_type")) {
+            ResourceLocation type = new ResourceLocation(nbt.getString("tunnel_type"));
+            this.tunnelType = type;
+        }
+    }
+
+    @Override
+    public CompoundNBT write(CompoundNBT compound) {
+        compound = super.write(compound);
+        compound.putString("tunnel_type", tunnelType.toString());
+        return compound;
+    }
+
+
+    @Override
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT nbt = super.getUpdateTag();
+        nbt.putString("tunnel_type", tunnelType.toString());
+
+        return nbt;
+    }
+
+    @Override
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        super.handleUpdateTag(state, tag);
+
+        if(tag.contains("tunnel_type")) {
+            this.tunnelType = new ResourceLocation(tag.getString("tunnel_type"));
+        }
     }
 
     /**
@@ -81,10 +120,15 @@ public class TunnelWallTile extends TileEntity {
     }
 
     public Optional<TunnelDefinition> getTunnelDefinition() {
-        BlockState state = getBlockState();
-        EnumTunnelType type = state.get(TunnelWallBlock.TUNNEL_TYPE);
+        if(tunnelType == null)
+            return Optional.empty();
 
-        return TunnelHelper.getTunnelDefinitionFromType(type);
+        TunnelRegistration value = GameRegistry
+                .findRegistry(TunnelRegistration.class)
+                .getValue(tunnelType);
+
+        TunnelDefinition definition = value.getDefinition();
+        return Optional.of(definition);
     }
 
     @Nonnull
@@ -115,5 +159,10 @@ public class TunnelWallTile extends TileEntity {
         }
 
         return super.getCapability(cap, side);
+    }
+
+    public void setTunnelType(ResourceLocation registryName) {
+        this.tunnelType = registryName;
+        markDirty();
     }
 }

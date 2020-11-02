@@ -14,7 +14,6 @@ import com.robotgryphon.compactmachines.item.tunnels.ItemTunnelItem;
 import com.robotgryphon.compactmachines.item.tunnels.RedstoneInTunnelItem;
 import com.robotgryphon.compactmachines.item.tunnels.RedstoneOutTunnelItem;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
 import com.robotgryphon.compactmachines.tunnels.definitions.ItemTunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneTunnelDefinition;
@@ -169,15 +168,15 @@ public class Registrations {
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
     public static final RegistryObject<TunnelRegistration> ITEM_TUNNEL = TUNNEL_TYPES.register("items", () ->
-        new TunnelRegistration(EnumTunnelType.ITEM, new ItemTunnelDefinition(ITEM_ITEM_TUNNEL.get()))
+        new TunnelRegistration(new ItemTunnelDefinition(ITEM_ITEM_TUNNEL.get()))
     );
 
     public static final RegistryObject<TunnelRegistration> REDSTONE_IN_TUNNEL = TUNNEL_TYPES.register("redstone_in", () ->
-            new TunnelRegistration(EnumTunnelType.REDSTONE_IN, new RedstoneTunnelDefinition(EnumTunnelType.REDSTONE_IN, ITEM_REDSTONEIN_TUNNEL.get()))
+            new TunnelRegistration(new RedstoneTunnelDefinition(ITEM_REDSTONEIN_TUNNEL.get()))
     );
 
     public static final RegistryObject<TunnelRegistration> REDSTONE_OUT_TUNNEL = TUNNEL_TYPES.register("redstone_out", () ->
-            new TunnelRegistration(EnumTunnelType.REDSTONE_OUT, new RedstoneTunnelDefinition(EnumTunnelType.REDSTONE_OUT, ITEM_REDSTONEOUT_TUNNEL.get()))
+            new TunnelRegistration(new RedstoneTunnelDefinition(ITEM_REDSTONEOUT_TUNNEL.get()))
     );
 
     // ================================================================================================================

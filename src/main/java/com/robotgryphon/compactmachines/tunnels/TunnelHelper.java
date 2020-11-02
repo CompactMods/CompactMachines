@@ -2,11 +2,11 @@ package com.robotgryphon.compactmachines.tunnels;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -42,17 +42,17 @@ public class TunnelHelper {
     }
 
     @Nonnull
-    public static Optional<TunnelDefinition> getTunnelDefinitionFromType(EnumTunnelType enumTunnelType) {
+    public static Optional<TunnelDefinition> getTunnelDefinitionFromType(ResourceLocation id) {
         Optional<RegistryObject<TunnelRegistration>> first = Registrations.TUNNEL_TYPES.getEntries()
                 .stream()
-                .filter(t -> t.get().getType() == enumTunnelType)
+                .filter(t -> t.get().getRegistryName() == id)
                 .findFirst();
 
         if (!first.isPresent())
             return Optional.empty();
 
         TunnelRegistration reg = first.get().get();
-        return Optional.ofNullable(reg.getDefinition());
+        return Optional.of(reg.getDefinition());
     }
 
     @Nonnull

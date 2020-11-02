@@ -1,8 +1,10 @@
 package com.robotgryphon.compactmachines.item.tunnels;
 
+import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
+import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -44,11 +46,17 @@ public abstract class TunnelItem extends Item {
             TunnelItem ti = ((TunnelItem) i);
             TunnelRegistration definition = ti.getDefinition();
 
-            BlockState defaultSolidItem = Registrations.BLOCK_TUNNEL_WALL.get()
-                    .getDefaultState()
-                    .with(TunnelWallBlock.TUNNEL_TYPE, definition.getType());
+            BlockState tunnelState = Registrations.BLOCK_TUNNEL_WALL.get()
+                    .getDefaultState();
 
-            w.setBlockState(pos, defaultSolidItem);
+            // Redstone Support
+            boolean redstone = (definition.getDefinition() instanceof IRedstoneTunnel);
+            tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
+            w.setBlockState(pos, tunnelState, 5);
+
+            TunnelWallTile tile = (TunnelWallTile) context.getWorld().getTileEntity(context.getPos());
+            tile.setTunnelType(definition.getRegistryName());
+
             is.shrink(1);
             return ActionResultType.CONSUME;
         }
@@ -58,6 +66,7 @@ public abstract class TunnelItem extends Item {
 
     /**
      * Implementation for easily swapping a tunnel type for another.
+     *
      * @param type
      * @param player
      * @param hand

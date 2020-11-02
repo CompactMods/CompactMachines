@@ -1,23 +1,19 @@
 package com.robotgryphon.compactmachines.tunnels;
 
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+
+import javax.annotation.Nonnull;
 
 public class TunnelRegistration extends ForgeRegistryEntry<TunnelRegistration> {
 
-    private EnumTunnelType tunnelType;
     private TunnelDefinition definition;
 
-    public TunnelRegistration(EnumTunnelType type, TunnelDefinition def) {
-        this.tunnelType = type;
+    public TunnelRegistration(TunnelDefinition def) {
         this.definition = def;
     }
 
+    @Nonnull
     public TunnelDefinition getDefinition() {
         return definition;
-    }
-
-    public EnumTunnelType getType() {
-        return tunnelType;
     }
 }

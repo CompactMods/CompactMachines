@@ -1,7 +1,6 @@
 package com.robotgryphon.compactmachines.tunnels.definitions;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
@@ -19,12 +18,18 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.Optional;
 
 public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunnel {
 
     public ItemTunnelDefinition(Item item) {
-        super(EnumTunnelType.ITEM, item);
+        super(item);
+    }
+
+    @Override
+    public int getTunnelColor() {
+        return new Color(205, 143, 36).getRGB();
     }
 
     @Nonnull
