@@ -1,5 +1,8 @@
 {
   "parent": "minecraft:block/block",
+  "textures": {
+    "tunnel": "compactmachines:block/tunnels/tunnel"
+  },
   "elements": [
     {
       "from": [0, 0, 0],
@@ -7,37 +10,73 @@
       "faces": {
         "down": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#wall",
+          "cullface": "down"
+        },
+        "up": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#wall",
+          "cullface": "up"
+        },
+        "north": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#wall",
+          "cullface": "north"
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#wall",
+          "cullface": "south"
+        },
+        "west": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#wall",
+          "cullface": "west"
+        },
+        "east": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#wall",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#tunnel",
           "cullface": "down",
           "tintindex": 0
         },
         "up": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#tunnel",
           "cullface": "up",
           "tintindex": 0
         },
         "north": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#tunnel",
           "cullface": "north",
           "tintindex": 0
         },
         "south": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#tunnel",
           "cullface": "south",
           "tintindex": 0
         },
         "west": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#tunnel",
           "cullface": "west",
           "tintindex": 0
         },
         "east": {
           "uv": [0, 0, 16, 16],
-          "texture": "#all",
+          "texture": "#tunnel",
           "cullface": "east",
           "tintindex": 0
         }

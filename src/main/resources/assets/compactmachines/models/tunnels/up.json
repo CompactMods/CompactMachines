@@ -1,6 +1,6 @@
 {
   "parent": "compactmachines:tunnels/base",
   "textures": {
-    "all": "compactmachines:block/tunnels/up"
+    "wall": "compactmachines:block/tunnels/up"
   }
 }

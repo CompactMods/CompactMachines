@@ -15,7 +15,7 @@ import java.util.Optional;
 public class TunnelColors implements IBlockColor {
 
     @Override
-    public int getColor(BlockState state, @Nullable IBlockDisplayReader reader, @Nullable BlockPos pos, int p_getColor_4_) {
+    public int getColor(BlockState state, @Nullable IBlockDisplayReader reader, @Nullable BlockPos pos, int tintIndex) {
         try {
             TileEntity tile = reader.getTileEntity(pos);
             if (tile instanceof TunnelWallTile) {
