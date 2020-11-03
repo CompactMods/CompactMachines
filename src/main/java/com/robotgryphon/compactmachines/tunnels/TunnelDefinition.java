@@ -1,9 +1,10 @@
 package com.robotgryphon.compactmachines.tunnels;
 
 import net.minecraft.item.Item;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public abstract class TunnelDefinition {
-    public Item item;
+public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefinition> {
+    protected Item item;
 
     /**
      * The color of a non-indicator (the same color as the wall)

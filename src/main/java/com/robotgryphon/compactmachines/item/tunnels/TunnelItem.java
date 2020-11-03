@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.item.tunnels;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
+import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +27,7 @@ public abstract class TunnelItem extends Item {
         super(properties);
     }
 
-    public abstract TunnelRegistration getDefinition();
+    public abstract TunnelDefinition getDefinition();
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
@@ -46,13 +46,13 @@ public abstract class TunnelItem extends Item {
             Item i = is.getItem();
 
             TunnelItem ti = ((TunnelItem) i);
-            TunnelRegistration definition = ti.getDefinition();
+            TunnelDefinition definition = ti.getDefinition();
 
             BlockState tunnelState = Registrations.BLOCK_TUNNEL_WALL.get()
                     .getDefaultState();
 
             // Redstone Support
-            boolean redstone = (definition.getDefinition() instanceof IRedstoneTunnel);
+            boolean redstone = (definition instanceof IRedstoneTunnel);
             tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
             w.setBlockState(pos, tunnelState, 3);
 

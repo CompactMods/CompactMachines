@@ -7,7 +7,6 @@ import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
-import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
 import com.robotgryphon.compactmachines.tunnels.api.ICapableTunnel;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
@@ -126,11 +125,10 @@ public class TunnelWallTile extends TileEntity {
         if(tunnelType == null)
             return Optional.empty();
 
-        TunnelRegistration value = GameRegistry
-                .findRegistry(TunnelRegistration.class)
+        TunnelDefinition definition = GameRegistry
+                .findRegistry(TunnelDefinition.class)
                 .getValue(tunnelType);
 
-        TunnelDefinition definition = value.getDefinition();
         return Optional.of(definition);
     }
 

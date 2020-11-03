@@ -43,16 +43,13 @@ public class TunnelHelper {
 
     @Nonnull
     public static Optional<TunnelDefinition> getTunnelDefinitionFromType(ResourceLocation id) {
-        Optional<RegistryObject<TunnelRegistration>> first = Registrations.TUNNEL_TYPES.getEntries()
+        Optional<RegistryObject<TunnelDefinition>> first = Registrations.TUNNEL_TYPES.getEntries()
                 .stream()
                 .filter(t -> t.get().getRegistryName() == id)
                 .findFirst();
 
-        if (!first.isPresent())
-            return Optional.empty();
+        return first.map(RegistryObject::get);
 
-        TunnelRegistration reg = first.get().get();
-        return Optional.of(reg.getDefinition());
     }
 
     @Nonnull

@@ -27,6 +27,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -49,7 +52,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
     public Optional<TunnelDefinition> getTunnelInfo(IBlockReader world, BlockPos pos) {
         TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(pos);
-        if(tile == null)
+        if (tile == null)
             return Optional.empty();
 
         return tile.getTunnelDefinition();
@@ -165,18 +168,35 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
+        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(hitData.getPos());
+        if(tile == null)
+            return;
+
+        Optional<DimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
+        Optional<BlockState> connected = TunnelHelper.getConnectedState(world, tile, EnumTunnelSide.OUTSIDE);
+
+        tile.getTunnelDefinition().ifPresent(def -> {
+            if (probeMode == ProbeMode.EXTENDED) {
+
+                IFormattableTextComponent tunType = new StringTextComponent(def.getRegistryName().toString())
+                        .mergeStyle(TextFormatting.GRAY);
+
+                CompoundText type = CompoundText.create().name(tunType);
+                v.horizontal(center)
+                        .item(new ItemStack(def.getItem()))
+                        .text(type);
+            }
+
+        });
+
         String sideTranslated = I18n.format(CompactMachines.MODID.concat(".direction.").concat(side.getName2()));
         v
                 .horizontal(center)
                 .item(new ItemStack(Items.COMPASS))
                 .text(new TranslationTextComponent(CompactMachines.MODID + ".direction.side", sideTranslated));
 
-        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(hitData.getPos());
-        Optional<DimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
-        Optional<BlockState> connected = TunnelHelper.getConnectedState(world, tile, EnumTunnelSide.OUTSIDE);
-
         connected.ifPresent(state -> {
-            if(!outside.isPresent())
+            if (!outside.isPresent())
                 return;
 
             DimensionalPosition outPos = outside.get();
@@ -200,7 +220,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
                             .item(pick)
                             .text(new TranslationTextComponent(CompactMachines.MODID.concat(".connected_block"), blockName));
                 }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 // no-op: we don't want to spam the log here
             }
         });
