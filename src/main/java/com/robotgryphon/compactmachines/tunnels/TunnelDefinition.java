@@ -5,6 +5,11 @@ import net.minecraft.item.Item;
 public abstract class TunnelDefinition {
     public Item item;
 
+    /**
+     * The color of a non-indicator (the same color as the wall)
+     */
+    public static final int NO_INDICATOR_COLOR = 3751749;
+
     public TunnelDefinition(Item item) {
         this.item = item;
     }
@@ -13,5 +18,12 @@ public abstract class TunnelDefinition {
         return this.item;
     }
 
-    public abstract int getTunnelColor();
+    public abstract int getTunnelRingColor();
+
+    /**
+     * Gets the color for the indicator at the top-right of the block texture.
+     *
+     * @return
+     */
+    public abstract int getTunnelIndicatorColor();
 }

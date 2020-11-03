@@ -28,8 +28,13 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
     }
 
     @Override
-    public int getTunnelColor() {
+    public int getTunnelRingColor() {
         return new Color(205, 143, 36).getRGB();
+    }
+
+    @Override
+    public int getTunnelIndicatorColor() {
+        return TunnelDefinition.NO_INDICATOR_COLOR;
     }
 
     @Nonnull

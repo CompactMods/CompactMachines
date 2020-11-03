@@ -3,6 +3,8 @@ package com.robotgryphon.compactmachines.block.tiles;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.network.NetworkHandler;
+import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
@@ -15,10 +17,12 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,7 +61,6 @@ public class TunnelWallTile extends TileEntity {
         compound.putString("tunnel_type", tunnelType.toString());
         return compound;
     }
-
 
     @Override
     public CompoundNBT getUpdateTag() {
@@ -163,6 +166,15 @@ public class TunnelWallTile extends TileEntity {
 
     public void setTunnelType(ResourceLocation registryName) {
         this.tunnelType = registryName;
-        markDirty();
+
+        if(world != null && !world.isRemote()) {
+            markDirty();
+
+            TunnelAddedPacket pkt = new TunnelAddedPacket(pos, registryName);
+
+            Chunk chunkAt = world.getChunkAt(pos);
+            NetworkHandler.MAIN_CHANNEL
+                    .send(PacketDistributor.TRACKING_CHUNK.with(() -> chunkAt), pkt);
+        }
     }
 }

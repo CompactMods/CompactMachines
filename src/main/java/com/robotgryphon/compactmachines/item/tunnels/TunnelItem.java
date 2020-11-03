@@ -11,6 +11,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -19,6 +20,7 @@ import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public abstract class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
@@ -52,10 +54,14 @@ public abstract class TunnelItem extends Item {
             // Redstone Support
             boolean redstone = (definition.getDefinition() instanceof IRedstoneTunnel);
             tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
-            w.setBlockState(pos, tunnelState, 5);
+            w.setBlockState(pos, tunnelState, 3);
 
-            TunnelWallTile tile = (TunnelWallTile) context.getWorld().getTileEntity(context.getPos());
-            tile.setTunnelType(definition.getRegistryName());
+            // Get the server and add a deferred task - allows the tile to be created on the client first
+            MinecraftServer server = ((ServerWorld) context.getWorld()).getServer();
+            server.deferTask(() -> {
+                TunnelWallTile tile = (TunnelWallTile) context.getWorld().getTileEntity(context.getPos());
+                tile.setTunnelType(definition.getRegistryName());
+            });
 
             is.shrink(1);
             return ActionResultType.CONSUME;

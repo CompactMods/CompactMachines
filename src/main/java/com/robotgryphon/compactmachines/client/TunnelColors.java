@@ -21,9 +21,15 @@ public class TunnelColors implements IBlockColor {
             if (tile instanceof TunnelWallTile) {
                 TunnelWallTile tunnel = (TunnelWallTile) tile;
                 Optional<TunnelDefinition> tunnelDefinition = tunnel.getTunnelDefinition();
-                return tunnelDefinition
-                        .map(TunnelDefinition::getTunnelColor)
-                        .orElse(Color.gray.getRGB());
+
+                switch(tintIndex) {
+                    case 0:
+                        return tunnelDefinition.map(TunnelDefinition::getTunnelRingColor)
+                                .orElse(Color.gray.getRGB());
+                    case 1:
+                        return tunnelDefinition.map(TunnelDefinition::getTunnelIndicatorColor)
+                                .orElse(TunnelDefinition.NO_INDICATOR_COLOR);
+                }
             }
 
             return Color.gray.getRGB();

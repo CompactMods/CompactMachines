@@ -1,7 +1,8 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "tunnel": "compactmachines:block/tunnels/tunnel"
+    "tunnel": "compactmachines:block/tunnels/tunnel",
+    "indicator": "compactmachines:block/tunnels/indicator"
   },
   "elements": [
     {
@@ -79,6 +80,48 @@
           "texture": "#tunnel",
           "cullface": "east",
           "tintindex": 0
+        }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "down",
+          "tintindex": 1
+        },
+        "up": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "up",
+          "tintindex": 1
+        },
+        "north": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "north",
+          "tintindex": 1
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "south",
+          "tintindex": 1
+        },
+        "west": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "west",
+          "tintindex": 1
+        },
+        "east": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#indicator",
+          "cullface": "east",
+          "tintindex": 1
         }
       }
     }
