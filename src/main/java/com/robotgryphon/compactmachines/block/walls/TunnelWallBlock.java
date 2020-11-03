@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.block.walls;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
@@ -25,9 +26,11 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -155,7 +158,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
     }
 
     @Override
-    public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData iProbeHitData) {
+    public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData hitData) {
         Direction side = blockState.get(TUNNEL_SIDE);
         ILayoutStyle center = info.defaultLayoutStyle()
                 .alignment(ElementAlignment.ALIGN_CENTER);
@@ -168,14 +171,38 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
                 .item(new ItemStack(Items.COMPASS))
                 .text(new TranslationTextComponent(CompactMachines.MODID + ".direction.side", sideTranslated));
 
-        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(iProbeHitData.getPos());
+        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(hitData.getPos());
+        Optional<DimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
         Optional<BlockState> connected = TunnelHelper.getConnectedState(world, tile, EnumTunnelSide.OUTSIDE);
+
         connected.ifPresent(state -> {
-            String blockName = state.getBlock().getTranslatedName().getString();
-            v
-                    .horizontal(center)
-                    .item(new ItemStack(state.getBlock().asItem()))
-                    .text(new TranslationTextComponent(CompactMachines.MODID.concat(".connected_block"), blockName));
+            if(!outside.isPresent())
+                return;
+
+            DimensionalPosition outPos = outside.get();
+            ServerWorld connectedWorld = (ServerWorld) world;
+            BlockPos outPosBlock = outPos.getBlockPosition();
+
+            try {
+                // If connected block isn't air, show a connected block line
+                if (!state.isAir(connectedWorld, outPosBlock)) {
+                    String blockName = state.getBlock().getTranslatedName().getString();
+                    RayTraceResult trace = new BlockRayTraceResult(
+                            hitData.getHitVec(), hitData.getSideHit(),
+                            outPosBlock, false);
+
+                    ItemStack pick = state
+                            .getBlock()
+                            .getPickBlock(state, trace, connectedWorld, outPosBlock, playerEntity);
+
+                    v
+                            .horizontal(center)
+                            .item(pick)
+                            .text(new TranslationTextComponent(CompactMachines.MODID.concat(".connected_block"), blockName));
+                }
+            } catch(Exception ex) {
+                // no-op: we don't want to spam the log here
+            }
         });
     }
 }
