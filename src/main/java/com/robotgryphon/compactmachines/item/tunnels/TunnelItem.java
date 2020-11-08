@@ -49,7 +49,8 @@ public abstract class TunnelItem extends Item {
             TunnelDefinition definition = ti.getDefinition();
 
             BlockState tunnelState = Registrations.BLOCK_TUNNEL_WALL.get()
-                    .getDefaultState();
+                    .getDefaultState()
+                    .with(TunnelWallBlock.TUNNEL_SIDE, context.getFace());
 
             // Redstone Support
             boolean redstone = (definition instanceof IRedstoneTunnel);

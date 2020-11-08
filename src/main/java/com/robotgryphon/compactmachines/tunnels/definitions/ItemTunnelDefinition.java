@@ -39,10 +39,42 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(ServerWorld world, BlockState state, BlockPos pos, @Nonnull Capability<T> cap, @Nullable Direction side) {
-        TileEntity te = world.getTileEntity(pos);
+    public <T> LazyOptional<T> getInternalCapability(ServerWorld compactWorld, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side) {
+        if (cap != CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return LazyOptional.empty();
 
-        if(cap != CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        TileEntity te = compactWorld.getTileEntity(tunnelPos);
+        if (te instanceof TunnelWallTile) {
+            TunnelWallTile twt = (TunnelWallTile) te;
+
+            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(compactWorld, twt, EnumTunnelSide.INSIDE);
+            if (!connectedState.isPresent())
+                return LazyOptional.empty();
+
+            Optional<DimensionalPosition> tunnelConnectedPosition = TunnelHelper.getTunnelConnectedPosition(twt, EnumTunnelSide.INSIDE);
+            if (!tunnelConnectedPosition.isPresent())
+                return LazyOptional.empty();
+
+            Direction tunnelSide = twt.getTunnelSide();
+
+            DimensionalPosition connectedInsidePos = tunnelConnectedPosition.get();
+            if (connectedState.get().hasTileEntity()) {
+                TileEntity connectedTile = compactWorld.getTileEntity(connectedInsidePos.getBlockPosition());
+                if (connectedTile != null) {
+                    return connectedTile.getCapability(cap, tunnelSide);
+                }
+            }
+        }
+
+        return LazyOptional.empty();
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getExternalCapability(ServerWorld world, BlockPos tunnelPos, @Nonnull Capability<T> cap, @Nullable Direction side) {
+        TileEntity te = world.getTileEntity(tunnelPos);
+
+        if (cap != CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return LazyOptional.empty();
 
         if (te instanceof TunnelWallTile) {
@@ -67,10 +99,10 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
             ServerWorld csw = connectedWorld.get();
 
             BlockPos connectedPos = dimensionalPosition.getBlockPosition();
-            if(connectedState.get().hasTileEntity()) {
+            if (connectedState.get().hasTileEntity()) {
                 TileEntity connectedTile = csw.getTileEntity(connectedPos);
-
-                return connectedTile.getCapability(cap, side);
+                if (connectedTile != null)
+                    return connectedTile.getCapability(cap, twt.getTunnelSide().getOpposite());
             }
 
             return LazyOptional.empty();

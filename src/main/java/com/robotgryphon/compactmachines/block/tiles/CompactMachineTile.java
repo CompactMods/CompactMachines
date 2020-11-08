@@ -6,6 +6,9 @@ import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
+import com.robotgryphon.compactmachines.tunnels.api.ICapableTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -14,10 +17,15 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Optional;
@@ -104,109 +112,40 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         return nbt;
     }
 
-//    public void initStructure() {
-//        if (this.coords != -1) {
-//            return;
-//        }
-//
-//        StructureTools.generateCubeForMachine(this);
-//
-//        double[] destination = new double[]{
-//                this.coords * 1024 + 0.5 + this.getSize().getDimension() / 2,
-//                42,
-//                0.5 + this.getSize().getDimension() / 2
-//        };
-//
-//        WorldSavedDataMachines.INSTANCE.addSpawnPoint(this.coords, destination);
-//    }
-//
-//    public boolean isAllowedToEnter(EntityPlayer player) {
-//        if (!isLocked()) {
-//            return true;
-//        }
-//
-//        if (!hasOwner()) {
-//            return true;
-//        }
-//
-//        if (player.getUniqueID().equals(owner)) {
-//            return true;
-//        }
-//
-//        if (isOnWhiteList(player)) {
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//    public boolean isOnWhiteList(EntityPlayer player) {
-//        return playerWhiteList.contains(player.getName());
-//    }
-//
-//    public boolean isOnWhiteList(String name) {
-//        return playerWhiteList.contains(name);
-//    }
-//
-//    public void addToWhiteList(EntityPlayer player) {
-//        playerWhiteList.add(player.getName());
-//    }
-//
-//    public void addToWhiteList(String playerName) {
-//        playerWhiteList.add(playerName);
-//    }
-//
-//    public void removeFromWhiteList(EntityPlayer player) {
-//        playerWhiteList.remove(player.getName());
-//    }
-//
-//    public void removeFromWhiteList(String playerName) {
-//        playerWhiteList.remove(playerName);
-//    }
-//
-//    public Set<String> getWhiteList() {
-//        HashSet<String> result = new HashSet<>();
-//        if (world.isRemote) {
-//            Logz.warn("The TileEntityMachine#getWhiteList method should not be called on the client. Please report this to the mod author here: https://github.com/thraaawn/CompactMachines/issues/ Thanks!");
-//            return result;
-//        }
-//
-//        for (String name : playerWhiteList) {
-//            result.add(name);
-//        }
-//
-//        return result;
-//    }
-//
-//    public boolean isLocked() {
-//        return locked;
-//    }
-//
-//    public void toggleLocked() {
-//        this.locked = !this.locked;
-//    }
-//
-//    public void setLocked(boolean state) {
-//        this.locked = state;
-//    }
-//
-//    public boolean hasNewSchema() {
-//        return schema != null && schema.length() > 0;
-//    }
-//
-//    public String getSchemaName() {
-//        return schema;
-//    }
-//
-//    public void setSchema(String schemaName) {
-//        this.schema = schemaName;
-//    }
-//
-//    public String getCustomName() {
-//        return customName;
-//    }
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if(world.isRemote())
+            return super.getCapability(cap, side);
 
+        ServerWorld serverWorld = (ServerWorld) world;
+        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registrations.COMPACT_DIMENSION);
+        if(compactWorld == null)
+            return LazyOptional.empty();
 
+        Set<BlockPos> tunnelPositions = TunnelHelper.getTunnelsForMachineSide(this.machineId, serverWorld, side);
+        if(tunnelPositions.isEmpty())
+            return LazyOptional.empty();
+
+        for(BlockPos possibleTunnel : tunnelPositions) {
+            TunnelWallTile tile = (TunnelWallTile) compactWorld.getTileEntity(possibleTunnel);
+            if(tile == null)
+                continue;
+
+            Optional<TunnelDefinition> tunnel = tile.getTunnelDefinition();
+            if(!tunnel.isPresent())
+                continue;
+
+            TunnelDefinition definition = tunnel.get();
+            if(definition instanceof ICapableTunnel) {
+                LazyOptional<T> capPoss = ((ICapableTunnel) definition).getInternalCapability(compactWorld, possibleTunnel, cap, side);
+                if(capPoss.isPresent())
+                    return capPoss;
+            }
+        }
+
+        return LazyOptional.empty();
+    }
 
     @Nullable
     @Override
@@ -265,10 +204,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     public void tick() {
 
     }
-
-//    public void setCustomName(ITextComponent displayName) {
-//        this.customName = displayName;
-//    }
 
     public Optional<UUID> getOwnerUUID() {
         return Optional.ofNullable(this.owner);
@@ -372,65 +307,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 //        }
 //
 //        ChunkLoadingMachines.unforceChunk(this.coords);
-//    }
-
-//    /*
-//     * Capabilities
-//     */
-//    public RedstoneTunnelData getRedstoneTunnelForSide(EnumFacing side) {
-//        if (!WorldSavedDataMachines.INSTANCE.redstoneTunnels.containsKey(this.coords)) {
-//            return null;
-//        }
-//
-//        return WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords).get(side);
-//    }
-//
-//    @Override
-//    public int getConnectedDimensionId(EnumFacing side) {
-//        return ConfigurationHandler.Settings.dimensionId;
-//    }
-//
-//    @Override
-//    public BlockPos getConnectedBlockPosition(EnumFacing side) {
-//        if (WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.tunnels == null) {
-//            return null;
-//        }
-//
-//        if (!WorldSavedDataMachines.INSTANCE.tunnels.containsKey(this.coords)) {
-//            return null;
-//        }
-//
-//        return WorldSavedDataMachines.INSTANCE.tunnels.get(this.coords).get(side);
-//    }
-//
-//    public BlockPos getMachineWorldInsetPos(EnumFacing facing) {
-//        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
-//        if (tunnelPos == null) {
-//            return null;
-//        }
-//
-//        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
-//        return tunnelPos.offset(insetDirection);
-//    }
-//
-//    public IBlockState getConnectedBlockState(EnumFacing facing) {
-//        BlockPos insetPos = getMachineWorldInsetPos(facing);
-//        if (insetPos == null) {
-//            return null;
-//        }
-//
-//        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-//        return machineWorld.getBlockState(insetPos);
-//    }
-//
-//    public TileEntity getConnectedTileEntity(EnumFacing facing) {
-//        BlockPos insetPos = getMachineWorldInsetPos(facing);
-//        if (insetPos == null) {
-//            return null;
-//        }
-//
-//        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-//        return machineWorld.getTileEntity(insetPos);
 //    }
 //
 //    public boolean isInsideItself() {

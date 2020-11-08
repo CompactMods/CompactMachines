@@ -93,7 +93,7 @@ public class TunnelWallTile extends TileEntity {
         if (!machineInfo.isPresent())
             return Optional.empty();
 
-        Direction outsideDir = getTunnelSide();
+        Direction outsideDir = getConnectedSide();
 
         CompactMachineRegistrationData regData = machineInfo.get();
 
@@ -116,9 +116,22 @@ public class TunnelWallTile extends TileEntity {
         return Optional.empty();
     }
 
+    /**
+     * Gets the side the tunnel is placed on (the wall inside the machine)
+     * @return
+     */
     public Direction getTunnelSide() {
+        BlockState state = getBlockState();
+        return state.get(TunnelWallBlock.TUNNEL_SIDE);
+    }
+
+    /**
+     * Gets the side the tunnel connects to externally (the machine side)
+     * @return
+     */
+    public Direction getConnectedSide() {
         BlockState blockState = getBlockState();
-        return blockState.get(TunnelWallBlock.TUNNEL_SIDE);
+        return blockState.get(TunnelWallBlock.CONNECTED_SIDE);
     }
 
     public Optional<TunnelDefinition> getTunnelDefinition() {
@@ -141,7 +154,7 @@ public class TunnelWallTile extends TileEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        Direction tunnelInDir = getTunnelSide();
+        Direction tunnelInDir = getConnectedSide();
 
         Optional<TunnelDefinition> tunnelDef = getTunnelDefinition();
 
@@ -154,8 +167,7 @@ public class TunnelWallTile extends TileEntity {
         if (definition instanceof ICapableTunnel) {
             if(!world.isRemote()) {
                 ServerWorld sw = (ServerWorld) world;
-                BlockState state = getBlockState();
-                return ((ICapableTunnel) definition).getCapability(sw, state, pos, cap, side);
+                return ((ICapableTunnel) definition).getExternalCapability(sw, pos, cap, side);
             }
         }
 

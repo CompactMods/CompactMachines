@@ -1,21 +1,21 @@
 {
   "variants": {
-    "tunnel_side=down": {
+    "connected_side=down": {
       "model": "compactmachines:tunnels/down"
     },
-    "tunnel_side=up": {
+    "connected_side=up": {
       "model": "compactmachines:tunnels/up"
     },
-    "tunnel_side=north": {
+    "connected_side=north": {
       "model": "compactmachines:tunnels/north"
     },
-    "tunnel_side=south": {
+    "connected_side=south": {
       "model": "compactmachines:tunnels/south"
     },
-    "tunnel_side=west": {
+    "connected_side=west": {
       "model": "compactmachines:tunnels/west"
     },
-    "tunnel_side=east": {
+    "connected_side=east": {
       "model": "compactmachines:tunnels/east"
     }
   }

@@ -31,7 +31,7 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
 
             getVariantBuilder(block)
                     .partialState()
-                    .with(TunnelWallBlock.TUNNEL_SIDE, dir)
+                    .with(TunnelWallBlock.CONNECTED_SIDE, dir)
                     .setModels(
                             ConfiguredModel.builder()
                                     .modelFile(models().getExistingFile(modLoc(typedTunnelDirectional)))

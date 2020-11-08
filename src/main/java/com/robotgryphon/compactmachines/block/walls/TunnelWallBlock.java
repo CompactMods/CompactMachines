@@ -40,11 +40,14 @@ import java.util.Optional;
 
 public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
+    public static DirectionProperty CONNECTED_SIDE = DirectionProperty.create("connected_side", Direction.values());
+
     public static BooleanProperty REDSTONE = BooleanProperty.create("redstone");
 
     public TunnelWallBlock(Properties props) {
         super(props);
         setDefaultState(getStateContainer().getBaseState()
+                .with(CONNECTED_SIDE, Direction.UP)
                 .with(TUNNEL_SIDE, Direction.UP)
                 .with(REDSTONE, false)
         );
@@ -135,17 +138,17 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 //                        player.sendStatusMessage(t, true);
         } else {
             // Rotate tunnel
-            Direction dir = state.get(TUNNEL_SIDE);
+            Direction dir = state.get(CONNECTED_SIDE);
             Direction nextDir = TunnelHelper.getNextDirection(dir);
 
-            worldIn.setBlockState(pos, state.with(TUNNEL_SIDE, nextDir));
+            worldIn.setBlockState(pos, state.with(CONNECTED_SIDE, nextDir));
         }
         return ActionResultType.SUCCESS;
     }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(TUNNEL_SIDE).add(REDSTONE);
+        builder.add(TUNNEL_SIDE).add(CONNECTED_SIDE).add(REDSTONE);
         super.fillStateContainer(builder);
     }
 
@@ -162,7 +165,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData hitData) {
-        Direction side = blockState.get(TUNNEL_SIDE);
+        Direction side = blockState.get(CONNECTED_SIDE);
         ILayoutStyle center = info.defaultLayoutStyle()
                 .alignment(ElementAlignment.ALIGN_CENTER);
 
