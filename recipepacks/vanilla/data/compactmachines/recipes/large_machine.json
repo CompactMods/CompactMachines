@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "result": {
+    "item": "compactmachines:machine_large",
+    "count": 1
+  },
+  "pattern": [
+    "www",
+    "wow",
+    "www"
+  ],
+  "key": {
+    "w": {
+      "item": "compactmachines:wall"
+    },
+    "o": {
+      "item": "minecraft:obsidian"
+    }
+  }
+}
