@@ -2,7 +2,6 @@ package com.robotgryphon.compactmachines.tunnels.definitions;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
@@ -14,11 +13,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.server.ServerWorld;
 
+import java.awt.*;
 import java.util.Optional;
 
 public class RedstoneTunnelDefinition extends TunnelDefinition implements IRedstoneTunnel {
-    public RedstoneTunnelDefinition(EnumTunnelType type, Item item) {
-        super(type, item);
+    public RedstoneTunnelDefinition(Item item) {
+        super(item);
+    }
+
+    @Override
+    public int getTunnelRingColor() {
+        return new Color(167, 38, 38).getRGB();
+    }
+
+    @Override
+    public int getTunnelIndicatorColor() {
+        return Color.ORANGE.darker().getRGB();
     }
 
     @Override

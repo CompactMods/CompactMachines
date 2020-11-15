@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.item.tunnels;
 
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
+import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,7 @@ public class RedstoneInTunnelItem extends TunnelItem {
     }
 
     @Override
-    public TunnelRegistration getDefinition() {
+    public TunnelDefinition getDefinition() {
         return Registrations.REDSTONE_IN_TUNNEL.get();
     }
 

@@ -1,14 +1,17 @@
 package com.robotgryphon.compactmachines.tunnels;
 
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import net.minecraft.item.Item;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class TunnelDefinition {
-    public EnumTunnelType type;
-    public Item item;
+public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefinition> {
+    protected Item item;
 
-    public TunnelDefinition(EnumTunnelType type, Item item) {
-        this.type = type;
+    /**
+     * The color of a non-indicator (the same color as the wall)
+     */
+    public static final int NO_INDICATOR_COLOR = 3751749;
+
+    public TunnelDefinition(Item item) {
         this.item = item;
     }
 
@@ -16,4 +19,12 @@ public class TunnelDefinition {
         return this.item;
     }
 
+    public abstract int getTunnelRingColor();
+
+    /**
+     * Gets the color for the indicator at the top-right of the block texture.
+     *
+     * @return
+     */
+    public abstract int getTunnelIndicatorColor();
 }

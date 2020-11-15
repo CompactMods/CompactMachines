@@ -22,5 +22,9 @@ public class NetworkHandler {
         MAIN_CHANNEL.registerMessage(index++, MachinePlayersChangedPacket.class,
                 MachinePlayersChangedPacket::encode, MachinePlayersChangedPacket::decode,
                 MachinePlayersChangedPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
+        MAIN_CHANNEL.registerMessage(index++, TunnelAddedPacket.class,
+                TunnelAddedPacket::encode, TunnelAddedPacket::decode,
+                TunnelAddedPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }

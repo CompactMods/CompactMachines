@@ -7,6 +7,7 @@ import com.robotgryphon.compactmachines.core.Registrations;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -27,6 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -37,12 +39,8 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Set;
 
-//import org.dave.compactmachines.tile.TileEntityMachine;
-//import org.dave.compactmachines.tile.TileEntityRedstoneTunnel;
-//import org.dave.compactmachines.tile.TileEntityTunnel;
-
-// TODO TOP Integration
 public class BlockCompactMachine extends Block implements IProbeInfoAccessor {
 
     private final EnumMachineSize size;
@@ -318,7 +316,7 @@ public class BlockCompactMachine extends Block implements IProbeInfoAccessor {
 
                 // Owner Name
                 PlayerEntity player = world.getPlayerByUuid(md.getOwner());
-                if(player != null) {
+                if (player != null) {
                     GameProfile ownerProfile = player.getGameProfile();
                     IFormattableTextComponent ownerText = new TranslationTextComponent(
                             String.format("tooltip.%s.owner", CompactMachines.MODID), ownerProfile.getName()
@@ -326,6 +324,13 @@ public class BlockCompactMachine extends Block implements IProbeInfoAccessor {
 
                     info.text(ownerText);
                 }
+
+                Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(md.getId(), (ServerWorld) world, data.getSideHit());
+                IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
+
+                tunnelsForMachineSide.forEach(pos -> {
+                    vertical.text(new StringTextComponent(pos.toString()));
+                });
 
                 // TODO: Connected block info (inside)
                 // TunnelHelper.getConnectedState(world, te, EnumTunnelSide.INSIDE);

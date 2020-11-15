@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "compactmachines:block/tunnels/redstone_in/redstone_in_down"
-  }
-}

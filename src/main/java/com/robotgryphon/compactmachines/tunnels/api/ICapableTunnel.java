@@ -1,6 +1,5 @@
 package com.robotgryphon.compactmachines.tunnels.api;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
@@ -15,5 +14,8 @@ import javax.annotation.Nonnull;
 public interface ICapableTunnel {
 
     @Nonnull
-    <T> LazyOptional<T> getCapability(ServerWorld world, BlockState state, BlockPos pos, @Nonnull Capability<T> cap, Direction side);
+    <T> LazyOptional<T> getInternalCapability(ServerWorld compactWorld, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
+
+    @Nonnull
+    <T> LazyOptional<T> getExternalCapability(ServerWorld world, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
 }

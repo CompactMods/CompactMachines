@@ -4,7 +4,6 @@ package com.robotgryphon.compactmachines.datagen;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.reference.EnumTunnelType;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.util.Direction;
@@ -21,28 +20,24 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
     protected void registerStatesAndModels() {
         Block block = Registrations.BLOCK_TUNNEL_WALL.get();
 
+        for (Direction dir : Direction.values()) {
 
-        for (EnumTunnelType type : EnumTunnelType.values()) {
+            String typedTunnelDirectional = "tunnels/" + dir.getString();
+            models().cubeAll(typedTunnelDirectional, modLoc("block/" + typedTunnelDirectional));
 
-            for (Direction dir : Direction.values()) {
+            // If we ever do one-side has the texture again
+            // int x = dir == Direction.DOWN ? 180 : dir.getAxis().isHorizontal() ? 90 : 0;
+            // int y = dir.getAxis().isVertical() ? 0 : (((int) dir.getHorizontalAngle()) + 180) % 360;
 
-                String typedTunnelDirectional = "tunnels/" + type.getString() + "/" + type.getString() + "_" + dir.getString();
-                models().cubeAll(typedTunnelDirectional, modLoc("block/" + typedTunnelDirectional));
+            getVariantBuilder(block)
+                    .partialState()
+                    .with(TunnelWallBlock.CONNECTED_SIDE, dir)
+                    .setModels(
+                            ConfiguredModel.builder()
+                                    .modelFile(models().getExistingFile(modLoc(typedTunnelDirectional)))
+                                    .build()
+                    );
 
-                // If we ever do one-side has the texture again
-                // int x = dir == Direction.DOWN ? 180 : dir.getAxis().isHorizontal() ? 90 : 0;
-                // int y = dir.getAxis().isVertical() ? 0 : (((int) dir.getHorizontalAngle()) + 180) % 360;
-
-                getVariantBuilder(block)
-                        .partialState()
-                        .with(TunnelWallBlock.TUNNEL_SIDE, dir)
-                        .with(TunnelWallBlock.TUNNEL_TYPE, type)
-                        .setModels(
-                                ConfiguredModel.builder()
-                                        .modelFile(models().getExistingFile(modLoc(typedTunnelDirectional)))
-                                        .build()
-                        );
-            }
         }
     }
 }

@@ -1,14 +1,17 @@
 package com.robotgryphon.compactmachines.item.tunnels;
 
+import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registrations;
-import com.robotgryphon.compactmachines.tunnels.TunnelRegistration;
+import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -17,13 +20,14 @@ import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public abstract class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
         super(properties);
     }
 
-    public abstract TunnelRegistration getDefinition();
+    public abstract TunnelDefinition getDefinition();
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
@@ -42,13 +46,24 @@ public abstract class TunnelItem extends Item {
             Item i = is.getItem();
 
             TunnelItem ti = ((TunnelItem) i);
-            TunnelRegistration definition = ti.getDefinition();
+            TunnelDefinition definition = ti.getDefinition();
 
-            BlockState defaultSolidItem = Registrations.BLOCK_TUNNEL_WALL.get()
+            BlockState tunnelState = Registrations.BLOCK_TUNNEL_WALL.get()
                     .getDefaultState()
-                    .with(TunnelWallBlock.TUNNEL_TYPE, definition.getType());
+                    .with(TunnelWallBlock.TUNNEL_SIDE, context.getFace());
 
-            w.setBlockState(pos, defaultSolidItem);
+            // Redstone Support
+            boolean redstone = (definition instanceof IRedstoneTunnel);
+            tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
+            w.setBlockState(pos, tunnelState, 3);
+
+            // Get the server and add a deferred task - allows the tile to be created on the client first
+            MinecraftServer server = ((ServerWorld) context.getWorld()).getServer();
+            server.deferTask(() -> {
+                TunnelWallTile tile = (TunnelWallTile) context.getWorld().getTileEntity(context.getPos());
+                tile.setTunnelType(definition.getRegistryName());
+            });
+
             is.shrink(1);
             return ActionResultType.CONSUME;
         }
@@ -58,6 +73,7 @@ public abstract class TunnelItem extends Item {
 
     /**
      * Implementation for easily swapping a tunnel type for another.
+     *
      * @param type
      * @param player
      * @param hand
