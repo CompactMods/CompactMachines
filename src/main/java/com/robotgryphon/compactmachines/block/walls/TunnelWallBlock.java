@@ -11,7 +11,6 @@ import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -192,7 +191,11 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
 
         });
 
-        String sideTranslated = I18n.format(CompactMachines.MODID.concat(".direction.").concat(side.getName2()));
+        String sideTranslated = IProbeInfo.STARTLOC
+                .concat(CompactMachines.MODID + ".direction.")
+                .concat(side.getName2())
+                .concat(IProbeInfo.ENDLOC);
+
         v
                 .horizontal(center)
                 .item(new ItemStack(Items.COMPASS))
@@ -209,7 +212,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeInfoAccessor {
             try {
                 // If connected block isn't air, show a connected block line
                 if (!state.isAir(connectedWorld, outPosBlock)) {
-                    String blockName = state.getBlock().getTranslatedName().getString();
+                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getTranslationKey() + IProbeInfo.ENDLOC;
                     RayTraceResult trace = new BlockRayTraceResult(
                             hitData.getHitVec(), hitData.getSideHit(),
                             outPosBlock, false);
