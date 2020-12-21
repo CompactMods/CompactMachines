@@ -20,8 +20,8 @@ public class DataGeneration {
     }
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
-
         generator.addProvider(new BlockLootGenerator(generator));
+        generator.addProvider(new RecipeGenerator(generator));
     }
 
     private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
