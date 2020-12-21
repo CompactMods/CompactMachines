@@ -23,7 +23,7 @@ import net.minecraft.world.server.ServerWorld;
 import java.util.Optional;
 import java.util.Set;
 
-public class CompactMachineProbeInfoProvider {
+public class CompactMachineProvider {
 
     public static void exec(IProbeData data, PlayerEntity player, World world, BlockState state) {
         ProbeMode mode = data.getMode();

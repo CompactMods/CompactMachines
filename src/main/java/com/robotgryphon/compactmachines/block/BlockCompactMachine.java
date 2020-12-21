@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.block;
 
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
-import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProbeInfoProvider;
+import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.core.Registrations;
@@ -289,7 +289,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
     @Override
     public void addProbeData(IProbeData data, PlayerEntity player, World world, BlockState state) {
-        CompactMachineProbeInfoProvider.exec(data, player, world, state);
+        CompactMachineProvider.exec(data, player, world, state);
     }
 
     // 1.12.1 code
