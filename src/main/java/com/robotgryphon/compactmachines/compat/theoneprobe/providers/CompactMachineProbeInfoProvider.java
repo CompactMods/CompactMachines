@@ -1,8 +1,9 @@
-package com.robotgryphon.compactmachines.compat.theoneprobe;
+package com.robotgryphon.compactmachines.compat.theoneprobe.providers;
 
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import mcjty.theoneprobe.api.IProbeHitData;

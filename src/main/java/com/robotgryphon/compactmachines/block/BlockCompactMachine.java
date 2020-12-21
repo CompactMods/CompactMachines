@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.block;
 
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
-import com.robotgryphon.compactmachines.compat.theoneprobe.CompactMachineProbeInfoProvider;
+import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProbeInfoProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.core.Registrations;
