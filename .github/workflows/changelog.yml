@@ -11,8 +11,6 @@ jobs:
   generate:
     name: Generate Changelog
     runs-on: ubuntu-latest
-    outputs: 
-      changelog: ${{steps.getchangelog.outputs.changelog}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -20,15 +18,14 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --unshallow
         
-      - name: Find Last Tag
-        id: last
-        uses: jimschubert/query-tag-action@v1
-        with:
-          include: 'v*'
-          exclude: '*-rc*'
-          commit-ish: 'HEAD~'
-          skip-unshallow: 'true'
-          
+#       - name: Find Last Tag
+#         id: last
+#         uses: jimschubert/query-tag-action@v1
+#         with:
+#           include: 'v*'
+#           exclude: '*-rc*'
+#           commit-ish: 'HEAD~'
+#           skip-unshallow: 'true'
       - name: Find Current Tag
         id: current
         uses: jimschubert/query-tag-action@v1
@@ -37,7 +34,14 @@ jobs:
           exclude: '*-rc*'
           commit-ish: '@'
           skip-unshallow: 'true'
-        
+          
+      - name: Previous Tag
+        id: last
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: ${{steps.current.outputs.tag}}
+          skip-unshallow: 'true'
 
       - name: Generate changelog
         uses: jimschubert/beast-changelog-action@v1
@@ -60,4 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [generate]
     steps:
-      - run: echo ${{needs.generate.outputs.changelog}}
+      - run: cat .github/CHANGELOG.md
+        
+      # {needs.generate.outputs.changelog}}
