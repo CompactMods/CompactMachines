@@ -11,6 +11,9 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - name: Generate changelog
         uses: heinrichreimer/action-github-changelog-generator@v2.2
         with:
