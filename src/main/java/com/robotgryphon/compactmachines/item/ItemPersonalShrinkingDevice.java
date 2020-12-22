@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.CompactMachines;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.client.gui.screen.Screen;
@@ -41,11 +41,11 @@ public class ItemPersonalShrinkingDevice extends Item {
 
         if (Screen.hasShiftDown()) {
             tooltip.add(
-                    new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".psd.hint")
+                    new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".psd.hint")
                             .mergeStyle(TextFormatting.YELLOW));
         } else {
             tooltip.add(
-                    new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
+                    new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".hold_shift.hint")
                             .mergeStyle(TextFormatting.GRAY));
         }
 
@@ -67,7 +67,7 @@ public class ItemPersonalShrinkingDevice extends Item {
         if (world instanceof ServerWorld && player instanceof ServerPlayerEntity) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            if (serverPlayer.world.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
+            if (serverPlayer.world.getDimensionKey() == Registration.COMPACT_DIMENSION) {
                     ServerWorld serverWorld = serverPlayer.getServerWorld();
                 if (player.isSneaking()) {
                     CompactMachineUtil.setMachineSpawn(serverWorld.getServer(), player.getPosition());

@@ -39,17 +39,17 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 import java.util.function.Supplier;
 
-import static com.robotgryphon.compactmachines.CompactMachines.MODID;
+import static com.robotgryphon.compactmachines.CompactMachines.MOD_ID;
 
-@Mod.EventBusSubscriber(modid = MODID)
-public class Registrations {
+@Mod.EventBusSubscriber(modid = MOD_ID)
+public class Registration {
     // ================================================================================================================
     //   REGISTRIES
     // ================================================================================================================
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
-    public static final DeferredRegister<TunnelDefinition> TUNNEL_TYPES = DeferredRegister.create(TunnelDefinition.class, MODID);
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MOD_ID);
+    public static final DeferredRegister<TunnelDefinition> TUNNEL_TYPES = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
 
     // ================================================================================================================
     //   PROPERTIES

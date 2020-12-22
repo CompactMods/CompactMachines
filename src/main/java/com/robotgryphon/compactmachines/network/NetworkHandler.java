@@ -12,7 +12,7 @@ public class NetworkHandler {
     private static int index = 0;
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel MAIN_CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CompactMachines.MODID, "main"),
+            new ResourceLocation(CompactMachines.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

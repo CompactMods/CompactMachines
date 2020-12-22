@@ -13,7 +13,7 @@ public class TheOneProbeProvider implements IProbeInfoProvider {
 
     @Override
     public String getID() {
-        return CompactMachines.MODID;
+        return CompactMachines.MOD_ID;
     }
 
     @Override

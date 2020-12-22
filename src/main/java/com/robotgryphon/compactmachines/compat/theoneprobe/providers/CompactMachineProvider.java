@@ -42,7 +42,7 @@ public class CompactMachineProvider {
             machineData.ifPresent(md -> {
 
                 IFormattableTextComponent id = new TranslationTextComponent(
-                        String.format("tooltip.%s.machine_id", CompactMachines.MODID),
+                        String.format("tooltip.%s.machine_id", CompactMachines.MOD_ID),
                         md.getId()
                 ).mergeStyle(TextFormatting.GREEN);
                 info.text(id);
@@ -52,7 +52,7 @@ public class CompactMachineProvider {
                 if (owner != null) {
                     GameProfile ownerProfile = owner.getGameProfile();
                     IFormattableTextComponent ownerText = new TranslationTextComponent(
-                            String.format("tooltip.%s.owner", CompactMachines.MODID), ownerProfile.getName()
+                            String.format("tooltip.%s.owner", CompactMachines.MOD_ID), ownerProfile.getName()
                     ).mergeStyle(TextFormatting.GRAY);
 
                     info.text(ownerText);

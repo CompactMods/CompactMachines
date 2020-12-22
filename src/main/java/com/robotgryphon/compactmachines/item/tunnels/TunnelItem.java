@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.item.tunnels;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
 import net.minecraft.block.BlockState;
@@ -38,7 +38,7 @@ public abstract class TunnelItem extends Item {
         BlockPos pos = context.getPos();
         BlockState blockState = w.getBlockState(pos);
 
-        if (blockState.getBlock() != Registrations.BLOCK_SOLID_WALL.get())
+        if (blockState.getBlock() != Registration.BLOCK_SOLID_WALL.get())
             return ActionResultType.FAIL;
 
         if (context.getPlayer() instanceof ServerPlayerEntity) {
@@ -48,7 +48,7 @@ public abstract class TunnelItem extends Item {
             TunnelItem ti = ((TunnelItem) i);
             TunnelDefinition definition = ti.getDefinition();
 
-            BlockState tunnelState = Registrations.BLOCK_TUNNEL_WALL.get()
+            BlockState tunnelState = Registration.BLOCK_TUNNEL_WALL.get()
                     .getDefaultState()
                     .with(TunnelWallBlock.TUNNEL_SIDE, context.getFace());
 

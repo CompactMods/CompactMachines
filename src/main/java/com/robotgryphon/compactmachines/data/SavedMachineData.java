@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.data;
 
 import com.robotgryphon.compactmachines.CompactMachines;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
  */
 public class SavedMachineData extends WorldSavedData {
 
-    public final static String DATA_NAME = CompactMachines.MODID + "_machines";
+    public final static String DATA_NAME = CompactMachines.MOD_ID + "_machines";
     private static CompactMachineServerData SERVER_DATA;
 
     public SavedMachineData() {
@@ -25,7 +25,7 @@ public class SavedMachineData extends WorldSavedData {
 
     @Nonnull
     public static SavedMachineData getMachineData(MinecraftServer server) {
-        ServerWorld compactWorld = server.getWorld(Registrations.COMPACT_DIMENSION);
+        ServerWorld compactWorld = server.getWorld(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
         {
             CompactMachines.LOGGER.error("No compact dimension found. Falling back to overworld.");

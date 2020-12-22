@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.datagen;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
@@ -41,15 +41,15 @@ public class BlockLootGenerator extends LootTableProvider {
     private static class Blocks extends BlockLootTables {
         @Override
         protected void addTables() {
-            registerSelfDroppedBlock(Registrations.BLOCK_BREAKABLE_WALL, Registrations.ITEM_BREAKABLE_WALL);
+            registerSelfDroppedBlock(Registration.BLOCK_BREAKABLE_WALL, Registration.ITEM_BREAKABLE_WALL);
 
             // Compact Machines
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_TINY, Registrations.MACHINE_BLOCK_ITEM_TINY);
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_SMALL, Registrations.MACHINE_BLOCK_ITEM_SMALL);
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_NORMAL, Registrations.MACHINE_BLOCK_ITEM_NORMAL);
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_LARGE, Registrations.MACHINE_BLOCK_ITEM_LARGE);
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_GIANT, Registrations.MACHINE_BLOCK_ITEM_GIANT);
-            registerCompactMachineBlockDrops(Registrations.MACHINE_BLOCK_MAXIMUM, Registrations.MACHINE_BLOCK_ITEM_MAXIMUM);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_TINY, Registration.MACHINE_BLOCK_ITEM_TINY);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_SMALL, Registration.MACHINE_BLOCK_ITEM_SMALL);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_NORMAL, Registration.MACHINE_BLOCK_ITEM_NORMAL);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_LARGE, Registration.MACHINE_BLOCK_ITEM_LARGE);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_GIANT, Registration.MACHINE_BLOCK_ITEM_GIANT);
+            registerCompactMachineBlockDrops(Registration.MACHINE_BLOCK_MAXIMUM, Registration.MACHINE_BLOCK_ITEM_MAXIMUM);
         }
 
         private LootPool.Builder registerSelfDroppedBlock(RegistryObject<Block> block, RegistryObject<Item> item) {
@@ -94,15 +94,15 @@ public class BlockLootGenerator extends LootTableProvider {
         protected Iterable<Block> getKnownBlocks() {
             return ImmutableList.of(
                     // Breakable Walls
-                    Registrations.BLOCK_BREAKABLE_WALL.get(),
+                    Registration.BLOCK_BREAKABLE_WALL.get(),
 
                     // Compact Machines
-                    Registrations.MACHINE_BLOCK_TINY.get(),
-                    Registrations.MACHINE_BLOCK_SMALL.get(),
-                    Registrations.MACHINE_BLOCK_NORMAL.get(),
-                    Registrations.MACHINE_BLOCK_LARGE.get(),
-                    Registrations.MACHINE_BLOCK_GIANT.get(),
-                    Registrations.MACHINE_BLOCK_MAXIMUM.get()
+                    Registration.MACHINE_BLOCK_TINY.get(),
+                    Registration.MACHINE_BLOCK_SMALL.get(),
+                    Registration.MACHINE_BLOCK_NORMAL.get(),
+                    Registration.MACHINE_BLOCK_LARGE.get(),
+                    Registration.MACHINE_BLOCK_GIANT.get(),
+                    Registration.MACHINE_BLOCK_MAXIMUM.get()
                 );
         }
     }

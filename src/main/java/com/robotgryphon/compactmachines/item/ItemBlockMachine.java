@@ -61,9 +61,9 @@ public class ItemBlockMachine extends BlockItem {
 
             IFormattableTextComponent player = playerProfile
                     .map(p -> (IFormattableTextComponent) new StringTextComponent(p.getName()))
-                    .orElseGet(() -> new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".unknown_player"));
+                    .orElseGet(() -> new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".unknown_player"));
 
-            IFormattableTextComponent ownerText = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".owner")
+            IFormattableTextComponent ownerText = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".owner")
                     .append(player);
 
             tooltip.add(ownerText);
@@ -77,13 +77,13 @@ public class ItemBlockMachine extends BlockItem {
                 EnumMachineSize size = ((BlockCompactMachine) b).getSize();
                 int internalSize = size.getInternalSize();
 
-                IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".machine.size", internalSize)
+                IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".machine.size", internalSize)
                         .mergeStyle(TextFormatting.YELLOW);
 
                 tooltip.add(text);
             }
         } else {
-            IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MODID + ".hold_shift.hint")
+            IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".hold_shift.hint")
                     .mergeStyle(TextFormatting.GRAY);
 
             tooltip.add(text);

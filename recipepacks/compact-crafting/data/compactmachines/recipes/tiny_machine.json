@@ -3,19 +3,15 @@
   "recipeSize": 3,
   "layers": [
     {
-      "type": "filled",
+      "type": "compactcrafting:filled",
       "component": "W"
     },
     {
-      "type": "mixed",
-      "pattern": [
-        ["W", "W", "W"],
-        ["W", "-", "W"],
-        ["W", "W", "W"]
-      ]
+      "type": "compactcrafting:hollow",
+      "wall": "W"
     },
     {
-      "type": "filled",
+      "type": "compactcrafting:filled",
       "component": "W"
     }
   ],
