@@ -41,6 +41,7 @@ jobs:
         uses: jimschubert/beast-changelog-action@v1
         with:
           GITHUB_TOKEN: ${{github.token}}
+          CONFIG_LOCATION: .github/changelog.json
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
