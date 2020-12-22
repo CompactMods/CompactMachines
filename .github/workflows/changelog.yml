@@ -1,0 +1,17 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on: workflow_dispatch
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  - name: Generate changelog
+    # You may pin to the exact commit or the version.
+    # uses: heinrichreimer/action-github-changelog-generator@854576bb5274851427527d8199fba0061552dff5
+    uses: heinrichreimer/action-github-changelog-generator@v2.2
+    with:
+      output: CHANGELOG
+      onlyLastTag: true
