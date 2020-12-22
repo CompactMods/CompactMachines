@@ -11,11 +11,40 @@ jobs:
   generate:
     name: Generate Changelog
     runs-on: ubuntu-latest
-    steps:        
-      - name: Generate changelog
-        uses: heinrichreimer/action-github-changelog-generator@v2.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+        
+      - name: Find Last Tag
+        id: last
+        uses: jimschubert/query-tag-action@v1
         with:
-          repo: robotgryphon/compact-machines
-          token: ${{ secrets.GITHUB_TOKEN }}
-          output: CHANGELOG
-          onlyLastTag: true
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: 'HEAD~'
+          skip-unshallow: 'true'
+          
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+        
+
+      - name: Generate changelog
+        uses: jimschubert/beast-changelog-action@v1
+        with:
+          GITHUB_TOKEN: ${{github.token}}
+          FROM: ${{steps.last.outputs.tag}}
+          TO: ${{steps.current.outputs.tag}}
+          OUTPUT: .github/CHANGELOG.md
+          
+      - name: View Changelog
+        run: cat .github/CHANGELOG.md
+        
