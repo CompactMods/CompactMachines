@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.tunnels;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
@@ -50,7 +50,7 @@ public class TunnelHelper {
 
     @Nonnull
     public static Optional<TunnelDefinition> getTunnelDefinitionFromType(ResourceLocation id) {
-        Optional<RegistryObject<TunnelDefinition>> first = Registrations.TUNNEL_TYPES.getEntries()
+        Optional<RegistryObject<TunnelDefinition>> first = Registration.TUNNEL_TYPES.getEntries()
                 .stream()
                 .filter(t -> t.get().getRegistryName() == id)
                 .findFirst();
@@ -61,7 +61,7 @@ public class TunnelHelper {
 
     public static Set<BlockPos> getTunnelsForMachineSide(int machine, ServerWorld world, Direction machineSide) {
 
-        ServerWorld compactWorld = world.getServer().getWorld(Registrations.COMPACT_DIMENSION);
+        ServerWorld compactWorld = world.getServer().getWorld(Registration.COMPACT_DIMENSION);
 
         Set<BlockPos> tunnelPositions = new HashSet<>();
 
@@ -110,7 +110,7 @@ public class TunnelHelper {
                 return tunnel.getConnectedPosition();
 
             case INSIDE:
-                RegistryKey<World> world = Registrations.COMPACT_DIMENSION;
+                RegistryKey<World> world = Registration.COMPACT_DIMENSION;
                 BlockPos offsetInside = tunnel.getPos().offset(tunnel.getTunnelSide());
 
                 DimensionalPosition pos = new DimensionalPosition(world, offsetInside);

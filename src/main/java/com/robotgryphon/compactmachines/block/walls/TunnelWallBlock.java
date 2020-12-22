@@ -4,7 +4,7 @@ import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.TunnelProvider;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
@@ -112,7 +112,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             if (!tunnelDef.isPresent())
                 return ActionResultType.FAIL;
 
-            BlockState solidWall = Registrations.BLOCK_SOLID_WALL.get().getDefaultState();
+            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().getDefaultState();
 
             worldIn.setBlockState(pos, solidWall);
 

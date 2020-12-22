@@ -4,7 +4,7 @@ import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
@@ -274,7 +274,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
             if (mainItem.isEmpty())
                 return ActionResultType.PASS;
 
-            if (mainItem.getItem() == Registrations.PERSONAL_SHRINKING_DEVICE.get()) {
+            if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
                 // Try teleport to compact machine dimension
                 CompactMachineUtil.teleportInto(serverPlayer, pos, size);
             }

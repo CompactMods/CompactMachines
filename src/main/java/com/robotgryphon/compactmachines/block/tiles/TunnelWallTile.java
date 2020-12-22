@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
@@ -32,7 +32,7 @@ public class TunnelWallTile extends TileEntity {
     private ResourceLocation tunnelType;
 
     public TunnelWallTile() {
-        super(Registrations.TUNNEL_WALL_TILE.get());
+        super(Registration.TUNNEL_WALL_TILE.get());
     }
 
     public Optional<CompactMachineRegistrationData> getMachineInfo() {

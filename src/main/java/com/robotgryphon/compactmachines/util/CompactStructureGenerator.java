@@ -1,6 +1,6 @@
 package com.robotgryphon.compactmachines.util;
 
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -22,7 +22,7 @@ public class CompactStructureGenerator {
     public static void generateCompactWall(IWorld world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
         int s = size.getInternalSize() / 2;
 
-        BlockState unbreakableWall = Registrations.BLOCK_SOLID_WALL.get().getDefaultState();
+        BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().getDefaultState();
 
         BlockPos start = BlockPos.ZERO;
         AxisAlignedBB wallBounds;

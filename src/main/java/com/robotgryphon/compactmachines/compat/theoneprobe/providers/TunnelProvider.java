@@ -64,14 +64,14 @@ public class TunnelProvider {
         });
 
         String sideTranslated = IProbeInfo.STARTLOC
-                .concat(CompactMachines.MODID + ".direction.")
+                .concat(CompactMachines.MOD_ID + ".direction.")
                 .concat(side.getName2())
                 .concat(IProbeInfo.ENDLOC);
 
         v
                 .horizontal(center)
                 .item(new ItemStack(Items.COMPASS))
-                .text(new TranslationTextComponent(CompactMachines.MODID + ".direction.side", sideTranslated));
+                .text(new TranslationTextComponent(CompactMachines.MOD_ID + ".direction.side", sideTranslated));
 
         connected.ifPresent(state -> {
             if (!outside.isPresent())
@@ -96,7 +96,7 @@ public class TunnelProvider {
                     v
                             .horizontal(center)
                             .item(pick)
-                            .text(new TranslationTextComponent(CompactMachines.MODID.concat(".connected_block"), blockName));
+                            .text(new TranslationTextComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
                 }
             } catch (Exception ex) {
                 // no-op: we don't want to spam the log here

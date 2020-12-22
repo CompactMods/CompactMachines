@@ -1,6 +1,6 @@
 package com.robotgryphon.compactmachines.item.tunnels;
 
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -17,12 +17,12 @@ public class RedstoneOutTunnelItem extends TunnelItem {
 
     @Override
     public TunnelDefinition getDefinition() {
-        return Registrations.REDSTONE_OUT_TUNNEL.get();
+        return Registration.REDSTONE_OUT_TUNNEL.get();
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        Item redstoneIn = Registrations.ITEM_REDSTONEIN_TUNNEL.get();
+        Item redstoneIn = Registration.ITEM_REDSTONEIN_TUNNEL.get();
         return super.swapTunnelType(redstoneIn, playerIn, handIn);
     }
 }

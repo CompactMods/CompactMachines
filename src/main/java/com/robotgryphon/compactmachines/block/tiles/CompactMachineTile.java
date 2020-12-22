@@ -1,6 +1,6 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineCommonData;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
@@ -44,7 +44,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     protected Set<String> playerWhiteList;
 
     public CompactMachineTile() {
-        super(Registrations.MACHINE_TILE_ENTITY.get());
+        super(Registration.MACHINE_TILE_ENTITY.get());
 
         playerWhiteList = new HashSet<>();
     }
@@ -119,7 +119,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
             return super.getCapability(cap, side);
 
         ServerWorld serverWorld = (ServerWorld) world;
-        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registrations.COMPACT_DIMENSION);
+        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registration.COMPACT_DIMENSION);
         if(compactWorld == null)
             return LazyOptional.empty();
 

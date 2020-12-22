@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.util;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.SavedMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
@@ -30,15 +30,15 @@ public abstract class CompactMachineUtil {
         ServerWorld serverWorld = serverPlayer.getServerWorld();
 
         MinecraftServer serv = serverWorld.getServer();
-        if (serverWorld.getDimensionKey() == Registrations.COMPACT_DIMENSION) {
-            IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MODID + ".cannot_enter")
+        if (serverWorld.getDimensionKey() == Registration.COMPACT_DIMENSION) {
+            IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MOD_ID + ".cannot_enter")
                     .mergeStyle(TextFormatting.RED);
 
             serverPlayer.sendStatusMessage(msg, true);
             return;
         }
 
-        ServerWorld compactWorld = serv.getWorld(Registrations.COMPACT_DIMENSION);
+        ServerWorld compactWorld = serv.getWorld(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
             return;
 
@@ -122,49 +122,49 @@ public abstract class CompactMachineUtil {
     public static Block getMachineBlockBySize(EnumMachineSize size) {
         switch (size) {
             case TINY:
-                return Registrations.MACHINE_BLOCK_TINY.get();
+                return Registration.MACHINE_BLOCK_TINY.get();
 
             case SMALL:
-                return Registrations.MACHINE_BLOCK_SMALL.get();
+                return Registration.MACHINE_BLOCK_SMALL.get();
 
             case NORMAL:
-                return Registrations.MACHINE_BLOCK_NORMAL.get();
+                return Registration.MACHINE_BLOCK_NORMAL.get();
 
             case LARGE:
-                return Registrations.MACHINE_BLOCK_LARGE.get();
+                return Registration.MACHINE_BLOCK_LARGE.get();
 
             case GIANT:
-                return Registrations.MACHINE_BLOCK_GIANT.get();
+                return Registration.MACHINE_BLOCK_GIANT.get();
 
             case MAXIMUM:
-                return Registrations.MACHINE_BLOCK_MAXIMUM.get();
+                return Registration.MACHINE_BLOCK_MAXIMUM.get();
         }
 
-        return Registrations.MACHINE_BLOCK_NORMAL.get();
+        return Registration.MACHINE_BLOCK_NORMAL.get();
     }
 
     public static Item getMachineBlockItemBySize(EnumMachineSize size) {
         switch (size) {
             case TINY:
-                return Registrations.MACHINE_BLOCK_ITEM_TINY.get();
+                return Registration.MACHINE_BLOCK_ITEM_TINY.get();
 
             case SMALL:
-                return Registrations.MACHINE_BLOCK_ITEM_SMALL.get();
+                return Registration.MACHINE_BLOCK_ITEM_SMALL.get();
 
             case NORMAL:
-                return Registrations.MACHINE_BLOCK_ITEM_NORMAL.get();
+                return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
 
             case LARGE:
-                return Registrations.MACHINE_BLOCK_ITEM_LARGE.get();
+                return Registration.MACHINE_BLOCK_ITEM_LARGE.get();
 
             case GIANT:
-                return Registrations.MACHINE_BLOCK_ITEM_GIANT.get();
+                return Registration.MACHINE_BLOCK_ITEM_GIANT.get();
 
             case MAXIMUM:
-                return Registrations.MACHINE_BLOCK_ITEM_MAXIMUM.get();
+                return Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
         }
 
-        return Registrations.MACHINE_BLOCK_ITEM_NORMAL.get();
+        return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
     }
 
     public static BlockPos getCenterOfMachineById(int id) {

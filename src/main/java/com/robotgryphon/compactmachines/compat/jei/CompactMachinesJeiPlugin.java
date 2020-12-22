@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 public class CompactMachinesJeiPlugin implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(CompactMachines.MODID, "main");
+        return new ResourceLocation(CompactMachines.MOD_ID, "main");
     }
 
     @Override

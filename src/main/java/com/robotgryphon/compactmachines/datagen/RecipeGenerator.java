@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.datagen;
 
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.config.EnableVanillaRecipesConfigCondition;
+import com.robotgryphon.compactmachines.core.Registration;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
@@ -12,8 +13,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.IItemProvider;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
-import net.minecraftforge.common.crafting.conditions.NotCondition;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -25,7 +24,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     @Override
     protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
-        ShapedRecipeBuilder.shapedRecipe(Registrations.ITEM_BREAKABLE_WALL.get())
+        ShapedRecipeBuilder.shapedRecipe(Registration.ITEM_BREAKABLE_WALL.get())
                 .patternLine(" R ")
                 .patternLine(" I ")
                 .key('R', Tags.Items.DUSTS_REDSTONE)
@@ -33,7 +32,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .addCriterion("has_recipe", hasItem(Tags.Items.STORAGE_BLOCKS_IRON))
                 .build(consumer);
 
-        ShapedRecipeBuilder.shapedRecipe(Registrations.PERSONAL_SHRINKING_DEVICE.get())
+        ShapedRecipeBuilder.shapedRecipe(Registration.PERSONAL_SHRINKING_DEVICE.get())
                 .patternLine(" P ")
                 .patternLine("EBE")
                 .patternLine(" I ")
@@ -43,17 +42,17 @@ public class RecipeGenerator extends RecipeProvider {
                 .key('I', Tags.Items.INGOTS_IRON)
                 .addCriterion("has_recipe", hasItem(Items.ENDER_EYE))
                 .build(consumer);
-        
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_TINY.get(), ItemTags.PLANKS);
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_SMALL.get(), Tags.Items.STORAGE_BLOCKS_IRON);
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_NORMAL.get(), Tags.Items.STORAGE_BLOCKS_GOLD);
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_GIANT.get(), Tags.Items.STORAGE_BLOCKS_DIAMOND);
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_LARGE.get(), Tags.Items.OBSIDIAN);
-        registerMachineRecipe(consumer, Registrations.MACHINE_BLOCK_ITEM_MAXIMUM.get(), Tags.Items.STORAGE_BLOCKS_EMERALD);
+
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_TINY.get(), ItemTags.PLANKS);
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_SMALL.get(), Tags.Items.STORAGE_BLOCKS_IRON);
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_NORMAL.get(), Tags.Items.STORAGE_BLOCKS_GOLD);
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_GIANT.get(), Tags.Items.STORAGE_BLOCKS_DIAMOND);
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_LARGE.get(), Tags.Items.OBSIDIAN);
+        registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get(), Tags.Items.STORAGE_BLOCKS_EMERALD);
     }
 
     protected void registerMachineRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider out, ITag<Item> center) {
-        Item wall = Registrations.ITEM_BREAKABLE_WALL.get();
+        Item wall = Registration.ITEM_BREAKABLE_WALL.get();
         ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shapedRecipe(out)
                 .patternLine("WWW");
 
@@ -70,7 +69,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .addCriterion("has_recipe", hasItem(wall));
 
         ConditionalRecipe.builder()
-                .addCondition(new NotCondition(new ModLoadedCondition("compactcrafting")))
+                .addCondition(new EnableVanillaRecipesConfigCondition())
                 .addRecipe(recipe::build)
                 .build(consumer, Objects.requireNonNull(out.asItem().getRegistryName()));
     }

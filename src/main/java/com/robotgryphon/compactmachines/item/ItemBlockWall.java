@@ -1,6 +1,6 @@
 package com.robotgryphon.compactmachines.item;
 
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
@@ -21,7 +21,7 @@ public class ItemBlockWall extends BlockItem {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        if (stack.getItem() == Registrations.ITEM_SOLID_WALL.get()) {
+        if (stack.getItem() == Registration.ITEM_SOLID_WALL.get()) {
             IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.solid_wall.hint")
                     .mergeStyle(TextFormatting.RED);
             

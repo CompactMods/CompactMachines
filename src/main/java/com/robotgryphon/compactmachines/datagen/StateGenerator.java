@@ -7,7 +7,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class StateGenerator extends BlockStateProvider {
     public StateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, CompactMachines.MODID, exFileHelper);
+        super(gen, CompactMachines.MOD_ID, exFileHelper);
     }
 
     @Override

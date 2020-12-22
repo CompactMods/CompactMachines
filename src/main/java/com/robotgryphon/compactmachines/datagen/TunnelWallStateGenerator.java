@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.datagen;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.core.Registration;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.util.Direction;
@@ -13,12 +13,12 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class TunnelWallStateGenerator extends BlockStateProvider {
     public TunnelWallStateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, CompactMachines.MODID, exFileHelper);
+        super(gen, CompactMachines.MOD_ID, exFileHelper);
     }
 
     @Override
     protected void registerStatesAndModels() {
-        Block block = Registrations.BLOCK_TUNNEL_WALL.get();
+        Block block = Registration.BLOCK_TUNNEL_WALL.get();
 
         for (Direction dir : Direction.values()) {
 

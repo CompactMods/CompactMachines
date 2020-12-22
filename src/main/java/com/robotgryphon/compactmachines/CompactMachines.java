@@ -1,15 +1,20 @@
 package com.robotgryphon.compactmachines;
 
 import com.robotgryphon.compactmachines.compat.theoneprobe.TheOneProbeCompat;
-import com.robotgryphon.compactmachines.core.Registrations;
+import com.robotgryphon.compactmachines.config.CommonConfig;
+import com.robotgryphon.compactmachines.config.EnableVanillaRecipesConfigCondition;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -17,20 +22,20 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(CompactMachines.MODID)
+@Mod(CompactMachines.MOD_ID)
 public class CompactMachines
 {
-    public static final String MODID = "compactmachines";
+    public static final String MOD_ID = "compactmachines";
 
     public static final Logger LOGGER = LogManager.getLogger();
 
 //    public static ClientWorldData clientWorldData;
 //    public static final CreativeTabcompactmachines CREATIVE_TAB = new CreativeTabcompactmachines();
 
-    public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MODID) {
+    public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MOD_ID) {
         @Override
         public ItemStack createIcon() {
-            return new ItemStack(Registrations.MACHINE_BLOCK_ITEM_NORMAL.get());
+            return new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get());
         }
     };
 
@@ -38,7 +43,7 @@ public class CompactMachines
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register blocks and items
-        Registrations.init();
+        Registration.init();
 
         // Register the setup method for modloading
         modBus.addListener(this::setup);
@@ -48,6 +53,11 @@ public class CompactMachines
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+
+        ModLoadingContext mlCtx = ModLoadingContext.get();
+        mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
+
+        CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
     }
 
     private void setup(final FMLCommonSetupEvent event)
