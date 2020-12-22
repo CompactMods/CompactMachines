@@ -60,4 +60,4 @@ jobs:
     runs-on: ubuntu-latest
     needs: [generate]
     steps:
-      - run: echo ${{jobs.generate.outputs.changelog}}
+      - run: echo ${{needs.generate.outputs.changelog}}
