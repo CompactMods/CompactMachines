@@ -168,6 +168,6 @@ jobs:
         run: dir buildfiles
       - name: Full File
         id: filename
-        run: echo "::set-output name=fullpath::${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar"
+        run: echo "::set-output name=fullpath::buildfiles/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar"
       - name: Echo full file
         run: echo "${{ steps.filename.outputs.fullpath }}"
