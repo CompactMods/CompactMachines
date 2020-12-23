@@ -107,7 +107,7 @@ jobs:
   upload:
     name: Upload to CurseForge
     runs-on: ubuntu-latest
-    needs: [generate]
+    needs: [generate, build]
     env:
       CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
 
