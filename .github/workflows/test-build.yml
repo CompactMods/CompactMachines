@@ -8,18 +8,25 @@ jobs:
     name: Get Variables
     runs-on: ubuntu-latest
     outputs:
-      release_type: ${{steps.releasetype.outputs.value }}
+      release_type: ${{steps.cf_release_type.outputs.value }}
+      mod_version: ${{steps.mod_version.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Release Type
-        id: releasetype
+        id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: './gradle.properties'
           property: 'cf_release_type'
 
+      - name: Mod Version
+        id: mod_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_version'
   changelog:
     name: Generate Changelog (tags)
     runs-on: ubuntu-latest
@@ -72,7 +79,7 @@ jobs:
   jar:
     name: Publish JAR
     runs-on: ubuntu-latest
-    needs: [changelog]
+    needs: [vars, changelog]
     steps:
       - name: Download Changelog Results
         uses: actions/download-artifact@v2
@@ -99,7 +106,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR with Gradle
-        run: ./gradlew publish
+        run: ./gradlew build
+#        run: ./gradlew publish
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: libs
-          path: build/libs/*.jar
+          path: build/libs/**${{jobs.vars.outputs.mod_version}}**.jar
 
   view:
     name: View Changelog Output
