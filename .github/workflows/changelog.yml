@@ -1,31 +1,23 @@
 # This is a basic workflow that is manually triggered
 
-name: Manual workflow
+name: Generate Changelog
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on: workflow_dispatch
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:    
+jobs:
   generate:
     name: Generate Changelog
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Unshallow
         run: git fetch --prune --unshallow
-        
-#       - name: Find Last Tag
-#         id: last
-#         uses: jimschubert/query-tag-action@v1
-#         with:
-#           include: 'v*'
-#           exclude: '*-rc*'
-#           commit-ish: 'HEAD~'
-#           skip-unshallow: 'true'
+
       - name: Find Current Tag
         id: current
         uses: jimschubert/query-tag-action@v1
@@ -34,7 +26,7 @@ jobs:
           exclude: '*-rc*'
           commit-ish: '@'
           skip-unshallow: 'true'
-          
+
       - name: Previous Tag
         id: last
         uses: jimschubert/query-tag-action@v1
@@ -51,11 +43,11 @@ jobs:
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
-          
+
       - name: Read CHANGELOG file
         id: getchangelog
         run: echo "::set-output name=changelog::$(cat .github/CHANGELOG.md)"
-        
+
       - name: View Changelog
         run: cat .github/CHANGELOG.md
 
