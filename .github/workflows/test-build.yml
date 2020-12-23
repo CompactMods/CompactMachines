@@ -83,7 +83,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR
-        run: /gradlew jar
+        run: ./gradlew jar
 
       - name: Do Upload
         run: ./gradlew curseforge
