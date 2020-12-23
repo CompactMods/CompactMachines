@@ -3,18 +3,11 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-
-        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
-}
-
-
-plugins {
-    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -189,25 +182,6 @@ jar {
 jar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
-
-curseforge {
-    apiKey = System.getenv("CF_TOKEN")
-    project {
-        id = cf_project
-        releaseType = "${cf_release_type}"
-        changelogType = "markdown"
-        changelog = file("changelog/CHANGELOG.md")
-
-        mainArtifact jar
-    }
-
-    options {
-        debug = true
-        javaVersionAutoDetect = true
-        javaIntegration = false
-        forgeGradleIntegration = false
-    }
-}
 
 publishing {
     publications {

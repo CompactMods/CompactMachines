@@ -53,8 +53,8 @@ jobs:
           name: out
           path: .github/CHANGELOG.md
 
-  curseforge:
-    name: Upload to CurseForge
+  jar:
+    name: Publish JAR
     runs-on: ubuntu-latest
     needs: [changelog]
     steps:
@@ -82,21 +82,34 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build JAR
-        run: ./gradlew jar
+      - name: Build JAR with Gradle
+        run: ./gradlew publish
         env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
-
-      - name: Do Upload
-        run: ./gradlew curseforge
-        env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Add Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: result
-          path: .
+          name: libs
+          path: build/libs/*.jar
+
+  echo:
+    name: Echo Variables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Release Type
+        id: releasetype
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_release_type'
+
+      - name: Echo
+        run: echo ${{steps.releasetype.outputs.value }}
 
   view:
     name: View Changelog Output
