@@ -84,6 +84,8 @@ jobs:
 
       - name: Build JAR
         run: ./gradlew jar
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
 
       - name: Do Upload
         run: ./gradlew curseforge
