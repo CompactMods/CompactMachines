@@ -82,6 +82,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew jar
       env:
+        CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
