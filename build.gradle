@@ -3,11 +3,20 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
+
+        maven { url "https://plugins.gradle.org/m2/" }
     }
+
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
+
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -23,7 +32,7 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
     mappings channel: 'snapshot', version: mappings_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -93,7 +102,7 @@ def getModVersion(filename) {
 
     def found = matcher.find()
 
-    if(found) {
+    if (found) {
         def mod = matcher.group("modid");
 
         // Extract MC version or default
@@ -104,7 +113,7 @@ def getModVersion(filename) {
 
         // println("> mod: ${mod}; mc: ${mcVersion}; version: ${version}");
 
-        if(mcVersion == null)
+        if (mcVersion == null)
             return "${mod}:${mod}:${version}";
         else
             return "${mod}:${mod}-${mcVersion}:${version}";
@@ -136,7 +145,7 @@ repositories {
     }
 }
 
-def dev_mods = fileTree(dev_mods_dir).filter { it -> it.isFile() }.files.name.collect( { getModVersion(it) } )
+def dev_mods = fileTree(dev_mods_dir).filter { it -> it.isFile() }.files.name.collect({ getModVersion(it) })
 
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
@@ -164,22 +173,39 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "compactmachines",
-            "Specification-Vendor": "",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" : "",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title"     : "compactmachines",
+                "Specification-Vendor"    : "",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
+
+curseforge {
+    apiKey = System.getenv("CF_TOKEN")
+    project {
+        id = cf_project
+        releaseType = "${cf_release_type}"
+        changelogType = "markdown"
+        changelog = file("changelog/CHANGELOG.md")
+    }
+
+    options {
+        debug = true // defaults to false
+        javaVersionAutoDetect = true // defaults to true
+        javaIntegration = true // defaults to true
+        forgeGradleIntegration = true // defaults to true
+    }
+}
 
 publishing {
     publications {
@@ -189,12 +215,12 @@ publishing {
     }
     repositories {
         maven {
-          name = "GitHubPackages"
-          url = "https://maven.pkg.github.com/robotgryphon/compact-machines"
-          credentials {
-            username = System.getenv("GITHUB_ACTOR")
-            password = System.getenv("GITHUB_TOKEN")
-          }
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/robotgryphon/compact-machines"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
