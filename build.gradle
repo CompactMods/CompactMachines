@@ -204,7 +204,7 @@ curseforge {
     options {
         debug = true
         javaVersionAutoDetect = true
-        javaIntegration = true
+        javaIntegration = false
         forgeGradleIntegration = false
     }
 }
