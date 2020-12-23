@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines;
 import com.robotgryphon.compactmachines.compat.theoneprobe.TheOneProbeCompat;
 import com.robotgryphon.compactmachines.config.CommonConfig;
 import com.robotgryphon.compactmachines.config.EnableVanillaRecipesConfigCondition;
+import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import net.minecraft.item.ItemGroup;
@@ -56,6 +57,7 @@ public class CompactMachines
 
         ModLoadingContext mlCtx = ModLoadingContext.get();
         mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
+        mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
     }

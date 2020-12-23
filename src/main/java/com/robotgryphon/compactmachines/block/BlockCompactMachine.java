@@ -4,6 +4,9 @@ import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
+import com.robotgryphon.compactmachines.config.CommonConfig;
+import com.robotgryphon.compactmachines.config.ServerConfig;
+import com.robotgryphon.compactmachines.core.EnumMachinePlayersBreakHandling;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
@@ -29,6 +32,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.UUID;
 
 public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
@@ -42,14 +47,34 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     @Override
     public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
+        float normalHardness = super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+
         if (tile == null)
-            return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+            return normalHardness;
 
         boolean hasPlayers = tile.hasPlayersInside();
-        if (hasPlayers)
-            return 0;
 
-        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+
+        // If there are players inside, check config for break handling
+        if(hasPlayers) {
+            EnumMachinePlayersBreakHandling hand = ServerConfig.MACHINE_PLAYER_BREAK_HANDLING.get();
+            switch (hand) {
+                case UNBREAKABLE:
+                    return 0;
+
+                case OWNER:
+                    Optional<UUID> ownerUUID = tile.getOwnerUUID();
+                    return ownerUUID
+                            .map(uuid -> player.getUniqueID() == uuid ? normalHardness : 0)
+                            .orElse(normalHardness);
+
+                case ANYONE:
+                    return normalHardness;
+            }
+        }
+
+        // No players inside - let anyone break it
+        return normalHardness;
     }
 
     @Override

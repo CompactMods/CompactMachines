@@ -172,6 +172,9 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
                 CompoundNBT playerNbt = data.serializeNBT();
                 base.put("players", playerNbt);
             });
+
+            if(this.owner != null)
+                base.putUniqueId("owner", this.owner);
         }
 
         return base;
@@ -188,6 +191,9 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
             CompactMachineCommonData.getInstance().updatePlayerData(playerData);
         }
+
+        if(tag.contains("owner"))
+            owner = tag.getUniqueId("owner");
     }
 
     @Override
