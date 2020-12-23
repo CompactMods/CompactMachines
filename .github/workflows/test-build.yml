@@ -25,8 +25,10 @@ jobs:
         restore-keys: ${{ runner.os }}-gradle
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Generate Data
+      run: ./gradlew runData
     - name: Build with Gradle
-      run: ./gradlew publish
+      run: ./gradlew jar
       env:
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
