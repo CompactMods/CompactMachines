@@ -108,9 +108,8 @@ jobs:
     name: Upload to CurseForge
     runs-on: ubuntu-latest
     needs: [generate]
-    with:
-      env:
-        CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+    env:
+      CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
 
     steps:
       - name: Download Build Results
