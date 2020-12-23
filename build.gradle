@@ -197,13 +197,15 @@ curseforge {
         releaseType = "${cf_release_type}"
         changelogType = "markdown"
         changelog = file("changelog/CHANGELOG.md")
+
+        mainArtifact jar
     }
 
     options {
-        debug = true // defaults to false
-        javaVersionAutoDetect = true // defaults to true
-        javaIntegration = true // defaults to true
-        forgeGradleIntegration = true // defaults to true
+        debug = true
+        javaVersionAutoDetect = true
+        javaIntegration = true
+        forgeGradleIntegration = false
     }
 }
 
