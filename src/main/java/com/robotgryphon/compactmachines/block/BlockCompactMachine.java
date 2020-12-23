@@ -253,6 +253,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
             }
         }
 
+        tile.doPostPlaced();
         tile.markDirty();
     }
 

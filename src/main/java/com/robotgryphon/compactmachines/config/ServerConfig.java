@@ -12,6 +12,7 @@ public class ServerConfig {
     public static ForgeConfigSpec CONFIG;
 
     public static ForgeConfigSpec.EnumValue<EnumMachinePlayersBreakHandling> MACHINE_PLAYER_BREAK_HANDLING;
+    public static ForgeConfigSpec.BooleanValue MACHINE_CHUNKLOADING;
 
     static {
         generateConfig();
@@ -37,6 +38,10 @@ public class ServerConfig {
                 .defineEnum("breakHandling",
                         EnumMachinePlayersBreakHandling.UNBREAKABLE,
                         EnumGetMethod.NAME_IGNORECASE);
+
+        MACHINE_CHUNKLOADING = builder
+                .comment("Allow machines to chunkload their insides when the machines are loaded.")
+                .define("chunkloading", true);
 
         builder.pop();
 

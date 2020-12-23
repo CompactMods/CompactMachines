@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.block.tiles;
 
+import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineCommonData;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
@@ -19,6 +20,9 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -47,6 +51,30 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         super(Registration.MACHINE_TILE_ENTITY.get());
 
         playerWhiteList = new HashSet<>();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        if(ServerConfig.MACHINE_CHUNKLOADING.get())
+            doChunkload(true);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+
+        if(ServerConfig.MACHINE_CHUNKLOADING.get())
+            doChunkload(false);
+    }
+
+    @Override
+    public void remove() {
+        super.remove();
+
+        if(ServerConfig.MACHINE_CHUNKLOADING.get())
+            doChunkload(false);
     }
 
     @Override
@@ -243,6 +271,22 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
                 .getPlayerData(machineId)
                 .map(CompactMachinePlayerData::hasPlayers)
                 .orElse(false);
+    }
+
+    protected void doChunkload(boolean force) {
+        if(world.isRemote)
+            return;
+
+        getMachineData().ifPresent(data -> {
+            ServerWorld compact = this.world.getServer().getWorld(Registration.COMPACT_DIMENSION);
+            IChunk machineChunk = compact.getChunk(data.getCenter());
+            ChunkPos chunkPos = machineChunk.getPos();
+            compact.forceChunk(chunkPos.x, chunkPos.z, force);
+        });
+    }
+
+    public void doPostPlaced() {
+        doChunkload(true);
     }
 
     /*
