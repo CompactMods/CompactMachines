@@ -116,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: libs
-          path: build/libs/**${{jobs.vars.outputs.mod_version}}**.jar
+          path: build/libs/**${{ needs.vars.outputs.mod_version }}**.jar
 
   view:
     name: View Changelog Output
