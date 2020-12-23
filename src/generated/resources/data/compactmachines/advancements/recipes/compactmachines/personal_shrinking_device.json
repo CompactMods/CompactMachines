@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "compactmachines:personal_shrinking_device"
+    ]
+  },
+  "criteria": {
+    "has_recipe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:ender_eye"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "compactmachines:personal_shrinking_device"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_recipe",
+      "has_the_recipe"
+    ]
+  ]
+}

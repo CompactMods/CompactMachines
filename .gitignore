@@ -26,7 +26,6 @@ forge*changelog.txt
 
 # Reference files during port to 1.16.x
 /ref/*
-/src/generated/
 
 logs/
 /mods/

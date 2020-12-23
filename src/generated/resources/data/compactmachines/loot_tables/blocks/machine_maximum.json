@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "name": "compactmachines:machine_maximum",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "compactmachines:machine_maximum"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "functions": [
+        {
+          "function": "minecraft:copy_nbt",
+          "source": "block_entity",
+          "ops": [
+            {
+              "source": "owner",
+              "target": "owner",
+              "op": "replace"
+            },
+            {
+              "source": "coords",
+              "target": "cm.coords",
+              "op": "replace"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
