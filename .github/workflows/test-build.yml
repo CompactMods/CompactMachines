@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_type: ${{steps.cf_release_type.outputs.value }}
+      cf_project: ${{steps.cf_project.outputs.value }}
       mod_version: ${{steps.mod_version.outputs.value }}
+      mod_id: ${{steps.mod_id.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,12 +23,27 @@ jobs:
           path: './gradle.properties'
           property: 'cf_release_type'
 
+      - name: Project ID
+        id: cf_project
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_project'
+
       - name: Mod Version
         id: mod_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: './gradle.properties'
           property: 'mod_version'
+
+      - name: Mod ID
+        id: mod_id
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_id'
+
   changelog:
     name: Generate Changelog (tags)
     runs-on: ubuntu-latest
@@ -149,13 +166,8 @@ jobs:
         run: cat changelog/CHANGELOG.md
       - name: ShowFiles
         run: dir buildfiles
-#      - name: Create Release
-#        uses: "marvinpinto/action-automatic-releases@latest"
-#        with:
-#          title: "Release ${{ github.event.release.tag_name }}"
-#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          prerelease: false
-#          files: |
-#            changelog/CHANGELOG.md
-#            LICENSE.txt
-#            buildfiles/*
+      - name: Full File
+        id: filename
+        run: echo "::set-output name=fullpath::buildfiles/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar"
+      - name: Echo full file
+        run: echo "${{ steps.filename.outputs.fullpath }}"
