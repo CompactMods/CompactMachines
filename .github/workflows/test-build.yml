@@ -4,6 +4,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-latest
+    outputs:
+      release_type: ${{steps.releasetype.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Release Type
+        id: releasetype
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_release_type'
+
   changelog:
     name: Generate Changelog (tags)
     runs-on: ubuntu-latest
@@ -94,23 +110,6 @@ jobs:
           name: libs
           path: build/libs/*.jar
 
-  echo:
-    name: Echo Variables
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Release Type
-        id: releasetype
-        uses: christian-draeger/read-properties@1.0.1
-        with:
-          path: './gradle.properties'
-          property: 'cf_release_type'
-
-      - name: Echo
-        run: echo ${{steps.releasetype.outputs.value }}
-
   view:
     name: View Changelog Output
     runs-on: ubuntu-latest
@@ -122,3 +121,33 @@ jobs:
           name: out
           path: changelog
       - run: cat changelog/CHANGELOG.md
+
+  release:
+    name: Make GitHub Release
+    runs-on: ubuntu-latest
+    needs: [changelog, vars, jar]
+    steps:
+      - name: Download Build Results
+        uses: actions/download-artifact@v2
+        with:
+          name: libs
+          path: buildfiles
+      - name: Download Changelog Results
+        uses: actions/download-artifact@v2
+        with:
+          name: out
+          path: changelog
+      - name: Debug
+        run: cat changelog/CHANGELOG.md
+      - name: ShowFiles
+        run: dir buildfiles
+#      - name: Create Release
+#        uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          title: "Release ${{ github.event.release.tag_name }}"
+#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#          prerelease: false
+#          files: |
+#            changelog/CHANGELOG.md
+#            LICENSE.txt
+#            buildfiles/*
