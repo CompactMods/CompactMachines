@@ -20,4 +20,12 @@ build
 # other
 eclipse
 run
-rawAssets
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# Reference files during port to 1.16.x
+/ref/*
+
+logs/
+/mods/

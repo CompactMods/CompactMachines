@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "result": {
+    "item": "compactmachines:machine_small",
+    "count": 1
+  },
+  "pattern": [
+    "www",
+    "wiw",
+    "www"
+  ],
+  "key": {
+    "w": {
+      "item": "compactmachines:wall"
+    },
+    "i": {
+      "item": "minecraft:iron_block"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "result": {
+    "item": "compactmachines:machine_maximum",
+    "count": 1
+  },
+  "pattern": [
+    "www",
+    "wew",
+    "www"
+  ],
+  "key": {
+    "w": {
+      "item": "compactmachines:wall"
+    },
+    "e": {
+      "item": "minecraft:emerald_block"
+    }
+  }
+}

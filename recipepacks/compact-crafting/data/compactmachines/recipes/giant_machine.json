@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "recipeSize": 5,
+  "layers": [
+    {
+      "type": "compactcrafting:filled",
+      "component": "W"
+    },
+    {
+      "type": "compactcrafting:hollow",
+      "wall": "W"
+    },
+    {
+      "type": "compactcrafting:mixed",
+      "pattern": [
+        ["W", "W", "W", "W", "W"],
+        ["W", "-", "-", "-", "W"],
+        ["W", "-", "D", "-", "W"],
+        ["W", "-", "-", "-", "W"],
+        ["W", "W", "W", "W", "W"]
+      ]
+    },
+    {
+      "type": "compactcrafting:hollow",
+      "wall": "W"
+    },
+    {
+      "type": "compactcrafting:filled",
+      "component": "W"
+    }
+  ],
+
+  "catalyst": {
+    "id": "minecraft:ender_pearl",
+    "Count": 1
+  },
+
+  "components": {
+    "W": {
+      "Name": "compactmachines:wall"
+    },
+    "D": {
+      "Name": "minecraft:diamond_block"
+    }
+  },
+
+  "outputs": [
+    {
+      "id": "compactmachines:machine_giant",
+      "Count": 1
+    }
+  ]
+}

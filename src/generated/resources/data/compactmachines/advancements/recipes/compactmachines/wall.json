@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "compactmachines:wall"
+    ]
+  },
+  "criteria": {
+    "has_recipe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:storage_blocks/iron"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "compactmachines:wall"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_recipe",
+      "has_the_recipe"
+    ]
+  ]
+}
