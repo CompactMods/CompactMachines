@@ -1,5 +1,4 @@
-# This is a basic workflow that is manually triggered
-
+# Generates a changelog between two version-tagged commits.
 name: Generate Changelog
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
