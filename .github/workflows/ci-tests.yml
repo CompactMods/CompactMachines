@@ -1,0 +1,58 @@
+name: Gradle Tests (CI)
+
+on: push
+
+jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-latest
+    outputs:
+      release_type: ${{steps.cf_release_type.outputs.value }}
+      mod_version: ${{steps.mod_version.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Release Type
+        id: cf_release_type
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_release_type'
+
+      - name: Mod Version
+        id: mod_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_version'
+
+  jar:
+    name: Publish JAR
+    runs-on: ubuntu-latest
+    needs: [vars]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Test JAR with Gradle
+        run: ./gradlew test
+#        run: ./gradlew publish
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
