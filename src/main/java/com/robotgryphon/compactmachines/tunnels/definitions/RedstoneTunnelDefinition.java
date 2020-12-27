@@ -28,7 +28,8 @@ public class RedstoneTunnelDefinition extends TunnelDefinition implements IRedst
 
     @Override
     public int getTunnelIndicatorColor() {
-        return Color.ORANGE.darker().getRGB();
+        return Color.blue.getRGB();
+        // return Color.ORANGE.darker().getRGB();
     }
 
     @Override

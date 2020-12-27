@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "compactmachines:tunnels/base",
   "textures": {
-    "all": "compactmachines:block/tunnels/west"
+    "wall": "compactmachines:block/tunnels/west"
   }
 }
