@@ -1,6 +1,5 @@
-
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube_all",
   "textures": {
     "all": "compactmachines:block/machine/machine_small"
   }

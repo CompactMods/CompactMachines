@@ -26,6 +26,7 @@ public class DataGeneration {
 
     private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
         ExistingFileHelper helper = event.getExistingFileHelper();
+        generator.addProvider(new StateGenerator(generator, helper));
         generator.addProvider(new TunnelWallStateGenerator(generator, helper));
     }
 }
