@@ -42,18 +42,7 @@ This command only works for server operators.
 
 #### Technical aspects
 
-- The inside of Compact Machines are rooms in another dimension.
-- The rooms in the other dimension are automatically chunk-loaded when the Compact Machine itself is chunk-loaded.
-- They only trigger chunk reloads when a block next to one of the tunnels changes.
-  There are no redstone signals being transferred between the tunnels and machine block.
-- There are two kinds of Compact Machine Wall blocks. The actual machines are made out of unbreakable blocks (you can still break them in Creative mode while holding a Personal Shrinking Device), while the machine structures you build for crafting are made out of breakable Wall blocks.
-- Right clicking a Compact Machine renders the contents of the machine in a GUI. On multiplayer games this is handled by sending the chunk contents to the client every time he opens the GUI. There is currently no auto-refresh of the machines' content.
-- Compact Machines can be nested.
-- Compact Machines spawn using a spiral algorithm in the Compact Machine dimension at y=60. This means they all fit in exactly one chunk.
-- Mobs and animals will spawn inside of machine blocks if the conditions are right,
-  e.g. light-level for mobs, grass for animals...
-- Players cannot leave the machine block they should currently be in according to the last one they've entered using a Personal Shrinking Device. Trying to enter a Compact Machines with other means results in the player being thrown out of the machine and getting some bad status effect applied. They might even die.
-- If players die without a bed in the CM dimension or with the `allowRespawning` config option disabled, they'll be teleported out of the machine dimension.
+- [Compact Machines 3 Technical Details](https://github.com/CompactMods/CompactMachines/wiki/Technical-Details-(CM3))
 
 ## Tunnels
 
