@@ -169,7 +169,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         loadSaveData();
     }
 
-    public static void loadSaveData() {
+    public static synchronized void loadSaveData() {
         if (instance != null)
             return;
 
