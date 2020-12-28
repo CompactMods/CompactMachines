@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import org.dave.compactmachines3.gui.framework.GUI;
 import org.dave.compactmachines3.gui.framework.event.*;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.*;
 

@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.particles.ParticleBlockMarker;
-import org.dave.compactmachines3.utility.Logz;
 
 public class MessageParticleBlockMarker implements IMessage {
     double x;
