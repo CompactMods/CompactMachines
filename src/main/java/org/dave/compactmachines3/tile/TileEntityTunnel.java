@@ -13,13 +13,13 @@ import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilityProvider, IRemoteBlockProvider {
 
     @Override
     public BlockPos getConnectedBlockPosition(EnumFacing side) {
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = WorldSavedDataMachines.getInstance().machinePositions.get(StructureTools.getIdForPos(this.getPos()));
         if(dimpos == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
 
     @Override
     public int getConnectedDimensionId(EnumFacing side) {
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = WorldSavedDataMachines.getInstance().machinePositions.get(StructureTools.getIdForPos(this.getPos()));
         if(dimpos == null) {
             return 0;
         }
@@ -53,17 +53,17 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
             return super.hasCapability(capability, facing);
         }
         
-        WorldSavedDataMachines wsd = WorldSavedDataMachines.INSTANCE;
+        WorldSavedDataMachines wsd = WorldSavedDataMachines.getInstance();
         if (wsd == null) {
         	return false;
         }
         
-        HashMap<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
+        Map<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
         if (machinePositions == null) {
         	return false;
         }
 
-        DimensionBlockPos dimpos = machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = machinePositions.get(StructureTools.getIdForPos(this.getPos()));
         if(dimpos == null) {
             return false;
         }
@@ -98,7 +98,7 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
             return super.getCapability(capability, facing);
         }
 
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = WorldSavedDataMachines.getInstance().machinePositions.get(StructureTools.getIdForPos(this.getPos()));
         if(dimpos == null) {
             return null;
         }

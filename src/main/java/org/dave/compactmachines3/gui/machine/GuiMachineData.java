@@ -2,17 +2,18 @@ package org.dave.compactmachines3.gui.machine;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 import org.dave.compactmachines3.gui.framework.WidgetGuiContainer;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
 import java.util.Set;
 
 public class GuiMachineData {
     public static int machineSize;
-    public static int coords;
+    public static int id;
 
+    public static BlockPos roomPos;
     public static DimensionBlockPos machinePos;
     public static String owner;
     public static String customName;
@@ -35,7 +36,7 @@ public class GuiMachineData {
     }
 
     public static boolean isUsedCube() {
-        return coords != -1;
+        return id != -1;
     }
 
     public static boolean isAllowedToEnter(EntityPlayer player) {
@@ -58,10 +59,11 @@ public class GuiMachineData {
         return false;
     }
 
-    public static void updateGuiMachineData(int machineSize, int coords, DimensionBlockPos machinePos, String owner, String customName, Set<String> playerWhiteList, boolean locked) {
+    public static void updateGuiMachineData(int machineSize, int id, BlockPos roomPos, DimensionBlockPos machinePos, String owner, String customName, Set<String> playerWhiteList, boolean locked) {
         canRender = false;
         GuiMachineData.machineSize = machineSize;
-        GuiMachineData.coords = coords;
+        GuiMachineData.id = id;
+        GuiMachineData.roomPos = roomPos;
         GuiMachineData.machinePos = machinePos;
         GuiMachineData.owner = owner;
         GuiMachineData.customName = customName;

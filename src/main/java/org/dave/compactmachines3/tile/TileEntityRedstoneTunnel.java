@@ -11,34 +11,34 @@ import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class TileEntityRedstoneTunnel extends BaseTileEntityTunnel {
 
     public int getRedstonePowerInput(EnumFacing facing) {
-        int coords = StructureTools.getCoordsForPos(this.getPos());
+        int id = StructureTools.getIdForPos(this.getPos());
 
-        WorldSavedDataMachines wsd = WorldSavedDataMachines.INSTANCE;
+        WorldSavedDataMachines wsd = WorldSavedDataMachines.getInstance();
         if (wsd == null) {
             return 0;
         }
 
-        HashMap<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
+        Map<Integer, DimensionBlockPos> machinePositions = wsd.machinePositions;
         if (machinePositions == null) {
             return 0;
         }
 
-        DimensionBlockPos dimpos = machinePositions.get(coords);
+        DimensionBlockPos dimpos = machinePositions.get(id);
         if (dimpos == null) {
             return 0;
         }
 
-        HashMap<Integer, HashMap<EnumFacing, RedstoneTunnelData>> redstoneTunnels = wsd.redstoneTunnels;
+        Map<Integer, Map<EnumFacing, RedstoneTunnelData>> redstoneTunnels = wsd.redstoneTunnels;
         if (redstoneTunnels == null) {
             return 0;
         }
 
-        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = redstoneTunnels.get(coords);
+        Map<EnumFacing, RedstoneTunnelData> tunnelMapping = redstoneTunnels.get(id);
         if(tunnelMapping == null) {
             return 0;
         }

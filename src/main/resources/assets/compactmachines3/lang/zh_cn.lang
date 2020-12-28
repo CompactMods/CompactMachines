@@ -1,4 +1,5 @@
 itemGroup.compactmachines3=Compact Machines 3
+generator.compactsky=Compact Sky
 
 tile.compactmachines3.machine.tiny.name=微型空间压缩机械
 tile.compactmachines3.machine.small.name=小型空间压缩机械
@@ -8,12 +9,14 @@ tile.compactmachines3.machine.giant.name=巨型空间压缩机械
 tile.compactmachines3.machine.maximum.name=最大空间压缩机械
 
 tile.compactmachines3.tunnel.name=空间压缩机械通道
+tile.compactmachines3.redstonetunnel.name=Redstone Tunnel
 tile.compactmachines3.wallbreakable.name=空间压缩机械墙壁
 tile.compactmachines3.wall.name=紧实的空间压缩机械墙壁
 tile.compactmachines3.fieldprojector.name=空间压缩机械领域投影器
 
 item.compactmachines3.psd.name=个人空间收缩设备
 item.compactmachines3.tunneltool.name=压缩机械通道
+item.compactmachines3.redstonetunneltool.name=Redstone Tunnel
 
 item.compactmachines3.psd.spawnpoint_set=入口点设置完成！
 
@@ -25,17 +28,84 @@ hint.compactmachines3.found_recipe_for=配方：%s
 hint.compactmachines3.invalid_block_in_field=区域中有无效的方块 @ %d,%d,%d: %s
 hint.compactmachines3.cant_sleep_here=你无法在空间压缩机械维度睡觉
 hint.compactmachines3.bed_position_set=重生位置已设置到本机械
+hint.compactmachines3.not_permitted_to_enter=You do not have permission to enter this machine
+
+hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in the Compact Hub!
+hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
+hint.compactmachines3.skyworld.only_one_machine_claim=You can only claim a single Compact Machine in the hub!
+
+## Configuration
+# Categories
+compactmachines3.config.category.client=Client
+compactmachines3.config.category.client.tooltip=Client rendering settings
+compactmachines3.config.category.compatibility=Compatibility
+compactmachines3.config.category.compatibility.tooltip=Modpack compatibility settings
+compactmachines3.config.category.internal=Internal
+compactmachines3.config.category.internal.tooltip=Internal values that should generally not be changed
+compactmachines3.config.category.machines=Machines
+compactmachines3.config.category.machines.tooltip=Machine Block settings that relate to machine rooms
+compactmachines3.config.category.miniaturization=Miniaturization
+compactmachines3.config.category.miniaturization.tooltip=Miniaturization projector settings
+
+# Client Category
+compactmachines3.config.autoUpdateRate=Machine Preview Update Rate
+compactmachines3.config.autoUpdateRate.tooltip=Updates the Machine Preview GUI every n ticks. Set to 0 to disable. Lower values decrease performance significantly!
+compactmachines3.config.renderLivingEntitiesInGUI=Render Entities in Machine Preview
+compactmachines3.config.renderLivingEntitiesInGUI.tooltip=Client-side rendering option, might give a performance boost when opening a Machine Preview GUI.
+compactmachines3.config.renderTileEntitiesInGUI=Render Tile Entities in Machine Preview
+compactmachines3.config.renderTileEntitiesInGUI.tooltip=Client-side rendering option, might give a performance boost when opening a Machine Preview GUI.
+
+# Compatibility Category
+compactmachines3.config.doesWaterVaporize=Does Water Vaporize
+compactmachines3.config.doesWaterVaporize.tooltip=Forces water to vaporize inside Compact Machines. Used for Forever Stranded: Lost Souls.
+
+# Internal Category
+compactmachines3.config.dimensionId=Dimension ID
+compactmachines3.config.dimensionId.tooltip=Dimension used for machines. Do not change this unless it is somehow conflicting!
+compactmachines3.config.dimensionTypeId=Dimension Type ID
+compactmachines3.config.dimensionTypeId.tooltip=Dimension type used for machines. Do not change this unless it is somehow conflicting!
+compactmachines3.config.forceLoadChunks=Force Load Chunks
+compactmachines3.config.forceLoadChunks.tooltip=Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.
+
+# Machines Category
+compactmachines3.config.allowEnteringWithoutPSD=Allow External Teleportation Commands
+compactmachines3.config.allowEnteringWithoutPSD.tooltip=Allow players to enter machines with teleportation commands, etc. from other mods without kicking them out.
+compactmachines3.config.allowHostileSpawns=Allow Hostile Entity Spawning
+compactmachines3.config.allowHostileSpawns.tooltip=Allow hostile creatures to spawn inside of machines.
+compactmachines3.config.allowPeacefulSpawns=Allow Peaceful Entity Spawning
+compactmachines3.config.allowPeacefulSpawns.tooltip=Allow peaceful creatures to spawn inside of machines.
+compactmachines3.config.allowPickupEmptyMachines=Allow Pickup of Empty Machines
+compactmachines3.config.allowPickupEmptyMachines.tooltip=If set to true, breaking a machine block that was never used will clear the NBT data.\nThis is disabled by default because it clears the owner of the machine block which may be an unintended side-effect.\nThis can be helpful to players who want to pick up empty machines and stack them since items with different NBT do not stack.
+compactmachines3.config.allowRespawning=Allow Respawning
+compactmachines3.config.allowRespawning.tooltip=Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there.
+compactmachines3.config.keepPlayersInside=Keep Players Inside Machine
+compactmachines3.config.keepPlayersInside.tooltip=Block players from leaving the confines of the box of the Compact Machine they should currently be in, only applies to players not in creative/spectator.
+compactmachines3.config.spawnRate=Entity Spawn Rate
+compactmachines3.config.spawnRate.tooltip=How often to try spawning entities inside of machines in ticks.
+
+# Miniaturization Category
+compactmachines3.config.maximumCraftingAreaSize=Maximum Crafting Area Size
+compactmachines3.config.maximumCraftingAreaSize.tooltip=Maximum size the field projectors can cover.
+compactmachines3.config.maximumCraftingCatalystAge=Maximum Crafting Catalyst Age
+compactmachines3.config.maximumCraftingCatalystAge.tooltip=Maximum age in ticks in which an item is valid for acting as a catalyst.
 
 top.compactmachines3.currently_crafting=制作：
 top.compactmachines3.found_recipe_for=配方：
 
-tooltip.compactmachines3.machine.coords=机械编号：
-tooltip.compactmachines3.machine.coords.unused=未使用
+tooltip.compactmachines3.machine.id=机械编号：
+tooltip.compactmachines3.machine.id.unused=未使用
+tooltip.compactmachines3.machine.schema=Schema:
+tooltip.compactmachines3.machine.stopitsoaryn=Feedback loop detected
 
+tooltip.compactmachines3.hold_shift.hint=Hold shift for details.
 tooltip.compactmachines3.psd.hint=用作文档并输入空间压缩机械
+tooltip.compactmachines3.fieldprojector.hint=Place 4 opposite of each other to create a Miniaturization Crafting field. Right click to get hints where the next projector needs to be!
 tooltip.compactmachines3.tunneltool.hint=用于联通空间压缩机械内部的墙壁与机械外部的面。
+tooltip.compactmachines3.redstonetunneltool.hint=Used to transfer redstone signals between wall blocks and outside Compact Machine faces.
 tooltip.compactmachines3.wall.hint=警告！对于除创造以外的玩家来说，这个方块是牢不可破的。
 tooltip.compactmachines3.machine.hint=%s提供%s大小的空间。
+
+tooltip.compactmachines3.lockforotherplayers.checkbox=Lock for other players
 
 tooltip.compactmachines3.jei.crafting_trigger=将这个物品抛入投影器的制作领域开始制作。
 tooltip.compactmachines3.jei.shape=使用这个方块来构筑需要的多方块结构
@@ -57,18 +127,33 @@ commands.compactmachines3.usage=/compactmachines3 [子命令，为命令列表�
 commands.compactmachines3.available=可用的子命令：
 commands.compactmachines3.denied=您无权使用此命令。
 
+commands.compactmachines3.documentation.description=Shows the mod documentation that opens with the PSD in the overworld
+
 commands.compactmachines3.schema.description=保存/加载机械的内容
 commands.compactmachines3.schema.save.usage=/compactmachines3 schema save <name>
 commands.compactmachines3.schema.save.description=将您所在的机械保存到磁盘中
 commands.compactmachines3.schema.save.exception.not_in_machine_dimension=您必须在机器维度中才能使用此命令。
 commands.compactmachines3.schema.save.exception.invalid_file=无法打开的文件'%s'！架构没有保存！
 commands.compactmachines3.schema.save.exception.not_serializable=无法序列化机械！架构没有保存！
+commands.compactmachines3.schema.save.success=Wrote schema to file: %s
 
 commands.compactmachines3.schema.load.usage=/compactmachines3 schema load <name>
 commands.compactmachines3.schema.load.description=从磁盘加载指定的模式并将其放置在您所在的机械房间中。
 commands.compactmachines3.schema.load.exception.not_in_machine_dimension=您必须在机器维度中才能使用此命令。
-commands.compactmachines3.schema.load.exception.invalid_file=模式无效，档案 '%s'不存在或无效！
-commands.compactmachines3.schema.load.exception.not_deserializable=无法反序列化架构！架构不加载！
+commands.compactmachines3.schema.load.exception.unknown_schema=No schema with that name exists!
+commands.compactmachines3.schema.load.exception.machine_size_does_not_match=The size of the machine does not match the schema! Try a %s machine.
+commands.compactmachines3.schema.load.machine_schema_set_to=Machine set to schema: %s
+
+commands.compactmachines3.schema.set.usage=/compactmachines3 schema set <name>
+commands.compactmachines3.schema.set.description=Sets the specified schema to the Compact Machine block you are looking at
+commands.compactmachines3.schema.set.exception.unknown_schema=No schema with that name exists!
+commands.compactmachines3.schema.set.exception.look_at_compact_machine=You need to look at a Compact Machine block!
+commands.compactmachines3.schema.set.exception.machine_size_does_not_match=The size of the machine does not match the schema!
+commands.compactmachines3.schema.set.exception.machine_is_already_in_use=Machine is already in use. Place a new machine!
+commands.compactmachines3.schema.set.machine_schema_set_to=Machine set to schema: %s
+
+commands.compactmachines3.schema.reload-files.usage=/compactmachines3 schema reload-files
+commands.compactmachines3.schema.reload-files.description=Reloads all the stored schema files from disk and from the jar
 
 commands.compactmachines3.recipe.description=与多方块结构配方相关的东西
 commands.compactmachines3.recipe.unpack-defaults.usage=/compactmachines3 recipe unpack-defaults [force]
@@ -79,10 +164,24 @@ commands.compactmachines3.recipe.copy-shape.description=将您正在查看的投
 commands.compactmachines3.recipe.copy-shape.exception.not_looking_at_projector=您没有注视投影器的制作区域。
 commands.compactmachines3.recipe.copy-shape.success=形状复制到剪贴板！
 
+commands.compactmachines3.recipe.copy-item.usage=/compactmachines3 recipe copy-item [catalyst|target]
+commands.compactmachines3.recipe.copy-item.description=Copies the stack in your main hand to the clipboard
+commands.compactmachines3.recipe.copy-item.exception.missing_type=You need to specify whether you want to get the JSON for a catalyst or for the target stack
+commands.compactmachines3.recipe.copy-item.exception.missing_item=You need to hold something in your hand for this command to work!
+commands.compactmachines3.recipe.copy-item.success=Copied item to clipboard!
+
+commands.compactmachines3.recipe.generate.usage=/compactmachines3 recipe generate <recipe-name>
+commands.compactmachines3.recipe.generate.description=Generates the given recipe in world. Warning: Replaces all blocks in area!
+commands.compactmachines3.recipe.generate.exception.not_looking_at_block=You are not looking at a block where the Recipe will be built.
+commands.compactmachines3.recipe.generate.exception.unknown_recipe=The given recipe does not seem to exist.
+commands.compactmachines3.recipe.generate.exception.missing_machine_recipe=You need to specify a recipe name (use tab completion!)
+
 commands.compactmachines3.machines.description=命令来恢复丢失/损坏的机器
 commands.compactmachines3.machines.give.usage=/compactmachines3 machines give <id>
 commands.compactmachines3.machines.give.description=给玩家一个相应的立方体。 警告：如果机器已经存在在世界上，这会打破机器！
 commands.compactmachines3.machines.give.warning=警告：如果机器已经存在在世界上，这会打破机器！
+commands.compactmachines3.machines.give.tpinsidetooltip=Teleports you inside the machine at the set spawnpoint.
+commands.compactmachines3.machines.give.tpoutsidetooltip=Teleports you to the location of the machine block in the world.
 
 commands.compactmachines3.machines.view.usage=/compactmachines3 machines view [<id>]
 commands.compactmachines3.machines.view.description=打开一个GUI，允许检查所有现有的空间压缩机械
@@ -90,7 +189,7 @@ commands.compactmachines3.machines.view.description=打开一个GUI，允许检�
 commands.compactmachines3.machines.clear.usage=/compactmachines3 machines clear [<id>]
 commands.compactmachines3.machines.clear.description=将给定机械中的所有方块设置为空气。
 
-gui.compactmachines3.psd.welcome.welcome=Compact Machines3可以让您将复杂的机器装置放置在单一的方块中！
+gui.compactmachines3.psd.welcome.welcome=Compact Machines3可以让您将复杂的机器装置放置在单一的方块中！\nControls:\nLeft click - Open chapter\nRight click - Close chapter
 gui.compactmachines3.psd.welcome.chapters=可用章节：
 
 gui.compactmachines3.psd.machines.label=空间压缩机械
@@ -99,5 +198,26 @@ gui.compactmachines3.psd.machines.text=这是空间压缩机械模组的核心�
 gui.compactmachines3.psd.tunnels.label=空间压缩机械通道
 gui.compactmachines3.psd.tunnels.text=压缩机械通道是连接机械内部和外部的通道，由于每个面只有一个连接点这意味着，每个空间压缩机械只能装备6个压缩机械通道。\n在机械内部右键一块墙壁来放置压缩机械通道，再次单击放置的面可以设置连接的面\n压缩机械通道使用Forge功能来实现方块内外的“连接”其他模组需要使用这个系统，通道才能正常工作这是大多数存储的实现方法，但很少用于多方块系统，所以不要太期待其他模组的管道系统能正常工作。
 
+gui.compactmachines3.psd.redstone_tunnels.label=Redstone Tunnels
+gui.compactmachines3.psd.redstone_tunnels.text=These can be used to transfer redstone signals between the machine and the world it is placed in. In comparison to normal Tunnels they are not bidirectional, but need to be configured to be either In- or Output. Press the button in the top right corner to toggle between modes (red=in, green=out).\nYou can use these to either enable/disable redstone based systems inside your machines or to build complicated redstone circuits inside a single block.
+
 gui.compactmachines3.psd.crafting.label=空间压缩机械制作
 gui.compactmachines3.psd.crafting.text=要制作空间压缩机械，你需要建立一个多方块功能结构。\n将4个空间压缩机械领域投影器放置在彼此相对的位置，相对的每个奇数块都适合放置它们（右键投影器确认放置位置）。每个投影器都需要正面面对中心。\n一旦放置正确，投影器将会发射粒子效果建立一个预览的工作区域。查找JEI中的配方，在预览区域摆好对应的多方块结构，最后扔入催化物品，就可以开始制作了。
+
+gui.compactmachines3.compactsky.whitelist=Whitelist
+gui.compactmachines3.compactsky.preview=Preview
+gui.compactmachines3.compactsky.enter=Enter machine
+gui.compactmachines3.compactsky.rename=Rename
+
+gui.compactmachines3.compactsky.configuration.startLocked=Start machines in locked state
+gui.compactmachines3.compactsky.configuration.givePSD=Give players a Shrinking Device on first spawn
+gui.compactmachines3.compactsky.configuration.voidDimensions=Use void dimensions
+gui.compactmachines3.compactsky.configuration.schema=Schema
+gui.compactmachines3.compactsky.configuration.close=Done
+gui.compactmachines3.compactsky.configuration.label.MachineSize=Machine Size
+gui.compactmachines3.compactsky.configuration.label.Description=Description
+gui.compactmachines3.compactsky.configuration.warning.PleaseSpecifyADescription=Please specify a description in the schemas .json file!
+
+gui.compactmachines3.compactsky.configuration.small=16 Players
+gui.compactmachines3.compactsky.configuration.medium=64 Players
+gui.compactmachines3.compactsky.configuration.large=256 Players

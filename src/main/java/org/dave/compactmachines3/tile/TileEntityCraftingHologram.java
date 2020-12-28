@@ -10,11 +10,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.misc.SoundHandler;
-import org.dave.compactmachines3.utility.Logz;
 
 public class TileEntityCraftingHologram extends TileEntity implements ITickable {
     private MultiblockRecipe recipe = null;

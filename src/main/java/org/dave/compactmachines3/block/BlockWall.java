@@ -29,7 +29,7 @@ import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class BlockWall extends BlockProtected {
 
@@ -87,8 +87,8 @@ public class BlockWall extends BlockProtected {
 
         if(playerStack.getItem() instanceof ItemTunnelTool) {
             EnumFacing tunnelSide = EnumFacing.DOWN;
-            int coords = StructureTools.getCoordsForPos(pos);
-            HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
+            int id = StructureTools.getIdForPos(pos);
+            Map<EnumFacing, BlockPos> sideMapping = WorldSavedDataMachines.getInstance().tunnels.get(id);
             while(sideMapping != null && tunnelSide != null) {
                 if(sideMapping.get(tunnelSide) == null) {
                     break;
@@ -102,7 +102,7 @@ public class BlockWall extends BlockProtected {
                 world.setBlockState(pos, blockState);
 
                 playerStack.setCount(playerStack.getCount()-1);
-                WorldSavedDataMachines.INSTANCE.addTunnel(pos, tunnelSide);
+                WorldSavedDataMachines.getInstance().addTunnel(pos, tunnelSide);
             } else {
                 // TODO: Localization
                 player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
@@ -113,8 +113,8 @@ public class BlockWall extends BlockProtected {
 
         if(playerStack.getItem() instanceof ItemRedstoneTunnelTool) {
             EnumFacing tunnelSide = EnumFacing.DOWN;
-            int coords = StructureTools.getCoordsForPos(pos);
-            HashMap<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(coords);
+            int id = StructureTools.getIdForPos(pos);
+            Map<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.getInstance().redstoneTunnels.get(id);
             while(sideMapping != null && tunnelSide != null) {
                 if(sideMapping.get(tunnelSide) == null) {
                     break;
@@ -128,7 +128,7 @@ public class BlockWall extends BlockProtected {
                 world.setBlockState(pos, blockState);
 
                 playerStack.setCount(playerStack.getCount()-1);
-                WorldSavedDataMachines.INSTANCE.addRedstoneTunnel(pos, tunnelSide, false);
+                WorldSavedDataMachines.getInstance().addRedstoneTunnel(pos, tunnelSide, false);
             } else {
                 // TODO: Localization
                 player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);

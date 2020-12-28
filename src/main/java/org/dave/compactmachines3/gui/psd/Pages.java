@@ -8,34 +8,37 @@ import org.dave.compactmachines3.gui.psd.segments.VerticalSpaceSegment;
 import org.dave.compactmachines3.init.Blockss;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Pages {
-    private HashMap<String, Page> pages;
-    public static String activePageOnClient = "welcome";
+    private final Map<String, Page> pages;
+    private String activePage;
 
     public Pages() {
-        pages = new HashMap<>();
+        this.pages = new HashMap<>();
+        this.activePage = "welcome";
 
-        Page welcomePage = new Page("welcome");
+        Page welcomePage = new Page(this, "welcome");
         welcomePage.addSegment(new TextSegment("welcome"));
         welcomePage.addSegment(new VerticalSpaceSegment(11));
         welcomePage.addSegment(new TextSegment("chapters"));
 
-        ChaptersSegment chapters = new ChaptersSegment();
-        // TODO: Chapter labels should be localized
-        chapters.addChapter(new ItemStack(Blockss.machine, 1), "Compact Machines", "machines");
-        chapters.addChapter(new ItemStack(Blockss.tunnel, 1), "Tunnels", "tunnels");
-        chapters.addChapter(new ItemStack(Blockss.redstoneTunnel, 1), "Redstone Tunnels", "redstone_tunnels");
-        chapters.addChapter(new ItemStack(Blockss.fieldProjector, 1), "Miniaturization Crafting", "crafting");
+        ChaptersSegment chapters = new ChaptersSegment(this);
+        chapters.addChapter(new ItemStack(Blockss.machine, 1), "machines");
+        chapters.addChapter(new ItemStack(Blockss.tunnel, 1), "tunnels");
+        chapters.addChapter(new ItemStack(Blockss.redstoneTunnel, 1), "redstone_tunnels");
+        chapters.addChapter(new ItemStack(Blockss.fieldProjector, 1), "crafting");
 
         welcomePage.addSegment(chapters);
 
         registerPage(welcomePage);
-        registerPage(new SimpleTextPage("tunnels"));
-        registerPage(new SimpleTextPage("machines"));
-        registerPage(new SimpleTextPage("redstone_tunnels"));
+        registerPage(new SimpleTextPage(this, "tunnels"));
+        registerPage(new SimpleTextPage(this, "machines"));
+        registerPage(new SimpleTextPage(this, "redstone_tunnels"));
 
-        Page craftingPage = new Page("crafting");
+        Page craftingPage = new Page(this, "crafting");
         craftingPage.addSegment(new TextSegment("text"));
         craftingPage.addSegment(new VerticalSpaceSegment(-4));
 
@@ -53,6 +56,19 @@ public class Pages {
     }
 
     public Page getActivePage() {
-        return pages.get(activePageOnClient);
+        return pages.get(activePage);
+    }
+
+    public Set<Page> getPages() {
+        return new HashSet<>(pages.values());
+    }
+
+    public void setActivePage(Page page) {
+        activePage = page.getName();
+    }
+
+    public void setActivePage(String page) {
+        if (pages.containsKey(page))
+            activePage = page;
     }
 }

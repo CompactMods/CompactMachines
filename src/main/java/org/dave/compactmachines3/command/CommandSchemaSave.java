@@ -5,6 +5,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
@@ -45,17 +46,18 @@ public class CommandSchemaSave extends CommandBaseExt {
                 throw this.getException(sender, "not_in_machine_dimension");
             }
 
-            int coords = StructureTools.getCoordsForPos(sender.getCommandSenderEntity().getPosition());
+            int id = StructureTools.getIdForPos(sender.getCommandSenderEntity().getPosition());
 
-            List<BlockInformation> blockList = StructureTools.createNewSchema(coords);
+            List<BlockInformation> blockList = StructureTools.createNewSchema(id);
 
             if(blockList != null) {
                 Schema schema = new Schema(args[0]);
                 schema.setBlocks(blockList);
-                schema.setSize(WorldSavedDataMachines.INSTANCE.machineSizes.get(coords));
+                schema.setSize(WorldSavedDataMachines.getInstance().machineSizes.get(id));
 
+                BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(id);
                 Vec3d pos = sender.getPositionVector();
-                schema.setSpawnPosition(new double[] {pos.x % 1024, pos.y - 40, pos.z});
+                schema.setSpawnPosition(new Vec3d(pos.x - roomPos.getX(), pos.y - roomPos.getY(), pos.z - roomPos.getZ()));
 
                 try {
                     File schemaFile = new File(ConfigurationHandler.schemaDirectory, sane);

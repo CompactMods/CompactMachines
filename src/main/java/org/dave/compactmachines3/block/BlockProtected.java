@@ -39,7 +39,7 @@ public abstract class BlockProtected extends BlockBase {
 
     public boolean isBlockProtected(IBlockState state, IBlockAccess world, BlockPos pos) {
         return true;
-    };
+    }
 
     @Override
     public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {

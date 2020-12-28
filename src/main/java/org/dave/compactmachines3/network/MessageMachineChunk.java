@@ -1,7 +1,6 @@
 package org.dave.compactmachines3.network;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
@@ -11,36 +10,41 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.utility.ChunkUtils;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
 public class MessageMachineChunk implements IMessage, IMessageHandler<MessageMachineChunk, IMessage> {
-    protected int coords;
+    protected int id;
     protected NBTTagCompound data;
 
     public MessageMachineChunk() {
     }
 
-    public MessageMachineChunk(int coords) {
-        this.coords = coords;
-        Chunk chunk = DimensionTools.getServerMachineWorld().getChunk(new BlockPos(coords * 1024, 40, 0));
-        this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
+    public MessageMachineChunk(int id) {
+        this.id = id;
+        BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(this.id);
+        if (roomPos == null) {
+            this.data = new NBTTagCompound();
+        } else {
+            Chunk chunk = DimensionTools.getServerMachineWorld().getChunk(roomPos);
+            this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
+        }
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        coords = buf.readInt();
+        id = buf.readInt();
         try {
             data = ByteBufUtils.readTag(buf);
         } catch (Exception e) {
-            Logz.debug("Unable to read nbt data from buffer: %s", e.getMessage());
+            CompactMachines3.logger.debug("Unable to read nbt data from buffer: {}", e.getMessage());
             data = new NBTTagCompound();
         }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(coords);
+        buf.writeInt(id);
         ByteBufUtils.writeTag(buf, data);
     }
 

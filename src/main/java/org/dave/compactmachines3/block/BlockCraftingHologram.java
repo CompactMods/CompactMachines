@@ -2,8 +2,10 @@ package org.dave.compactmachines3.block;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -18,8 +20,6 @@ import org.dave.compactmachines3.tile.TileEntityCraftingHologram;
 import javax.annotation.Nullable;
 
 public class BlockCraftingHologram extends BlockProtected implements ITileEntityProvider {
-    private static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-
     public BlockCraftingHologram(Material material) {
         super(material);
     }
@@ -36,9 +36,19 @@ public class BlockCraftingHologram extends BlockProtected implements ITileEntity
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-        return false;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
+    }
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return NULL_AABB;
+    }
+
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+        return BlockFaceShape.UNDEFINED;
     }
 
     @Override
@@ -52,7 +62,7 @@ public class BlockCraftingHologram extends BlockProtected implements ITileEntity
     }
 
     @Override
-    public boolean isFullBlock(IBlockState state) {
+    public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid) {
         return false;
     }
 
@@ -60,16 +70,4 @@ public class BlockCraftingHologram extends BlockProtected implements ITileEntity
     public boolean isFullCube(IBlockState state) {
         return false;
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return BOUNDING_BOX;
-    }
-
-    @Nullable
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return BOUNDING_BOX;
-    }
-
 }

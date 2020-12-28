@@ -84,7 +84,7 @@ public abstract class BlockBaseTunnel extends BlockProtected implements ITileEnt
     }
 
     public void notifyOverworldNeighbor(BlockPos pos) {
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(pos));
+        DimensionBlockPos dimpos = WorldSavedDataMachines.getInstance().machinePositions.get(StructureTools.getIdForPos(pos));
         if(dimpos == null) {
             return;
         }

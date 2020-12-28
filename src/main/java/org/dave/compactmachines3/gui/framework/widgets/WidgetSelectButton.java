@@ -46,7 +46,7 @@ public class WidgetSelectButton<T> extends WidgetWithChoiceValue<T> {
 
     @Override
     public void draw(GuiScreen screen) {
-        //Logz.info("Width: %d, height: %d", width, height);
+        //Logz.info("Width: {}, height: {}", width, height);
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();

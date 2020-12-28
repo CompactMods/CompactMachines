@@ -68,9 +68,9 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             EntityPlayerMP serverPlayer = (EntityPlayerMP)player;
 
             if(player.isSneaking()) {
-                int coords = StructureTools.getCoordsForPos(player.getPosition());
+                int id = StructureTools.getIdForPos(player.getPosition());
                 Vec3d pos = player.getPositionVector();
-                WorldSavedDataMachines.INSTANCE.addSpawnPoint(coords, pos.x, pos.y, pos.z);
+                WorldSavedDataMachines.getInstance().addSpawnPoint(id, pos);
 
                 TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines3.psd.spawnpoint_set");
                 tc.getStyle().setColor(TextFormatting.GREEN);

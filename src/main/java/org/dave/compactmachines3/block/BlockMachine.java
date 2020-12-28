@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.compat.ITopInfoProvider;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.network.MessageMachineChunk;
 import org.dave.compactmachines3.network.MessageMachineContent;
 import org.dave.compactmachines3.network.PackageHandler;
@@ -48,7 +49,6 @@ import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.DimensionTools;
-import org.dave.compactmachines3.world.tools.StructureTools;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 import java.util.ArrayList;
@@ -94,7 +94,8 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(pos);
-        if(machine.isInsideItself()) {
+        // If we are on the client, this should not be called
+        if(machine.getWorld().isRemote || machine.isInsideItself()) {
             return 0;
         }
 
@@ -211,11 +212,11 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-        WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
+        WorldSavedDataMachines.getInstance().removeMachinePosition(te.id);
 
         BlockMachine.spawnItemWithNBT(world, pos, state.getValue(BlockMachine.SIZE), te);
 
-        ChunkLoadingMachines.unforceChunk(te.coords);
+        ChunkLoadingMachines.unforceChunk(te.id, te.getRoomPos());
         world.removeTileEntity(pos);
 
         super.breakBlock(world, pos, state);
@@ -227,15 +228,20 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         ItemStack stack = new ItemStack(Blockss.machine, 1, size.getMeta());
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("coords", te.coords);
-        if(te.hasOwner()) {
-            compound.setUniqueId("owner", te.getOwner());
+        // If a player places a machine, doesn't use it, and picks it back up, they can't stack it as it has NBT data.
+        if (ConfigurationHandler.MachineSettings.allowPickupEmptyMachines && te.id == -1 && !te.hasNewSchema()) {
+            // Don't add NBT data if the config value is set to true and the machine id is -1 and it doesn't have a schema
+        } else {
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setInteger("machineId", te.id);
+            if (te.hasOwner()) {
+                compound.setUniqueId("owner", te.getOwner());
+            }
+            if (te.hasNewSchema()) {
+                compound.setString("schema", te.getSchemaName());
+            }
+            stack.setTagCompound(compound);
         }
-        if(te.hasNewSchema()) {
-            compound.setString("schema", te.getSchemaName());
-        }
-        stack.setTagCompound(compound);
 
         if(te.getCustomName().length() > 0) {
             stack.setStackDisplayName(te.getCustomName());
@@ -259,40 +265,46 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
 
-        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
+        if (!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
             // Not a tile entity machine. Should not happen.
             return;
         }
 
-        TileEntityMachine tileEntityMachine = (TileEntityMachine)world.getTileEntity(pos);
-        if(tileEntityMachine.coords != -1) {
+        TileEntityMachine tileEntityMachine = (TileEntityMachine) world.getTileEntity(pos);
+        if (tileEntityMachine.id != -1) {
             // The machine already has data for some reason
             return;
         }
 
         // TODO: Allow storing of schemas in machines
         if(stack.hasTagCompound()) {
-            if(stack.getTagCompound().hasKey("coords")) {
-                int coords = stack.getTagCompound().getInteger("coords");
-                if (coords != -1) {
-                    tileEntityMachine.coords = coords;
+            NBTTagCompound tagCompound = stack.getTagCompound();
+            if (tagCompound.hasKey("machineId") || tagCompound.hasKey("coords")) {
+                int id = tagCompound.hasKey("machineId") ? tagCompound.getInteger("machineId") : tagCompound.getInteger("coords");
+                if (id != -1) {
+                    tileEntityMachine.id = id;
                     if(!world.isRemote) {
-                        WorldSavedDataMachines.INSTANCE.addMachinePosition(tileEntityMachine.coords, pos, world.provider.getDimension(), tileEntityMachine.getSize());
-                        StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
+                        WorldSavedDataMachines.getInstance().addMachinePosition(tileEntityMachine.id, pos, world.provider.getDimension());
+                        WorldSavedDataMachines.getInstance().addMachineSize(tileEntityMachine.id, tileEntityMachine.getSize());
+                        tileEntityMachine.syncRoomPos(); // Sync the roomPos if it already exists
+
+                        // This should be set when a player enters the machine for the first time anyways, and this breaks with the grid system as the position
+                        // of the room has not yet been determined/generated.
+                        // StructureTools.setBiomeForMachineId(id, world.getBiome(pos));
                     }
                 }
             }
 
-            if(stack.getTagCompound().hasKey("schema")) {
-                tileEntityMachine.setSchema(stack.getTagCompound().getString("schema"));
+            if (tagCompound.hasKey("schema")) {
+                tileEntityMachine.setSchema(tagCompound.getString("schema"));
             }
 
             if(stack.hasDisplayName()) {
                 tileEntityMachine.setCustomName(stack.getDisplayName());
             }
 
-            if(stack.getTagCompound().hasKey("ownerLeast") && stack.getTagCompound().hasKey("ownerMost")) {
-                tileEntityMachine.setOwner(stack.getTagCompound().getUniqueId("owner"));
+            if(tagCompound.hasKey("ownerLeast") && tagCompound.hasKey("ownerMost")) {
+                tileEntityMachine.setOwner(tagCompound.getUniqueId("owner"));
             }
         }
 
@@ -327,8 +339,8 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
-        PackageHandler.instance.sendTo(new MessageMachineContent(machine.coords), (EntityPlayerMP)player);
-        PackageHandler.instance.sendTo(new MessageMachineChunk(machine.coords), (EntityPlayerMP)player);
+        PackageHandler.instance.sendTo(new MessageMachineContent(machine.id), (EntityPlayerMP)player);
+        PackageHandler.instance.sendTo(new MessageMachineChunk(machine.id), (EntityPlayerMP)player);
 
         return true;
     }
@@ -344,15 +356,15 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
             }
 
             String nameOrId = "";
-            if(machine.coords < 0 && machine.getCustomName().length() == 0) {
-                nameOrId = "{*tooltip.compactmachines3.machine.coords.unused*}";
+            if(machine.id < 0 && machine.getCustomName().length() == 0) {
+                nameOrId = "{*tooltip.compactmachines3.machine.id.unused*}";
             } else if(machine.getCustomName().length() > 0) {
                 nameOrId = machine.getCustomName();
             } else {
-                nameOrId = "#" + machine.coords;
+                nameOrId = "#" + machine.id;
             }
 
-            probeInfo.horizontal().text(TextFormatting.GREEN + "{*tooltip.compactmachines3.machine.coords*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET);
+            probeInfo.horizontal().text(TextFormatting.GREEN + "{*tooltip.compactmachines3.machine.id*} " + TextFormatting.YELLOW + nameOrId + TextFormatting.RESET);
             if(player.isCreative() && mode == ProbeMode.EXTENDED) {
                 if(machine.hasNewSchema()) {
                     String schemaName = machine.getSchemaName();

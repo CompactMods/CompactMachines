@@ -245,7 +245,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
         BlockPos center = this.getPos().offset(this.getDirection(), magnitude);
         BlockPos topLeft = center.offset(EnumFacing.UP, magnitude).offset(this.getDirection().rotateYCCW(), magnitude);
 
-        List<BlockPos> positionsToCheck = StructureTools.getCubePositions(topLeft, fieldDimension, fieldDimension, fieldDimension, false);
+        List<BlockPos> positionsToCheck = StructureTools.getCubePositionsLegacy(topLeft, fieldDimension, fieldDimension, fieldDimension, false);
         for(BlockPos pos : positionsToCheck) {
             if(!getWorld().isAirBlock(pos)) {
                 return pos;
@@ -256,27 +256,22 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
     }
 
     public boolean shouldRenderField() {
-        if(world.isBlockPowered(getPos())) {
+        // This method is only ever called on the master projector
+        if (world.isBlockPowered(getPos())) {
             return false;
         }
 
         int magnitude = getCraftingAreaMagnitude();
-        if(magnitude <= 1) {
+        if (magnitude <= 1) {
             return false;
         }
 
-        if(getMissingProjectors(magnitude).size() > 0) {
+        if (!getMissingProjectors(magnitude).isEmpty()) {
             return false;
         }
 
-        // One of the projectors must be a master projector
-        TileEntityFieldProjector master = getMasterProjector();
-        if(master == null) {
-            return false;
-        }
-
-        // Then check the crafting area is free, this is done by the master projector
-        if(!master.canGenerateFieldAtMagnitude(magnitude)) {
+        // Then check the crafting area is free
+        if (!this.canGenerateFieldAtMagnitude(magnitude)) {
             return false;
         }
 
@@ -368,7 +363,7 @@ public class TileEntityFieldProjector extends TileEntity implements ITickable {
             // Remove blocks from the world
             for(BlockPos pos : getInsideBlocks()) {
                 world.setBlockToAir(pos);
-                ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 10, 0.5D, 0.5D, 0.5D, 0.01D, new int[0]);
+                ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 10, 0.5D, 0.5D, 0.5D, 0.01D);
             }
 
             // Reduce the number of items in the stack

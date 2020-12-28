@@ -29,19 +29,19 @@ public class CommandMachinesView extends CommandBaseExt {
             return;
         }
 
-        int coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;
+        int id = WorldSavedDataMachines.getInstance().nextId - 1;
         if(args.length == 1) {
-            coords = Integer.parseInt(args[0]);
+            id = Integer.parseInt(args[0]);
         }
 
-        if(coords < 0 || coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+        if(id < 0 || id >= WorldSavedDataMachines.getInstance().nextId) {
             return;
         }
 
         EntityPlayerMP player = (EntityPlayerMP)sender.getCommandSenderEntity();
 
         player.openGui(CompactMachines3.instance, GuiIds.MACHINE_ADMIN.ordinal(), player.world, 0,0,0);
-        PackageHandler.instance.sendTo(new MessageMachineContent(coords), player);
-        PackageHandler.instance.sendTo(new MessageMachineChunk(coords), player);
+        PackageHandler.instance.sendTo(new MessageMachineContent(id), player);
+        PackageHandler.instance.sendTo(new MessageMachineChunk(id), player);
     }
 }

@@ -56,29 +56,27 @@ public abstract class CommandMenu extends CommandBaseExt {
             }
         }
 
-        if(found) {
+        if (found) {
             sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.denied"));
             return;
         }
 
-        if(args.length == 0 || found == false) {
-            TextComponentTranslation tc = new TextComponentTranslation("commands.compactmachines3.available");
-            tc.getStyle().setUnderlined(true);
-            tc.appendText("\n");
+        TextComponentTranslation tc = new TextComponentTranslation("commands.compactmachines3.available");
+        tc.getStyle().setUnderlined(true);
+        tc.appendText("\n");
 
-            for(CommandBaseExt cmd : subcommands) {
-                boolean allowed = cmd.checkPermission(server, sender);
-                String color = "" + (allowed ? TextFormatting.GREEN : TextFormatting.DARK_RED);
-                tc.appendSibling(new TextComponentString("\n" + color + cmd.getName() + " "));
-                TextComponentTranslation tt = new TextComponentTranslation(cmd.getCommandDescription(sender));
-                tt.getStyle().setColor(TextFormatting.GRAY);
-                tt.getStyle().setUnderlined(false);
-                tc.appendSibling(tt);
-                tc.appendSibling(new TextComponentString("" + TextFormatting.RESET));
-            }
-
-            sender.sendMessage(tc);
+        for (CommandBaseExt cmd : subcommands) {
+            boolean allowed = cmd.checkPermission(server, sender);
+            String color = "" + (allowed ? TextFormatting.GREEN : TextFormatting.DARK_RED);
+            tc.appendSibling(new TextComponentString("\n" + color + cmd.getName() + " "));
+            TextComponentTranslation tt = new TextComponentTranslation(cmd.getCommandDescription(sender));
+            tt.getStyle().setColor(TextFormatting.GRAY);
+            tt.getStyle().setUnderlined(false);
+            tc.appendSibling(tt);
+            tc.appendSibling(new TextComponentString("" + TextFormatting.RESET));
         }
+
+        sender.sendMessage(tc);
     }
 
     @Override

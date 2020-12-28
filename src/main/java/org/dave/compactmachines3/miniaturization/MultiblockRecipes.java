@@ -8,15 +8,14 @@ import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ResourceLoader;
 import org.dave.compactmachines3.utility.SerializationHelper;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class MultiblockRecipes {
     private static List<MultiblockRecipe> recipes = new ArrayList<>();
@@ -46,9 +45,10 @@ public class MultiblockRecipes {
     }
 
     public static MultiblockRecipe getRecipeByName(String name) {
-        Optional<MultiblockRecipe> opt = recipes.stream().filter(recipe -> recipe.getName().equals(name)).findFirst();
-        if(opt.isPresent()) {
-            return opt.get();
+        for (MultiblockRecipe recipe : recipes) {
+            if (recipe.getName().equals(name)) {
+                return recipe;
+            }
         }
 
         return null;
@@ -66,11 +66,11 @@ public class MultiblockRecipes {
 
             MultiblockRecipe recipe = SerializationHelper.GSON.fromJson(new JsonReader(new InputStreamReader(is)), MultiblockRecipe.class);
             if (recipe == null) {
-                Logz.error("Could not deserialize recipe from file: \"" + filename + "\"");
+                CompactMachines3.logger.error("Could not deserialize recipe from file: \"{}\"", filename);
                 continue;
             }
 
-            Logz.info("Loaded recipe \"%s\"", filename);
+            CompactMachines3.logger.info("Loaded recipe \"{}\"", filename);
             recipes.add(recipe);
         }
     }

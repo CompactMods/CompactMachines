@@ -21,7 +21,7 @@ public class WidgetPanel extends Widget {
         // Also notify widgets when the mouse entered or exited their area
         this.addListener(MouseMoveEvent.class, (event, widget)-> {
 
-            //Logz.info("[%s] Moved mouse to x=%d, y=%d", widget.id, innerX, innerY);
+            //Logz.info("[{}] Moved mouse to x={}, y={}", widget.id, innerX, innerY);
             for(Widget child : children) {
                 MouseMoveEvent shifted = new MouseMoveEvent(event.x, event.y);
                 child.fireEvent(shifted);
@@ -47,19 +47,19 @@ public class WidgetPanel extends Widget {
         this.addListener(MouseClickEvent.class, ((event, widget) -> {
             int innerX = event.x - widget.getActualX();
             int innerY = event.y - widget.getActualY();
-            //Logz.info("%s: Click: screen@%d,%d, panel@%d,%d", this.toString(), event.x, event.y, innerX, innerY);
+            //Logz.info("{}: Click: screen@{},{}, panel@{},{}", this.toString(), event.x, event.y, innerX, innerY);
 
             for(Widget child : children) {
                 if(!child.visible) {
                     continue;
                 }
 
-                //Logz.info("Checking child: %s @ %d,%d", child.toString(), innerX, innerY);
+                //Logz.info("Checking child: {} @ {},{}", child.toString(), innerX, innerY);
                 if(!child.isPosInside(event.x, event.y)) {
                     continue;
                 }
 
-                //Logz.info("Passing along to child=%s with %d,%d", child.toString(), innerX, innerY);
+                //Logz.info("Passing along to child={} with {},{}", child.toString(), innerX, innerY);
                 if(child.fireEvent(new MouseClickEvent(event.x, event.y, event.button)) == WidgetEventResult.HANDLED) {
                     return WidgetEventResult.HANDLED;
                 }

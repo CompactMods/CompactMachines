@@ -8,6 +8,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.TextFormatting;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.block.BlockFieldProjector;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.block.BlockRedstoneTunnel;
@@ -16,7 +17,6 @@ import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
 import org.dave.compactmachines3.tile.TileEntityFieldProjector;
 import org.dave.compactmachines3.tile.TileEntityMachine;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.TextFormattingHelper;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class WailaProvider {
     public static void register(IWailaRegistrar registry) {
-        Logz.info("Enabled support for Waila/Hwyla");
+        CompactMachines3.logger.info("Enabled support for Waila/Hwyla");
         MachineProvider mpInstance = new MachineProvider();
         TunnelProvider tpInstance = new TunnelProvider();
         RedstoneTunnelProvider rtpInstance = new RedstoneTunnelProvider();
@@ -104,14 +104,14 @@ public class WailaProvider {
 
             String nameOrId = "";
             TileEntityMachine te = (TileEntityMachine)accessor.getTileEntity();
-            if(te.coords < 0 && te.getCustomName().length() == 0) {
-                nameOrId = I18n.format("tooltip.compactmachines3.machine.coords.unused");
+            if(te.id < 0 && te.getCustomName().length() == 0) {
+                nameOrId = I18n.format("tooltip.compactmachines3.machine.id.unused");
             } else if(te.getCustomName().length() > 0) {
                 nameOrId = te.getCustomName();
             } else {
-                nameOrId = "#" + te.coords;
+                nameOrId = "#" + te.id;
             }
-            currenttip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords") + " " + nameOrId));
+            currenttip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.id") + " " + nameOrId));
 
             String sideString = I18n.format("enumfacing.side", I18n.format("enumfacing." + accessor.getSide().getName()));
             currenttip.add(TextFormattingHelper.colorizeKeyValue(sideString));

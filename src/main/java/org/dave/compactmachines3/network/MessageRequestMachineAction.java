@@ -4,19 +4,19 @@ import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessageRequestMachineAction implements IMessage {
-    int coords;
+    int id;
     Action action;
 
-    public MessageRequestMachineAction(int coords, Action action) {
-        this.coords = coords;
+    public MessageRequestMachineAction(int id, Action action) {
+        this.id = id;
         this.action = action;
     }
 
     public MessageRequestMachineAction() {
     }
 
-    public void setCoords(int coords) {
-        this.coords = coords;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setAction(Action action) {
@@ -25,13 +25,13 @@ public class MessageRequestMachineAction implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        this.coords = buf.readInt();
+        this.id = buf.readInt();
         this.action = Action.values()[buf.readInt()];
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(this.coords);
+        buf.writeInt(this.id);
         buf.writeInt(this.action.ordinal());
     }
 

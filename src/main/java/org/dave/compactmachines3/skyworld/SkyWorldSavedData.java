@@ -9,7 +9,7 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.CompactMachines3;
 
 import java.util.*;
 
@@ -34,8 +34,8 @@ public class SkyWorldSavedData extends WorldSavedData {
         return hubMachineOwners.contains(player.getUniqueID());
     }
 
-    public void setHomeOwner(EntityPlayer player, int coords) {
-        homeOwnerMapping.put(player.getUniqueID(), coords);
+    public void setHomeOwner(EntityPlayer player, int id) {
+        homeOwnerMapping.put(player.getUniqueID(), id);
         hubMachineOwners.add(player.getUniqueID());
         this.markDirty();
     }
@@ -70,7 +70,7 @@ public class SkyWorldSavedData extends WorldSavedData {
             data.markDirty();
         }
 
-        Logz.info("Compact Skies Machine Owners: %d", data.hubMachineOwners.size());
+        CompactMachines3.logger.info("Compact Skies Machine Owners: {}", data.hubMachineOwners.size());
 
         instance = data;
         world.getMapStorage().setData(SAVED_DATA_NAME, data);
@@ -137,8 +137,8 @@ public class SkyWorldSavedData extends WorldSavedData {
             NBTTagCompound innerKey = new NBTTagCompound();
             innerKey.setUniqueId("", owner);
 
-            int coords = homeOwnerMapping.get(owner);
-            homeMapping.setTag("" + coords, innerKey);
+            int id = homeOwnerMapping.get(owner);
+            homeMapping.setTag("" + id, innerKey);
         }
 
         compound.setTag("homeOwnerMapping", homeMapping);

@@ -18,7 +18,7 @@ import org.dave.compactmachines3.tile.TileEntityTunnel;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class BlockTunnel extends BlockBaseTunnel {
 
@@ -46,9 +46,12 @@ public class BlockTunnel extends BlockBaseTunnel {
         EnumFacing connectedSide = state.getValue(MACHINE_SIDE);
         EnumFacing nextDirection = StructureTools.getNextDirection(connectedSide);
 
-        int coords = StructureTools.getCoordsForPos(pos);
-        HashMap sideMapping = WorldSavedDataMachines.INSTANCE.tunnels.get(coords);
-        while(sideMapping != null) {
+        int id = StructureTools.getIdForPos(pos);
+        Map<EnumFacing, BlockPos> sideMapping = WorldSavedDataMachines.getInstance().tunnels.get(id);
+        if (sideMapping == null) {
+            return true;
+        }
+        while (true) {
             if (nextDirection == null) {
                 if(world.getTileEntity(pos) != null) {
                     world.removeTileEntity(pos);
@@ -58,7 +61,7 @@ public class BlockTunnel extends BlockBaseTunnel {
                 world.setBlockState(pos, blockState);
 
                 ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Itemss.tunnelTool));
-                WorldSavedDataMachines.INSTANCE.removeTunnel(pos);
+                WorldSavedDataMachines.getInstance().removeTunnel(pos);
                 break;
             }
 
@@ -68,8 +71,8 @@ public class BlockTunnel extends BlockBaseTunnel {
                 }
 
                 world.setBlockState(pos, state.withProperty(MACHINE_SIDE, nextDirection));
-                WorldSavedDataMachines.INSTANCE.removeTunnel(pos, connectedSide);
-                WorldSavedDataMachines.INSTANCE.addTunnel(pos, nextDirection);
+                WorldSavedDataMachines.getInstance().removeTunnel(pos, connectedSide);
+                WorldSavedDataMachines.getInstance().addTunnel(pos, nextDirection);
                 break;
             }
 

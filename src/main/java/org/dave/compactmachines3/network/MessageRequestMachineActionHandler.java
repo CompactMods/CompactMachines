@@ -23,40 +23,40 @@ import org.dave.compactmachines3.world.tools.TeleportationTools;
 public class MessageRequestMachineActionHandler implements IMessageHandler<MessageRequestMachineAction, MessageMachineContent> {
     @Override
     public MessageMachineContent onMessage(MessageRequestMachineAction message, MessageContext ctx) {
-        int coords = message.coords;
+        int id = message.id;
         if(message.action == MessageRequestMachineAction.Action.REFRESH) {
-            if(message.coords < 0) {
-                coords = WorldSavedDataMachines.INSTANCE.nextCoord-1;
+            if(message.id < 0) {
+                id = WorldSavedDataMachines.getInstance().nextId-1;
             }
-            if(message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
-                coords = 0;
+            if(message.id >= WorldSavedDataMachines.getInstance().nextId) {
+                id = 0;
             }
         }
 
         final boolean[] updateMachineContent = {true};
-        int finalCoords = coords;
+        int finalId = id;
         EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
         if(message.action == MessageRequestMachineAction.Action.GIVE_ITEM) {
-            EnumMachineSize size = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
+            EnumMachineSize size = WorldSavedDataMachines.getInstance().machineSizes.get(id);
 
             serverPlayer.getServerWorld().addScheduledTask(() -> {
                 ItemStack stack = new ItemStack(Blockss.machine, 1, size.getMeta());
                 NBTTagCompound compound = new NBTTagCompound();
-                compound.setInteger("coords", finalCoords);
+                compound.setInteger("machineId", finalId);
                 stack.setTagCompound(compound);
 
                 ItemHandlerHelper.giveItemToPlayer(serverPlayer, stack);
-                WorldSavedDataMachines.INSTANCE.removeMachinePosition(finalCoords);
+                WorldSavedDataMachines.getInstance().removeMachinePosition(finalId);
             });
         }
 
         if(message.action == MessageRequestMachineAction.Action.TELEPORT_INSIDE) {
-            TeleportationTools.teleportPlayerToMachine(serverPlayer, coords, false);
+            TeleportationTools.teleportPlayerToMachine(serverPlayer, id, false);
             // return null;
         }
 
         if(message.action == MessageRequestMachineAction.Action.TELEPORT_OUTSIDE) {
-            DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
+            DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(id);
             WorldServer world = DimensionTools.getWorldServerForDimension(pos.getDimension());
             BlockPos spawnPos = TeleportationTools.getValidSpawnLocation(world, pos.getBlockPos());
 
@@ -67,7 +67,7 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
 
         if(message.action == MessageRequestMachineAction.Action.TOGGLE_LOCKED) {
             serverPlayer.getServerWorld().addScheduledTask(() -> {
-                DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(finalCoords);
+                DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(finalId);
                 TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
                 if (te != null && te instanceof TileEntityMachine) {
                     TileEntityMachine machine = (TileEntityMachine) te;
@@ -79,7 +79,7 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
 
         if(message.action == MessageRequestMachineAction.Action.TRY_TO_ENTER) {
             serverPlayer.getServerWorld().addScheduledTask(() -> {
-                DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(finalCoords);
+                DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(finalId);
                 TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
                 if (te != null && te instanceof TileEntityMachine) {
                     TileEntityMachine machine = (TileEntityMachine) te;
@@ -91,8 +91,8 @@ public class MessageRequestMachineActionHandler implements IMessageHandler<Messa
 
         if(updateMachineContent[0]) {
             serverPlayer.getServerWorld().addScheduledTask(() -> {
-                PackageHandler.instance.sendTo(new MessageMachineChunk(finalCoords), serverPlayer);
-                PackageHandler.instance.sendTo(new MessageMachineContent(finalCoords), serverPlayer);
+                PackageHandler.instance.sendTo(new MessageMachineChunk(finalId), serverPlayer);
+                PackageHandler.instance.sendTo(new MessageMachineContent(finalId), serverPlayer);
             });
         }
 

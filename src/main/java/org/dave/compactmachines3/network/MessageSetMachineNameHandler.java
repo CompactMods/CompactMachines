@@ -13,16 +13,16 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 public class MessageSetMachineNameHandler implements IMessageHandler<MessageSetMachineName, MessageSetMachineName> {
     @Override
     public MessageSetMachineName onMessage(MessageSetMachineName message, MessageContext ctx) {
-        int coords = message.coords;
-        if(message.coords < 0 || message.coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+        int id = message.id;
+        if(message.id < 0 || message.id >= WorldSavedDataMachines.getInstance().nextId) {
             return null;
         }
 
-        int finalCoords = coords;
+        int finalId = id;
         EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
 
         serverPlayer.getServerWorld().addScheduledTask(() -> {
-            DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(finalCoords);
+            DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(finalId);
             TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
             if (te != null && te instanceof TileEntityMachine) {
                 TileEntityMachine machine = (TileEntityMachine) te;
@@ -33,7 +33,7 @@ public class MessageSetMachineNameHandler implements IMessageHandler<MessageSetM
                 machine.getWorld().notifyBlockUpdate(pos.getBlockPos(), state, state, 3);
             }
 
-            PackageHandler.instance.sendTo(new MessageMachineContent(finalCoords), serverPlayer);
+            PackageHandler.instance.sendTo(new MessageMachineContent(finalId), serverPlayer);
         });
 
         return null;

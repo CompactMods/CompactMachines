@@ -15,6 +15,7 @@ import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 
@@ -249,7 +250,7 @@ public class ChunkUtils {
                 try {
                     tileentity.setWorld(worldIn);
                 } catch (Exception e) {
-                    Logz.warn("Unable to render tile-entity %s in a fake world. Skipping.", tileentity.getClass().getName());
+                    CompactMachines3.logger.warn("Unable to render tile-entity {} in a fake world. Skipping.", tileentity.getClass().getName());
                     erroneousTiles.add(tileentity.getClass().getName());
                     continue;
                 }
@@ -262,7 +263,7 @@ public class ChunkUtils {
                         }
                     }
                 } catch (Exception e) {
-                    Logz.warn("Unable to provide extra tile-entity data for %s", tileentity.getClass().getName());
+                    CompactMachines3.logger.warn("Unable to provide extra tile-entity data for {}", tileentity.getClass().getName());
                 }
 
                 chunk.addTileEntity(tileentity);
@@ -273,9 +274,9 @@ public class ChunkUtils {
                     try {
                         tileentity.onDataPacket(null, new SPacketUpdateTileEntity(tileentity.getPos(), 1, tag));
                     } catch (NullPointerException npe) {
-                        Logz.debug("TileEntity '%s' is unable to read data packet without a network manager instance.", tileentity.getClass().getName());
+                        CompactMachines3.logger.debug("TileEntity '{}' is unable to read data packet without a network manager instance.", tileentity.getClass().getName());
                     } catch (Exception e) {
-                        Logz.debug("TileEntity '%s' is unable to read data packet. Probably because of internally saved block positions or dimension. Report this to the Compact Machines author, not the blocks mod author!", tileentity.getClass().getName());
+                        CompactMachines3.logger.debug("TileEntity '{}' is unable to read data packet. Probably because of internally saved block positions or dimension. Report this to the Compact Machines author, not the blocks mod author!", tileentity.getClass().getName());
                     }
                 }
             }

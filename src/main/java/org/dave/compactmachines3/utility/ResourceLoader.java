@@ -1,6 +1,7 @@
 package org.dave.compactmachines3.utility;
 
 import net.minecraft.launchwrapper.Launch;
+import org.dave.compactmachines3.CompactMachines3;
 
 import java.io.*;
 import java.net.JarURLConnection;
@@ -49,7 +50,7 @@ public class ResourceLoader {
             for(File file : runtimePath.listFiles()) {
                 try {
                     result.put(file.getName(), new FileInputStream(file));
-                    Logz.debug(" - Loading file '%s' from config folder", file.getName());
+                    CompactMachines3.logger.debug(" - Loading file '{}' from config folder", file.getName());
                 } catch (FileNotFoundException e) {
                 }
             }
@@ -65,7 +66,7 @@ public class ResourceLoader {
                     }
                     try {
                         result.put(file.getName(), new FileInputStream(file));
-                        Logz.debug(" - Loading file '%s' from development assets folder", file.getName());
+                        CompactMachines3.logger.debug(" - Loading file '{}' from development assets folder", file.getName());
                     } catch (FileNotFoundException e) {
                     }
                 }
@@ -74,7 +75,7 @@ public class ResourceLoader {
             // We need to get an InputStream from within our jar file
             URL srcUrl = this.jarClass.getResource("/" + assetPathName);
             if(srcUrl == null || !srcUrl.getProtocol().equals("jar")) {
-                Logz.error("Error while reading files from jar: unable to get Resource URL for '%s'.", assetPathName);
+                CompactMachines3.logger.error("Error while reading files from jar: unable to get Resource URL for '{}'.", assetPathName);
                 return null;
             }
 
@@ -98,7 +99,7 @@ public class ResourceLoader {
                     }
 
                     result.put(filename, zipFile.getInputStream(zipEntry));
-                    Logz.debug(" - Loading file '%s' from jar", filename);
+                    CompactMachines3.logger.debug(" - Loading file '{}' from jar", filename);
                 }
             } catch(IOException e) {
                 e.printStackTrace();

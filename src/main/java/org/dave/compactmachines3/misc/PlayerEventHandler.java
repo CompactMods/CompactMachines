@@ -5,12 +5,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -25,12 +23,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.network.MessageMachinePositions;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.network.MessageWorldInfo;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.DimensionTools;
-import org.dave.compactmachines3.world.tools.StructureTools;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
 
 public class PlayerEventHandler {
@@ -41,6 +39,7 @@ public class PlayerEventHandler {
         }
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         PackageHandler.instance.sendTo(new MessageWorldInfo(DimensionTools.getServerMachineWorld().getWorldInfo()), player);
+        PackageHandler.instance.sendTo(MessageMachinePositions.initWithWorldSavedData(), player);
     }
 
     @SubscribeEvent
@@ -49,14 +48,15 @@ public class PlayerEventHandler {
             return;
         }
 
-        int bedCoords = WorldSavedDataMachines.INSTANCE.getBedCoords(event.player);
-        boolean bedInCM = bedCoords != -1;
+        int bedLocations = WorldSavedDataMachines.getInstance().getBedLocation(event.player);
+        boolean bedInCM = bedLocations != -1;
 
         if(bedInCM && ConfigurationHandler.MachineSettings.allowRespawning) {
-            TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) event.player, bedCoords, false);
+            TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) event.player, bedLocations, false);
         } else {
             TeleportationTools.teleportPlayerOutOfMachineDimension((EntityPlayerMP) event.player);
-            event.player.getEntityData().removeTag("compactmachines3-coordHistory");
+            event.player.getEntityData().removeTag("compactmachines3-idHistory");
+            event.player.getEntityData().removeTag("compactmachines3-coordHistory"); // Legacy
         }
     }
 
@@ -68,7 +68,7 @@ public class PlayerEventHandler {
 
         if (!ConfigurationHandler.MachineSettings.allowRespawning) {
             event.setResult(EntityPlayer.SleepResult.NOT_POSSIBLE_HERE);
-            event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.cant_sleep_here", new Object[0]), true);
+            event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.cant_sleep_here"), true);
             return;
         }
 
@@ -77,8 +77,8 @@ public class PlayerEventHandler {
             return;
         }
 
-        event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.bed_position_set", new Object[0]), true);
-        WorldSavedDataMachines.INSTANCE.setBedCoords(event.getEntityPlayer());
+        event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("hint.compactmachines3.bed_position_set"), true);
+        WorldSavedDataMachines.getInstance().setBedLocation(event.getEntityPlayer());
 
         event.setResult(EntityPlayer.SleepResult.NOT_POSSIBLE_HERE);
     }
@@ -149,10 +149,11 @@ public class PlayerEventHandler {
         if (event.player.world.getTotalWorldTime() % 20 != 0) {
             return;
         }
+        int enteredMachineId = WorldSavedDataMachines.getInstance().getMachineIdFromBoxPos(event.player);
 
         // No coord history -> out of here
-        int lastCoords = TeleportationTools.getLastKnownCoords(event.player);
-        if(lastCoords == -1 && ConfigurationHandler.MachineSettings.allowEnteringWithoutPSD == false) {
+        int lastId = TeleportationTools.getLastKnownRoomId(event.player, false);
+        if(lastId == -1 && !ConfigurationHandler.MachineSettings.allowEnteringWithoutPSD) {
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:nausea"), 200, 5, false, false));
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:wither"), 160, 1, false, false));
 
@@ -166,12 +167,16 @@ public class PlayerEventHandler {
             return;
         }
 
-        if(!ConfigurationHandler.MachineSettings.keepPlayersInside) {
+        if (enteredMachineId != -1 && lastId != enteredMachineId && ConfigurationHandler.MachineSettings.allowEnteringWithoutPSD) {
+            TeleportationTools.addMachineIdToHistory(enteredMachineId, event.player);
             return;
         }
 
-        int actualCoords = StructureTools.getCoordsForPos(new BlockPos(event.player.posX, event.player.posY, event.player.posZ));
-        EnumMachineSize enumSize = WorldSavedDataMachines.INSTANCE.machineSizes.getOrDefault(lastCoords, null);
+        if(!ConfigurationHandler.MachineSettings.keepPlayersInside) { // If "keepPlayersInside" is set to false then there is no reason to check this
+            return;
+        }
+
+        EnumMachineSize enumSize = WorldSavedDataMachines.getInstance().machineSizes.get(lastId);
         if(enumSize == null) {
             // This should only happen after someone updated before this feature was implemented:
             // The size value will only be known once at least one player entered the machine.
@@ -179,16 +184,12 @@ public class PlayerEventHandler {
             return;
         }
 
-        if(event.player.isCreative() && event.player.canUseCommand(2, "")) {
+        if((event.player.isCreative() || event.player.isSpectator()) && event.player.canUseCommand(2, "")) {
             return;
         }
 
-        int size = enumSize.getDimension() + 1;
-        AxisAlignedBB bb = new AxisAlignedBB(
-                lastCoords << 10, 40, 0,
-                (lastCoords << 10) + size, 40 + size, size
-                );
-        if(!bb.contains(new Vec3d(event.player.posX, event.player.posY, event.player.posZ))) {
+        // True if the last machine the player entered does not equal the one they are inside of, which is not allowed
+        if (lastId != enteredMachineId && lastId != -1) {
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:nausea"), 200, 5, false, false));
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:wither"), 160, 1, false, false));
             TeleportationTools.teleportPlayerOutOfMachine((EntityPlayerMP) event.player);

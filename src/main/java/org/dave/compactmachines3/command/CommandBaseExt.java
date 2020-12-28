@@ -61,7 +61,7 @@ public abstract class CommandBaseExt extends CommandBase {
         return new WrongUsageException(this.getUsage(sender));
     }
 
-    public SyntaxErrorException getException(ICommandSender sender, String type) {
-        return new SyntaxErrorException("commands." + this.getFullCommandName() + ".exception." + type);
+    public SyntaxErrorException getException(ICommandSender sender, String type, Object... args) {
+        return new SyntaxErrorException("commands." + this.getFullCommandName() + ".exception." + type, args);
     }
 }

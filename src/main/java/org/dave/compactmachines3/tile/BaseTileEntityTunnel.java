@@ -21,7 +21,7 @@ public class BaseTileEntityTunnel extends TileEntity implements ITickable {
     }
 
     public ItemStack getConnectedPickBlock() {
-        DimensionBlockPos dimpos = WorldSavedDataMachines.INSTANCE.machinePositions.get(StructureTools.getCoordsForPos(this.getPos()));
+        DimensionBlockPos dimpos = WorldSavedDataMachines.getInstance().machinePositions.get(StructureTools.getIdForPos(this.getPos()));
         if(dimpos == null) {
             return ItemStack.EMPTY;
         }
