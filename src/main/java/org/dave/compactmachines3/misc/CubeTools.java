@@ -3,7 +3,6 @@ package org.dave.compactmachines3.misc;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.ChunkBlockAccess;
@@ -25,13 +24,13 @@ public class CubeTools {
         // TODO: Remove this ChunkBlockAccess class from the mod if possible, investigate why it still exists?
         int yOffset = world instanceof ChunkBlockAccess ? 0 : 40;
 
-        int id = CubeTools.getRoomId(blockPos);
+        int id = WorldSavedDataMachines.getClientMachineIdFromBoxPos(blockPos);
 
         if (id == -1)
             return true; // Render as full block
 
-        BlockPos roomPos = CompactMachines3.clientMachineGrid.get(id);
-        EnumMachineSize sizeEnum = CompactMachines3.clientMachineSizes.get(id);
+        BlockPos roomPos = WorldSavedDataMachines.getClientMachineGrid().get(id);
+        EnumMachineSize sizeEnum = WorldSavedDataMachines.getClientMachineSizes().get(id);
 
         if (sizeEnum == null)
             return true; // Render as full block
@@ -62,11 +61,5 @@ public class CubeTools {
         }
 
         return false;
-    }
-
-    public static int getRoomId(BlockPos blockPos) {
-        if (CompactMachines3.clientMachineGrid == null || CompactMachines3.clientMachineSizes == null)
-            return -1;
-        return WorldSavedDataMachines.getMachineIdFromBoxPos(blockPos, CompactMachines3.clientMachineGrid, CompactMachines3.clientMachineSizes);
     }
 }

@@ -149,7 +149,7 @@ public class PlayerEventHandler {
         if (event.player.world.getTotalWorldTime() % 20 != 0) {
             return;
         }
-        int enteredMachineId = WorldSavedDataMachines.getInstance().getMachineIdFromBoxPos(event.player);
+        int enteredMachineId = WorldSavedDataMachines.getInstance().getMachineIdFromEntityPos(event.player);
 
         // No coord history -> out of here
         int lastId = TeleportationTools.getLastKnownRoomId(event.player, false);

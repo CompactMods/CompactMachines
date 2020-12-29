@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
@@ -72,8 +71,8 @@ public class MessageMachinePositions implements IMessage, IMessageHandler<Messag
 
     @Override
     public IMessage onMessage(MessageMachinePositions message, MessageContext ctx) {
-        CompactMachines3.clientMachineGrid = message.machineGrid;
-        CompactMachines3.clientMachineSizes = message.machineSizes;
+        WorldSavedDataMachines.setClientMachineGrid(message.machineGrid);
+        WorldSavedDataMachines.setClientMachineSizes(message.machineSizes);
         return null;
     }
 }

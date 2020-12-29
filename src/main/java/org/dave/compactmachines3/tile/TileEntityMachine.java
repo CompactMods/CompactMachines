@@ -462,7 +462,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return StructureTools.getIdForPos(this.getPos()) == this.id;
         } else {
             // Client
-            return WorldSavedDataMachines.getMachineIdFromBoxPos(this.getPos(), CompactMachines3.clientMachineGrid, CompactMachines3.clientMachineSizes) == this.id;
+            return WorldSavedDataMachines.getClientMachineIdFromBoxPos(this.getPos()) == this.id;
         }
     }
 

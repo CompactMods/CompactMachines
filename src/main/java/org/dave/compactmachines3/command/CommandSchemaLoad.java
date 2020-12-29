@@ -43,7 +43,7 @@ public class CommandSchemaLoad extends CommandBaseExt {
         }
 
         Schema schema = SchemaRegistry.instance.getSchema(args[0]);
-        int id = WorldSavedDataMachines.getInstance().getMachineIdFromBoxPos(sender.getCommandSenderEntity());
+        int id = WorldSavedDataMachines.getInstance().getMachineIdFromEntityPos(sender.getCommandSenderEntity());
         EnumMachineSize machineSize = WorldSavedDataMachines.getInstance().machineSizes.get(id);
         if (machineSize != schema.getSize()) {
             throw this.getException(sender, "machine_size_does_not_match", schema.getSize().toString());

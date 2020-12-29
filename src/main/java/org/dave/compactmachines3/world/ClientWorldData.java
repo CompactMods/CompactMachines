@@ -17,6 +17,4 @@ public class ClientWorldData {
     public boolean isInitialized() {
         return worldInfo != null && worldClone != null;
     }
-
-
 }

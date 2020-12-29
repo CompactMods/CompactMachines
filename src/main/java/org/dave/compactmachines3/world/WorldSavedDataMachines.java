@@ -40,6 +40,8 @@ public class WorldSavedDataMachines extends WorldSavedData {
     public BlockPos lastGrid = null;
 
     private static WorldSavedDataMachines instance;
+    private static Map<Integer, BlockPos> clientMachineGrid;
+    private static Map<Integer, EnumMachineSize> clientMachineSizes;
 
     public static WorldSavedDataMachines getInstance() {
         // In some rare cases, like when loading the world and restoring chunk tickets, this could still be null!
@@ -49,7 +51,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
     }
 
     public void setBedLocation(EntityPlayer player) {
-        int id = getMachineIdFromBoxPos(player);
+        int id = getMachineIdFromEntityPos(player);
         bedLocations.put(player.getUniqueID(), id);
         this.markDirty();
     }
@@ -88,7 +90,7 @@ public class WorldSavedDataMachines extends WorldSavedData {
         return machineGrid.get(id);
     }
 
-    public int getMachineIdFromBoxPos(Entity entity) {
+    public int getMachineIdFromEntityPos(Entity entity) {
         return getMachineIdFromBoxPos(new BlockPos(entity.posX, entity.posY, entity.posZ));
     }
 
@@ -100,11 +102,13 @@ public class WorldSavedDataMachines extends WorldSavedData {
         return getMachineIdFromBoxPos(x, y, z, machineGrid, machineSizes);
     }
 
-    public static int getMachineIdFromBoxPos(BlockPos pos, Map<Integer, BlockPos> machineGrid, Map<Integer, EnumMachineSize> machineSizes) {
-        return getMachineIdFromBoxPos(pos.getX(), pos.getY(), pos.getZ(), machineGrid, machineSizes);
+    public static int getClientMachineIdFromBoxPos(BlockPos pos) {
+        if (clientMachineGrid == null || clientMachineSizes == null)
+            return -1;
+        return getMachineIdFromBoxPos(pos.getX(), pos.getY(), pos.getZ(), clientMachineGrid, clientMachineSizes);
     }
 
-    public static int getMachineIdFromBoxPos(int x, int y, int z, Map<Integer, BlockPos> machineGrid, Map<Integer, EnumMachineSize> machineSizes) {
+    private static int getMachineIdFromBoxPos(int x, int y, int z, Map<Integer, BlockPos> machineGrid, Map<Integer, EnumMachineSize> machineSizes) {
         for (Map.Entry<Integer, BlockPos> entry : machineGrid.entrySet()) {
             int roomPosX = entry.getValue().getX();
             int roomPosZ = entry.getValue().getZ();
@@ -316,6 +320,22 @@ public class WorldSavedDataMachines extends WorldSavedData {
         if(!isLoading) {
             this.markDirty();
         }
+    }
+
+    public static Map<Integer, BlockPos> getClientMachineGrid() {
+        return clientMachineGrid;
+    }
+
+    public static void setClientMachineGrid(Map<Integer, BlockPos> clientMachineGrid) {
+        WorldSavedDataMachines.clientMachineGrid = clientMachineGrid;
+    }
+
+    public static Map<Integer, EnumMachineSize> getClientMachineSizes() {
+        return clientMachineSizes;
+    }
+
+    public static void setClientMachineSizes(Map<Integer, EnumMachineSize> clientMachineSizes) {
+        WorldSavedDataMachines.clientMachineSizes = clientMachineSizes;
     }
 
     @Override
