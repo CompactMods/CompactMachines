@@ -30,9 +30,6 @@ public class CompactMachines
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-//    public static ClientWorldData clientWorldData;
-//    public static final CreativeTabcompactmachines CREATIVE_TAB = new CreativeTabcompactmachines();
-
     public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MOD_ID) {
         @Override
         public ItemStack createIcon() {
@@ -72,43 +69,4 @@ public class CompactMachines
         if(ModList.get().isLoaded("theoneprobe"))
             TheOneProbeCompat.sendIMC();
     }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
-        // do something when the server starts
-        // TODO: Register compact machines command here?
-        // event.registerCommand(new Commandcompactmachines());
-    }
-
-//    @EventHandler
-//    public void init(FMLInitializationEvent event) {
-//        PackageHandler.init();
-//
-//        proxy.init(event);
-//
-//        SkyDimension.init();
-//
-//        MultiblockRecipes.init();
-//        SchemaRegistry.init();
-//    }
-//
-//    @EventHandler
-//    public void postInit(FMLPostInitializationEvent event) {
-//        CapabilityNullHandlerRegistry.registerNullHandlers();
-//        ExtraTileDataProviderRegistry.registerExtraTileDataProviders();
-//
-//        ForgeChunkManager.setForcedChunkLoadingCallback(instance, new ChunkLoadingMachines());
-//
-//        proxy.postInit(event);
-//    }
-//
-//    @EventHandler
-//    public void onServerAboutToStart(FMLServerAboutToStartEvent event) {
-//        for(WorldServer world : event.getServer().worlds) {
-//            if(world.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator) {
-//                world.setSpawnPoint(new BlockPos(0,0,0));
-//            }
-//        }
-//    }
 }
