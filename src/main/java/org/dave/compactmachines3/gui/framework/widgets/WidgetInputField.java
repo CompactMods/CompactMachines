@@ -50,7 +50,6 @@ public class WidgetInputField extends WidgetWithValue<String> {
         this.addListener(MouseClickEvent.class, new IWidgetListener<MouseClickEvent>() {
             @Override
             public WidgetEventResult call(MouseClickEvent event, Widget widget) {
-                //Logz.info("Mouse clicked @ x={}, y={}", event.x, event.y);
                 //textField.mouseClicked(event.x, event.y, event.button);
                 return WidgetEventResult.CONTINUE_PROCESSING;
             }

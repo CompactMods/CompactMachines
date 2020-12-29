@@ -71,8 +71,6 @@ public class WidgetList extends WidgetPanel {
         Gui.drawRect(0, 0, width, height, borderColor);
         Gui.drawRect(1, 1, width-1, height-1, backgroundColor);
 
-        //Logz.info("Rendering lines {} to {}", lineOffset, lastVisibleLine);
-
         if(selected >= lineOffset && selected <= lastVisibleLine) {
             // We need to high-light a specific line
             int yOffset = 0;

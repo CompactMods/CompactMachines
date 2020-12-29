@@ -37,7 +37,6 @@ public class TeleportationTools {
             return false;
         }
 
-        // Logz.info("Trying to enter machine. id={}, owner={}, world is skyworld={}", machine.id, machine.getOwner(), world.getWorldType() instanceof SkyWorldType);
         // Prevent players from claiming more than one machine in the SkyWorld Machine Hub
         if(!machine.hasOwner() && world.getWorldType() instanceof SkyWorldType) {
             boolean playerHasHubMachine = SkyWorldSavedData.instance.isHubMachineOwner(player);

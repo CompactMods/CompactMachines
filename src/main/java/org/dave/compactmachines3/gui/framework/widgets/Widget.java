@@ -114,10 +114,8 @@ public class Widget {
 
     public boolean isPosInside(int x, int y) {
         boolean isInsideX = this.getActualX() <= x && x < this.getActualX() + this.width;
-        //Logz.info("[{}] insideX: {} < {} <= {} --> {}", this.id, this.lastDrawX, x, this.lastDrawX + this.lastDrawWidth, this.toString());
 
         boolean isInsideY = this.getActualY() <= y && y < this.getActualY() + this.height;
-        //Logz.info("[{}] insideY: {} < {} <= {} --> {}", this.id, this.lastDrawY, y, this.lastDrawY + this.lastDrawHeight, this.toString());
 
         return isInsideX && isInsideY;
     }
