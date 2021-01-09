@@ -558,7 +558,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if(isInsideItself()) {
+        if (isInsideItself() || this.roomPos == null) {
             return null;
         }
 
