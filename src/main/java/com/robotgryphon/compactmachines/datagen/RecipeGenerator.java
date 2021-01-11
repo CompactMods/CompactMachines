@@ -7,6 +7,7 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
@@ -24,7 +25,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     @Override
     protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
-        ShapedRecipeBuilder.shapedRecipe(Registration.ITEM_BREAKABLE_WALL.get())
+        ShapedRecipeBuilder.shapedRecipe(Registration.ITEM_BREAKABLE_WALL.get(), 16)
                 .patternLine(" R ")
                 .patternLine(" I ")
                 .key('R', Tags.Items.DUSTS_REDSTONE)

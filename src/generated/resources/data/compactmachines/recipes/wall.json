@@ -13,6 +13,7 @@
     }
   },
   "result": {
-    "item": "compactmachines:wall"
+    "item": "compactmachines:wall",
+    "count": 16
   }
 }
