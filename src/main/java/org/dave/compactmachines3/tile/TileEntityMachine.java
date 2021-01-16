@@ -157,24 +157,14 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         WorldSavedDataMachines.getInstance().addSpawnPoint(this.id, destination);
     }
 
+    // The package is marked as returning non-null, but this is not true.
+    @SuppressWarnings("ConstantConditions")
     public boolean isAllowedToEnter(EntityPlayer player) {
-        if(!isLocked()) {
-            return true;
-        }
-
-        if(!hasOwner()) {
-            return true;
-        }
-
-        if(player.getUniqueID().equals(owner)) {
-            return true;
-        }
-
-        if(isOnWhiteList(player)) {
-            return true;
-        }
-
-        return false;
+        return !isLocked()
+                || !hasOwner()
+                || player.getUniqueID().equals(owner)
+                || isOnWhiteList(player)
+                || (player.getServer() != null && player.getServer().getPlayerList().getOppedPlayers().getEntry(player.getGameProfile()) != null);
     }
 
     public void syncRoomPos() {
@@ -425,7 +415,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return null;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         return tunnelPos.offset(insetDirection);
     }
 
@@ -507,7 +497,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return 0;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.roomPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelData.pos.offset(insetDirection);
         IBlockState insetBlockState = machineWorld.getBlockState(insetPos);
 
@@ -545,7 +535,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
         TileEntity te = machineWorld.getTileEntity(insetPos);
@@ -580,12 +570,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return null;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
         TileEntity te = machineWorld.getTileEntity(insetPos);
-        if(te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
-            return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
+        if (te != null && te.hasCapability(capability, insetDirection.getOpposite())) {
+            return te.getCapability(capability, insetDirection.getOpposite());
         }
 
         if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {

@@ -13,6 +13,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Blockss;
+import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.schema.BlockInformation;
 import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.tile.TileEntityMachine;
@@ -148,18 +149,29 @@ public class StructureTools {
         }
     }
 
-    public static EnumFacing getInsetWallFacing(BlockPos wallPos, BlockPos roomPos, int size) {
+    /**
+     * Get the {@link EnumFacing} direction from a {@code wallPos} relative to a {@code roomPos} and its {@code size}.
+     * The returned block face points towards the inside of the room, e.g. a block in the floor would return {@link EnumFacing#UP}.
+     * Useful for getting the block touching a tunnel.
+     *
+     * @param wallPos The {@link BlockPos} of the wall.
+     * @param roomPos The {@link BlockPos} of the room.
+     * @param size The size of the room.
+     * @return A block face pointing towards the inside of the room.
+     */
+    public static EnumFacing getInsetWallFacing(BlockPos wallPos, BlockPos roomPos, EnumMachineSize size) {
+        int dimensions = size.getDimension();
         int x = wallPos.getX() - roomPos.getX();
         int y = wallPos.getY() - roomPos.getY();
         int z = wallPos.getZ() - roomPos.getZ();
 
         if (y == 0) {
             return EnumFacing.UP;
-        } else if (y == size) {
+        } else if (y == dimensions) {
             return EnumFacing.DOWN;
         } else if (x == 0) {
             return EnumFacing.EAST;
-        } else if (x == size) {
+        } else if (x == dimensions) {
             return EnumFacing.WEST;
         } else if (z == 0) {
             return EnumFacing.SOUTH;
