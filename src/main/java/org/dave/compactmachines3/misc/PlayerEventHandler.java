@@ -189,11 +189,10 @@ public class PlayerEventHandler {
         }
 
         // True if the last machine the player entered does not equal the one they are inside of, which is not allowed
-        if (lastId != enteredMachineId && lastId != -1) {
+        if (lastId != enteredMachineId) {
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:nausea"), 200, 5, false, false));
             event.player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("minecraft:wither"), 160, 1, false, false));
             TeleportationTools.teleportPlayerOutOfMachine((EntityPlayerMP) event.player);
-            return;
         }
     }
 }

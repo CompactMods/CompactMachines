@@ -46,7 +46,6 @@ public class WidgetPanel extends Widget {
         this.addListener(MouseClickEvent.class, ((event, widget) -> {
             int innerX = event.x - widget.getActualX();
             int innerY = event.y - widget.getActualY();
-            //Logz.info("{}: Click: screen@{},{}, panel@{},{}", this.toString(), event.x, event.y, innerX, innerY);
 
             for(Widget child : children) {
                 if(!child.visible) {

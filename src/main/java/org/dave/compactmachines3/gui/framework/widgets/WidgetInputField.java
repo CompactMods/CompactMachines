@@ -613,8 +613,6 @@ public class WidgetInputField extends WidgetWithValue<String> {
         int width = this.width;
         int height = this.height;
 
-        //Logz.info("Drawing input field @ {},{} [width={}, height={}]", x, y, width, height);
-
         Gui.drawRect(x, y, x+width, y+height, borderColor);
         Gui.drawRect(x+1, y+1, x+width-1, y+height-1, backgroundColor);
 

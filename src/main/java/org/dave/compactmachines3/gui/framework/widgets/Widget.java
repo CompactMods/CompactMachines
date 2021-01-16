@@ -230,9 +230,7 @@ public class Widget {
      *
      * @param screen
      */
-    public void draw(GuiScreen screen) {
-        //Logz.debug("Drawing widget: {}, x={}, y={}, width={}, height={}", this, layoutResult.getX(), layoutResult.getY(), layoutResult.getWidth(), layoutResult.getHeight());
-    }
+    public void draw(GuiScreen screen) {}
 
     public <T extends IEvent> void addListener(Class<T> eventClass, IWidgetListener<? super T> listener) {
         if(!eventListeners.containsKey(eventClass)) {
