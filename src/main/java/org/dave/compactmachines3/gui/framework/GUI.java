@@ -1,17 +1,15 @@
 package org.dave.compactmachines3.gui.framework;
 
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.gui.framework.widgets.Widget;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetPanel;
 
 
 public class GUI extends WidgetPanel {
-    private static ResourceLocation tabIcons;
+    private static final ResourceLocation tabIcons = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
 
     public boolean hasTabs = false;
 
@@ -20,13 +18,11 @@ public class GUI extends WidgetPanel {
         this.setY(y);
         this.setWidth(width);
         this.setHeight(height);
-
-        this.tabIcons = new ResourceLocation(CompactMachines3.MODID, "textures/gui/tabicons.png");
     }
 
     public void drawGUI(GuiScreen screen) {
-        this.setX((screen.width - this.width)/2);
-        this.setY((screen.height - this.height)/2);
+        this.setX((screen.width - this.width) / 2);
+        this.setY((screen.height - this.height) / 2);
 
         this.shiftAndDraw(screen);
     }
@@ -62,7 +58,7 @@ public class GUI extends WidgetPanel {
         int width = this.width;
         int xOffset = 0;
 
-        if(hasTabs) {
+        if (hasTabs) {
             width -= 32;
             xOffset += 32;
         }
@@ -71,44 +67,36 @@ public class GUI extends WidgetPanel {
         screen.drawTexturedModalRect(xOffset, 0, texOffsetX, texOffsetY, 4, 4);
 
         // Top right corner
-        screen.drawTexturedModalRect(xOffset+width - 4, 0, texOffsetX + 4 + 64, texOffsetY, 4, 4);
+        screen.drawTexturedModalRect(xOffset + width - 4, 0, texOffsetX + 4 + 64, texOffsetY, 4, 4);
 
         // Bottom Left corner
         screen.drawTexturedModalRect(xOffset, this.height - 4, texOffsetX, texOffsetY + 4 + 64, 4, 4);
 
         // Bottom Right corner
-        screen.drawTexturedModalRect(xOffset+width - 4, this.height - 4, texOffsetX + 4 + 64, texOffsetY + 4 + 64, 4, 4);
+        screen.drawTexturedModalRect(xOffset + width - 4, this.height - 4, texOffsetX + 4 + 64, texOffsetY + 4 + 64, 4, 4);
 
         // Top edge
-        GUIHelper.drawStretchedTexture(xOffset+4, 0, width - 8, 4, texOffsetX + 4, texOffsetY, 64, 4);
+        GUIHelper.drawStretchedTexture(xOffset + 4, 0, width - 8, 4, texOffsetX + 4, texOffsetY, 64, 4);
 
         // Bottom edge
-        GUIHelper.drawStretchedTexture(xOffset+4, this.height - 4, width - 8, 4, texOffsetX + 4, texOffsetY + 4 + 64, 64, 4);
+        GUIHelper.drawStretchedTexture(xOffset + 4, this.height - 4, width - 8, 4, texOffsetX + 4, texOffsetY + 4 + 64, 64, 4);
 
         // Left edge
-        GUIHelper.drawStretchedTexture(xOffset, 4, 4, this.height - 8, texOffsetX, texOffsetY+4, 4, 64);
+        GUIHelper.drawStretchedTexture(xOffset, 4, 4, this.height - 8, texOffsetX, texOffsetY + 4, 4, 64);
 
         // Right edge
-        GUIHelper.drawStretchedTexture(xOffset+width - 4, 4, 4, this.height - 8, texOffsetX + 64 + 4, texOffsetY + 3, 4, 64);
+        GUIHelper.drawStretchedTexture(xOffset + width - 4, 4, 4, this.height - 8, texOffsetX + 64 + 4, texOffsetY + 3, 4, 64);
 
-        GUIHelper.drawStretchedTexture(xOffset+4, 4, width - 8, this.height - 8, texOffsetX + 4, texOffsetY+4, 64, 64);
+        GUIHelper.drawStretchedTexture(xOffset + 4, 4, width - 8, this.height - 8, texOffsetX + 4, texOffsetY + 4, 64, 64);
 
         GlStateManager.popMatrix();
     }
 
     public void drawTooltips(GuiScreen screen, int mouseX, int mouseY) {
         Widget hoveredWidget = getHoveredWidget(mouseX, mouseY);
-        FontRenderer font = screen.mc.fontRenderer;
 
-        if(hoveredWidget != null && hoveredWidget.getTooltip() != null) {
-            if(hoveredWidget.getTooltip().size() > 0) {
-                GuiUtils.drawHoveringText(hoveredWidget.getTooltip(), mouseX, mouseY, width, height, 180, font);
-            }/* else {
-                List<String> tooltips = new ArrayList<>();
-                tooltips.add(hoveredWidget.toString());
-                GuiUtils.drawHoveringText(tooltips, mouseX, mouseY, width, height, 180, font);
-            }*/
+        if (hoveredWidget != null && hoveredWidget.hasTooltip()) {
+            screen.drawHoveringText(hoveredWidget.getTooltip(), mouseX, mouseY);
         }
     }
-
 }

@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 public class WidgetTabsPanel extends WidgetPanel {
-    private List<WidgetPanel> pages = new ArrayList<>();
-    private Map<WidgetPanel, ItemStack> pageStacks = new HashMap<>();
-    private Map<WidgetPanel, List<String>> pageTooltips = new HashMap<>();
+    private final List<WidgetPanel> pages = new ArrayList<>();
+    private final Map<WidgetPanel, ItemStack> pageStacks = new HashMap<>();
+    private final Map<WidgetPanel, List<String>> pageTooltips = new HashMap<>();
 
     private WidgetPanel activePanel = null;
 
@@ -77,7 +77,7 @@ public class WidgetTabsPanel extends WidgetPanel {
             result.add(button);
 
             if(pageTooltips.containsKey(page)) {
-                button.addTooltipLine(pageTooltips.get(page));
+                button.addTooltipLines(pageTooltips.get(page));
             }
 
             y += 28;
