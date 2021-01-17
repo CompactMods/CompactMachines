@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -104,8 +104,9 @@ public class BlockWall extends BlockProtected {
                 playerStack.setCount(playerStack.getCount()-1);
                 WorldSavedDataMachines.getInstance().addTunnel(pos, tunnelSide);
             } else {
-                // TODO: Localization
-                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
+                TextComponentTranslation tc = new TextComponentTranslation("hint.compactmachines3.all_tunnels_used");
+                tc.getStyle().setColor(TextFormatting.RED);
+                player.sendStatusMessage(tc, false);
             }
 
             return true;
@@ -130,8 +131,9 @@ public class BlockWall extends BlockProtected {
                 playerStack.setCount(playerStack.getCount()-1);
                 WorldSavedDataMachines.getInstance().addRedstoneTunnel(pos, tunnelSide, false);
             } else {
-                // TODO: Localization
-                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "All tunnels already used up"), false);
+                TextComponentTranslation tc = new TextComponentTranslation("hint.compactmachines3.all_tunnels_used");
+                tc.getStyle().setColor(TextFormatting.RED);
+                player.sendStatusMessage(tc, false);
             }
 
             return true;

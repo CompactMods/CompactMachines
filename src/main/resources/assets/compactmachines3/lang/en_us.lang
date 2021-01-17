@@ -29,6 +29,7 @@ hint.compactmachines3.invalid_block_in_field=Invalid block in field area @ %d,%d
 hint.compactmachines3.cant_sleep_here=You can not sleep in the Compact Machines dimension
 hint.compactmachines3.bed_position_set=Respawn position set to this Machine
 hint.compactmachines3.not_permitted_to_enter=You do not have permission to enter this machine
+hint.compactmachines3.all_tunnels_used=You have already placed 6 tunnels!
 
 hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in the Compact Hub!
 hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
