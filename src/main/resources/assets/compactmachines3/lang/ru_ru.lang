@@ -30,6 +30,7 @@ hint.compactmachines3.cant_sleep_here=Вы не можете спать в из�
 hint.compactmachines3.bed_position_set=Точка возрождения установлена на этот механизм
 hint.compactmachines3.not_permitted_to_enter=У вас нет разрешения на вход в этот механизм
 hint.compactmachines3.all_tunnels_used=You have already placed 6 tunnels!
+hint.compactmachines3.all_redstone_tunnels_used=You have already placed 6 redstone tunnels!
 
 hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in the Compact Hub!
 hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
