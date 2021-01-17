@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Page {
-    private String name;
-    private List<ISegment> segments;
+    protected final Pages pages;
+    private final String name;
+    private final List<ISegment> segments;
 
-    public Page(String name) {
+    public Page(Pages pages, String name) {
+        this.pages = pages;
         this.name = name;
-        segments = new ArrayList<>();
+        this.segments = new ArrayList<>();
     }
 
     public String getName() {
@@ -33,10 +35,10 @@ public class Page {
 
     public void mouseClicked(GuiPSDScreen psd, int mouseX, int mouseY, int mouseButton) {
         if(mouseButton == 1) {
-            if(name == "welcome") {
+            if(name.equals("welcome")) {
                 Minecraft.getMinecraft().player.closeScreen();
             } else {
-                Pages.activePageOnClient = "welcome";
+                pages.setActivePage("welcome");
             }
 
             return;

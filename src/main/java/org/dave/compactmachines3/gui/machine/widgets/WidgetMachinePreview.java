@@ -14,6 +14,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
@@ -24,7 +25,6 @@ import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.utility.ChunkUtils;
-import org.dave.compactmachines3.utility.Logz;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -81,12 +81,14 @@ public class WidgetMachinePreview extends Widget {
     public void draw(GuiScreen screen) {
         super.draw(screen);
 
-        if(!GuiMachineData.canRender) {
+        if(!GuiMachineData.canRender || GuiMachineData.roomPos == null) {
             return;
         }
 
         if(GuiMachineData.requiresNewDisplayList) {
-            List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
+            BlockPos roomPos = GuiMachineData.roomPos;
+            ChunkPos chunkPos = new ChunkPos(roomPos);
+            List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(chunkPos.x, chunkPos.z);
             if(toRenderCopy != null) {
                 TileEntityRendererDispatcher.instance.setWorld(CompactMachines3.clientWorldData.worldClone);
 
@@ -100,7 +102,7 @@ public class WidgetMachinePreview extends Widget {
                 GlStateManager.pushAttrib();
                 GlStateManager.pushMatrix();
 
-                GlStateManager.translate(-GuiMachineData.coords * 1024, -40, 0);
+                GlStateManager.translate(-roomPos.getX(), -roomPos.getY(), -roomPos.getZ());
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder buffer = tessellator.getBuffer();
 
@@ -205,7 +207,11 @@ public class WidgetMachinePreview extends Widget {
 
         GlStateManager.resetColor();
 
-        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(GuiMachineData.coords * 64, 0);
+        BlockPos roomPos = GuiMachineData.roomPos;
+        if (roomPos == null)
+            return;
+        ChunkPos chunkPos = new ChunkPos(roomPos);
+        List<BlockPos> toRenderCopy = CompactMachines3.clientWorldData.worldClone.providerClient.getRenderListForChunk(chunkPos.x, chunkPos.z);
         if(ConfigurationHandler.MachineSettings.renderTileEntitiesInGUI) {
             this.renderTileEntities(TileEntityRendererDispatcher.instance, toRenderCopy);
         }
@@ -235,7 +241,7 @@ public class WidgetMachinePreview extends Widget {
             try {
                 state = state.getActualState(CompactMachines3.clientWorldData.worldClone, pos);
             } catch (Exception e) {
-                Logz.debug("Could not determine actual state of block: %s", state.getBlock());
+                CompactMachines3.logger.debug("Could not determine actual state of block: {}", state.getBlock());
             }
 
             ForgeHooksClient.setRenderLayer(renderLayer);
@@ -252,7 +258,7 @@ public class WidgetMachinePreview extends Widget {
             try {
                 blockrendererdispatcher.renderBlock(state, pos, CompactMachines3.clientWorldData.worldClone, buffer);
             } catch (Throwable e) {
-                Logz.debug("Failed rendering of block: %s", state.getBlock());
+                CompactMachines3.logger.debug("Failed rendering of block: {}", state.getBlock());
             }
 
             ForgeHooksClient.setRenderLayer(null);
@@ -264,18 +270,20 @@ public class WidgetMachinePreview extends Widget {
             return;
         }
 
-        ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(GuiMachineData.coords * 64, 0).getEntityLists()[2];
+        BlockPos roomPos = GuiMachineData.roomPos;
+        ChunkPos chunkPos = new ChunkPos(roomPos);
+        ClassInheritanceMultiMap<Entity> entities = CompactMachines3.clientWorldData.worldClone.getChunk(chunkPos.x, chunkPos.z).getEntityLists()[2];
         for(Entity entity : entities) {
-            renderEntity(entity);
+            renderEntity(entity, roomPos);
         }
     }
 
-    private static void renderEntity(Entity entity) {
+    private static void renderEntity(Entity entity, BlockPos roomPos) {
         GlStateManager.pushMatrix();
 
-        double x = entity.posX % 1024;
-        double y = entity.posY - 40;
-        double z = entity.posZ;
+        double x = entity.posX - roomPos.getX();
+        double y = entity.posY - roomPos.getY();
+        double z = entity.posZ - roomPos.getZ();
 
         RenderHelper.enableStandardItemLighting();
 
@@ -288,7 +296,7 @@ public class WidgetMachinePreview extends Widget {
         try {
             Minecraft.getMinecraft().getRenderManager().renderEntity(entity, x, y, z, entity.rotationYaw, 1.0F, false);
         } catch (Exception e) {
-            Logz.debug("Could not render entity '%s': %s", entity.getClass().getSimpleName(), e.getMessage());
+            CompactMachines3.logger.debug("Could not render entity '{}': {}", entity.getClass().getSimpleName(), e.getMessage());
         }
 
         RenderHelper.disableStandardItemLighting();
@@ -300,6 +308,8 @@ public class WidgetMachinePreview extends Widget {
         if(toRender == null) {
             return;
         }
+        BlockPos roomPos = GuiMachineData.roomPos;
+
         ForgeHooksClient.setRenderLayer(BlockRenderLayer.SOLID);
         for (BlockPos pos : toRender) {
             TileEntity te;
@@ -326,9 +336,9 @@ public class WidgetMachinePreview extends Widget {
 
                 renderer.preDrawBatch();
                 try {
-                    renderer.render(te, pos.getX() % 1024, pos.getY()-40, pos.getZ(), 0.0f);
+                    renderer.render(te, pos.getX() - roomPos.getX(), pos.getY() - roomPos.getY(), pos.getZ() - roomPos.getZ(), 0.0f);
                 } catch(Exception e) {
-                    Logz.warn("Could not render tile entity '%s': %s", te.getClass().getSimpleName(), e.getMessage());
+                    CompactMachines3.logger.warn("Could not render tile entity '{}': {}", te.getClass().getSimpleName(), e.getMessage());
                 }
                 renderer.drawBatch(0);
 

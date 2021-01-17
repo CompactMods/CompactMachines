@@ -17,7 +17,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import org.dave.compactmachines3.utility.Logz;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

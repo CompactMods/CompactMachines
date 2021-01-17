@@ -17,18 +17,22 @@ import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import java.util.List;
 
 public class SpawnTools {
-    public static int spawnEntitiesInMachine(int coords) {
+    public static int spawnEntitiesInMachine(int id) {
         int count = 0;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
 
-        EnumMachineSize size = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
+        EnumMachineSize size = WorldSavedDataMachines.getInstance().machineSizes.get(id);
         if(size == null) {
             return count;
         }
 
-        BlockPos start = new BlockPos((coords << 10) + 1, 41, 1);
-        BlockPos end = new BlockPos((coords << 10) + size.getDimension(), 41 + size.getDimension(), 1 + size.getDimension());
+        BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(id);
+        if (roomPos == null)
+            return -1;
+        // Start and end corners of a cube inside the walls
+        BlockPos start = roomPos.add(1, 1, 1);
+        BlockPos end = roomPos.add(size.getDimension()-1, size.getDimension()-1, size.getDimension()-1);
 
         List<EntityLivingBase> livingEntities = machineWorld.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(start,end));
         int maxEntities = size.getDimension() / 2;

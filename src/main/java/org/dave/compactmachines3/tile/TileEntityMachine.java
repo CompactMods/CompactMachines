@@ -9,23 +9,29 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.api.IRemoteBlockProvider;
 import org.dave.compactmachines3.block.BlockMachine;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.reference.EnumMachineSize;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.RedstoneTunnelData;
@@ -33,13 +39,14 @@ import org.dave.compactmachines3.world.tools.DimensionTools;
 import org.dave.compactmachines3.world.tools.SpawnTools;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public class TileEntityMachine extends TileEntity implements ICapabilityProvider, ITickable, IRemoteBlockProvider {
-    public int coords = -1;
+    public int id = -1;
+    private BlockPos roomPos;
     private boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
     public long nextSpawnTick = 0;
@@ -65,7 +72,16 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        coords = compound.getInteger("coords");
+        id = compound.getInteger("machineId");
+        if (compound.hasKey("coords")) {
+            id = compound.getInteger("coords"); // Legacy
+            roomPos = new BlockPos(1024 * id, 40, 0);
+        } else {
+            NBTTagCompound roomPosTag = compound.getCompoundTag("roomPos");
+            if (!roomPosTag.isEmpty()) {
+                roomPos = NBTUtil.getPosFromTag(roomPosTag);
+            }
+        }
         customName = compound.getString("CustomName");
         if(compound.hasKey("ownerLeast") && compound.hasKey("ownerMost")) {
             owner = compound.getUniqueId("owner");
@@ -99,7 +115,9 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setInteger("coords", coords);
+        compound.setInteger("machineId", id); // Can't use key "id" because it is used by tile entities
+        if (roomPos != null)
+            compound.setTag("roomPos", NBTUtil.createPosTag(roomPos));
         compound.setString("CustomName", customName);
 
         if(hasOwner()) {
@@ -127,39 +145,54 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public void initStructure() {
-        if(this.coords != -1) {
+        if(this.id != -1) {
             return;
         }
 
+        // "roomPos" is set to the northwest corner of the machine at y=40
         StructureTools.generateCubeForMachine(this);
 
-        double[] destination = new double[] {
-                this.coords * 1024 + 0.5 + this.getSize().getDimension() / 2,
-                42,
-                0.5 + this.getSize().getDimension() / 2
-        };
+        Vec3d destination = new Vec3d(this.getCenterRoomPos()).add(0.5, 2, 0.5);
 
-        WorldSavedDataMachines.INSTANCE.addSpawnPoint(this.coords, destination);
+        WorldSavedDataMachines.getInstance().addSpawnPoint(this.id, destination);
     }
 
+    // The package is marked as returning non-null, but this is not true.
+    @SuppressWarnings("ConstantConditions")
     public boolean isAllowedToEnter(EntityPlayer player) {
-        if(!isLocked()) {
-            return true;
-        }
+        return !isLocked()
+                || !hasOwner()
+                || player.getUniqueID().equals(owner)
+                || isOnWhiteList(player)
+                || (player.getServer() != null && player.getServer().getPlayerList().getOppedPlayers().getEntry(player.getGameProfile()) != null);
+    }
 
-        if(!hasOwner()) {
-            return true;
-        }
+    public void syncRoomPos() {
+        BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(this.id);
+        if (this.roomPos == null)
+            this.roomPos = roomPos;
+    }
 
-        if(player.getUniqueID().equals(owner)) {
-            return true;
-        }
+    public void setRoomPos(BlockPos roomPos) {
+        this.roomPos = roomPos;
+        WorldSavedDataMachines.getInstance().setMachineRoomPosition(this.id, roomPos, true);
+    }
 
-        if(isOnWhiteList(player)) {
-            return true;
-        }
+    /**
+     *
+     * @return North-west corner of machine at y=40
+     */
+    public BlockPos getRoomPos() {
+        return roomPos;
+    }
 
-        return false;
+    /**
+     *
+     * @return Center floor block of the room based on {@link #getRoomPos}. Calculated by using an offset of (room size/2) on x and z axis at y=40.
+     */
+    public BlockPos getCenterRoomPos() {
+        int centerOffset = getSize().getDimension() / 2;
+        return this.roomPos.add(centerOffset, 0, centerOffset);
     }
 
     public boolean isOnWhiteList(EntityPlayer player) {
@@ -187,17 +220,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public Set<String> getWhiteList() {
-        HashSet<String> result = new HashSet<>();
-        if(world.isRemote) {
-            Logz.warn("The TileEntityMachine#getWhiteList method should not be called on the client. Please report this to the mod author here: https://github.com/thraaawn/CompactMachines/issues/ Thanks!");
-            return result;
+        if (world.isRemote) {
+            CompactMachines3.logger.warn("The TileEntityMachine#getWhiteList method should not be called on the client. Please report this to the mod author here: https://github.com/CompactMods/CompactMachines/issues/ Thanks!");
+            return new HashSet<>();
         }
 
-        for(String name : playerWhiteList) {
-            result.add(name);
-        }
-
-        return result;
+        return new HashSet<>(playerWhiteList);
     }
 
     public boolean isLocked() {
@@ -239,7 +267,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     public String getOwnerName() {
         GameProfile profile = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(getOwner());
         if(profile == null) {
-            Logz.warn("Profile not found for owner: %s", getOwner());
+            CompactMachines3.logger.warn("Profile not found for owner: {}", getOwner());
             return "Unknown";
         }
 
@@ -281,23 +309,27 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     /*
      * Chunk-Loading triggers
      */
-
     private void initialize() {
-        if(this.getWorld().isRemote) {
+        if (this.initialized || this.getWorld().isRemote || this.isInvalid() || this.id == -1 || this.roomPos == null) {
             return;
         }
 
-        if(!ChunkLoadingMachines.isMachineChunkLoaded(this.coords)) {
-            ChunkLoadingMachines.forceChunk(this.coords);
+        if (ConfigurationHandler.Settings.forceLoadChunks && !ChunkLoadingMachines.isMachineChunkLoaded(this.id, this.roomPos)) {
+            ChunkLoadingMachines.forceChunk(this.id, this.roomPos);
         }
 
+        BlockPos storedPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(this.id);
+        if (storedPos != this.roomPos) { // Make sure the two values have not de-synced
+            WorldSavedDataMachines.getInstance().setMachineRoomPosition(this.id, this.roomPos, false);
+        }
+
+        this.initialized = true;
     }
 
     @Override
     public void update() {
-        if(!this.initialized && !this.isInvalid() && this.coords != -1) {
+        if (!this.initialized) {
             initialize();
-            this.initialized = true;
         }
 
         this.alreadyNotifiedOnTick = false;
@@ -306,7 +338,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
         }
 
-        if(!this.getWorld().isRemote && this.coords != -1 && isInsideItself()) {
+        if(!this.getWorld().isRemote && this.id != -1 && isInsideItself()) {
             if (this.getWorld().getTotalWorldTime() % 20 == 0) {
                 world.playSound(null, getPos(),
                         SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.wither.spawn")),
@@ -317,9 +349,9 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             }
         }
 
-        if(!this.getWorld().isRemote && this.coords != -1 && this.getWorld().getTotalWorldTime() > nextSpawnTick) {
+        if(!this.getWorld().isRemote && this.id != -1 && this.getWorld().getTotalWorldTime() > nextSpawnTick) {
             if(ConfigurationHandler.MachineSettings.allowPeacefulSpawns || ConfigurationHandler.MachineSettings.allowHostileSpawns) {
-                SpawnTools.spawnEntitiesInMachine(coords);
+                SpawnTools.spawnEntitiesInMachine(id);
             }
 
             nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
@@ -328,8 +360,8 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
         /*
         // Use this once we render in world or use the proxy world to determine client side capabilities.
-        if(!this.getWorld().isRemote && this.getWorld().getTotalWorldTime() % 20 == 0 && this.coords != -1) {
-            PackageHandler.instance.sendToAllAround(new MessageMachineChunk(this.coords), new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 32.0f));
+        if(!this.getWorld().isRemote && this.getWorld().getTotalWorldTime() % 20 == 0 && this.id != -1) {
+            PackageHandler.instance.sendToAllAround(new MessageMachineChunk(this.id), new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 32.0f));
         }
         */
     }
@@ -341,22 +373,22 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return;
         }
 
-        if(ConfigurationHandler.Settings.forceLoadChunks) {
+        if(ConfigurationHandler.Settings.forceLoadChunks) { // Only unload the chunk if we have forceLoadChunks disabled
             return;
         }
 
-        ChunkLoadingMachines.unforceChunk(this.coords);
+        ChunkLoadingMachines.unforceChunk(this.id, this.roomPos);
     }
 
     /*
      * Capabilities
      */
     public RedstoneTunnelData getRedstoneTunnelForSide(EnumFacing side) {
-        if(!WorldSavedDataMachines.INSTANCE.redstoneTunnels.containsKey(this.coords)) {
+        if(!WorldSavedDataMachines.getInstance().redstoneTunnels.containsKey(this.id)) {
             return null;
         }
 
-        return WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords).get(side);
+        return WorldSavedDataMachines.getInstance().redstoneTunnels.get(this.id).get(side);
     }
 
     @Override
@@ -366,15 +398,15 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public BlockPos getConnectedBlockPosition(EnumFacing side) {
-        if(WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.tunnels == null) {
+        if(WorldSavedDataMachines.getInstance() == null || WorldSavedDataMachines.getInstance().tunnels == null) {
             return null;
         }
 
-        if(!WorldSavedDataMachines.INSTANCE.tunnels.containsKey(this.coords)) {
+        if(!WorldSavedDataMachines.getInstance().tunnels.containsKey(this.id)) {
             return null;
         }
 
-        return WorldSavedDataMachines.INSTANCE.tunnels.get(this.coords).get(side);
+        return WorldSavedDataMachines.getInstance().tunnels.get(this.id).get(side);
     }
 
     public BlockPos getMachineWorldInsetPos(EnumFacing facing) {
@@ -383,7 +415,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return null;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         return tunnelPos.offset(insetDirection);
     }
 
@@ -412,7 +444,16 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        return StructureTools.getCoordsForPos(this.getPos()) == this.coords;
+        if (this.id == -1)
+            return false;
+
+        if (!this.getWorld().isRemote) {
+            // Server
+            return StructureTools.getIdForPos(this.getPos()) == this.id;
+        } else {
+            // Client
+            return WorldSavedDataMachines.getClientMachineIdFromBoxPos(this.getPos()) == this.id;
+        }
     }
 
     public ItemStack getConnectedPickBlock(EnumFacing facing) {
@@ -427,16 +468,16 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
     }
 
     public int getRedstonePowerOutput(EnumFacing facing) {
-        if(this.coords == -1) {
+        if(this.id == -1) {
             return 0;
         }
 
         // We don't know the actual power on the client-side, which does not have the worldsaveddatamachines instance
-        if(WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.redstoneTunnels == null) {
+        if(this.getWorld().isRemote) {
             return 0;
         }
 
-        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords);
+        Map<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.getInstance().redstoneTunnels.get(this.id);
         if(tunnelMapping == null) {
             return 0;
         }
@@ -456,7 +497,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return 0;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelData.pos.offset(insetDirection);
         IBlockState insetBlockState = machineWorld.getBlockState(insetPos);
 
@@ -472,7 +513,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if(isInsideItself()) {
+        if (isInsideItself() || this.roomPos == null) {
             return false;
         }
 
@@ -494,24 +535,20 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return false;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
         TileEntity te = machineWorld.getTileEntity(insetPos);
-        if(te != null && te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
+        if (te != null && te.hasCapability(capability, insetDirection.getOpposite())) {
             return true;
         }
 
-        if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
-            return true;
-        }
-
-        return false;
+        return CapabilityNullHandlerRegistry.hasNullHandler(capability);
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if(isInsideItself()) {
+        if (isInsideItself() || this.roomPos == null) {
             return null;
         }
 
@@ -533,12 +570,12 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
             return null;
         }
 
-        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
+        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.roomPos, this.getSize());
         BlockPos insetPos = tunnelPos.offset(insetDirection);
 
         TileEntity te = machineWorld.getTileEntity(insetPos);
-        if(te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
-            return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
+        if (te != null && te.hasCapability(capability, insetDirection.getOpposite())) {
+            return te.getCapability(capability, insetDirection.getOpposite());
         }
 
         if(CapabilityNullHandlerRegistry.hasNullHandler(capability)) {

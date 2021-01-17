@@ -38,7 +38,7 @@ public class GuiMachineWidgetGui extends GUI {
             giveItemButton.setY(height-90);
             giveItemButton.addListener(MouseClickEvent.class, (event, widget) -> {
                 player.closeScreen();
-                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.GIVE_ITEM);
+                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.id, MessageRequestMachineAction.Action.GIVE_ITEM);
                 PackageHandler.instance.sendToServer(requestMessage);
                 return WidgetEventResult.HANDLED;
             });
@@ -53,10 +53,11 @@ public class GuiMachineWidgetGui extends GUI {
             tpInsideButton.setY(height-63);
             tpInsideButton.addListener(MouseClickEvent.class, (event, widget) -> {
                 player.closeScreen();
-                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TELEPORT_INSIDE);
+                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.id, MessageRequestMachineAction.Action.TELEPORT_INSIDE);
                 PackageHandler.instance.sendToServer(requestMessage);
                 return WidgetEventResult.HANDLED;
             });
+            tpInsideButton.setTooltipLines(I18n.format("commands.compactmachines3.machines.give.tpinsidetooltip"));
             this.add(tpInsideButton);
 
 
@@ -66,10 +67,11 @@ public class GuiMachineWidgetGui extends GUI {
             tpOutsideButton.setY(height-42);
             tpOutsideButton.addListener(MouseClickEvent.class, (event, widget) -> {
                 player.closeScreen();
-                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TELEPORT_OUTSIDE);
+                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.id, MessageRequestMachineAction.Action.TELEPORT_OUTSIDE);
                 PackageHandler.instance.sendToServer(requestMessage);
                 return WidgetEventResult.HANDLED;
             });
+            tpOutsideButton.setTooltipLines(I18n.format("commands.compactmachines3.machines.give.tpoutsidetooltip"));
             this.add(tpOutsideButton);
 
 
@@ -78,7 +80,7 @@ public class GuiMachineWidgetGui extends GUI {
             previousButton.setX(-42);
             previousButton.setY(height-21);
             previousButton.addListener(MouseClickEvent.class, (event, widget) -> {
-                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords-1, MessageRequestMachineAction.Action.REFRESH);
+                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.id -1, MessageRequestMachineAction.Action.REFRESH);
                 PackageHandler.instance.sendToServer(requestMessage);
                 return WidgetEventResult.HANDLED;
             });
@@ -89,7 +91,7 @@ public class GuiMachineWidgetGui extends GUI {
             nextButton.setX(-21);
             nextButton.setY(height-21);
             nextButton.addListener(MouseClickEvent.class, (event, widget) -> {
-                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.coords+1, MessageRequestMachineAction.Action.REFRESH);
+                MessageRequestMachineAction requestMessage = new MessageRequestMachineAction(GuiMachineData.id +1, MessageRequestMachineAction.Action.REFRESH);
                 PackageHandler.instance.sendToServer(requestMessage);
                 return WidgetEventResult.HANDLED;
             });
@@ -105,7 +107,7 @@ public class GuiMachineWidgetGui extends GUI {
 
         tabs.addPage(new WidgetPreviewPanel(player, this.width, this.height, adminMode), new ItemStack(Blockss.wall), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.preview")));
 
-        if(GuiMachineData.coords != -1 && GuiMachineData.isOwner(player)) {
+        if(GuiMachineData.id != -1 && GuiMachineData.isOwner(player)) {
             tabs.addPage(new WidgetWhitelistPanel(this.width, this.height), new ItemStack(Items.FILLED_MAP), Collections.singletonList(I18n.format("gui.compactmachines3.compactsky.whitelist")));
         }
 

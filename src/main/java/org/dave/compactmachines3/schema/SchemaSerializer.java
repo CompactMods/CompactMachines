@@ -2,6 +2,7 @@ package org.dave.compactmachines3.schema;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import net.minecraft.util.math.Vec3d;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 
 import java.lang.reflect.Type;
@@ -27,11 +28,10 @@ public class SchemaSerializer implements JsonSerializer<Schema>, JsonDeserialize
         }
 
         JsonArray spawnPos = jsonRoot.getAsJsonArray("spawn");
-        double[] spawnPosition = new double[] {
+        Vec3d spawnPosition = new Vec3d(
                 spawnPos.get(0).getAsDouble(),
                 spawnPos.get(1).getAsDouble(),
-                spawnPos.get(2).getAsDouble()
-        };
+                spawnPos.get(2).getAsDouble());
         result.setSpawnPosition(spawnPosition);
 
         return result;
@@ -46,9 +46,9 @@ public class SchemaSerializer implements JsonSerializer<Schema>, JsonDeserialize
         root.add("blocks", context.serialize(src.getBlocks()));
 
         JsonArray spawnArray = new JsonArray();
-        spawnArray.add(src.getSpawnPosition()[0]);
-        spawnArray.add(src.getSpawnPosition()[1]);
-        spawnArray.add(src.getSpawnPosition()[2]);
+        spawnArray.add(src.getSpawnPosition().x);
+        spawnArray.add(src.getSpawnPosition().y);
+        spawnArray.add(src.getSpawnPosition().z);
 
         root.add("spawn", spawnArray);
         return root;

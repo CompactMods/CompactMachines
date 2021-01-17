@@ -1,7 +1,9 @@
 package org.dave.compactmachines3.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.dave.compactmachines3.reference.EnumMachineSize;
@@ -15,24 +17,26 @@ import java.util.Set;
 
 public class MessageMachineContent implements IMessage {
     protected int machineSize;
-    protected int coords;
+    protected int id;
 
+    protected BlockPos roomPos;
     protected DimensionBlockPos machinePos;
     protected String owner;
     protected String customName;
     protected Set<String> playerWhiteList;
     protected boolean locked;
 
-    public MessageMachineContent(int coords) {
-        this.coords = coords;
-        WorldSavedDataMachines data = WorldSavedDataMachines.INSTANCE;
+    public MessageMachineContent(int id) {
+        this.id = id;
+        WorldSavedDataMachines data = WorldSavedDataMachines.getInstance();
 
-        machinePos = data.getMachinePosition(coords);
-        machineSize = data.machineSizes.getOrDefault(coords, EnumMachineSize.MAXIMUM).getDimension();
+        roomPos = data.getMachineRoomPosition(id);
+        machinePos = data.getMachineBlockPosition(id);
+        machineSize = data.machineSizes.getOrDefault(id, EnumMachineSize.MAXIMUM).getDimension();
 
         if(machinePos != null) {
             TileEntity te = DimensionTools.getWorldServerForDimension(machinePos.getDimension()).getTileEntity(machinePos.getBlockPos());
-            if (te != null && te instanceof TileEntityMachine) {
+            if (te instanceof TileEntityMachine) { // instanceof null returns false
                 TileEntityMachine machine = (TileEntityMachine) te;
                 owner = machine.getOwnerName();
                 customName = machine.getCustomName();
@@ -49,8 +53,12 @@ public class MessageMachineContent implements IMessage {
         this.machineSize = machineSize;
     }
 
-    public void setCoords(int coords) {
-        this.coords = coords;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setRoomPos(BlockPos roomPos) {
+        this.roomPos = roomPos;
     }
 
     public void setMachinePos(DimensionBlockPos machinePos) {
@@ -68,7 +76,9 @@ public class MessageMachineContent implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         machineSize = buf.readInt();
-        coords = buf.readInt();
+        id = buf.readInt();
+        if (buf.readBoolean())
+            roomPos = NBTUtil.getPosFromTag(ByteBufUtils.readTag(buf));
         boolean hasMachineBlock = buf.readBoolean();
         if(hasMachineBlock) {
             machinePos = new DimensionBlockPos(buf);
@@ -89,7 +99,13 @@ public class MessageMachineContent implements IMessage {
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(machineSize);
-        buf.writeInt(coords);
+        buf.writeInt(id);
+        if (roomPos != null) {
+            buf.writeBoolean(true);
+            ByteBufUtils.writeTag(buf, NBTUtil.createPosTag(roomPos));
+        } else {
+            buf.writeBoolean(false);
+        }
         if(machinePos != null) {
             buf.writeBoolean(true);
             machinePos.writeToByteBuf(buf);

@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import org.dave.compactmachines3.gui.framework.GUI;
 import org.dave.compactmachines3.gui.framework.event.*;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.*;
 
@@ -115,10 +114,8 @@ public class Widget {
 
     public boolean isPosInside(int x, int y) {
         boolean isInsideX = this.getActualX() <= x && x < this.getActualX() + this.width;
-        //Logz.info("[%s] insideX: %d < %d <= %d --> %s", this.id, this.lastDrawX, x, this.lastDrawX + this.lastDrawWidth, this.toString());
 
         boolean isInsideY = this.getActualY() <= y && y < this.getActualY() + this.height;
-        //Logz.info("[%s] insideY: %d < %d <= %d --> %s", this.id, this.lastDrawY, y, this.lastDrawY + this.lastDrawHeight, this.toString());
 
         return isInsideX && isInsideY;
     }
@@ -233,9 +230,7 @@ public class Widget {
      *
      * @param screen
      */
-    public void draw(GuiScreen screen) {
-        //Logz.debug("Drawing widget: %s, x=%d, y=%d, width=%d, height=%d", this, layoutResult.getX(), layoutResult.getY(), layoutResult.getWidth(), layoutResult.getHeight());
-    }
+    public void draw(GuiScreen screen) {}
 
     public <T extends IEvent> void addListener(Class<T> eventClass, IWidgetListener<? super T> listener) {
         if(!eventListeners.containsKey(eventClass)) {

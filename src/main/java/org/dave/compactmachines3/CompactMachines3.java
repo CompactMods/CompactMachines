@@ -7,12 +7,22 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dave.compactmachines3.command.CommandCompactMachines3;
 import org.dave.compactmachines3.gui.GuiHandler;
 import org.dave.compactmachines3.integration.CapabilityNullHandlerRegistry;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipes;
-import org.dave.compactmachines3.misc.*;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.misc.CreativeTabCompactMachines3;
+import org.dave.compactmachines3.misc.MachineEventHandler;
+import org.dave.compactmachines3.misc.PlayerEventHandler;
+import org.dave.compactmachines3.misc.RenderTickCounter;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.proxy.CommonProxy;
 import org.dave.compactmachines3.render.BakeryHandler;
@@ -22,22 +32,22 @@ import org.dave.compactmachines3.skyworld.SkyDimension;
 import org.dave.compactmachines3.skyworld.SkyWorldEvents;
 import org.dave.compactmachines3.skyworld.SkyWorldSavedData;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ChunkLoadingMachines;
 import org.dave.compactmachines3.world.ClientWorldData;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.data.provider.ExtraTileDataProviderRegistry;
 import org.dave.compactmachines3.world.tools.DimensionTools;
 
-@Mod(modid = CompactMachines3.MODID, version = CompactMachines3.VERSION, acceptedMinecraftVersions = "[1.12,1.13)", dependencies = "after:refinedstorage;after:yunomakegoodmap", guiFactory = CompactMachines3.GUI_FACTORY)
-public class CompactMachines3
-{
+@Mod(modid = CompactMachines3.MODID, version = CompactMachines3.VERSION, acceptedMinecraftVersions = "[1.12,1.13)",
+        dependencies = "after:refinedstorage;after:yunomakegoodmap", guiFactory = CompactMachines3.GUI_FACTORY)
+public class CompactMachines3 {
     public static final String MODID = "compactmachines3";
-    public static final String VERSION = "3.0.18";
+    public static final String VERSION = "@VERSION@";
     public static final String GUI_FACTORY = "org.dave.compactmachines3.misc.ConfigGuiFactory";
 
     @Mod.Instance(CompactMachines3.MODID)
     public static CompactMachines3 instance;
+    public static final Logger logger = LogManager.getLogger(CompactMachines3.MODID);
 
     public static ClientWorldData clientWorldData;
 
@@ -48,10 +58,8 @@ public class CompactMachines3
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        Logz.setLogger(event.getModLog());
-
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
-        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
+        MinecraftForge.EVENT_BUS.register(ConfigurationHandler.class);
 
         MinecraftForge.EVENT_BUS.register(MachineEventHandler.class);
         MinecraftForge.EVENT_BUS.register(PlayerEventHandler.class);
@@ -95,9 +103,9 @@ public class CompactMachines3
 
     @EventHandler
     public void onServerAboutToStart(FMLServerAboutToStartEvent event) {
-        for(WorldServer world : event.getServer().worlds) {
-            if(world.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator) {
-                world.setSpawnPoint(new BlockPos(0,0,0));
+        for (WorldServer world : event.getServer().worlds) {
+            if (world.getChunkProvider().chunkGenerator instanceof SkyChunkGenerator) {
+                world.setSpawnPoint(new BlockPos(0, 0, 0));
             }
         }
     }

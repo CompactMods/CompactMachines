@@ -18,9 +18,10 @@ public class GuiPSDScreen extends GuiScreen {
     public int offsetY;
     public int offsetX;
 
-    public static Pages pages;
+    private final Pages pages;
 
     public GuiPSDScreen() {
+        this.pages = new Pages();
     }
 
     @Override

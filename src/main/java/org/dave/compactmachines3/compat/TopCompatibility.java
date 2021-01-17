@@ -5,7 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.CompactMachines3;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -35,7 +35,7 @@ public class TopCompatibility {
         @Override
         public Void apply(ITheOneProbe iTheOneProbe) {
             probe = iTheOneProbe;
-            Logz.info("Enabled support for The One Probe");
+            CompactMachines3.logger.info("Enabled support for The One Probe");
             probe.registerProvider(new IProbeInfoProvider() {
                 @Override
                 public String getID() {

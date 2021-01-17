@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MultiblockRecipe {
     private String name;
@@ -34,12 +35,12 @@ public class MultiblockRecipe {
     private String[][][] map180;
     private String[][][] map270;
     private List<BlockPos> mapAsBlockPos;
-    private HashMap<String, IBlockState> reference;
-    private HashMap<String, Integer> referenceCount;
-    private HashMap<String, Boolean> referenceIgnoresMeta;
-    private HashMap<String, NBTTagCompound> referenceTags;
-    //private HashMap<String, Boolean> referenceIgnoresNBT;
-    private HashMap<String, ItemStack> referenceStacks;
+    private Map<String, IBlockState> reference;
+    private Map<String, Integer> referenceCount;
+    private Map<String, Boolean> referenceIgnoresMeta;
+    private Map<String, NBTTagCompound> referenceTags;
+    //private Map<String, Boolean> referenceIgnoresNBT;
+    private Map<String, ItemStack> referenceStacks;
 
     private BlockPos minPos;
     private BlockPos maxPos;
@@ -159,7 +160,7 @@ public class MultiblockRecipe {
                         continue;
                     }
 
-                    referenceCount.put(content, referenceCount.getOrDefault(content, 0)+1);
+                    referenceCount.merge(content, 1, Integer::sum);
 
                     minY = Math.min(minY, y);
                     minZ = Math.min(minZ, z);
@@ -185,8 +186,8 @@ public class MultiblockRecipe {
                 IBlockState state = getBlockState(pos);
                 if(state.getBlock().hasTileEntity(state)) {
                     TileEntity tileentity = state.getBlock().createTileEntity(proxyWorld, state);
-                    tileentity.setWorld(proxyWorld);
                     if (tileentity != null) {
+                        tileentity.setWorld(proxyWorld);
                         NBTTagCompound nbt = getVariantAtBlockPos(pos);
                         if(nbt != null) {
                             tileentity.readFromNBT(nbt);

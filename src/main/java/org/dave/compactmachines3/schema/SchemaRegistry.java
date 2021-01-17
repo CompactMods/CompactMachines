@@ -3,7 +3,6 @@ package org.dave.compactmachines3.schema;
 import com.google.gson.stream.JsonReader;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ResourceLoader;
 import org.dave.compactmachines3.utility.SerializationHelper;
 
@@ -49,11 +48,11 @@ public class SchemaRegistry {
 
             Schema schema = SerializationHelper.GSON.fromJson(new JsonReader(new InputStreamReader(is)), Schema.class);
             if(schema == null) {
-                Logz.error("Could not deserialize schema from file: \"" + filename + "\"");
+                CompactMachines3.logger.error("Could not deserialize schema from file: \"{}\"", filename);
                 continue;
             }
 
-            Logz.info("Loaded schema: %s [size=%s, blocks=%d]", schema.getName(), schema.getSize(), schema.getBlocks().size());
+            CompactMachines3.logger.info("Loaded schema: {} [size={}, blocks={}]", schema.getName(), schema.getSize(), schema.getBlocks().size());
             addSchema(schema);
         }
     }

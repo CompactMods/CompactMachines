@@ -2,6 +2,7 @@ package org.dave.compactmachines3.utility;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.integration.CapabilityNullHandler;
 import org.dave.compactmachines3.integration.AbstractNullHandler;
 import org.dave.compactmachines3.world.data.provider.AbstractExtraTileDataProvider;
@@ -56,13 +57,13 @@ public class AnnotatedInstanceUtil {
                 T instance = asmInstanceClass.newInstance();
                 instances.add(instance);
             } catch (ClassNotFoundException e) {
-                Logz.error("Failed to load: {}", asmData.getClassName(), e);
+                CompactMachines3.logger.error("Failed to load: {}", asmData.getClassName(), e);
             } catch (IllegalAccessException e) {
-                Logz.error("Failed to load: {}", asmData.getClassName(), e);
+                CompactMachines3.logger.error("Failed to load: {}", asmData.getClassName(), e);
             } catch (InstantiationException e) {
-                Logz.error("Failed to load: {}", asmData.getClassName(), e);
+                CompactMachines3.logger.error("Failed to load: {}", asmData.getClassName(), e);
             } catch (ExceptionInInitializerError e) {
-                Logz.error("Failed to load: {}", asmData.getClassName(), e);
+                CompactMachines3.logger.error("Failed to load: {}", asmData.getClassName(), e);
             }
         }
         return instances;

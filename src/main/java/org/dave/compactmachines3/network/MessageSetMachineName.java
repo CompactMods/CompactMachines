@@ -5,26 +5,26 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessageSetMachineName implements IMessage {
-    int coords;
+    int id;
     String newName;
 
     public MessageSetMachineName() {
     }
 
-    public MessageSetMachineName(int coords, String newName) {
-        this.coords = coords;
+    public MessageSetMachineName(int id, String newName) {
+        this.id = id;
         this.newName = newName;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
         this.newName = ByteBufUtils.readUTF8String(buf);
-        this.coords = buf.readInt();
+        this.id = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeUTF8String(buf, this.newName);
-        buf.writeInt(this.coords);
+        buf.writeInt(this.id);
     }
 }

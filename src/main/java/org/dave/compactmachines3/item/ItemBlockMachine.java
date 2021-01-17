@@ -6,6 +6,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.dave.compactmachines3.CompactMachines3;
@@ -48,10 +49,11 @@ public class ItemBlockMachine extends ItemBlock {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        if(stack.hasTagCompound() && stack.getTagCompound().hasKey("coords")) {
-            int coords = stack.getTagCompound().getInteger("coords");
-            if(coords > -1) {
-                tooltip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.coords") + " #" + coords));
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if(stack.hasTagCompound() && (tagCompound.hasKey("id") || tagCompound.hasKey("coords"))) {
+            int id = tagCompound.hasKey("id") ? tagCompound.getInteger("id") : tagCompound.getInteger("coords");
+            if (id != -1) {
+                tooltip.add(TextFormattingHelper.colorizeKeyValue(I18n.format("tooltip.compactmachines3.machine.id") + " #" + id));
             }
         }
 

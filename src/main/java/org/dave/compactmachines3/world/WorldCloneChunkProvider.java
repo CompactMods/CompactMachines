@@ -39,6 +39,9 @@ public class WorldCloneChunkProvider implements IChunkProvider {
     }
 
     public Chunk loadChunkFromNBT(NBTTagCompound tag) {
+        if (tag.isEmpty()) {
+            return null;
+        }
         Chunk chunk = ChunkUtils.readChunkFromNBT(world, tag);
         chunk.markLoaded(true);
         this.loadedChunks.put(ChunkPos.asLong(chunk.x, chunk.z), chunk);
@@ -47,7 +50,7 @@ public class WorldCloneChunkProvider implements IChunkProvider {
         for(int x = 15; x >= 0; x--) {
             for(int y = 15; y >= 0; y--) {
                 for(int z = 15; z >= 0; z--) {
-                    BlockPos pos = new BlockPos(chunk.x * 16 + x, y + 40, z);
+                    BlockPos pos = chunk.getPos().getBlock(x, y + 40, z);
                     IBlockState state = chunk.getBlockState(pos);
                     if(state.getBlock() == Blocks.AIR) {
                         continue;

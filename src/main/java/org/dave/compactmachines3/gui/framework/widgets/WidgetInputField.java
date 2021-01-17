@@ -50,7 +50,6 @@ public class WidgetInputField extends WidgetWithValue<String> {
         this.addListener(MouseClickEvent.class, new IWidgetListener<MouseClickEvent>() {
             @Override
             public WidgetEventResult call(MouseClickEvent event, Widget widget) {
-                //Logz.info("Mouse clicked @ x=%d, y=%d", event.x, event.y);
                 //textField.mouseClicked(event.x, event.y, event.button);
                 return WidgetEventResult.CONTINUE_PROCESSING;
             }
@@ -613,8 +612,6 @@ public class WidgetInputField extends WidgetWithValue<String> {
         int y = 0;
         int width = this.width;
         int height = this.height;
-
-        //Logz.info("Drawing input field @ %d,%d [width=%d, height=%d]", x, y, width, height);
 
         Gui.drawRect(x, y, x+width, y+height, borderColor);
         Gui.drawRect(x+1, y+1, x+width-1, y+height-1, backgroundColor);

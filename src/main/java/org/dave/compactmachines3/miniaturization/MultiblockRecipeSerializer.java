@@ -10,7 +10,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.CompactMachines3;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -19,30 +19,30 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
     @Override
     public MultiblockRecipe deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (!json.isJsonObject()) {
-            Logz.info("Invalid recipe! Not a json object!");
+            CompactMachines3.logger.info("Invalid recipe! Not a json object!");
             return null;
         }
 
         JsonObject jsonRoot = json.getAsJsonObject();
         // Abort if these sections don't exist
         if(!jsonRoot.has("input-types") || !jsonRoot.has("shape")) {
-            Logz.info("Invalid recipe! Missing section shape and/or input-types!");
+            CompactMachines3.logger.info("Invalid recipe! Missing section shape and/or input-types!");
             return null;
         }
 
         if(!jsonRoot.has("name")) {
-            Logz.info("Invalid recipe! Missing recipe name!");
+            CompactMachines3.logger.info("Invalid recipe! Missing recipe name!");
             return null;
         }
 
         String name = jsonRoot.get("name").getAsString();
         if(MultiblockRecipes.getRecipeByName(name) != null) {
-            Logz.info("Duplicate recipe with name: %s", name);
+            CompactMachines3.logger.info("Duplicate recipe with name: {}", name);
             return null;
         }
 
         if(jsonRoot.has("disabled") && jsonRoot.get("disabled").getAsBoolean() == true) {
-            Logz.info("Recipe '%s' is disabled via its json file", name);
+            CompactMachines3.logger.info("Recipe '{}' is disabled via its json file", name);
             return null;
         }
 
@@ -76,7 +76,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
                 NBTTagCompound targetNBT = JsonToNBT.getTagFromJson(nbtRaw);
                 targetStack.setTagCompound(targetNBT);
             } catch (NBTException e) {
-                Logz.warn("Unable to read target NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
+                CompactMachines3.logger.warn("Unable to read target NBT tag from miniaturization recipe: {} (exception={})", nbtRaw, e);
             }
         }
 
@@ -100,7 +100,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             try {
                 catalystNbt = JsonToNBT.getTagFromJson(nbtRaw);
             } catch (NBTException e) {
-                Logz.warn("Unable to read NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
+                CompactMachines3.logger.warn("Unable to read NBT tag from miniaturization recipe: {} (exception={})", nbtRaw, e);
             }
         }
 
@@ -121,7 +121,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
         for(Map.Entry<String, JsonElement> entry : jsonReferenceMap.entrySet()) {
             JsonObject data = entry.getValue().getAsJsonObject();
             if(!data.has("id")) {
-                Logz.error("Missing id for source block");
+                CompactMachines3.logger.error("Missing id for source block");
                 return null;
             }
 
@@ -169,7 +169,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
                                 NBTTagCompound stackNbt = JsonToNBT.getTagFromJson(nbtRaw);
                                 stackStack.setTagCompound(stackNbt);
                             } catch (NBTException e) {
-                                Logz.warn("Unable to read NBT tag from miniaturization recipe: %s (exception=%s)", nbtRaw, e);
+                                CompactMachines3.logger.warn("Unable to read NBT tag from miniaturization recipe: {} (exception={})", nbtRaw, e);
                             }
                         }
 
@@ -185,7 +185,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
             for (Map.Entry<String, JsonElement> entry : jsonVariantMap.entrySet()) {
                 JsonObject data = entry.getValue().getAsJsonObject();
                 if (!data.has("nbt")) {
-                    Logz.error("Missing nbt for variant");
+                    CompactMachines3.logger.error("Missing nbt for variant");
                     return null;
                 }
 
@@ -194,7 +194,7 @@ public class MultiblockRecipeSerializer implements JsonSerializer<MultiblockReci
                     NBTTagCompound variantNBT = JsonToNBT.getTagFromJson(rawNbtJson);
                     result.addBlockVariation(entry.getKey(), variantNBT);
                 } catch (NBTException e) {
-                    Logz.warn("Unable to read NBT tag from miniaturiazation recipe: %s (exception=%s)", rawNbtJson, e);
+                    CompactMachines3.logger.warn("Unable to read NBT tag from miniaturiazation recipe: {} (exception={})", rawNbtJson, e);
                     return null;
                 }
             }

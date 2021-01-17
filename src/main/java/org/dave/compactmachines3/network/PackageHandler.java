@@ -18,6 +18,8 @@ public class PackageHandler {
         instance.registerMessage(MessageWorldInfo.class, MessageWorldInfo.class, 6, Side.CLIENT);
         instance.registerMessage(MessageMachineChunk.class, MessageMachineChunk.class, 7, Side.CLIENT);
         instance.registerMessage(MessageSetMachineNameHandler.class, MessageSetMachineName.class, 8, Side.SERVER);
+        instance.registerMessage(MessageMachinePositions.class, MessageMachinePositions.class, 9, Side.CLIENT);
+        instance.registerMessage(MessageDocumentation.class, MessageDocumentation.class, 10, Side.CLIENT);
     }
 }
 

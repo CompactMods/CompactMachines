@@ -1,5 +1,6 @@
 package org.dave.compactmachines3.schema;
 
+import net.minecraft.util.math.Vec3d;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class Schema {
     private String description;
     private List<BlockInformation> blocks;
     private EnumMachineSize size;
-    private double[] spawnPosition;
+    private Vec3d spawnPosition;
 
     public Schema(String name) {
         this.name = name;
@@ -43,11 +44,11 @@ public class Schema {
         this.size = size;
     }
 
-    public void setSpawnPosition(double[] spawnPosition) {
+    public void setSpawnPosition(Vec3d spawnPosition) {
         this.spawnPosition = spawnPosition;
     }
 
-    public double[] getSpawnPosition() {
+    public Vec3d getSpawnPosition() {
         return spawnPosition;
     }
 }

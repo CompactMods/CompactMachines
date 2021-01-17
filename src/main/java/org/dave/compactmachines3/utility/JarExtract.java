@@ -17,12 +17,12 @@ public class JarExtract {
 
     public static int copy(String src, File dst) {
         if(DEVELOPMENT) {
-            Logz.info("Running in a development environment, copying '%s' from assets folder", src);
+            CompactMachines3.logger.info("Running in a development environment, copying '{}' from assets folder", src);
             File srcFile = new File(CompactMachines3.class.getResource("/" + src).getFile());
             try {
                 FileUtils.copyDirectory(srcFile, dst);
             } catch(IOException e) {
-                Logz.error("Error while copy files from development environment:");
+                CompactMachines3.logger.error("Error while copy files from development environment:");
                 e.printStackTrace();
             }
         } else {
@@ -35,7 +35,7 @@ public class JarExtract {
     private static int extract(String src, String dst) {
         URL srcUrl = CompactMachines3.class.getResource("/" + src);
         if(srcUrl == null || !srcUrl.getProtocol().equals("jar")) {
-            Logz.error("Error while extracting files from jar: unable to get Resource URL for '%s'.", src);
+            CompactMachines3.logger.error("Error while extracting files from jar: unable to get Resource URL for '{}'.", src);
             return 0;
         }
 

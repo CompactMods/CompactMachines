@@ -43,14 +43,14 @@ public class CommandSchemaLoad extends CommandBaseExt {
         }
 
         Schema schema = SchemaRegistry.instance.getSchema(args[0]);
-        int coords = StructureTools.getCoordsForPos(sender.getCommandSenderEntity().getPosition());
-        EnumMachineSize machineSize = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
-        if(machineSize != schema.getSize()) {
-            throw this.getException(sender, "machine_size_does_not_match");
+        int id = WorldSavedDataMachines.getInstance().getMachineIdFromEntityPos(sender.getCommandSenderEntity());
+        EnumMachineSize machineSize = WorldSavedDataMachines.getInstance().machineSizes.get(id);
+        if (machineSize != schema.getSize()) {
+            throw this.getException(sender, "machine_size_does_not_match", schema.getSize().toString());
         }
 
         sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.schema.load.machine_schema_set_to", args[0]));
-        StructureTools.restoreSchema(schema, coords);
+        StructureTools.restoreSchema(schema, id);
     }
 
     @Override

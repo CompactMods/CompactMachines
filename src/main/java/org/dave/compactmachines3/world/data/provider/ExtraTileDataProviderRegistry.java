@@ -1,8 +1,8 @@
 package org.dave.compactmachines3.world.data.provider;
 
 import net.minecraft.tileentity.TileEntity;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.utility.AnnotatedInstanceUtil;
-import org.dave.compactmachines3.utility.Logz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class ExtraTileDataProviderRegistry {
                 continue;
             }
 
-            Logz.info("Registered extra tile data provider '%s'", etdp.getName());
+            CompactMachines3.logger.info("Registered extra tile data provider '{}'", etdp.getName());
             extraTileData.add(etdp);
         }
     }

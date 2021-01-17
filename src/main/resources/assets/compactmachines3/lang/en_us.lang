@@ -34,16 +34,71 @@ hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in
 hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
 hint.compactmachines3.skyworld.only_one_machine_claim=You can only claim a single Compact Machine in the hub!
 
+## Configuration
+# Categories
+compactmachines3.config.category.client=Client
+compactmachines3.config.category.client.tooltip=Client rendering settings
+compactmachines3.config.category.compatibility=Compatibility
+compactmachines3.config.category.compatibility.tooltip=Modpack compatibility settings
+compactmachines3.config.category.internal=Internal
+compactmachines3.config.category.internal.tooltip=Internal values that should generally not be changed
+compactmachines3.config.category.machines=Machines
+compactmachines3.config.category.machines.tooltip=Machine Block settings that relate to machine rooms
+compactmachines3.config.category.miniaturization=Miniaturization
+compactmachines3.config.category.miniaturization.tooltip=Miniaturization projector settings
+
+# Client Category
+compactmachines3.config.autoUpdateRate=Machine Preview Update Rate
+compactmachines3.config.autoUpdateRate.tooltip=Updates the Machine Preview GUI every n ticks. Set to 0 to disable. Lower values decrease performance significantly!
+compactmachines3.config.renderLivingEntitiesInGUI=Render Entities in Machine Preview
+compactmachines3.config.renderLivingEntitiesInGUI.tooltip=Client-side rendering option, might give a performance boost when opening a Machine Preview GUI.
+compactmachines3.config.renderTileEntitiesInGUI=Render Tile Entities in Machine Preview
+compactmachines3.config.renderTileEntitiesInGUI.tooltip=Client-side rendering option, might give a performance boost when opening a Machine Preview GUI.
+
+# Compatibility Category
+compactmachines3.config.doesWaterVaporize=Does Water Vaporize
+compactmachines3.config.doesWaterVaporize.tooltip=Forces water to vaporize inside Compact Machines. Used for Forever Stranded: Lost Souls.
+
+# Internal Category
+compactmachines3.config.dimensionId=Dimension ID
+compactmachines3.config.dimensionId.tooltip=Dimension used for machines. Do not change this unless it is somehow conflicting!
+compactmachines3.config.dimensionTypeId=Dimension Type ID
+compactmachines3.config.dimensionTypeId.tooltip=Dimension type used for machines. Do not change this unless it is somehow conflicting!
+compactmachines3.config.forceLoadChunks=Force Load Chunks
+compactmachines3.config.forceLoadChunks.tooltip=Whether the interior of all Compact Machines should be chunk loaded always. Otherwise they will only chunkload when the CM itself is chunkloaded.
+
+# Machines Category
+compactmachines3.config.allowEnteringWithoutPSD=Allow External Teleportation Commands
+compactmachines3.config.allowEnteringWithoutPSD.tooltip=Allow players to enter machines with teleportation commands, etc. from other mods without kicking them out.
+compactmachines3.config.allowHostileSpawns=Allow Hostile Entity Spawning
+compactmachines3.config.allowHostileSpawns.tooltip=Allow hostile creatures to spawn inside of machines.
+compactmachines3.config.allowPeacefulSpawns=Allow Peaceful Entity Spawning
+compactmachines3.config.allowPeacefulSpawns.tooltip=Allow peaceful creatures to spawn inside of machines.
+compactmachines3.config.allowPickupEmptyMachines=Allow Pickup of Empty Machines
+compactmachines3.config.allowPickupEmptyMachines.tooltip=If set to true, breaking a machine block that was never used will clear the NBT data.\nThis is disabled by default because it clears the owner of the machine block which may be an unintended side-effect.\nThis can be helpful to players who want to pick up empty machines and stack them since items with different NBT do not stack.
+compactmachines3.config.allowRespawning=Allow Respawning
+compactmachines3.config.allowRespawning.tooltip=Whether players can respawn inside of Compact Machines, i.e. place beds and sleep there.
+compactmachines3.config.keepPlayersInside=Keep Players Inside Machine
+compactmachines3.config.keepPlayersInside.tooltip=Block players from leaving the confines of the box of the Compact Machine they should currently be in, only applies to players not in creative/spectator.
+compactmachines3.config.spawnRate=Entity Spawn Rate
+compactmachines3.config.spawnRate.tooltip=How often to try spawning entities inside of machines in ticks.
+
+# Miniaturization Category
+compactmachines3.config.maximumCraftingAreaSize=Maximum Crafting Area Size
+compactmachines3.config.maximumCraftingAreaSize.tooltip=Maximum size the field projectors can cover.
+compactmachines3.config.maximumCraftingCatalystAge=Maximum Crafting Catalyst Age
+compactmachines3.config.maximumCraftingCatalystAge.tooltip=Maximum age in ticks in which an item is valid for acting as a catalyst.
+
 top.compactmachines3.currently_crafting=Crafting:
 top.compactmachines3.found_recipe_for=Recipe for:
 
-tooltip.compactmachines3.machine.coords=Machine:
-tooltip.compactmachines3.machine.coords.unused=Unused
+tooltip.compactmachines3.machine.id=Machine:
+tooltip.compactmachines3.machine.id.unused=Unused
 tooltip.compactmachines3.machine.schema=Schema:
-tooltip.compactmachines3.machine.stopitsoaryn=Feedbackloop detected
+tooltip.compactmachines3.machine.stopitsoaryn=Feedback loop detected
 
 tooltip.compactmachines3.hold_shift.hint=Hold shift for details.
-tooltip.compactmachines3.psd.hint=Used as ingame documentation and to enter Compact Machines.
+tooltip.compactmachines3.psd.hint=Used as in-game documentation and to enter Compact Machines.
 tooltip.compactmachines3.fieldprojector.hint=Place 4 opposite of each other to create a Miniaturization Crafting field. Right click to get hints where the next projector needs to be!
 tooltip.compactmachines3.tunneltool.hint=Used to connect Wall blocks with outside Compact Machine faces.
 tooltip.compactmachines3.redstonetunneltool.hint=Used to transfer redstone signals between wall blocks and outside Compact Machine faces.
@@ -72,6 +127,8 @@ commands.compactmachines3.usage=/compactmachines3 [subcommand, leave empty for l
 commands.compactmachines3.available=Available sub-commands:
 commands.compactmachines3.denied=You do not have the permission to use this command.
 
+commands.compactmachines3.documentation.description=Shows the mod documentation that opens with the PSD in the overworld
+
 commands.compactmachines3.schema.description=Save/load the contents of machines
 commands.compactmachines3.schema.save.usage=/compactmachines3 schema save <name>
 commands.compactmachines3.schema.save.description=Saves the machine you are in to disk
@@ -84,7 +141,7 @@ commands.compactmachines3.schema.load.usage=/compactmachines3 schema load <name>
 commands.compactmachines3.schema.load.description=Generates the specified schema in the room you are standing in
 commands.compactmachines3.schema.load.exception.not_in_machine_dimension=You must be in the machine dimension for this command to work.
 commands.compactmachines3.schema.load.exception.unknown_schema=No schema with that name exists!
-commands.compactmachines3.schema.load.exception.machine_size_does_not_match=The size of the machine does not match the schema!
+commands.compactmachines3.schema.load.exception.machine_size_does_not_match=The size of the machine does not match the schema! Try a %s machine.
 commands.compactmachines3.schema.load.machine_schema_set_to=Machine set to schema: %s
 
 commands.compactmachines3.schema.set.usage=/compactmachines3 schema set <name>
@@ -97,7 +154,6 @@ commands.compactmachines3.schema.set.machine_schema_set_to=Machine set to schema
 
 commands.compactmachines3.schema.reload-files.usage=/compactmachines3 schema reload-files
 commands.compactmachines3.schema.reload-files.description=Reloads all the stored schema files from disk and from the jar
-
 
 commands.compactmachines3.recipe.description=Stuff related to Multiblock Miniaturization recipes
 commands.compactmachines3.recipe.unpack-defaults.usage=/compactmachines3 recipe unpack-defaults [force]
@@ -124,14 +180,16 @@ commands.compactmachines3.machines.description=Commands to recover lost/broken m
 commands.compactmachines3.machines.give.usage=/compactmachines3 machines give <id>
 commands.compactmachines3.machines.give.description=Gives the player a corresponding cube. WARNING: This breaks Machines if they already exist in the world!
 commands.compactmachines3.machines.give.warning=WARNING: This breaks Machines if they already exist in the world!
+commands.compactmachines3.machines.give.tpinsidetooltip=Teleports you inside the machine at the set spawnpoint.
+commands.compactmachines3.machines.give.tpoutsidetooltip=Teleports you to the location of the machine block in the world.
 
 commands.compactmachines3.machines.view.usage=/compactmachines3 machines view [<id>]
-commands.compactmachines3.machines.view.description=Opens a GUI allowing inspectation of all existing Compact Machines
+commands.compactmachines3.machines.view.description=Opens a GUI allowing inspection of all existing Compact Machines
 
 commands.compactmachines3.machines.clear.usage=/compactmachines3 machines clear [<id>]
 commands.compactmachines3.machines.clear.description=Sets all blocks inside the given machine to air.
 
-gui.compactmachines3.psd.welcome.welcome=Compact Machines 3 allows you to build complex machine contraptions within a single block!
+gui.compactmachines3.psd.welcome.welcome=Compact Machines 3 allows you to build complex machine contraptions within a single block!\nControls:\nLeft click - Open chapter\nRight click - Close chapter
 gui.compactmachines3.psd.welcome.chapters=Available chapters:
 
 gui.compactmachines3.psd.machines.label=Compact Machines

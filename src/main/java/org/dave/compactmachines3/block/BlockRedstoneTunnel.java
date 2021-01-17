@@ -27,7 +27,7 @@ import org.dave.compactmachines3.world.data.RedstoneTunnelData;
 import org.dave.compactmachines3.world.tools.StructureTools;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.Map;
 
 public class BlockRedstoneTunnel extends BlockBaseTunnel {
     public static final PropertyBool IS_OUTPUT = PropertyBool.create("output");
@@ -81,16 +81,19 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
 
         if(faceX >= 0.69d && faceX <= 0.94d && faceY >= 0.69d && faceY <= 0.94d) {
             world.setBlockState(pos, state.withProperty(IS_OUTPUT, !state.getValue(IS_OUTPUT)));
-            WorldSavedDataMachines.INSTANCE.toggleRedstoneTunnelOutput(pos);
+            WorldSavedDataMachines.getInstance().toggleRedstoneTunnelOutput(pos);
 
             notifyOverworldNeighbor(pos);
             world.notifyNeighborsOfStateChange(pos, Blockss.redstoneTunnel, false);
         } else {
             EnumFacing nextDirection = StructureTools.getNextDirection(connectedSide);
 
-            int coords = StructureTools.getCoordsForPos(pos);
-            HashMap<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(coords);
-            while(sideMapping != null) {
+            int id = StructureTools.getIdForPos(pos);
+            Map<EnumFacing, RedstoneTunnelData> sideMapping = WorldSavedDataMachines.getInstance().redstoneTunnels.get(id);
+            if (sideMapping == null) {
+                return true;
+            }
+            while (true) {
                 if (nextDirection == null) {
                     if(world.getTileEntity(pos) != null) {
                         world.removeTileEntity(pos);
@@ -100,7 +103,7 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
                     world.setBlockState(pos, blockState);
 
                     ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Itemss.redstoneTunnelTool));
-                    WorldSavedDataMachines.INSTANCE.removeRedstoneTunnel(pos);
+                    WorldSavedDataMachines.getInstance().removeRedstoneTunnel(pos);
                     break;
                 }
 
@@ -110,8 +113,8 @@ public class BlockRedstoneTunnel extends BlockBaseTunnel {
                     }
 
                     world.setBlockState(pos, state.withProperty(MACHINE_SIDE, nextDirection));
-                    WorldSavedDataMachines.INSTANCE.removeRedstoneTunnel(pos, connectedSide);
-                    WorldSavedDataMachines.INSTANCE.addRedstoneTunnel(pos, nextDirection, state.getValue(IS_OUTPUT));
+                    WorldSavedDataMachines.getInstance().removeRedstoneTunnel(pos, connectedSide);
+                    WorldSavedDataMachines.getInstance().addRedstoneTunnel(pos, nextDirection, state.getValue(IS_OUTPUT));
                     break;
                 }
 

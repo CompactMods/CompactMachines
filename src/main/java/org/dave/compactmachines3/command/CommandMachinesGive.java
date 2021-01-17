@@ -34,19 +34,19 @@ public class CommandMachinesGive extends CommandBaseExt {
         }
 
         EntityPlayerMP player = (EntityPlayerMP) sender.getCommandSenderEntity();
-        int coords = Integer.parseInt(args[0]);
-        if(coords < 0 || coords >= WorldSavedDataMachines.INSTANCE.nextCoord) {
+        int id = Integer.parseInt(args[0]);
+        if(id < 0 || id >= WorldSavedDataMachines.getInstance().nextId) {
             return;
         }
 
-        EnumMachineSize size = WorldSavedDataMachines.INSTANCE.machineSizes.get(coords);
+        EnumMachineSize size = WorldSavedDataMachines.getInstance().machineSizes.get(id);
 
         ItemStack stack = new ItemStack(Blockss.machine, 1, size.getMeta());
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("coords", coords);
+        compound.setInteger("machineId", id);
         stack.setTagCompound(compound);
 
         ItemHandlerHelper.giveItemToPlayer(player, stack);
-        WorldSavedDataMachines.INSTANCE.removeMachinePosition(coords);
+        WorldSavedDataMachines.getInstance().removeMachinePosition(id);
     }
 }

@@ -63,8 +63,6 @@ public class WidgetButton extends Widget {
 
     @Override
     public void draw(GuiScreen screen) {
-        //Logz.info("Width: %d, height: %d", width, height);
-
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.enableAlpha();

@@ -5,19 +5,19 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MessagePlayerWhiteListToggle implements IMessage {
-    int coords;
+    int id;
     String playerName;
 
     public MessagePlayerWhiteListToggle() {
     }
 
-    public MessagePlayerWhiteListToggle(int coords, String playerName) {
-        this.coords = coords;
+    public MessagePlayerWhiteListToggle(int id, String playerName) {
+        this.id = id;
         this.playerName = playerName;
     }
 
-    public void setCoords(int coords) {
-        this.coords = coords;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setPlayerName(String playerName) {
@@ -27,12 +27,12 @@ public class MessagePlayerWhiteListToggle implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         this.playerName = ByteBufUtils.readUTF8String(buf);
-        this.coords = buf.readInt();
+        this.id = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeUTF8String(buf, this.playerName);
-        buf.writeInt(this.coords);
+        buf.writeInt(this.id);
     }
 }

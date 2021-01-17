@@ -23,7 +23,7 @@ public class WidgetWhitelistPanel extends WidgetPanel {
         checkbox.setY(6);
         checkbox.setValue(GuiMachineData.locked);
         checkbox.addListener(ValueChangedEvent.class, (event, widget) -> {
-            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TOGGLE_LOCKED));
+            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.id, MessageRequestMachineAction.Action.TOGGLE_LOCKED));
             listPanel.setVisible(!GuiMachineData.locked);
             return WidgetEventResult.HANDLED;
         });
@@ -60,7 +60,7 @@ public class WidgetWhitelistPanel extends WidgetPanel {
                 return WidgetEventResult.HANDLED;
             }
 
-            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.coords, playerName));
+            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.id, playerName));
             inputField.setText("");
 
             return WidgetEventResult.HANDLED;
@@ -80,7 +80,7 @@ public class WidgetWhitelistPanel extends WidgetPanel {
                 return WidgetEventResult.HANDLED;
             }
 
-            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.coords, playerName));
+            PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.id, playerName));
             inputField.setText("");
 
             return WidgetEventResult.HANDLED;
@@ -108,7 +108,7 @@ public class WidgetWhitelistPanel extends WidgetPanel {
                 WidgetWhitelistEntry entry = new WidgetWhitelistEntry(username, this.width);
                 usernameList.addListEntry(entry);
                 entry.getDeleteButton().addListener(MouseClickEvent.class, (clickEvent, clickWidget) -> {
-                    PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.coords, username));
+                    PackageHandler.instance.sendToServer(new MessagePlayerWhiteListToggle(GuiMachineData.id, username));
                     usernameList.deselect();
 
                     return WidgetEventResult.HANDLED;

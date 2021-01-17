@@ -53,13 +53,13 @@ public class CommandSchemaSet extends CommandBaseExt {
         }
 
         TileEntityMachine machine = (TileEntityMachine)te;
-        if(machine.coords != -1) {
+        if(machine.id != -1) {
             throw this.getException(sender, "machine_is_already_in_use");
         }
 
         Schema schema = SchemaRegistry.instance.getSchema(schemaName);
         if(machine.getSize() != schema.getSize()) {
-            throw this.getException(sender, "machine_size_does_not_match");
+            throw this.getException(sender, "machine_size_does_not_match", schema.getSize().toString());
         }
 
         sender.sendMessage(new TextComponentTranslation("commands.compactmachines3.schema.set.machine_schema_set_to", schemaName));

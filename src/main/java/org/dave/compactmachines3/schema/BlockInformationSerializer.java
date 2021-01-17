@@ -4,7 +4,7 @@ import com.google.gson.*;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.CompactMachines3;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -51,7 +51,7 @@ public class BlockInformationSerializer implements JsonSerializer<BlockInformati
 
             // In case a tile entity does not write its x, y and z position to its nbt data
             // we won't overwrite it when recreating the tile entity.
-            if(src.writePositionData == false) {
+            if(!src.writePositionData) {
                 root.addProperty("skipPositionData", true);
             }
         }
@@ -109,8 +109,8 @@ public class BlockInformationSerializer implements JsonSerializer<BlockInformati
                 }
                 element = array;
             } else {
-                Logz.info(nbt + " no support for: " + NBTBase.NBT_TYPES[nbt.getId()]);
-                throw new IllegalArgumentException("NBTtoJSON doesn't support nbt base type=" + NBTBase.NBT_TYPES[nbt.getId()] + ", tag=" + nbt);
+                CompactMachines3.logger.info("{} no support for: {}", nbt, NBTBase.NBT_TYPES[nbt.getId()]);
+                throw new IllegalArgumentException(String.format("NBTtoJSON doesn't support nbt base type=%s, tag=%s", NBTBase.NBT_TYPES[nbt.getId()], nbt));
             }
 
             jsonRoot.add(key, element);

@@ -132,7 +132,7 @@ public class SkyTerrainGenerator {
 
 
     private void generateEmptyCube(int chunkX, int chunkZ, ChunkPrimer cp) {
-        List<BlockPos> cubePositions = StructureTools.getCubePositions(new BlockPos(15,ROOM_FLOOR_HEIGHT,15), ROOM_DIMENSION, ROOM_DIMENSION, ROOM_DIMENSION, true);
+        List<BlockPos> cubePositions = StructureTools.getCubePositionsLegacy(new BlockPos(15,ROOM_FLOOR_HEIGHT,15), ROOM_DIMENSION, ROOM_DIMENSION, ROOM_DIMENSION, true);
         for(BlockPos pos : cubePositions) {
             cp.setBlockState(pos.getX(), pos.getY(), pos.getZ(), WALL_BLOCK);
         }

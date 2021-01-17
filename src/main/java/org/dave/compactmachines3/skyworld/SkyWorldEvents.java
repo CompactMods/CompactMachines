@@ -12,9 +12,9 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.init.Itemss;
 import org.dave.compactmachines3.init.Triggerss;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 import org.dave.compactmachines3.world.tools.TeleportationTools;
 
@@ -93,8 +93,8 @@ public class SkyWorldEvents {
         float centerPos = 16.0f - (SkyTerrainGenerator.ROOM_DIMENSION / 2.0f);
         int heightPos = SkyTerrainGenerator.ROOM_FLOOR_HEIGHT - SkyTerrainGenerator.ROOM_DIMENSION + 2;
 
-        Logz.info("World generator settings are: %s", ((SkyChunkGenerator) worldServer.getChunkProvider().chunkGenerator).config.getAsJsonString());
-        Logz.info("Overriding world spawn point");
+        CompactMachines3.logger.info("World generator settings are: {}", ((SkyChunkGenerator) worldServer.getChunkProvider().chunkGenerator).config.getAsJsonString());
+        CompactMachines3.logger.info("Overriding world spawn point");
         event.getWorld().setSpawnPoint(new BlockPos(centerPos, heightPos, centerPos));
         event.setCanceled(true);
     }

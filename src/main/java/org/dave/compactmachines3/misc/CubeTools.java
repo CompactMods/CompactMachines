@@ -6,84 +6,58 @@ import net.minecraft.world.IBlockAccess;
 import org.dave.compactmachines3.init.Blockss;
 import org.dave.compactmachines3.reference.EnumMachineSize;
 import org.dave.compactmachines3.utility.ChunkBlockAccess;
-import org.dave.compactmachines3.utility.Logz;
+import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
 public class CubeTools {
-    public static int getCubeSize(IBlockAccess world, int coord) {
-        int yOffset = 40;
-        if(world instanceof ChunkBlockAccess) {
-            yOffset = 0;
+    public static EnumMachineSize getCubeSize(IBlockAccess world, BlockPos roomPos) {
+        for (EnumMachineSize size : EnumMachineSize.values()) {
+            BlockPos pos = roomPos.add(size.getDimension(), 0, 0);
+            if (world.getBlockState(pos).getBlock() == Blockss.wall) {
+                return size;
+            }
         }
 
-        BlockPos base = new BlockPos(coord * 1024, yOffset, 0);
-        if(world.getBlockState(base.add(14,0,0)).getBlock() == Blockss.wall) {
-            return 5;
-        }
-
-        if(world.getBlockState(base.add(12,0,0)).getBlock()  == Blockss.wall) {
-            return 4;
-        }
-
-        if(world.getBlockState(base.add(10,0,0)).getBlock()  == Blockss.wall) {
-            return 3;
-        }
-
-        if(world.getBlockState(base.add(8,0,0)).getBlock()  == Blockss.wall) {
-            return 2;
-        }
-
-        if(world.getBlockState(base.add(6,0,0)).getBlock()  == Blockss.wall) {
-            return 1;
-        }
-
-        return 0;
+        return null; // Not a valid cube size
     }
 
-    public static boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
+    public static boolean shouldSideBeRendered(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
+        // TODO: Remove this ChunkBlockAccess class from the mod if possible, investigate why it still exists?
+        int yOffset = world instanceof ChunkBlockAccess ? 0 : 40;
 
-        int yOffset = 40;
-        if(world instanceof ChunkBlockAccess) {
-            yOffset = 0;
+        int id = WorldSavedDataMachines.getClientMachineIdFromBoxPos(blockPos);
+
+        if (id == -1)
+            return true; // Render as full block
+
+        BlockPos roomPos = WorldSavedDataMachines.getClientMachineGrid().get(id);
+        EnumMachineSize sizeEnum = WorldSavedDataMachines.getClientMachineSizes().get(id);
+
+        if (sizeEnum == null)
+            return true; // Render as full block
+
+        int size = sizeEnum.getDimension();
+        int x = blockPos.getX() - roomPos.getX(); // Relative x
+        int y = blockPos.getY() - yOffset; // Relative y
+        int z = blockPos.getZ() - roomPos.getZ(); // Relative z
+        if (x != 0 && x != size && z != 0 && z != size && y > 0 && y < size) {
+            return true; // Not part of the wall, render as full block
         }
 
-        int coord = x / 1024;
-        int size = EnumMachineSize.getFromMeta(CubeTools.getCubeSize(world, coord)).getDimension();
+        // NOTE: The EnumFacing rendering directions are the directions relative to the wall blocks, not the room!
+        // This makes it easier to program and understand. It makes the direction the same as what the player would see when looking at the block in F3.
+        EnumFacing lookingSide = side.getOpposite();
 
-        int relativeX = x - (coord * 1024);
+        if (lookingSide == EnumFacing.DOWN) { // Floor
+            return y == 0 && x > 0 && x < size && z > 0 && z < size;
+        } else if (lookingSide == EnumFacing.UP) { // Ceiling
+            return y == size && x > 0 && x < size && z > 0 && z < size;
+        } else if (y > 0 && y < size) { // Walls
+            int xEdge = lookingSide.getXOffset() == -1 ? 0 : size;
+            int zEdge = lookingSide.getZOffset() == -1 ? 0 : size;
+            boolean validX = lookingSide.getAxis() == EnumFacing.Axis.X ? x == xEdge : x > 0 && x < size;
+            boolean validZ = lookingSide.getAxis() == EnumFacing.Axis.Z ? z == zEdge : z > 0 && z < size;
 
-        // Bottom layer
-        if((y == yOffset) && relativeX > 0 && relativeX < size && z < size && z > 0) {
-            if(side == EnumFacing.UP) {
-                return true;
-            }
-        }
-
-        if(y == yOffset+size && relativeX > 0 && relativeX < size && z < size && z > 0) {
-            if(side == EnumFacing.DOWN) {
-                return true;
-            }
-        }
-
-        if(y > yOffset && y < yOffset+size) {
-            if(side == EnumFacing.EAST && relativeX == 0 && z < size && z > 0) {
-                return true;
-            }
-
-            if(side == EnumFacing.WEST && relativeX == size && z < size && z > 0) {
-                return true;
-            }
-
-            if(side == EnumFacing.NORTH && z == size && relativeX < size && relativeX > 0) {
-                return true;
-            }
-
-            if(side == EnumFacing.SOUTH && z == 0 && relativeX < size && relativeX > 0) {
-                return true;
-            }
-
+            return validX && validZ;
         }
 
         return false;

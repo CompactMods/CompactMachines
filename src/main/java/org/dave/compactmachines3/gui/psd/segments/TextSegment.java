@@ -8,7 +8,7 @@ import org.dave.compactmachines3.gui.psd.GuiPSDScreen;
 import java.util.List;
 
 public class TextSegment extends Segment {
-    private String langId;
+    private final String langId;
 
     public TextSegment(String langId) {
         this.langId = langId;

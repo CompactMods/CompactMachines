@@ -17,13 +17,14 @@ import org.dave.compactmachines3.gui.framework.widgets.WidgetPanel;
 import org.dave.compactmachines3.gui.framework.widgets.WidgetTextBox;
 import org.dave.compactmachines3.gui.machine.GuiMachineData;
 import org.dave.compactmachines3.init.Itemss;
+import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.network.MessageRequestMachineAction;
 import org.dave.compactmachines3.network.MessageSetMachineName;
 import org.dave.compactmachines3.network.PackageHandler;
 import org.dave.compactmachines3.utility.ShrinkingDeviceUtils;
 
 public class WidgetPreviewPanel extends WidgetPanel {
-    int coords;
+    int machineId; // "id" conflicts with a parent class
 
     public WidgetPreviewPanel(EntityPlayer player, int width, int height, boolean adminMode) {
         super();
@@ -31,7 +32,7 @@ public class WidgetPreviewPanel extends WidgetPanel {
         this.setHeight(height);
         this.setId("PreviewPanel");
 
-        this.coords = GuiMachineData.coords;
+        this.machineId = GuiMachineData.id;
 
         WidgetMachinePreview preview = new WidgetMachinePreview();
         preview.setWidth(width);
@@ -44,7 +45,7 @@ public class WidgetPreviewPanel extends WidgetPanel {
         machineNameTextBox.setWidth(200);
 
         if(adminMode) {
-            machineNameTextBox.setText(String.format("%d: %s", GuiMachineData.coords, GuiMachineData.customName));
+            machineNameTextBox.setText(String.format("%d: %s", GuiMachineData.id, GuiMachineData.customName));
         }
 
         this.add(machineNameTextBox);
@@ -107,7 +108,7 @@ public class WidgetPreviewPanel extends WidgetPanel {
             machineNameTextBox.setVisible(true);
             renamePanel.setVisible(false);
             if(GuiMachineData.isUsedCube() && GuiMachineData.isOwner(player)) {
-                PackageHandler.instance.sendToServer(new MessageSetMachineName(GuiMachineData.coords, renameInput.getText()));
+                PackageHandler.instance.sendToServer(new MessageSetMachineName(GuiMachineData.id, renameInput.getText()));
             }
             return WidgetEventResult.HANDLED;
         });
@@ -117,7 +118,7 @@ public class WidgetPreviewPanel extends WidgetPanel {
             machineNameTextBox.setVisible(true);
             renamePanel.setVisible(false);
             if(GuiMachineData.isUsedCube() && GuiMachineData.isOwner(player)) {
-                PackageHandler.instance.sendToServer(new MessageSetMachineName(GuiMachineData.coords, renameInput.getText()));
+                PackageHandler.instance.sendToServer(new MessageSetMachineName(GuiMachineData.id, renameInput.getText()));
             }
             return WidgetEventResult.HANDLED;
         });
@@ -153,13 +154,13 @@ public class WidgetPreviewPanel extends WidgetPanel {
 
         enterButton.addListener(MouseClickEvent.class, (event, widget) -> {
             boolean hasDevice = ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(player);
-            boolean validCoords = GuiMachineData.isUsedCube();
+            boolean validId = GuiMachineData.isUsedCube();
             boolean isAllowedToEnter = GuiMachineData.isAllowedToEnter(player);
-            if(!hasDevice || !validCoords || !isAllowedToEnter) {
+            if(!hasDevice || !validId || !isAllowedToEnter) {
                 return WidgetEventResult.CONTINUE_PROCESSING;
             }
 
-            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.coords, MessageRequestMachineAction.Action.TRY_TO_ENTER));
+            PackageHandler.instance.sendToServer(new MessageRequestMachineAction(GuiMachineData.id, MessageRequestMachineAction.Action.TRY_TO_ENTER));
             player.closeScreen();
 
             return WidgetEventResult.HANDLED;
@@ -182,6 +183,14 @@ public class WidgetPreviewPanel extends WidgetPanel {
 
         this.add(positionBox);
 
+        WidgetTextBox roomPosBox = new WidgetTextBox(getRoomPositionText(), 0xFF1f2429);
+        roomPosBox.setX(5);
+        roomPosBox.setY(27);
+        roomPosBox.setWidth(200);
+        roomPosBox.setVisible(adminMode);
+
+        this.add(roomPosBox);
+
 
         this.addListener(GuiDataUpdatedEvent.class, (event, widget) -> {
             ownerTextBox.setText(getOwnerText());
@@ -190,16 +199,17 @@ public class WidgetPreviewPanel extends WidgetPanel {
             machineNameTextBox.setText(GuiMachineData.customName);
             if(adminMode) {
                 positionBox.setText(getPositionText());
-                machineNameTextBox.setText(String.format("%d: %s", GuiMachineData.coords, GuiMachineData.customName));
+                roomPosBox.setText(getRoomPositionText());
+                machineNameTextBox.setText(String.format("%d: %s", GuiMachineData.id, GuiMachineData.customName));
             }
 
-            if(this.coords != GuiMachineData.coords) {
+            if(this.machineId != GuiMachineData.id) {
                 renameInput.setText("");
                 machineNameTextBox.setVisible(true);
                 renamePanel.setVisible(false);
                 renameButton.setVisible(shouldShowRenamePanel(player, adminMode));
 
-                this.coords = GuiMachineData.coords;
+                this.machineId = GuiMachineData.id;
             }
 
             if(renameInput.getText().equals("")) {
@@ -210,7 +220,7 @@ public class WidgetPreviewPanel extends WidgetPanel {
     }
 
     private String getOwnerText() {
-        return GuiMachineData.owner != null ? GuiMachineData.owner : I18n.format("tooltip.compactmachines3.machine.coords.unused");
+        return GuiMachineData.owner != null ? GuiMachineData.owner : I18n.format("tooltip.compactmachines3.machine.id.unused");
     }
 
     private String getPositionText() {
@@ -226,8 +236,20 @@ public class WidgetPreviewPanel extends WidgetPanel {
         );
     }
 
+    private String getRoomPositionText() {
+        if (GuiMachineData.roomPos == null)
+            return null;
+
+        return String.format("Room: %d,%d,%d @ %d",
+                GuiMachineData.roomPos.getX(),
+                GuiMachineData.roomPos.getY(),
+                GuiMachineData.roomPos.getZ(),
+                ConfigurationHandler.Settings.dimensionId
+        );
+    }
+
     private boolean shouldShowEnterButton(EntityPlayer player) {
-        return ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(player) && GuiMachineData.coords != -1 && GuiMachineData.isAllowedToEnter(player);
+        return ShrinkingDeviceUtils.hasShrinkingDeviceInInventory(player) && GuiMachineData.id != -1 && GuiMachineData.isAllowedToEnter(player);
     }
 
     private boolean shouldShowRenamePanel(EntityPlayer player, boolean adminMode) {

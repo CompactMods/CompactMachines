@@ -2,11 +2,11 @@ package org.dave.compactmachines3.gui.framework.widgets;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.gui.framework.ISelectable;
 import org.dave.compactmachines3.gui.framework.event.MouseClickEvent;
 import org.dave.compactmachines3.gui.framework.event.MouseScrollEvent;
 import org.dave.compactmachines3.gui.framework.event.WidgetEventResult;
-import org.dave.compactmachines3.utility.Logz;
 
 public class WidgetList extends WidgetPanel {
     public int padding = 2;
@@ -71,8 +71,6 @@ public class WidgetList extends WidgetPanel {
         Gui.drawRect(0, 0, width, height, borderColor);
         Gui.drawRect(1, 1, width-1, height-1, backgroundColor);
 
-        //Logz.info("Rendering lines %d to %d", lineOffset, lastVisibleLine);
-
         if(selected >= lineOffset && selected <= lastVisibleLine) {
             // We need to high-light a specific line
             int yOffset = 0;
@@ -98,15 +96,15 @@ public class WidgetList extends WidgetPanel {
     @Override
     @Deprecated
     public void add(Widget widget) {
-        Logz.warn("Calling unused method to add widgets to list! Use WidgetList#addListEntry instead!");
+        CompactMachines3.logger.warn("Calling unused method to add widgets to list! Use WidgetList#addListEntry instead!");
     }
 
     public <T extends Widget & ISelectable> void addListEntry(T widget) {
         if(widget.height <= 0) {
-            Logz.warn("Heightless widget [%s] added to list. This will cause problems.", widget);
+            CompactMachines3.logger.warn("Heightless widget [{}] added to list. This will cause problems.", widget);
         }
         if(widget.height > this.height) {
-            Logz.warn("List has an entry larger than the list itself. This will cause problems.", widget);
+            CompactMachines3.logger.warn("List has an entry larger than the list itself. This will cause problems.");
         }
 
         final int line = this.children.size();

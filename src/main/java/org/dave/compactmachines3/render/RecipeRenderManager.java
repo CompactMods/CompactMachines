@@ -13,8 +13,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.miniaturization.MultiblockRecipe;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.ProxyWorld;
 import org.lwjgl.opengl.GL11;
 
@@ -89,7 +89,7 @@ public class RecipeRenderManager {
                         renderer.render(renderTe, pos.getX(), pos.getY(), pos.getZ(), 0.0f);
                         //renderer.drawBatch(0);
                     } catch(Exception e) {
-                        Logz.info("Could not render tile entity '%s': %s", renderTe.getClass().getSimpleName(), e.getMessage());
+                        CompactMachines3.logger.info("Could not render tile entity '{}': {}", renderTe.getClass().getSimpleName(), e.getMessage());
                     }
 
 

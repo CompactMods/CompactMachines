@@ -6,18 +6,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.network.MessageMachinePositions;
 import org.dave.compactmachines3.schema.Schema;
 import org.dave.compactmachines3.schema.SchemaRegistry;
 import org.dave.compactmachines3.skyworld.SkyWorldSavedData;
 import org.dave.compactmachines3.skyworld.SkyWorldType;
 import org.dave.compactmachines3.tile.TileEntityMachine;
 import org.dave.compactmachines3.utility.DimensionBlockPos;
-import org.dave.compactmachines3.utility.Logz;
 import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
@@ -35,7 +37,6 @@ public class TeleportationTools {
             return false;
         }
 
-        // Logz.info("Trying to enter machine. coords=%d, owner=%s, world is skyworld=%s", machine.coords, machine.getOwner(), world.getWorldType() instanceof SkyWorldType);
         // Prevent players from claiming more than one machine in the SkyWorld Machine Hub
         if(!machine.hasOwner() && world.getWorldType() instanceof SkyWorldType) {
             boolean playerHasHubMachine = SkyWorldSavedData.instance.isHubMachineOwner(player);
@@ -45,19 +46,23 @@ public class TeleportationTools {
             }
         }
 
+        boolean isNew = machine.id == -1;
         machine.initStructure();
 
-        WorldSavedDataMachines.INSTANCE.addMachinePosition(machine.coords, pos, world.provider.getDimension(), machine.getSize());
+        WorldSavedDataMachines.getInstance().addMachinePosition(machine.id, pos, world.provider.getDimension());
+
+        if (isNew) // A new grid position was chosen if the id had not yet been set before the structure init, have to update for clients
+            MessageMachinePositions.updateClientMachinePositions();
 
         TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine);
-        StructureTools.setBiomeForCoords(machine.coords, world.getBiome(pos));
+        StructureTools.setBiomeForMachineId(machine.id, world.getBiome(pos));
 
         if(!machine.hasOwner() || "Unknown".equals(machine.getOwnerName())) {
             machine.setOwner(player);
             machine.markDirty();
 
             if(world.getWorldType() instanceof SkyWorldType) {
-                SkyWorldSavedData.instance.setHomeOwner(player, machine.coords);
+                SkyWorldSavedData.instance.setHomeOwner(player, machine.id);
             }
         }
 
@@ -69,8 +74,8 @@ public class TeleportationTools {
             return;
         }
 
-        int coords = SkyWorldSavedData.instance.getSkyworldHome(player);
-        DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
+        int id = SkyWorldSavedData.instance.getSkyworldHome(player);
+        DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(id);
         if(pos == null) {
             return;
         }
@@ -79,21 +84,28 @@ public class TeleportationTools {
         player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 1.2d, spawnPoint.getZ() + 0.5d);
     }
 
-    public static int getLastKnownCoords(EntityPlayer player) {
+    public static int getLastKnownRoomId(EntityPlayer player, boolean getFirst) {
         NBTTagCompound playerNBT = player.getEntityData();
-        if(!playerNBT.hasKey("compactmachines3-coordHistory")) {
+        if(!playerNBT.hasKey("compactmachines3-idHistory") && /* Legacy */ !playerNBT.hasKey("compactmachines3-coordHistory")) {
             return -1;
         }
 
-        NBTTagList coordHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10);
-        if(coordHistory.tagCount() == 0) {
+        NBTTagList idHistory = playerNBT.getTagList("compactmachines3-idHistory", 10);
+        if (idHistory.isEmpty()) {
+            idHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10); // Legacy
+        }
+        if(idHistory.isEmpty()) {
             return -1;
         }
 
-        return coordHistory.getCompoundTagAt(coordHistory.tagCount() - 1).getInteger("coord");
+        NBTTagCompound nbt = idHistory.getCompoundTagAt(getFirst ? 0 : idHistory.tagCount() - 1);
+        return nbt.hasKey("id", 3) ? nbt.getInteger("id") : /* Legacy */ nbt.getInteger("coords");
     }
 
-    public static void teleportPlayerToMachine(EntityPlayerMP player, int coords, boolean isReturning) {
+    public static void teleportPlayerToMachine(EntityPlayerMP player, int id, boolean isReturning) {
+        if (id == -1)
+            return;
+
         NBTTagCompound playerNBT = player.getEntityData();
         if (player.dimension != ConfigurationHandler.Settings.dimensionId) {
             playerNBT.setInteger("compactmachines3-oldDimension", player.dimension);
@@ -106,45 +118,51 @@ public class TeleportationTools {
             PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
             playerList.transferPlayerToDimension(player, ConfigurationHandler.Settings.dimensionId, new TeleporterMachines(machineWorld));
 
-            if(playerNBT.hasKey("compactmachines3-coordHistory")) {
-                playerNBT.removeTag("compactmachines3-coordHistory");
-            }
+            playerNBT.removeTag("compactmachines3-idHistory");
+            playerNBT.removeTag("compactmachines3-coordHistory"); // Legacy
         }
 
         if(!isReturning) {
-            NBTTagList coordHistory;
-            if (playerNBT.hasKey("compactmachines3-coordHistory")) {
-                coordHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10);
-            } else {
-                coordHistory = new NBTTagList();
-            }
-
-            NBTTagCompound toAppend = new NBTTagCompound();
-            toAppend.setInteger("coord", coords);
-
-            coordHistory.appendTag(toAppend);
-            playerNBT.setTag("compactmachines3-coordHistory", coordHistory);
+            addMachineIdToHistory(id, playerNBT);
         }
 
-        TileEntityMachine machine = WorldSavedDataMachines.INSTANCE.getMachine(coords);
+        TileEntityMachine machine = WorldSavedDataMachines.getInstance().getMachine(id);
+        if (machine == null)
+            return;
+
         if(machine.hasNewSchema()) {
             Schema schema = SchemaRegistry.instance.getSchema(machine.getSchemaName());
             if(schema == null) {
-                Logz.warn("Unknown schema used by Compact Machine @ %s", WorldSavedDataMachines.INSTANCE.getMachinePosition(coords));
+                CompactMachines3.logger.warn("Unknown schema used by Compact Machine @ {}", WorldSavedDataMachines.getInstance().getMachineBlockPosition(id));
             } else {
-                StructureTools.restoreSchema(schema, coords);
-                double[] adjustedSpawnPosition = schema.getSpawnPosition().clone();
-                adjustedSpawnPosition[0] += coords * 1024;
-                adjustedSpawnPosition[1] += 40;
-                WorldSavedDataMachines.INSTANCE.addSpawnPoint(machine.coords, adjustedSpawnPosition);
+                StructureTools.restoreSchema(schema, id);
+
+                Vec3d adjustedSpawnPosition = schema.getSpawnPosition().add(new Vec3d(WorldSavedDataMachines.getInstance().getMachineRoomPosition(id)));
+                WorldSavedDataMachines.getInstance().addSpawnPoint(machine.id, adjustedSpawnPosition);
                 machine.setSchema(null);
                 machine.markDirty();
             }
         }
 
-        double[] destination = WorldSavedDataMachines.INSTANCE.spawnPoints.get(coords);
-        player.setPositionAndUpdate(destination[0], destination[1], destination[2]);
+        Vec3d destination = WorldSavedDataMachines.getInstance().spawnPoints.get(id);
+        player.setPositionAndUpdate(destination.x, destination.y, destination.z);
+    }
 
+    public static void addMachineIdToHistory(int id, EntityPlayer player) {
+        addMachineIdToHistory(id, player.getEntityData());
+    }
+
+    public static void addMachineIdToHistory(int id, NBTTagCompound playerNBT) {
+        NBTTagList idHistory = playerNBT.getTagList("compactmachines3-idHistory", 10);
+        if (idHistory.isEmpty()) {
+            idHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10); // Legacy
+        }
+
+        NBTTagCompound toAppend = new NBTTagCompound();
+        toAppend.setInteger("id", id);
+
+        idHistory.appendTag(toAppend);
+        playerNBT.setTag("compactmachines3-idHistory", idHistory);
     }
 
     public static void teleportPlayerOutOfMachineDimension(EntityPlayerMP player) {
@@ -161,13 +179,14 @@ public class TeleportationTools {
             playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(DimensionTools.getWorldServerForDimension(oldDimension)));
             player.setPositionAndUpdate(oldPosX, oldPosY, oldPosZ);
         } else {
-            int coords = StructureTools.getCoordsForPos(new BlockPos(player.posX, player.posY, player.posZ));
-            if(playerNBT.hasKey("compactmachines3-coordHistory")) {
-                coords = getLastKnownCoords(player);
-                playerNBT.removeTag("compactmachines3-coordHistory");
+            int firstId = getLastKnownRoomId(player, true);
+            playerNBT.removeTag("compactmachines3-idHistory");
+            playerNBT.removeTag("compactmachines3-coordHistory");
+            if (firstId == -1) {
+                firstId = StructureTools.getIdForPos(new BlockPos(player.posX, player.posY, player.posZ));
             }
 
-            DimensionBlockPos pos = WorldSavedDataMachines.INSTANCE.machinePositions.get(coords);
+            DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(firstId);
 
             BlockPos startPoint;
             int dimension;
@@ -234,33 +253,37 @@ public class TeleportationTools {
 
 
     public static void teleportPlayerToMachine(EntityPlayerMP player, TileEntityMachine machine) {
-        teleportPlayerToMachine(player, machine.coords, false);
+        teleportPlayerToMachine(player, machine.id, false);
     }
 
     public static void teleportPlayerOutOfMachine(EntityPlayerMP player) {
         NBTTagCompound playerNBT = player.getEntityData();
-        if (!playerNBT.hasKey("compactmachines3-coordHistory")) {
+        if (!playerNBT.hasKey("compactmachines3-idHistory") && /* Legacy */ !playerNBT.hasKey("compactmachines3-coordHistory")) {
             teleportPlayerOutOfMachineDimension(player);
             return;
         }
 
-        NBTTagList coordHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10);
-        if(coordHistory.tagCount() == 0) {
+        NBTTagList idHistory = playerNBT.getTagList("compactmachines3-idHistory", 10);
+        if (idHistory.isEmpty()) {
+            idHistory = playerNBT.getTagList("compactmachines3-coordHistory", 10); // Legacy
+        }
+        if(idHistory.isEmpty()) {
             // No id history, teleport back to overworld
             teleportPlayerOutOfMachineDimension(player);
             return;
         }
 
         // Remove the last tag, then teleport to the new last
-        coordHistory.removeTag(coordHistory.tagCount()-1);
+        idHistory.removeTag(idHistory.tagCount()-1);
 
         // No id history -> Back to the overworld
-        if(coordHistory.tagCount() == 0) {
+        if(idHistory.tagCount() == 0) {
             teleportPlayerOutOfMachineDimension(player);
             return;
         }
 
-        int coords = coordHistory.getCompoundTagAt(coordHistory.tagCount()-1).getInteger("coord");
-        teleportPlayerToMachine(player, coords, true);
+        NBTTagCompound lastTag = idHistory.getCompoundTagAt(idHistory.tagCount() - 1);
+        int id = lastTag.hasKey("id", 3) ? lastTag.getInteger("id") : /* Legacy */ lastTag.getInteger("coords");
+        teleportPlayerToMachine(player, id, true);
     }
 }

@@ -48,15 +48,15 @@ public class GuiMachineContainer extends Container {
         }
 
         TileEntityMachine machine = (TileEntityMachine) te;
-        int coords = machine.coords;
+        int id = machine.id;
 
         for(IContainerListener listener : this.listeners) {
             if (!(listener instanceof EntityPlayerMP)) {
                 continue;
             }
 
-            PackageHandler.instance.sendTo(new MessageMachineContent(coords), (EntityPlayerMP) listener);
-            PackageHandler.instance.sendTo(new MessageMachineChunk(coords), (EntityPlayerMP) listener);
+            PackageHandler.instance.sendTo(new MessageMachineContent(id), (EntityPlayerMP) listener);
+            PackageHandler.instance.sendTo(new MessageMachineChunk(id), (EntityPlayerMP) listener);
         }
     }
 }
