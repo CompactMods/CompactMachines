@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
@@ -32,7 +34,6 @@ import org.dave.compactmachines3.world.tools.StructureTools;
 import java.util.Map;
 
 public class BlockWall extends BlockProtected {
-
     public BlockWall(Material material) {
         super(material);
         this.setLightOpacity(1);
@@ -78,7 +79,7 @@ public class BlockWall extends BlockProtected {
         }
 
         if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-            return playerStack.getItem() instanceof ItemTunnelTool;
+            return playerStack.getItem() instanceof ItemTunnelTool || playerStack.getItem() instanceof ItemRedstoneTunnelTool;
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
@@ -104,9 +105,9 @@ public class BlockWall extends BlockProtected {
                 playerStack.setCount(playerStack.getCount()-1);
                 WorldSavedDataMachines.getInstance().addTunnel(pos, tunnelSide);
             } else {
-                TextComponentTranslation tc = new TextComponentTranslation("hint.compactmachines3.all_tunnels_used");
-                tc.getStyle().setColor(TextFormatting.RED);
-                player.sendStatusMessage(tc, false);
+                ITextComponent tc = new TextComponentTranslation("hint.compactmachines3.all_tunnels_used")
+                        .setStyle(new Style().setColor(TextFormatting.RED));
+                player.sendStatusMessage(tc, true);
             }
 
             return true;
@@ -131,9 +132,9 @@ public class BlockWall extends BlockProtected {
                 playerStack.setCount(playerStack.getCount()-1);
                 WorldSavedDataMachines.getInstance().addRedstoneTunnel(pos, tunnelSide, false);
             } else {
-                TextComponentTranslation tc = new TextComponentTranslation("hint.compactmachines3.all_tunnels_used");
-                tc.getStyle().setColor(TextFormatting.RED);
-                player.sendStatusMessage(tc, false);
+                ITextComponent tc = new TextComponentTranslation("hint.compactmachines3.all_redstone_tunnels_used")
+                        .setStyle(new Style().setColor(TextFormatting.RED));
+                player.sendStatusMessage(tc, true);
             }
 
             return true;

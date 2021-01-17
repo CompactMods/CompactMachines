@@ -30,6 +30,7 @@ hint.compactmachines3.cant_sleep_here=你无法在空间压缩机械维度睡觉
 hint.compactmachines3.bed_position_set=重生位置已设置到本机械
 hint.compactmachines3.not_permitted_to_enter=You do not have permission to enter this machine
 hint.compactmachines3.all_tunnels_used=You have already placed 6 tunnels!
+hint.compactmachines3.all_redstone_tunnels_used=You have already placed 6 redstone tunnels!
 
 hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in the Compact Hub!
 hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
