@@ -42,8 +42,8 @@ public class Widget {
         }));
     }
 
-    public boolean hasToolTip() {
-        return tooltipLines != null && tooltipLines.size() > 0;
+    public boolean hasTooltip() {
+        return tooltipLines != null && !tooltipLines.isEmpty();
     }
 
     public List<String> getTooltip() {
@@ -61,20 +61,16 @@ public class Widget {
 
     public Widget setTooltipLines(String ... tooltipLines) {
         this.tooltipLines = new ArrayList<>();
-        for(String line : tooltipLines) {
-            this.tooltipLines.add(line);
-        }
+        this.tooltipLines.addAll(Arrays.asList(tooltipLines));
         return this;
     }
 
-    public Widget addTooltipLine(String ... tooltipLines) {
-        for(String line : tooltipLines) {
-            this.tooltipLines.add(line);
-        }
+    public Widget addTooltipLines(String ... tooltipLines) {
+        this.tooltipLines.addAll(Arrays.asList(tooltipLines));
         return this;
     }
 
-    public Widget addTooltipLine(List<String> strings) {
+    public Widget addTooltipLines(List<String> strings) {
         this.tooltipLines.addAll(strings);
         return this;
     }

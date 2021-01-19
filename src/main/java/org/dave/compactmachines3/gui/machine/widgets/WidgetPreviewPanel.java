@@ -100,7 +100,6 @@ public class WidgetPreviewPanel extends WidgetPanel {
         renameButton.setY(5);
         renameButton.setWidth(20);
         renameButton.setHeight(20);
-        // TODO: Investigate why the tooltip wont show
         renameButton.setTooltipLines(I18n.format("gui.compactmachines3.compactsky.rename"));
 
         confirmRenameButton.addListener(MouseClickEvent.class, (event, widget) -> {
@@ -149,7 +148,6 @@ public class WidgetPreviewPanel extends WidgetPanel {
         enterButton.setWidth(20);
         enterButton.setHeight(20);
         enterButton.setVisible(shouldShowEnterButton(player));
-        // TODO: Investigate why the tooltip wont show
         enterButton.setTooltipLines(I18n.format("gui.compactmachines3.compactsky.enter"));
 
         enterButton.addListener(MouseClickEvent.class, (event, widget) -> {
