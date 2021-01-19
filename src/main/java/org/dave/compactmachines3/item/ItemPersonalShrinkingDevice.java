@@ -19,6 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
+import org.dave.compactmachines3.misc.Vec3d2f;
 import org.dave.compactmachines3.reference.GuiIds;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 import org.dave.compactmachines3.world.tools.StructureTools;
@@ -69,7 +70,7 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
 
             if(player.isSneaking()) {
                 int id = StructureTools.getIdForPos(player.getPosition());
-                Vec3d pos = player.getPositionVector();
+                Vec3d2f pos = new Vec3d2f(player);
                 WorldSavedDataMachines.getInstance().addSpawnPoint(id, pos);
 
                 TextComponentTranslation tc = new TextComponentTranslation("item.compactmachines3.psd.spawnpoint_set");

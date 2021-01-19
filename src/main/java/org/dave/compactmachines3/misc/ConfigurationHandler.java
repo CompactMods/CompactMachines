@@ -107,23 +107,25 @@ public class ConfigurationHandler {
         );
 
         // Internal Category
-        Settings.dimensionId = configuration.getInt(
+        Settings.dimensionId = configuration.get(
+                CATEGORY_INTERNAL,
                 "dimensionId",
-                CATEGORY_INTERNAL,
                 144,
-                Integer.MIN_VALUE, Integer.MAX_VALUE,
-                "Dimension used for machines. Do not change this unless it is somehow conflicting!",
-                langKeyPrefix + "dimensionId"
-        );
+                "Dimension used for machines. Do not change this unless it is somehow conflicting!"
+        )
+                .setRequiresWorldRestart(true)
+                .setLanguageKey(langKeyPrefix + "dimensionId")
+                .getInt();
 
-        Settings.dimensionTypeId = configuration.getInt(
-                "dimensionTypeId",
+        Settings.dimensionTypeId = configuration.get(
                 CATEGORY_INTERNAL,
+                "dimensionTypeId",
                 144,
-                Integer.MIN_VALUE, Integer.MAX_VALUE,
-                "Dimension type used for machines. Do not change this unless it is somehow conflicting!",
-                langKeyPrefix + "dimensionTypeId"
-        );
+                "Dimension type used for machines. Do not change this unless it is somehow conflicting!"
+        )
+                .setRequiresWorldRestart(true)
+                .setLanguageKey(langKeyPrefix + "dimensionTypeId")
+                .getInt();
 
         Settings.forceLoadChunks = configuration.getBoolean(
                 "forceLoadChunks",
@@ -176,6 +178,16 @@ public class ConfigurationHandler {
                 langKeyPrefix + "allowRespawning"
         );
 
+        MachineSettings.allowUnsafeTeleport = configuration.getBoolean(
+                "allowUnsafeTeleport",
+                CATEGORY_MACHINES,
+                false,
+                "Whether players can teleport into machines with unsafe spawnpoints.\n" +
+                        "If true, players can suffocate or glitch out of the box if teleported into unsafe spawnpoints.\n" +
+                        "If false, a safe spawnpoint will attempted to be found if needed.",
+                langKeyPrefix + "allowUnsafeTeleport"
+        );
+
         MachineSettings.keepPlayersInside = configuration.getBoolean(
                 "keepPlayersInside",
                 CATEGORY_MACHINES,
@@ -219,7 +231,7 @@ public class ConfigurationHandler {
     }
 
     private static void createCategory(String category, String comment) {
-        String langKey = "compactmachines3.config.category." + category.toLowerCase();
+        String langKey = "compactmachines3.config.category." + category.replace(' ', '_').toLowerCase();
         ConfigCategory configCat = configuration.getCategory(category);
 
         // Copy old settings from legacy case-insensitive configs
@@ -276,6 +288,7 @@ public class ConfigurationHandler {
         public static boolean renderLivingEntitiesInGUI;
         public static boolean allowPickupEmptyMachines;
         public static int autoUpdateRate;
+        public static boolean allowUnsafeTeleport;
     }
 
     public static class Settings {
