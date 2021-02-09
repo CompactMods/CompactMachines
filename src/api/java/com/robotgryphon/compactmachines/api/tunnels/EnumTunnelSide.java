@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.tunnels;
+package com.robotgryphon.compactmachines.api.tunnels;
 
 /**
  * Represents the side of a tunnel (inside or outside).

@@ -2,10 +2,10 @@ package com.robotgryphon.compactmachines.tunnels.definitions;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
-import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
-import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
-import com.robotgryphon.compactmachines.tunnels.api.IItemTunnel;
+import com.robotgryphon.compactmachines.api.tunnels.IItemTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;

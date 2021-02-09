@@ -5,7 +5,7 @@ import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
-import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
+import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.BlockState;

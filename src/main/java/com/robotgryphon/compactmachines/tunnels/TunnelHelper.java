@@ -1,5 +1,7 @@
 package com.robotgryphon.compactmachines.tunnels;
 
+import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;

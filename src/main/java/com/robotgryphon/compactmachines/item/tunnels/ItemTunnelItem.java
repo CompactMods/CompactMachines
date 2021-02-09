@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.item.tunnels;
 
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 
 public class ItemTunnelItem extends TunnelItem {
     public ItemTunnelItem(Properties properties) {

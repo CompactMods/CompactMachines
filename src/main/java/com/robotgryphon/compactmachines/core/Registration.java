@@ -14,7 +14,7 @@ import com.robotgryphon.compactmachines.item.tunnels.ItemTunnelItem;
 import com.robotgryphon.compactmachines.item.tunnels.RedstoneInTunnelItem;
 import com.robotgryphon.compactmachines.item.tunnels.RedstoneOutTunnelItem;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
-import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.definitions.ItemTunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneTunnelDefinition;
 import net.minecraft.block.AbstractBlock;
