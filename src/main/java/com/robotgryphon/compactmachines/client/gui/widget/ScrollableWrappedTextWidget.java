@@ -2,18 +2,20 @@ package com.robotgryphon.compactmachines.client.gui.widget;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.List;
 
 public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
 
-    private String text;
+    private String localeKey;
     private double yScroll = 0;
     private FontRenderer fontRenderer;
 
@@ -22,9 +24,9 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     private List<IReorderingProcessor> lines;
     private int charSize;
 
-    public ScrollableWrappedTextWidget(String text, int x, int y, int width, int height) {
+    public ScrollableWrappedTextWidget(String key, int x, int y, int width, int height) {
         super(x, y, width, height);
-        this.text = text;
+        this.localeKey = key;
         this.fontRenderer = Minecraft.getInstance().fontRenderer;
 
         this.recalculate();
@@ -39,7 +41,8 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     }
 
     private void recalculate() {
-        lines = fontRenderer.trimStringToWidth(new StringTextComponent(text), width);
+        String t = I18n.format(localeKey);
+        lines = fontRenderer.trimStringToWidth(new StringTextComponent(t), width);
 
         charSize = fontRenderer.getStringWidth("M");
         int maxOnScreen = height / (charSize + 4);
@@ -53,8 +56,8 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         matrixStack.push();
-        matrixStack.translate(0, 0, 10);
-
+        matrixStack.translate(x, y, 10);
+        
         FontRenderer fr = Minecraft.getInstance().fontRenderer;
 
         try {
@@ -67,10 +70,5 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
         catch(Exception ex1) {}
 
         matrixStack.pop();
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return false;
     }
 }
