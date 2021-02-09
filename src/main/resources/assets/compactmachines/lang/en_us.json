@@ -47,5 +47,8 @@
   "compactmachines.direction.north": "North",
   "compactmachines.direction.south": "South",
   "compactmachines.direction.west": "West",
-  "compactmachines.direction.east": "East"
+  "compactmachines.direction.east": "East",
+
+  "compactmachines.psd.pages.machines.title": "Compact Machines",
+  "compactmachines.psd.pages.machines": "Compact Machines are the core mechanic of this mod. They allow you to build large rooms in a single block space connected to the outside world. They come in various sizes ranging from 3x3x3 to 13x13x13.\n\nYou can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\nYou can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes."
 }

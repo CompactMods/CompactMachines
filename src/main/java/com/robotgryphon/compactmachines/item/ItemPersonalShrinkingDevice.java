@@ -1,16 +1,20 @@
 package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.client.gui.PersonalShrinkingDeviceScreen;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
@@ -18,6 +22,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -58,12 +64,13 @@ public class ItemPersonalShrinkingDevice extends Item {
             return ActionResult.resultFail(stack);
         }
 
-//        TODO: Machine enter/exit dimension
-//        if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
-//            // player.openGui(compactmachines.instance, GuiIds.PSD_GUIDE.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
-//            return new ActionResult(ActionResultType.SUCCESS, stack);
-//        }
-//
+        // If we aren't in the compact dimension, allow PSD guide usage
+        // Prevents misfiring if a player is trying to leave a machine or set their spawn
+        if(world.isRemote && world.getDimensionKey() != Registration.COMPACT_DIMENSION) {
+            PersonalShrinkingDeviceScreen.show();
+            return ActionResult.resultSuccess(stack);
+        }
+
         if (world instanceof ServerWorld && player instanceof ServerPlayerEntity) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
