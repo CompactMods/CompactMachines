@@ -159,15 +159,13 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         Block given = CompactMachineUtil.getMachineBlockBySize(this.size);
         ItemStack stack = new ItemStack(given, 1);
 
-        CompoundNBT nbt = stack.getOrCreateTag();
+        CompoundNBT nbt = stack.getOrCreateChildTag("cm");
         nbt.putString("size", this.size.getName());
 
         CompactMachineTile tileEntity = (CompactMachineTile) world.getTileEntity(pos);
         if (tileEntity != null) {
             nbt.putInt("coords", tileEntity.machineId);
         }
-
-        stack.setTag(nbt);
 
         return stack;
     }

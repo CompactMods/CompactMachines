@@ -1,7 +1,7 @@
 {
   "itemGroup.compactmachines": "Compact Machines",
 
-  "tooltip.compactmachines.machine_id": "Machine: %s",
+  "tooltip.compactmachines.machine_id": "Machine ID: %s",
   "tooltip.compactmachines.owner": "Owner: %s",
   "tooltip.compactmachines.unknown_player": "Unknown Player",
   "tooltip.compactmachines.machine.size": "Size: %1$sx%1$sx%1$s",
