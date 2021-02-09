@@ -81,4 +81,12 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     public BlockPos getBlockPosition() {
         return new BlockPos(position.x, position.y, position.z);
     }
+
+    @Override
+    public String toString() {
+        return "DimensionalPosition{" +
+                "dimension=" + dimension +
+                ", position=" + position +
+                '}';
+    }
 }

@@ -101,7 +101,7 @@ public class TunnelWallTile extends TileEntity {
         if (!regData.isPlacedInWorld())
             return Optional.empty();
 
-        DimensionalPosition machinePosition = regData.getOutsidePosition(serverWorld);
+        DimensionalPosition machinePosition = regData.getOutsidePosition(serverWorld.getServer());
         if (machinePosition != null) {
             Vector3d o = machinePosition.getPosition();
             BlockPos machineOutPos = new BlockPos(o.x, o.y, o.z);
