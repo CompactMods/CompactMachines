@@ -16,6 +16,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -40,7 +41,10 @@ public class PlayerEventHandler {
             return;
         }
         EntityPlayerMP player = (EntityPlayerMP) event.player;
-        PackageHandler.instance.sendTo(new MessageWorldInfo(DimensionTools.getServerMachineWorld().getWorldInfo()), player);
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return;
+        PackageHandler.instance.sendTo(new MessageWorldInfo(machineWorld.getWorldInfo()), player);
         PackageHandler.instance.sendTo(MessageMachinePositions.initWithWorldSavedData(), player);
     }
 

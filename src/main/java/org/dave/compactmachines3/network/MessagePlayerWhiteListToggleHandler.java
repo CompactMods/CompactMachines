@@ -22,12 +22,12 @@ public class MessagePlayerWhiteListToggleHandler implements IMessageHandler<Mess
         serverPlayer.getServerWorld().addScheduledTask(() -> {
             DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(id);
             TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
-            if (te != null && te instanceof TileEntityMachine) {
+            if (te instanceof TileEntityMachine) {
                 TileEntityMachine machine = (TileEntityMachine) te;
-                if(!machine.isOnWhiteList(message.playerName)) {
-                    machine.addToWhiteList(message.playerName);
-                } else {
+                if (machine.isOnWhiteList(message.playerName)) {
                     machine.removeFromWhiteList(message.playerName);
+                } else {
+                    machine.addToWhiteList(message.playerName);
                 }
 
                 machine.markDirty();

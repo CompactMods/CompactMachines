@@ -73,6 +73,8 @@ public class WorldSavedDataMachines extends WorldSavedData {
 
         DimensionBlockPos dimPos = getMachineBlockPosition(id);
         WorldServer world = DimensionTools.getWorldServerForDimension(dimPos.getDimension());
+        if (world == null)
+            return null;
         TileEntity result = world.getTileEntity(dimPos.getBlockPos());
 
         return result instanceof TileEntityMachine ? (TileEntityMachine) result : null;
@@ -177,6 +179,8 @@ public class WorldSavedDataMachines extends WorldSavedData {
             return;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return;
         instance = (WorldSavedDataMachines) machineWorld.getMapStorage().getOrLoadData(WorldSavedDataMachines.class, "WorldSavedDataMachines");
         if (instance == null) {
             instance = new WorldSavedDataMachines("WorldSavedDataMachines");

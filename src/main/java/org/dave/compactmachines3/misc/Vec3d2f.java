@@ -3,6 +3,7 @@ package org.dave.compactmachines3.misc;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class Vec3d2f {
@@ -12,6 +13,10 @@ public class Vec3d2f {
 
     public Vec3d2f(EntityPlayer player) {
         this(player.getPositionVector(), player);
+    }
+
+    public Vec3d2f(BlockPos position, EntityPlayer player) {
+        this(new Vec3d(position.getX() + 0.5d, position.getY(), position.getZ() + 0.5d), player);
     }
 
     public Vec3d2f(Vec3d position, EntityPlayer player) {

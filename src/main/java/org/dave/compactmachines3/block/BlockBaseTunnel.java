@@ -90,7 +90,7 @@ public abstract class BlockBaseTunnel extends BlockProtected implements ITileEnt
         }
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if(realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+        if (realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
             return;
         }
 

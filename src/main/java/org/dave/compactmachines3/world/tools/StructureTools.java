@@ -47,6 +47,8 @@ public class StructureTools {
 
     public static boolean setBiomeForMachineId(int id, Biome biome) {
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return false;
         BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(id);
         if (roomPos == null) {
             return false;
@@ -90,6 +92,8 @@ public class StructureTools {
         int startZ = machine.getRoomPos().getZ();
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return;
         IBlockState state = Blockss.wall.getDefaultState();
         IBlockState barrier = Blocks.BARRIER.getDefaultState();
         StructureTools.generateCube(machineWorld, new BlockPos(startX, startY, startZ), size, state);
@@ -237,6 +241,8 @@ public class StructureTools {
         List<BlockInformation> blockList = new ArrayList<>();
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return blockList;
         int size = machine.getSize().getDimension();
 
         // Southeast corner in the top block, opposite corner of the original roomPos
@@ -284,6 +290,8 @@ public class StructureTools {
             return;
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return;
         int size = machine.getSize().getDimension();
 
         // Southeast top corner of the **air** cube inside the machine.

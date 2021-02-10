@@ -53,7 +53,7 @@ public class TileEntityRedstoneTunnel extends BaseTileEntityTunnel {
         }
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if(realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+        if (realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
             return 0;
         }
 

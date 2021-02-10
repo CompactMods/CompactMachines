@@ -429,7 +429,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        return machineWorld.getBlockState(insetPos);
+        return machineWorld == null ? null : machineWorld.getBlockState(insetPos);
     }
 
     public TileEntity getConnectedTileEntity(EnumFacing facing) {
@@ -439,7 +439,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        return machineWorld.getTileEntity(insetPos);
+        return machineWorld == null ? null : machineWorld.getTileEntity(insetPos);
     }
 
     public boolean isInsideItself() {
@@ -466,6 +466,8 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return ItemStack.EMPTY;
         IBlockState state = machineWorld.getBlockState(insetPos);
         //noinspection deprecation
         return state.getBlock().getItem(machineWorld, insetPos, state);
@@ -497,7 +499,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        if(!(machineWorld.getTileEntity(tunnelData.pos) instanceof TileEntityRedstoneTunnel)) {
+        if (machineWorld == null || !(machineWorld.getTileEntity(tunnelData.pos) instanceof TileEntityRedstoneTunnel)) {
             return 0;
         }
 
@@ -535,7 +537,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         World machineWorld = DimensionTools.getServerMachineWorld();
-        if(!(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
+        if (machineWorld == null || !(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
             return false;
         }
 
@@ -570,7 +572,7 @@ public class TileEntityMachine extends TileEntity implements ICapabilityProvider
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-        if(!(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
+        if (machineWorld == null || !(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
             return null;
         }
 

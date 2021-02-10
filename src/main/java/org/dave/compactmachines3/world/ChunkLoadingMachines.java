@@ -24,7 +24,10 @@ public class ChunkLoadingMachines implements LoadingCallback {
             return false;
 
         // The set of tickets that are being used to chunkload the room chunk, or empty if none
-        Set<Ticket> chunkTickets = getPersistentChunksForMachineWorld().get(new ChunkPos(roomPos));
+        ImmutableSetMultimap<ChunkPos, Ticket> chunkMap = getPersistentChunksForMachineWorld();
+        if (chunkMap == null)
+            return false;
+        Set<Ticket> chunkTickets = chunkMap.get(new ChunkPos(roomPos));
 
         for (Ticket ticket : chunkTickets) {
             NBTTagCompound data = ticket.getModData();
@@ -46,10 +49,13 @@ public class ChunkLoadingMachines implements LoadingCallback {
     public static void unforceChunk(int id, BlockPos roomPos) {
         if (id == -1 || roomPos == null)
             return;
+        ImmutableSetMultimap<ChunkPos, Ticket> chunkMap = getPersistentChunksForMachineWorld();
+        if (chunkMap == null)
+            return;
 
         // The set of tickets that are being used to chunkload the room chunk, or empty if none
         ChunkPos chunkPos = new ChunkPos(roomPos);
-        Set<Ticket> chunkTickets = getPersistentChunksForMachineWorld().get(chunkPos);
+        Set<Ticket> chunkTickets = chunkMap.get(chunkPos);
 
         for (Ticket ticket : chunkTickets) {
             NBTTagCompound data = ticket.getModData();
@@ -98,6 +104,8 @@ public class ChunkLoadingMachines implements LoadingCallback {
         if (chunkTicket == null) {
             // No existing/free ticket found. Requesting a new one.
             WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+            if (machineWorld == null)
+                return;
             chunkTicket = ForgeChunkManager.requestTicket(CompactMachines3.instance, machineWorld, ForgeChunkManager.Type.NORMAL);
         }
 
@@ -134,13 +142,17 @@ public class ChunkLoadingMachines implements LoadingCallback {
     }
 
     private static ImmutableSetMultimap<ChunkPos, Ticket> getPersistentChunksForMachineWorld() {
-        return ForgeChunkManager.getPersistentChunksFor(DimensionTools.getServerMachineWorld());
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        return machineWorld == null ? null : ForgeChunkManager.getPersistentChunksFor(machineWorld);
     }
 
     private static Set<Ticket> getModTicketsForMachineWorld() {
+        ImmutableSetMultimap<ChunkPos, Ticket> chunkMap = getPersistentChunksForMachineWorld();
         Set<Ticket> tickets = new HashSet<>();
         Set<Ticket> seen = new HashSet<>();
-        for (Ticket ticket : getPersistentChunksForMachineWorld().values()) {
+        if (chunkMap == null)
+            return tickets;
+        for (Ticket ticket : chunkMap.values()) {
             if (!seen.add(ticket))
                 continue; // We've already seen it if Set#add is false
             if (CompactMachines3.MODID.equals(ticket.getModId())) {

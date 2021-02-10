@@ -27,7 +27,7 @@ public class BaseTileEntityTunnel extends TileEntity implements ITickable {
         }
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if(realWorld == null) {
+        if (realWorld == null) {
             return ItemStack.EMPTY;
         }
 

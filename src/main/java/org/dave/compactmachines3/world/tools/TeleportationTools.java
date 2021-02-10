@@ -60,6 +60,8 @@ public class TeleportationTools {
             MessageMachinePositions.updateClientMachinePositions();
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return false;
         BlockPos destination = new BlockPos(WorldSavedDataMachines.getInstance().spawnPoints.get(machine.id).getPosition());
 
         BlockPos safe = null;
@@ -97,6 +99,8 @@ public class TeleportationTools {
         BlockPos start = machine.getCenterRoomPos();
         EnumMachineSize size = machine.getSize();
         WorldServer world = DimensionTools.getServerMachineWorld();
+        if (world == null)
+            return null;
 
         BlockPos found = TeleportationTools.getValidSpawnLocation(world, start, (size.getDimension() - 2) / 2, size.getDimension() - 2, 1);
         if (found == start) {
@@ -154,6 +158,8 @@ public class TeleportationTools {
             playerNBT.setTag("compactmachines3-oldPos", new Vec3d2f(player).toTag());
 
             WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+            if (machineWorld == null)
+                return;
             player.addExperienceLevel(0);
             PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
             playerList.transferPlayerToDimension(player, ConfigurationHandler.Settings.dimensionId, new TeleporterMachines(machineWorld));
@@ -227,7 +233,13 @@ public class TeleportationTools {
             }
 
             player.addExperienceLevel(0);
-            playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(DimensionTools.getWorldServerForDimension(oldDimension)));
+            WorldServer world = DimensionTools.getWorldServerForDimension(oldDimension);
+            if (world == null) {
+                oldDimension = 0;
+                world = DimensionTools.getWorldServerForDimension(0);
+                pos = new Vec3d2f(world.provider.getRandomizedSpawnPoint(), player);
+            }
+            playerList.transferPlayerToDimension(player, oldDimension, new TeleporterMachines(world));
             // Should only be null if the compound tag is empty, which it shouldn't be if it exists
             if (pos != null)
                 pos.setPlayerLocation(player);
@@ -241,25 +253,29 @@ public class TeleportationTools {
 
             DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(firstId);
 
-            BlockPos startPoint;
-            int dimension;
+            int dimension = 0;
+            BlockPos startPoint = null;
+            WorldServer world = null;
 
             if (pos != null) {
                 // The machine exists and we know its position
                 dimension = pos.getDimension();
                 startPoint = pos.getBlockPos();
-            } else {
-                // We have no idea -> use the world spawn instead
-                dimension = 0;
-                startPoint = DimensionTools.getWorldServerForDimension(0).provider.getRandomizedSpawnPoint();
+                world = DimensionTools.getWorldServerForDimension(dimension);
             }
 
-            WorldServer world = DimensionTools.getWorldServerForDimension(dimension);
+            // If the target dimension has become invalid OR the position is missing, set to dim 0
+            if (pos == null || world == null) {
+                // We have no idea -> use the world spawn instead
+                dimension = 0;
+                world = DimensionTools.getWorldServerForDimension(0);
+                startPoint = world.provider.getRandomizedSpawnPoint();
+            }
+
             BlockPos spawnPoint = pos != null ? getValidSpawnLocation(world, startPoint) : startPoint;
 
             playerList.transferPlayerToDimension(player, dimension, new TeleporterMachines(world));
             player.setPositionAndUpdate(spawnPoint.getX() + 0.5d, spawnPoint.getY() + 0.2d, spawnPoint.getZ() + 0.5d);
-
         }
     }
 

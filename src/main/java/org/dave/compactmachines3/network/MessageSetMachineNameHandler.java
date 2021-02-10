@@ -24,7 +24,7 @@ public class MessageSetMachineNameHandler implements IMessageHandler<MessageSetM
         serverPlayer.getServerWorld().addScheduledTask(() -> {
             DimensionBlockPos pos = WorldSavedDataMachines.getInstance().machinePositions.get(finalId);
             TileEntity te = DimensionTools.getWorldServerForDimension(pos.getDimension()).getTileEntity(pos.getBlockPos());
-            if (te != null && te instanceof TileEntityMachine) {
+            if (te instanceof TileEntityMachine) {
                 TileEntityMachine machine = (TileEntityMachine) te;
                 machine.setCustomName(message.newName);
                 machine.markDirty();

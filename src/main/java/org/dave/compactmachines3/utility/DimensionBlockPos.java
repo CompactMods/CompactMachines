@@ -34,7 +34,7 @@ public class DimensionBlockPos  {
 
     public TileEntity getTileEntity() {
         World world = DimensionTools.getWorldServerForDimension(this.dimension);
-        return world.getTileEntity(pos);
+        return world == null ? null : world.getTileEntity(this.pos);
     }
 
     public NBTTagCompound getAsNBT() {

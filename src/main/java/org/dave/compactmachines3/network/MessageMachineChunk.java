@@ -3,6 +3,7 @@ package org.dave.compactmachines3.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -23,11 +24,12 @@ public class MessageMachineChunk implements IMessage, IMessageHandler<MessageMac
     public MessageMachineChunk(int id) {
         this.id = id;
         BlockPos roomPos = WorldSavedDataMachines.getInstance().getMachineRoomPosition(this.id);
-        if (roomPos == null) {
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (roomPos == null || machineWorld == null) {
             this.data = new NBTTagCompound();
         } else {
-            Chunk chunk = DimensionTools.getServerMachineWorld().getChunk(roomPos);
-            this.data = ChunkUtils.writeChunkToNBT(chunk, DimensionTools.getServerMachineWorld(), new NBTTagCompound());
+            Chunk chunk = machineWorld.getChunk(roomPos);
+            this.data = ChunkUtils.writeChunkToNBT(chunk, machineWorld, new NBTTagCompound());
         }
     }
 

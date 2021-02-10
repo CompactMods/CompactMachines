@@ -25,7 +25,7 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
         }
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if(realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+        if (realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
             return null;
         }
 
@@ -62,7 +62,7 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
             return false;
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if (!(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+        if (realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
             return false;
         }
 
@@ -96,7 +96,7 @@ public class TileEntityTunnel extends BaseTileEntityTunnel implements ICapabilit
             return null;
 
         WorldServer realWorld = DimensionTools.getWorldServerForDimension(dimpos.getDimension());
-        if (!(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
+        if (realWorld == null || !(realWorld.getTileEntity(dimpos.getBlockPos()) instanceof TileEntityMachine)) {
             return null;
         }
 

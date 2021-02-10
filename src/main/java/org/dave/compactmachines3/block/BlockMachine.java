@@ -106,11 +106,7 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos what) {
         super.neighborChanged(state, world, pos, blockIn, what);
 
-        if(world.isRemote) {
-            return;
-        }
-
-        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
+        if (world.isRemote || !(world.getTileEntity(pos) instanceof TileEntityMachine)) {
             return;
         }
 
@@ -124,29 +120,29 @@ public class BlockMachine extends BlockBase implements IMetaBlockName, ITileEnti
         }
 
         // And do nothing if it isnt, e.g. diagonal
-        if(facing == null) {
+        if (facing == null)
             return;
-        }
 
         // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
         // Just ensure only a single notification happens per tick.
         TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-        if(te.isInsideItself() || te.alreadyNotifiedOnTick) {
+        if (te == null || te.isInsideItself() || te.alreadyNotifiedOnTick) {
             return;
         }
 
         WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        if (machineWorld == null)
+            return;
         BlockPos neighborPos = te.getConnectedBlockPosition(facing);
-        if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
+        if (neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
             machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
             te.alreadyNotifiedOnTick = true;
         }
 
-
         RedstoneTunnelData tunnelData = te.getRedstoneTunnelForSide(facing);
-        if(tunnelData != null && !tunnelData.isOutput) {
+        if (tunnelData != null && !tunnelData.isOutput) {
             BlockPos redstoneNeighborPos = tunnelData.pos;
-            if(redstoneNeighborPos != null && machineWorld.getTileEntity(redstoneNeighborPos) instanceof TileEntityRedstoneTunnel) {
+            if (redstoneNeighborPos != null && machineWorld.getTileEntity(redstoneNeighborPos) instanceof TileEntityRedstoneTunnel) {
                 machineWorld.notifyNeighborsOfStateChange(redstoneNeighborPos, Blockss.redstoneTunnel, false);
             }
         }

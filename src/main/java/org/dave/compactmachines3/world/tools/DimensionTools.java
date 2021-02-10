@@ -8,6 +8,8 @@ import org.dave.compactmachines3.CompactMachines3;
 import org.dave.compactmachines3.misc.ConfigurationHandler;
 import org.dave.compactmachines3.world.WorldProviderMachines;
 
+import javax.annotation.Nullable;
+
 public class DimensionTools {
     public static DimensionType baseType;
 
@@ -19,10 +21,12 @@ public class DimensionTools {
         DimensionManager.registerDimension(ConfigurationHandler.Settings.dimensionId, DimensionTools.baseType);
     }
 
+    @Nullable
     public static WorldServer getWorldServerForDimension(int dim) {
         return FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim);
     }
 
+    @Nullable
     public static WorldServer getServerMachineWorld() {
         return getWorldServerForDimension(ConfigurationHandler.Settings.dimensionId);
     }
