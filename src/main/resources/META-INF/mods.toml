@@ -23,7 +23,7 @@ license="All rights reserved"
     ## OPTIONAL INFO ##
 
     # A URL to refer people to when problems occur with this mod
-    # issueTrackerURL="http://my.issue.tracker/" #optional
+    issueTrackerURL="https://github.com/CompactMods/CompactMachines/issues"
 
     # A URL to query for updates for this mod. See the JSON update specification <here>
     #updateJSONURL="http://myurl.me/" #optional
@@ -51,6 +51,6 @@ license="All rights reserved"
 [[dependencies.compactmachines]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4,)"
+    versionRange="[1.16.4,1.17)"
     ordering="NONE"
     side="BOTH"
