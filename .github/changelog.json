@@ -1,5 +1,33 @@
 {
   "resolve": "commits",
   "sort": "asc",
-  "template": ".github/changelog.tmpl"
+  "template": ".github/changelog.tmpl",
+  "groupings": [
+    {
+      "name": "Fixes",
+      "patterns": [
+        "(?i)\\bbug\\b",
+        "(?i)\\bfix\\b"
+      ]
+    },
+    {
+      "name": "Features",
+      "patterns": [
+        "^(?i)feat:\\b",
+        "^(?i)add:\\b"
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "patterns": [
+        "(?i)\\brefactor:\\b"
+      ]
+    },
+    {
+      "name": "Other",
+      "patterns": [
+        ".?"
+      ]
+    }
+  ]
 }
