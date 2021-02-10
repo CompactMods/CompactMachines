@@ -39,8 +39,10 @@ public abstract class CompactMachineUtil {
         }
 
         ServerWorld compactWorld = serv.getWorld(Registration.COMPACT_DIMENSION);
-        if (compactWorld == null)
+        if (compactWorld == null) {
+            CompactMachines.LOGGER.warn("Compact dimension not found; player attempted to enter machine.");
             return;
+        }
 
         CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
         if (tile == null)
