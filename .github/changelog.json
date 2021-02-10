@@ -1,4 +1,5 @@
 {
   "resolve": "commits",
-  "sort": "asc"
+  "sort": "asc",
+  "template": ".github/changelog.tmpl"
 }
