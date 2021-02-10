@@ -21,26 +21,9 @@ public class CompactMachineServerData extends CompactMachineCommonData {
 
     private Map<Integer, CompactMachineRegistrationData> machineData;
 
-    @Nullable
-    private MinecraftServer server;
-
     CompactMachineServerData() {
         super();
         this.machineData = new HashMap<>();
-    }
-
-    CompactMachineServerData(MinecraftServer server) {
-        this();
-        this.server = server;
-    }
-
-    public static CompactMachineServerData getInstance(MinecraftServer server) {
-        CompactMachineServerData serverData = SavedMachineData
-                .getMachineData(server)
-                .getServerData();
-
-        serverData.server = server;
-        return serverData;
     }
 
     public static CompactMachineServerData fromNbt(CompoundNBT nbt) {
@@ -75,12 +58,6 @@ public class CompactMachineServerData extends CompactMachineCommonData {
                 machineData.put(md.getId(), md);
             });
         }
-    }
-
-    @Override
-    public void markDirty() {
-        SavedMachineData machineData = SavedMachineData.getMachineData(server);
-        machineData.markDirty();
     }
 
     public int getNextMachineId() {
@@ -137,7 +114,6 @@ public class CompactMachineServerData extends CompactMachineCommonData {
             return;
 
         machineData.replace(id, d);
-        markDirty();
     }
 
     public Optional<CompactMachineRegistrationData> getMachineData(int machineId) {

@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntArrayNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -132,10 +133,10 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
      * Gets the position of the machine in-world. (Dimension and Position info)
      * @return
      */
-    public DimensionalPosition getOutsidePosition(ServerWorld server) {
+    public DimensionalPosition getOutsidePosition(MinecraftServer server) {
         if(this.inPlayerInventory) {
-            List<ServerPlayerEntity> players = server.getPlayers(p -> playerUUID == p.getGameProfile().getId());
-            ServerPlayerEntity player = players.get(0);
+            ServerPlayerEntity player = server.getPlayerList().getPlayerByUUID(playerUUID);
+
             Vector3d positionVec = player.getPositionVec();
             RegistryKey<World> dimensionKey = player.world.getDimensionKey();
 

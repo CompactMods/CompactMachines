@@ -47,9 +47,7 @@ public class ItemBlockMachine extends BlockItem {
             if (machineData.contains("coords")) {
                 int coords = machineData.getInt("coords");
                 if (coords > -1) {
-                    IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine.coords")
-                            .append(new StringTextComponent(" #" + coords));
-
+                    IFormattableTextComponent coordsTC = new TranslationTextComponent("tooltip.compactmachines.machine_id", coords);
                     tooltip.add(coordsTC);
                 }
             }

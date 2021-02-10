@@ -6,6 +6,7 @@ import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
+import com.robotgryphon.compactmachines.data.SavedMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
@@ -67,7 +68,7 @@ public class TunnelHelper {
 
         Set<BlockPos> tunnelPositions = new HashSet<>();
 
-        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
+        CompactMachineServerData data = SavedMachineData.getInstance(world.getServer()).getData();
 
         Optional<CompactMachineRegistrationData> mData = data.getMachineData(machine);
         mData.ifPresent(machineData -> {

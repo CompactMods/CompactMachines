@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.util;
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
+import com.robotgryphon.compactmachines.data.SavedMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
@@ -37,9 +38,10 @@ public abstract class PlayerUtil {
 
     public static void teleportPlayerOutOfMachine(ServerWorld world, ServerPlayerEntity serverPlayer) {
 
-        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
+        SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
+        CompactMachineServerData serverData = machineData.getData();
 
-        Optional<CompactMachineRegistrationData> machine = data.getMachineContainingPosition(serverPlayer.getPositionVec());
+        Optional<CompactMachineRegistrationData> machine = serverData.getMachineContainingPosition(serverPlayer.getPositionVec());
 
         if (!machine.isPresent()) {
             serverPlayer.sendStatusMessage(
@@ -51,7 +53,7 @@ public abstract class PlayerUtil {
 
         CompactMachineRegistrationData machineInfo = machine.get();
 
-        Optional<CompactMachinePlayerData> machinePlayers = data.getPlayerData(machineInfo.getId());
+        Optional<CompactMachinePlayerData> machinePlayers = serverData.getPlayerData(machineInfo.getId());
         if (!machinePlayers.isPresent()) {
             // No player data for machine, wut
             CompactMachines.LOGGER.warn("Warning: Machine player data not set but machine registered, and player is inside. Machine ID: {}", machineInfo.getId());
@@ -71,11 +73,11 @@ public abstract class PlayerUtil {
             outsideWorld.ifPresent(w -> {
                 machine.ifPresent(m -> {
                     serverPlayer.teleport(w, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
-                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, machineInfo.getOutsidePosition(w).getBlockPosition(), m.getId());
+                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer,
+                            machineInfo.getOutsidePosition(serverPlayer.getServer()).getBlockPosition(),
+                            m.getId());
                 });
             });
-
-
         }
     }
 }

@@ -64,7 +64,10 @@ public class RedstoneTunnelDefinition extends TunnelDefinition implements IRedst
                 return 0;
 
             if(world instanceof ServerWorld) {
-                DimensionalPosition realPosition = compactMachineData.getOutsidePosition((ServerWorld) world);
+                ServerWorld sw = (ServerWorld) world;
+                DimensionalPosition realPosition = compactMachineData.getOutsidePosition(sw.getServer());
+
+                // TODO - Finish implementation
             }
         }
 

@@ -9,7 +9,7 @@ on:
 jobs:
   vars:
     name: Get Variables
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       release_type: ${{steps.cf_release_type.outputs.value }}
       cf_project: ${{steps.cf_project.outputs.value }}
@@ -49,7 +49,7 @@ jobs:
 
   changelog:
     name: Generate Changelog (tags)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -98,7 +98,7 @@ jobs:
 
   jar:
     name: Publish JAR
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [vars, changelog]
     steps:
       - name: Download Changelog Results
@@ -113,14 +113,16 @@ jobs:
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: "8.0.282"
 
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
       
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -139,7 +141,7 @@ jobs:
 
   view:
     name: View Changelog Output
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [changelog]
     steps:
       - name: Download Build Results
@@ -151,7 +153,7 @@ jobs:
 
   release:
     name: Make GitHub Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [changelog, vars, jar]
     steps:
       - name: Download Build Results

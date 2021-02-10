@@ -17,14 +17,14 @@ import javax.annotation.Nonnull;
 public class SavedMachineData extends WorldSavedData {
 
     public final static String DATA_NAME = CompactMachines.MOD_ID + "_machines";
-    private static CompactMachineServerData SERVER_DATA;
+    private static CompactMachineServerData DATA;
 
     public SavedMachineData() {
         super(DATA_NAME);
     }
 
     @Nonnull
-    public static SavedMachineData getMachineData(MinecraftServer server) {
+    public static SavedMachineData getInstance(MinecraftServer server) {
         ServerWorld compactWorld = server.getWorld(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
         {
@@ -35,24 +35,27 @@ public class SavedMachineData extends WorldSavedData {
                     .getOrCreate(SavedMachineData::new, DATA_NAME);
         }
 
-        if(SERVER_DATA == null)
-            SERVER_DATA = new CompactMachineServerData(server);
-
         DimensionSavedDataManager sd = compactWorld.getSavedData();
         return sd.getOrCreate(SavedMachineData::new, DATA_NAME);
     }
 
     @Override
     public void read(CompoundNBT nbt) {
-        SERVER_DATA = CompactMachineServerData.fromNbt(nbt);
+        DATA = CompactMachineServerData.fromNbt(nbt);
     }
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        return SERVER_DATA.serializeNBT(compound);
+        if(DATA != null)
+            return DATA.serializeNBT(compound);
+
+        return compound;
     }
 
-    public CompactMachineServerData getServerData() {
-        return SERVER_DATA;
+    public CompactMachineServerData getData() {
+        if(DATA == null)
+            DATA = new CompactMachineServerData();
+
+        return DATA;
     }
 }

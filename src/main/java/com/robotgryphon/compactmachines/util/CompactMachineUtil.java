@@ -39,8 +39,10 @@ public abstract class CompactMachineUtil {
         }
 
         ServerWorld compactWorld = serv.getWorld(Registration.COMPACT_DIMENSION);
-        if (compactWorld == null)
+        if (compactWorld == null) {
+            CompactMachines.LOGGER.warn("Compact dimension not found; player attempted to enter machine.");
             return;
+        }
 
         CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
         if (tile == null)
@@ -49,7 +51,8 @@ public abstract class CompactMachineUtil {
         serv.deferTask(() -> {
             BlockPos spawnPoint;
 
-            CompactMachineServerData serverData = CompactMachineServerData.getInstance(serv);
+            SavedMachineData machineData = SavedMachineData.getInstance(serv);
+            CompactMachineServerData serverData = machineData.getData();
 
             if (tile.machineId == -1) {
                 int nextID = serverData.getNextMachineId();
@@ -66,7 +69,7 @@ public abstract class CompactMachineUtil {
                 regData.setWorldPosition(serverWorld, machinePos);
 
                 serverData.registerMachine(nextID, regData);
-                serverData.markDirty();
+                machineData.markDirty();
 
                 BlockPos.Mutable spawn = center.toMutable();
                 spawn.setY(62);
@@ -173,11 +176,14 @@ public abstract class CompactMachineUtil {
     }
 
     public static void setMachineSpawn(MinecraftServer server, BlockPos position) {
-        CompactMachineServerData serverData = CompactMachineServerData.getInstance(server);
+        SavedMachineData machineData = SavedMachineData.getInstance(server);
+        CompactMachineServerData serverData = machineData.getData();
+
         Optional<CompactMachineRegistrationData> compactMachineData = serverData.getMachineContainingPosition(position);
         compactMachineData.ifPresent(d -> {
             d.setSpawnPoint(position);
             serverData.updateMachineData(d);
+            machineData.markDirty();
         });
     }
 
@@ -185,18 +191,22 @@ public abstract class CompactMachineUtil {
         if (world == null)
             return Optional.empty();
 
-        SavedMachineData md = SavedMachineData.getMachineData(world.getServer());
+        SavedMachineData md = SavedMachineData.getInstance(world.getServer());
         return Optional.of(md);
     }
 
     public static Optional<CompactMachineRegistrationData> getMachineInfoByInternalPosition(ServerWorld world, Vector3d pos) {
-        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
-        return data.getMachineContainingPosition(pos);
+        SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
+        CompactMachineServerData serverData = machineData.getData();
+
+        return serverData.getMachineContainingPosition(pos);
     }
 
     public static Optional<CompactMachineRegistrationData> getMachineInfoByInternalPosition(ServerWorld world, BlockPos pos) {
-        CompactMachineServerData data = CompactMachineServerData.getInstance(world.getServer());
-        return data.getMachineContainingPosition(pos);
+        SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
+        CompactMachineServerData serverData = machineData.getData();
+
+        return serverData.getMachineContainingPosition(pos);
     }
 
     /**
@@ -208,7 +218,8 @@ public abstract class CompactMachineUtil {
      * @param pos
      */
     public static void updateMachineInWorldPosition(ServerWorld world, int machineID, BlockPos pos) {
-        CompactMachineServerData serverData = CompactMachineServerData.getInstance(world.getServer());
+        SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
+        CompactMachineServerData serverData = machineData.getData();
 
         Optional<CompactMachineRegistrationData> machineById = serverData.getMachineData(machineID);
         machineById.ifPresent(data -> {
@@ -217,6 +228,7 @@ public abstract class CompactMachineUtil {
 
             // Write changes to disk
             serverData.updateMachineData(data);
+            machineData.markDirty();
         });
     }
 }

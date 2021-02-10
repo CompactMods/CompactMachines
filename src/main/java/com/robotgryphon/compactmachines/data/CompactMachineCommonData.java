@@ -26,9 +26,6 @@ public class CompactMachineCommonData {
         return INSTANCE;
     }
 
-    public void markDirty() throws Exception {
-    }
-
     public static CompoundNBT serializePlayerData(CompactMachineCommonData shared, CompoundNBT nbt) {
         ListNBT playerList = shared.playerData.values()
                 .stream()
