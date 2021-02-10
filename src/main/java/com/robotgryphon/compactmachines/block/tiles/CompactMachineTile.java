@@ -7,7 +7,7 @@ import com.robotgryphon.compactmachines.data.SavedMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.reference.Reference;
-import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.api.tunnels.ICapableTunnel;
 import net.minecraft.block.BlockState;

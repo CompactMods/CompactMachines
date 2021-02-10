@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.tunnels;
 
 import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
-import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
@@ -53,7 +53,7 @@ public class TunnelHelper {
 
     @Nonnull
     public static Optional<TunnelDefinition> getTunnelDefinitionFromType(ResourceLocation id) {
-        Optional<RegistryObject<TunnelDefinition>> first = Registration.TUNNEL_TYPES.getEntries()
+        Optional<RegistryObject<TunnelDefinition>> first = Registration.TUNNEL_DEFINITIONS.getEntries()
                 .stream()
                 .filter(t -> t.get().getRegistryName() == id)
                 .findFirst();

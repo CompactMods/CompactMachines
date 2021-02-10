@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.core;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
@@ -10,11 +11,8 @@ import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.item.ItemBlockMachine;
 import com.robotgryphon.compactmachines.item.ItemBlockWall;
 import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
-import com.robotgryphon.compactmachines.item.tunnels.ItemTunnelItem;
-import com.robotgryphon.compactmachines.item.tunnels.RedstoneInTunnelItem;
-import com.robotgryphon.compactmachines.item.tunnels.RedstoneOutTunnelItem;
+import com.robotgryphon.compactmachines.item.TunnelItem;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
-import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.definitions.ItemTunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneTunnelDefinition;
 import net.minecraft.block.AbstractBlock;
@@ -49,7 +47,14 @@ public class Registration {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MOD_ID);
-    public static final DeferredRegister<TunnelDefinition> TUNNEL_TYPES = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
+    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
+
+    static {
+        TUNNEL_DEFINITIONS.makeRegistry("tunnel_types",
+                () -> new RegistryBuilder<TunnelDefinition>()
+                        .setType(TunnelDefinition.class)
+                        .tagFolder("tunnel_types"));
+    }
 
     // ================================================================================================================
     //   PROPERTIES
@@ -151,14 +156,8 @@ public class Registration {
     //   TUNNELS
     // ================================================================================================================
 
-    public static final RegistryObject<Item> ITEM_ITEM_TUNNEL = ITEMS.register("item_tunnel", () ->
-            new ItemTunnelItem(BASIC_ITEM_PROPS.get()));
-
-    public static final RegistryObject<Item> ITEM_REDSTONEIN_TUNNEL = ITEMS.register("redstone_in_tunnel", () ->
-            new RedstoneInTunnelItem(BASIC_ITEM_PROPS.get()));
-
-    public static final RegistryObject<Item> ITEM_REDSTONEOUT_TUNNEL = ITEMS.register("redstone_out_tunnel", () ->
-            new RedstoneOutTunnelItem(BASIC_ITEM_PROPS.get()));
+    public static final RegistryObject<Item> ITEM_TUNNEL = ITEMS.register("tunnel", () ->
+            new TunnelItem(BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<TileEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = TILES_ENTITIES.register("tunnel_wall", () ->
             TileEntityType.Builder.create(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
@@ -167,17 +166,11 @@ public class Registration {
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL = TUNNEL_TYPES.register("items", () ->
-        new ItemTunnelDefinition(ITEM_ITEM_TUNNEL.get())
-    );
+    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = TUNNEL_DEFINITIONS.register("item", ItemTunnelDefinition::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_TYPES.register("redstone_in", () ->
-            new RedstoneTunnelDefinition(ITEM_REDSTONEIN_TUNNEL.get())
-    );
+    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneTunnelDefinition::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_TYPES.register("redstone_out", () ->
-            new RedstoneTunnelDefinition(ITEM_REDSTONEOUT_TUNNEL.get())
-    );
+    public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneTunnelDefinition::new);
 
     // ================================================================================================================
     //   DIMENSION
@@ -194,9 +187,6 @@ public class Registration {
         ITEMS.register(eventBus);
         TILES_ENTITIES.register(eventBus);
 
-        TUNNEL_TYPES.makeRegistry("tunnel_types", () -> new RegistryBuilder<TunnelDefinition>()
-                .tagFolder("tunnel_types"));
-
-        TUNNEL_TYPES.register(eventBus);
+        TUNNEL_DEFINITIONS.register(eventBus);
     }
 }

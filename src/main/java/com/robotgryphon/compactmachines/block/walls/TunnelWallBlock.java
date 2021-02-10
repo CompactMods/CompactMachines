@@ -5,15 +5,15 @@ import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.TunnelProvider;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.api.tunnels.IRedstoneTunnel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
@@ -116,8 +116,9 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             worldIn.setBlockState(pos, solidWall);
 
             TunnelDefinition tunnelRegistration = tunnelDef.get();
-            Item item = tunnelRegistration.getItem();
-            ItemStack stack = new ItemStack(item, 1);
+            ItemStack stack = new ItemStack(Registration.ITEM_TUNNEL.get(), 1);
+            CompoundNBT defTag = stack.getOrCreateChildTag("definition");
+            defTag.putString("id", tunnelRegistration.getRegistryName().toString());
 
             ItemEntity ie = new ItemEntity(worldIn, player.getPosX(), player.getPosY(), player.getPosZ(), stack);
             worldIn.addEntity(ie);

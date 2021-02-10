@@ -4,6 +4,7 @@ import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
@@ -57,7 +58,7 @@ public class TunnelProvider {
 
                 CompoundText type = CompoundText.create().name(tunType);
                 v.horizontal(center)
-                        .item(new ItemStack(def.getItem()))
+                        .item(new ItemStack(Registration.ITEM_TUNNEL.get()))
                         .text(type);
             }
 

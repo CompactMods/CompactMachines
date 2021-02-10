@@ -6,7 +6,7 @@ import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistration
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
-import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
 import com.robotgryphon.compactmachines.api.tunnels.ICapableTunnel;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.BlockState;
