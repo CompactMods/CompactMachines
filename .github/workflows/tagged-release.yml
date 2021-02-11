@@ -154,7 +154,7 @@ jobs:
       - run: cat changelog/CHANGELOG.md
 
   release:
-    name: Make GitHub Release
+    name: Make Releases
     runs-on: ubuntu-20.04
     needs: [changelog, vars, jar]
     steps:
@@ -188,11 +188,6 @@ jobs:
         id: filename
         run: echo "::set-output name=fullpath::buildfiles/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar"
 
-      - name: Publish package
-        run: gradle publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create CurseForge Release
         uses: itsmeow/curseforge-upload@master
         with:
@@ -204,3 +199,13 @@ jobs:
           changelog_type: markdown
           game_versions: java:Java 8,Forge
           release_type: ${{ needs.vars.outputs.release_type }}
+
+  publishMaven:
+    name: Maven Release (GH Packages)
+    runs-on: ubuntu-20.04
+    needs: [changelog, vars, jar]
+    steps:
+      - name: Publish package
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
