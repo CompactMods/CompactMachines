@@ -129,6 +129,9 @@ jobs:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Output Dir Structure
+        run: ls -lhR buildfiles
+        
       - name: Add Artifact
         uses: actions/upload-artifact@v2
         with:
