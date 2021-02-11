@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.tunnels.api;
+package com.robotgryphon.compactmachines.api.tunnels;
 
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;

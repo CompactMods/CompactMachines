@@ -1,6 +1,11 @@
 package com.robotgryphon.compactmachines.block;
 
+import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.api.tunnels.ITunnelConnectionInfo;
+import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneReaderTunnel;
+import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneTunnel;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
@@ -10,6 +15,7 @@ import com.robotgryphon.compactmachines.core.EnumMachinePlayersBreakHandling;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
+import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.util.CompactMachineUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -32,7 +38,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class BlockCompactMachine extends Block implements IProbeDataProvider {
@@ -56,7 +64,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
 
         // If there are players inside, check config for break handling
-        if(hasPlayers) {
+        if (hasPlayers) {
             EnumMachinePlayersBreakHandling hand = ServerConfig.MACHINE_PLAYER_BREAK_HANDLING.get();
             switch (hand) {
                 case UNBREAKABLE:
@@ -83,11 +91,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        return 0;
-    }
-
-    @Override
     public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
 //        TODO Tile Entity
 //        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
@@ -104,54 +107,51 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        super.onNeighborChange(state, world, pos, neighbor);
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block changedBlock, BlockPos changedPos, boolean isMoving) {
+        super.neighborChanged(state, world, pos, changedBlock, changedPos, isMoving);
 
-        if (world.isRemote()) {
+        if (world.isRemote)
+            return;
+
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        BlockState changedState = serverWorld.getBlockState(changedPos);
+
+        CompactMachineTile machine = (CompactMachineTile) serverWorld.getTileEntity(pos);
+        if (machine == null)
+            return;
+
+        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registration.COMPACT_DIMENSION);
+        if (compactWorld == null) {
+            CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
             return;
         }
 
-//        TODO Tile Entity
-//        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
-//            return;
-//        }
+        // Determine whether it's an immediate neighbor; if so, execute ...
+        Arrays.stream(Direction.values())
+                .filter(hd -> pos.offset(hd).equals(changedPos))
+                .findFirst()
+                .ifPresent(facing -> {
+                    Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(machine.machineId, serverWorld, facing);
+                    for (BlockPos tunnelPos : tunnelsForMachineSide) {
+                        TunnelWallTile tunnelTile = (TunnelWallTile) compactWorld.getTileEntity(tunnelPos);
+                        if (tunnelTile == null) continue;
 
-        // Determine whether it's an immediate neighbor ...
-        Direction facing = null;
-        for (Direction dir : Direction.values()) {
-            if (pos.offset(dir).equals(neighbor)) {
-                facing = dir;
-                break;
-            }
-        }
+                        compactWorld.notifyNeighborsOfStateChange(tunnelPos, Registration.BLOCK_TUNNEL_WALL.get());
 
-        // And do nothing if it isnt, e.g. diagonal
-        if (facing == null) {
-            return;
-        }
+                        ITunnelConnectionInfo connInfo = TunnelHelper.generateConnectionInfo(tunnelTile);
 
-//        TODO Tile Entity and Server Stuff
-//        // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
-//        // Just ensure only a single notification happens per tick.
-//        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-//        if(te.isInsideItself() || te.alreadyNotifiedOnTick) {
-//            return;
-//        }
-//
-//        ServerWorld machineWorld = DimensionTools.getServerMachineWorld();
-//        BlockPos neighborPos = te.getConnectedBlockPosition(facing);
-//        if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
-//            machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
-//            te.alreadyNotifiedOnTick = true;
-//        }
-//
-//        RedstoneTunnelData tunnelData = te.getRedstoneTunnelForSide(facing);
-//        if(tunnelData != null && !tunnelData.isOutput) {
-//            BlockPos redstoneNeighborPos = tunnelData.pos;
-//            if(redstoneNeighborPos != null && machineWorld.getTileEntity(redstoneNeighborPos) instanceof TileEntityRedstoneTunnel) {
-//                machineWorld.notifyNeighborsOfStateChange(redstoneNeighborPos, Blockss.redstoneTunnel, false);
-//            }
-//        }
+                        tunnelTile.getTunnelDefinition().ifPresent(tunnelDefinition -> {
+                            // TODO: world notification interface for tunnels
+                            if (tunnelDefinition instanceof IRedstoneReaderTunnel) {
+                                // Send redstone changes into machine
+                                IRedstoneReaderTunnel rrt = (IRedstoneReaderTunnel) tunnelDefinition;
+                                int latestPower = world.getRedstonePower(changedPos, facing);
+                                rrt.onPowerChanged(connInfo, latestPower);
+                            }
+                        });
+                    }
+                });
     }
 
     @Override

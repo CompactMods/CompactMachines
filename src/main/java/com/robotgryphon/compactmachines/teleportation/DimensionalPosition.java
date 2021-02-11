@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
@@ -31,12 +32,8 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         this.position = new Vector3d(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
     }
 
-    public Optional<ServerWorld> getWorld(ServerWorld serverWorld) {
-        if(serverWorld == null)
-            return Optional.empty();
-
-        MinecraftServer serv = serverWorld.getServer();
-        return Optional.ofNullable(serv.getWorld(this.dimension));
+    public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {
+        return Optional.ofNullable(server.getWorld(this.dimension));
     }
 
     public static DimensionalPosition fromNBT(CompoundNBT nbt) {

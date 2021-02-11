@@ -1,11 +1,13 @@
 package com.robotgryphon.compactmachines.compat.theoneprobe.providers;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
-import com.robotgryphon.compactmachines.tunnels.EnumTunnelSide;
+import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.BlockState;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -43,25 +46,37 @@ public class TunnelProvider {
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
         TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(hitData.getPos());
-        if(tile == null)
+        if (tile == null)
             return;
 
         Optional<DimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
-        Optional<BlockState> connected = TunnelHelper.getConnectedState(world, tile, EnumTunnelSide.OUTSIDE);
+        Optional<BlockState> connected = TunnelHelper.getConnectedState(tile, EnumTunnelSide.OUTSIDE);
 
-        tile.getTunnelDefinition().ifPresent(def -> {
-            if (probeMode == ProbeMode.EXTENDED) {
-
-                IFormattableTextComponent tunType = new StringTextComponent(def.getRegistryName().toString())
+        if (probeMode == ProbeMode.EXTENDED) {
+            Optional<TunnelDefinition> definition = tile.getTunnelDefinition();
+            if (definition.isPresent()) {
+                IFormattableTextComponent tunType = new StringTextComponent(definition.get().getRegistryName().toString())
                         .mergeStyle(TextFormatting.GRAY);
 
                 CompoundText type = CompoundText.create().name(tunType);
                 v.horizontal(center)
-                        .item(new ItemStack(def.getItem()))
+                        .item(new ItemStack(Registration.ITEM_TUNNEL.get()))
+                        .text(type);
+
+            } else {
+                ResourceLocation defID = tile
+                        .getTunnelDefinitionId()
+                        .orElse(new ResourceLocation(CompactMachines.MOD_ID, "unknown"));
+
+                IFormattableTextComponent tunType = new TranslationTextComponent(CompactMachines.MOD_ID + ".errors.unknown_tunnel_type", defID)
+                        .mergeStyle(TextFormatting.GRAY);
+
+                CompoundText type = CompoundText.create().name(tunType);
+                v.horizontal(center)
+                        .item(new ItemStack(Registration.ITEM_TUNNEL.get()))
                         .text(type);
             }
-
-        });
+        }
 
         String sideTranslated = IProbeInfo.STARTLOC
                 .concat(CompactMachines.MOD_ID + ".direction.")

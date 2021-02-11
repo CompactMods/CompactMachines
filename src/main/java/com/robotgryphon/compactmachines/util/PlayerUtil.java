@@ -69,7 +69,7 @@ public abstract class PlayerUtil {
         } else {
             DimensionalPosition p = lastPos.get();
             Vector3d bp = p.getPosition();
-            Optional<ServerWorld> outsideWorld = p.getWorld(world);
+            Optional<ServerWorld> outsideWorld = p.getWorld(world.getServer());
             outsideWorld.ifPresent(w -> {
                 machine.ifPresent(m -> {
                     serverPlayer.teleport(w, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);

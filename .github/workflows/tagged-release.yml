@@ -137,7 +137,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: libs
-          path: build/libs/**${{ needs.vars.outputs.mod_version }}**.jar
+          path: |
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}-api.jar
 
   view:
     name: View Changelog Output
@@ -160,7 +162,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: libs
-          path: buildfiles
+          path: build-out
       - name: Download Changelog Results
         uses: actions/download-artifact@v2
         with:
@@ -179,7 +181,8 @@ jobs:
           prerelease: false
           files: |
             changelog/CHANGELOG.md
-            buildfiles/**${{ needs.vars.outputs.mod_version }}**.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}-api.jar
 
       - name: Full File
         id: filename

@@ -1,19 +1,20 @@
 package com.robotgryphon.compactmachines.block.walls;
 
+import com.robotgryphon.compactmachines.api.tunnels.ITunnelConnectionInfo;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.TunnelProvider;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
-import com.robotgryphon.compactmachines.tunnels.api.IRedstoneTunnel;
+import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
@@ -59,8 +60,9 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             return false;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).canConnectRedstone(world, state, pos, side);
+        if (definition instanceof IRedstoneReaderTunnel) {
+            ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
+            return ((IRedstoneReaderTunnel) definition).canConnectRedstone(conn);
         }
 
         return false;
@@ -73,15 +75,6 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
 
     @Override
     public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
-        if (!tunnelInfo.isPresent())
-            return 0;
-
-        TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).getStrongPower(world, state, pos, side);
-        }
-
         return 0;
     }
 
@@ -92,8 +85,10 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             return 0;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).getWeakPower(world, state, pos, side);
+        if (definition instanceof IRedstoneReaderTunnel) {
+            ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
+            int weak = ((IRedstoneReaderTunnel) definition).getPowerLevel(conn);
+            return weak;
         }
 
         return 0;
@@ -106,7 +101,6 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
 
 
         if (player.isSneaking()) {
-            // TODO Remove tunnelDef and return
             Optional<TunnelDefinition> tunnelDef = getTunnelInfo(worldIn, pos);
 
             if (!tunnelDef.isPresent())
@@ -117,8 +111,9 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             worldIn.setBlockState(pos, solidWall);
 
             TunnelDefinition tunnelRegistration = tunnelDef.get();
-            Item item = tunnelRegistration.getItem();
-            ItemStack stack = new ItemStack(item, 1);
+            ItemStack stack = new ItemStack(Registration.ITEM_TUNNEL.get(), 1);
+            CompoundNBT defTag = stack.getOrCreateChildTag("definition");
+            defTag.putString("id", tunnelRegistration.getRegistryName().toString());
 
             ItemEntity ie = new ItemEntity(worldIn, player.getPosX(), player.getPosY(), player.getPosZ(), stack);
             worldIn.addEntity(ie);

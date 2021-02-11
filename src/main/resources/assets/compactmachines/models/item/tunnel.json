@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "compactmachines:item/redstone_tunnel"
+    "layer0": "compactmachines:item/tunnel"
   }
 }
