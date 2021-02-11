@@ -1,0 +1,162 @@
+# Creates releases on GH Packages based on a version tag
+name: Manual Tagged Github Packages Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-20.04
+    outputs:
+      release_type: ${{steps.cf_release_type.outputs.value }}
+      cf_project: ${{steps.cf_project.outputs.value }}
+      mod_version: ${{steps.mod_version.outputs.value }}
+      mod_id: ${{steps.mod_id.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Release Type
+        id: cf_release_type
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_release_type'
+
+      - name: Project ID
+        id: cf_project
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'cf_project'
+
+      - name: Mod Version
+        id: mod_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_version'
+
+      - name: Mod ID
+        id: mod_id
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_id'
+
+  changelog:
+    name: Generate Changelog (tags)
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+
+      - name: Previous Tag
+        id: last
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: ${{steps.current.outputs.tag}}
+          skip-unshallow: 'true'
+
+      - name: Generate changelog
+        uses: jimschubert/beast-changelog-action@v1
+        with:
+          GITHUB_TOKEN: ${{github.token}}
+          CONFIG_LOCATION: .github/changelog.json
+          FROM: ${{steps.last.outputs.tag}}
+          TO: ${{steps.current.outputs.tag}}
+          OUTPUT: .github/CHANGELOG.md
+
+      - name: Read CHANGELOG file
+        id: getchangelog
+        run: echo "::set-output name=changelog::$(cat .github/CHANGELOG.md)"
+
+      - name: View Changelog
+        run: cat .github/CHANGELOG.md
+
+      - name: Add Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: out
+          path: .github/CHANGELOG.md
+
+  jar:
+    name: Publish JAR
+    runs-on: ubuntu-20.04
+    needs: [vars, changelog]
+    steps:
+      - name: Download Changelog Results
+        uses: actions/download-artifact@v2
+        with:
+          name: out
+          path: changelog
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: "8.0.282"
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build JAR with Gradle
+        run: ./gradlew build
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: libs
+          path: |
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}-api.jar
+
+  view:
+    name: View Changelog Output
+    runs-on: ubuntu-20.04
+    needs: [changelog]
+    steps:
+      - name: Download Build Results
+        uses: actions/download-artifact@v2
+        with:
+          name: out
+          path: changelog
+      - run: cat changelog/CHANGELOG.md
+
+  publishMaven:
+    name: Maven Release (GH Packages)
+    runs-on: ubuntu-20.04
+    needs: [changelog, vars, jar]
+    steps:
+      - name: Publish package
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
