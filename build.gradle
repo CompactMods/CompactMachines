@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "idea"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -22,13 +26,12 @@ archivesBaseName = mod_id
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
-    api
-    main
+    main{
+        resources {
+            srcDir 'src/generated/resources'
+        }
+    }
     test
-}
-
-configurations {
-    apiCompile.extendsFrom(compile)
 }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -95,8 +98,6 @@ minecraft {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
 def getModVersion(filename) {
     // println(filename);
     def pattern = /^(?<modid>[^-]+)(?:-(?<mcversion>[0-9.]+))?(?:-(?<modver>[0-9.\-]+))\.jar$/;
@@ -156,8 +157,6 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation sourceSets.api.output
-
     // Deobfuscate each dev mod for runtime
     dev_mods.each {
         compileOnly fg.deobf(it)
@@ -194,6 +193,23 @@ jar {
 jar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
+
+task srcJar (type: Jar) {
+    from sourceSets.main.java
+    classifier = 'sources'
+}
+
+task apiJar(type: Jar) {
+    // Sources included because of MinecraftForge/ForgeGradle#369
+    from(sourceSets.main.allJava)
+    from(sourceSets.main.output)
+    include 'com/robotgryphon/compactmachines/api/**'
+    classifier = 'api'
+}
+
+artifacts {
+    archives srcJar, apiJar
+}
 
 publishing {
     publications {

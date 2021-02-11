@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.tunnels.definitions;
+package com.robotgryphon.compactmachines.api.tunnels;
 
 import net.minecraftforge.registries.ForgeRegistryEntry;
 

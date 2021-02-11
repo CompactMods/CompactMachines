@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.core;
 
 import com.robotgryphon.compactmachines.CompactMachines;
-import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;

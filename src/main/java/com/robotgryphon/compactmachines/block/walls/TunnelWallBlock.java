@@ -5,7 +5,7 @@ import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.providers.TunnelProvider;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.api.tunnels.IRedstoneTunnel;
 import net.minecraft.block.Block;

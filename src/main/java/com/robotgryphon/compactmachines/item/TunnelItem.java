@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.item;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.api.tunnels.IRedstoneTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

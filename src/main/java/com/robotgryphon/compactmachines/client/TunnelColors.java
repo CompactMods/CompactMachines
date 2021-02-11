@@ -1,7 +1,7 @@
 package com.robotgryphon.compactmachines.client;
 
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
-import com.robotgryphon.compactmachines.tunnels.definitions.TunnelDefinition;
+import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.tileentity.TileEntity;
