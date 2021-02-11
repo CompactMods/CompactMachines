@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.tunnels;
 
 import com.robotgryphon.compactmachines.api.tunnels.EnumTunnelSide;
+import com.robotgryphon.compactmachines.api.tunnels.ITunnelConnectionInfo;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
@@ -10,11 +11,14 @@ import com.robotgryphon.compactmachines.data.SavedMachineData;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.RegistryObject;
@@ -26,6 +30,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TunnelHelper {
+
+    public static ITunnelConnectionInfo generateConnectionInfo(TunnelWallTile tunnelTile) {
+        return new TunnelConnectionInfo(tunnelTile);
+    }
+
+    public static ITunnelConnectionInfo generateConnectionInfo(@Nonnull IBlockReader tunnelWorld, @Nonnull BlockPos tunnelPos) {
+        TunnelWallTile tile = (TunnelWallTile) tunnelWorld.getTileEntity(tunnelPos);
+        return generateConnectionInfo(tile);
+    }
+
     @Nonnull
     public static Direction getNextDirection(Direction in) {
         switch (in) {
@@ -106,6 +120,7 @@ public class TunnelHelper {
 
         return tunnelPositions;
     }
+
     @Nonnull
     public static Optional<DimensionalPosition> getTunnelConnectedPosition(TunnelWallTile tunnel, EnumTunnelSide side) {
         switch (side) {
@@ -124,22 +139,21 @@ public class TunnelHelper {
     }
 
     @Nonnull
-    public static Optional<BlockState> getConnectedState(World world, TunnelWallTile twt, EnumTunnelSide side) {
-        Optional<DimensionalPosition> connectedPosition = getTunnelConnectedPosition(twt, side);
-        if(!connectedPosition.isPresent())
+    public static Optional<BlockState> getConnectedState(TunnelWallTile twt, EnumTunnelSide side) {
+        DimensionalPosition connectedPosition = getTunnelConnectedPosition(twt, side).orElse(null);
+        if(connectedPosition == null)
             return Optional.empty();
 
-        if (world instanceof ServerWorld) {
-            ServerWorld sw = (ServerWorld) world;
+        // We need a server world to reach across dimensions to get information
+        if (twt.getWorld() instanceof ServerWorld) {
+            ServerWorld sw = (ServerWorld) twt.getWorld();
 
-            DimensionalPosition dimensionalPosition = connectedPosition.get();
-
-            Optional<ServerWorld> connectedWorld = dimensionalPosition.getWorld(sw);
+            Optional<ServerWorld> connectedWorld = connectedPosition.getWorld(sw.getServer());
             if (!connectedWorld.isPresent())
                 return Optional.empty();
 
             ServerWorld csw = connectedWorld.get();
-            BlockPos connectedPos = dimensionalPosition.getBlockPosition();
+            BlockPos connectedPos = connectedPosition.getBlockPosition();
 
             BlockState state = csw.getBlockState(connectedPos);
             return Optional.of(state);
@@ -147,4 +161,6 @@ public class TunnelHelper {
 
         return Optional.empty();
     }
+
+
 }

@@ -1,11 +1,14 @@
 package com.robotgryphon.compactmachines.item;
 
+import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
-import com.robotgryphon.compactmachines.api.tunnels.IRedstoneTunnel;
+import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -16,14 +19,16 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 
 public class TunnelItem extends Item {
@@ -32,10 +37,33 @@ public class TunnelItem extends Item {
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
+    public ITextComponent getDisplayName(ItemStack stack) {
+        String key = getDefinition(stack)
+                .map(def -> {
+                    ResourceLocation id = def.getRegistryName();
+                    return "item." + id.getNamespace() + ".tunnels." + id.getPath().replace('/', '.');
+                })
+                .orElse("item." + CompactMachines.MOD_ID + ".tunnels.unnamed");
 
-        if(this.isInGroup(group)) {
+        return new TranslationTextComponent(key);
+    }
+
+    @Override
+    public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        getDefinition(stack).ifPresent(tunnelDef -> {
+            if (Screen.hasShiftDown()) {
+                IFormattableTextComponent type = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".tunnel_type", tunnelDef.getRegistryName())
+                        .mergeStyle(TextFormatting.GRAY)
+                        .mergeStyle(TextFormatting.ITALIC);
+
+                tooltip.add(type);
+            }
+        });
+    }
+
+    @Override
+    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+        if (this.isInGroup(group)) {
             IForgeRegistry<TunnelDefinition> definitions = GameRegistry.findRegistry(TunnelDefinition.class);
             definitions.getValues().forEach(def -> {
                 ItemStack withDef = new ItemStack(this, 1);
@@ -47,15 +75,15 @@ public class TunnelItem extends Item {
         }
     }
 
-    public Optional<TunnelDefinition> getDefinition(ItemStack stack) {
+    public static Optional<TunnelDefinition> getDefinition(ItemStack stack) {
         CompoundNBT defTag = stack.getOrCreateChildTag("definition");
-        if(defTag.isEmpty() || !defTag.contains("id"))
+        if (defTag.isEmpty() || !defTag.contains("id"))
             return Optional.empty();
 
         ResourceLocation defId = new ResourceLocation(defTag.getString("id"));
         IForgeRegistry<TunnelDefinition> tunnelReg = GameRegistry.findRegistry(TunnelDefinition.class);
 
-        if(!tunnelReg.containsKey(defId))
+        if (!tunnelReg.containsKey(defId))
             return Optional.empty();
 
         return Optional.ofNullable(tunnelReg.getValue(defId));
@@ -86,7 +114,7 @@ public class TunnelItem extends Item {
                         .with(TunnelWallBlock.TUNNEL_SIDE, context.getFace());
 
                 // Redstone Support
-                boolean redstone = (def instanceof IRedstoneTunnel);
+                boolean redstone = (def instanceof IRedstoneReaderTunnel);
                 tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
                 w.setBlockState(pos, tunnelState, 3);
 

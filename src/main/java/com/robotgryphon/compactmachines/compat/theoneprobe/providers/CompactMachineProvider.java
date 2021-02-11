@@ -3,7 +3,9 @@ package com.robotgryphon.compactmachines.compat.theoneprobe.providers;
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
+import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -61,8 +63,17 @@ public class CompactMachineProvider {
                 Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(md.getId(), (ServerWorld) world, hitData.getSideHit());
                 IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
 
+                ServerWorld cm = world.getServer().getWorld(Registration.COMPACT_DIMENSION);
                 tunnelsForMachineSide.forEach(pos -> {
-                    vertical.text(new StringTextComponent(pos.toString()));
+                    TunnelWallTile tile = (TunnelWallTile) cm.getTileEntity(pos);
+                    if(tile == null)
+                        return;
+
+                    tile.getTunnelDefinition().ifPresent(tunnelDef -> {
+                        vertical.text(
+                                new StringTextComponent(pos.toString() + ": " + tunnelDef.getRegistryName().toString())
+                        );
+                    });
                 });
 
                 // TODO: Connected block info (inside)

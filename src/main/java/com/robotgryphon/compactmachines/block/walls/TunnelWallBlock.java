@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.block.walls;
 
+import com.robotgryphon.compactmachines.api.tunnels.ITunnelConnectionInfo;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
@@ -7,7 +8,7 @@ import com.robotgryphon.compactmachines.compat.theoneprobe.providers.TunnelProvi
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
-import com.robotgryphon.compactmachines.api.tunnels.IRedstoneTunnel;
+import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
@@ -59,8 +60,9 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             return false;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).canConnectRedstone(world, state, pos, side);
+        if (definition instanceof IRedstoneReaderTunnel) {
+            ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
+            return ((IRedstoneReaderTunnel) definition).canConnectRedstone(conn);
         }
 
         return false;
@@ -73,15 +75,6 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
 
     @Override
     public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
-        if (!tunnelInfo.isPresent())
-            return 0;
-
-        TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).getStrongPower(world, state, pos, side);
-        }
-
         return 0;
     }
 
@@ -92,8 +85,10 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
             return 0;
 
         TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneTunnel) {
-            return ((IRedstoneTunnel) definition).getWeakPower(world, state, pos, side);
+        if (definition instanceof IRedstoneReaderTunnel) {
+            ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
+            int weak = ((IRedstoneReaderTunnel) definition).getWeakPower(conn);
+            return weak;
         }
 
         return 0;

@@ -16,6 +16,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
@@ -78,6 +79,32 @@ public class TunnelWallTile extends TileEntity {
         }
     }
 
+    public Optional<? extends IWorldReader> getConnectedWorld() {
+        if (world == null || world.isRemote())
+            return Optional.empty();
+
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        Optional<CompactMachineRegistrationData> machineInfo = getMachineInfo();
+        if (!machineInfo.isPresent())
+            return Optional.empty();
+
+        Direction outsideDir = getConnectedSide();
+
+        CompactMachineRegistrationData regData = machineInfo.get();
+
+        // Is the machine placed in world? If not, do not return an outside position
+        if (!regData.isPlacedInWorld())
+            return Optional.empty();
+
+        DimensionalPosition machinePosition = regData.getOutsidePosition(serverWorld.getServer());
+        if (machinePosition != null) {
+            return machinePosition.getWorld(serverWorld.getServer());
+        }
+
+        return Optional.empty();
+    }
+
     /**
      * Gets the position outside the machine where this tunnel is connected to.
      *
@@ -134,6 +161,10 @@ public class TunnelWallTile extends TileEntity {
         return blockState.get(TunnelWallBlock.CONNECTED_SIDE);
     }
 
+    public Optional<ResourceLocation> getTunnelDefinitionId() {
+        return Optional.ofNullable(this.tunnelType);
+    }
+
     public Optional<TunnelDefinition> getTunnelDefinition() {
         if(tunnelType == null)
             return Optional.empty();
@@ -142,7 +173,7 @@ public class TunnelWallTile extends TileEntity {
                 .findRegistry(TunnelDefinition.class)
                 .getValue(tunnelType);
 
-        return Optional.of(definition);
+        return Optional.ofNullable(definition);
     }
 
     @Nonnull

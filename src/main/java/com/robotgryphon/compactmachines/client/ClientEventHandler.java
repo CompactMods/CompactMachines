@@ -14,7 +14,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientEventHandler {
 
     @SubscribeEvent
-    public static void onColors(final ColorHandlerEvent.Block colors) {
+    public static void onItemColors(final ColorHandlerEvent.Item colors) {
+        colors.getItemColors().register(new TunnelItemColor(), Registration.ITEM_TUNNEL.get());
+    }
+
+    @SubscribeEvent
+    public static void onBlockColors(final ColorHandlerEvent.Block colors) {
         colors.getBlockColors().register(new TunnelColors(), Registration.BLOCK_TUNNEL_WALL.get());
     }
 

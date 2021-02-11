@@ -37,7 +37,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
         if (te instanceof TunnelWallTile) {
             TunnelWallTile twt = (TunnelWallTile) te;
 
-            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(compactWorld, twt, EnumTunnelSide.INSIDE);
+            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(twt, EnumTunnelSide.INSIDE);
             if (!connectedState.isPresent())
                 return LazyOptional.empty();
 
@@ -70,7 +70,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
         if (te instanceof TunnelWallTile) {
             TunnelWallTile twt = (TunnelWallTile) te;
 
-            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(world, twt, EnumTunnelSide.OUTSIDE);
+            Optional<BlockState> connectedState = TunnelHelper.getConnectedState(twt, EnumTunnelSide.OUTSIDE);
             if (!connectedState.isPresent())
                 return LazyOptional.empty();
 
@@ -82,7 +82,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
             DimensionalPosition dimensionalPosition = connectedPosition.get();
             // CompactMachines.LOGGER.debug(String.format("[%s] %s %s", 0, dimensionalPosition.getDimension(), dimensionalPosition.getPosition()));
 
-            Optional<ServerWorld> connectedWorld = dimensionalPosition.getWorld(world);
+            Optional<ServerWorld> connectedWorld = dimensionalPosition.getWorld(world.getServer());
             if (!connectedWorld.isPresent())
                 return LazyOptional.empty();
 

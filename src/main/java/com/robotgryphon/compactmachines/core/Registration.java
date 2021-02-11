@@ -14,7 +14,8 @@ import com.robotgryphon.compactmachines.item.ItemPersonalShrinkingDevice;
 import com.robotgryphon.compactmachines.item.TunnelItem;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.tunnels.definitions.ItemTunnelDefinition;
-import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneTunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneInTunnelDefinition;
+import com.robotgryphon.compactmachines.tunnels.definitions.RedstoneOutTunnelDefinition;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -168,9 +169,9 @@ public class Registration {
     // ================================================================================================================
     public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = TUNNEL_DEFINITIONS.register("item", ItemTunnelDefinition::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneTunnelDefinition::new);
+    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneTunnelDefinition::new);
+    public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
 
     // ================================================================================================================
     //   DIMENSION

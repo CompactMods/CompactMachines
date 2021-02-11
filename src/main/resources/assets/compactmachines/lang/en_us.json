@@ -9,6 +9,7 @@
   "tooltip.compactmachines.psd.hint": "Used as in-game documentation and to enter Compact Machines.",
   "tooltip.compactmachines.solid_wall.hint": "Warning! Unbreakable for non-creative players!",
   "tooltip.compactmachines.machine.hint": "A %1$s provides a %2$s room.",
+  "tooltip.compactmachines.tunnel_type": "Type ID: %1$s",
 
   "messages.compactmachines.psd.spawnpoint_set": "New spawn point set.",
   "messages.compactmachines.no_machine_data": "No machine data loaded; report this.",
@@ -34,9 +35,9 @@
 
   "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device",
 
-  "item.compactmachines.item_tunnel": "Item Tunnel",
-  "item.compactmachines.redstone_in_tunnel": "Redstone Tunnel (In)",
-  "item.compactmachines.redstone_out_tunnel": "Redstone Tunnel (Out)",
+  "item.compactmachines.tunnels.item": "Item Tunnel",
+  "item.compactmachines.tunnels.redstone_in": "Redstone Tunnel (In)",
+  "item.compactmachines.tunnels.redstone_out": "Redstone Tunnel (Out)",
 
   "compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work.",
 
@@ -50,5 +51,7 @@
   "compactmachines.direction.east": "East",
 
   "compactmachines.psd.pages.machines.title": "Compact Machines",
-  "compactmachines.psd.pages.machines": "Compact Machines are the core mechanic of this mod. They allow you to build large rooms in a single block space connected to the outside world. They come in various sizes ranging from 3x3x3 to 13x13x13.\n\nYou can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\nYou can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes."
+  "compactmachines.psd.pages.machines": "Compact Machines are the core mechanic of this mod. They allow you to build large rooms in a single block space connected to the outside world. They come in various sizes ranging from 3x3x3 to 13x13x13.\n\nYou can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\nYou can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes.",
+
+  "compactmachines.errors.unknown_tunnel_type": "Unknown Tunnel Type (%s)"
 }
