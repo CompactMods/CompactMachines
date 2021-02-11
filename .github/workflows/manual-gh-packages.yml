@@ -125,10 +125,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build JAR with Gradle
-        run: ./gradlew build
+      - name: Publish package
+        run: ./gradlew publish
         env:
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Add Artifact
@@ -150,13 +149,3 @@ jobs:
           name: out
           path: changelog
       - run: cat changelog/CHANGELOG.md
-
-  publishMaven:
-    name: Maven Release (GH Packages)
-    runs-on: ubuntu-20.04
-    needs: [changelog, vars, jar]
-    steps:
-      - name: Publish package
-        run: ./gradlew publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
