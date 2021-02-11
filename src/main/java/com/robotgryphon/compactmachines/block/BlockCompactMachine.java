@@ -91,11 +91,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        return 0;
-    }
-
-    @Override
     public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
 //        TODO Tile Entity
 //        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
@@ -132,8 +127,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
             return;
         }
 
-        CompactMachines.LOGGER.debug(changedBlock);
-
         // Determine whether it's an immediate neighbor; if so, execute ...
         Arrays.stream(Direction.values())
                 .filter(hd -> pos.offset(hd).equals(changedPos))
@@ -141,7 +134,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                 .ifPresent(facing -> {
                     Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(machine.machineId, serverWorld, facing);
                     for (BlockPos tunnelPos : tunnelsForMachineSide) {
-                        // TODO: Tunnel definition lookup, check for IRedstoneTunnel instances
                         TunnelWallTile tunnelTile = (TunnelWallTile) compactWorld.getTileEntity(tunnelPos);
                         if (tunnelTile == null) continue;
 
@@ -150,10 +142,9 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                         ITunnelConnectionInfo connInfo = TunnelHelper.generateConnectionInfo(tunnelTile);
 
                         tunnelTile.getTunnelDefinition().ifPresent(tunnelDefinition -> {
+                            // TODO: world notification interface for tunnels
                             if (tunnelDefinition instanceof IRedstoneReaderTunnel) {
                                 // Send redstone changes into machine
-
-
                                 IRedstoneReaderTunnel rrt = (IRedstoneReaderTunnel) tunnelDefinition;
                                 int latestPower = world.getRedstonePower(changedPos, facing);
                                 rrt.onPowerChanged(connInfo, latestPower);
@@ -161,44 +152,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                         });
                     }
                 });
-    }
-
-    @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        super.onNeighborChange(state, world, pos, neighbor);
-
-        if (world.isRemote()) {
-            return;
-        }
-
-//        TODO Tile Entity
-//        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
-//            return;
-//        }
-
-
-//        TODO Tile Entity and Server Stuff
-//        // Make sure we don't stack overflow when we get in a notifyBlockChange loop.
-//        // Just ensure only a single notification happens per tick.
-//        TileEntityMachine te = (TileEntityMachine) world.getTileEntity(pos);
-//        if(te.isInsideItself() || te.alreadyNotifiedOnTick) {
-//            return;
-//        }
-//
-//        ServerWorld machineWorld = DimensionTools.getServerMachineWorld();
-//        BlockPos neighborPos = te.getConnectedBlockPosition(facing);
-//        if(neighborPos != null && machineWorld.getTileEntity(neighborPos) instanceof TileEntityTunnel) {
-//            machineWorld.notifyNeighborsOfStateChange(neighborPos, Blockss.tunnel, false);
-//            te.alreadyNotifiedOnTick = true;
-//        }
-//
-//        RedstoneTunnelData tunnelData = te.getRedstoneTunnelForSide(facing);
-//        if(tunnelData != null && !tunnelData.isOutput) {
-//            BlockPos redstoneNeighborPos = tunnelData.pos;
-//            if(redstoneNeighborPos != null && machineWorld.getTileEntity(redstoneNeighborPos) instanceof TileEntityRedstoneTunnel) {
-//                machineWorld.notifyNeighborsOfStateChange(redstoneNeighborPos, Blockss.redstoneTunnel, false);
-//            }
-//        }
     }
 
     @Override

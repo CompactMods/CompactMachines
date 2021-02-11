@@ -171,7 +171,7 @@ public class Registration {
 
     public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
+    // public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
 
     // ================================================================================================================
     //   DIMENSION

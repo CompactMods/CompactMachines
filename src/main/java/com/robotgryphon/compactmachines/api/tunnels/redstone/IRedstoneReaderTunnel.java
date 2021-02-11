@@ -12,9 +12,15 @@ import net.minecraft.world.IBlockReader;
  */
 public interface IRedstoneReaderTunnel extends IRedstoneTunnel {
 
-    int getStrongPower(ITunnelConnectionInfo connectionInfo);
-
-    int getWeakPower(ITunnelConnectionInfo connectionInfo);
+    /**
+     * Gets the weak (passive) power level from the outside of the machine.
+     *
+     * @param connectionInfo
+     * @return
+     */
+    default int getPowerLevel(ITunnelConnectionInfo connectionInfo) {
+        return 0;
+    }
 
     /**
      * Called by the tunnel wall blocks to check if a redstone signal can be pulled
@@ -28,5 +34,5 @@ public interface IRedstoneReaderTunnel extends IRedstoneTunnel {
         return true;
     }
 
-    void onPowerChanged(ITunnelConnectionInfo connectionInfo, int latestPower);
+    default void onPowerChanged(ITunnelConnectionInfo connectionInfo, int latestPower) {}
 }

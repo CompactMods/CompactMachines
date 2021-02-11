@@ -87,7 +87,7 @@ public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
         TunnelDefinition definition = tunnelInfo.get();
         if (definition instanceof IRedstoneReaderTunnel) {
             ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
-            int weak = ((IRedstoneReaderTunnel) definition).getWeakPower(conn);
+            int weak = ((IRedstoneReaderTunnel) definition).getPowerLevel(conn);
             return weak;
         }
 

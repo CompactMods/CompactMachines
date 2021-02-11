@@ -34,22 +34,7 @@ public class RedstoneInTunnelDefinition extends TunnelDefinition implements IRed
     }
 
     @Override
-    public boolean canConnectRedstone(ITunnelConnectionInfo connectionInfo) {
-        return true;
-    }
-
-    @Override
-    public void onPowerChanged(ITunnelConnectionInfo connectionInfo, int latestPower) {
-        CompactMachines.LOGGER.debug("Got power change: {}", latestPower);
-    }
-
-    @Override
-    public int getStrongPower(ITunnelConnectionInfo connectionInfo) {
-        return 0;
-    }
-
-    @Override
-    public int getWeakPower(ITunnelConnectionInfo connectionInfo) {
+    public int getPowerLevel(ITunnelConnectionInfo connectionInfo) {
         IWorldReader connectedWorld = connectionInfo.getConnectedWorld(EnumTunnelSide.OUTSIDE).orElse(null);
         if (connectedWorld instanceof ServerWorld) {
             DimensionalPosition pos = connectionInfo.getConnectedPosition(EnumTunnelSide.OUTSIDE).orElse(null);
