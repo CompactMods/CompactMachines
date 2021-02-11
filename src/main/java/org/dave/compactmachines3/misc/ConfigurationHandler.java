@@ -206,6 +206,18 @@ public class ConfigurationHandler {
                 langKeyPrefix + "spawnRate"
         );
 
+        MachineSettings.waitTime = configuration.getInt(
+                "waitTime",
+                CATEGORY_MACHINES,
+                5,
+                0,
+                Integer.MAX_VALUE,
+                "How long players must wait in seconds after exiting a machine before they can enter the same machine again.\n" +
+                        "A higher value means players cannot spam entering and exiting the same machine.\n" +
+                        "Set to 0 to disable.",
+                langKeyPrefix + "waitTime"
+        );
+
         // Miniaturization Category
         Settings.maximumCraftingAreaSize = configuration.getInt(
                 "maximumCraftingAreaSize",
@@ -289,6 +301,7 @@ public class ConfigurationHandler {
         public static boolean allowPickupEmptyMachines;
         public static int autoUpdateRate;
         public static boolean allowUnsafeTeleport;
+        public static int waitTime;
     }
 
     public static class Settings {

@@ -28,8 +28,29 @@ import org.dave.compactmachines3.utility.DimensionBlockPos;
 import org.dave.compactmachines3.world.TeleporterMachines;
 import org.dave.compactmachines3.world.WorldSavedDataMachines;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class TeleportationTools {
-    public static boolean tryToEnterMachine(EntityPlayer player, TileEntityMachine machine) {
+    private static final Map<UUID, ExitData> machineExitData = new HashMap<>();
+
+    public static boolean tryToEnterMachine(EntityPlayerMP player, TileEntityMachine machine) {
+        if (machineExitData.containsKey(player.getUniqueID())) {
+            ExitData exitData = machineExitData.get(player.getUniqueID());
+            if (exitData.machineId == machine.id) {
+                WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+                int waitTimeSeconds = ConfigurationHandler.MachineSettings.waitTime;
+
+                if (machineWorld.getTotalWorldTime() - exitData.exitTimestamp <= (waitTimeSeconds * 20L)) {
+                    ITextComponent message = new TextComponentTranslation("hint.compactmachines3.entered_too_soon", waitTimeSeconds, waitTimeSeconds == 1 ? "" : "s");
+                    message.getStyle().setColor(TextFormatting.RED);
+                    player.sendStatusMessage(message, true);
+                    return false;
+                }
+            }
+        }
+
         BlockPos pos = machine.getPos();
         World world = machine.getWorld();
 
@@ -73,7 +94,8 @@ public class TeleportationTools {
             }
         }
 
-        TeleportationTools.teleportPlayerToMachine((EntityPlayerMP) player, machine.id, false, safe);
+        machineExitData.remove(player.getUniqueID()); // Remove old exit data
+        TeleportationTools.teleportPlayerToMachine(player, machine.id, false, safe);
         if (safe != null) {
             ITextComponent message = new TextComponentTranslation("hint.compactmachines3.used_safe_spawnpoint")
                     .setStyle(new Style().setColor(TextFormatting.GREEN));
@@ -329,8 +351,9 @@ public class TeleportationTools {
             return;
         }
 
-        // Remove the last tag, but not before getting the pos we teleported into the machine with, THEN teleport to the new last
-        Vec3d2f pos = Vec3d2f.fromTag(idHistory.getCompoundTagAt(idHistory.tagCount() - 1).getCompoundTag("pos"));
+        // Remove the last tag (our entered data), but not before storing it and getting the pos we teleported into the machine with, THEN teleport to the new last
+        NBTTagCompound enteredTag = idHistory.getCompoundTagAt(idHistory.tagCount() - 1);
+        Vec3d2f pos = Vec3d2f.fromTag(enteredTag.getCompoundTag("pos"));
         idHistory.removeTag(idHistory.tagCount() - 1);
 
         // No id history -> Back to the overworld
@@ -341,10 +364,22 @@ public class TeleportationTools {
 
         NBTTagCompound lastTag = idHistory.getCompoundTagAt(idHistory.tagCount() - 1);
         int id = lastTag.hasKey("id", 3) ? lastTag.getInteger("id") : /* Legacy */ lastTag.getInteger("coords");
+        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
+        machineExitData.put(player.getUniqueID(), new ExitData(enteredTag.getInteger("id"), machineWorld.getTotalWorldTime()));
         if (pos == null) {
             teleportPlayerToMachine(player, id, true, null);
         } else {
             pos.setPlayerLocation(player);
+        }
+    }
+
+    private static final class ExitData {
+        private final int machineId;
+        private final long exitTimestamp;
+
+        private ExitData(int machineId, long exitTimestamp) {
+            this.machineId = machineId;
+            this.exitTimestamp = exitTimestamp;
         }
     }
 }

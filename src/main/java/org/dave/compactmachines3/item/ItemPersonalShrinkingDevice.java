@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -30,8 +29,6 @@ import java.util.List;
 
 public class ItemPersonalShrinkingDevice extends ItemBase {
     public ItemPersonalShrinkingDevice() {
-        super();
-
         this.setCreativeTab(CompactMachines3.CREATIVE_TAB);
         this.setMaxStackSize(1);
     }
@@ -57,12 +54,12 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if(hand == EnumHand.OFF_HAND) {
-            return new ActionResult(EnumActionResult.FAIL, stack);
+            return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
 
         if(world.provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
             player.openGui(CompactMachines3.instance, GuiIds.PSD_GUIDE.ordinal(), world, (int) player.posX, (int) player.posY, (int) player.posZ);
-            return new ActionResult(EnumActionResult.SUCCESS, stack);
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
 
         if(!world.isRemote && player instanceof EntityPlayerMP) {
@@ -81,9 +78,6 @@ public class ItemPersonalShrinkingDevice extends ItemBase {
             }
         }
 
-        return new ActionResult(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
-
-
-
 }

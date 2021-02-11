@@ -36,6 +36,7 @@ hint.compactmachines3.reset_spawnpoint=Spawnpoint reset to %d, %d, %d.
 hint.compactmachines3.used_safe_spawnpoint=The room's spawnpoint was obstructed, so you were teleported to a fallback location.
 hint.compactmachines3.illegal_exit=You tried to escape from the machine!
 hint.compactmachines3.illegal_teleport=You entered a machine without use of a Personal Shrinking Device!
+hint.compactmachines3.entered_too_soon=You must wait at least %s second%s between exiting a machine and entering again!
 
 hint.compactmachines3.skyworld.no_block_breaking=You can not break any blocks in the Compact Hub!
 hint.compactmachines3.skyworld.no_block_placing=You can not place any blocks in the Compact Hub!
@@ -91,6 +92,8 @@ compactmachines3.config.keepPlayersInside=Keep Players Inside Machine
 compactmachines3.config.keepPlayersInside.tooltip=Block players from leaving the confines of the box of the Compact Machine they should currently be in, only applies to players not in creative/spectator.
 compactmachines3.config.spawnRate=Entity Spawn Rate
 compactmachines3.config.spawnRate.tooltip=How often to try spawning entities inside of machines in ticks.
+compactmachines3.config.waitTime=Machine Enter Wait Time
+compactmachines3.config.waitTime.tooltip=How long players must wait in seconds after exiting a machine before they can enter the same machine again.\nA higher value means players cannot spam entering and exiting the same machine.\nSet to 0 to disable.
 
 # Miniaturization Category
 compactmachines3.config.maximumCraftingAreaSize=Maximum Crafting Area Size
