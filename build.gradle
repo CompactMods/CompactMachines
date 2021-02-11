@@ -26,7 +26,7 @@ archivesBaseName = mod_id
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
-    main{
+    main {
         resources {
             srcDir 'src/generated/resources'
         }
@@ -208,14 +208,16 @@ artifacts {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
             artifact jar
+            artifact apiJar
         }
     }
     repositories {
+        // GitHub Packages
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/robotgryphon/compact-machines"
+            url = "https://maven.pkg.github.com/compactmods/compactmachines"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
