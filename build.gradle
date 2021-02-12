@@ -175,6 +175,8 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    destinationDir = file("$rootDir/build-out")
+    finalizedBy('reobfJar')
     manifest {
         attributes([
                 "Specification-Title"     : "compactmachines",
@@ -186,11 +188,6 @@ jar {
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-}
-
-jar {
-    destinationDir = file("$rootDir/build-out")
-    finalizedBy('reobfJar')
 }
 
 task apiJar(type: Jar) {
@@ -209,10 +206,16 @@ artifacts {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact jar
-            artifact apiJar
+            artifactId = mod_id
+            artifacts {
+                artifact jar
+                artifact(apiJar) {
+                    classifier = "api"
+                }
+            }
         }
     }
+
     repositories {
         // GitHub Packages
         maven {
