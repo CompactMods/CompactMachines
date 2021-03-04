@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class TunnelWallBlock extends WallBlock implements IProbeDataProvider {
+public class TunnelWallBlock extends Block implements IProbeDataProvider {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
     public static DirectionProperty CONNECTED_SIDE = DirectionProperty.create("connected_side", Direction.values());
 
