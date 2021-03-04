@@ -16,7 +16,6 @@ license="All rights reserved"
     modId="compactmachines"
     version="${file.jarVersion}"
     displayName="Compact Machines 4"
-    credits="Thanks for this example mod goes to Java" #optional
     authors="Davenonymous, RobotGryphon" #optional
     description="It's all so tiny!"
 
