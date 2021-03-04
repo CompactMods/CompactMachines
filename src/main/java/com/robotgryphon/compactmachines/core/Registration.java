@@ -63,7 +63,6 @@ public class Registration {
     private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
             .create(Material.IRON)
             .hardnessAndResistance(8.0F, 20.0F)
-            .setLightLevel((state) -> 3)
             .harvestLevel(1)
             .harvestTool(ToolType.PICKAXE)
             .setRequiresTool();
