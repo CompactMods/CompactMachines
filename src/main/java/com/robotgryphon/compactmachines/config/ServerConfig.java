@@ -14,6 +14,8 @@ public class ServerConfig {
     public static ForgeConfigSpec.EnumValue<EnumMachinePlayersBreakHandling> MACHINE_PLAYER_BREAK_HANDLING;
     public static ForgeConfigSpec.BooleanValue MACHINE_CHUNKLOADING;
 
+    public static ForgeConfigSpec.IntValue MACHINE_FLOOR_Y;
+
     static {
         generateConfig();
     }
@@ -42,6 +44,10 @@ public class ServerConfig {
         MACHINE_CHUNKLOADING = builder
                 .comment("Allow machines to chunkload their insides when the machines are loaded.")
                 .define("chunkloading", true);
+
+        MACHINE_FLOOR_Y = builder
+                .comment("The Y-level to spawn machine floors at.")
+                .defineInRange("floor", 40, 10, 200);
 
         builder.pop();
 

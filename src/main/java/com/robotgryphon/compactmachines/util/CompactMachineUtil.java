@@ -2,6 +2,7 @@ package com.robotgryphon.compactmachines.util;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
+import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.CompactMachineServerData;
 import com.robotgryphon.compactmachines.data.SavedMachineData;
@@ -57,10 +58,7 @@ public abstract class CompactMachineUtil {
             if (tile.machineId == -1) {
                 int nextID = serverData.getNextMachineId();
 
-                BlockPos center = getCenterOfMachineById(nextID);
-
-                // Bump the center up a bit so the floor is Y = 60
-                center = center.offset(Direction.UP, size.getInternalSize() / 2);
+                BlockPos center = getCenterForNewMachine(nextID, size);
 
                 CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
 
@@ -72,7 +70,7 @@ public abstract class CompactMachineUtil {
                 machineData.markDirty();
 
                 BlockPos.Mutable spawn = center.toMutable();
-                spawn.setY(62);
+                spawn.setY(ServerConfig.MACHINE_FLOOR_Y.get());
 
                 spawnPoint = spawn.toImmutable();
             } else {
@@ -89,10 +87,10 @@ public abstract class CompactMachineUtil {
                 }
 
                 CompactMachineRegistrationData data = info.get();
-                BlockPos.Mutable center = data.getCenter().toMutable();
-                center.setY(62);
+                BlockPos.Mutable spawn = data.getCenter().toMutable();
+                spawn.setY(spawn.getY() - (size.getInternalSize() / 2));
 
-                spawnPoint = data.getSpawnPoint().orElse(center);
+                spawnPoint = data.getSpawnPoint().orElse(spawn);
             }
 
             try {
@@ -170,9 +168,10 @@ public abstract class CompactMachineUtil {
         return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
     }
 
-    public static BlockPos getCenterOfMachineById(int id) {
+    public static BlockPos getCenterForNewMachine(int id, EnumMachineSize size) {
         Vector3i location = MathUtil.getRegionPositionByIndex(id);
-        return new BlockPos((location.getX() * 1024) + 8, 60, (location.getZ() * 1024) + 8);
+        int centerY = ServerConfig.MACHINE_FLOOR_Y.get() + (size.getInternalSize() / 2);
+        return new BlockPos((location.getX() * 1024) + 8, centerY, (location.getZ() * 1024) + 8);
     }
 
     public static void setMachineSpawn(MinecraftServer server, BlockPos position) {
