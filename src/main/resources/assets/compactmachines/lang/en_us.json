@@ -24,7 +24,7 @@
 
   "block.compactmachines.solid_wall": "Solid Compact Machine Wall",
   "block.compactmachines.wall": "Compact Machine Wall",
-  "block.compactmachines.tunnel_wall": "Tunnel",
+  "block.compactmachines.tunnel_wall": "Solid Compact Machine Wall (with Tunnel)",
 
   "item.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "item.compactmachines.machine_small": "Compact Machine (Small)",
