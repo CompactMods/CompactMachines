@@ -123,15 +123,11 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
-      
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
-      - name: Gradle Dependencies
-        run: ./gradlew --refresh-dependencies
-        
       - name: Build JAR with Gradle
-        run: ./gradlew build
+        uses: eskatos/gradle-command-action@v1
+        with:
+            arguments: build
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -216,10 +212,10 @@ jobs:
         with:
           java-version: "8.0.282"
 
-      - name: Gradle Dependencies
-        run: ./gradlew --refresh-dependencies
-
-      - name: Publish package
-        run: ./gradlew publish
+      - name: Build JAR with Gradle
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
         env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

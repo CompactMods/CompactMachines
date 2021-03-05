@@ -126,8 +126,9 @@ jobs:
         run: ./gradlew --refresh-dependencies
 
       - name: Build JAR with Gradle
-        run: ./gradlew build
-#        run: ./gradlew publish
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

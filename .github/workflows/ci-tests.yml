@@ -49,15 +49,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
       
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Gradle Dependencies
-        run: ./gradlew --refresh-dependencies
-
-      - name: Test JAR with Gradle
-        run: ./gradlew test
-#        run: ./gradlew publish
+      - name: Build JAR with Gradle
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: test
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
