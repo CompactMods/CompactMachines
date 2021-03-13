@@ -33,7 +33,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
         if (cap != CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return LazyOptional.empty();
 
-        TileEntity te = compactWorld.getTileEntity(tunnelPos);
+        TileEntity te = compactWorld.getBlockEntity(tunnelPos);
         if (te instanceof TunnelWallTile) {
             TunnelWallTile twt = (TunnelWallTile) te;
 
@@ -49,7 +49,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
 
             DimensionalPosition connectedInsidePos = tunnelConnectedPosition.get();
             if (connectedState.get().hasTileEntity()) {
-                TileEntity connectedTile = compactWorld.getTileEntity(connectedInsidePos.getBlockPosition());
+                TileEntity connectedTile = compactWorld.getBlockEntity(connectedInsidePos.getBlockPosition());
                 if (connectedTile != null) {
                     return connectedTile.getCapability(cap, tunnelSide);
                 }
@@ -62,7 +62,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
     @Nonnull
     @Override
     public <T> LazyOptional<T> getExternalCapability(ServerWorld world, BlockPos tunnelPos, @Nonnull Capability<T> cap, @Nullable Direction side) {
-        TileEntity te = world.getTileEntity(tunnelPos);
+        TileEntity te = world.getBlockEntity(tunnelPos);
 
         if (cap != CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return LazyOptional.empty();
@@ -90,7 +90,7 @@ public class ItemTunnelDefinition extends TunnelDefinition implements IItemTunne
 
             BlockPos connectedPos = dimensionalPosition.getBlockPosition();
             if (connectedState.get().hasTileEntity()) {
-                TileEntity connectedTile = csw.getTileEntity(connectedPos);
+                TileEntity connectedTile = csw.getBlockEntity(connectedPos);
                 if (connectedTile != null)
                     return connectedTile.getCapability(cap, twt.getTunnelSide().getOpposite());
             }

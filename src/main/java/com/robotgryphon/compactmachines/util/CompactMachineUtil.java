@@ -28,28 +28,28 @@ import java.util.Optional;
 public abstract class CompactMachineUtil {
 
     public static void teleportInto(ServerPlayerEntity serverPlayer, BlockPos machinePos, EnumMachineSize size) {
-        ServerWorld serverWorld = serverPlayer.getServerWorld();
+        ServerWorld serverWorld = serverPlayer.getLevel();
 
         MinecraftServer serv = serverWorld.getServer();
-        if (serverWorld.getDimensionKey() == Registration.COMPACT_DIMENSION) {
+        if (serverWorld.dimension() == Registration.COMPACT_DIMENSION) {
             IFormattableTextComponent msg = new TranslationTextComponent(CompactMachines.MOD_ID + ".cannot_enter")
-                    .mergeStyle(TextFormatting.RED);
+                    .withStyle(TextFormatting.RED);
 
-            serverPlayer.sendStatusMessage(msg, true);
+            serverPlayer.displayClientMessage(msg, true);
             return;
         }
 
-        ServerWorld compactWorld = serv.getWorld(Registration.COMPACT_DIMENSION);
+        ServerWorld compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.warn("Compact dimension not found; player attempted to enter machine.");
             return;
         }
 
-        CompactMachineTile tile = (CompactMachineTile) serverWorld.getTileEntity(machinePos);
+        CompactMachineTile tile = (CompactMachineTile) serverWorld.getBlockEntity(machinePos);
         if (tile == null)
             return;
 
-        serv.deferTask(() -> {
+        serv.submitAsync(() -> {
             BlockPos spawnPoint;
 
             SavedMachineData machineData = SavedMachineData.getInstance(serv);
@@ -63,31 +63,31 @@ public abstract class CompactMachineUtil {
                 CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
 
                 tile.setMachineId(nextID);
-                CompactMachineRegistrationData regData = new CompactMachineRegistrationData(nextID, center, serverPlayer.getUniqueID(), size);
+                CompactMachineRegistrationData regData = new CompactMachineRegistrationData(nextID, center, serverPlayer.getUUID(), size);
                 regData.setWorldPosition(serverWorld, machinePos);
 
                 serverData.registerMachine(nextID, regData);
-                machineData.markDirty();
+                machineData.setDirty();
 
-                BlockPos.Mutable spawn = center.toMutable();
+                BlockPos.Mutable spawn = center.mutable();
                 spawn.setY(ServerConfig.MACHINE_FLOOR_Y.get());
 
-                spawnPoint = spawn.toImmutable();
+                spawnPoint = spawn.immutable();
             } else {
                 Optional<CompactMachineRegistrationData> info = serverData.getMachineData(tile.machineId);
 
                 // We have no machine info here?
                 if (!info.isPresent()) {
                     IFormattableTextComponent text = new TranslationTextComponent("messages.compactmachines.no_machine_data")
-                            .mergeStyle(TextFormatting.RED)
-                            .mergeStyle(TextFormatting.BOLD);
+                            .withStyle(TextFormatting.RED)
+                            .withStyle(TextFormatting.BOLD);
 
-                    serverPlayer.sendStatusMessage(text, true);
+                    serverPlayer.displayClientMessage(text, true);
                     return;
                 }
 
                 CompactMachineRegistrationData data = info.get();
-                BlockPos.Mutable spawn = data.getCenter().toMutable();
+                BlockPos.Mutable spawn = data.getCenter().mutable();
                 spawn.setY(spawn.getY() - (size.getInternalSize() / 2));
 
                 spawnPoint = data.getSpawnPoint().orElse(spawn);
@@ -100,7 +100,7 @@ public abstract class CompactMachineUtil {
                 CompactMachines.LOGGER.error(ex);
             }
 
-            serverPlayer.teleport(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+            serverPlayer.teleportTo(compactWorld, spawnPoint.getX() + 0.5, spawnPoint.getY(), spawnPoint.getZ() + 0.5, serverPlayer.yRot, serverPlayer.xRot);
         });
     }
 
@@ -182,7 +182,7 @@ public abstract class CompactMachineUtil {
         compactMachineData.ifPresent(d -> {
             d.setSpawnPoint(position);
             serverData.updateMachineData(d);
-            machineData.markDirty();
+            machineData.setDirty();
         });
     }
 
@@ -227,7 +227,7 @@ public abstract class CompactMachineUtil {
 
             // Write changes to disk
             serverData.updateMachineData(data);
-            machineData.markDirty();
+            machineData.setDirty();
         });
     }
 }

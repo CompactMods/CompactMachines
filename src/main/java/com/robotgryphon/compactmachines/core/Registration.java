@@ -60,15 +60,15 @@ public class Registration {
     // ================================================================================================================
     //   PROPERTIES
     // ================================================================================================================
-    private static Block.Properties MACHINE_BLOCK_PROPS = Block.Properties
-            .create(Material.IRON)
-            .hardnessAndResistance(8.0F, 20.0F)
+    private static AbstractBlock.Properties MACHINE_BLOCK_PROPS = AbstractBlock.Properties
+            .of(Material.METAL)
+            .strength(8.0F, 20.0F)
             .harvestLevel(1)
             .harvestTool(ToolType.PICKAXE)
-            .setRequiresTool();
+            .requiresCorrectToolForDrops();
 
     private static Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
-            .group(CompactMachines.COMPACT_MACHINES_ITEMS);
+            .tab(CompactMachines.COMPACT_MACHINES_ITEMS);
 
     // ================================================================================================================
     //   COMPACT MACHINE BLOCKS
@@ -110,7 +110,7 @@ public class Registration {
             () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), EnumMachineSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<TileEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
-            TileEntityType.Builder.create(CompactMachineTile::new,
+            TileEntityType.Builder.of(CompactMachineTile::new,
                     MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
                     MACHINE_BLOCK_LARGE.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
                     .build(null));
@@ -120,31 +120,31 @@ public class Registration {
     // ================================================================================================================
     public static final RegistryObject<Block> BLOCK_TUNNEL_WALL = BLOCKS.register("tunnel_wall", () ->
             new TunnelWallBlock(AbstractBlock.Properties
-                    .create(Material.IRON, MaterialColor.CLAY)
-                    .hardnessAndResistance(-1.0F, 3600000.8F)
+                    .of(Material.METAL, MaterialColor.CLAY)
+                    .strength(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
-                    .setLightLevel((state) -> 15)
+                    .lightLevel((state) -> 15)
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_SOLID_WALL = BLOCKS.register("solid_wall", () ->
             new SolidWallBlock(AbstractBlock.Properties
-                    .create(Material.IRON, MaterialColor.CLAY)
-                    .hardnessAndResistance(-1.0F, 3600000.8F)
+                    .of(Material.METAL, MaterialColor.CLAY)
+                    .strength(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
-                    .setLightLevel((state) -> 15)
+                    .lightLevel((state) -> 15)
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall", () ->
-            new BreakableWallBlock(Block.Properties
-                    .create(Material.IRON)
-                    .hardnessAndResistance(3.0f, 128.0f)
-                    .setRequiresTool()
+            new BreakableWallBlock(AbstractBlock.Properties
+                    .of(Material.METAL)
+                    .strength(3.0f, 128.0f)
+                    .requiresCorrectToolForDrops()
                     .harvestTool(ToolType.PICKAXE)
                     .harvestLevel(1)));
 
     public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
             () -> new ItemPersonalShrinkingDevice(BASIC_ITEM_PROPS.get()
-                    .maxStackSize(1)));
+                    .stacksTo(1)));
 
     public static final RegistryObject<Item> ITEM_SOLID_WALL = ITEMS.register("solid_wall", () ->
             new ItemBlockWall(BLOCK_SOLID_WALL.get(), BASIC_ITEM_PROPS.get()));
@@ -160,7 +160,7 @@ public class Registration {
             new TunnelItem(BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<TileEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = TILES_ENTITIES.register("tunnel_wall", () ->
-            TileEntityType.Builder.create(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
+            TileEntityType.Builder.of(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
                     .build(null));
 
     // ================================================================================================================
@@ -175,7 +175,7 @@ public class Registration {
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation("compactmachines:compact_world"));
+    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("compactmachines:compact_world"));
 
     // ================================================================================================================
     //   INITIALIZATION

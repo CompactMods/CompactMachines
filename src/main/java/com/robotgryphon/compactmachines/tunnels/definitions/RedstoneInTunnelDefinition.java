@@ -44,7 +44,7 @@ public class RedstoneInTunnelDefinition extends TunnelDefinition implements IRed
             Optional<BlockState> state = connectionInfo.getConnectedState(EnumTunnelSide.OUTSIDE);
             if (!state.isPresent()) return 0;
 
-            int weak = state.get().getWeakPower(
+            int weak = state.get().getSignal(
                     connectedWorld,
                     pos.getBlockPosition(),
                     connectionInfo.getConnectedSide(EnumTunnelSide.OUTSIDE));

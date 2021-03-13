@@ -31,13 +31,15 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+import net.minecraft.item.Item.Properties;
+
 public class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ITextComponent getDisplayName(ItemStack stack) {
+    public ITextComponent getName(ItemStack stack) {
         String key = getDefinition(stack)
                 .map(def -> {
                     ResourceLocation id = def.getRegistryName();
@@ -49,12 +51,12 @@ public class TunnelItem extends Item {
     }
 
     @Override
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         getDefinition(stack).ifPresent(tunnelDef -> {
             if (Screen.hasShiftDown()) {
                 IFormattableTextComponent type = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".tunnel_type", tunnelDef.getRegistryName())
-                        .mergeStyle(TextFormatting.GRAY)
-                        .mergeStyle(TextFormatting.ITALIC);
+                        .withStyle(TextFormatting.GRAY)
+                        .withStyle(TextFormatting.ITALIC);
 
                 tooltip.add(type);
             }
@@ -62,12 +64,12 @@ public class TunnelItem extends Item {
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        if (this.isInGroup(group)) {
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        if (this.allowdedIn(group)) {
             IForgeRegistry<TunnelDefinition> definitions = GameRegistry.findRegistry(TunnelDefinition.class);
             definitions.getValues().forEach(def -> {
                 ItemStack withDef = new ItemStack(this, 1);
-                CompoundNBT defTag = withDef.getOrCreateChildTag("definition");
+                CompoundNBT defTag = withDef.getOrCreateTagElement("definition");
                 defTag.putString("id", def.getRegistryName().toString());
 
                 items.add(withDef);
@@ -76,7 +78,7 @@ public class TunnelItem extends Item {
     }
 
     public static Optional<TunnelDefinition> getDefinition(ItemStack stack) {
-        CompoundNBT defTag = stack.getOrCreateChildTag("definition");
+        CompoundNBT defTag = stack.getOrCreateTagElement("definition");
         if (defTag.isEmpty() || !defTag.contains("id"))
             return Optional.empty();
 
@@ -90,38 +92,38 @@ public class TunnelItem extends Item {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        World w = context.getWorld();
-        if (w.isRemote())
+    public ActionResultType useOn(ItemUseContext context) {
+        World w = context.getLevel();
+        if (w.isClientSide())
             return ActionResultType.SUCCESS;
 
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getClickedPos();
         BlockState blockState = w.getBlockState(pos);
 
         if (blockState.getBlock() != Registration.BLOCK_SOLID_WALL.get())
             return ActionResultType.FAIL;
 
         if (context.getPlayer() instanceof ServerPlayerEntity) {
-            ItemStack is = context.getItem();
+            ItemStack is = context.getItemInHand();
             Item i = is.getItem();
 
             TunnelItem ti = ((TunnelItem) i);
-            Optional<TunnelDefinition> definition = ti.getDefinition(context.getItem());
+            Optional<TunnelDefinition> definition = ti.getDefinition(context.getItemInHand());
 
             definition.ifPresent(def -> {
                 BlockState tunnelState = Registration.BLOCK_TUNNEL_WALL.get()
-                        .getDefaultState()
-                        .with(TunnelWallBlock.TUNNEL_SIDE, context.getFace());
+                        .defaultBlockState()
+                        .setValue(TunnelWallBlock.TUNNEL_SIDE, context.getClickedFace());
 
                 // Redstone Support
                 boolean redstone = (def instanceof IRedstoneReaderTunnel);
-                tunnelState = tunnelState.with(TunnelWallBlock.REDSTONE, redstone);
-                w.setBlockState(pos, tunnelState, 3);
+                tunnelState = tunnelState.setValue(TunnelWallBlock.REDSTONE, redstone);
+                w.setBlock(pos, tunnelState, 3);
 
                 // Get the server and add a deferred task - allows the tile to be created on the client first
-                MinecraftServer server = ((ServerWorld) context.getWorld()).getServer();
-                server.deferTask(() -> {
-                    TunnelWallTile tile = (TunnelWallTile) context.getWorld().getTileEntity(context.getPos());
+                MinecraftServer server = ((ServerWorld) context.getLevel()).getServer();
+                server.submitAsync(() -> {
+                    TunnelWallTile tile = (TunnelWallTile) context.getLevel().getBlockEntity(context.getClickedPos());
                     tile.setTunnelType(def.getRegistryName());
                 });
 
@@ -144,22 +146,22 @@ public class TunnelItem extends Item {
      */
     protected ActionResult<ItemStack> swapTunnelType(Item type, PlayerEntity player, Hand hand) {
         if (player instanceof ServerPlayerEntity) {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-                ItemStack stack = serverPlayer.getHeldItem(hand);
+                ItemStack stack = serverPlayer.getItemInHand(hand);
                 ItemStack newStack = new ItemStack(type, stack.getCount());
 
-                serverPlayer.setHeldItem(hand, newStack);
+                serverPlayer.setItemInHand(hand, newStack);
 
                 IFormattableTextComponent msg = new StringTextComponent("switch state")
-                        .mergeStyle(TextFormatting.GOLD);
+                        .withStyle(TextFormatting.GOLD);
 
-                serverPlayer.sendStatusMessage(msg, true);
-                return ActionResult.resultConsume(newStack);
+                serverPlayer.displayClientMessage(msg, true);
+                return ActionResult.consume(newStack);
             }
         }
 
-        return ActionResult.resultPass(player.getHeldItem(hand));
+        return ActionResult.pass(player.getItemInHand(hand));
     }
 
 

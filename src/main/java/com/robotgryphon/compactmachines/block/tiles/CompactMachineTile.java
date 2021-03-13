@@ -54,8 +54,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void validate() {
-        super.validate();
+    public void clearRemoved() {
+        super.clearRemoved();
 
         if (ServerConfig.MACHINE_CHUNKLOADING.get())
             doChunkload(true);
@@ -70,21 +70,21 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void setRemoved() {
+        super.setRemoved();
 
         if (ServerConfig.MACHINE_CHUNKLOADING.get())
             doChunkload(false);
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundNBT nbt) {
+        super.load(state, nbt);
 
         machineId = nbt.getInt("coords");
         // TODO customName = nbt.getString("CustomName");
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-            owner = nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT);
+            owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
         } else {
             owner = null;
         }
@@ -105,19 +105,19 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         playerWhiteList = new HashSet<>();
         if (nbt.contains("playerWhiteList")) {
             ListNBT list = nbt.getList("playerWhiteList", Constants.NBT.TAG_STRING);
-            list.forEach(nametag -> playerWhiteList.add(nametag.getString()));
+            list.forEach(nametag -> playerWhiteList.add(nametag.getAsString()));
         }
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT nbt) {
-        nbt = super.write(nbt);
+    public CompoundNBT save(CompoundNBT nbt) {
+        nbt = super.save(nbt);
 
         nbt.putInt("coords", machineId);
         // nbt.putString("CustomName", customName.getString());
 
         if (owner != null) {
-            nbt.putUniqueId(Reference.CompactMachines.OWNER_NBT, this.owner);
+            nbt.putUUID(Reference.CompactMachines.OWNER_NBT, this.owner);
         }
 
         nbt.putLong("spawntick", nextSpawnTick);
@@ -143,11 +143,11 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (world.isRemote())
+        if (level.isClientSide())
             return super.getCapability(cap, side);
 
-        ServerWorld serverWorld = (ServerWorld) world;
-        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registration.COMPACT_DIMENSION);
+        ServerWorld serverWorld = (ServerWorld) level;
+        ServerWorld compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
             return LazyOptional.empty();
 
@@ -156,7 +156,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
             return LazyOptional.empty();
 
         for (BlockPos possibleTunnel : tunnelPositions) {
-            TunnelWallTile tile = (TunnelWallTile) compactWorld.getTileEntity(possibleTunnel);
+            TunnelWallTile tile = (TunnelWallTile) compactWorld.getBlockEntity(possibleTunnel);
             if (tile == null)
                 continue;
 
@@ -178,7 +178,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(pos, 1, getUpdateTag());
+        return new SUpdateTileEntityPacket(worldPosition, 1, getUpdateTag());
     }
 
     @Override
@@ -186,10 +186,10 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         CompoundNBT base = super.getUpdateTag();
         base.putInt("machine", this.machineId);
 
-        if (world instanceof ServerWorld) {
+        if (level instanceof ServerWorld) {
             Optional<CompactMachinePlayerData> playerData = Optional.empty();
             try {
-                SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
+                SavedMachineData machineData = SavedMachineData.getInstance(level.getServer());
                 playerData = machineData.getData().getPlayerData(machineId);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -201,7 +201,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
             });
 
             if (this.owner != null)
-                base.putUniqueId("owner", this.owner);
+                base.putUUID("owner", this.owner);
         }
 
         return base;
@@ -219,17 +219,17 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         }
 
         if (tag.contains("owner"))
-            owner = tag.getUniqueId("owner");
+            owner = tag.getUUID("owner");
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
         BlockState state = null;
-        if (this.world != null) {
-            state = this.world.getBlockState(pos);
+        if (this.level != null) {
+            state = this.level.getBlockState(worldPosition);
         }
 
-        read(state, pkt.getNbtCompound());
+        load(state, pkt.getTag());
     }
 
     @Override
@@ -247,15 +247,15 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
     public void setMachineId(int id) {
         this.machineId = id;
-        this.markDirty();
+        this.setChanged();
     }
 
     public Optional<CompactMachineRegistrationData> getMachineData() {
         if (this.machineId == 0)
             return Optional.empty();
 
-        if (world instanceof ServerWorld) {
-            return Optional.ofNullable(world.getServer())
+        if (level instanceof ServerWorld) {
+            return Optional.ofNullable(level.getServer())
                     .map(SavedMachineData::getInstance)
                     .map(SavedMachineData::getData)
                     .flatMap(d -> d.getMachineData(this.machineId));
@@ -273,14 +273,14 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     protected void doChunkload(boolean force) {
-        if (world == null || world.isRemote)
+        if (level == null || level.isClientSide)
             return;
 
         getMachineData().ifPresent(data -> {
-            ServerWorld compact = this.world.getServer().getWorld(Registration.COMPACT_DIMENSION);
+            ServerWorld compact = this.level.getServer().getLevel(Registration.COMPACT_DIMENSION);
             IChunk machineChunk = compact.getChunk(data.getCenter());
             ChunkPos chunkPos = machineChunk.getPos();
-            compact.forceChunk(chunkPos.x, chunkPos.z, force);
+            compact.setChunkForced(chunkPos.x, chunkPos.z, force);
         });
     }
 

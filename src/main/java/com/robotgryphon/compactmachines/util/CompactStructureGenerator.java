@@ -22,7 +22,7 @@ public class CompactStructureGenerator {
     public static void generateCompactWall(IWorld world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
         int s = size.getInternalSize() / 2;
 
-        BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().getDefaultState();
+        BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
         BlockPos start = BlockPos.ZERO;
         AxisAlignedBB wallBounds;
@@ -30,34 +30,34 @@ public class CompactStructureGenerator {
         boolean horiz = wallDirection.getAxis().getPlane() == Direction.Plane.HORIZONTAL;
         if (horiz) {
             start = cubeCenter
-                    .down(s)
-                    .offset(wallDirection, s + 1);
+                    .below(s)
+                    .relative(wallDirection, s + 1);
 
             wallBounds = new AxisAlignedBB(start, start)
-                    .expand(0, (s * 2) + 1, 0);
+                    .expandTowards(0, (s * 2) + 1, 0);
         } else {
-            start = cubeCenter.offset(wallDirection, s + 1);
+            start = cubeCenter.relative(wallDirection, s + 1);
 
             wallBounds = new AxisAlignedBB(start, start)
-                    .grow(s + 1, 0, s + 1);
+                    .inflate(s + 1, 0, s + 1);
         }
 
         switch (wallDirection) {
             case NORTH:
             case SOUTH:
-                wallBounds = wallBounds.grow(s + 1, 0, 0);
+                wallBounds = wallBounds.inflate(s + 1, 0, 0);
                 break;
 
             case WEST:
             case EAST:
-                wallBounds = wallBounds.grow(0, 0, s + 1);
+                wallBounds = wallBounds.inflate(0, 0, s + 1);
                 break;
         }
 
-        BlockPos.getAllInBox(wallBounds)
-                .filter(world::isAirBlock)
-                .map(BlockPos::toImmutable)
-                .forEach(p -> world.setBlockState(p, unbreakableWall, 7));
+        BlockPos.betweenClosedStream(wallBounds)
+                .filter(world::isEmptyBlock)
+                .map(BlockPos::immutable)
+                .forEach(p -> world.setBlock(p, unbreakableWall, 7));
     }
 
     /**
@@ -70,11 +70,11 @@ public class CompactStructureGenerator {
     public static void generateCompactStructure(IWorld world, EnumMachineSize size, BlockPos center) {
         int s = size.getInternalSize() / 2;
 
-        BlockPos floorCenter = center.offset(Direction.DOWN, s);
+        BlockPos floorCenter = center.relative(Direction.DOWN, s);
         AxisAlignedBB floorBlocks = new AxisAlignedBB(floorCenter, floorCenter)
-                .grow(s, 0, s);
+                .inflate(s, 0, s);
 
-        boolean anyAir = BlockPos.getAllInBox(floorBlocks).anyMatch(world::isAirBlock);
+        boolean anyAir = BlockPos.betweenClosedStream(floorBlocks).anyMatch(world::isEmptyBlock);
 
         if (anyAir) {
             // Generate the walls

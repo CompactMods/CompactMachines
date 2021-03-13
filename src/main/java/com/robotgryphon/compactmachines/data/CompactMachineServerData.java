@@ -77,7 +77,7 @@ public class CompactMachineServerData extends CompactMachineCommonData {
     public Stream<AxisAlignedBB> getAllMachineBounds() {
         return machineData.values().stream()
                 .map(mach -> new AxisAlignedBB(mach.getCenter(), mach.getCenter())
-                        .grow(mach.getSize().getInternalSize()));
+                        .inflate(mach.getSize().getInternalSize()));
     }
 
     public Stream<CompactMachineRegistrationData> getMachines() {
@@ -89,7 +89,7 @@ public class CompactMachineServerData extends CompactMachineCommonData {
                 .filter(machine -> {
                     BlockPos center = machine.getCenter();
                     AxisAlignedBB bounds = new AxisAlignedBB(center, center)
-                            .grow(machine.getSize().getInternalSize());
+                            .inflate(machine.getSize().getInternalSize());
 
                     return bounds.contains(position);
                 })
@@ -97,7 +97,7 @@ public class CompactMachineServerData extends CompactMachineCommonData {
     }
 
     public Optional<CompactMachineRegistrationData> getMachineContainingPosition(BlockPos position) {
-        AxisAlignedBB possibleCenters = new AxisAlignedBB(position, position).grow(EnumMachineSize.maximum().getInternalSize());
+        AxisAlignedBB possibleCenters = new AxisAlignedBB(position, position).inflate(EnumMachineSize.maximum().getInternalSize());
 
         return getMachines()
                 .filter(machine -> {

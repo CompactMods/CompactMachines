@@ -25,27 +25,27 @@ public class SavedMachineData extends WorldSavedData {
 
     @Nonnull
     public static SavedMachineData getInstance(MinecraftServer server) {
-        ServerWorld compactWorld = server.getWorld(Registration.COMPACT_DIMENSION);
+        ServerWorld compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
         {
             CompactMachines.LOGGER.error("No compact dimension found. Falling back to overworld.");
             return server
-                    .getWorld(World.OVERWORLD)
-                    .getSavedData()
-                    .getOrCreate(SavedMachineData::new, DATA_NAME);
+                    .getLevel(World.OVERWORLD)
+                    .getDataStorage()
+                    .computeIfAbsent(SavedMachineData::new, DATA_NAME);
         }
 
-        DimensionSavedDataManager sd = compactWorld.getSavedData();
-        return sd.getOrCreate(SavedMachineData::new, DATA_NAME);
+        DimensionSavedDataManager sd = compactWorld.getDataStorage();
+        return sd.computeIfAbsent(SavedMachineData::new, DATA_NAME);
     }
 
     @Override
-    public void read(CompoundNBT nbt) {
+    public void load(CompoundNBT nbt) {
         DATA = CompactMachineServerData.fromNbt(nbt);
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         if(DATA != null)
             return DATA.serializeNBT(compound);
 

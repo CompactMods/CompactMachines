@@ -30,10 +30,10 @@ public class GuidePage implements IRenderable, IGuiEventListener {
 
     @Override
     public void render(MatrixStack ms, int mouseX, int mouseY, float partialTicks) {
-        FontRenderer fr = Minecraft.getInstance().fontRenderer;
+        FontRenderer fr = Minecraft.getInstance().font;
         AbstractGui.drawString(ms, fr,
                 new TranslationTextComponent(CompactMachines.MOD_ID + ".psd.pages.machines.title")
-                .mergeStyle(TextFormatting.GOLD),
+                .withStyle(TextFormatting.GOLD),
                 2, 2, 0);
 
         for(IRenderable comp : widgets)

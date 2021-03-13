@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class ItemBlockWall extends BlockItem {
 
     public ItemBlockWall(Block blockIn, Properties builder) {
@@ -18,12 +20,12 @@ public class ItemBlockWall extends BlockItem {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         if (stack.getItem() == Registration.ITEM_SOLID_WALL.get()) {
             IFormattableTextComponent text = new TranslationTextComponent("tooltip.compactmachines.solid_wall.hint")
-                    .mergeStyle(TextFormatting.RED);
+                    .withStyle(TextFormatting.RED);
             
             tooltip.add(text);
         }

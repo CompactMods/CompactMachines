@@ -56,7 +56,7 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
         CompoundNBT nbt = super.serializeNBT();
         ListNBT ids = internalPlayers.stream()
                 .map(u -> {
-                    IntArrayNBT intNBTS = NBTUtil.func_240626_a_(u);
+                    IntArrayNBT intNBTS = NBTUtil.createUUID(u);
                     CompoundNBT pnbt = new CompoundNBT();
                     pnbt.put("id", intNBTS);
                     return pnbt;
@@ -72,7 +72,7 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
 
                     UUID playerId = pSpawn.getKey();
                     DimensionalPosition pSpawnPos = pSpawn.getValue();
-                    spawn.put("id", NBTUtil.func_240626_a_(playerId));
+                    spawn.put("id", NBTUtil.createUUID(playerId));
                     spawn.put("spawn", pSpawnPos.serializeNBT());
 
                     return spawn;
@@ -92,7 +92,7 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
             ListNBT players = nbt.getList("players", Constants.NBT.TAG_COMPOUND);
             players.forEach(playerData -> {
                 CompoundNBT pd = (CompoundNBT) playerData;
-                UUID id = pd.getUniqueId("id");
+                UUID id = pd.getUUID("id");
                 this.internalPlayers.add(id);
             });
         }
@@ -102,7 +102,7 @@ public class CompactMachinePlayerData extends CompactMachineBaseData {
             spawns.forEach(spawnData -> {
 
                 CompoundNBT spawn = (CompoundNBT) spawnData;
-                UUID playerId = spawn.getUniqueId("id");
+                UUID playerId = spawn.getUUID("id");
                 DimensionalPosition pos = DimensionalPosition.fromNBT(spawn.getCompound("spawn"));
 
                 externalSpawns.put(playerId, pos);

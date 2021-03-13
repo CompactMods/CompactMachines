@@ -37,17 +37,17 @@ public class TunnelWallTile extends TileEntity {
     }
 
     public Optional<CompactMachineRegistrationData> getMachineInfo() {
-        if (this.world instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) this.world;
-            return CompactMachineUtil.getMachineInfoByInternalPosition(serverWorld, this.pos);
+        if (this.level instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) this.level;
+            return CompactMachineUtil.getMachineInfoByInternalPosition(serverWorld, this.worldPosition);
         }
 
         return Optional.empty();
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundNBT nbt) {
+        super.load(state, nbt);
 
         if(nbt.contains("tunnel_type")) {
             ResourceLocation type = new ResourceLocation(nbt.getString("tunnel_type"));
@@ -56,8 +56,8 @@ public class TunnelWallTile extends TileEntity {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        compound = super.write(compound);
+    public CompoundNBT save(CompoundNBT compound) {
+        compound = super.save(compound);
         compound.putString("tunnel_type", tunnelType.toString());
         return compound;
     }
@@ -80,10 +80,10 @@ public class TunnelWallTile extends TileEntity {
     }
 
     public Optional<? extends IWorldReader> getConnectedWorld() {
-        if (world == null || world.isRemote())
+        if (level == null || level.isClientSide())
             return Optional.empty();
 
-        ServerWorld serverWorld = (ServerWorld) world;
+        ServerWorld serverWorld = (ServerWorld) level;
 
         Optional<CompactMachineRegistrationData> machineInfo = getMachineInfo();
         if (!machineInfo.isPresent())
@@ -111,10 +111,10 @@ public class TunnelWallTile extends TileEntity {
      * @return
      */
     public Optional<DimensionalPosition> getConnectedPosition() {
-        if (world == null || world.isRemote())
+        if (level == null || level.isClientSide())
             return Optional.empty();
 
-        ServerWorld serverWorld = (ServerWorld) world;
+        ServerWorld serverWorld = (ServerWorld) level;
 
         Optional<CompactMachineRegistrationData> machineInfo = getMachineInfo();
         if (!machineInfo.isPresent())
@@ -133,7 +133,7 @@ public class TunnelWallTile extends TileEntity {
             Vector3d o = machinePosition.getPosition();
             BlockPos machineOutPos = new BlockPos(o.x, o.y, o.z);
 
-            BlockPos connectedBlock = machineOutPos.offset(outsideDir);
+            BlockPos connectedBlock = machineOutPos.relative(outsideDir);
             Vector3d connectedBlockVec = new Vector3d(connectedBlock.getX(), connectedBlock.getY(), connectedBlock.getZ());
 
             DimensionalPosition connectedPosition = new DimensionalPosition(machinePosition.getDimension(), connectedBlockVec);
@@ -149,7 +149,7 @@ public class TunnelWallTile extends TileEntity {
      */
     public Direction getTunnelSide() {
         BlockState state = getBlockState();
-        return state.get(TunnelWallBlock.TUNNEL_SIDE);
+        return state.getValue(TunnelWallBlock.TUNNEL_SIDE);
     }
 
     /**
@@ -158,7 +158,7 @@ public class TunnelWallTile extends TileEntity {
      */
     public Direction getConnectedSide() {
         BlockState blockState = getBlockState();
-        return blockState.get(TunnelWallBlock.CONNECTED_SIDE);
+        return blockState.getValue(TunnelWallBlock.CONNECTED_SIDE);
     }
 
     public Optional<ResourceLocation> getTunnelDefinitionId() {
@@ -196,9 +196,9 @@ public class TunnelWallTile extends TileEntity {
         // loop through tunnel definition for capabilities
         TunnelDefinition definition = tunnelDef.get();
         if (definition instanceof ICapableTunnel) {
-            if(!world.isRemote()) {
-                ServerWorld sw = (ServerWorld) world;
-                return ((ICapableTunnel) definition).getExternalCapability(sw, pos, cap, side);
+            if(!level.isClientSide()) {
+                ServerWorld sw = (ServerWorld) level;
+                return ((ICapableTunnel) definition).getExternalCapability(sw, worldPosition, cap, side);
             }
         }
 
@@ -208,12 +208,12 @@ public class TunnelWallTile extends TileEntity {
     public void setTunnelType(ResourceLocation registryName) {
         this.tunnelType = registryName;
 
-        if(world != null && !world.isRemote()) {
-            markDirty();
+        if(level != null && !level.isClientSide()) {
+            setChanged();
 
-            TunnelAddedPacket pkt = new TunnelAddedPacket(pos, registryName);
+            TunnelAddedPacket pkt = new TunnelAddedPacket(worldPosition, registryName);
 
-            Chunk chunkAt = world.getChunkAt(pos);
+            Chunk chunkAt = level.getChunkAt(worldPosition);
             NetworkHandler.MAIN_CHANNEL
                     .send(PacketDistributor.TRACKING_CHUNK.with(() -> chunkAt), pkt);
         }

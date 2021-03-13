@@ -13,12 +13,12 @@ public class MachinePlayerEventHandler {
     public static void handlePlayerMachineChanged(UUID playerID,
                                                   MachinePlayersChangedPacket.EnumPlayerChangeType changeType,
                                                   DimensionalPosition pos) {
-        ClientWorld w = Minecraft.getInstance().world;
+        ClientWorld w = Minecraft.getInstance().level;
 
-        if (w.getDimensionKey() != pos.getDimension())
+        if (w.dimension() != pos.getDimension())
             return;
 
-        CompactMachineTile tile = (CompactMachineTile) w.getTileEntity(pos.getBlockPosition());
+        CompactMachineTile tile = (CompactMachineTile) w.getBlockEntity(pos.getBlockPosition());
         if (tile == null)
             return;
 

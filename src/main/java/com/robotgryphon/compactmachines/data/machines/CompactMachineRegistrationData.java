@@ -69,7 +69,7 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
             nbt.put("spawn", spawnNbt);
         }
 
-        IntArrayNBT ownerNbt = NBTUtil.func_240626_a_(this.owner);
+        IntArrayNBT ownerNbt = NBTUtil.createUUID(this.owner);
         nbt.put("owner", ownerNbt);
 
         if(this.outsidePosition != null) {
@@ -93,7 +93,7 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
         if (nbt.contains("owner")) {
             INBT ownerNbt = nbt.get("owner");
             if (ownerNbt != null)
-                this.owner = NBTUtil.readUniqueId(ownerNbt);
+                this.owner = NBTUtil.loadUUID(ownerNbt);
         }
 
         if (nbt.contains("center")) {
@@ -135,10 +135,10 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
      */
     public DimensionalPosition getOutsidePosition(MinecraftServer server) {
         if(this.inPlayerInventory) {
-            ServerPlayerEntity player = server.getPlayerList().getPlayerByUUID(playerUUID);
+            ServerPlayerEntity player = server.getPlayerList().getPlayer(playerUUID);
 
-            Vector3d positionVec = player.getPositionVec();
-            RegistryKey<World> dimensionKey = player.world.getDimensionKey();
+            Vector3d positionVec = player.position();
+            RegistryKey<World> dimensionKey = player.level.dimension();
 
             // Player location in-world
             return new DimensionalPosition(dimensionKey, positionVec);
@@ -152,7 +152,7 @@ public class CompactMachineRegistrationData extends CompactMachineBaseData {
     }
 
     public void setWorldPosition(ServerWorld world, BlockPos pos) {
-        this.outsidePosition = new DimensionalPosition(world.getDimensionKey(),
+        this.outsidePosition = new DimensionalPosition(world.dimension(),
                 new Vector3d(pos.getX(), pos.getY(), pos.getZ()));
     }
 

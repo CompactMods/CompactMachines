@@ -45,8 +45,8 @@ public class MachinePlayersChangedPacket {
 
     public static void encode(MachinePlayersChangedPacket pkt, PacketBuffer buf) {
         buf.writeInt(pkt.machineID);
-        buf.writeUniqueId(pkt.playerID);
-        buf.writeString(pkt.type.toString());
+        buf.writeUUID(pkt.playerID);
+        buf.writeUtf(pkt.type.toString());
 
         SavedMachineData md = SavedMachineData.getInstance(pkt.server);
         CompactMachineServerData data = md.getData();
@@ -55,18 +55,18 @@ public class MachinePlayersChangedPacket {
         buf.writeBoolean(machineData.isPresent());
         machineData.ifPresent(mData -> {
             DimensionalPosition out = mData.getOutsidePosition(pkt.server);
-            buf.writeCompoundTag(out.serializeNBT());
+            buf.writeNbt(out.serializeNBT());
         });
     }
 
     public static MachinePlayersChangedPacket decode(PacketBuffer buf) {
         int machine = buf.readInt();
-        UUID id = buf.readUniqueId();
-        EnumPlayerChangeType changeType = EnumPlayerChangeType.valueOf(buf.readString());
+        UUID id = buf.readUUID();
+        EnumPlayerChangeType changeType = EnumPlayerChangeType.valueOf(buf.readUtf());
 
         MachinePlayersChangedPacket pkt = new MachinePlayersChangedPacket(null, machine, id, changeType);
         if(buf.readBoolean()) {
-            DimensionalPosition tilePos = DimensionalPosition.fromNBT(buf.readCompoundTag());
+            DimensionalPosition tilePos = DimensionalPosition.fromNBT(buf.readNbt());
             pkt.machinePositions = ImmutableSet.of(tilePos);
         }
 

@@ -27,7 +27,7 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     public ScrollableWrappedTextWidget(String key, int x, int y, int width, int height) {
         super(x, y, width, height);
         this.localeKey = key;
-        this.fontRenderer = Minecraft.getInstance().fontRenderer;
+        this.fontRenderer = Minecraft.getInstance().font;
 
         this.recalculate();
     }
@@ -41,10 +41,10 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     }
 
     private void recalculate() {
-        String t = I18n.format(localeKey);
-        lines = fontRenderer.trimStringToWidth(new StringTextComponent(t), width);
+        String t = I18n.get(localeKey);
+        lines = fontRenderer.split(new StringTextComponent(t), width);
 
-        charSize = fontRenderer.getStringWidth("M");
+        charSize = fontRenderer.width("M");
         int maxOnScreen = height / (charSize + 4);
         maxLinesToShow = Math.min(lines.size(), maxOnScreen);
 
@@ -55,20 +55,20 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(x, y, 10);
         
-        FontRenderer fr = Minecraft.getInstance().fontRenderer;
+        FontRenderer fr = Minecraft.getInstance().font;
 
         try {
             for (int y = lineIndexStart; y <= lineIndexStart + maxLinesToShow; y++) {
                 IReorderingProcessor s = lines.get(y);
-                fr.func_238407_a_(matrixStack, s, 0, (y - lineIndexStart) * (charSize + 4), 0xFFFFFF);
+                fr.drawShadow(matrixStack, s, 0, (y - lineIndexStart) * (charSize + 4), 0xFFFFFF);
             }
         }
 
         catch(Exception ex1) {}
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 }

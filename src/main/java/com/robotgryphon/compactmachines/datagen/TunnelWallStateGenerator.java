@@ -14,6 +14,9 @@ import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
+import net.minecraftforge.client.model.generators.ModelBuilder.ElementBuilder;
+import net.minecraftforge.client.model.generators.ModelBuilder.ElementBuilder.FaceBuilder;
+
 public class TunnelWallStateGenerator extends BlockStateProvider {
     public TunnelWallStateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
         super(gen, CompactMachines.MOD_ID, exFileHelper);
@@ -27,7 +30,7 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
 
         for (Direction dir : Direction.values()) {
 
-            String typedTunnelDirectional = "tunnels/" + dir.getString();
+            String typedTunnelDirectional = "tunnels/" + dir.getSerializedName();
             models()
                     .withExistingParent(typedTunnelDirectional, modLoc("tunnels/base"))
                     .texture("wall", modLoc("block/" + typedTunnelDirectional));

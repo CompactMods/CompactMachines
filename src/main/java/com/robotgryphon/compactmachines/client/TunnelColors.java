@@ -17,7 +17,7 @@ public class TunnelColors implements IBlockColor {
     @Override
     public int getColor(BlockState state, @Nullable IBlockDisplayReader reader, @Nullable BlockPos pos, int tintIndex) {
         try {
-            TileEntity tile = reader.getTileEntity(pos);
+            TileEntity tile = reader.getBlockEntity(pos);
             if (tile instanceof TunnelWallTile) {
                 TunnelWallTile tunnel = (TunnelWallTile) tile;
                 Optional<TunnelDefinition> tunnelDefinition = tunnel.getTunnelDefinition();

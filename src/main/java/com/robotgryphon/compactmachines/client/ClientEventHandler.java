@@ -25,7 +25,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent client) {
-        RenderType cutout = RenderType.getCutoutMipped();
+        RenderType cutout = RenderType.cutoutMipped();
         RenderTypeLookup.setRenderLayer(Registration.BLOCK_TUNNEL_WALL.get(), cutout);
     }
 }

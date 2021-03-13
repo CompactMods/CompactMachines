@@ -10,11 +10,11 @@ import net.minecraft.util.math.BlockPos;
 
 public class ClientTunnelHandler {
     public static void updateTunnelData(BlockPos position, ResourceLocation type) {
-        ClientWorld w = Minecraft.getInstance().world;
+        ClientWorld w = Minecraft.getInstance().level;
         if(w == null)
             return;
 
-        TileEntity tileEntity = w.getTileEntity(position);
+        TileEntity tileEntity = w.getBlockEntity(position);
         if(tileEntity == null)
             return;
 
@@ -22,6 +22,6 @@ public class ClientTunnelHandler {
         tile.setTunnelType(type);
 
         BlockState state = w.getBlockState(position);
-        w.notifyBlockUpdate(position, state, state, 1);
+        w.sendBlockUpdated(position, state, state, 1);
     }
 }

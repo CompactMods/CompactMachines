@@ -13,6 +13,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import java.util.stream.Collector.Characteristics;
+
 public class NbtListCollector implements Collector<INBT, List<INBT>, ListNBT> {
 
     @Override

@@ -33,7 +33,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {
-        return Optional.ofNullable(server.getWorld(this.dimension));
+        return Optional.ofNullable(server.getLevel(this.dimension));
     }
 
     public static DimensionalPosition fromNBT(CompoundNBT nbt) {
@@ -46,7 +46,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
-        nbt.putString("dim", dimension.getLocation().toString());
+        nbt.putString("dim", dimension.location().toString());
         CompoundNBT posNbt = NbtDataUtil.writeVectorCompound(position);
         nbt.put("pos", posNbt);
         return nbt;
@@ -57,7 +57,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         if(nbt.contains("dim"))
         {
             ResourceLocation dim = new ResourceLocation(nbt.getString("dim"));
-            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dim);
+            this.dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, dim);
         }
 
         if(nbt.contains("pos")) {

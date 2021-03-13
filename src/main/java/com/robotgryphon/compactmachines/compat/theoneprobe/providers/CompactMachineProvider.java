@@ -36,7 +36,7 @@ public class CompactMachineProvider {
     }
 
     private static void addProbeInfo(ProbeMode mode, IProbeInfo info, PlayerEntity player, World world, BlockState state, IProbeHitData hitData) {
-        TileEntity te = world.getTileEntity(hitData.getPos());
+        TileEntity te = world.getBlockEntity(hitData.getPos());
         if (te instanceof CompactMachineTile) {
             CompactMachineTile machine = (CompactMachineTile) te;
 
@@ -46,16 +46,16 @@ public class CompactMachineProvider {
                 IFormattableTextComponent id = new TranslationTextComponent(
                         String.format("tooltip.%s.machine_id", CompactMachines.MOD_ID),
                         md.getId()
-                ).mergeStyle(TextFormatting.GREEN);
+                ).withStyle(TextFormatting.GREEN);
                 info.text(id);
 
                 // Owner Name
-                PlayerEntity owner = world.getPlayerByUuid(md.getOwner());
+                PlayerEntity owner = world.getPlayerByUUID(md.getOwner());
                 if (owner != null) {
                     GameProfile ownerProfile = owner.getGameProfile();
                     IFormattableTextComponent ownerText = new TranslationTextComponent(
                             String.format("tooltip.%s.owner", CompactMachines.MOD_ID), ownerProfile.getName()
-                    ).mergeStyle(TextFormatting.GRAY);
+                    ).withStyle(TextFormatting.GRAY);
 
                     info.text(ownerText);
                 }
@@ -63,9 +63,9 @@ public class CompactMachineProvider {
                 Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(md.getId(), (ServerWorld) world, hitData.getSideHit());
                 IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
 
-                ServerWorld cm = world.getServer().getWorld(Registration.COMPACT_DIMENSION);
+                ServerWorld cm = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
                 tunnelsForMachineSide.forEach(pos -> {
-                    TunnelWallTile tile = (TunnelWallTile) cm.getTileEntity(pos);
+                    TunnelWallTile tile = (TunnelWallTile) cm.getBlockEntity(pos);
                     if(tile == null)
                         return;
 

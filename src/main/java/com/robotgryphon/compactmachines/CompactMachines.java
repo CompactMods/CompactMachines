@@ -32,7 +32,7 @@ public class CompactMachines
 
     public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MOD_ID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get());
         }
     };

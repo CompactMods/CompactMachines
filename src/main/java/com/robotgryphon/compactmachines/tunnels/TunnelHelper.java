@@ -36,7 +36,7 @@ public class TunnelHelper {
     }
 
     public static ITunnelConnectionInfo generateConnectionInfo(@Nonnull IBlockReader tunnelWorld, @Nonnull BlockPos tunnelPos) {
-        TunnelWallTile tile = (TunnelWallTile) tunnelWorld.getTileEntity(tunnelPos);
+        TunnelWallTile tile = (TunnelWallTile) tunnelWorld.getBlockEntity(tunnelPos);
         return generateConnectionInfo(tile);
     }
 
@@ -78,7 +78,7 @@ public class TunnelHelper {
 
     public static Set<BlockPos> getTunnelsForMachineSide(int machine, ServerWorld world, Direction machineSide) {
 
-        ServerWorld compactWorld = world.getServer().getWorld(Registration.COMPACT_DIMENSION);
+        ServerWorld compactWorld = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
 
         Set<BlockPos> tunnelPositions = new HashSet<>();
 
@@ -90,12 +90,12 @@ public class TunnelHelper {
             int internalSize = machineData.getSize().getInternalSize();
 
             AxisAlignedBB allBlocksInMachine = new AxisAlignedBB(machineCenter, machineCenter)
-                    .grow(internalSize);
+                    .inflate(internalSize);
 
-            Set<BlockPos> tunnelPositionsUnfiltered = BlockPos.getAllInBox(allBlocksInMachine)
-                    .filter(pos -> !compactWorld.isAirBlock(pos))
+            Set<BlockPos> tunnelPositionsUnfiltered = BlockPos.betweenClosedStream(allBlocksInMachine)
+                    .filter(pos -> !compactWorld.isEmptyBlock(pos))
                     // .filter(pos -> world.getBlockState(pos).getBlock() instanceof TunnelWallBlock)
-                    .map(BlockPos::toImmutable)
+                    .map(BlockPos::immutable)
                     .collect(Collectors.toSet());
 
             if(!tunnelPositionsUnfiltered.isEmpty()) {
@@ -108,10 +108,10 @@ public class TunnelHelper {
                             if(!tunnel)
                                 return false;
 
-                            Direction externalSide = state.get(TunnelWallBlock.CONNECTED_SIDE);
+                            Direction externalSide = state.getValue(TunnelWallBlock.CONNECTED_SIDE);
                             return externalSide == machineSide;
                         })
-                        .map(BlockPos::toImmutable)
+                        .map(BlockPos::immutable)
                         .collect(Collectors.toSet());
 
                 tunnelPositions.addAll(tunnelPositionsFiltered);
@@ -129,7 +129,7 @@ public class TunnelHelper {
 
             case INSIDE:
                 RegistryKey<World> world = Registration.COMPACT_DIMENSION;
-                BlockPos offsetInside = tunnel.getPos().offset(tunnel.getTunnelSide());
+                BlockPos offsetInside = tunnel.getBlockPos().relative(tunnel.getTunnelSide());
 
                 DimensionalPosition pos = new DimensionalPosition(world, offsetInside);
                 return Optional.of(pos);
@@ -145,8 +145,8 @@ public class TunnelHelper {
             return Optional.empty();
 
         // We need a server world to reach across dimensions to get information
-        if (twt.getWorld() instanceof ServerWorld) {
-            ServerWorld sw = (ServerWorld) twt.getWorld();
+        if (twt.getLevel() instanceof ServerWorld) {
+            ServerWorld sw = (ServerWorld) twt.getLevel();
 
             Optional<ServerWorld> connectedWorld = connectedPosition.getWorld(sw.getServer());
             if (!connectedWorld.isPresent())

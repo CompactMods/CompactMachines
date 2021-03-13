@@ -30,6 +30,8 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataProvider {
     public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
     public static DirectionProperty CONNECTED_SIDE = DirectionProperty.create("connected_side", Direction.values());
@@ -38,15 +40,15 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
 
     public TunnelWallBlock(Properties props) {
         super(props);
-        setDefaultState(getStateContainer().getBaseState()
-                .with(CONNECTED_SIDE, Direction.UP)
-                .with(TUNNEL_SIDE, Direction.UP)
-                .with(REDSTONE, false)
+        registerDefaultState(getStateDefinition().any()
+                .setValue(CONNECTED_SIDE, Direction.UP)
+                .setValue(TUNNEL_SIDE, Direction.UP)
+                .setValue(REDSTONE, false)
         );
     }
 
     public Optional<TunnelDefinition> getTunnelInfo(IBlockReader world, BlockPos pos) {
-        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(pos);
+        TunnelWallTile tile = (TunnelWallTile) world.getBlockEntity(pos);
         if (tile == null)
             return Optional.empty();
 
@@ -69,17 +71,17 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
     }
 
     @Override
-    public boolean canProvidePower(BlockState state) {
-        return state.get(REDSTONE);
+    public boolean isSignalSource(BlockState state) {
+        return state.getValue(REDSTONE);
     }
 
     @Override
-    public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+    public int getDirectSignal(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return 0;
     }
 
     @Override
-    public int getWeakPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+    public int getSignal(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
         if (!tunnelInfo.isPresent())
             return 0;
@@ -95,28 +97,28 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote())
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isClientSide())
             return ActionResultType.SUCCESS;
 
 
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             Optional<TunnelDefinition> tunnelDef = getTunnelInfo(worldIn, pos);
 
             if (!tunnelDef.isPresent())
                 return ActionResultType.FAIL;
 
-            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().getDefaultState();
+            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
-            worldIn.setBlockState(pos, solidWall);
+            worldIn.setBlockAndUpdate(pos, solidWall);
 
             TunnelDefinition tunnelRegistration = tunnelDef.get();
             ItemStack stack = new ItemStack(Registration.ITEM_TUNNEL.get(), 1);
-            CompoundNBT defTag = stack.getOrCreateChildTag("definition");
+            CompoundNBT defTag = stack.getOrCreateTagElement("definition");
             defTag.putString("id", tunnelRegistration.getRegistryName().toString());
 
-            ItemEntity ie = new ItemEntity(worldIn, player.getPosX(), player.getPosY(), player.getPosZ(), stack);
-            worldIn.addEntity(ie);
+            ItemEntity ie = new ItemEntity(worldIn, player.getX(), player.getY(), player.getZ(), stack);
+            worldIn.addFreshEntity(ie);
 
 //                        IFormattableTextComponent t = new StringTextComponent(tunnelRegistration.getRegistryName().toString())
 //                                .mergeStyle(TextFormatting.GRAY);
@@ -124,18 +126,18 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
 //                        player.sendStatusMessage(t, true);
         } else {
             // Rotate tunnel
-            Direction dir = state.get(CONNECTED_SIDE);
+            Direction dir = state.getValue(CONNECTED_SIDE);
             Direction nextDir = TunnelHelper.getNextDirection(dir);
 
-            worldIn.setBlockState(pos, state.with(CONNECTED_SIDE, nextDir));
+            worldIn.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
         }
         return ActionResultType.SUCCESS;
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
         builder.add(TUNNEL_SIDE).add(CONNECTED_SIDE).add(REDSTONE);
-        super.fillStateContainer(builder);
+        super.createBlockStateDefinition(builder);
     }
 
     @Override

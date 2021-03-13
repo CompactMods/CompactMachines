@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import net.minecraft.item.Item.Properties;
+
 public class ItemBlockMachine extends BlockItem {
 
     public ItemBlockMachine(Block blockIn, EnumMachineSize size, Properties builder) {
@@ -29,13 +31,13 @@ public class ItemBlockMachine extends BlockItem {
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         // We need NBT data for the rest of this
         if (!stack.hasTag())
@@ -54,7 +56,7 @@ public class ItemBlockMachine extends BlockItem {
         }
 
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-            UUID owner = nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT);
+            UUID owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
             Optional<GameProfile> playerProfile = PlayerUtil.getProfileByUUID(worldIn, owner);
 
             IFormattableTextComponent player = playerProfile
@@ -70,19 +72,19 @@ public class ItemBlockMachine extends BlockItem {
         if (Screen.hasShiftDown()) {
             // TODO Show size information when sneaking
 
-            Block b = Block.getBlockFromItem(stack.getItem());
+            Block b = Block.byItem(stack.getItem());
             if (b instanceof BlockCompactMachine) {
                 EnumMachineSize size = ((BlockCompactMachine) b).getSize();
                 int internalSize = size.getInternalSize();
 
                 IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".machine.size", internalSize)
-                        .mergeStyle(TextFormatting.YELLOW);
+                        .withStyle(TextFormatting.YELLOW);
 
                 tooltip.add(text);
             }
         } else {
             IFormattableTextComponent text = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".hold_shift.hint")
-                    .mergeStyle(TextFormatting.GRAY);
+                    .withStyle(TextFormatting.GRAY);
 
             tooltip.add(text);
         }

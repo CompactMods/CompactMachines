@@ -21,11 +21,11 @@ public class CompactMachinePlayerUtil {
 
         playerData.ifPresent(d -> {
             d.addPlayer(serverPlayer);
-            machineData.markDirty();
+            machineData.setDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, machineId, serverPlayer.getUniqueID(), MachinePlayersChangedPacket.EnumPlayerChangeType.ENTERED);
+            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, machineId, serverPlayer.getUUID(), MachinePlayersChangedPacket.EnumPlayerChangeType.ENTERED);
             NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getServerWorld().getChunkAt(machinePos)),
+                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
                     p);
         });
     }
@@ -38,11 +38,11 @@ public class CompactMachinePlayerUtil {
 
         playerData.ifPresent(d -> {
             d.removePlayer(serverPlayer);
-            machineData.markDirty();
+            machineData.setDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, machineId, serverPlayer.getUniqueID(), MachinePlayersChangedPacket.EnumPlayerChangeType.EXITED);
+            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, machineId, serverPlayer.getUUID(), MachinePlayersChangedPacket.EnumPlayerChangeType.EXITED);
             NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getServerWorld().getChunkAt(machinePos)),
+                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
                     p);
         });
     }

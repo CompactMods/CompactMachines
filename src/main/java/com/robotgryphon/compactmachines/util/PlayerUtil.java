@@ -21,7 +21,7 @@ import java.util.UUID;
 
 public abstract class PlayerUtil {
     public static Optional<GameProfile> getProfileByUUID(IWorld world, UUID uuid) {
-        PlayerEntity player = world.getPlayerByUuid(uuid);
+        PlayerEntity player = world.getPlayerByUUID(uuid);
         if (player == null)
             return Optional.empty();
 
@@ -30,8 +30,8 @@ public abstract class PlayerUtil {
     }
 
     public static DimensionalPosition getPlayerDimensionalPosition(PlayerEntity player) {
-        Vector3d pos = player.getPositionVec();
-        RegistryKey<World> dim = player.world.getDimensionKey();
+        Vector3d pos = player.position();
+        RegistryKey<World> dim = player.level.dimension();
 
         return new DimensionalPosition(dim, pos);
     }
@@ -41,10 +41,10 @@ public abstract class PlayerUtil {
         SavedMachineData machineData = SavedMachineData.getInstance(world.getServer());
         CompactMachineServerData serverData = machineData.getData();
 
-        Optional<CompactMachineRegistrationData> machine = serverData.getMachineContainingPosition(serverPlayer.getPositionVec());
+        Optional<CompactMachineRegistrationData> machine = serverData.getMachineContainingPosition(serverPlayer.position());
 
         if (!machine.isPresent()) {
-            serverPlayer.sendStatusMessage(
+            serverPlayer.displayClientMessage(
                     new TranslationTextComponent("not_inside_machine"),
                     true);
 
@@ -57,7 +57,7 @@ public abstract class PlayerUtil {
         if (!machinePlayers.isPresent()) {
             // No player data for machine, wut
             CompactMachines.LOGGER.warn("Warning: Machine player data not set but machine registered, and player is inside. Machine ID: {}", machineInfo.getId());
-            serverPlayer.sendStatusMessage(new TranslationTextComponent("ah_crap"), true);
+            serverPlayer.displayClientMessage(new TranslationTextComponent("ah_crap"), true);
             return;
         }
 
@@ -72,7 +72,7 @@ public abstract class PlayerUtil {
             Optional<ServerWorld> outsideWorld = p.getWorld(world.getServer());
             outsideWorld.ifPresent(w -> {
                 machine.ifPresent(m -> {
-                    serverPlayer.teleport(w, bp.getX(), bp.getY(), bp.getZ(), serverPlayer.rotationYaw, serverPlayer.rotationPitch);
+                    serverPlayer.teleportTo(w, bp.x(), bp.y(), bp.z(), serverPlayer.yRot, serverPlayer.xRot);
                     CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer,
                             machineInfo.getOutsidePosition(serverPlayer.getServer()).getBlockPosition(),
                             m.getId());

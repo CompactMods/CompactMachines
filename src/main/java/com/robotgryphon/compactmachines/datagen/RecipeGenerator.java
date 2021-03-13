@@ -24,25 +24,25 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
-        ShapedRecipeBuilder.shapedRecipe(Registration.ITEM_BREAKABLE_WALL.get(), 16)
-                .patternLine(" R ")
-                .patternLine(" I ")
-                .key('R', Tags.Items.DUSTS_REDSTONE)
-                .key('I', Tags.Items.STORAGE_BLOCKS_IRON)
-                .addCriterion("has_recipe", hasItem(Tags.Items.STORAGE_BLOCKS_IRON))
-                .build(consumer);
+    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+        ShapedRecipeBuilder.shaped(Registration.ITEM_BREAKABLE_WALL.get(), 16)
+                .pattern(" R ")
+                .pattern(" I ")
+                .define('R', Tags.Items.DUSTS_REDSTONE)
+                .define('I', Tags.Items.STORAGE_BLOCKS_IRON)
+                .unlockedBy("has_recipe", has(Tags.Items.STORAGE_BLOCKS_IRON))
+                .save(consumer);
 
-        ShapedRecipeBuilder.shapedRecipe(Registration.PERSONAL_SHRINKING_DEVICE.get())
-                .patternLine(" P ")
-                .patternLine("EBE")
-                .patternLine(" I ")
-                .key('P', Tags.Items.GLASS_PANES)
-                .key('E', Items.ENDER_EYE)
-                .key('B', Items.BOOK)
-                .key('I', Tags.Items.INGOTS_IRON)
-                .addCriterion("has_recipe", hasItem(Items.ENDER_EYE))
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(Registration.PERSONAL_SHRINKING_DEVICE.get())
+                .pattern(" P ")
+                .pattern("EBE")
+                .pattern(" I ")
+                .define('P', Tags.Items.GLASS_PANES)
+                .define('E', Items.ENDER_EYE)
+                .define('B', Items.BOOK)
+                .define('I', Tags.Items.INGOTS_IRON)
+                .unlockedBy("has_recipe", has(Items.ENDER_EYE))
+                .save(consumer);
 
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_TINY.get(), ItemTags.PLANKS);
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_SMALL.get(), Tags.Items.STORAGE_BLOCKS_IRON);
@@ -54,24 +54,24 @@ public class RecipeGenerator extends RecipeProvider {
 
     protected void registerMachineRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider out, ITag<Item> center) {
         Item wall = Registration.ITEM_BREAKABLE_WALL.get();
-        ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shapedRecipe(out)
-                .patternLine("WWW");
+        ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(out)
+                .pattern("WWW");
 
         if (center != null)
-            recipe.patternLine("WCW");
+            recipe.pattern("WCW");
         else
-            recipe.patternLine("W W");
+            recipe.pattern("W W");
 
-        recipe.patternLine("WWW").key('W', wall);
+        recipe.pattern("WWW").define('W', wall);
         if (center != null)
-            recipe.key('C', center);
+            recipe.define('C', center);
 
         recipe
-                .addCriterion("has_recipe", hasItem(wall));
+                .unlockedBy("has_recipe", has(wall));
 
         ConditionalRecipe.builder()
                 .addCondition(new EnableVanillaRecipesConfigCondition())
-                .addRecipe(recipe::build)
+                .addRecipe(recipe::save)
                 .build(consumer, Objects.requireNonNull(out.asItem().getRegistryName()));
     }
 }

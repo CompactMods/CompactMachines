@@ -34,7 +34,7 @@ public class TunnelConnectionInfo implements ITunnelConnectionInfo {
     public Optional<? extends IWorldReader> getConnectedWorld(EnumTunnelSide side) {
         switch(side) {
             case INSIDE:
-                return Optional.ofNullable(tunnel.getWorld());
+                return Optional.ofNullable(tunnel.getLevel());
 
             case OUTSIDE:
                 return tunnel.getConnectedWorld();

@@ -28,6 +28,8 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class ItemPersonalShrinkingDevice extends Item {
 
     public ItemPersonalShrinkingDevice(Properties props) {
@@ -42,54 +44,54 @@ public class ItemPersonalShrinkingDevice extends Item {
 
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         if (Screen.hasShiftDown()) {
             tooltip.add(
                     new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".psd.hint")
-                            .mergeStyle(TextFormatting.YELLOW));
+                            .withStyle(TextFormatting.YELLOW));
         } else {
             tooltip.add(
                     new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".hold_shift.hint")
-                            .mergeStyle(TextFormatting.GRAY));
+                            .withStyle(TextFormatting.GRAY));
         }
 
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
         if (hand == Hand.OFF_HAND) {
-            return ActionResult.resultFail(stack);
+            return ActionResult.fail(stack);
         }
 
         // If we aren't in the compact dimension, allow PSD guide usage
         // Prevents misfiring if a player is trying to leave a machine or set their spawn
-        if(world.isRemote && world.getDimensionKey() != Registration.COMPACT_DIMENSION) {
+        if(world.isClientSide && world.dimension() != Registration.COMPACT_DIMENSION) {
             PersonalShrinkingDeviceScreen.show();
-            return ActionResult.resultSuccess(stack);
+            return ActionResult.success(stack);
         }
 
         if (world instanceof ServerWorld && player instanceof ServerPlayerEntity) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            if (serverPlayer.world.getDimensionKey() == Registration.COMPACT_DIMENSION) {
-                    ServerWorld serverWorld = serverPlayer.getServerWorld();
-                if (player.isSneaking()) {
-                    CompactMachineUtil.setMachineSpawn(serverWorld.getServer(), player.getPosition());
+            if (serverPlayer.level.dimension() == Registration.COMPACT_DIMENSION) {
+                    ServerWorld serverWorld = serverPlayer.getLevel();
+                if (player.isShiftKeyDown()) {
+                    CompactMachineUtil.setMachineSpawn(serverWorld.getServer(), player.blockPosition());
 
                     IFormattableTextComponent tc = new TranslationTextComponent("messages.compactmachines.psd.spawnpoint_set")
-                            .mergeStyle(TextFormatting.GREEN);
+                            .withStyle(TextFormatting.GREEN);
 
-                    player.sendStatusMessage(tc, true);
+                    player.displayClientMessage(tc, true);
                 } else {
                     PlayerUtil.teleportPlayerOutOfMachine(serverWorld, serverPlayer);
                 }
             }
         }
 
-        return ActionResult.resultSuccess(stack);
+        return ActionResult.success(stack);
     }
 
 }

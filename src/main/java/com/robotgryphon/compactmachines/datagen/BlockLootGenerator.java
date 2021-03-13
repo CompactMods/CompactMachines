@@ -35,7 +35,7 @@ public class BlockLootGenerator extends LootTableProvider {
 
     @Override
     protected void validate(Map<ResourceLocation, LootTable> map, ValidationTracker validationtracker) {
-        map.forEach((name, table) -> LootTableManager.validateLootTable(validationtracker, name, table));
+        map.forEach((name, table) -> LootTableManager.validate(validationtracker, name, table));
     }
 
     private static class Blocks extends BlockLootTables {
@@ -53,19 +53,19 @@ public class BlockLootGenerator extends LootTableProvider {
         }
 
         private LootPool.Builder registerSelfDroppedBlock(RegistryObject<Block> block, RegistryObject<Item> item) {
-            LootPool.Builder builder = LootPool.builder()
+            LootPool.Builder builder = LootPool.lootPool()
                     .name(block.get().getRegistryName().toString())
-                    .rolls(ConstantRange.of(1))
-                    .acceptCondition(SurvivesExplosion.builder())
-                    .addEntry(ItemLootEntry.builder(item.get()));
+                    .setRolls(ConstantRange.exactly(1))
+                    .when(SurvivesExplosion.survivesExplosion())
+                    .add(ItemLootEntry.lootTableItem(item.get()));
 
-            this.registerLootTable(block.get(), LootTable.builder().addLootPool(builder));
+            this.add(block.get(), LootTable.lootTable().withPool(builder));
             return builder;
         }
 
-        private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
-                .replaceOperation(Reference.CompactMachines.OWNER_NBT, Reference.CompactMachines.OWNER_NBT)
-                .replaceOperation("coords", "cm.coords");
+        private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.copyData(CopyNbt.Source.BLOCK_ENTITY)
+                .copy(Reference.CompactMachines.OWNER_NBT, Reference.CompactMachines.OWNER_NBT)
+                .copy("coords", "cm.coords");
 
         private LootPool.Builder registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
 //            LootTable.builder()
@@ -77,16 +77,16 @@ public class BlockLootGenerator extends LootTableProvider {
 //                                            .replaceOperation("Lock", "BlockEntityTag.Lock")
 //                                            .replaceOperation("LootTable", "BlockEntityTag.LootTable")
 //                                            .replaceOperation("LootTableSeed", "BlockEntityTag.LootTableSeed"))
-//                                    .acceptFunction(SetContents.builderIn().addLootEntry(DynamicLootEntry.func_216162_a(ShulkerBoxBlock.CONTENTS))))));
+//                                    .acceptFunction(SetContents.builderIn().addLootEntry(DynamicLootEntry.dynamicEntry(ShulkerBoxBlock.CONTENTS))))));
 
-            LootPool.Builder builder = LootPool.builder()
+            LootPool.Builder builder = LootPool.lootPool()
                     .name(block.get().getRegistryName().toString())
-                    .rolls(ConstantRange.of(1))
-                    .acceptCondition(SurvivesExplosion.builder())
-                    .acceptFunction(CopyOwnerAndReferenceFunction)
-                    .addEntry(ItemLootEntry.builder(item.get()));
+                    .setRolls(ConstantRange.exactly(1))
+                    .when(SurvivesExplosion.survivesExplosion())
+                    .apply(CopyOwnerAndReferenceFunction)
+                    .add(ItemLootEntry.lootTableItem(item.get()));
 
-            this.registerLootTable(block.get(), LootTable.builder().addLootPool(builder));
+            this.add(block.get(), LootTable.lootTable().withPool(builder));
             return builder;
         }
 

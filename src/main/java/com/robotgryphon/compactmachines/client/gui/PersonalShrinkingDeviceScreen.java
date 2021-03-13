@@ -77,21 +77,21 @@ public class PersonalShrinkingDeviceScreen extends Screen {
         // relY = relative position, places screen against bottom edge of screen
         int relY = (this.height - HEIGHT);
 
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(relX, relY, 0);
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
         this.blit(matrixStack, 0, 0, 0, 0, WIDTH, HEIGHT);
-        matrixStack.pop();
+        matrixStack.popPose();
 
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(relX + 15, relY + 14, 10);
 
         if(currentSection != null) {
             currentSection.render(matrixStack, mouseX - relX - 15, mouseY - relY - 14, partialTicks);
         }
 
-        matrixStack.pop();
+        matrixStack.popPose();
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
@@ -102,6 +102,6 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     }
 
     public static void show() {
-        Minecraft.getInstance().displayGuiScreen(new PersonalShrinkingDeviceScreen());
+        Minecraft.getInstance().setScreen(new PersonalShrinkingDeviceScreen());
     }
 }

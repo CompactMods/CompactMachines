@@ -43,19 +43,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import net.minecraft.block.AbstractBlock;
+
 public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
     private final EnumMachineSize size;
 
-    public BlockCompactMachine(EnumMachineSize size, Block.Properties props) {
+    public BlockCompactMachine(EnumMachineSize size, AbstractBlock.Properties props) {
         super(props);
         this.size = size;
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-        CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
-        float normalHardness = super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+    public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+        CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
+        float normalHardness = super.getDestroyProgress(state, player, worldIn, pos);
 
         if (tile == null)
             return normalHardness;
@@ -73,7 +75,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                 case OWNER:
                     Optional<UUID> ownerUUID = tile.getOwnerUUID();
                     return ownerUUID
-                            .map(uuid -> player.getUniqueID() == uuid ? normalHardness : 0)
+                            .map(uuid -> player.getUUID() == uuid ? normalHardness : 0)
                             .orElse(normalHardness);
 
                 case ANYONE:
@@ -91,7 +93,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
 //        TODO Tile Entity
 //        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
 //            return 0;
@@ -110,18 +112,18 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     public void neighborChanged(BlockState state, World world, BlockPos pos, Block changedBlock, BlockPos changedPos, boolean isMoving) {
         super.neighborChanged(state, world, pos, changedBlock, changedPos, isMoving);
 
-        if (world.isRemote)
+        if (world.isClientSide)
             return;
 
         ServerWorld serverWorld = (ServerWorld) world;
 
         BlockState changedState = serverWorld.getBlockState(changedPos);
 
-        CompactMachineTile machine = (CompactMachineTile) serverWorld.getTileEntity(pos);
+        CompactMachineTile machine = (CompactMachineTile) serverWorld.getBlockEntity(pos);
         if (machine == null)
             return;
 
-        ServerWorld compactWorld = serverWorld.getServer().getWorld(Registration.COMPACT_DIMENSION);
+        ServerWorld compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
             return;
@@ -129,15 +131,15 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
         // Determine whether it's an immediate neighbor; if so, execute ...
         Arrays.stream(Direction.values())
-                .filter(hd -> pos.offset(hd).equals(changedPos))
+                .filter(hd -> pos.relative(hd).equals(changedPos))
                 .findFirst()
                 .ifPresent(facing -> {
                     Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(machine.machineId, serverWorld, facing);
                     for (BlockPos tunnelPos : tunnelsForMachineSide) {
-                        TunnelWallTile tunnelTile = (TunnelWallTile) compactWorld.getTileEntity(tunnelPos);
+                        TunnelWallTile tunnelTile = (TunnelWallTile) compactWorld.getBlockEntity(tunnelPos);
                         if (tunnelTile == null) continue;
 
-                        compactWorld.notifyNeighborsOfStateChange(tunnelPos, Registration.BLOCK_TUNNEL_WALL.get());
+                        compactWorld.updateNeighborsAt(tunnelPos, Registration.BLOCK_TUNNEL_WALL.get());
 
                         ITunnelConnectionInfo connInfo = TunnelHelper.generateConnectionInfo(tunnelTile);
 
@@ -146,7 +148,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                             if (tunnelDefinition instanceof IRedstoneReaderTunnel) {
                                 // Send redstone changes into machine
                                 IRedstoneReaderTunnel rrt = (IRedstoneReaderTunnel) tunnelDefinition;
-                                int latestPower = world.getRedstonePower(changedPos, facing);
+                                int latestPower = world.getSignal(changedPos, facing);
                                 rrt.onPowerChanged(connInfo, latestPower);
                             }
                         });
@@ -159,10 +161,10 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         Block given = CompactMachineUtil.getMachineBlockBySize(this.size);
         ItemStack stack = new ItemStack(given, 1);
 
-        CompoundNBT nbt = stack.getOrCreateChildTag("cm");
+        CompoundNBT nbt = stack.getOrCreateTagElement("cm");
         nbt.putString("size", this.size.getName());
 
-        CompactMachineTile tileEntity = (CompactMachineTile) world.getTileEntity(pos);
+        CompactMachineTile tileEntity = (CompactMachineTile) world.getBlockEntity(pos);
         if (tileEntity != null) {
             nbt.putInt("coords", tileEntity.machineId);
         }
@@ -189,39 +191,39 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public void onPlayerDestroy(IWorld world, BlockPos pos, BlockState state) {
-        if (world.isRemote()) {
-            super.onPlayerDestroy(world, pos, state);
+    public void destroy(IWorld world, BlockPos pos, BlockState state) {
+        if (world.isClientSide()) {
+            super.destroy(world, pos, state);
             return;
         }
 
-        if (!(world.getTileEntity(pos) instanceof CompactMachineTile)) {
+        if (!(world.getBlockEntity(pos) instanceof CompactMachineTile)) {
             return;
         }
 
-        CompactMachineTile te = (CompactMachineTile) world.getTileEntity(pos);
+        CompactMachineTile te = (CompactMachineTile) world.getBlockEntity(pos);
 //        WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
 //
 //        BlockMachine.spawnItemWithNBT(world, pos, state.get(BlockMachine.SIZE), te);
 //
 //        ChunkLoadingMachines.unforceChunk(te.coords);
 
-        super.onPlayerDestroy(world, pos, state);
+        super.destroy(world, pos, state);
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 
-        if (worldIn.isRemote())
+        if (worldIn.isClientSide())
             return;
 
         ServerWorld serverWorld = (ServerWorld) worldIn;
 
-        boolean hasProperTile = worldIn.getTileEntity(pos) instanceof CompactMachineTile;
+        boolean hasProperTile = worldIn.getBlockEntity(pos) instanceof CompactMachineTile;
         if (!hasProperTile)
             return;
 
-        CompactMachineTile tile = (CompactMachineTile) worldIn.getTileEntity(pos);
+        CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
 
         // The machine already has data for some reason
         if (tile.machineId != -1)
@@ -234,11 +236,11 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         CompoundNBT nbt = stack.getOrCreateTag();
 
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-            tile.setOwner(nbt.getUniqueId(Reference.CompactMachines.OWNER_NBT));
+            tile.setOwner(nbt.getUUID(Reference.CompactMachines.OWNER_NBT));
         }
 
         if (!tile.getOwnerUUID().isPresent() && placer instanceof PlayerEntity) {
-            tile.setOwner(placer.getUniqueID());
+            tile.setOwner(placer.getUUID());
         }
 
         if (nbt.contains("cm")) {
@@ -252,7 +254,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         }
 
         tile.doPostPlaced();
-        tile.markDirty();
+        tile.setChanged();
     }
 
 //        // TODO: Allow storing of schemas in machines
@@ -282,8 +284,8 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote())
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isClientSide())
             return ActionResultType.SUCCESS;
 
         // TODO - Open GUI with machine preview
@@ -291,10 +293,10 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            TileEntity te = worldIn.getTileEntity(pos);
+            TileEntity te = worldIn.getBlockEntity(pos);
             CompactMachineTile tile = (CompactMachineTile) te;
 
-            ItemStack mainItem = player.getHeldItemMainhand();
+            ItemStack mainItem = player.getMainHandItem();
             if (mainItem.isEmpty())
                 return ActionResultType.PASS;
 

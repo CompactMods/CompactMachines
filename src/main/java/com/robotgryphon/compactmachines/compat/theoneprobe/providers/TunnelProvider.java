@@ -39,13 +39,13 @@ public class TunnelProvider {
     }
 
     private static void addProbeInfo(ProbeMode probeMode, IProbeInfo info, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData hitData) {
-        Direction side = blockState.get(TunnelWallBlock.CONNECTED_SIDE);
+        Direction side = blockState.getValue(TunnelWallBlock.CONNECTED_SIDE);
         ILayoutStyle center = info.defaultLayoutStyle()
                 .alignment(ElementAlignment.ALIGN_CENTER);
 
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
-        TunnelWallTile tile = (TunnelWallTile) world.getTileEntity(hitData.getPos());
+        TunnelWallTile tile = (TunnelWallTile) world.getBlockEntity(hitData.getPos());
         if (tile == null)
             return;
 
@@ -56,7 +56,7 @@ public class TunnelProvider {
             Optional<TunnelDefinition> definition = tile.getTunnelDefinition();
             if (definition.isPresent()) {
                 IFormattableTextComponent tunType = new StringTextComponent(definition.get().getRegistryName().toString())
-                        .mergeStyle(TextFormatting.GRAY);
+                        .withStyle(TextFormatting.GRAY);
 
                 CompoundText type = CompoundText.create().name(tunType);
                 v.horizontal(center)
@@ -69,7 +69,7 @@ public class TunnelProvider {
                         .orElse(new ResourceLocation(CompactMachines.MOD_ID, "unknown"));
 
                 IFormattableTextComponent tunType = new TranslationTextComponent(CompactMachines.MOD_ID + ".errors.unknown_tunnel_type", defID)
-                        .mergeStyle(TextFormatting.GRAY);
+                        .withStyle(TextFormatting.GRAY);
 
                 CompoundText type = CompoundText.create().name(tunType);
                 v.horizontal(center)
@@ -80,7 +80,7 @@ public class TunnelProvider {
 
         String sideTranslated = IProbeInfo.STARTLOC
                 .concat(CompactMachines.MOD_ID + ".direction.")
-                .concat(side.getName2())
+                .concat(side.getName())
                 .concat(IProbeInfo.ENDLOC);
 
         v
@@ -99,7 +99,7 @@ public class TunnelProvider {
             try {
                 // If connected block isn't air, show a connected block line
                 if (!state.isAir(connectedWorld, outPosBlock)) {
-                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getTranslationKey() + IProbeInfo.ENDLOC;
+                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
                     RayTraceResult trace = new BlockRayTraceResult(
                             hitData.getHitVec(), hitData.getSideHit(),
                             outPosBlock, false);
