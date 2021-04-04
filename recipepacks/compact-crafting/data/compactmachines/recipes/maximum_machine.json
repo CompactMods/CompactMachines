@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "type": "compactcrafting:miniaturization",
   "recipeSize": 5,
   "layers": [
     {
@@ -37,11 +37,13 @@
 
   "components": {
     "W": {
-      "Name": "compactmachines:wall"
+      "type": "compactcrafting:block",
+      "block": "compactmachines:wall"
     },
 
     "E": {
-      "Name": "minecraft:emerald_block"
+      "type": "compactcrafting:block",
+      "block": "minecraft:emerald_block"
     }
   },
 

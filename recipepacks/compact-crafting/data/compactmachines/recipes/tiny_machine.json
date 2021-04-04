@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "type": "compactcrafting:miniaturization",
   "recipeSize": 3,
   "layers": [
     {
@@ -23,7 +23,8 @@
 
   "components": {
     "W": {
-      "Name": "compactmachines:wall"
+      "type": "compactcrafting:block",
+      "block": "compactmachines:wall"
     }
   },
 

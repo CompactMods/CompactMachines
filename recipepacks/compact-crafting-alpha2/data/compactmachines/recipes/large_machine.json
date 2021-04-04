@@ -1,5 +1,5 @@
 {
-  "type": "compactcrafting:miniaturization",
+  "version": 1,
   "recipeSize": 5,
   "layers": [
     {
@@ -11,14 +11,8 @@
       "wall": "W"
     },
     {
-      "type": "compactcrafting:mixed",
-      "pattern": [
-        ["W", "W", "W", "W", "W"],
-        ["W", "-", "-", "-", "W"],
-        ["W", "-", "D", "-", "W"],
-        ["W", "-", "-", "-", "W"],
-        ["W", "W", "W", "W", "W"]
-      ]
+      "type": "compactcrafting:hollow",
+      "wall": "W"
     },
     {
       "type": "compactcrafting:hollow",
@@ -37,18 +31,13 @@
 
   "components": {
     "W": {
-      "type": "compactcrafting:block",
-      "block": "compactmachines:wall"
-    },
-    "D": {
-      "type": "compactcrafting:block",
-      "block": "minecraft:diamond_block"
+      "Name": "compactmachines:wall"
     }
   },
 
   "outputs": [
     {
-      "id": "compactmachines:machine_giant",
+      "id": "compactmachines:machine_large",
       "Count": 1
     }
   ]

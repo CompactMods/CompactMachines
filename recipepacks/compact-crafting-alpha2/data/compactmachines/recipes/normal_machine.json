@@ -1,5 +1,5 @@
 {
-  "type": "compactcrafting:miniaturization",
+  "version": 1,
   "recipeSize": 3,
   "layers": [
     {
@@ -10,7 +10,7 @@
       "type": "compactcrafting:mixed",
       "pattern": [
         ["W", "W", "W"],
-        ["W", "I", "W"],
+        ["W", "G", "W"],
         ["W", "W", "W"]
       ]
     },
@@ -27,18 +27,16 @@
 
   "components": {
     "W": {
-      "type": "compactcrafting:block",
-      "block": "compactmachines:wall"
+      "Name": "compactmachines:wall"
     },
-    "I": {
-      "type": "compactcrafting:block",
-      "block": "minecraft:iron_block"
+    "G": {
+      "Name": "minecraft:gold_block"
     }
   },
 
   "outputs": [
     {
-      "id": "compactmachines:machine_small",
+      "id": "compactmachines:machine_normal",
       "Count": 1
     }
   ]

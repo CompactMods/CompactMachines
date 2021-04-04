@@ -1,18 +1,10 @@
 {
-  "type": "compactcrafting:miniaturization",
-  "recipeSize": 5,
+  "version": 1,
+  "recipeSize": 3,
   "layers": [
     {
       "type": "compactcrafting:filled",
       "component": "W"
-    },
-    {
-      "type": "compactcrafting:hollow",
-      "wall": "W"
-    },
-    {
-      "type": "compactcrafting:hollow",
-      "wall": "W"
     },
     {
       "type": "compactcrafting:hollow",
@@ -31,14 +23,13 @@
 
   "components": {
     "W": {
-      "type": "compactcrafting:block",
-      "block": "compactmachines:wall"
+      "Name": "compactmachines:wall"
     }
   },
 
   "outputs": [
     {
-      "id": "compactmachines:machine_large",
+      "id": "compactmachines:machine_tiny",
       "Count": 1
     }
   ]

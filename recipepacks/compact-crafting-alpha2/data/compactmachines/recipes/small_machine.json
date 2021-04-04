@@ -1,5 +1,5 @@
 {
-  "type": "compactcrafting:miniaturization",
+  "version": 1,
   "recipeSize": 3,
   "layers": [
     {
@@ -27,12 +27,10 @@
 
   "components": {
     "W": {
-      "type": "compactcrafting:block",
-      "block": "compactmachines:wall"
+      "Name": "compactmachines:wall"
     },
     "I": {
-      "type": "compactcrafting:block",
-      "block": "minecraft:iron_block"
+      "Name": "minecraft:iron_block"
     }
   },
 

@@ -1,5 +1,5 @@
 {
-  "type": "compactcrafting:miniaturization",
+  "version": 1,
   "recipeSize": 5,
   "layers": [
     {
@@ -15,7 +15,7 @@
       "pattern": [
         ["W", "W", "W", "W", "W"],
         ["W", "-", "-", "-", "W"],
-        ["W", "-", "D", "-", "W"],
+        ["W", "-", "E", "-", "W"],
         ["W", "-", "-", "-", "W"],
         ["W", "W", "W", "W", "W"]
       ]
@@ -37,18 +37,17 @@
 
   "components": {
     "W": {
-      "type": "compactcrafting:block",
-      "block": "compactmachines:wall"
+      "Name": "compactmachines:wall"
     },
-    "D": {
-      "type": "compactcrafting:block",
-      "block": "minecraft:diamond_block"
+
+    "E": {
+      "Name": "minecraft:emerald_block"
     }
   },
 
   "outputs": [
     {
-      "id": "compactmachines:machine_giant",
+      "id": "compactmachines:machine_maximum",
       "Count": 1
     }
   ]

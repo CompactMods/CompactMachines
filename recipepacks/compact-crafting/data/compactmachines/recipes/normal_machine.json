@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "type": "compactcrafting:miniaturization",
   "recipeSize": 3,
   "layers": [
     {
@@ -27,10 +27,12 @@
 
   "components": {
     "W": {
-      "Name": "compactmachines:wall"
+      "type": "compactcrafting:block",
+      "block": "compactmachines:wall"
     },
     "G": {
-      "Name": "minecraft:gold_block"
+      "type": "compactcrafting:block",
+      "block": "minecraft:gold_block"
     }
   },
 
