@@ -174,7 +174,7 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
-    destinationDir = file("$rootDir/build-out")
+    destinationDirectory = file("$rootDir/build-out")
     finalizedBy('reobfJar')
     manifest {
         attributes([
@@ -182,7 +182,7 @@ jar {
                 "Specification-Vendor"    : "",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}",
+                "Implementation-Version"  : "${archiveVersion}",
                 "Implementation-Vendor"   : "",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -194,8 +194,8 @@ task apiJar(type: Jar) {
     from(sourceSets.main.allJava)
     from(sourceSets.main.output)
     include 'com/robotgryphon/compactmachines/api/**'
-    classifier = 'api'
-    destinationDir = file("$rootDir/build-out")
+    archiveClassifier = 'api'
+    destinationDirectory = file("$rootDir/build-out")
 }
 
 artifacts {
