@@ -1,7 +1,13 @@
 package com.robotgryphon.compactmachines.teleportation;
 
-import com.robotgryphon.compactmachines.data.NbtDataUtil;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +26,17 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     private RegistryKey<World> dimension;
     private Vector3d position;
 
+    public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
+            Codec.STRING.fieldOf("dim").forGetter(DimensionalPosition::getDimensionString),
+            CodecExtensions.VECTOR3D_CODEC.fieldOf("pos").forGetter(DimensionalPosition::getPosition)
+    ).apply(i, DimensionalPosition::new));
+
     private DimensionalPosition() { }
+
+    private DimensionalPosition(String dimKey, Vector3d pos) {
+        this.dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimKey));
+        this.position = pos;
+    }
 
     public DimensionalPosition(RegistryKey<World> dim, Vector3d pos) {
         this.dimension = dim;
@@ -45,30 +61,28 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
     @Override
     public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
-        nbt.putString("dim", dimension.location().toString());
-        CompoundNBT posNbt = NbtDataUtil.writeVectorCompound(position);
-        nbt.put("pos", posNbt);
-        return nbt;
+        DataResult<INBT> nbt = CODEC.encodeStart(NBTDynamicOps.INSTANCE, this);
+        return (CompoundNBT) nbt.result().orElse(null);
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        if(nbt.contains("dim"))
-        {
-            ResourceLocation dim = new ResourceLocation(nbt.getString("dim"));
-            this.dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, dim);
-        }
+        Optional<DimensionalPosition> dimensionalPosition = CODEC
+                .parse(NBTDynamicOps.INSTANCE, nbt)
+                .resultOrPartial(CompactMachines.LOGGER::error);
 
-        if(nbt.contains("pos")) {
-            CompoundNBT bPosNbt = nbt.getCompound("pos");
-            Vector3d bPos = NbtDataUtil.readVectorCompound(bPosNbt);
-            this.position = bPos;
-        }
+        dimensionalPosition.ifPresent(dp -> {
+            this.dimension = dp.dimension;
+            this.position = dp.position;
+        });
     }
 
     public RegistryKey<World> getDimension() {
         return this.dimension;
+    }
+
+    private String getDimensionString() {
+        return this.dimension.location().toString();
     }
 
     public Vector3d getPosition() {

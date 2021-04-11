@@ -94,7 +94,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
     @Override
     public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-//        TODO Tile Entity
+//        TODO Redstone out tunnels
 //        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
 //            return 0;
 //        }
@@ -256,32 +256,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         tile.doPostPlaced();
         tile.setChanged();
     }
-
-//        // TODO: Allow storing of schemas in machines
-//        if(stack.hasTag()) {
-//            if(stack.getTag().contains("coords")) {
-//                int coords = stack.getTag().getInt("coords");
-//                if (coords != -1) {
-//                    tileEntityMachine.coords = coords;
-//                    if(!world.isRemote) {
-//                        WorldSavedDataMachines.INSTANCE.addMachinePosition(tileEntityMachine.coords, pos, world.provider.getDimension(), tileEntityMachine.getSize());
-//                        StructureTools.setBiomeForCoords(coords, world.getBiome(pos));
-//                    }
-//                }
-//            }
-//
-//            if(stack.getTag().contains("schema")) {
-//                tileEntityMachine.setSchema(stack.getTag().getString("schema"));
-//            }
-//
-
-//        }
-//
-
-//
-//        tileEntityMachine.markDirty();
-//    }
-
 
     @Override
     public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {

@@ -2,7 +2,7 @@ package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.data.legacy.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;

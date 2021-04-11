@@ -2,10 +2,11 @@ package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.CompactMachineCommonData;
-import com.robotgryphon.compactmachines.data.SavedMachineData;
-import com.robotgryphon.compactmachines.data.machines.CompactMachinePlayerData;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.data.legacy.CompactMachineCommonData;
+import com.robotgryphon.compactmachines.data.legacy.SavedMachineData;
+import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
+import com.robotgryphon.compactmachines.data.legacy.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.data.world.ExternalMachineData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
@@ -189,8 +190,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         if (level instanceof ServerWorld) {
             Optional<CompactMachinePlayerData> playerData = Optional.empty();
             try {
-                SavedMachineData machineData = SavedMachineData.getInstance(level.getServer());
-                playerData = machineData.getData().getPlayerData(machineId);
+                CompactMachinePlayerData psd = CompactMachinePlayerData.get(level.getServer());
+                // psd = psd.getPlayersInside(this.machineId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -207,6 +208,15 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         return base;
     }
 
+    public Optional<ChunkPos> getInternalChunkPos() {
+        if(level instanceof ServerWorld) {
+            ExternalMachineData emd = ExternalMachineData.get(level.getServer());
+            return emd.getChunkLocation(this.machineId);
+        }
+
+        return Optional.empty();
+    }
+
     @Override
     public void handleUpdateTag(BlockState state, CompoundNBT tag) {
         super.handleUpdateTag(state, tag);
@@ -214,7 +224,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.machineId = tag.getInt("machine");
         if (tag.contains("players")) {
             CompoundNBT players = tag.getCompound("players");
-            playerData = CompactMachinePlayerData.fromNBT(players);
+            // playerData = CompactMachinePlayerData.fromNBT(players);
 
         }
 
@@ -265,11 +275,13 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public boolean hasPlayersInside() {
-        return CompactMachineCommonData
-                .getInstance()
-                .getPlayerData(machineId)
-                .map(CompactMachinePlayerData::hasPlayers)
-                .orElse(false);
+        return false;
+        // TODO
+//        return CompactMachineCommonData
+//                .getInstance()
+//                .getPlayerData(machineId)
+//                .map(CompactMachinePlayerData::hasPlayers)
+//                .orElse(false);
     }
 
     protected void doChunkload(boolean force) {
@@ -294,8 +306,9 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void handlePlayerEntered(UUID playerID) {
-        if(this.playerData != null)
-            this.playerData.addPlayer(playerID);
+        // TODO
+//        if(this.playerData != null)
+//            this.playerData.addPlayer(playerID);
     }
 
     /*

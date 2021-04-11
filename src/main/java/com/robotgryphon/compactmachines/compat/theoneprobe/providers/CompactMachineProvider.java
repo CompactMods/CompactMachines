@@ -6,7 +6,7 @@ import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.machines.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.data.legacy.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
