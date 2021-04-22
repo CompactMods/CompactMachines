@@ -47,6 +47,9 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addTunnelRecipes(Consumer<IFinishedRecipe> consumer) {
         // todo
+
+        ShapelessRecipeBuilder.shapeless()
+
     }
 
     private void addMachineRecipes(Consumer<IFinishedRecipe> consumer) {

@@ -262,8 +262,7 @@ publishing {
 }
 
 test {
-    useJUnitPlatform()
-    filter {
-        exclude "com/robotgryphon/compactmachines/tests/minecraft/**"
+    useJUnitPlatform {
+        excludeTags "minecraft"
     }
 }

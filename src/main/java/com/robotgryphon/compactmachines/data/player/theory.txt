@@ -5,11 +5,11 @@ Machines A,B,C,D
 machine locations (external)
 ======================================================================
 A (01): 00, 00, 00 @ overworld
-A (05): 76, 40, 76 @ compact_world
-A (06): 51, 40, 51 @ compact_world
-B (02): 26, 40, 26 @ compact_world
-C (03): 51, 40, 51 @ compact_world
+B (02): 26, 40, 26 @ compact_world (inside A)
+C (03): 51, 40, 51 @ compact_world (inside B)
 D (04): 10, 10, 10 @ overworld
+A (05): 76, 40, 76 @ compact_world (inside D)
+A (06): 51, 40, 51 @ compact_world (inside C)
 
 ======================================================================
 Tree View of machine nesting
@@ -54,3 +54,7 @@ head    DimPos { 10, 00, 10   @ overworld }         (entered D)
 
 Player P is represented as "inside" A, B, C, and D.
     B and C are included because A is inside C, and the tree was traversed upwards.
+
+
+
+

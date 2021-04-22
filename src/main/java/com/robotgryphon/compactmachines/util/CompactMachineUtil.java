@@ -94,7 +94,7 @@ public abstract class CompactMachineUtil {
 
             try {
                 // Mark the player as inside the machine, set external spawn, and yeet
-                CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, machinePos, tile.machineId);
+                CompactMachinePlayerUtil.addPlayerToMachine(serverPlayer, machinePos);
             } catch (Exception ex) {
                 CompactMachines.LOGGER.error(ex);
             }
