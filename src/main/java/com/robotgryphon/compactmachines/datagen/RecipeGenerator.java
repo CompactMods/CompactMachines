@@ -40,7 +40,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .define('I', Tags.Items.INGOTS_IRON)
                 .unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
                 .save(consumer);
-        
+
         addMachineRecipes(consumer);
     }
 

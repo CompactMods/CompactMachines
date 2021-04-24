@@ -3,6 +3,7 @@ package com.robotgryphon.compactmachines.data.machine;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
@@ -39,11 +40,20 @@ public class CompactMachineInternalData {
         return this.size.name();
     }
 
+    public UUID getOwner() { return this.owner; }
+
     private String getOwnerString() {
         return owner.toString();
     }
 
     public BlockPos getSpawn() {
+        if(this.spawn != null)
+            return this.spawn;
+
+        BlockPos.Mutable newSpawn = center.mutable();
+        newSpawn.setY(newSpawn.getY() - (size.getInternalSize() / 2));
+
+        this.spawn = newSpawn;
         return this.spawn;
     }
 
@@ -53,5 +63,9 @@ public class CompactMachineInternalData {
 
     public void setSpawn(BlockPos newSpawn) {
         this.spawn = newSpawn;
+    }
+
+    public AxisAlignedBB getMachineBounds() {
+        return size.getBounds(this.center);
     }
 }

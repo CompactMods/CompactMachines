@@ -18,6 +18,7 @@ import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.naming.OperationNotSupportedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import java.util.Optional;
 public class InternalMachineData extends WorldSavedData {
     public static final String DATA_NAME = "machines_internal";
 
-    public Map<ChunkPos, CompactMachineInternalData> machineData;
+    private Map<ChunkPos, CompactMachineInternalData> machineData;
 
     public InternalMachineData() {
         super(DATA_NAME);
@@ -80,5 +81,25 @@ public class InternalMachineData extends WorldSavedData {
         }
 
         return nbt;
+    }
+
+    public boolean isRegistered(ChunkPos chunkPos) {
+        return machineData.containsKey(chunkPos);
+    }
+
+    public void register(ChunkPos pos, CompactMachineInternalData data) throws OperationNotSupportedException {
+        if(isRegistered(pos))
+            throw new OperationNotSupportedException("Machine already registered.");
+
+        machineData.put(pos, data);
+        setDirty();
+    }
+
+    public Optional<CompactMachineInternalData> forChunk(ChunkPos chunkPos) {
+        return Optional.ofNullable(machineData.get(chunkPos));
+    }
+
+    public int getNextId() {
+        return this.machineData.size() + 1;
     }
 }

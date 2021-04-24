@@ -15,6 +15,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
+import javax.naming.OperationNotSupportedException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,7 +41,7 @@ public class SavedMachineDataMigrator {
         }
 
         InternalMachineData imd = InternalMachineData.get(server);
-        if(imd == null) {
+        if (imd == null) {
             CompactMachines.LOGGER.error("Could not perform migration; couldn't create the internal machine file.");
             return;
         }
@@ -63,9 +64,13 @@ public class SavedMachineDataMigrator {
             if (!emd.machineMapping.containsKey(id))
                 emd.machineMapping.put(id, machineChunk);
 
-            if(!imd.machineData.containsKey(machineChunk)) {
-                CompactMachineInternalData d = new CompactMachineInternalData(owner, center, spawn, size);
-                imd.machineData.put(machineChunk, d);
+            if (!imd.isRegistered(machineChunk)) {
+                try {
+                    CompactMachineInternalData d = new CompactMachineInternalData(owner, center, spawn, size);
+                    imd.register(machineChunk, d);
+                } catch (OperationNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

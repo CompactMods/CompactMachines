@@ -2,13 +2,13 @@ package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.legacy.CompactMachineCommonData;
-import com.robotgryphon.compactmachines.data.legacy.SavedMachineData;
+import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
-import com.robotgryphon.compactmachines.data.legacy.CompactMachineRegistrationData;
 import com.robotgryphon.compactmachines.data.world.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.world.InternalMachineData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.api.tunnels.ICapableTunnel;
 import net.minecraft.block.BlockState;
@@ -17,6 +17,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -260,15 +261,26 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.setChanged();
     }
 
-    public Optional<CompactMachineRegistrationData> getMachineData() {
-        if (this.machineId == 0)
+    public Optional<CompactMachineInternalData> getInternalData() {
+        if(this.machineId == 0)
             return Optional.empty();
 
         if (level instanceof ServerWorld) {
-            return Optional.ofNullable(level.getServer())
-                    .map(SavedMachineData::getInstance)
-                    .map(SavedMachineData::getData)
-                    .flatMap(d -> d.getMachineData(this.machineId));
+            MinecraftServer serv = level.getServer();
+            if(serv == null)
+                return Optional.empty();
+
+            // Get external machine info (which, this should have some if it has a machine ID
+            ExternalMachineData extern = ExternalMachineData.get(serv);
+            if(extern == null)
+                return Optional.empty();
+
+            Optional<ChunkPos> chunkLocation = extern.getChunkLocation(machineId);
+            if(!chunkLocation.isPresent())
+                return Optional.empty();
+
+            InternalMachineData intern = InternalMachineData.get(serv);
+            return intern.forChunk(chunkLocation.get());
         } else {
             return Optional.empty();
         }
@@ -288,7 +300,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         if (level == null || level.isClientSide)
             return;
 
-        getMachineData().ifPresent(data -> {
+        getInternalData().ifPresent(data -> {
             ServerWorld compact = this.level.getServer().getLevel(Registration.COMPACT_DIMENSION);
             IChunk machineChunk = compact.getChunk(data.getCenter());
             ChunkPos chunkPos = machineChunk.getPos();
@@ -297,6 +309,21 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void doPostPlaced() {
+        if(this.level == null || this.level.isClientSide)
+            return;
+
+        MinecraftServer serv = this.level.getServer();
+        if(serv == null)
+            return;
+
+        DimensionalPosition dp = new DimensionalPosition(
+                this.level.dimension(),
+                this.worldPosition
+        );
+
+        ExternalMachineData extern = ExternalMachineData.get(serv);
+        extern.setMachineLocation(this.machineId, dp);
+
         doChunkload(true);
     }
 
@@ -309,6 +336,10 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         // TODO
 //        if(this.playerData != null)
 //            this.playerData.addPlayer(playerID);
+    }
+
+    public boolean mapped() {
+        return getInternalData().isPresent();
     }
 
     /*

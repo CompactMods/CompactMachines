@@ -164,4 +164,19 @@ public class ExternalMachineData extends WorldSavedData {
     public Optional<ChunkPos> getChunkLocation(int machineId) {
         return Optional.ofNullable(machineMapping.get(machineId));
     }
+
+    public boolean isPlaced(Integer machineId) {
+        return machineLocations.containsKey(machineId);
+    }
+
+    public void setMachineLocation(int machineId, DimensionalPosition position) {
+        // TODO - Packet/Event for machine changing external location (tunnels)
+        machineLocations.put(machineId, position);
+        this.setDirty();
+    }
+
+    @Nullable
+    public DimensionalPosition getMachineLocation(int machineId) {
+        return machineLocations.get(machineId);
+    }
 }

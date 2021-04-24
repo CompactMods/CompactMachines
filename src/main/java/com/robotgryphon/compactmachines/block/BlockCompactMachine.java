@@ -3,25 +3,25 @@ package com.robotgryphon.compactmachines.block;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.api.tunnels.ITunnelConnectionInfo;
 import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneReaderTunnel;
-import com.robotgryphon.compactmachines.api.tunnels.redstone.IRedstoneTunnel;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
-import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeDataProvider;
-import com.robotgryphon.compactmachines.config.CommonConfig;
+import com.robotgryphon.compactmachines.compat.theoneprobe.providers.CompactMachineProvider;
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.EnumMachinePlayersBreakHandling;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
-import com.robotgryphon.compactmachines.util.CompactMachineUtil;
+import com.robotgryphon.compactmachines.util.PlayerUtil;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -33,7 +33,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -42,8 +41,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import net.minecraft.block.AbstractBlock;
 
 public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
@@ -156,9 +153,73 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
                 });
     }
 
+
+    public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundNBT tag) {
+        try {
+            if (tag == null)
+                return EnumMachineSize.TINY;
+
+            if (!tag.contains("size"))
+                return EnumMachineSize.TINY;
+
+            String sizeFromTag = tag.getString("size");
+            return EnumMachineSize.getFromSize(sizeFromTag);
+        } catch (Exception ex) {
+            return EnumMachineSize.TINY;
+        }
+    }
+
+    public static Block getBySize(EnumMachineSize size) {
+        switch (size) {
+            case TINY:
+                return Registration.MACHINE_BLOCK_TINY.get();
+
+            case SMALL:
+                return Registration.MACHINE_BLOCK_SMALL.get();
+
+            case NORMAL:
+                return Registration.MACHINE_BLOCK_NORMAL.get();
+
+            case LARGE:
+                return Registration.MACHINE_BLOCK_LARGE.get();
+
+            case GIANT:
+                return Registration.MACHINE_BLOCK_GIANT.get();
+
+            case MAXIMUM:
+                return Registration.MACHINE_BLOCK_MAXIMUM.get();
+        }
+
+        return Registration.MACHINE_BLOCK_NORMAL.get();
+    }
+
+    public static Item getItemBySize(EnumMachineSize size) {
+        switch (size) {
+            case TINY:
+                return Registration.MACHINE_BLOCK_ITEM_TINY.get();
+
+            case SMALL:
+                return Registration.MACHINE_BLOCK_ITEM_SMALL.get();
+
+            case NORMAL:
+                return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
+
+            case LARGE:
+                return Registration.MACHINE_BLOCK_ITEM_LARGE.get();
+
+            case GIANT:
+                return Registration.MACHINE_BLOCK_ITEM_GIANT.get();
+
+            case MAXIMUM:
+                return Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
+        }
+
+        return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
+    }
+
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        Block given = CompactMachineUtil.getMachineBlockBySize(this.size);
+        Block given = getBySize(this.size);
         ItemStack stack = new ItemStack(given, 1);
 
         CompoundNBT nbt = stack.getOrCreateTagElement("cm");
@@ -233,7 +294,12 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 //            tile.setCustomName(stack.getDisplayName());
 //        }
 
-        CompoundNBT nbt = stack.getOrCreateTag();
+        if(!stack.hasTag())
+            return;
+
+        CompoundNBT nbt = stack.getTag();
+        if(nbt == null)
+            return;
 
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
             tile.setOwner(nbt.getUUID(Reference.CompactMachines.OWNER_NBT));
@@ -248,8 +314,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
             if (machineData.contains("coords")) {
                 int machineID = machineData.getInt("coords");
                 tile.setMachineId(machineID);
-
-                CompactMachineUtil.updateMachineInWorldPosition(serverWorld, machineID, pos);
             }
         }
 
@@ -274,9 +338,10 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
             if (mainItem.isEmpty())
                 return ActionResultType.PASS;
 
+            // TODO - Item tags instead of direct item reference here
             if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
                 // Try teleport to compact machine dimension
-                CompactMachineUtil.teleportInto(serverPlayer, pos, size);
+                PlayerUtil.teleportPlayerIntoMachine(serverPlayer, pos, size);
             }
         }
 

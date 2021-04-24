@@ -1,13 +1,14 @@
 package com.robotgryphon.compactmachines.compat.theoneprobe.providers;
 
 import com.mojang.authlib.GameProfile;
-import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.api.core.Tooltips;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.block.tiles.TunnelWallTile;
 import com.robotgryphon.compactmachines.compat.theoneprobe.IProbeData;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.legacy.CompactMachineRegistrationData;
+import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
+import com.robotgryphon.compactmachines.util.TranslationUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -18,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -40,33 +40,35 @@ public class CompactMachineProvider {
         if (te instanceof CompactMachineTile) {
             CompactMachineTile machine = (CompactMachineTile) te;
 
-            Optional<CompactMachineRegistrationData> machineData = machine.getMachineData();
+            Optional<CompactMachineInternalData> machineData = machine.getInternalData();
             machineData.ifPresent(md -> {
 
-                IFormattableTextComponent id = new TranslationTextComponent(
-                        String.format("tooltip.%s.machine_id", CompactMachines.MOD_ID),
-                        md.getId()
-                ).withStyle(TextFormatting.GREEN);
+                IFormattableTextComponent id = TranslationUtil
+                        .tooltip(Tooltips.Machines.ID, machine.machineId)
+                        .withStyle(TextFormatting.GREEN);
+
                 info.text(id);
 
                 // Owner Name
                 PlayerEntity owner = world.getPlayerByUUID(md.getOwner());
                 if (owner != null) {
                     GameProfile ownerProfile = owner.getGameProfile();
-                    IFormattableTextComponent ownerText = new TranslationTextComponent(
-                            String.format("tooltip.%s.owner", CompactMachines.MOD_ID), ownerProfile.getName()
-                    ).withStyle(TextFormatting.GRAY);
+                    IFormattableTextComponent ownerText = TranslationUtil
+                        .tooltip(Tooltips.Machines.OWNER, ownerProfile.getName())
+                        .withStyle(TextFormatting.GRAY);
 
                     info.text(ownerText);
                 }
 
-                Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(md.getId(), (ServerWorld) world, hitData.getSideHit());
+                Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(machine.machineId,
+                        (ServerWorld) world, hitData.getSideHit());
+
                 IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
 
                 ServerWorld cm = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
                 tunnelsForMachineSide.forEach(pos -> {
                     TunnelWallTile tile = (TunnelWallTile) cm.getBlockEntity(pos);
-                    if(tile == null)
+                    if (tile == null)
                         return;
 
                     tile.getTunnelDefinition().ifPresent(tunnelDef -> {

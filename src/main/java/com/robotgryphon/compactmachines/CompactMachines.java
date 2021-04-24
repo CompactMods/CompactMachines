@@ -41,8 +41,6 @@ public class CompactMachines {
     };
 
     public CompactMachines() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-
         // Register blocks and items
         Registration.init();
 
@@ -51,17 +49,6 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
-    }
-
-    @SubscribeEvent
-    public static void setup(final FMLCommonSetupEvent event) {
-        NetworkHandler.initialize();
-    }
-
-    @SubscribeEvent
-    public static void enqueueIMC(final InterModEnqueueEvent event) {
-        if (ModList.get().isLoaded("theoneprobe"))
-            TheOneProbeCompat.sendIMC();
     }
 
     @SubscribeEvent

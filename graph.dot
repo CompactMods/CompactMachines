@@ -1,0 +1,257 @@
+strict digraph G {
+	layout = fdp;
+	node [shape=square,style=filled,color=lightgray];
+	machine0 [label="Compact Machine #0",style=filled,color=lightgray]
+	machine1 [label="Compact Machine #1",style=filled,color=lightgray]
+	machine2 [label="Compact Machine #2",style=filled,color=lightgray]
+	machine3 [label="Compact Machine #3",style=filled,color=lightgray]
+	machine4 [label="Compact Machine #4",style=filled,color=lightgray]
+	machine5 [label="Compact Machine #5",style=filled,color=lightgray]
+	machine6 [label="Compact Machine #6",style=filled,color=lightgray]
+	machine7 [label="Compact Machine #7",style=filled,color=lightgray]
+	machine8 [label="Compact Machine #8",style=filled,color=lightgray]
+	machine9 [label="Compact Machine #9",style=filled,color=lightgray]
+	machine12 [label="Compact Machine #12",style=filled,color=lightgray]
+	machine13 [label="Compact Machine #13",style=filled,color=lightgray]
+	machine14 [label="Compact Machine #14",style=filled,color=lightgray]
+	machine15 [label="Compact Machine #15",style=filled,color=lightgray]
+	machine18 [label="Compact Machine #18",style=filled,color=lightgray]
+	machine20 [label="Compact Machine #20",style=filled,color=lightgray]
+	machine26 [label="Compact Machine #26",style=filled,color=lightgray]
+	machine27 [label="Compact Machine #27",style=filled,color=lightgray]
+	machine28 [label="Compact Machine #28",style=filled,color=lightgray]
+	machine29 [label="Compact Machine #29",style=filled,color=lightgray]
+	machine30 [label="Compact Machine #30",style=filled,color=lightgray]
+	machine31 [label="Compact Machine #31",style=filled,color=lightgray]
+	machine32 [label="Compact Machine #32",style=filled,color=lightgray]
+	machine33 [label="Compact Machine #33",style=filled,color=lightgray]
+	machine36 [label="Compact Machine #36",style=filled,color=lightgray]
+	machine37 [label="Compact Machine #37",style=filled,color=lightgray]
+	machine38 [label="Compact Machine #38",style=filled,color=lightgray]
+	machine39 [label="Compact Machine #39",style=filled,color=lightgray]
+	machine40 [label="Compact Machine #40",style=filled,color=lightgray]
+	machine41 [label="Compact Machine #41",style=filled,color=lightgray]
+	machine42 [label="Compact Machine #42",style=filled,color=lightgray]
+	machine43 [label="Compact Machine #43",style=filled,color=lightgray]
+	machine44 [label="Compact Machine #44",style=filled,color=lightgray]
+	machine45 [label="Compact Machine #45",style=filled,color=lightgray]
+	machine46 [label="Compact Machine #46",style=filled,color=lightgray]
+	machine47 [label="Compact Machine #47",style=filled,color=lightgray]
+	machine48 [label="Compact Machine #48",style=filled,color=lightgray]
+	machine49 [label="Compact Machine #49",style=filled,color=lightgray]
+	machine50 [label="Compact Machine #50",style=filled,color=lightgray]
+	machine51 [label="Compact Machine #51",style=filled,color=lightgray]
+	machine52 [label="Compact Machine #52",style=filled,color=lightgray]
+	machine53 [label="Compact Machine #53",style=filled,color=lightgray]
+	machine54 [label="Compact Machine #54",style=filled,color=lightgray]
+	machine55 [label="Compact Machine #55",style=filled,color=lightgray]
+	machine56 [label="Compact Machine #56",style=filled,color=lightgray]
+	machine57 [label="Compact Machine #57",style=filled,color=lightgray]
+	machine58 [label="Compact Machine #58",style=filled,color=lightgray]
+	machine59 [label="Compact Machine #59",style=filled,color=lightgray]
+	machine60 [label="Compact Machine #60",style=filled,color=lightgray]
+	machine13->cluster_internal_1
+	machine2->cluster_internal_1
+	machine20->cluster_internal_1
+	subgraph cluster_internal_1 {
+		graph [label="Compact Machine {1,0}",style=filled,color=cadetblue]
+	}
+
+	machine38->cluster_internal_12884901886
+	subgraph cluster_internal_12884901886 {
+		graph [label="Compact Machine {-2,2}",style=filled,color=cadetblue]
+	}
+
+	machine57->cluster_internal_12884901887
+	subgraph cluster_internal_12884901887 {
+		graph [label="Compact Machine {-1,2}",style=filled,color=cadetblue]
+	}
+
+	machine60->cluster_internal_12884901890
+	subgraph cluster_internal_12884901890 {
+		graph [label="Compact Machine {2,3}",style=filled,color=cadetblue]
+	}
+
+	machine47->cluster_internal_12884901891
+	subgraph cluster_internal_12884901891 {
+		graph [label="Compact Machine {3,3}",style=filled,color=cadetblue]
+	}
+
+	machine41->cluster_internal_2
+	subgraph cluster_internal_2 {
+		graph [label="Compact Machine {2,0}",style=filled,color=cadetblue]
+	}
+
+	machine56->cluster_internal_3
+	subgraph cluster_internal_3 {
+		graph [label="Compact Machine {3,0}",style=filled,color=cadetblue]
+	}
+
+	machine55->cluster_internal_4294967294
+	subgraph cluster_internal_4294967294 {
+		graph [label="Compact Machine {-2,0}",style=filled,color=cadetblue]
+	}
+
+	machine12->cluster_internal_4294967295
+	machine6->cluster_internal_4294967295
+	subgraph cluster_internal_4294967295 {
+		graph [label="Compact Machine {-1,0}",style=filled,color=cadetblue]
+	machine11 [label="Compact Machine #11",style=filled,color=lightgray]
+	machine21 [label="Compact Machine #21",style=filled,color=lightgray]
+	machine16 [label="Compact Machine #16",style=filled,color=palevioletred1]
+	}
+
+	machine4->cluster_internal_4294967296
+	subgraph cluster_internal_4294967296 {
+		graph [label="Compact Machine {0,1}",style=filled,color=cadetblue]
+	}
+
+	machine33->cluster_internal_4294967297
+	machine18->cluster_internal_4294967297
+	machine3->cluster_internal_4294967297
+	machine28->cluster_internal_4294967297
+	machine29->cluster_internal_4294967297
+	subgraph cluster_internal_4294967297 {
+		graph [label="Compact Machine {1,1}",style=filled,color=cadetblue]
+	machine35 [label="Compact Machine #35",style=filled,color=palevioletred1]
+	}
+
+	machine46->cluster_internal_4294967298
+	subgraph cluster_internal_4294967298 {
+		graph [label="Compact Machine {2,1}",style=filled,color=cadetblue]
+	}
+
+	machine59->cluster_internal_4294967299
+	subgraph cluster_internal_4294967299 {
+		graph [label="Compact Machine {3,1}",style=filled,color=cadetblue]
+	}
+
+	machine49->cluster_internal_8589934590
+	subgraph cluster_internal_8589934590 {
+		graph [label="Compact Machine {-2,1}",style=filled,color=cadetblue]
+	}
+
+	machine5->cluster_internal_8589934591
+	machine32->cluster_internal_8589934591
+	subgraph cluster_internal_8589934591 {
+		graph [label="Compact Machine {-1,1}",style=filled,color=cadetblue]
+	machine25 [label="Compact Machine #25",style=filled,color=lightgray]
+	machine22 [label="Compact Machine #22",style=filled,color=palevioletred1]
+	}
+
+	machine36->cluster_internal_8589934592
+	subgraph cluster_internal_8589934592 {
+		graph [label="Compact Machine {0,2}",style=filled,color=cadetblue]
+	}
+
+	machine44->cluster_internal_8589934593
+	subgraph cluster_internal_8589934593 {
+		graph [label="Compact Machine {1,2}",style=filled,color=cadetblue]
+	}
+
+	machine51->cluster_internal_8589934594
+	subgraph cluster_internal_8589934594 {
+		graph [label="Compact Machine {2,2}",style=filled,color=cadetblue]
+	}
+
+	machine40->cluster_internal_8589934595
+	subgraph cluster_internal_8589934595 {
+		graph [label="Compact Machine {3,2}",style=filled,color=cadetblue]
+	}
+
+	machine25->cluster_internal_N1
+	machine30->cluster_internal_N1
+	machine7->cluster_internal_N1
+	subgraph cluster_internal_N1 {
+		graph [label="Compact Machine {-1,-1}",style=filled,color=cadetblue]
+	machine34 [label="Compact Machine #34",style=filled,color=palevioletred1]
+	}
+
+	machine48->cluster_internal_N12884901885
+	subgraph cluster_internal_N12884901885 {
+		graph [label="Compact Machine {3,-3}",style=filled,color=cadetblue]
+	}
+
+	machine50->cluster_internal_N12884901886
+	subgraph cluster_internal_N12884901886 {
+		graph [label="Compact Machine {2,-3}",style=filled,color=cadetblue]
+	}
+
+	machine37->cluster_internal_N12884901887
+	subgraph cluster_internal_N12884901887 {
+		graph [label="Compact Machine {1,-3}",style=filled,color=cadetblue]
+	}
+
+	machine42->cluster_internal_N12884901888
+	subgraph cluster_internal_N12884901888 {
+		graph [label="Compact Machine {0,-3}",style=filled,color=cadetblue]
+	}
+
+	machine54->cluster_internal_N2
+	subgraph cluster_internal_N2 {
+		graph [label="Compact Machine {-2,-1}",style=filled,color=cadetblue]
+	}
+
+	machine53->cluster_internal_N4294967293
+	subgraph cluster_internal_N4294967293 {
+		graph [label="Compact Machine {3,-1}",style=filled,color=cadetblue]
+	}
+
+	machine39->cluster_internal_N4294967294
+	subgraph cluster_internal_N4294967294 {
+		graph [label="Compact Machine {2,-1}",style=filled,color=cadetblue]
+	}
+
+	machine1->cluster_internal_N4294967295
+	machine27->cluster_internal_N4294967295
+	machine14->cluster_internal_N4294967295
+	machine23->cluster_internal_N4294967295
+	subgraph cluster_internal_N4294967295 {
+		graph [label="Compact Machine {1,-1}",style=filled,color=cadetblue]
+	machine17 [label="Compact Machine #17",style=filled,color=palevioletred1]
+	}
+
+	machine26->cluster_internal_N4294967296
+	machine0->cluster_internal_N4294967296
+	subgraph cluster_internal_N4294967296 {
+		graph [label="Compact Machine {0,-1}",style=filled,color=cadetblue]
+	machine19 [label="Compact Machine #19",style=filled,color=palevioletred1]
+	}
+
+	machine52->cluster_internal_N4294967297
+	subgraph cluster_internal_N4294967297 {
+		graph [label="Compact Machine {-1,-2}",style=filled,color=cadetblue]
+	}
+
+	machine45->cluster_internal_N4294967298
+	subgraph cluster_internal_N4294967298 {
+		graph [label="Compact Machine {-2,-2}",style=filled,color=cadetblue]
+	}
+
+	machine43->cluster_internal_N8589934589
+	subgraph cluster_internal_N8589934589 {
+		graph [label="Compact Machine {3,-2}",style=filled,color=cadetblue]
+	}
+
+	machine58->cluster_internal_N8589934590
+	subgraph cluster_internal_N8589934590 {
+		graph [label="Compact Machine {2,-2}",style=filled,color=cadetblue]
+	}
+
+	machine9->cluster_internal_N8589934591
+	machine15->cluster_internal_N8589934591
+	subgraph cluster_internal_N8589934591 {
+		graph [label="Compact Machine {1,-2}",style=filled,color=cadetblue]
+	machine24 [label="Compact Machine #24",style=filled,color=palevioletred1]
+	}
+
+	machine11->cluster_internal_N8589934592
+	machine21->cluster_internal_N8589934592
+	machine31->cluster_internal_N8589934592
+	machine8->cluster_internal_N8589934592
+	subgraph cluster_internal_N8589934592 {
+		graph [label="Compact Machine {0,-2}",style=filled,color=cadetblue]
+	machine23 [label="Compact Machine #23",style=filled,color=lightgray]
+	}
+
+}

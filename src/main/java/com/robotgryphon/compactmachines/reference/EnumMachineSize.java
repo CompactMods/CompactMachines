@@ -1,6 +1,8 @@
 package com.robotgryphon.compactmachines.reference;
 
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 
 public enum EnumMachineSize implements IStringSerializable {
     TINY    ("tiny", 3),
@@ -24,6 +26,11 @@ public enum EnumMachineSize implements IStringSerializable {
 
     public String getName() {
         return this.name;
+    }
+
+    public AxisAlignedBB getBounds(BlockPos center) {
+        AxisAlignedBB bounds = new AxisAlignedBB(center);
+        return bounds.inflate(Math.floorDiv(internalSize, 2));
     }
 
     public int getInternalSize() {
