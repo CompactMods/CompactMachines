@@ -179,4 +179,14 @@ public class ExternalMachineData extends WorldSavedData {
     public DimensionalPosition getMachineLocation(int machineId) {
         return machineLocations.get(machineId);
     }
+
+    public Set<DimensionalPosition> getExternalMachineLocations(ChunkPos inside) {
+        Set<Integer> externIDs = getExternalMachineIDs(inside);
+
+        return machineLocations.entrySet()
+                .stream()
+                .filter(in -> externIDs.contains(in.getKey()))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
+    }
 }

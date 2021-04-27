@@ -27,7 +27,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -105,7 +104,7 @@ public abstract class PlayerUtil {
                         newCenter,
                         newSpawn,
                         size
-                    ));
+                ));
             } catch (OperationNotSupportedException e) {
                 CompactMachines.LOGGER.warn(e);
             }
@@ -235,7 +234,12 @@ public abstract class PlayerUtil {
             playerData.addPlayer(serverPlayer, mChunk);
             playerData.setDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, tile.machineId, serverPlayer.getUUID(), MachinePlayersChangedPacket.EnumPlayerChangeType.ENTERED);
+            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
+                    .forMachine(mChunk)
+                    .forPlayer(serverPlayer)
+                    .enteredFrom(tile.machineId)
+                    .build();
+
             NetworkHandler.MAIN_CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
                     p);
@@ -260,7 +264,11 @@ public abstract class PlayerUtil {
             playerData.removePlayer(serverPlayer);
             playerData.setDirty();
 
-            MachinePlayersChangedPacket p = new MachinePlayersChangedPacket(serv, tile.machineId, serverPlayer.getUUID(), MachinePlayersChangedPacket.EnumPlayerChangeType.EXITED);
+            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
+                    .forMachine(mChunk)
+                    .forPlayer(serverPlayer)
+                    .build();
+
             NetworkHandler.MAIN_CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
                     p);

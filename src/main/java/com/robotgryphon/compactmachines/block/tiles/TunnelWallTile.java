@@ -41,21 +41,6 @@ public class TunnelWallTile extends TileEntity {
         super(Registration.TUNNEL_WALL_TILE.get());
     }
 
-    public Optional<CompactMachineInternalData> getMachineInfo() {
-        if (this.level instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) this.level;
-            ChunkPos p = new ChunkPos(worldPosition);
-
-            InternalMachineData intern = InternalMachineData.get(serverWorld.getServer());
-            if (intern == null)
-                return Optional.empty();
-
-            return intern.forChunk(p);
-        }
-
-        return Optional.empty();
-    }
-
     @Override
     public void load(BlockState state, CompoundNBT nbt) {
         super.load(state, nbt);
@@ -199,8 +184,6 @@ public class TunnelWallTile extends TileEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        Direction tunnelInDir = getConnectedSide();
-
         Optional<TunnelDefinition> tunnelDef = getTunnelDefinition();
 
         // If we don't have a definition for the tunnel, skip
@@ -210,7 +193,7 @@ public class TunnelWallTile extends TileEntity {
         // loop through tunnel definition for capabilities
         TunnelDefinition definition = tunnelDef.get();
         if (definition instanceof ICapableTunnel) {
-            if (!level.isClientSide()) {
+            if (!level.isClientSide) {
                 ServerWorld sw = (ServerWorld) level;
                 return ((ICapableTunnel) definition).getExternalCapability(sw, worldPosition, cap, side);
             }
