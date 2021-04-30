@@ -82,10 +82,7 @@ public abstract class PlayerUtil {
             Vector3i location = MathUtil.getRegionPositionByIndex(nextId);
 
             int centerY = ServerConfig.MACHINE_FLOOR_Y.get() + (size.getInternalSize() / 2);
-            BlockPos newCenter = new BlockPos(
-                    (location.getX() * 1024) + 8,
-                    centerY,
-                    (location.getZ() * 1024) + 8);
+            BlockPos newCenter = MathUtil.getCenterWithY(location, centerY);
 
             // Generate a new machine inside and update the tile
             CompactStructureGenerator.generateCompactStructure(compactWorld, size, newCenter);

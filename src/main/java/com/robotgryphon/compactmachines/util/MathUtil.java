@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.util;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
 
 public class MathUtil {
@@ -39,5 +40,12 @@ public class MathUtil {
         y -= (int) (s / 2);
 
         return new Vector3i(x, 0, y);
+    }
+
+    public static BlockPos getCenterWithY(Vector3i regionIndex, int y) {
+        return new BlockPos(
+                (regionIndex.getX() * 1024) + 8,
+                y,
+                (regionIndex.getZ() * 1024) + 8);
     }
 }
