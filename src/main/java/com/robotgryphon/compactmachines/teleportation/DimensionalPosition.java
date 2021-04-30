@@ -19,6 +19,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
@@ -91,6 +92,19 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
     public BlockPos getBlockPosition() {
         return new BlockPos(position.x, position.y, position.z);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DimensionalPosition that = (DimensionalPosition) o;
+        return Objects.equals(dimension, that.dimension) && Objects.equals(position, that.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dimension, position);
     }
 
     @Override
