@@ -7,11 +7,11 @@ import java.util.Objects;
 /**
  * Represents the inside of a Compact Machine.
  */
-public class CompactMachineInsideNode implements IMachineGraphNode {
+public class CompactMachineRoomNode implements IMachineGraphNode {
 
     private final ChunkPos pos;
 
-    public CompactMachineInsideNode(ChunkPos pos) {
+    public CompactMachineRoomNode(ChunkPos pos) {
         this.pos = pos;
     }
 
@@ -34,12 +34,16 @@ public class CompactMachineInsideNode implements IMachineGraphNode {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CompactMachineInsideNode that = (CompactMachineInsideNode) o;
+        CompactMachineRoomNode that = (CompactMachineRoomNode) o;
         return pos.equals(that.pos);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(pos);
+    }
+
+    public ChunkPos getChunk() {
+        return pos;
     }
 }

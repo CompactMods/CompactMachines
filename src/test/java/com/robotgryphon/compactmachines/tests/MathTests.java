@@ -4,14 +4,15 @@ import com.robotgryphon.compactmachines.util.MathUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.vector.Vector3i;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.HashMap;
 
+@DisplayName("Math")
 public class MathTests {
 
     @Test
+    @DisplayName("Position Generator Works Correctly")
     void positionGeneratorWorksCorrectly() {
         // Our generation works in a counter-clockwise spiral, starting at 0,0
         /*

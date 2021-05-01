@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.data.world;
+package com.robotgryphon.compactmachines.data.persistent;
 
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registration;

@@ -1,7 +1,6 @@
 package com.robotgryphon.compactmachines.data.graph;
 
 import com.google.common.graph.MutableGraph;
-import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 
 import java.util.Objects;
 
@@ -9,28 +8,10 @@ import java.util.Objects;
  * Represents a machine's external point. This can be either inside a machine or in a dimension somewhere.
  */
 public class CompactMachineNode implements IMachineGraphNode {
-    public boolean isConnected;
-    private int machineId;
-    private IMachineGraphNode linkedTo;
-    public MachineExternalLocation location;
-    public DimensionalPosition position;
-    private MutableGraph<IMachineGraphNode> graph;
+    private final int machineId;
 
-    public CompactMachineNode(MutableGraph<IMachineGraphNode> graph, int machine) {
-        this.graph = graph;
+    public CompactMachineNode(int machine) {
         this.machineId = machine;
-        this.isConnected = false;
-    }
-
-    public void connectTo(IMachineGraphNode newInside) {
-        if (this.linkedTo != null) {
-            graph.removeEdge(this, linkedTo);
-            this.isConnected = false;
-        }
-
-        this.linkedTo = newInside;
-        this.isConnected = true;
-        graph.putEdge(this, linkedTo);
     }
 
     @Override
@@ -42,6 +23,8 @@ public class CompactMachineNode implements IMachineGraphNode {
     public String getId() {
         return "machine" + machineId;
     }
+
+    public int getMachineId() { return machineId; }
 
     @Override
     public boolean equals(Object o) {

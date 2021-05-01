@@ -4,7 +4,7 @@ import com.robotgryphon.compactmachines.api.core.Messages;
 import com.robotgryphon.compactmachines.api.core.Tooltips;
 import com.robotgryphon.compactmachines.client.gui.PersonalShrinkingDeviceScreen;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.world.InternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.InternalMachineData;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import com.robotgryphon.compactmachines.util.TranslationUtil;
 import net.minecraft.client.gui.screen.Screen;

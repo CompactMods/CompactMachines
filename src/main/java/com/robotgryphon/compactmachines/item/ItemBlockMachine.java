@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.item;
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.api.core.Tooltips;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
-import com.robotgryphon.compactmachines.data.world.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.PlayerUtil;

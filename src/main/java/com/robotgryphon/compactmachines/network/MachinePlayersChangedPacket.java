@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.client.machine.MachinePlayerEventHandler;
 import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
-import com.robotgryphon.compactmachines.data.world.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;

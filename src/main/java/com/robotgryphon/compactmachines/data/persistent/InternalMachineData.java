@@ -1,4 +1,4 @@
-package com.robotgryphon.compactmachines.data.world;
+package com.robotgryphon.compactmachines.data.persistent;
 
 import com.mojang.serialization.DataResult;
 import com.robotgryphon.compactmachines.CompactMachines;
