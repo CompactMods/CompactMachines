@@ -5,13 +5,17 @@ import com.google.gson.JsonElement;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileHelper {
     public static final FileHelper INSTANCE = new FileHelper();
+    public static Path RESOURCES_DIR = Paths.get("src","test","resources");
 
     private FileHelper() {
     }

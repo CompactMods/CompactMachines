@@ -1,20 +1,37 @@
 package com.robotgryphon.compactmachines.tests;
 
 import com.google.common.graph.Graph;
+import com.mojang.serialization.DataResult;
+import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
 import com.robotgryphon.compactmachines.data.graph.CompactMachineConnectionGraph;
 import com.robotgryphon.compactmachines.data.graph.CompactMachineNode;
 import com.robotgryphon.compactmachines.data.graph.CompactMachineRoomNode;
 import com.robotgryphon.compactmachines.data.graph.IMachineGraphNode;
+import com.robotgryphon.compactmachines.tests.util.FileHelper;
+import net.minecraft.nbt.*;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.common.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
 @DisplayName("Machine Graph Tests")
 public class GraphTests {
+
+    private CompactMachineConnectionGraph generateGraphWithSingleRoom() {
+        CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
+
+        g.addMachine(0);
+        g.addRoom(new ChunkPos(0, 0));
+
+        g.connectMachineToRoom(0, new ChunkPos(0, 0));
+        return g;
+    }
 
     @Test
     @DisplayName("Can Create Basic Graph")
@@ -45,12 +62,7 @@ public class GraphTests {
         int machine = 0;
         ChunkPos room = new ChunkPos(0, 0);
 
-        CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
-
-        g.addMachine(0);
-        g.addRoom(new ChunkPos(0, 0));
-
-        g.connectMachineToRoom(0, new ChunkPos(0, 0));
+        CompactMachineConnectionGraph g = generateGraphWithSingleRoom();
 
         Optional<ChunkPos> connectedRoom = g.getConnectedRoom(machine);
         Assertions.assertTrue(connectedRoom.isPresent());
@@ -100,6 +112,52 @@ public class GraphTests {
         Assertions.assertTrue(linkedMachines.contains(MACHINE_2));
     }
 
+    @Test
+    @DisplayName("Correctly serializes to NBT")
+    void canSerialize() {
+        CompactMachineConnectionGraph graph = generateGraphWithSingleRoom();
+
+        DataResult<INBT> nbtResult = CompactMachineConnectionGraph.CODEC.encodeStart(NBTDynamicOps.INSTANCE, graph);
+
+        nbtResult.resultOrPartial(Assertions::fail)
+                .ifPresent(nbt -> {
+                    Assertions.assertTrue(nbt instanceof CompoundNBT);
+
+//                    try {
+//                        File file = FileHelper.RESOURCES_DIR.resolve("graph.dat").toFile();
+//                        file.delete();
+//                        CompressedStreamTools.writeCompressed((CompoundNBT) nbt, file);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+
+                    CompoundNBT c = (CompoundNBT) nbt;
+                    Assertions.assertFalse(c.isEmpty());
+
+                    Assertions.assertTrue(c.contains("connections"));
+
+                    ListNBT connections = c.getList("connections", Constants.NBT.TAG_COMPOUND);
+                    Assertions.assertEquals(1, connections.size(), "Expected one connection from a machine to a single room.");
+
+                    CompoundNBT conn1 = connections.getCompound(0);
+                    Assertions.assertNotNull(conn1);
+
+                    Assertions.assertTrue(conn1.contains("machine"));
+                    Assertions.assertTrue(conn1.contains("connections"));
+
+                    CompoundNBT machineChunk = conn1.getCompound("machine");
+                    DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS_CODEC.parse(NBTDynamicOps.INSTANCE, machineChunk);
+                    chunkRes.resultOrPartial(Assertions::fail)
+                            .ifPresent(chunk -> {
+                                Assertions.assertEquals(new ChunkPos(0, 0), chunk);
+                            });
+
+                    ListNBT connList = conn1.getList("connections", Constants.NBT.TAG_INT);
+                    Assertions.assertNotNull(connList);
+                    Assertions.assertEquals(1, connList.size());
+                    Assertions.assertEquals(0, connList.getInt(0));
+                });
+    }
 //    private void generateData(MutableGraph<IGraphNode> g, HashMap<String, IGraphNode> lookup) {
 //        Random r = new Random();
 //        MachineExternalLocation[] values = MachineExternalLocation.values();

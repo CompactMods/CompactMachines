@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.data.graph;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.graph.ElementOrder;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
@@ -22,18 +23,8 @@ public class CompactMachineConnectionGraph {
     private final Map<Integer, CompactMachineNode> machines;
     private final Map<ChunkPos, CompactMachineRoomNode> rooms;
 
-    private static final Codec<CompactMachineConnectionInfo> CONNECTION_INFO_CODEC = RecordCodecBuilder.create(i -> i.group(
-            CodecExtensions.CHUNKPOS_CODEC
-                    .fieldOf("machine")
-                    .forGetter(CompactMachineConnectionInfo::room),
-
-            Codec.INT.listOf()
-                    .fieldOf("connections")
-                    .forGetter(CompactMachineConnectionInfo::machines)
-    ).apply(i, CompactMachineConnectionInfo::new));
-
     public static final Codec<CompactMachineConnectionGraph> CODEC = RecordCodecBuilder.create(i -> i.group(
-            CONNECTION_INFO_CODEC.listOf()
+            CompactMachineConnectionInfo.CODEC.listOf()
                     .fieldOf("connections")
                     .forGetter(CompactMachineConnectionGraph::buildConnections)
     ).apply(i, CompactMachineConnectionGraph::new));
@@ -63,7 +54,14 @@ public class CompactMachineConnectionGraph {
     }
 
     private List<CompactMachineConnectionInfo> buildConnections() {
-        return Collections.emptyList();
+        List<CompactMachineConnectionInfo> result = new ArrayList<>();
+        this.rooms.forEach((chunk, node) -> {
+            Collection<Integer> machines = this.getMachinesFor(chunk);
+            CompactMachineConnectionInfo roomInfo = new CompactMachineConnectionInfo(chunk, machines);
+            result.add(roomInfo);
+        });
+
+        return result;
     }
 
     public void addMachine(int machine) {
@@ -134,9 +132,19 @@ public class CompactMachineConnectionGraph {
         private final ChunkPos roomChunk;
         private final List<Integer> connectedMachines;
 
-        public CompactMachineConnectionInfo(ChunkPos roomChunk, List<Integer> connections) {
+        public static final Codec<CompactMachineConnectionInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
+                CodecExtensions.CHUNKPOS_CODEC
+                        .fieldOf("machine")
+                        .forGetter(CompactMachineConnectionInfo::room),
+
+                Codec.INT.listOf()
+                        .fieldOf("connections")
+                        .forGetter(CompactMachineConnectionInfo::machines)
+        ).apply(i, CompactMachineConnectionInfo::new));
+
+        public CompactMachineConnectionInfo(ChunkPos roomChunk, Collection<Integer> connections) {
             this.roomChunk = roomChunk;
-            this.connectedMachines = connections;
+            this.connectedMachines = ImmutableList.copyOf(connections);
         }
 
         public ChunkPos room() {
