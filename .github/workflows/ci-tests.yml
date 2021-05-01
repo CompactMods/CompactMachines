@@ -22,7 +22,7 @@ jobs:
           rm -rf ~/.gradle
 
       - name: Test JAR with Gradle
-        run: ./gradlew test
+        run: ./gradlew test --max-workers 1
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
