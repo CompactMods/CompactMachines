@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:4.0.23"
+        classpath "net.minecraftforge.gradle:ForgeGradle:4.1.9"
     }
 }
 
