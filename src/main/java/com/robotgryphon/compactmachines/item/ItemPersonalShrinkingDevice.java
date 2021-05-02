@@ -4,7 +4,7 @@ import com.robotgryphon.compactmachines.api.core.Messages;
 import com.robotgryphon.compactmachines.api.core.Tooltips;
 import com.robotgryphon.compactmachines.client.gui.PersonalShrinkingDeviceScreen;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.persistent.InternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import com.robotgryphon.compactmachines.util.TranslationUtil;
 import net.minecraft.client.gui.screen.Screen;
@@ -75,7 +75,7 @@ public class ItemPersonalShrinkingDevice extends Item {
                 if (player.isShiftKeyDown()) {
                     ChunkPos machineChunk = new ChunkPos(player.blockPosition());
 
-                    InternalMachineData intern = InternalMachineData.get(serverWorld.getServer());
+                    CompactRoomData intern = CompactRoomData.get(serverWorld.getServer());
                     if (intern != null) {
                         // Use internal data to set new spawn point
                         intern.forChunk(machineChunk).ifPresent(data -> {

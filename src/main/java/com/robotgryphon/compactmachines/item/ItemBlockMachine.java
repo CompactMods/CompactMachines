@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.item;
 import com.mojang.authlib.GameProfile;
 import com.robotgryphon.compactmachines.api.core.Tooltips;
 import com.robotgryphon.compactmachines.block.BlockCompactMachine;
-import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
@@ -69,7 +69,7 @@ public class ItemBlockMachine extends BlockItem {
         return getMachineId(stack)
                 .map(id -> {
                     // Need to determine if another machine with this ID already on server
-                    ExternalMachineData extern = ExternalMachineData.get(serv);
+                    CompactMachineData extern = CompactMachineData.get(serv);
                     return extern.isPlaced(id);
                 })
                 .orElse(true);

@@ -3,9 +3,10 @@ package com.robotgryphon.compactmachines.block.tiles;
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
+import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
+import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
-import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
-import com.robotgryphon.compactmachines.data.persistent.InternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
 import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
@@ -23,7 +24,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -211,8 +211,15 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
     public Optional<ChunkPos> getInternalChunkPos() {
         if(level instanceof ServerWorld) {
-            ExternalMachineData emd = ExternalMachineData.get(level.getServer());
-            return emd.getChunkLocation(this.machineId);
+            MinecraftServer serv = level.getServer();
+            if(serv == null)
+                return Optional.empty();
+
+            MachineConnections connections = MachineConnections.get(serv);
+            if(connections == null)
+                return Optional.empty();
+
+            return connections.graph.getConnectedRoom(this.machineId);
         }
 
         return Optional.empty();
@@ -261,31 +268,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         this.setChanged();
     }
 
-    public Optional<CompactMachineInternalData> getInternalData() {
-        if(this.machineId == 0)
-            return Optional.empty();
-
-        if (level instanceof ServerWorld) {
-            MinecraftServer serv = level.getServer();
-            if(serv == null)
-                return Optional.empty();
-
-            // Get external machine info (which, this should have some if it has a machine ID
-            ExternalMachineData extern = ExternalMachineData.get(serv);
-            if(extern == null)
-                return Optional.empty();
-
-            Optional<ChunkPos> chunkLocation = extern.getChunkLocation(machineId);
-            if(!chunkLocation.isPresent())
-                return Optional.empty();
-
-            InternalMachineData intern = InternalMachineData.get(serv);
-            return intern.forChunk(chunkLocation.get());
-        } else {
-            return Optional.empty();
-        }
-    }
-
     public boolean hasPlayersInside() {
         return false;
         // TODO
@@ -300,11 +282,10 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         if (level == null || level.isClientSide)
             return;
 
-        getInternalData().ifPresent(data -> {
+        getInternalChunkPos().ifPresent(chunk -> {
             ServerWorld compact = this.level.getServer().getLevel(Registration.COMPACT_DIMENSION);
-            IChunk machineChunk = compact.getChunk(data.getCenter());
-            ChunkPos chunkPos = machineChunk.getPos();
-            compact.setChunkForced(chunkPos.x, chunkPos.z, force);
+            compact.setChunkForced(chunk.x, chunk.z, force);
+
         });
     }
 
@@ -321,7 +302,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
                 this.worldPosition
         );
 
-        ExternalMachineData extern = ExternalMachineData.get(serv);
+        CompactMachineData extern = CompactMachineData.get(serv);
         extern.setMachineLocation(this.machineId, dp);
 
         doChunkload(true);
@@ -339,23 +320,34 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public boolean mapped() {
-        return getInternalData().isPresent();
+        return getInternalChunkPos().isPresent();
     }
 
-    /*
-     * Chunk-Loading triggers
-     */
+    public Optional<BlockPos> getSpawn() {
+        if(level instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) level;
+            MinecraftServer serv = serverWorld.getServer();
 
-//    private void initialize() {
-//        if (this.getWorld().isRemote) {
-//            return;
-//        }
-//
-//        if (!ChunkLoadingMachines.isMachineChunkLoaded(this.coords)) {
-//            ChunkLoadingMachines.forceChunk(this.coords);
-//        }
-//
-//    }
+            MachineConnections connections = MachineConnections.get(serv);
+            if(connections == null)
+                return Optional.empty();
+
+            Optional<ChunkPos> connectedRoom = connections.graph.getConnectedRoom(machineId);
+
+            if(!connectedRoom.isPresent())
+                return Optional.empty();
+
+            CompactRoomData roomData = CompactRoomData.get(serv);
+                if(roomData == null)
+                    return Optional.empty();
+
+            ChunkPos chunk = connectedRoom.get();
+            return roomData.forChunk(chunk)
+                    .map(CompactMachineInternalData::getSpawn);
+        }
+
+        return Optional.empty();
+    }
 
 //    @Override
 //    public void update() {
@@ -418,138 +410,5 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 //        }
 //
 //        return StructureTools.getCoordsForPos(this.getPos()) == this.coords;
-//    }
-//
-//    public ItemStack getConnectedPickBlock(EnumFacing facing) {
-//        BlockPos insetPos = getMachineWorldInsetPos(facing);
-//        if (insetPos == null) {
-//            return ItemStack.EMPTY;
-//        }
-//
-//        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-//        IBlockState state = machineWorld.getBlockState(insetPos);
-//        return state.getBlock().getItem(machineWorld, insetPos, state);
-//    }
-//
-//    public int getRedstonePowerOutput(EnumFacing facing) {
-//        if (this.coords == -1) {
-//            return 0;
-//        }
-//
-//        // We don't know the actual power on the client-side, which does not have the worldsaveddatamachines instance
-//        if (WorldSavedDataMachines.INSTANCE == null || WorldSavedDataMachines.INSTANCE.redstoneTunnels == null) {
-//            return 0;
-//        }
-//
-//        HashMap<EnumFacing, RedstoneTunnelData> tunnelMapping = WorldSavedDataMachines.INSTANCE.redstoneTunnels.get(this.coords);
-//        if (tunnelMapping == null) {
-//            return 0;
-//        }
-//
-//        RedstoneTunnelData tunnelData = tunnelMapping.get(facing);
-//        if (tunnelData == null) {
-//            return 0;
-//        }
-//
-//
-//        if (!tunnelData.isOutput) {
-//            return 0;
-//        }
-//
-//        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-//        if (!(machineWorld.getTileEntity(tunnelData.pos) instanceof TileEntityRedstoneTunnel)) {
-//            return 0;
-//        }
-//
-//        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelData.pos, this.getSize().getDimension());
-//        BlockPos insetPos = tunnelData.pos.offset(insetDirection);
-//        IBlockState insetBlockState = machineWorld.getBlockState(insetPos);
-//
-//        int power = 0;
-//        if (insetBlockState.getBlock() instanceof BlockRedstoneWire) {
-//            power = insetBlockState.getValue(BlockRedstoneWire.POWER);
-//        } else {
-//            power = machineWorld.getRedstonePower(insetPos, insetDirection);
-//        }
-//
-//        return power;
-//    }
-//
-//    @Override
-//    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-//        if (isInsideItself()) {
-//            return false;
-//        }
-//
-//        if (world.isRemote || facing == null) {
-//            if (CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
-//                return true;
-//            }
-//
-//            return super.hasCapability(capability, facing);
-//        }
-//
-//        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
-//        if (tunnelPos == null) {
-//            return false;
-//        }
-//
-//        World machineWorld = DimensionTools.getServerMachineWorld();
-//        if (!(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
-//            return false;
-//        }
-//
-//        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
-//        BlockPos insetPos = tunnelPos.offset(insetDirection);
-//
-//        TileEntity te = machineWorld.getTileEntity(insetPos);
-//        if (te != null && te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
-//            return true;
-//        }
-//
-//        if (CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//    @Override
-//    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-//        if (isInsideItself()) {
-//            return null;
-//        }
-//
-//        if (this.getWorld().isRemote || facing == null) {
-//            if (CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
-//                return CapabilityNullHandlerRegistry.getNullHandler(capability);
-//            }
-//
-//            return super.getCapability(capability, facing);
-//        }
-//
-//        BlockPos tunnelPos = this.getConnectedBlockPosition(facing);
-//        if (tunnelPos == null) {
-//            return null;
-//        }
-//
-//        WorldServer machineWorld = DimensionTools.getServerMachineWorld();
-//        if (!(machineWorld.getTileEntity(tunnelPos) instanceof TileEntityTunnel)) {
-//            return null;
-//        }
-//
-//        EnumFacing insetDirection = StructureTools.getInsetWallFacing(tunnelPos, this.getSize().getDimension());
-//        BlockPos insetPos = tunnelPos.offset(insetDirection);
-//
-//        TileEntity te = machineWorld.getTileEntity(insetPos);
-//        if (te instanceof ICapabilityProvider && te.hasCapability(capability, insetDirection.getOpposite())) {
-//            return machineWorld.getTileEntity(insetPos).getCapability(capability, insetDirection.getOpposite());
-//        }
-//
-//        if (CapabilityNullHandlerRegistry.hasNullHandler(capability)) {
-//            return CapabilityNullHandlerRegistry.getNullHandler(capability);
-//        }
-//
-//        return null;
 //    }
 }

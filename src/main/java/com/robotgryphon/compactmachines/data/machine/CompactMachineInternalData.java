@@ -2,6 +2,7 @@ package com.robotgryphon.compactmachines.data.machine;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -10,24 +11,17 @@ import java.util.UUID;
 
 public class CompactMachineInternalData {
 
-    public static Codec<CompactMachineInternalData> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.STRING.fieldOf("owner").forGetter(CompactMachineInternalData::getOwnerString),
+    public static final Codec<CompactMachineInternalData> CODEC = RecordCodecBuilder.create(i -> i.group(
+            CodecExtensions.UUID_CODEC.fieldOf("owner").forGetter(CompactMachineInternalData::getOwner),
             BlockPos.CODEC.fieldOf("center").forGetter(CompactMachineInternalData::getCenter),
             BlockPos.CODEC.fieldOf("spawn").forGetter(CompactMachineInternalData::getSpawn),
-            Codec.STRING.fieldOf("size").forGetter(CompactMachineInternalData::getSizeString)
+            EnumMachineSize.CODEC.fieldOf("size").forGetter(CompactMachineInternalData::getSize)
     ).apply(i, CompactMachineInternalData::new));
 
     private final UUID owner;
     private final BlockPos center;
     private BlockPos spawn;
     private final EnumMachineSize size;
-
-    protected CompactMachineInternalData(String owner, BlockPos center, BlockPos spawn, String sizeString) {
-        this.owner = UUID.fromString(owner);
-        this.center = center;
-        this.spawn = spawn;
-        this.size = EnumMachineSize.getFromSize(sizeString);
-    }
 
     public CompactMachineInternalData(UUID owner, BlockPos center, BlockPos spawn, EnumMachineSize size) {
         this.owner = owner;
@@ -36,15 +30,11 @@ public class CompactMachineInternalData {
         this.size = size;
     }
 
-    private String getSizeString() {
-        return this.size.name();
+    private EnumMachineSize getSize() {
+        return this.size;
     }
 
     public UUID getOwner() { return this.owner; }
-
-    private String getOwnerString() {
-        return owner.toString();
-    }
 
     public BlockPos getSpawn() {
         if(this.spawn != null)

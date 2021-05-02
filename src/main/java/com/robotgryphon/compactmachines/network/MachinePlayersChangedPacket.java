@@ -6,7 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.client.machine.MachinePlayerEventHandler;
 import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
-import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
+import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -104,16 +105,22 @@ public class MachinePlayersChangedPacket {
 
         @Nullable
         public MachinePlayersChangedPacket build() {
-            ExternalMachineData extern = ExternalMachineData.get(server);
-            if(extern == null)
+            MachineConnections connections = MachineConnections.get(server);
+            CompactMachineData extern = CompactMachineData.get(server);
+            if(connections == null || extern == null)
             {
                 CompactMachines.LOGGER.fatal("Could not load external machine data from server.");
                 return null;
             }
 
-            Set<DimensionalPosition> externalMachineIDs = extern.getExternalMachineLocations(chunk);
+            Collection<Integer> externalMachineIDs = connections.graph.getMachinesFor(chunk);
+            HashSet<DimensionalPosition> externalLocations = new HashSet<>();
+            for(int eid : externalMachineIDs) {
+                final Optional<DimensionalPosition> loc = extern.getMachineLocation(eid);
+                loc.ifPresent(externalLocations::add);
+            }
 
-            return new MachinePlayersChangedPacket(chunk, player, change.name(), externalMachineIDs);
+            return new MachinePlayersChangedPacket(chunk, player, change.name(), externalLocations);
         }
 
         public Builder forMachine(ChunkPos insideChunk) {

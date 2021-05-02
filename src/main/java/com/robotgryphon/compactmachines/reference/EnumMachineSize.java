@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.reference;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +15,9 @@ public enum EnumMachineSize implements IStringSerializable {
 
     private String name;
     private int internalSize;
+
+    public static final Codec<EnumMachineSize> CODEC = IStringSerializable.fromEnum(
+            EnumMachineSize::values, EnumMachineSize::getFromSize);
 
     EnumMachineSize(String name, int internalSize) {
         this.name = name;

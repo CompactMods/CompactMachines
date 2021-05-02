@@ -354,7 +354,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
 
     @Override
     public void addProbeData(IProbeData data, PlayerEntity player, World world, BlockState state) {
-        CompactMachineProvider.exec(data, player, world, state);
+        CompactMachineProvider.exec(data, world);
     }
 
     // 1.12.1 code

@@ -3,7 +3,7 @@ package com.robotgryphon.compactmachines.teleportation;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.api.core.Messages;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.persistent.InternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
 import com.robotgryphon.compactmachines.util.TranslationUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -59,7 +59,7 @@ public class TeleportationEventHandler {
 
         ChunkPos machineChunk = new ChunkPos(entity.xChunk, entity.zChunk);
 
-        InternalMachineData intern = InternalMachineData.get(serv);
+        CompactRoomData intern = CompactRoomData.get(serv);
         if (intern == null)
             return false;
 

@@ -5,7 +5,8 @@ import com.robotgryphon.compactmachines.api.tunnels.ICapableTunnel;
 import com.robotgryphon.compactmachines.api.tunnels.TunnelDefinition;
 import com.robotgryphon.compactmachines.block.walls.TunnelWallBlock;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
+import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.network.TunnelAddedPacket;
 import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
@@ -26,8 +27,8 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 public class TunnelWallTile extends TileEntity {
 
@@ -47,7 +48,7 @@ public class TunnelWallTile extends TileEntity {
             this.tunnelType = type;
         }
 
-        if(nbt.contains("machine")) {
+        if (nbt.contains("machine")) {
             this.connectedMachine = nbt.getInt("machine");
         }
     }
@@ -76,7 +77,7 @@ public class TunnelWallTile extends TileEntity {
             this.tunnelType = new ResourceLocation(tag.getString("tunnel_type"));
         }
 
-        if(tag.contains("machine")) {
+        if (tag.contains("machine")) {
             this.connectedMachine = tag.getInt("machine");
         }
     }
@@ -88,37 +89,36 @@ public class TunnelWallTile extends TileEntity {
         ServerWorld serverWorld = (ServerWorld) level;
         MinecraftServer serv = serverWorld.getServer();
 
-        ExternalMachineData extern = ExternalMachineData.get(serv);
-        if(extern == null)
+        MachineConnections connections = MachineConnections.get(serv);
+        CompactMachineData extern = CompactMachineData.get(serv);
+        if (connections == null || extern == null)
             return Optional.empty();
 
         if (this.connectedMachine <= 0) {
-            Optional<Integer> mid = tryFindExternalMachineByChunkPos(extern);
+            Optional<Integer> mid = tryFindExternalMachineByChunkPos(connections);
 
             // Map the results - either it found an ID and we can map, or it found nothing
             return mid.map(i -> {
                 this.connectedMachine = i;
-                DimensionalPosition pos = extern.getMachineLocation(i);
-                if(pos == null)
-                    return null;
-
-                BlockPos bumped = pos.getBlockPosition().relative(getConnectedSide(), 1);
-                return new DimensionalPosition(pos.getDimension(), bumped);
+                Optional<DimensionalPosition> pos = extern.getMachineLocation(i);
+                return pos.map(p -> {
+                    BlockPos bumped = p.getBlockPosition().relative(getConnectedSide(), 1);
+                    return new DimensionalPosition(p.getDimension(), bumped);
+                }).orElse(null);
             });
         }
 
-        DimensionalPosition pos = extern.getMachineLocation(this.connectedMachine);
-        if(pos == null)
-            return Optional.empty();
-
-        BlockPos bumped = pos.getBlockPosition().relative(getConnectedSide(), 1);
-        DimensionalPosition bdp = new DimensionalPosition(pos.getDimension(), bumped);
-        return Optional.of(bdp);
+        Optional<DimensionalPosition> pos = extern.getMachineLocation(this.connectedMachine);
+        return pos.map(p -> {
+            BlockPos bumped = p.getBlockPosition().relative(getConnectedSide(), 1);
+            DimensionalPosition bdp = new DimensionalPosition(p.getDimension(), bumped);
+            return bdp;
+        });
     }
 
-    private Optional<Integer> tryFindExternalMachineByChunkPos(ExternalMachineData extern) {
+    private Optional<Integer> tryFindExternalMachineByChunkPos(MachineConnections connections) {
         ChunkPos thisMachineChunk = new ChunkPos(worldPosition);
-        Set<Integer> externalMachineIDs = extern.getExternalMachineIDs(thisMachineChunk);
+        Collection<Integer> externalMachineIDs = connections.graph.getMachinesFor(thisMachineChunk);
 
         // This shouldn't happen - there should always be at least one machine attached externally
         // If this DOES happen, it's probably a migration failure or the block was destroyed without notification

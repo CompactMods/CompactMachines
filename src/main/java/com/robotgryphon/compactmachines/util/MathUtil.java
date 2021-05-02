@@ -1,6 +1,7 @@
 package com.robotgryphon.compactmachines.util;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.vector.Vector3i;
 
 public class MathUtil {
@@ -47,5 +48,11 @@ public class MathUtil {
                 (regionIndex.getX() * 1024) + 8,
                 y,
                 (regionIndex.getZ() * 1024) + 8);
+    }
+
+    public static ChunkPos getChunkForRoomIndex(int roomIndex) {
+        Vector3i region = getRegionPositionByIndex(roomIndex);
+        BlockPos roomCenter = getCenterWithY(region, 0);
+        return new ChunkPos(roomCenter);
     }
 }

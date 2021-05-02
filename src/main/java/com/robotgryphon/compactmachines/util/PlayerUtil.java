@@ -7,9 +7,10 @@ import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
+import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
-import com.robotgryphon.compactmachines.data.persistent.ExternalMachineData;
-import com.robotgryphon.compactmachines.data.persistent.InternalMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
+import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
 import com.robotgryphon.compactmachines.network.MachinePlayersChangedPacket;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
@@ -75,10 +76,16 @@ public abstract class PlayerUtil {
             return;
 
         if (!tile.mapped()) {
-            ExternalMachineData extern = ExternalMachineData.get(serv);
-            InternalMachineData intern = InternalMachineData.get(serv);
+            CompactMachineData machines = CompactMachineData.get(serv);
+            CompactRoomData rooms = CompactRoomData.get(serv);
+            MachineConnections connections = MachineConnections.get(serv);
 
-            int nextId = intern.getNextId();
+            if (machines == null || rooms == null || connections == null) {
+                CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.");
+                return;
+            }
+
+            int nextId = rooms.getNextId();
             Vector3i location = MathUtil.getRegionPositionByIndex(nextId);
 
             int centerY = ServerConfig.MACHINE_FLOOR_Y.get() + (size.getInternalSize() / 2);
@@ -88,15 +95,19 @@ public abstract class PlayerUtil {
             CompactStructureGenerator.generateCompactStructure(compactWorld, size, newCenter);
             ChunkPos machineChunk = new ChunkPos(newCenter);
             tile.setMachineId(nextId);
-            extern.machineMapping.put(nextId, machineChunk);
-            extern.machineLocations.put(nextId, new DimensionalPosition(serverWorld.dimension(), machinePos));
-            extern.setDirty();
+
+            connections.graph.addMachine(nextId);
+            connections.graph.addRoom(machineChunk);
+            connections.graph.connectMachineToRoom(nextId, machineChunk);
+            connections.setDirty();
+
+            machines.setMachineLocation(nextId, new DimensionalPosition(serverWorld.dimension(), machinePos));
 
             BlockPos.Mutable newSpawn = newCenter.mutable();
             newSpawn.setY(newSpawn.getY() - (size.getInternalSize() / 2));
 
             try {
-                intern.register(machineChunk, new CompactMachineInternalData(
+                rooms.register(machineChunk, new CompactMachineInternalData(
                         serverPlayer.getUUID(),
                         newCenter,
                         newSpawn,
@@ -108,44 +119,29 @@ public abstract class PlayerUtil {
         }
 
         serv.submitAsync(() -> {
-            tile.getInternalData().ifPresent(mach -> {
-                BlockPos spawn = mach.getSpawn();
-                InternalMachineData.get(serv).setDirty();
-                try {
-                    // Mark the player as inside the machine, set external spawn, and yeet
-                    addPlayerToMachine(serverPlayer, machinePos);
-                } catch (Exception ex) {
-                    CompactMachines.LOGGER.error(ex);
-                }
+            BlockPos spawn = tile.getSpawn().orElse(null);
+            if (spawn == null) {
+                CompactMachines.LOGGER.error("Machine " + tile.machineId + " could not load spawn info.");
+                return;
+            }
 
-                serverPlayer.teleportTo(
-                        compactWorld,
-                        spawn.getX() + 0.5,
-                        spawn.getY(),
-                        spawn.getZ() + 0.5,
-                        serverPlayer.yRot,
-                        serverPlayer.xRot);
-            });
+            try {
+                // Mark the player as inside the machine, set external spawn, and yeet
+                addPlayerToMachine(serverPlayer, machinePos);
+            } catch (Exception ex) {
+                CompactMachines.LOGGER.error(ex);
+            }
 
-            // TODO - Move machine generation to new method
-//                int nextID = serverData.getNextMachineId();
-//
-//                BlockPos center = getCenterForNewMachine(nextID, size);
-//
-//                CompactStructureGenerator.generateCompactStructure(compactWorld, size, center);
-//
-//                tile.setMachineId(nextID);
-//                CompactMachineRegistrationData regData = new CompactMachineRegistrationData(nextID, center, serverPlayer.getUUID(), size);
-//                regData.setWorldPosition(serverWorld, machinePos);
-//
-//                serverData.registerMachine(nextID, regData);
-//                machineData.setDirty();
-//
-//                BlockPos.Mutable spawn = center.mutable();
-//                spawn.setY(ServerConfig.MACHINE_FLOOR_Y.get());
-//
-//                spawnPoint = spawn.immutable();
+            serverPlayer.teleportTo(
+                    compactWorld,
+                    spawn.getX() + 0.5,
+                    spawn.getY(),
+                    spawn.getZ() + 0.5,
+                    serverPlayer.yRot,
+                    serverPlayer.xRot);
         });
+
+        // TODO - Move machine generation to new method
     }
 
     public static void teleportPlayerOutOfMachine(ServerWorld world, ServerPlayerEntity serverPlayer) {

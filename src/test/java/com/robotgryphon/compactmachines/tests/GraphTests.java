@@ -7,7 +7,7 @@ import com.robotgryphon.compactmachines.data.graph.CompactMachineConnectionGraph
 import com.robotgryphon.compactmachines.data.graph.CompactMachineNode;
 import com.robotgryphon.compactmachines.data.graph.CompactMachineRoomNode;
 import com.robotgryphon.compactmachines.data.graph.IMachineGraphNode;
-import com.robotgryphon.compactmachines.tests.util.FileHelper;
+import com.robotgryphon.compactmachines.util.MathUtil;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.util.Constants;
@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -31,6 +29,28 @@ public class GraphTests {
 
         g.connectMachineToRoom(0, new ChunkPos(0, 0));
         return g;
+    }
+
+    private CompactMachineConnectionGraph generateGraphWithMultipleRooms(int numRooms) {
+        CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
+
+        for(int i = 0; i < numRooms; i++) {
+            g.addMachine(i);
+            ChunkPos chunk = MathUtil.getChunkForRoomIndex(i);
+            g.addRoom(chunk);
+            g.connectMachineToRoom(i, chunk);
+        }
+
+        return g;
+    }
+
+    private void verifySingleRoomValid(CompactMachineConnectionGraph graph, int machine, ChunkPos room) {
+        Optional<ChunkPos> connectedRoom = graph.getConnectedRoom(machine);
+        Assertions.assertTrue(connectedRoom.isPresent());
+
+        connectedRoom.ifPresent(cRoom -> {
+            Assertions.assertEquals(room, cRoom);
+        });
     }
 
     @Test
@@ -64,16 +84,25 @@ public class GraphTests {
 
         CompactMachineConnectionGraph g = generateGraphWithSingleRoom();
 
-        Optional<ChunkPos> connectedRoom = g.getConnectedRoom(machine);
-        Assertions.assertTrue(connectedRoom.isPresent());
-
-        connectedRoom.ifPresent(cRoom -> {
-            Assertions.assertEquals(room, cRoom);
-        });
+        verifySingleRoomValid(g, machine, room);
 
         Collection<Integer> linkedMachines = g.getMachinesFor(room);
         Assertions.assertEquals(1, linkedMachines.size());
         Assertions.assertTrue(linkedMachines.contains(machine));
+    }
+
+
+
+    @Test
+    @DisplayName("Create Multiple Rooms (1:1)")
+    void canCreateMultipleRoomsWithSingleLinkedMachine() {
+        CompactMachineConnectionGraph graph = generateGraphWithMultipleRooms(10);
+
+        for(int roomIndex = 0; roomIndex < 10; roomIndex++) {
+            final ChunkPos EXPECTED_CHUNK = MathUtil.getChunkForRoomIndex(roomIndex);
+
+            verifySingleRoomValid(graph, roomIndex, EXPECTED_CHUNK);
+        }
     }
 
     @Test
@@ -85,7 +114,6 @@ public class GraphTests {
 
         CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
 
-
         g.addMachine(0);
         g.addMachine(1);
 
@@ -94,17 +122,8 @@ public class GraphTests {
         g.connectMachineToRoom(0, roomChunk);
         g.connectMachineToRoom(1, roomChunk);
 
-        Optional<ChunkPos> connectedRoom = g.getConnectedRoom(0);
-        Assertions.assertTrue(connectedRoom.isPresent());
-        connectedRoom.ifPresent(cRoom -> {
-            Assertions.assertEquals(EXPECTED_ROOM, cRoom);
-        });
-
-        Optional<ChunkPos> connectedRoom2 = g.getConnectedRoom(1);
-        Assertions.assertTrue(connectedRoom2.isPresent());
-        connectedRoom2.ifPresent(cRoom2 -> {
-            Assertions.assertEquals(EXPECTED_ROOM, cRoom2);
-        });
+        verifySingleRoomValid(g, 0, EXPECTED_ROOM);
+        verifySingleRoomValid(g, 1, EXPECTED_ROOM);
 
         Collection<Integer> linkedMachines = g.getMachinesFor(EXPECTED_ROOM);
         Assertions.assertEquals(2, linkedMachines.size());
@@ -145,7 +164,7 @@ public class GraphTests {
                     Assertions.assertTrue(conn1.contains("machine"));
                     Assertions.assertTrue(conn1.contains("connections"));
 
-                    CompoundNBT machineChunk = conn1.getCompound("machine");
+                    INBT machineChunk = conn1.get("machine");
                     DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS_CODEC.parse(NBTDynamicOps.INSTANCE, machineChunk);
                     chunkRes.resultOrPartial(Assertions::fail)
                             .ifPresent(chunk -> {

@@ -23,18 +23,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class InternalMachineData extends WorldSavedData {
-    public static final String DATA_NAME = "machines_internal";
+public class CompactRoomData extends WorldSavedData {
+    public static final String DATA_NAME = CompactMachines.MOD_ID + "_rooms";
 
     private Map<ChunkPos, CompactMachineInternalData> machineData;
 
-    public InternalMachineData() {
+    public CompactRoomData() {
         super(DATA_NAME);
         machineData = new HashMap<>();
     }
 
     @Nullable
-    public static InternalMachineData get(MinecraftServer server) {
+    public static CompactRoomData get(MinecraftServer server) {
         ServerWorld compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
@@ -42,7 +42,7 @@ public class InternalMachineData extends WorldSavedData {
         }
 
         DimensionSavedDataManager sd = compactWorld.getDataStorage();
-        return sd.computeIfAbsent(InternalMachineData::new, DATA_NAME);
+        return sd.computeIfAbsent(CompactRoomData::new, DATA_NAME);
     }
 
     @Override

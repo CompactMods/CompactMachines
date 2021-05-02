@@ -15,14 +15,14 @@ import net.minecraft.world.storage.WorldSavedData;
 public class MachineConnections extends WorldSavedData {
     public static final String DATA_NAME = CompactMachines.MOD_ID + "_connections";
 
-    private CompactMachineConnectionGraph graph;
+    public CompactMachineConnectionGraph graph;
 
     public MachineConnections() {
         super(DATA_NAME);
         graph = new CompactMachineConnectionGraph();
     }
 
-    public static MachineConnections instance(MinecraftServer server) {
+    public static MachineConnections get(MinecraftServer server) {
         ServerWorld compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
