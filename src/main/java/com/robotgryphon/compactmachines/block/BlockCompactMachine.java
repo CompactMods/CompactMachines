@@ -226,7 +226,7 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         nbt.putString("size", this.size.getName());
 
         CompactMachineTile tileEntity = (CompactMachineTile) world.getBlockEntity(pos);
-        if (tileEntity != null) {
+        if (tileEntity != null && tileEntity.mapped()) {
             nbt.putInt("coords", tileEntity.machineId);
         }
 

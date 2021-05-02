@@ -83,6 +83,9 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     private String getDimensionString() {
+        if(this.dimension == null)
+            return "";
+
         return this.dimension.location().toString();
     }
 
