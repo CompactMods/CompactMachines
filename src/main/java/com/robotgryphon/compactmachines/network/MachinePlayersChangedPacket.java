@@ -58,7 +58,7 @@ public class MachinePlayersChangedPacket {
         NetworkEvent.Context ctx = context.get();
 
         message.machinePositions.forEach(machinePos -> {
-            CompactMachines.LOGGER.debug("Player changed inside {}; outer position {}", message.machine, machinePos);
+            CompactMachines.LOGGER.debug("Player {} machine {} via {}", message.type, message.machine, machinePos);
             MachinePlayerEventHandler.handlePlayerMachineChanged(message.playerID, message.type, machinePos);
         });
 

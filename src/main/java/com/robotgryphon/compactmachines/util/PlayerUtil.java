@@ -10,6 +10,7 @@ import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
 import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
+import com.robotgryphon.compactmachines.network.CMPacketTargets;
 import com.robotgryphon.compactmachines.network.MachinePlayersChangedPacket;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
@@ -27,6 +28,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -106,7 +108,7 @@ public abstract class PlayerUtil {
                 rooms.createNew()
                         .owner(serverPlayer.getUUID())
                         .size(size)
-                        .center(newCenter)
+                        .chunk(machineChunk)
                         .register();
             } catch (OperationNotSupportedException e) {
                 CompactMachines.LOGGER.warn(e);
@@ -143,6 +145,7 @@ public abstract class PlayerUtil {
         // TODO - Move machine generation to new method
     }
 
+    // TODO - Overhaul this to handle nested machines
     public static void teleportPlayerOutOfMachine(ServerWorld world, ServerPlayerEntity serverPlayer) {
 
         MinecraftServer serv = world.getServer();
@@ -162,50 +165,20 @@ public abstract class PlayerUtil {
 
         ChunkPos currentMachine = new ChunkPos(serverPlayer.blockPosition());
 
+        MachineConnections connections = MachineConnections.get(serv);
+        if (connections == null)
+            return;
+
         DimensionalPosition spawnPoint = externalSpawn.get();
 
-        Optional<ServerWorld> outsideWorld = spawnPoint.getWorld(world.getServer());
+        Optional<ServerWorld> outsideWorld = spawnPoint.getWorld(serv);
         outsideWorld.ifPresent(w -> {
             Vector3d worldPos = spawnPoint.getPosition();
-            serverPlayer.teleportTo(w, worldPos.x(), worldPos.y(), worldPos.z(), serverPlayer.yRot, serverPlayer.xRot);
+            Vector3d entryRot = spawnPoint.getRotation();
+            serverPlayer.teleportTo(w, worldPos.x(), worldPos.y(), worldPos.z(), (float) entryRot.y, (float) entryRot.x);
 
-            // CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer, MACHINE_POS);
-            // TODO - Networking for player leaving machine
-//                machine.ifPresent(m -> {
-//                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer,
-//                            machineInfo.getOutsidePosition(serverPlayer.getServer()).getBlockPosition(),
-//                            m.getId());
-//                });
+            removePlayerFromMachine(serverPlayer, currentMachine);
         });
-
-        // TODO
-//        Optional<CompactMachinePlayerData> machinePlayers = serverData.getPlayerData(machineInfo.getId());
-//        if (!machinePlayers.isPresent()) {
-//            // No player data for machine, wut
-//            CompactMachines.LOGGER.warn("Warning: Machine player data not set but machine registered, and player is inside. Machine ID: {}", machineInfo.getId());
-//            serverPlayer.displayClientMessage(new TranslationTextComponent("ah_crap"), true);
-//            return;
-//        }
-//
-//        Optional<DimensionalPosition> lastPos = machinePlayers.get().getExternalSpawn(serverPlayer);
-//        if (!lastPos.isPresent()) {
-//            // PANIC
-//
-//            return;
-//        } else {
-//            DimensionalPosition p = lastPos.get();
-//            Vector3d bp = p.getPosition();
-//            Optional<ServerWorld> outsideWorld = p.getWorld(world.getServer());
-//            outsideWorld.ifPresent(w -> {
-//                machine.ifPresent(m -> {
-//                    serverPlayer.teleportTo(w, bp.x(), bp.y(), bp.z(), serverPlayer.yRot, serverPlayer.xRot);
-//                    CompactMachinePlayerUtil.removePlayerFromMachine(serverPlayer,
-//                            machineInfo.getOutsidePosition(serverPlayer.getServer()).getBlockPosition(),
-//                            m.getId());
-//                });
-//            });
-//        }
-
     }
 
     public static void addPlayerToMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos) {
@@ -221,7 +194,10 @@ public abstract class PlayerUtil {
         if (tile == null)
             return;
 
+
         tile.getInternalChunkPos().ifPresent(mChunk -> {
+            final Chunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
+                    .getChunk(mChunk.x, mChunk.z);
 
             playerData.addPlayer(serverPlayer, mChunk);
             playerData.setDirty();
@@ -232,13 +208,11 @@ public abstract class PlayerUtil {
                     .enteredFrom(tile.machineId)
                     .build();
 
-            NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
-                    p);
+            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
         });
     }
 
-    public static void removePlayerFromMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos) {
+    public static void removePlayerFromMachine(ServerPlayerEntity serverPlayer, ChunkPos roomChunk) {
         MinecraftServer serv = serverPlayer.getServer();
 
         CompactMachinePlayerData playerData = CompactMachinePlayerData.get(serv);
@@ -246,24 +220,16 @@ public abstract class PlayerUtil {
             return;
 
         playerData.removePlayer(serverPlayer);
+        playerData.setDirty();
 
-        CompactMachineTile tile = (CompactMachineTile) serverPlayer.getLevel().getBlockEntity(machinePos);
-        if (tile == null)
-            return;
+        final Chunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
+                .getChunk(roomChunk.x, roomChunk.z);
 
-        tile.getInternalChunkPos().ifPresent(mChunk -> {
+        MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
+                .forMachine(roomChunk)
+                .forPlayer(serverPlayer)
+                .build();
 
-            playerData.removePlayer(serverPlayer);
-            playerData.setDirty();
-
-            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
-                    .forMachine(mChunk)
-                    .forPlayer(serverPlayer)
-                    .build();
-
-            NetworkHandler.MAIN_CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> serverPlayer.getLevel().getChunkAt(machinePos)),
-                    p);
-        });
+        NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
     }
 }

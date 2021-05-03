@@ -169,11 +169,6 @@ public class CompactRoomData extends WorldSavedData {
             return this;
         }
 
-        public NewRoomRegistration center(BlockPos roomCenter) {
-            this.center = roomCenter;
-            return this;
-        }
-
         public NewRoomRegistration size(EnumMachineSize size) {
             this.size = size;
             recalculateSize();
@@ -181,7 +176,12 @@ public class CompactRoomData extends WorldSavedData {
         }
 
         public NewRoomRegistration spawn(BlockPos spawn) {
-            this.spawn = new Vector3d(spawn.getX(), spawn.getY(), spawn.getZ());
+            Vector3d spawnTest = new Vector3d(spawn.getX(), spawn.getY(), spawn.getZ());
+
+            // Make sure the spawn is inside the new room bounds
+            if(size.getBounds(this.center).contains(spawnTest))
+                this.spawn = spawnTest;
+
             return this;
         }
 
