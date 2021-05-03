@@ -2,7 +2,6 @@ package com.robotgryphon.compactmachines.block.tiles;
 
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
 import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
 import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
@@ -210,13 +209,13 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public Optional<ChunkPos> getInternalChunkPos() {
-        if(level instanceof ServerWorld) {
+        if (level instanceof ServerWorld) {
             MinecraftServer serv = level.getServer();
-            if(serv == null)
+            if (serv == null)
                 return Optional.empty();
 
             MachineConnections connections = MachineConnections.get(serv);
-            if(connections == null)
+            if (connections == null)
                 return Optional.empty();
 
             return connections.graph.getConnectedRoom(this.machineId);
@@ -290,11 +289,11 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void doPostPlaced() {
-        if(this.level == null || this.level.isClientSide)
+        if (this.level == null || this.level.isClientSide)
             return;
 
         MinecraftServer serv = this.level.getServer();
-        if(serv == null)
+        if (serv == null)
             return;
 
         DimensionalPosition dp = new DimensionalPosition(
@@ -309,7 +308,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void handlePlayerLeft(UUID playerID) {
-        if(this.playerData != null)
+        if (this.playerData != null)
             this.playerData.removePlayer(playerID);
     }
 
@@ -323,27 +322,26 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         return getInternalChunkPos().isPresent();
     }
 
-    public Optional<BlockPos> getSpawn() {
-        if(level instanceof ServerWorld) {
+    public Optional<DimensionalPosition> getSpawn() {
+        if (level instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) level;
             MinecraftServer serv = serverWorld.getServer();
 
             MachineConnections connections = MachineConnections.get(serv);
-            if(connections == null)
+            if (connections == null)
                 return Optional.empty();
 
             Optional<ChunkPos> connectedRoom = connections.graph.getConnectedRoom(machineId);
 
-            if(!connectedRoom.isPresent())
+            if (!connectedRoom.isPresent())
                 return Optional.empty();
 
             CompactRoomData roomData = CompactRoomData.get(serv);
-                if(roomData == null)
-                    return Optional.empty();
+            if (roomData == null)
+                return Optional.empty();
 
             ChunkPos chunk = connectedRoom.get();
-            return roomData.forChunk(chunk)
-                    .map(CompactMachineInternalData::getSpawn);
+            return Optional.ofNullable(roomData.getSpawn(chunk));
         }
 
         return Optional.empty();

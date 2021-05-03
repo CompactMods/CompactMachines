@@ -133,7 +133,7 @@ public class CompactMachineConnectionGraph {
         private final List<Integer> connectedMachines;
 
         public static final Codec<CompactMachineConnectionInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
-                CodecExtensions.CHUNKPOS_CODEC
+                CodecExtensions.CHUNKPOS
                         .fieldOf("machine")
                         .forGetter(CompactMachineConnectionInfo::room),
 

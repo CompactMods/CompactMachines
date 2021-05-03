@@ -43,11 +43,17 @@ public class MathUtil {
         return new Vector3i(x, 0, y);
     }
 
+    public static BlockPos getCenterWithY(ChunkPos chunk, int y) {
+        return chunk.getWorldPosition()
+                .offset(new BlockPos(8, y, 8));
+    }
+
     public static BlockPos getCenterWithY(Vector3i regionIndex, int y) {
-        return new BlockPos(
-                (regionIndex.getX() * 1024) + 8,
-                y,
-                (regionIndex.getZ() * 1024) + 8);
+        ChunkPos chunk = new ChunkPos(
+                regionIndex.getX() * 64,
+                regionIndex.getZ() * 64);
+
+        return getCenterWithY(chunk, y);
     }
 
     public static ChunkPos getChunkForRoomIndex(int roomIndex) {

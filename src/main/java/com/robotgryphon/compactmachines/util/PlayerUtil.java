@@ -6,7 +6,6 @@ import com.robotgryphon.compactmachines.api.core.Messages;
 import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.Registration;
-import com.robotgryphon.compactmachines.data.machine.CompactMachineInternalData;
 import com.robotgryphon.compactmachines.data.persistent.MachineConnections;
 import com.robotgryphon.compactmachines.data.player.CompactMachinePlayerData;
 import com.robotgryphon.compactmachines.data.persistent.CompactMachineData;
@@ -103,23 +102,19 @@ public abstract class PlayerUtil {
 
             machines.setMachineLocation(nextId, new DimensionalPosition(serverWorld.dimension(), machinePos));
 
-            BlockPos.Mutable newSpawn = newCenter.mutable();
-            newSpawn.setY(newSpawn.getY() - (size.getInternalSize() / 2));
-
             try {
-                rooms.register(machineChunk, new CompactMachineInternalData(
-                        serverPlayer.getUUID(),
-                        newCenter,
-                        newSpawn,
-                        size
-                ));
+                rooms.createNew()
+                        .owner(serverPlayer.getUUID())
+                        .size(size)
+                        .center(newCenter)
+                        .register();
             } catch (OperationNotSupportedException e) {
                 CompactMachines.LOGGER.warn(e);
             }
         }
 
         serv.submitAsync(() -> {
-            BlockPos spawn = tile.getSpawn().orElse(null);
+            DimensionalPosition spawn = tile.getSpawn().orElse(null);
             if (spawn == null) {
                 CompactMachines.LOGGER.error("Machine " + tile.machineId + " could not load spawn info.");
                 return;
@@ -132,13 +127,17 @@ public abstract class PlayerUtil {
                 CompactMachines.LOGGER.error(ex);
             }
 
+            Vector3d sp = spawn.getPosition();
+            Vector3d sr = spawn.getRotation() != Vector3d.ZERO ?
+                    spawn.getRotation() : new Vector3d(serverPlayer.xRot, serverPlayer.yRot, 0);
+
             serverPlayer.teleportTo(
                     compactWorld,
-                    spawn.getX() + 0.5,
-                    spawn.getY(),
-                    spawn.getZ() + 0.5,
-                    serverPlayer.yRot,
-                    serverPlayer.xRot);
+                    sp.x,
+                    sp.y,
+                    sp.z,
+                    (float) sr.y,
+                    (float) sr.x);
         });
 
         // TODO - Move machine generation to new method

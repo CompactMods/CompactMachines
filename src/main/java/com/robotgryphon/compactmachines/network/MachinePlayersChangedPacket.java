@@ -28,7 +28,7 @@ public class MachinePlayersChangedPacket {
     public EnumPlayerChangeType type;
 
     public static final Codec<MachinePlayersChangedPacket> CODEC = RecordCodecBuilder.create(i -> i.group(
-            CodecExtensions.CHUNKPOS_CODEC.fieldOf("machine").forGetter(MachinePlayersChangedPacket::getChunkPos),
+            CodecExtensions.CHUNKPOS.fieldOf("machine").forGetter(MachinePlayersChangedPacket::getChunkPos),
             CodecExtensions.UUID_CODEC.fieldOf("player").forGetter(MachinePlayersChangedPacket::getPlayer),
             Codec.STRING.fieldOf("type").forGetter((p) -> p.type.name()),
             DimensionalPosition.CODEC.listOf().fieldOf("positions").forGetter(p -> p.machinePositions.asList())

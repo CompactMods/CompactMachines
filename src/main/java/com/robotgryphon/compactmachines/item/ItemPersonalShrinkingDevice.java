@@ -78,15 +78,12 @@ public class ItemPersonalShrinkingDevice extends Item {
                     CompactRoomData intern = CompactRoomData.get(serverWorld.getServer());
                     if (intern != null) {
                         // Use internal data to set new spawn point
-                        intern.forChunk(machineChunk).ifPresent(data -> {
-                            data.setSpawn(player.blockPosition());
-                            intern.setDirty();
+                        intern.setSpawn(machineChunk, player.position());
 
-                            IFormattableTextComponent tc = TranslationUtil.message(Messages.MACHINE_SPAWNPOINT_SET)
-                                    .withStyle(TextFormatting.GREEN);
+                        IFormattableTextComponent tc = TranslationUtil.message(Messages.MACHINE_SPAWNPOINT_SET)
+                                .withStyle(TextFormatting.GREEN);
 
-                            player.displayClientMessage(tc, true);
-                        });
+                        player.displayClientMessage(tc, true);
                     }
                 } else {
                     PlayerUtil.teleportPlayerOutOfMachine(serverWorld, serverPlayer);

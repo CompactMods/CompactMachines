@@ -165,7 +165,7 @@ public class GraphTests {
                     Assertions.assertTrue(conn1.contains("connections"));
 
                     INBT machineChunk = conn1.get("machine");
-                    DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS_CODEC.parse(NBTDynamicOps.INSTANCE, machineChunk);
+                    DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS.parse(NBTDynamicOps.INSTANCE, machineChunk);
                     chunkRes.resultOrPartial(Assertions::fail)
                             .ifPresent(chunk -> {
                                 Assertions.assertEquals(new ChunkPos(0, 0), chunk);

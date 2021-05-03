@@ -10,10 +10,8 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -26,27 +24,34 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
     private RegistryKey<World> dimension;
     private Vector3d position;
+    private Vector3d rotation;
 
+    // Note: We'd use the actual world registry key here, but it static loads the world and does a bunch
+    // of initialization, making it impossible to unit test without booting a whole server up.
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.STRING.fieldOf("dim").forGetter(DimensionalPosition::getDimensionString),
-            CodecExtensions.VECTOR3D_CODEC.fieldOf("pos").forGetter(DimensionalPosition::getPosition)
+            CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
+            CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
+            CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vector3d.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
 
     private DimensionalPosition() { }
 
-    private DimensionalPosition(String dimKey, Vector3d pos) {
-        this.dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimKey));
-        this.position = pos;
+    public DimensionalPosition(RegistryKey<World> world, BlockPos positionBlock) {
+        this(world, Vector3d.ZERO, Vector3d.ZERO);
+        this.position = new Vector3d(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
     }
 
-    public DimensionalPosition(RegistryKey<World> dim, Vector3d pos) {
+    public DimensionalPosition(RegistryKey<World> world, Vector3d positionBlock) {
+        this(world, positionBlock, Vector3d.ZERO);
+        this.dimension = world;
+
+        this.rotation = Vector3d.ZERO;
+    }
+
+    public DimensionalPosition(RegistryKey<World> dim, Vector3d pos, Vector3d rotation) {
         this.dimension = dim;
         this.position = pos;
-    }
-
-    public DimensionalPosition(RegistryKey<World> world, BlockPos positionBlock) {
-        this.dimension = world;
-        this.position = new Vector3d(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
+        this.rotation = rotation;
     }
 
     public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {
@@ -75,6 +80,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         dimensionalPosition.ifPresent(dp -> {
             this.dimension = dp.dimension;
             this.position = dp.position;
+            this.rotation = dp.rotation;
         });
     }
 
@@ -82,15 +88,12 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         return this.dimension;
     }
 
-    private String getDimensionString() {
-        if(this.dimension == null)
-            return "";
-
-        return this.dimension.location().toString();
-    }
-
     public Vector3d getPosition() {
         return this.position;
+    }
+
+    public Vector3d getRotation() {
+        return this.rotation;
     }
 
     public BlockPos getBlockPosition() {
@@ -102,19 +105,22 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DimensionalPosition that = (DimensionalPosition) o;
-        return Objects.equals(dimension, that.dimension) && Objects.equals(position, that.position);
+        return Objects.equals(dimension, that.dimension) &&
+                Objects.equals(position, that.position) &&
+                Objects.equals(rotation, rotation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dimension, position);
+        return Objects.hash(dimension, position, rotation);
     }
 
     @Override
     public String toString() {
         return "DimensionalPosition{" +
-                "dimension=" + dimension +
-                ", position=" + position +
+                "d=" + dimension +
+                ", p=" + position +
+                ", r=" + rotation +
                 '}';
     }
 }

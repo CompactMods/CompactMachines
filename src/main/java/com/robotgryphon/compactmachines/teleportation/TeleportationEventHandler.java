@@ -63,12 +63,9 @@ public class TeleportationEventHandler {
         if (intern == null)
             return false;
 
-        return intern.forChunk(machineChunk).map(md -> {
-            AxisAlignedBB bounds = md.getMachineBounds();
-            boolean targetInBounds = bounds.contains(target);
-
-            return !targetInBounds;
-        }).orElse(false);
+        return intern.getInnerBounds(machineChunk)
+                .map(bounds -> !bounds.contains(target))
+                .orElse(false);
     }
 
     private static void doEntityTeleportHandle(EntityEvent evt, Vector3d target, Entity ent) {

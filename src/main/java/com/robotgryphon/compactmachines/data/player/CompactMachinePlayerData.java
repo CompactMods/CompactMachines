@@ -59,7 +59,7 @@ public class CompactMachinePlayerData extends WorldSavedData {
                 CompoundNBT pd = (CompoundNBT) playerData;
                 UUID id = pd.getUUID("id");
 
-                Optional<ChunkPos> chunk = CodecExtensions.CHUNKPOS_CODEC
+                Optional<ChunkPos> chunk = CodecExtensions.CHUNKPOS
                         .parse(NBTDynamicOps.INSTANCE, pd.get("chunk"))
                         .resultOrPartial(CompactMachines.LOGGER::error);
 
@@ -93,7 +93,7 @@ public class CompactMachinePlayerData extends WorldSavedData {
                     CompoundNBT pnbt = new CompoundNBT();
                     pnbt.put("id", intNBTS);
 
-                    DataResult<INBT> r = CodecExtensions.CHUNKPOS_CODEC.encodeStart(NBTDynamicOps.INSTANCE, u.getValue());
+                    DataResult<INBT> r = CodecExtensions.CHUNKPOS.encodeStart(NBTDynamicOps.INSTANCE, u.getValue());
                     r.result().ifPresent(a -> pnbt.put("chunk", a));
 
                     return pnbt;

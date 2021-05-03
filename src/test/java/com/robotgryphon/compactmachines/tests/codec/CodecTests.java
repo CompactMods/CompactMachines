@@ -17,7 +17,7 @@ public class CodecTests {
     void canSerializeVector3d() {
         Vector3d expected = new Vector3d(1.25d, 2.50d, 3.75d);
 
-        DataResult<INBT> nbtResult = CodecExtensions.VECTOR3D_CODEC.encodeStart(NBTDynamicOps.INSTANCE, expected);
+        DataResult<INBT> nbtResult = CodecExtensions.VECTOR3D.encodeStart(NBTDynamicOps.INSTANCE, expected);
         nbtResult.resultOrPartial(Assertions::fail)
                 .ifPresent(nbt -> {
                     ListNBT list = (ListNBT) nbt;
