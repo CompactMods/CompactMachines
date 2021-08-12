@@ -1,6 +1,8 @@
 package com.robotgryphon.compactmachines.core;
 
 import com.robotgryphon.compactmachines.CompactMachines;
+import com.robotgryphon.compactmachines.advancement.AdvancementTriggers;
+import com.robotgryphon.compactmachines.api.core.Advancements;
 import com.robotgryphon.compactmachines.compat.theoneprobe.TheOneProbeCompat;
 import com.robotgryphon.compactmachines.network.NetworkHandler;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -16,6 +18,9 @@ public class ModBusEvents {
     public static void setup(final FMLCommonSetupEvent event) {
         CompactMachines.LOGGER.trace("Initializing network handler.");
         NetworkHandler.initialize();
+
+        CompactMachines.LOGGER.trace("Registering advancement triggers.");
+        AdvancementTriggers.init();
     }
 
     @SubscribeEvent

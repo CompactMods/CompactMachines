@@ -308,14 +308,11 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void handlePlayerLeft(UUID playerID) {
-        if (this.playerData != null)
-            this.playerData.removePlayer(playerID);
+        // TODO
     }
 
     public void handlePlayerEntered(UUID playerID) {
         // TODO
-//        if(this.playerData != null)
-//            this.playerData.addPlayer(playerID);
     }
 
     public boolean mapped() {

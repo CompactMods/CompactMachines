@@ -52,6 +52,9 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
             args '--username', 'Dev##'
 
             mods {
@@ -70,6 +73,9 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
             mods {
                 compactmachines {
                     source sourceSets.main
@@ -86,7 +92,13 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'compactmachines', '--existing', file('src/main/resources'), '--all', '--output', file('src/generated/resources/')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            args '--mod', mod_id
+            args '--existing', file('src/main/resources')
+            args '--all'
+            args '--output', file('src/generated/resources/')
 
             mods {
                 compactmachines {

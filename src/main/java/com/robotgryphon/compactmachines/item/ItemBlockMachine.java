@@ -55,36 +55,14 @@ public class ItemBlockMachine extends BlockItem {
     }
 
     @Override
-    protected boolean canPlace(BlockItemUseContext ctx, BlockState state) {
-        boolean s = super.canPlace(ctx, state);
-        if (!s) return false;
-
-        ItemStack stack = ctx.getItemInHand();
-        World level = ctx.getLevel();
-
-        if(level.isClientSide)
-            return true;
-
-        MinecraftServer serv = level.getServer();
-        return getMachineId(stack)
-                .map(id -> {
-                    // Need to determine if another machine with this ID already on server
-                    CompactMachineData extern = CompactMachineData.get(serv);
-                    return extern.isPlaced(id);
-                })
-                .orElse(true);
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-
-
 
         // We need NBT data for the rest of this
         if (stack.hasTag()) {
 
             CompoundNBT nbt = stack.getTag();
+            assert nbt != null;
 
             getMachineId(stack).ifPresent(id -> {
                 tooltip.add(TranslationUtil.tooltip(Tooltips.Machines.ID, id));

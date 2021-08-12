@@ -2,19 +2,26 @@ package com.robotgryphon.compactmachines.item;
 
 import com.robotgryphon.compactmachines.api.core.Messages;
 import com.robotgryphon.compactmachines.api.core.Tooltips;
+import com.robotgryphon.compactmachines.block.BlockCompactMachine;
+import com.robotgryphon.compactmachines.block.tiles.CompactMachineTile;
 import com.robotgryphon.compactmachines.client.gui.PersonalShrinkingDeviceScreen;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.data.persistent.CompactRoomData;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import com.robotgryphon.compactmachines.util.TranslationUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
@@ -30,13 +37,6 @@ public class ItemPersonalShrinkingDevice extends Item {
     public ItemPersonalShrinkingDevice(Properties props) {
         super(props);
     }
-
-//    TODO Model locations
-//    @SideOnly(MixinEnvironment.Side.CLIENT)
-//    public void initModel() {
-//        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-//    }
-
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -93,5 +93,4 @@ public class ItemPersonalShrinkingDevice extends Item {
 
         return ActionResult.success(stack);
     }
-
 }

@@ -29,4 +29,20 @@ public abstract class TranslationUtil {
     public static TranslationTextComponent tooltip(ResourceLocation tooltip, Object... params) {
         return new TranslationTextComponent(tooltipId(tooltip), params);
     }
+
+    public static String advId(ResourceLocation tooltip) {
+        return Util.makeDescriptionId("advancement", tooltip);
+    }
+
+    public static TranslationTextComponent advancement(ResourceLocation advancement) {
+        return new TranslationTextComponent(advId(advancement));
+    }
+
+    public static TranslationTextComponent advancementTitle(ResourceLocation advancement) {
+        return advancement(advancement);
+    }
+
+    public static TranslationTextComponent advancementDesc(ResourceLocation advancement) {
+        return new TranslationTextComponent(Util.makeDescriptionId("advancement", advancement) + ".desc");
+    }
 }

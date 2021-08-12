@@ -34,7 +34,7 @@ public class GraphTests {
     private CompactMachineConnectionGraph generateGraphWithMultipleRooms(int numRooms) {
         CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
 
-        for(int i = 0; i < numRooms; i++) {
+        for (int i = 0; i < numRooms; i++) {
             g.addMachine(i);
             ChunkPos chunk = MathUtil.getChunkForRoomIndex(i);
             g.addRoom(chunk);
@@ -92,13 +92,12 @@ public class GraphTests {
     }
 
 
-
     @Test
     @DisplayName("Create Multiple Rooms (1:1)")
     void canCreateMultipleRoomsWithSingleLinkedMachine() {
         CompactMachineConnectionGraph graph = generateGraphWithMultipleRooms(10);
 
-        for(int roomIndex = 0; roomIndex < 10; roomIndex++) {
+        for (int roomIndex = 0; roomIndex < 10; roomIndex++) {
             final ChunkPos EXPECTED_CHUNK = MathUtil.getChunkForRoomIndex(roomIndex);
 
             verifySingleRoomValid(graph, roomIndex, EXPECTED_CHUNK);
@@ -176,6 +175,29 @@ public class GraphTests {
                     Assertions.assertEquals(1, connList.size());
                     Assertions.assertEquals(0, connList.getInt(0));
                 });
+    }
+
+    @Test
+    void simpleNestedMachines() {
+        /*
+            Overworld - Contains Machine 0, linked to Room 0
+            CompactWorld - Contains Machine 1, linked to Room 1 (Inside Room 0)
+         */
+
+        CompactMachineConnectionGraph graph = new CompactMachineConnectionGraph();
+
+        graph.addMachine(0);
+        graph.addMachine(1);
+
+        // Add two rooms
+        ChunkPos room0 = MathUtil.getChunkForRoomIndex(0);
+        ChunkPos room1 = MathUtil.getChunkForRoomIndex(1);
+        graph.addRoom(room0);
+        graph.addRoom(room1);
+
+        graph.connectMachineToRoom(0, room0);
+        graph.connectMachineToRoom(1, room1);
+
     }
 //    private void generateData(MutableGraph<IGraphNode> g, HashMap<String, IGraphNode> lookup) {
 //        Random r = new Random();

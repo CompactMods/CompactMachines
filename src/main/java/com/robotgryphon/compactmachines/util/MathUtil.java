@@ -5,7 +5,13 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.vector.Vector3i;
 
 public class MathUtil {
+    /**
+     *
+     * @param i
+     * @return
+     */
     public static Vector3i getRegionPositionByIndex(int i) {
+        // From SO, https://stackoverflow.com/a/41141648
         int index = i + 1;
         // wth
         int s = (int) Math.ceil(Math.sqrt(index)) + (int) ((Math.ceil(Math.sqrt(index)) % 2 + 1) % 2);

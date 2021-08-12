@@ -1,0 +1,29 @@
+{
+  "parent": "compactmachines:root",
+  "display": {
+    "icon": {
+      "item": "compactmachines:personal_shrinking_device"
+    },
+    "title": {
+      "translate": "advancement.compactmachines.how_did_you_get_here"
+    },
+    "description": {
+      "translate": "advancement.compactmachines.how_did_you_get_here.desc"
+    },
+    "frame": "challenge",
+    "show_toast": false,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "got_stuck": {
+      "trigger": "compactmachines:how_did_you_get_here",
+      "conditions": {}
+    }
+  },
+  "requirements": [
+    [
+      "got_stuck"
+    ]
+  ]
+}

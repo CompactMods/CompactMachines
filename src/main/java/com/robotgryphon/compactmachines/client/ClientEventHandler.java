@@ -1,5 +1,6 @@
 package com.robotgryphon.compactmachines.client;
 
+import java.util.stream.Stream;
 import com.robotgryphon.compactmachines.CompactMachines;
 import com.robotgryphon.compactmachines.core.Registration;
 import net.minecraft.client.renderer.RenderType;
@@ -27,5 +28,7 @@ public class ClientEventHandler {
     public static void onClientSetup(final FMLClientSetupEvent client) {
         RenderType cutout = RenderType.cutoutMipped();
         RenderTypeLookup.setRenderLayer(Registration.BLOCK_TUNNEL_WALL.get(), cutout);
+
+        Stream.of(new int[] {}).map(Object::toString).toArray(String[]::new);
     }
 }

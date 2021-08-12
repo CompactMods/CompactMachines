@@ -1,12 +1,11 @@
 package com.robotgryphon.compactmachines.data.graph;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.graph.ElementOrder;
-import com.google.common.graph.GraphBuilder;
-import com.google.common.graph.MutableGraph;
+import com.google.common.graph.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.robotgryphon.compactmachines.data.codec.CodecExtensions;
+import com.robotgryphon.compactmachines.teleportation.DimensionalPosition;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.stream.Stream;
  */
 public class CompactMachineConnectionGraph {
 
-    private final MutableGraph<IMachineGraphNode> graph;
+    private final MutableValueGraph<IMachineGraphNode, IGraphEdge> graph;
     private final Map<Integer, CompactMachineNode> machines;
     private final Map<ChunkPos, CompactMachineRoomNode> rooms;
 
@@ -32,7 +31,7 @@ public class CompactMachineConnectionGraph {
 
 
     public CompactMachineConnectionGraph() {
-        graph = GraphBuilder
+        graph = ValueGraphBuilder
                 .directed()
                 .nodeOrder(ElementOrder.sorted(Comparator.comparing(IMachineGraphNode::getId)))
                 .build();
@@ -92,7 +91,7 @@ public class CompactMachineConnectionGraph {
         CompactMachineNode machineNode = machines.get(machine);
         CompactMachineRoomNode roomNode = rooms.get(room);
 
-        graph.putEdge(machineNode, roomNode);
+        graph.putEdgeValue(machineNode, roomNode, DefaultEdges.MACHINE_LINK);
     }
 
     public Collection<Integer> getMachinesFor(ChunkPos machineChunk) {

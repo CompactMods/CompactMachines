@@ -12,12 +12,12 @@ import com.robotgryphon.compactmachines.config.ServerConfig;
 import com.robotgryphon.compactmachines.core.EnumMachinePlayersBreakHandling;
 import com.robotgryphon.compactmachines.core.Registration;
 import com.robotgryphon.compactmachines.reference.EnumMachineSize;
-import com.robotgryphon.compactmachines.reference.Reference;
 import com.robotgryphon.compactmachines.tunnels.TunnelHelper;
 import com.robotgryphon.compactmachines.util.PlayerUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -49,6 +49,11 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     public BlockCompactMachine(EnumMachineSize size, AbstractBlock.Properties props) {
         super(props);
         this.size = size;
+    }
+
+    @Override
+    public void entityInside(BlockState p_196262_1_, World p_196262_2_, BlockPos p_196262_3_, Entity p_196262_4_) {
+        super.entityInside(p_196262_1_, p_196262_2_, p_196262_3_, p_196262_4_);
     }
 
     @Override
@@ -301,14 +306,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         if(nbt == null)
             return;
 
-        if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-            tile.setOwner(nbt.getUUID(Reference.CompactMachines.OWNER_NBT));
-        }
-
-        if (!tile.getOwnerUUID().isPresent() && placer instanceof PlayerEntity) {
-            tile.setOwner(placer.getUUID());
-        }
-
         if (nbt.contains("cm")) {
             CompoundNBT machineData = nbt.getCompound("cm");
             if (machineData.contains("coords")) {
@@ -330,9 +327,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         if (player instanceof ServerPlayerEntity) {
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-
-            TileEntity te = worldIn.getBlockEntity(pos);
-            CompactMachineTile tile = (CompactMachineTile) te;
 
             ItemStack mainItem = player.getMainHandItem();
             if (mainItem.isEmpty())

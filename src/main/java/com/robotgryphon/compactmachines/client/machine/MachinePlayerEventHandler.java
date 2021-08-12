@@ -17,9 +17,11 @@ public class MachinePlayerEventHandler {
         if(w == null)
             return;
 
+        // Early exit if machine in another dimension
         if (w.dimension() != pos.getDimension())
             return;
 
+        // Early exit if machine isn't in range of the player - the block sync will handle those
         if(!w.isLoaded(pos.getBlockPosition()))
             return;
 
