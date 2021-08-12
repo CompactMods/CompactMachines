@@ -67,7 +67,7 @@ public class AdvancementGenerator implements IDataProvider {
                         .background(modLoc("textures/block/wall.png"))
                         .item(new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get()))
                         .id(Advancements.ROOT)
-                        .toast(false).hidden(true).chat(false)
+                        .toast(false).hidden(false).chat(false)
                         .build())
                 .save(consumer, modLoc("root").toString());
 
