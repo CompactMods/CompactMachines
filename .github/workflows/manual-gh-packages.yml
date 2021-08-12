@@ -117,8 +117,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish JAR with Gradle
-        run: ./gradlew publish --max-workers 1
+        run: ./gradlew publish -x test
         env:
+          CM_RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
