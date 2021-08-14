@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.advancement.trigger.ClaimedMachineTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.criterion.ImpossibleTrigger;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -78,6 +82,45 @@ public class AdvancementGenerator implements IDataProvider {
                         .toast(false).hidden(true)
                         .build())
                 .save(consumer, Advancements.HOW_DID_YOU_GET_HERE.toString());
+
+        final Advancement wall = Advancement.Builder.advancement()
+                .parent(root)
+                .addCriterion("obtained_wall", InventoryChangeTrigger.Instance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
+                .display(new DisplayBuilder()
+                        .frame(FrameType.TASK)
+                        .item(new ItemStack(Registration.BLOCK_BREAKABLE_WALL.get()))
+                        .id(Advancements.FOUNDATIONS)
+                        .build())
+                .save(consumer, Advancements.FOUNDATIONS.toString());
+
+        final Advancement psd = Advancement.Builder.advancement()
+                .parent(root)
+                .addCriterion("obtained_psd", InventoryChangeTrigger.Instance.hasItems(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                .display(new DisplayBuilder()
+                        .frame(FrameType.TASK)
+                        .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                        .id(Advancements.GOT_SHRINKING_DEVICE)
+                        .build())
+                .save(consumer, Advancements.GOT_SHRINKING_DEVICE.toString());
+
+        final Advancement tiny = machineAdvancement(consumer, psd, Advancements.CLAIMED_TINY_MACHINE, Registration.MACHINE_BLOCK_ITEM_TINY);
+        final Advancement small = machineAdvancement(consumer, psd, Advancements.CLAIMED_SMALL_MACHINE, Registration.MACHINE_BLOCK_ITEM_SMALL);
+        final Advancement normal = machineAdvancement(consumer, psd, Advancements.CLAIMED_NORMAL_MACHINE, Registration.MACHINE_BLOCK_ITEM_NORMAL);
+        final Advancement large = machineAdvancement(consumer, psd, Advancements.CLAIMED_LARGE_MACHINE, Registration.MACHINE_BLOCK_ITEM_LARGE);
+        final Advancement giant = machineAdvancement(consumer, psd, Advancements.CLAIMED_GIANT_MACHINE, Registration.MACHINE_BLOCK_ITEM_GIANT);
+        final Advancement max = machineAdvancement(consumer, psd, Advancements.CLAIMED_MAX_MACHINE, Registration.MACHINE_BLOCK_ITEM_MAXIMUM);
+    }
+
+    private Advancement machineAdvancement(Consumer<Advancement> consumer, Advancement root, ResourceLocation advancement, Supplier<Item> item) {
+        return Advancement.Builder.advancement()
+                .parent(root)
+                .addCriterion("claimed_machine", ClaimedMachineTrigger.Instance.create(advancement))
+                .display(new DisplayBuilder()
+                        .frame(FrameType.TASK)
+                        .item(new ItemStack(item.get()))
+                        .id(advancement)
+                        .build())
+                .save(consumer, advancement.toString());
     }
 
     @Override

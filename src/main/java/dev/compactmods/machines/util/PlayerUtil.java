@@ -134,12 +134,11 @@ public abstract class PlayerUtil {
                     sp.z,
                     (float) sr.y,
                     (float) sr.x);
-        });
 
-        // TODO - Move machine generation to new method
+            AdvancementTriggers.getTriggerForMachineClaim(size).trigger(serverPlayer);
+        });
     }
 
-    // TODO - Overhaul this to handle nested machines
     public static void teleportPlayerOutOfMachine(ServerWorld world, @Nonnull ServerPlayerEntity serverPlayer) {
 
         MinecraftServer serv = world.getServer();

@@ -58,5 +58,21 @@
   "advancement.compactmachines.root": "Compact Machines",
   "advancement.compactmachines.root.desc": "",
   "advancement.compactmachines.how_did_you_get_here": "How Did You Get Here?!",
-  "advancement.compactmachines.how_did_you_get_here.desc": "Manage to trap yourself inside a machine room."
+  "advancement.compactmachines.how_did_you_get_here.desc": "Manage to trap yourself inside a machine room.",
+  "advancement.compactmachines.foundations": "Foundations",
+  "advancement.compactmachines.foundations.desc": "Obtain a breakable wall block.",
+  "advancement.compactmachines.got_shrinking_device": "Personal Shrinking Device",
+  "advancement.compactmachines.got_shrinking_device.desc": "Obtain a Personal Shrinking Device.",
+  "advancement.compactmachines.claimed_machine_tiny": "Small Spaces, Big Ideas",
+  "advancement.compactmachines.claimed_machine_tiny.desc": "Claim a tiny compact machine.",
+  "advancement.compactmachines.claimed_machine_small": "I Can Breathe",
+  "advancement.compactmachines.claimed_machine_small.desc": "Claim a small compact machine.",
+  "advancement.compactmachines.claimed_machine_normal": "Bigger on the Inside",
+  "advancement.compactmachines.claimed_machine_normal.desc": "Claim a normal compact machine.",
+  "advancement.compactmachines.claimed_machine_large": "Room to Grow",
+  "advancement.compactmachines.claimed_machine_large.desc": "Claim a large compact machine.",
+  "advancement.compactmachines.claimed_machine_giant": "Got Enough Space?",
+  "advancement.compactmachines.claimed_machine_giant.desc": "Claim a giant compact machine.",
+  "advancement.compactmachines.claimed_machine_max": "Room for Activities!",
+  "advancement.compactmachines.claimed_machine_max.desc": "Claim a maximum compact machine."
 }

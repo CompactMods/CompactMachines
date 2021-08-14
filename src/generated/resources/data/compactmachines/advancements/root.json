@@ -12,7 +12,7 @@
     "frame": "task",
     "show_toast": false,
     "announce_to_chat": false,
-    "hidden": true,
+    "hidden": false,
     "background": "compactmachines:textures/block/wall.png"
   },
   "criteria": {
