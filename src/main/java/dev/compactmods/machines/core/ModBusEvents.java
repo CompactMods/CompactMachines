@@ -4,6 +4,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.compat.theoneprobe.TheOneProbeCompat;
 import dev.compactmods.machines.network.NetworkHandler;
+import dev.compactmods.machines.rooms.capability.CapabilityRoomHistory;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +21,9 @@ public class ModBusEvents {
 
         CompactMachines.LOGGER.trace("Registering advancement triggers.");
         AdvancementTriggers.init();
+
+        CompactMachines.LOGGER.trace("Registering capabilities.");
+        CapabilityRoomHistory.register();
     }
 
     @SubscribeEvent
