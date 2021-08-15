@@ -10,6 +10,7 @@ public class CMCommandRoot {
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         final LiteralArgumentBuilder<CommandSource> root = LiteralArgumentBuilder.literal(CompactMachines.MOD_ID);
         root.then(CMEjectSubcommand.register());
+        root.then(CMFixBiomeSubcommand.register());
         dispatcher.register(root);
     }
 }

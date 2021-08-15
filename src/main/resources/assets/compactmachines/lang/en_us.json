@@ -16,6 +16,7 @@
   "message.compactmachines.spawnpoint_set": "New spawn point set.",
   "message.compactmachines.no_machine_data": "No machine data loaded; report this.",
   "message.compactmachines.teleport_oob": "An otherworldly force prevents your teleportation.",
+  "message.compactmachines.fixbiome_bad_dim": "Cannot use fixbiome command outside of a machine room.",
 
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
