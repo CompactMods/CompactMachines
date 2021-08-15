@@ -70,6 +70,7 @@ public abstract class PlayerUtil {
         if (tile == null)
             return;
 
+        final boolean grantAdvancement = !tile.mapped();
         if (!tile.mapped()) {
             CompactMachineData machines = CompactMachineData.get(serv);
             CompactRoomData rooms = CompactRoomData.get(serv);
@@ -136,7 +137,8 @@ public abstract class PlayerUtil {
                     (float) sr.y,
                     (float) sr.x);
 
-            AdvancementTriggers.getTriggerForMachineClaim(size).trigger(serverPlayer);
+            if(grantAdvancement)
+                AdvancementTriggers.getTriggerForMachineClaim(size).trigger(serverPlayer);
         });
     }
 
