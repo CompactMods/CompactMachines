@@ -5,9 +5,9 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 
 public class ProbeData implements IProbeData {
-    private IProbeInfo info;
-    private ProbeMode mode;
-    private IProbeHitData hitData;
+    private final IProbeInfo info;
+    private final ProbeMode mode;
+    private final IProbeHitData hitData;
 
     public ProbeData(IProbeInfo info, ProbeMode mode, IProbeHitData hitData) {
         this.info = info;

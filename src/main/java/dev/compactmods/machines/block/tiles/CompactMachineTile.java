@@ -36,7 +36,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
     public int machineId = -1;
-    private boolean initialized = false;
+    private final boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
     public long nextSpawnTick = 0;
 

@@ -22,7 +22,7 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     private final ResourceLocation emptySection = new ResourceLocation(CompactMachines.MOD_ID, "empty");
 
     @Nullable
-    private GuideSection currentSection;
+    private final GuideSection currentSection;
 
     protected PersonalShrinkingDeviceScreen() {
         super(new TranslationTextComponent(CompactMachines.MOD_ID + ".gui.psd.title"));

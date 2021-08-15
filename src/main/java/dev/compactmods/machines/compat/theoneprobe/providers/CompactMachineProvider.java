@@ -77,7 +77,7 @@ public class CompactMachineProvider {
 
                 tile.getTunnelDefinition().ifPresent(tunnelDef -> {
                     vertical.text(
-                            new StringTextComponent(pos.toString() + ": " + tunnelDef.getRegistryName().toString())
+                            new StringTextComponent(pos + ": " + tunnelDef.getRegistryName().toString())
                     );
                 });
             });

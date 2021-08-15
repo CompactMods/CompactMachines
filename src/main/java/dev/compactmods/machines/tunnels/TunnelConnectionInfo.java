@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class TunnelConnectionInfo implements ITunnelConnectionInfo {
 
-    private TunnelWallTile tunnel;
+    private final TunnelWallTile tunnel;
 
     TunnelConnectionInfo(TunnelWallTile tile) {
         this.tunnel = tile;

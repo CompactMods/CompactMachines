@@ -111,7 +111,7 @@ public class TunnelItem extends Item {
             Item i = is.getItem();
 
             TunnelItem ti = ((TunnelItem) i);
-            Optional<TunnelDefinition> definition = ti.getDefinition(context.getItemInHand());
+            Optional<TunnelDefinition> definition = getDefinition(context.getItemInHand());
 
             definition.ifPresent(def -> {
                 BlockState tunnelState = Registration.BLOCK_TUNNEL_WALL.get()

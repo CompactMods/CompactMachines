@@ -59,14 +59,14 @@ public class Registration {
     // ================================================================================================================
     //   PROPERTIES
     // ================================================================================================================
-    private static AbstractBlock.Properties MACHINE_BLOCK_PROPS = AbstractBlock.Properties
+    private static final AbstractBlock.Properties MACHINE_BLOCK_PROPS = AbstractBlock.Properties
             .of(Material.METAL)
             .strength(8.0F, 20.0F)
             .harvestLevel(1)
             .harvestTool(ToolType.PICKAXE)
             .requiresCorrectToolForDrops();
 
-    private static Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
+    private static final Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
             .tab(CompactMachines.COMPACT_MACHINES_ITEMS);
 
     // ================================================================================================================

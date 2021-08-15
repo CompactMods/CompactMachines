@@ -9,8 +9,8 @@ import java.util.List;
 
 public class GuideSection implements IRenderable, IGuiEventListener {
     private final List<GuidePage> pages;
-    private int currentPageIndex = 0;
-    private GuidePage currentPage;
+    private final int currentPageIndex = 0;
+    private final GuidePage currentPage;
 
     public GuideSection() {
         this.pages = new ArrayList<>();

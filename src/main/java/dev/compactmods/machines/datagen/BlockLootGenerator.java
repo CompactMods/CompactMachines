@@ -63,7 +63,7 @@ public class BlockLootGenerator extends LootTableProvider {
             return builder;
         }
 
-        private ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.copyData(CopyNbt.Source.BLOCK_ENTITY)
+        private final ILootFunction.IBuilder CopyOwnerAndReferenceFunction = CopyNbt.copyData(CopyNbt.Source.BLOCK_ENTITY)
                 .copy(Reference.CompactMachines.OWNER_NBT, Reference.CompactMachines.OWNER_NBT)
                 .copy("coords", "cm.coords");
 

@@ -13,8 +13,8 @@ public enum EnumMachineSize implements IStringSerializable {
     GIANT   ("giant", 11),
     MAXIMUM ("maximum", 13);
 
-    private String name;
-    private int internalSize;
+    private final String name;
+    private final int internalSize;
 
     public static final Codec<EnumMachineSize> CODEC = IStringSerializable.fromEnum(
             EnumMachineSize::values, EnumMachineSize::getFromSize);

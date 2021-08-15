@@ -12,9 +12,9 @@ import java.util.List;
 
 public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
 
-    private String localeKey;
+    private final String localeKey;
     private double yScroll = 0;
-    private FontRenderer fontRenderer;
+    private final FontRenderer fontRenderer;
 
     private int maxLinesToShow;
     private int lineIndexStart;

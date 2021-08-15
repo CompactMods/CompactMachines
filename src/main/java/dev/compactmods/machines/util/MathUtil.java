@@ -22,7 +22,7 @@ public class MathUtil {
             p = s * s - (s - 2) * (s - 2);
         }
 
-        int ri = (ringIndex + (int) (s / 2)) % p;
+        int ri = (ringIndex + (s / 2)) % p;
 
         int x = 0;
         if (s > 1) {
@@ -43,8 +43,8 @@ public class MathUtil {
                             (ri <= (p / 4 * 3) ? (p / 4) :
                                     (p - ri)));
 
-        x -= (int) (s / 2);
-        y -= (int) (s / 2);
+        x -= s / 2;
+        y -= s / 2;
 
         return new Vector3i(x, 0, y);
     }

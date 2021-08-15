@@ -36,7 +36,7 @@ import java.util.UUID;
 public class CompactRoomData extends WorldSavedData {
     public static final String DATA_NAME = CompactMachines.MOD_ID + "_rooms";
 
-    private Map<ChunkPos, RoomData> machineData;
+    private final Map<ChunkPos, RoomData> machineData;
 
     public CompactRoomData() {
         super(DATA_NAME);
