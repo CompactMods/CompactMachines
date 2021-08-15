@@ -1,23 +1,19 @@
 {
   "itemGroup.compactmachines": "Compact Machines",
-
   "tooltip.compactmachines.machine.id": "Machine ID: %s",
   "tooltip.compactmachines.machine.owner": "Owner: %s",
   "tooltip.compactmachines.machine.size": "Internal Size: %1$sx%1$sx%1$s",
   "tooltip.compactmachines.unknown_player": "Unknown Player",
   "tooltip.compactmachines.tunnel_type": "Type ID: %1$s",
-
   "tooltip.compactmachines.hint.hold_shift": "Hold shift for details.",
   "tooltip.compactmachines.details.psd": "Used as in-game documentation and to enter Compact Machines.",
   "tooltip.compactmachines.details.solid_wall": "Warning! Unbreakable for non-creative players!",
-
   "message.compactmachines.new_machine": "New Machine",
   "message.compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work.",
   "message.compactmachines.spawnpoint_set": "New spawn point set.",
   "message.compactmachines.no_machine_data": "No machine data loaded; report this.",
   "message.compactmachines.teleport_oob": "An otherworldly force prevents your teleportation.",
   "message.compactmachines.fixbiome_bad_dim": "Cannot use fixbiome command outside of a machine room.",
-
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "block.compactmachines.machine_small": "Compact Machine (Small)",
@@ -25,24 +21,19 @@
   "block.compactmachines.machine_large": "Compact Machine (Large)",
   "block.compactmachines.machine_giant": "Compact Machine (Giant)",
   "block.compactmachines.machine_maximum": "Compact Machine (Maximum)",
-
   "block.compactmachines.solid_wall": "Solid Compact Machine Wall",
   "block.compactmachines.wall": "Compact Machine Wall",
   "block.compactmachines.tunnel_wall": "Solid Compact Machine Wall (with Tunnel)",
-
   "item.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "item.compactmachines.machine_small": "Compact Machine (Small)",
   "item.compactmachines.machine_normal": "Compact Machine (Normal)",
   "item.compactmachines.machine_large": "Compact Machine (Large)",
   "item.compactmachines.machine_giant": "Compact Machine (Giant)",
   "item.compactmachines.machine_maximum": "Compact Machine (Maximum)",
-
   "item.compactmachines.personal_shrinking_device": "Personal Shrinking Device",
-
   "item.compactmachines.tunnels.item": "Item Tunnel",
   "item.compactmachines.tunnels.redstone_in": "Redstone Tunnel (In)",
   "item.compactmachines.tunnels.redstone_out": "Redstone Tunnel (Out)",
-
   "compactmachines.connected_block": "Connected: %s",
   "compactmachines.direction.side": "Side: %s",
   "compactmachines.direction.up": "Up",
@@ -51,12 +42,9 @@
   "compactmachines.direction.south": "South",
   "compactmachines.direction.west": "West",
   "compactmachines.direction.east": "East",
-
   "compactmachines.psd.pages.machines.title": "Compact Machines",
   "compactmachines.psd.pages.machines": "Compact Machines are the core mechanic of this mod. They allow you to build large rooms in a single block space connected to the outside world. They come in various sizes ranging from 3x3x3 to 13x13x13.\n\nYou can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\nYou can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes.",
-
   "compactmachines.errors.unknown_tunnel_type": "Unknown Tunnel Type (%s)",
-
   "advancement.compactmachines.root": "Compact Machines",
   "advancement.compactmachines.root.desc": "",
   "advancement.compactmachines.how_did_you_get_here": "How Did You Get Here?!",
@@ -76,5 +64,7 @@
   "advancement.compactmachines.claimed_machine_giant": "Got Enough Space?",
   "advancement.compactmachines.claimed_machine_giant.desc": "Claim a giant compact machine.",
   "advancement.compactmachines.claimed_machine_max": "Room for Activities!",
-  "advancement.compactmachines.claimed_machine_max.desc": "Claim a maximum compact machine."
+  "advancement.compactmachines.claimed_machine_max.desc": "Claim a maximum compact machine.",
+  "jei.compactmachines.shrinking_device": "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. You can also right click it in the overworld for more info.",
+  "jei.compactmachines.machines": "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside."
 }

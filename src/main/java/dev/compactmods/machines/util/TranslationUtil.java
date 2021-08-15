@@ -45,4 +45,8 @@ public abstract class TranslationUtil {
     public static TranslationTextComponent advancementDesc(ResourceLocation advancement) {
         return new TranslationTextComponent(Util.makeDescriptionId("advancement", advancement) + ".desc");
     }
+
+    public static TranslationTextComponent jeiInfo(ResourceLocation jei) {
+        return new TranslationTextComponent(Util.makeDescriptionId("jei", jei));
+    }
 }
