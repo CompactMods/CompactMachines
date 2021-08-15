@@ -2,7 +2,7 @@ package dev.compactmods.machines.rooms.capability;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import dev.compactmods.machines.rooms.IRoomHistoryItem;
+import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 
 public class CMRoomHistory implements IRoomHistory{
 
@@ -13,18 +13,23 @@ public class CMRoomHistory implements IRoomHistory{
     }
 
     @Override
+    public void clear() {
+        history.clear();
+    }
+
+    @Override
     public boolean hasHistory() {
         return !history.isEmpty();
     }
 
     @Override
     public IRoomHistoryItem peek() {
-        return history.peek();
+        return history.peekLast();
     }
 
     @Override
     public IRoomHistoryItem pop() {
-        return history.pop();
+        return history.removeLast();
     }
 
     @Override

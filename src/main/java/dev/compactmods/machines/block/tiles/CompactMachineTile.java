@@ -1,16 +1,21 @@
 package dev.compactmods.machines.block.tiles;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import dev.compactmods.machines.api.tunnels.ICapableTunnel;
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.data.player.CompactMachinePlayerData;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.reference.Reference;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import dev.compactmods.machines.tunnels.TunnelHelper;
-import dev.compactmods.machines.api.tunnels.ICapableTunnel;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -29,10 +34,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-
 public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
     public int machineId = -1;
     private boolean initialized = false;
@@ -44,14 +45,10 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     protected boolean locked = false;
     protected Set<String> playerWhiteList;
 
-    @Nullable
-    private CompactMachinePlayerData playerData;
-
     public CompactMachineTile() {
         super(Registration.MACHINE_TILE_ENTITY.get());
 
         playerWhiteList = new HashSet<>();
-        playerData = null;
     }
 
     @Override
@@ -188,18 +185,19 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         base.putInt("machine", this.machineId);
 
         if (level instanceof ServerWorld) {
-            Optional<CompactMachinePlayerData> playerData = Optional.empty();
-            try {
-                CompactMachinePlayerData psd = CompactMachinePlayerData.get(level.getServer());
-                // psd = psd.getPlayersInside(this.machineId);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            playerData.ifPresent(data -> {
-                CompoundNBT playerNbt = data.serializeNBT();
-                base.put("players", playerNbt);
-            });
+            // TODO - Internal player list
+//            Optional<CompactMachinePlayerData> playerData = Optional.empty();
+//            try {
+//                CompactMachinePlayerData psd = CompactMachinePlayerData.get(level.getServer());
+//                // psd = psd.getPlayersInside(this.machineId);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            playerData.ifPresent(data -> {
+//                CompoundNBT playerNbt = data.serializeNBT();
+//                base.put("players", playerNbt);
+//            });
 
             if (this.owner != null)
                 base.putUUID("owner", this.owner);

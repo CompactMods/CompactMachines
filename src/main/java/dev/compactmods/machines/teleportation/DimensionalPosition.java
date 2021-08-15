@@ -5,6 +5,8 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.data.codec.CodecExtensions;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
@@ -34,7 +36,8 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
             CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vector3d.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
 
-    private DimensionalPosition() { }
+    private DimensionalPosition() {
+    }
 
     public DimensionalPosition(RegistryKey<World> world, BlockPos positionBlock) {
         this(world, Vector3d.ZERO, Vector3d.ZERO);
@@ -52,6 +55,10 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
         this.dimension = dim;
         this.position = pos;
         this.rotation = rotation;
+    }
+
+    public static DimensionalPosition fromEntity(LivingEntity entity) {
+        return new DimensionalPosition(entity.level.dimension(), entity.position());
     }
 
     public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {

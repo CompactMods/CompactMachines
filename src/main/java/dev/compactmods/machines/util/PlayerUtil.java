@@ -8,16 +8,16 @@ import dev.compactmods.machines.block.tiles.CompactMachineTile;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.data.player.CompactMachinePlayerData;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.network.CMPacketTargets;
 import dev.compactmods.machines.network.MachinePlayersChangedPacket;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.rooms.IRoomHistoryItem;
+import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 import dev.compactmods.machines.rooms.capability.CapabilityRoomHistory;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
+import dev.compactmods.machines.rooms.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -88,6 +88,7 @@ public abstract class PlayerUtil {
 
             // Generate a new machine inside and update the tile
             CompactStructureGenerator.generateCompactStructure(compactWorld, size, newCenter);
+
             ChunkPos machineChunk = new ChunkPos(newCenter);
             tile.setMachineId(nextId);
 
@@ -142,9 +143,6 @@ public abstract class PlayerUtil {
     public static void teleportPlayerOutOfMachine(ServerWorld world, @Nonnull ServerPlayerEntity serverPlayer) {
 
         MinecraftServer serv = world.getServer();
-        CompactMachinePlayerData playerData = CompactMachinePlayerData.get(serv);
-        if (playerData == null)
-            return;
 
         final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(CapabilityRoomHistory.HISTORY_CAPABILITY);
 
@@ -170,11 +168,13 @@ public abstract class PlayerUtil {
 
                     serverPlayer.teleportTo(w, worldPos.x(), worldPos.y(), worldPos.z(), (float) entryRot.y, (float) entryRot.x);
                 } else {
+                    hist.clear();
                     teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
                 }
             } else {
                 howDidYouGetThere(serverPlayer);
 
+                hist.clear();
                 teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
             }
 
@@ -199,7 +199,7 @@ public abstract class PlayerUtil {
         );
     }
 
-    private static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @Nonnull ServerPlayerEntity player) {
+    public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @Nonnull ServerPlayerEntity player) {
         ServerWorld level = Optional.ofNullable(serv.getLevel(player.getRespawnDimension())).orElse(serv.overworld());
         Vector3d worldPos = LocationUtil.blockPosToVector(level.getSharedSpawnPos());
 
@@ -214,10 +214,6 @@ public abstract class PlayerUtil {
         if (serv == null)
             return;
 
-        CompactMachinePlayerData playerData = CompactMachinePlayerData.get(serv);
-        if (playerData == null)
-            return;
-
         CompactMachineTile tile = (CompactMachineTile) serverPlayer.getLevel().getBlockEntity(machinePos);
         if (tile == null)
             return;
@@ -226,9 +222,11 @@ public abstract class PlayerUtil {
             final Chunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(mChunk.x, mChunk.z);
 
-            // TODO - Add player to machine data
-            // playerData.addPlayer(serverPlayer, mChunk);
-            playerData.setDirty();
+            serverPlayer.getCapability(CapabilityRoomHistory.HISTORY_CAPABILITY)
+                    .ifPresent(hist -> {
+                        DimensionalPosition pos = DimensionalPosition.fromEntity(serverPlayer);
+                        hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
+                    });
 
             MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
                     .forMachine(mChunk)

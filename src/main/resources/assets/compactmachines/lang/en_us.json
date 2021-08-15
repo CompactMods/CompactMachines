@@ -11,6 +11,7 @@
   "tooltip.compactmachines.details.psd": "Used as in-game documentation and to enter Compact Machines.",
   "tooltip.compactmachines.details.solid_wall": "Warning! Unbreakable for non-creative players!",
 
+  "message.compactmachines.new_machine": "New Machine",
   "message.compactmachines.cannot_enter": "You fumble with the shrinking device, to no avail. It refuses to work.",
   "message.compactmachines.spawnpoint_set": "New spawn point set.",
   "message.compactmachines.no_machine_data": "No machine data loaded; report this.",

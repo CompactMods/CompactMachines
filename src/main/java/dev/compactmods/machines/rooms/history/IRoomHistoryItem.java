@@ -1,4 +1,4 @@
-package dev.compactmods.machines.rooms;
+package dev.compactmods.machines.rooms.history;
 
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 
