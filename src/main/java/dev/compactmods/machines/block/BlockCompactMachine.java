@@ -52,11 +52,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     }
 
     @Override
-    public void entityInside(BlockState p_196262_1_, World p_196262_2_, BlockPos p_196262_3_, Entity p_196262_4_) {
-        super.entityInside(p_196262_1_, p_196262_2_, p_196262_3_, p_196262_4_);
-    }
-
-    @Override
     public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
         float normalHardness = super.getDestroyProgress(state, player, worldIn, pos);
@@ -238,13 +233,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         return stack;
     }
 
-
-//    @Override
-//    public String getSpecialName(ItemStack stack) {
-//        return this.getStateFromMeta(stack.getItemDamage()).getValue(SIZE).getName();
-//    }
-
-
     @Override
     public boolean hasTileEntity(BlockState state) {
         return true;
@@ -254,27 +242,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new CompactMachineTile();
-    }
-
-    @Override
-    public void destroy(IWorld world, BlockPos pos, BlockState state) {
-        if (world.isClientSide()) {
-            super.destroy(world, pos, state);
-            return;
-        }
-
-        if (!(world.getBlockEntity(pos) instanceof CompactMachineTile)) {
-            return;
-        }
-
-        CompactMachineTile te = (CompactMachineTile) world.getBlockEntity(pos);
-//        WorldSavedDataMachines.INSTANCE.removeMachinePosition(te.coords);
-//
-//        BlockMachine.spawnItemWithNBT(world, pos, state.get(BlockMachine.SIZE), te);
-//
-//        ChunkLoadingMachines.unforceChunk(te.coords);
-
-        super.destroy(world, pos, state);
     }
 
     @Override
@@ -315,7 +282,6 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
         }
 
         tile.doPostPlaced();
-        tile.setChanged();
     }
 
     @Override
@@ -350,46 +316,4 @@ public class BlockCompactMachine extends Block implements IProbeDataProvider {
     public void addProbeData(IProbeData data, PlayerEntity player, World world, BlockState state) {
         CompactMachineProvider.exec(data, world);
     }
-
-    // 1.12.1 code
-//    @Override
-//    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-//        if(player.isSneaking()) {
-//            return false;
-//        }
-//
-//        if(world.isRemote || !(player instanceof EntityPlayerMP)) {
-//            return true;
-//        }
-//
-//        if(!(world.getTileEntity(pos) instanceof TileEntityMachine)) {
-//            return false;
-//        }
-//
-//        TileEntityMachine machine = (TileEntityMachine)world.getTileEntity(pos);
-//        ItemStack playerStack = player.getHeldItemMainhand();
-//        if(ShrinkingDeviceUtils.isShrinkingDevice(playerStack)) {
-//            TeleportationTools.tryToEnterMachine(player, machine);
-//            return true;
-//        }
-//
-//        player.openGui(compactmachines.instance, GuiIds.MACHINE_VIEW.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
-//        PackageHandler.instance.sendTo(new MessageMachineContent(machine.coords), (EntityPlayerMP)player);
-//        PackageHandler.instance.sendTo(new MessageMachineChunk(machine.coords), (EntityPlayerMP)player);
-//
-//        return true;
-//    }
-
-// TOP code
-//    @Override
-//    public String getID() {
-//        return CompactMachines.MODID + ":" + "machine";
-//    }
-//
-//    @Override
-//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
-//        String size = this.size.getName();
-//        probeInfo.text(new TranslationTextComponent("machines.sizes." + size));
-//
-    // }
 }

@@ -46,12 +46,9 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     protected UUID owner;
     protected String schema;
     protected boolean locked = false;
-    protected Set<String> playerWhiteList;
 
     public CompactMachineTile() {
         super(Registration.MACHINE_TILE_ENTITY.get());
-
-        playerWhiteList = new HashSet<>();
     }
 
     @Override
@@ -114,12 +111,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         } else {
             locked = false;
         }
-
-        playerWhiteList = new HashSet<>();
-        if (nbt.contains("playerWhiteList")) {
-            ListNBT list = nbt.getList("playerWhiteList", Constants.NBT.TAG_STRING);
-            list.forEach(nametag -> playerWhiteList.add(nametag.getAsString()));
-        }
     }
 
     @Override
@@ -139,16 +130,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         }
 
         nbt.putBoolean("locked", locked);
-
-        if (playerWhiteList.size() > 0) {
-            ListNBT list = new ListNBT();
-            playerWhiteList.forEach(player -> {
-                StringNBT nameTag = StringNBT.valueOf(player);
-                list.add(nameTag);
-            });
-
-            nbt.put("playerWhiteList", list);
-        }
 
         return nbt;
     }
@@ -291,8 +272,9 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public void doPostPlaced() {
-        if (this.level == null || this.level.isClientSide)
+        if (this.level == null || this.level.isClientSide) {
             return;
+        }
 
         MinecraftServer serv = this.level.getServer();
         if (serv == null)
@@ -308,6 +290,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
         if(ServerConfig.MACHINE_CHUNKLOADING.get())
             CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkLoad(machineId);
+
+        this.setChanged();
     }
 
     public void handlePlayerLeft(UUID playerID) {
