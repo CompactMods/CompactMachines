@@ -2,6 +2,7 @@ package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.command.CMCommandRoot;
+import dev.compactmods.machines.rooms.chunkloading.CMRoomChunkloadingManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,6 +15,8 @@ public class ServerEventHandler {
     @SubscribeEvent
     public static void onServerStarting(final FMLServerStartingEvent evt) {
         MinecraftServer server = evt.getServer();
+
+        CompactMachines.CHUNKLOAD_MANAGER = new CMRoomChunkloadingManager(server);
         // SavedMachineDataMigrator.migrate(server);
     }
 

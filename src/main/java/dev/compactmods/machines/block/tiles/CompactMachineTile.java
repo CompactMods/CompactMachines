@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.ICapableTunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.config.ServerConfig;
@@ -26,6 +27,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.server.ServerWorld;
@@ -33,6 +35,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.world.ForgeChunkManager;
 
 public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
     public int machineId = -1;
@@ -54,9 +57,21 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     @Override
     public void clearRemoved() {
         super.clearRemoved();
+    }
 
-        if (ServerConfig.MACHINE_CHUNKLOADING.get())
-            doChunkload(true);
+    @Override
+    public void onLoad() {
+        super.onLoad();
+
+        if(level == null || level.isClientSide)
+            return;
+
+        if (ServerConfig.MACHINE_CHUNKLOADING.get()) {
+            final MinecraftServer server = ((ServerWorld) level).getServer();
+            server.submitAsync(new TickDelayedTask(server.getTickCount() + 5, () -> {
+                CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkLoad(machineId);
+            }));
+        }
     }
 
     @Override
@@ -64,7 +79,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         super.onChunkUnloaded();
 
         if (ServerConfig.MACHINE_CHUNKLOADING.get())
-            doChunkload(false);
+            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkUnload(machineId);
     }
 
     @Override
@@ -72,7 +87,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         super.setRemoved();
 
         if (ServerConfig.MACHINE_CHUNKLOADING.get())
-            doChunkload(false);
+            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkUnload(machineId);
     }
 
     @Override
@@ -275,17 +290,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 //                .orElse(false);
     }
 
-    protected void doChunkload(boolean force) {
-        if (level == null || level.isClientSide)
-            return;
-
-        getInternalChunkPos().ifPresent(chunk -> {
-            ServerWorld compact = this.level.getServer().getLevel(Registration.COMPACT_DIMENSION);
-            compact.setChunkForced(chunk.x, chunk.z, force);
-
-        });
-    }
-
     public void doPostPlaced() {
         if (this.level == null || this.level.isClientSide)
             return;
@@ -302,7 +306,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         CompactMachineData extern = CompactMachineData.get(serv);
         extern.setMachineLocation(this.machineId, dp);
 
-        doChunkload(true);
+        if(ServerConfig.MACHINE_CHUNKLOADING.get())
+            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkLoad(machineId);
     }
 
     public void handlePlayerLeft(UUID playerID) {

@@ -4,6 +4,7 @@ import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.rooms.chunkloading.CMRoomChunkloadingManager;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -28,6 +29,8 @@ public class CompactMachines {
             return new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get());
         }
     };
+
+    public static CMRoomChunkloadingManager CHUNKLOAD_MANAGER;
 
     public CompactMachines() {
         // Register blocks and items

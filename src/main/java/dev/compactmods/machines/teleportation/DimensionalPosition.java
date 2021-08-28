@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.data.codec.CodecExtensions;
+import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -28,8 +29,10 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     private Vector3d position;
     private Vector3d rotation;
 
-    // Note: We'd use the actual world registry key here, but it static loads the world and does a bunch
-    // of initialization, making it impossible to unit test without booting a whole server up.
+    /*
+     Note: We'd use the actual world registry key here, but it static loads the world and does a bunch
+     of initialization, making it impossible to unit test without booting a whole server up.
+    */
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
@@ -63,6 +66,12 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
 
     public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {
         return Optional.ofNullable(server.getLevel(this.dimension));
+    }
+
+    public boolean isLoaded(MinecraftServer server) {
+        return getWorld(server)
+                .map(w -> w.isLoaded(LocationUtil.vectorToBlockPos(position)))
+                .orElse(false);
     }
 
     public static DimensionalPosition fromNBT(CompoundNBT nbt) {
@@ -104,7 +113,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     public BlockPos getBlockPosition() {
-        return new BlockPos(position.x, position.y, position.z);
+        return LocationUtil.vectorToBlockPos(position);
     }
 
     @Override

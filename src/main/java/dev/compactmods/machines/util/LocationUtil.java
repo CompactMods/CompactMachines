@@ -12,4 +12,8 @@ public class LocationUtil {
                 pos.getZ() + 0.5f
         );
     }
+
+    public static BlockPos vectorToBlockPos(Vector3d position) {
+        return new BlockPos(position.x, position.y, position.z);
+    }
 }
