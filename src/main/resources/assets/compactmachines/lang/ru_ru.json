@@ -6,13 +6,13 @@
   "tooltip.compactmachines.unknown_player": "Неизвестный игрок",
   "tooltip.compactmachines.machine.size": "Размер: %1$sx%1$sx%1$s",
   "tooltip.compactmachines.hold_shift.hint": "Удерживайте Shift для просмотра деталей.",
-  "tooltip.compactmachines.psd.hint": "Используется в качестве внутриигровой документации а также для входа в Компактные механизмы.",
-  "tooltip.compactmachines.solid_wall.hint": "Внимание! Неразрушим для игроков без включённого творческого режима!",
+  "tooltip.compactmachines.psd.hint": "Используется в качестве внутриигровой документации, а также для входа в Компактные механизмы.",
+  "tooltip.compactmachines.solid_wall.hint": "Внимание! Неразрушим для игроков без творческого режима!",
   "tooltip.compactmachines.machine.hint": "%1$s предоставляет %2$s комнату.",
   "tooltip.compactmachines.tunnel_type": "Тип ID: %1$s",
 
   "messages.compactmachines.psd.spawnpoint_set": "Новая точка возрождения установлена.",
-  "messages.compactmachines.no_machine_data": "Данные механизма не загружены; сообщите об этом.",
+  "messages.compactmachines.no_machine_data": "Данные механизма не загружены; сообщите об этом разработчику.",
 
   "block.compactmachines.machine": "Компактный механизм",
   "block.compactmachines.machine_tiny": "Компактный механизм (Крошечный)",
