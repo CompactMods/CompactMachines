@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(CompactMachines.MOD_ID)
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
 public class CompactMachines {
     public static final String MOD_ID = "compactmachines";
 
@@ -41,16 +40,5 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
-    }
-
-    @SubscribeEvent
-    public static void onTick(TickEvent.RenderTickEvent e) {
-        // lol frames r good
-//        ObfuscationReflectionHelper.setPrivateValue(
-//                Minecraft.class,
-//                Minecraft.getInstance(),
-//                -100,
-//                "field_71420_M"
-//        );
     }
 }
