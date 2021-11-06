@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
         mavenCentral()
     }
 
@@ -31,9 +30,25 @@ println("Version: ${version}");
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
-    main {
-        resources.srcDir "src/generated/resources"
+    api {
+        java {
+            srcDir "src/api/java"
+        }
+        compileClasspath += configurations.getByName("minecraft")
     }
+
+    main {
+        java {
+            srcDir "src/api/java"
+            srcDir "src/main/java"
+        }
+
+        resources {
+            srcDir "src/main/resources"
+            srcDir 'src/generated/resources'
+        }
+    }
+
     test
 }
 
@@ -114,19 +129,22 @@ minecraft {
         unitTests {
             parent runs.server // This run config inherits settings from the server config
             workingDirectory project.file('run/test')
-            main 'com.alcatrazescapee.mcjunitlib.DedicatedTestServerLauncher' // The main class which launches a customized server which then runs JUnit tests
+            main 'com.alcatrazescapee.mcjunitlib.DedicatedTestServerLauncher'
+            // The main class which launches a customized server which then runs JUnit tests
             ideaModule "${project.name}.test" // Tell IDEA to use the classpath of the test module
-            property 'forge.logging.console.level', 'unittest' // This logging level prevents any other server information messages and leaves only the unit test output
+            property 'forge.logging.console.level', 'unittest'
+            // This logging level prevents any other server information messages and leaves only the unit test output
             environment 'MOD_CLASSES', String.join(File.pathSeparator,
                     "${mod_id}%%${sourceSets.main.output.resourcesDir}",
                     "${mod_id}%%${sourceSets.main.output.classesDirs[0]}",
                     "${mod_id}%%${sourceSets.test.output.resourcesDir}",
                     "${mod_id}%%${sourceSets.test.output.classesDirs[0]}",
             ) // Forge will ignore all test sources unless we explicitly tell it to include them as mod sources
-            environment 'target', 'fmltestserver' // This is a custom service used to launch with ModLauncher's transforming class loader
+            environment 'target', 'fmltestserver'
+            // This is a custom service used to launch with ModLauncher's transforming class loader
             mods {
                 compactmachines { // The mod that is being tested - Replace this with your mod ID!
-                    sources sourceSets.main
+                    sources sourceSets.api, sourceSets.main
                 }
             }
         }
@@ -191,6 +209,14 @@ repositories {
         name 'MCUnitTests'
         url 'https://jitpack.io'
     }
+
+    // Curseforge stuff
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 def dev_mods = fileTree(dev_mods_dir).filter { it -> it.isFile() }.files.name.collect({ getModVersion(it) })
@@ -203,10 +229,7 @@ dependencies {
 
 
     // Deobfuscate each dev mod for runtime
-    dev_mods.each {
-        compileOnly fg.deobf(it)
-        runtimeOnly fg.deobf(it)
-    }
+    dev_mods.each { implementation(fg.deobf(it)) }
 
 
     // JEI
@@ -219,11 +242,20 @@ dependencies {
 
     testImplementation(fg.deobf("com.github.alcatrazEscapee:mcjunitlib:1.3.3-${minecraft_version}"))
 
+    // Nicephore - Screenshots and Stuff
+    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3318114"))
+
+    // Mekanism + Mek Generators - Tunnel testing
+    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))
+    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3206395"))
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    from sourceSets.api.output
+    from sourceSets.main.output
     destinationDirectory = file("$rootDir/build-out")
+
     finalizedBy('reobfJar')
     manifest {
         attributes([
@@ -231,7 +263,7 @@ jar {
                 "Specification-Vendor"    : "",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
-                "Implementation-Version":  isRelease ? archiveVersion : "nightly-${gitCommitHash}",
+                "Implementation-Version"  : isRelease ? archiveVersion : "nightly-${gitCommitHash}",
                 "Implementation-Vendor"   : "",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -239,10 +271,8 @@ jar {
 }
 
 task apiJar(type: Jar) {
+    from sourceSets.api.output
     // Sources included because of MinecraftForge/ForgeGradle#369
-    from(sourceSets.main.allJava)
-    from(sourceSets.main.output)
-    include 'com/robotgryphon/compactmachines/api/**'
     archiveClassifier = 'api'
     destinationDirectory = file("$rootDir/build-out")
 }

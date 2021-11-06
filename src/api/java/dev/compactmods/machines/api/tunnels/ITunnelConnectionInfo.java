@@ -1,6 +1,6 @@
 package dev.compactmods.machines.api.tunnels;
 
-import dev.compactmods.machines.teleportation.DimensionalPosition;
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.world.IWorldReader;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ITunnelConnectionInfo {
     @Nonnull
-    Optional<DimensionalPosition> getConnectedPosition(EnumTunnelSide side);
+    Optional<IDimensionalPosition> getConnectedPosition(EnumTunnelSide side);
 
     @Nonnull
     Optional<BlockState> getConnectedState(EnumTunnelSide side);
