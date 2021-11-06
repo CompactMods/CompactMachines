@@ -52,37 +52,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-
-        if(level == null || level.isClientSide)
-            return;
-
-        if (ServerConfig.MACHINE_CHUNKLOADING.get()) {
-            final MinecraftServer server = ((ServerWorld) level).getServer();
-            server.submitAsync(new TickDelayedTask(server.getTickCount() + 5, () -> {
-                CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkLoad(machineId);
-            }));
-        }
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-
-        if (ServerConfig.MACHINE_CHUNKLOADING.get())
-            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkUnload(machineId);
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-
-        if (ServerConfig.MACHINE_CHUNKLOADING.get())
-            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkUnload(machineId);
-    }
-
-    @Override
     public void load(BlockState state, CompoundNBT nbt) {
         super.load(state, nbt);
 
@@ -247,9 +216,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
 
         CompactMachineData extern = CompactMachineData.get(serv);
         extern.setMachineLocation(this.machineId, dp);
-
-        if(ServerConfig.MACHINE_CHUNKLOADING.get())
-            CompactMachines.CHUNKLOAD_MANAGER.onMachineChunkLoad(machineId);
 
         this.setChanged();
     }

@@ -12,7 +12,6 @@ public class ServerConfig {
     public static ForgeConfigSpec CONFIG;
 
     public static ForgeConfigSpec.EnumValue<EnumMachinePlayersBreakHandling> MACHINE_PLAYER_BREAK_HANDLING;
-    public static ForgeConfigSpec.BooleanValue MACHINE_CHUNKLOADING;
 
     public static ForgeConfigSpec.IntValue MACHINE_FLOOR_Y;
 
@@ -40,10 +39,6 @@ public class ServerConfig {
                 .defineEnum("breakHandling",
                         EnumMachinePlayersBreakHandling.UNBREAKABLE,
                         EnumGetMethod.NAME_IGNORECASE);
-
-        MACHINE_CHUNKLOADING = builder
-                .comment("Allow machines to chunkload their insides when the machines are loaded.")
-                .define("chunkloading", true);
 
         MACHINE_FLOOR_Y = builder
                 .comment("The Y-level to spawn machine floors at.")
