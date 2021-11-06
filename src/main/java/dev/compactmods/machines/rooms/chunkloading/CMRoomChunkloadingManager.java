@@ -7,10 +7,8 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.graph.CompactMachineConnectionGraph;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.Dimension;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.world.ForgeChunkManager;
 

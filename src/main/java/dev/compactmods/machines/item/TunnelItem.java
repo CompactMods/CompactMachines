@@ -3,6 +3,7 @@ package dev.compactmods.machines.item;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.block.tiles.TunnelWallTile;
+import dev.compactmods.machines.block.walls.SolidWallBlock;
 import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
@@ -96,76 +97,16 @@ public class TunnelItem extends Item {
 
     @Override
     public ActionResultType useOn(ItemUseContext context) {
-        World w = context.getLevel();
-        if (w.isClientSide())
-            return ActionResultType.SUCCESS;
+        final World level = context.getLevel();
+        if(!level.isClientSide) {
+            final PlayerEntity player = context.getPlayer();
+            final BlockState state = level.getBlockState(context.getClickedPos());
 
-        BlockPos pos = context.getClickedPos();
-        BlockState blockState = w.getBlockState(pos);
-
-        if (blockState.getBlock() != Registration.BLOCK_SOLID_WALL.get())
-            return ActionResultType.FAIL;
-
-        if (context.getPlayer() instanceof ServerPlayerEntity) {
-            ItemStack is = context.getItemInHand();
-            Item i = is.getItem();
-
-            TunnelItem ti = ((TunnelItem) i);
-            Optional<TunnelDefinition> definition = getDefinition(context.getItemInHand());
-
-            definition.ifPresent(def -> {
-                BlockState tunnelState = Registration.BLOCK_TUNNEL_WALL.get()
-                        .defaultBlockState()
-                        .setValue(TunnelWallBlock.TUNNEL_SIDE, context.getClickedFace());
-
-                // Redstone Support
-                boolean redstone = (def instanceof IRedstoneReaderTunnel);
-                tunnelState = tunnelState.setValue(TunnelWallBlock.REDSTONE, redstone);
-                w.setBlock(pos, tunnelState, 3);
-
-                // Get the server and add a deferred task - allows the tile to be created on the client first
-                MinecraftServer server = ((ServerWorld) context.getLevel()).getServer();
-                server.submitAsync(() -> {
-                    TunnelWallTile tile = (TunnelWallTile) context.getLevel().getBlockEntity(context.getClickedPos());
-                    tile.setTunnelType(def.getRegistryName());
-                });
-
-                is.shrink(1);
-            });
-
-            return ActionResultType.CONSUME;
-        }
-
-        return ActionResultType.FAIL;
-    }
-
-    /**
-     * Implementation for easily swapping a tunnel type for another.
-     *
-     * @param type
-     * @param player
-     * @param hand
-     * @return
-     */
-    protected ActionResult<ItemStack> swapTunnelType(Item type, PlayerEntity player, Hand hand) {
-        if (player instanceof ServerPlayerEntity) {
-            if (player.isShiftKeyDown()) {
-                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-                ItemStack stack = serverPlayer.getItemInHand(hand);
-                ItemStack newStack = new ItemStack(type, stack.getCount());
-
-                serverPlayer.setItemInHand(hand, newStack);
-
-                IFormattableTextComponent msg = new StringTextComponent("switch state")
-                        .withStyle(TextFormatting.GOLD);
-
-                serverPlayer.displayClientMessage(msg, true);
-                return ActionResult.consume(newStack);
+            if(state.getBlock() instanceof SolidWallBlock && player != null) {
+                player.displayClientMessage(TranslationUtil.message(new ResourceLocation(CompactMachines.MOD_ID, "tunnels_nyi")), true);
             }
         }
 
-        return ActionResult.pass(player.getItemInHand(hand));
+        return ActionResultType.sidedSuccess(level.isClientSide);
     }
-
-
 }

@@ -1,5 +1,6 @@
 package dev.compactmods.machines.tunnels.definitions;
 
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.EnumTunnelSide;
 import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
@@ -29,7 +30,7 @@ public class RedstoneInTunnelDefinition extends TunnelDefinition implements IRed
     public int getPowerLevel(ITunnelConnectionInfo connectionInfo) {
         IWorldReader connectedWorld = connectionInfo.getConnectedWorld(EnumTunnelSide.OUTSIDE).orElse(null);
         if (connectedWorld instanceof ServerWorld) {
-            DimensionalPosition pos = connectionInfo.getConnectedPosition(EnumTunnelSide.OUTSIDE).orElse(null);
+            IDimensionalPosition pos = connectionInfo.getConnectedPosition(EnumTunnelSide.OUTSIDE).orElse(null);
             if (pos == null)
                 return 0;
 

@@ -14,6 +14,7 @@
   "message.compactmachines.no_machine_data": "No machine data loaded; report this.",
   "message.compactmachines.teleport_oob": "An otherworldly force prevents your teleportation.",
   "message.compactmachines.fixbiome_bad_dim": "Cannot use fixbiome command outside of a machine room.",
+  "message.compactmachines.tunnels_nyi": "Tunnels will be implemented in 1.17.",
   "block.compactmachines.machine": "Compact Machine",
   "block.compactmachines.machine_tiny": "Compact Machine (Tiny)",
   "block.compactmachines.machine_small": "Compact Machine (Small)",

@@ -4,10 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTDynamicOps;
@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
+public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDimensionalPosition {
 
     private RegistryKey<World> dimension;
     private Vector3d position;
@@ -113,7 +113,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT> {
     }
 
     public BlockPos getBlockPosition() {
-        return LocationUtil.vectorToBlockPos(position);
+        return new BlockPos(position.x, position.y, position.z);
     }
 
     @Override

@@ -1,25 +1,35 @@
 package dev.compactmods.machines.tunnels;
 
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.EnumTunnelSide;
 import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.block.tiles.TunnelWallTile;
+import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.data.persistent.CompactMachineData;
+import dev.compactmods.machines.data.persistent.CompactRoomData;
+import dev.compactmods.machines.data.persistent.MachineConnections;
+import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TunnelHelper {
 
@@ -71,10 +81,27 @@ public class TunnelHelper {
     public static Set<BlockPos> getTunnelsForMachineSide(int machine, ServerWorld world, Direction machineSide) {
 
         ServerWorld compactWorld = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
+        if (compactWorld == null)
+            return Collections.emptySet();
 
-        Set<BlockPos> tunnelPositions = new HashSet<>();
+        final MachineConnections machines = MachineConnections.get(world.getServer());
+        final CompactRoomData rooms = CompactRoomData.get(world.getServer());
+        if (machines == null || rooms == null)
+            return Collections.emptySet();
 
-        // TODO - Reimplement with capability
+        // TODO - Reimplement with capability - this is wasteful
+        return machines.graph.getConnectedRoom(machine).map(roomChunk -> {
+            return rooms.getInnerBounds(roomChunk)
+                    .map(b -> b.inflate(1))
+                    .map(BlockPos::betweenClosedStream).orElse(Stream.empty())
+                    .filter(pos -> {
+                        BlockState state = compactWorld.getBlockState(pos);
+                        return state.getBlock() instanceof TunnelWallBlock;
+                    })
+                    .map(BlockPos::immutable)
+                    .collect(Collectors.toSet());
+        }).orElse(Collections.emptySet());
+
 //        CompactMachineServerData data = SavedMachineData.getInstance(world.getServer()).getData();
 //
 //        Optional<CompactMachineRegistrationData> mData = data.getMachineData(machine);
@@ -110,12 +137,10 @@ public class TunnelHelper {
 //                tunnelPositions.addAll(tunnelPositionsFiltered);
 //            }
 //        });
-
-        return tunnelPositions;
     }
 
     @Nonnull
-    public static Optional<DimensionalPosition> getTunnelConnectedPosition(TunnelWallTile tunnel, EnumTunnelSide side) {
+    public static Optional<IDimensionalPosition> getTunnelConnectedPosition(TunnelWallTile tunnel, EnumTunnelSide side) {
         switch (side) {
             case OUTSIDE:
                 return tunnel.getConnectedPosition();
@@ -133,8 +158,8 @@ public class TunnelHelper {
 
     @Nonnull
     public static Optional<BlockState> getConnectedState(TunnelWallTile twt, EnumTunnelSide side) {
-        DimensionalPosition connectedPosition = getTunnelConnectedPosition(twt, side).orElse(null);
-        if(connectedPosition == null)
+        IDimensionalPosition connectedPosition = getTunnelConnectedPosition(twt, side).orElse(null);
+        if (connectedPosition == null)
             return Optional.empty();
 
         // We need a server world to reach across dimensions to get information

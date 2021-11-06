@@ -2,7 +2,6 @@ package dev.compactmods.machines.block.tiles;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -19,8 +18,6 @@ import dev.compactmods.machines.teleportation.DimensionalPosition;
 import dev.compactmods.machines.tunnels.TunnelHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.server.MinecraftServer;
@@ -33,9 +30,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.world.ForgeChunkManager;
 
 public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
     public int machineId = -1;
@@ -132,41 +127,6 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         nbt.putBoolean("locked", locked);
 
         return nbt;
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (level.isClientSide())
-            return super.getCapability(cap, side);
-
-        ServerWorld serverWorld = (ServerWorld) level;
-        ServerWorld compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
-        if (compactWorld == null)
-            return LazyOptional.empty();
-
-        Set<BlockPos> tunnelPositions = TunnelHelper.getTunnelsForMachineSide(this.machineId, serverWorld, side);
-        if (tunnelPositions.isEmpty())
-            return LazyOptional.empty();
-
-        for (BlockPos possibleTunnel : tunnelPositions) {
-            TunnelWallTile tile = (TunnelWallTile) compactWorld.getBlockEntity(possibleTunnel);
-            if (tile == null)
-                continue;
-
-            Optional<TunnelDefinition> tunnel = tile.getTunnelDefinition();
-            if (!tunnel.isPresent())
-                continue;
-
-            TunnelDefinition definition = tunnel.get();
-            if (definition instanceof ICapableTunnel) {
-                LazyOptional<T> capPoss = ((ICapableTunnel) definition).getInternalCapability(compactWorld, possibleTunnel, cap, side);
-                if (capPoss.isPresent())
-                    return capPoss;
-            }
-        }
-
-        return LazyOptional.empty();
     }
 
     @Nullable

@@ -3,7 +3,6 @@ package dev.compactmods.machines.advancement.trigger;
 import com.google.gson.JsonObject;
 import dev.compactmods.machines.advancement.GenericAdvancementTriggerListener;
 import dev.compactmods.machines.advancement.GenericAdvancementTriggerListenerList;
-import dev.compactmods.machines.api.core.Advancements;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.criterion.CriterionInstance;

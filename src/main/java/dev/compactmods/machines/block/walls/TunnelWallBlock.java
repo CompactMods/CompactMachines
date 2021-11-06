@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -55,22 +56,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
-        Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, pos);
-        if (!tunnelInfo.isPresent())
-            return false;
-
-        TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneReaderTunnel) {
-            ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, pos);
-            return ((IRedstoneReaderTunnel) definition).canConnectRedstone(conn);
-        }
-
         return false;
     }
 
     @Override
     public boolean isSignalSource(BlockState state) {
-        return state.getValue(REDSTONE);
+        return false;
     }
 
     @Override
@@ -92,44 +83,6 @@ public class TunnelWallBlock extends ProtectedWallBlock implements IProbeDataPro
         }
 
         return 0;
-    }
-
-    @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isClientSide())
-            return ActionResultType.SUCCESS;
-
-
-        if (player.isShiftKeyDown()) {
-            Optional<TunnelDefinition> tunnelDef = getTunnelInfo(worldIn, pos);
-
-            if (!tunnelDef.isPresent())
-                return ActionResultType.FAIL;
-
-            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
-
-            worldIn.setBlockAndUpdate(pos, solidWall);
-
-            TunnelDefinition tunnelRegistration = tunnelDef.get();
-            ItemStack stack = new ItemStack(Registration.ITEM_TUNNEL.get(), 1);
-            CompoundNBT defTag = stack.getOrCreateTagElement("definition");
-            defTag.putString("id", tunnelRegistration.getRegistryName().toString());
-
-            ItemEntity ie = new ItemEntity(worldIn, player.getX(), player.getY(), player.getZ(), stack);
-            worldIn.addFreshEntity(ie);
-
-//                        IFormattableTextComponent t = new StringTextComponent(tunnelRegistration.getRegistryName().toString())
-//                                .mergeStyle(TextFormatting.GRAY);
-//
-//                        player.sendStatusMessage(t, true);
-        } else {
-            // Rotate tunnel
-            Direction dir = state.getValue(CONNECTED_SIDE);
-            Direction nextDir = TunnelHelper.getNextDirection(dir);
-
-            worldIn.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
-        }
-        return ActionResultType.SUCCESS;
     }
 
     @Override

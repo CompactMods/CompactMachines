@@ -1,6 +1,7 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.block.tiles.TunnelWallTile;
 import dev.compactmods.machines.block.walls.TunnelWallBlock;
@@ -49,7 +50,7 @@ public class TunnelProvider {
         if (tile == null)
             return;
 
-        Optional<DimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
+        Optional<IDimensionalPosition> outside = TunnelHelper.getTunnelConnectedPosition(tile, EnumTunnelSide.OUTSIDE);
         Optional<BlockState> connected = TunnelHelper.getConnectedState(tile, EnumTunnelSide.OUTSIDE);
 
         if (probeMode == ProbeMode.EXTENDED) {
@@ -92,7 +93,7 @@ public class TunnelProvider {
             if (!outside.isPresent())
                 return;
 
-            DimensionalPosition outPos = outside.get();
+            IDimensionalPosition outPos = outside.get();
             ServerWorld connectedWorld = (ServerWorld) world;
             BlockPos outPosBlock = outPos.getBlockPosition();
 

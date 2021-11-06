@@ -1,6 +1,8 @@
 package dev.compactmods.machines.block.tiles;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
+import dev.compactmods.machines.api.tunnels.EnumTunnelSide;
 import dev.compactmods.machines.api.tunnels.ICapableTunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.block.walls.TunnelWallBlock;
@@ -10,9 +12,11 @@ import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
+import dev.compactmods.machines.tunnels.TunnelHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -24,19 +28,27 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-public class TunnelWallTile extends TileEntity {
+public class TunnelWallTile extends TileEntity implements ITickableTileEntity {
 
     private int connectedMachine;
     private ResourceLocation tunnelType;
 
+    private final HashMap<Capability<?>, LazyOptional<?>> capabilityCache;
+
     public TunnelWallTile() {
         super(Registration.TUNNEL_WALL_TILE.get());
+        this.capabilityCache = new HashMap<>();
     }
 
     @Override
@@ -82,38 +94,8 @@ public class TunnelWallTile extends TileEntity {
         }
     }
 
-    public Optional<DimensionalPosition> getConnectedPosition() {
-        if (level == null || level.isClientSide())
-            return Optional.empty();
-
-        ServerWorld serverWorld = (ServerWorld) level;
-        MinecraftServer serv = serverWorld.getServer();
-
-        MachineConnections connections = MachineConnections.get(serv);
-        CompactMachineData extern = CompactMachineData.get(serv);
-        if (connections == null || extern == null)
-            return Optional.empty();
-
-        if (this.connectedMachine <= 0) {
-            Optional<Integer> mid = tryFindExternalMachineByChunkPos(connections);
-
-            // Map the results - either it found an ID and we can map, or it found nothing
-            return mid.map(i -> {
-                this.connectedMachine = i;
-                Optional<DimensionalPosition> pos = extern.getMachineLocation(i);
-                return pos.map(p -> {
-                    BlockPos bumped = p.getBlockPosition().relative(getConnectedSide(), 1);
-                    return new DimensionalPosition(p.getDimension(), bumped);
-                }).orElse(null);
-            });
-        }
-
-        Optional<DimensionalPosition> pos = extern.getMachineLocation(this.connectedMachine);
-        return pos.map(p -> {
-            BlockPos bumped = p.getBlockPosition().relative(getConnectedSide(), 1);
-            DimensionalPosition bdp = new DimensionalPosition(p.getDimension(), bumped);
-            return bdp;
-        });
+    public Optional<IDimensionalPosition> getConnectedPosition() {
+        return Optional.empty();
     }
 
     private Optional<Integer> tryFindExternalMachineByChunkPos(MachineConnections connections) {
@@ -172,33 +154,6 @@ public class TunnelWallTile extends TileEntity {
         return Optional.ofNullable(definition);
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
-        return LazyOptional.empty();
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        Optional<TunnelDefinition> tunnelDef = getTunnelDefinition();
-
-        // If we don't have a definition for the tunnel, skip
-        if (!tunnelDef.isPresent())
-            return super.getCapability(cap, side);
-
-        // loop through tunnel definition for capabilities
-        TunnelDefinition definition = tunnelDef.get();
-        if (definition instanceof ICapableTunnel) {
-            if (!level.isClientSide) {
-                ServerWorld sw = (ServerWorld) level;
-                return ((ICapableTunnel) definition).getExternalCapability(sw, worldPosition, cap, side);
-            }
-        }
-
-        return super.getCapability(cap, side);
-    }
-
     public void setTunnelType(ResourceLocation registryName) {
         this.tunnelType = registryName;
 
@@ -211,5 +166,11 @@ public class TunnelWallTile extends TileEntity {
             NetworkHandler.MAIN_CHANNEL
                     .send(PacketDistributor.TRACKING_CHUNK.with(() -> chunkAt), pkt);
         }
+    }
+
+    @Override
+    public void tick() {
+        // first tick - unset this block, tunnels will be reimplemented in 1.17
+        level.setBlockAndUpdate(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState());
     }
 }

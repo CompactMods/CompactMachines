@@ -1,10 +1,12 @@
 package dev.compactmods.machines.tunnels;
 
+import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.EnumTunnelSide;
 import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.block.tiles.TunnelWallTile;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.world.IWorldReader;
@@ -22,7 +24,7 @@ public class TunnelConnectionInfo implements ITunnelConnectionInfo {
 
     @Nonnull
     @Override
-    public Optional<DimensionalPosition> getConnectedPosition(EnumTunnelSide side) {
+    public Optional<IDimensionalPosition> getConnectedPosition(EnumTunnelSide side) {
         return TunnelHelper.getTunnelConnectedPosition(tunnel, side);
     }
 
@@ -33,6 +35,7 @@ public class TunnelConnectionInfo implements ITunnelConnectionInfo {
 
     @Override
     public Optional<? extends IWorldReader> getConnectedWorld(EnumTunnelSide side) {
+        ServerPlayerEntity sp;
         switch(side) {
             case INSIDE:
                 return Optional.ofNullable(tunnel.getLevel());
