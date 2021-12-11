@@ -5,6 +5,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonConfig {
@@ -36,7 +37,7 @@ public class CommonConfig {
     }
 
     @SubscribeEvent
-    public static void onLoaded(ModConfig.Loading loading) {
+    public static void onLoaded(ModConfigEvent.Loading loading) {
         CompactMachines.LOGGER.debug("Loading common configuration...");
     }
 }

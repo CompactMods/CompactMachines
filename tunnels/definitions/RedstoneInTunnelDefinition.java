@@ -6,9 +6,9 @@ import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
-import net.minecraft.block.BlockState;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.server.level.ServerLevel;
 
 import java.awt.*;
 import java.util.Optional;
@@ -28,8 +28,8 @@ public class RedstoneInTunnelDefinition extends TunnelDefinition implements IRed
 
     @Override
     public int getPowerLevel(ITunnelConnectionInfo connectionInfo) {
-        IWorldReader connectedWorld = connectionInfo.getConnectedWorld(EnumTunnelSide.OUTSIDE).orElse(null);
-        if (connectedWorld instanceof ServerWorld) {
+        LevelReader connectedWorld = connectionInfo.getConnectedWorld(EnumTunnelSide.OUTSIDE).orElse(null);
+        if (connectedWorld instanceof ServerLevel) {
             IDimensionalPosition pos = connectionInfo.getConnectedPosition(EnumTunnelSide.OUTSIDE).orElse(null);
             if (pos == null)
                 return 0;

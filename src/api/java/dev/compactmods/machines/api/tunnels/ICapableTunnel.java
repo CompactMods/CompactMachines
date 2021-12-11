@@ -1,9 +1,9 @@
 package dev.compactmods.machines.api.tunnels;
 
 import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -17,10 +17,10 @@ import java.util.Map;
 public interface ICapableTunnel {
 
     @Nonnull
-    <T> LazyOptional<T> getInternalCapability(ServerWorld compactWorld, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
+    <T> LazyOptional<T> getInternalCapability(ServerLevel compactWorld, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
 
     @Nonnull
-    <T> LazyOptional<T> getExternalCapability(ServerWorld world, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
+    <T> LazyOptional<T> getExternalCapability(ServerLevel world, BlockPos tunnelPos, @Nonnull Capability<T> cap, Direction side);
 
-    Map<Capability<?>, LazyOptional<?>> rebuildCapabilityCache(ServerWorld compactLevel, BlockPos tunnelPos, BlockPos inside, @Nullable IDimensionalPosition external);
+    Map<Capability<?>, LazyOptional<?>> rebuildCapabilityCache(ServerLevel compactLevel, BlockPos tunnelPos, BlockPos inside, @Nullable IDimensionalPosition external);
 }

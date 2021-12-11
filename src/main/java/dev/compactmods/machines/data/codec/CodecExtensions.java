@@ -2,13 +2,13 @@ package dev.compactmods.machines.data.codec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 import java.util.stream.DoubleStream;
@@ -24,12 +24,12 @@ public abstract class CodecExtensions {
                 }
             }, UUID::toString).stable();
 
-    public static final Codec<RegistryKey<World>> WORLD_REGISTRY_KEY = ResourceLocation.CODEC
-            .xmap(RegistryKey.elementKey(Registry.DIMENSION_REGISTRY), RegistryKey::location);
+    public static final Codec<ResourceKey<Level>> WORLD_REGISTRY_KEY = ResourceLocation.CODEC
+            .xmap(ResourceKey.elementKey(Registry.DIMENSION_REGISTRY), ResourceKey::location);
 
-    public static final Codec<Vector3d> VECTOR3D = DoubleStreamExtensions.CODEC
+    public static final Codec<Vec3> VECTOR3D = DoubleStreamExtensions.CODEC
             .comapFlatMap(i -> DoubleStreamExtensions.fixedDoubleSize(i, 3)
-                    .map(out -> new Vector3d(out[0], out[1], out[2])), vec -> DoubleStream.of(vec.x, vec.y, vec.z));
+                    .map(out -> new Vec3(out[0], out[1], out[2])), vec -> DoubleStream.of(vec.x, vec.y, vec.z));
 
     public static final Codec<ChunkPos> CHUNKPOS = Codec.INT_STREAM
             .comapFlatMap(i -> Util.fixedSize(i, 2)

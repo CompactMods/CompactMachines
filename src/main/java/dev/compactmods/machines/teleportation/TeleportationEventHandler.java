@@ -5,15 +5,14 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.living.EnderTeleportEvent;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -21,8 +20,8 @@ import net.minecraftforge.fml.common.Mod;
 public class TeleportationEventHandler {
 
     @SubscribeEvent
-    public static void onEnderTeleport(final EnderTeleportEvent evt) {
-        Vector3d target = new Vector3d(
+    public static void onEnderTeleport(final EntityTeleportEvent.EnderEntity evt) {
+        Vec3 target = new Vec3(
                 evt.getTargetX(),
                 evt.getTargetY(),
                 evt.getTargetZ()
@@ -51,12 +50,12 @@ public class TeleportationEventHandler {
      * @param target Teleportation target location.
      * @return True if teleportation should be cancelled; false otherwise.
      */
-    private static boolean cancelOutOfBoxTeleport(Entity entity, Vector3d target) {
+    private static boolean cancelOutOfBoxTeleport(Entity entity, Vec3 target) {
         MinecraftServer serv = entity.getServer();
         if (serv == null)
             return false;
 
-        ChunkPos machineChunk = new ChunkPos(entity.xChunk, entity.zChunk);
+        ChunkPos machineChunk = new ChunkPos(entity.chunkPosition().x, entity.chunkPosition().z);
 
         CompactRoomData intern = CompactRoomData.get(serv);
         if (intern == null)
@@ -67,14 +66,14 @@ public class TeleportationEventHandler {
                 .orElse(false);
     }
 
-    private static void doEntityTeleportHandle(EntityEvent evt, Vector3d target, Entity ent) {
+    private static void doEntityTeleportHandle(EntityEvent evt, Vec3 target, Entity ent) {
         if (ent.level.dimension() == Registration.COMPACT_DIMENSION) {
             if (cancelOutOfBoxTeleport(ent, target) && evt.isCancelable()) {
-                if (ent instanceof ServerPlayerEntity) {
-                    ((ServerPlayerEntity) ent).displayClientMessage(
+                if (ent instanceof ServerPlayer) {
+                    ((ServerPlayer) ent).displayClientMessage(
                             TranslationUtil.message(Messages.TELEPORT_OUT_OF_BOUNDS, ent.getName())
-                                    .withStyle(TextFormatting.RED)
-                                    .withStyle(TextFormatting.ITALIC),
+                                    .withStyle(ChatFormatting.RED)
+                                    .withStyle(ChatFormatting.ITALIC),
                             true
                     );
                 }

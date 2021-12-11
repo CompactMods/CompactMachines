@@ -2,11 +2,11 @@ package dev.compactmods.machines.util;
 
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Arrays;
 
@@ -19,13 +19,13 @@ public class CompactStructureGenerator {
      * @param cubeCenter
      * @param wallDirection
      */
-    public static void generateCompactWall(IWorld world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
+    public static void generateCompactWall(LevelAccessor world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
         int s = size.getInternalSize() / 2;
 
         BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
         BlockPos start = BlockPos.ZERO;
-        AxisAlignedBB wallBounds;
+        AABB wallBounds;
 
         boolean horiz = wallDirection.getAxis().getPlane() == Direction.Plane.HORIZONTAL;
         if (horiz) {
@@ -33,12 +33,12 @@ public class CompactStructureGenerator {
                     .below(s)
                     .relative(wallDirection, s + 1);
 
-            wallBounds = new AxisAlignedBB(start, start)
+            wallBounds = new AABB(start, start)
                     .expandTowards(0, (s * 2) + 1, 0);
         } else {
             start = cubeCenter.relative(wallDirection, s + 1);
 
-            wallBounds = new AxisAlignedBB(start, start)
+            wallBounds = new AABB(start, start)
                     .inflate(s + 1, 0, s + 1);
         }
 
@@ -67,11 +67,11 @@ public class CompactStructureGenerator {
      * @param size
      * @param center
      */
-    public static void generateCompactStructure(IWorld world, EnumMachineSize size, BlockPos center) {
+    public static void generateCompactStructure(LevelAccessor world, EnumMachineSize size, BlockPos center) {
         int s = size.getInternalSize() / 2;
 
         BlockPos floorCenter = center.relative(Direction.DOWN, s);
-        AxisAlignedBB floorBlocks = new AxisAlignedBB(floorCenter, floorCenter)
+        AABB floorBlocks = new AABB(floorCenter, floorCenter)
                 .inflate(s, 0, s);
 
         boolean anyAir = BlockPos.betweenClosedStream(floorBlocks).anyMatch(world::isEmptyBlock);

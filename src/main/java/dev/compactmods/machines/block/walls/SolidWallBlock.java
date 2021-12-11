@@ -1,13 +1,11 @@
 package dev.compactmods.machines.block.walls;
 
 import dev.compactmods.machines.config.ServerConfig;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-
-import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SolidWallBlock extends ProtectedWallBlock {
     public SolidWallBlock(Properties props) {
@@ -15,7 +13,7 @@ public class SolidWallBlock extends ProtectedWallBlock {
     }
 
     @Override
-    public boolean canCreatureSpawn(BlockState state, IBlockReader world, BlockPos pos, EntitySpawnPlacementRegistry.PlacementType type, @Nullable EntityType<?> entityType) {
+    public boolean isValidSpawn(BlockState state, BlockGetter world, BlockPos pos, SpawnPlacements.Type type, EntityType<?> entityType) {
         return pos.getY() == ServerConfig.MACHINE_FLOOR_Y.get();
     }
 }

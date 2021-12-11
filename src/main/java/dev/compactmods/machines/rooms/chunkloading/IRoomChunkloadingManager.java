@@ -1,7 +1,7 @@
 package dev.compactmods.machines.rooms.chunkloading;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 
 public interface IRoomChunkloadingManager {
 

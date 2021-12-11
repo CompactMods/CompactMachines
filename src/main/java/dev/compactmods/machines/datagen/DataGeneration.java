@@ -5,7 +5,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGeneration {
@@ -29,6 +29,6 @@ public class DataGeneration {
     private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
         ExistingFileHelper helper = event.getExistingFileHelper();
         generator.addProvider(new StateGenerator(generator, helper));
-        generator.addProvider(new TunnelWallStateGenerator(generator, helper));
+        // generator.addProvider(new TunnelWallStateGenerator(generator, helper));
     }
 }

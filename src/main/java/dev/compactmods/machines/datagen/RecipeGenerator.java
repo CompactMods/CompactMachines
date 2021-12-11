@@ -1,18 +1,20 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
-import dev.compactmods.machines.core.Registration;
-import net.minecraft.data.*;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.crafting.ConditionalRecipe;
-
 import java.util.Objects;
 import java.util.function.Consumer;
+import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
+import dev.compactmods.machines.core.Registration;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.crafting.ConditionalRecipe;
 
 public class RecipeGenerator extends RecipeProvider {
     public RecipeGenerator(DataGenerator generatorIn) {
@@ -20,7 +22,7 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     @Override
-    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder.shaped(Registration.ITEM_BREAKABLE_WALL.get(), 16)
                 .pattern(" R ")
                 .pattern(" I ")
@@ -43,7 +45,7 @@ public class RecipeGenerator extends RecipeProvider {
         addMachineRecipes(consumer);
     }
 
-    private void addMachineRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void addMachineRecipes(Consumer<FinishedRecipe> consumer) {
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_TINY.get(), ItemTags.PLANKS);
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_SMALL.get(), Tags.Items.STORAGE_BLOCKS_IRON);
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_NORMAL.get(), Tags.Items.STORAGE_BLOCKS_GOLD);
@@ -52,7 +54,7 @@ public class RecipeGenerator extends RecipeProvider {
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get(), Tags.Items.STORAGE_BLOCKS_EMERALD);
     }
 
-    protected void registerMachineRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider out, ITag<Item> center) {
+    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ItemLike out, Tag<Item> center) {
         Item wall = Registration.ITEM_BREAKABLE_WALL.get();
         ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(out)
                 .pattern("WWW");

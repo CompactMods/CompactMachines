@@ -1,38 +1,25 @@
 package dev.compactmods.machines.block.tiles;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.tunnels.ICapableTunnel;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
-import dev.compactmods.machines.tunnels.TunnelHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.concurrent.TickDelayedTask;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
-public class CompactMachineTile extends TileEntity implements ICapabilityProvider, ITickableTileEntity {
+public class CompactMachineTile extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
     private final boolean initialized = false;
     public boolean alreadyNotifiedOnTick = false;
@@ -42,8 +29,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     protected String schema;
     protected boolean locked = false;
 
-    public CompactMachineTile() {
-        super(Registration.MACHINE_TILE_ENTITY.get());
+    public CompactMachineTile(BlockPos pos, BlockState state) {
+        super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
     }
 
     @Override
@@ -52,8 +39,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT nbt) {
-        super.load(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
 
         machineId = nbt.getInt("coords");
         // TODO customName = nbt.getString("CustomName");
@@ -78,9 +65,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT nbt) {
-        nbt = super.save(nbt);
-
+    protected void saveAdditional(CompoundTag nbt) {
         nbt.putInt("coords", machineId);
         // nbt.putString("CustomName", customName.getString());
 
@@ -94,22 +79,14 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
         }
 
         nbt.putBoolean("locked", locked);
-
-        return nbt;
-    }
-
-    @Nullable
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(worldPosition, 1, getUpdateTag());
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT base = super.getUpdateTag();
+    public CompoundTag getUpdateTag() {
+        CompoundTag base = super.getUpdateTag();
         base.putInt("machine", this.machineId);
 
-        if (level instanceof ServerWorld) {
+        if (level instanceof ServerLevel) {
             // TODO - Internal player list
 //            Optional<CompactMachinePlayerData> playerData = Optional.empty();
 //            try {
@@ -132,7 +109,7 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public Optional<ChunkPos> getInternalChunkPos() {
-        if (level instanceof ServerWorld) {
+        if (level instanceof ServerLevel) {
             MinecraftServer serv = level.getServer();
             if (serv == null)
                 return Optional.empty();
@@ -148,12 +125,12 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(CompoundTag tag) {
+        super.handleUpdateTag(tag);
 
         this.machineId = tag.getInt("machine");
         if (tag.contains("players")) {
-            CompoundNBT players = tag.getCompound("players");
+            CompoundTag players = tag.getCompound("players");
             // playerData = CompactMachinePlayerData.fromNBT(players);
 
         }
@@ -163,18 +140,13 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         BlockState state = null;
         if (this.level != null) {
             state = this.level.getBlockState(worldPosition);
         }
 
-        load(state, pkt.getTag());
-    }
-
-    @Override
-    public void tick() {
-
+        super.onDataPacket(net, pkt);
     }
 
     public Optional<UUID> getOwnerUUID() {
@@ -233,8 +205,8 @@ public class CompactMachineTile extends TileEntity implements ICapabilityProvide
     }
 
     public Optional<DimensionalPosition> getSpawn() {
-        if (level instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) level;
+        if (level instanceof ServerLevel) {
+            ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer serv = serverWorld.getServer();
 
             MachineConnections connections = MachineConnections.get(serv);

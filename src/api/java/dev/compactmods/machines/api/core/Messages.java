@@ -1,6 +1,6 @@
 package dev.compactmods.machines.api.core;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class Messages {
     public static final ResourceLocation CANNOT_ENTER_MACHINE = new ResourceLocation(Constants.MOD_ID, "cannot_enter");

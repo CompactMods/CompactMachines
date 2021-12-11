@@ -1,22 +1,22 @@
 package dev.compactmods.machines.client.gui.guide;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.client.gui.widget.AbstractCMGuiWidget;
 import dev.compactmods.machines.client.gui.widget.ScrollableWrappedTextWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class GuidePage implements IRenderable, IGuiEventListener {
+public class GuidePage implements Widget, GuiEventListener {
 
     protected List<AbstractCMGuiWidget> widgets;
 
@@ -28,14 +28,14 @@ public class GuidePage implements IRenderable, IGuiEventListener {
     }
 
     @Override
-    public void render(MatrixStack ms, int mouseX, int mouseY, float partialTicks) {
-        FontRenderer fr = Minecraft.getInstance().font;
-        AbstractGui.drawString(ms, fr,
-                new TranslationTextComponent(CompactMachines.MOD_ID + ".psd.pages.machines.title")
-                .withStyle(TextFormatting.GOLD),
+    public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
+        Font fr = Minecraft.getInstance().font;
+        GuiComponent.drawString(ms, fr,
+                new TranslatableComponent(CompactMachines.MOD_ID + ".psd.pages.machines.title")
+                .withStyle(ChatFormatting.GOLD),
                 2, 2, 0);
 
-        for(IRenderable comp : widgets)
+        for(Widget comp : widgets)
             comp.render(ms, mouseX, mouseY, partialTicks);
     }
 

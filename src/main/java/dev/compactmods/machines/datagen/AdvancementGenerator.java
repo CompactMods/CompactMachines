@@ -15,16 +15,16 @@ import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.advancements.*;
-import net.minecraft.advancements.criterion.ImpossibleTrigger;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.DataProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
-public class AdvancementGenerator implements IDataProvider {
+public class AdvancementGenerator implements DataProvider {
 
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
     private final DataGenerator generator;
@@ -34,7 +34,7 @@ public class AdvancementGenerator implements IDataProvider {
     }
 
     @Override
-    public void run(DirectoryCache cache) {
+    public void run(HashCache cache) {
         Path path = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
         Consumer<Advancement> consumer = (adv) -> {
@@ -44,7 +44,7 @@ public class AdvancementGenerator implements IDataProvider {
                 Path path1 = path.resolve("data/" + adv.getId().getNamespace() + "/advancements/" + adv.getId().getPath() + ".json");
 
                 try {
-                    IDataProvider.save(GSON, cache, adv.deconstruct().serializeToJson(), path1);
+                    DataProvider.save(GSON, cache, adv.deconstruct().serializeToJson(), path1);
                 } catch (IOException ioexception) {
                     CompactMachines.LOGGER.error("Couldn't save advancement {}", path1, ioexception);
                 }
@@ -62,7 +62,7 @@ public class AdvancementGenerator implements IDataProvider {
     private void generateAdvancements(Consumer<Advancement> consumer) {
 
         final Advancement root = Advancement.Builder.advancement()
-                .addCriterion("root", new ImpossibleTrigger.Instance())
+                .addCriterion("root", new ImpossibleTrigger.TriggerInstance())
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
                         .background(modLoc("textures/block/wall.png"))
@@ -85,7 +85,7 @@ public class AdvancementGenerator implements IDataProvider {
 
         final Advancement wall = Advancement.Builder.advancement()
                 .parent(root)
-                .addCriterion("obtained_wall", InventoryChangeTrigger.Instance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
+                .addCriterion("obtained_wall", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
                         .item(new ItemStack(Registration.BLOCK_BREAKABLE_WALL.get()))
@@ -95,7 +95,7 @@ public class AdvancementGenerator implements IDataProvider {
 
         final Advancement psd = Advancement.Builder.advancement()
                 .parent(root)
-                .addCriterion("obtained_psd", InventoryChangeTrigger.Instance.hasItems(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                .addCriterion("obtained_psd", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.PERSONAL_SHRINKING_DEVICE.get()))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
                         .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.reference;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import dev.compactmods.machines.CompactMachines;
 
 public class Resources {

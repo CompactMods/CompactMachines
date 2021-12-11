@@ -12,15 +12,15 @@ import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,7 @@ public class TunnelHelper {
         return new TunnelConnectionInfo(tunnelTile);
     }
 
-    public static ITunnelConnectionInfo generateConnectionInfo(@Nonnull IBlockReader tunnelWorld, @Nonnull BlockPos tunnelPos) {
+    public static ITunnelConnectionInfo generateConnectionInfo(@Nonnull BlockGetter tunnelWorld, @Nonnull BlockPos tunnelPos) {
         TunnelWallTile tile = (TunnelWallTile) tunnelWorld.getBlockEntity(tunnelPos);
         return generateConnectionInfo(tile);
     }
@@ -78,9 +78,9 @@ public class TunnelHelper {
 
     }
 
-    public static Set<BlockPos> getTunnelsForMachineSide(int machine, ServerWorld world, Direction machineSide) {
+    public static Set<BlockPos> getTunnelsForMachineSide(int machine, ServerLevel world, Direction machineSide) {
 
-        ServerWorld compactWorld = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compactWorld = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null)
             return Collections.emptySet();
 
@@ -146,7 +146,7 @@ public class TunnelHelper {
                 return tunnel.getConnectedPosition();
 
             case INSIDE:
-                RegistryKey<World> world = Registration.COMPACT_DIMENSION;
+                ResourceKey<Level> world = Registration.COMPACT_DIMENSION;
                 BlockPos offsetInside = tunnel.getBlockPos().relative(tunnel.getTunnelSide());
 
                 DimensionalPosition pos = new DimensionalPosition(world, offsetInside);
@@ -163,14 +163,14 @@ public class TunnelHelper {
             return Optional.empty();
 
         // We need a server world to reach across dimensions to get information
-        if (twt.getLevel() instanceof ServerWorld) {
-            ServerWorld sw = (ServerWorld) twt.getLevel();
+        if (twt.getLevel() instanceof ServerLevel) {
+            ServerLevel sw = (ServerLevel) twt.getLevel();
 
-            Optional<ServerWorld> connectedWorld = connectedPosition.getWorld(sw.getServer());
+            Optional<ServerLevel> connectedWorld = connectedPosition.getWorld(sw.getServer());
             if (!connectedWorld.isPresent())
                 return Optional.empty();
 
-            ServerWorld csw = connectedWorld.get();
+            ServerLevel csw = connectedWorld.get();
             BlockPos connectedPos = connectedPosition.getBlockPosition();
 
             BlockState state = csw.getBlockState(connectedPos);

@@ -1,43 +1,35 @@
 package dev.compactmods.machines.core;
 
+import java.util.function.Supplier;
 import dev.compactmods.machines.CompactMachines;
+import static dev.compactmods.machines.CompactMachines.MOD_ID;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.block.BlockCompactMachine;
 import dev.compactmods.machines.block.tiles.CompactMachineTile;
-import dev.compactmods.machines.block.tiles.TunnelWallTile;
 import dev.compactmods.machines.block.walls.BreakableWallBlock;
 import dev.compactmods.machines.block.walls.SolidWallBlock;
-import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.item.ItemBlockMachine;
 import dev.compactmods.machines.item.ItemBlockWall;
 import dev.compactmods.machines.item.ItemPersonalShrinkingDevice;
 import dev.compactmods.machines.item.TunnelItem;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.tunnels.definitions.ItemTunnelDefinition;
-import dev.compactmods.machines.tunnels.definitions.RedstoneInTunnelDefinition;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryBuilder;
-
-import java.util.function.Supplier;
-
-import static dev.compactmods.machines.CompactMachines.MOD_ID;
+import net.minecraftforge.registries.*;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public class Registration {
@@ -46,7 +38,9 @@ public class Registration {
     // ================================================================================================================
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
-    private static final DeferredRegister<TileEntityType<?>> TILES_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MOD_ID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
+
+    public static IForgeRegistry<TunnelDefinition> TUNNEL_DEF_REGISTRY;
     public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
 
     static {
@@ -59,11 +53,9 @@ public class Registration {
     // ================================================================================================================
     //   PROPERTIES
     // ================================================================================================================
-    private static final AbstractBlock.Properties MACHINE_BLOCK_PROPS = AbstractBlock.Properties
+    private static final BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
             .of(Material.METAL)
             .strength(8.0F, 20.0F)
-            .harvestLevel(1)
-            .harvestTool(ToolType.PICKAXE)
             .requiresCorrectToolForDrops();
 
     private static final Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
@@ -108,8 +100,8 @@ public class Registration {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
             () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), EnumMachineSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
 
-    public static final RegistryObject<TileEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = TILES_ENTITIES.register("compact_machine", () ->
-            TileEntityType.Builder.of(CompactMachineTile::new,
+    public static final RegistryObject<BlockEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = BLOCK_ENTITIES.register("compact_machine", () ->
+            BlockEntityType.Builder.of(CompactMachineTile::new,
                     MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
                     MACHINE_BLOCK_LARGE.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
                     .build(null));
@@ -117,16 +109,16 @@ public class Registration {
     // ================================================================================================================
     //   WALLS
     // ================================================================================================================
-    public static final RegistryObject<Block> BLOCK_TUNNEL_WALL = BLOCKS.register("tunnel_wall", () ->
-            new TunnelWallBlock(AbstractBlock.Properties
-                    .of(Material.METAL, MaterialColor.CLAY)
-                    .strength(-1.0F, 3600000.8F)
-                    .sound(SoundType.METAL)
-                    .lightLevel((state) -> 15)
-                    .noDrops()));
+//    public static final RegistryObject<Block> BLOCK_TUNNEL_WALL = BLOCKS.register("tunnel_wall", () ->
+//            new TunnelWallBlock(BlockBehaviour.Properties
+//                    .of(Material.METAL, MaterialColor.CLAY)
+//                    .strength(-1.0F, 3600000.8F)
+//                    .sound(SoundType.METAL)
+//                    .lightLevel((state) -> 15)
+//                    .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_SOLID_WALL = BLOCKS.register("solid_wall", () ->
-            new SolidWallBlock(AbstractBlock.Properties
+            new SolidWallBlock(BlockBehaviour.Properties
                     .of(Material.METAL, MaterialColor.CLAY)
                     .strength(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
@@ -134,12 +126,10 @@ public class Registration {
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall", () ->
-            new BreakableWallBlock(AbstractBlock.Properties
+            new BreakableWallBlock(BlockBehaviour.Properties
                     .of(Material.METAL)
                     .strength(3.0f, 128.0f)
-                    .requiresCorrectToolForDrops()
-                    .harvestTool(ToolType.PICKAXE)
-                    .harvestLevel(1)));
+                    .requiresCorrectToolForDrops()));
 
     public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
             () -> new ItemPersonalShrinkingDevice(BASIC_ITEM_PROPS.get()
@@ -158,23 +148,23 @@ public class Registration {
     public static final RegistryObject<Item> ITEM_TUNNEL = ITEMS.register("tunnel", () ->
             new TunnelItem(BASIC_ITEM_PROPS.get()));
 
-    public static final RegistryObject<TileEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = TILES_ENTITIES.register("tunnel_wall", () ->
-            TileEntityType.Builder.of(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
-                    .build(null));
+//    public static final RegistryObject<BlockEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = BLOCK_ENTITIES.register("tunnel_wall", () ->
+//            BlockEntityType.Builder.of(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
+//                    .build(null));
 
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = TUNNEL_DEFINITIONS.register("item", ItemTunnelDefinition::new);
-
-    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
+//    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = TUNNEL_DEFINITIONS.register("item", ItemTunnelDefinition::new);
+//
+//    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
 
     // public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
 
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    public static final RegistryKey<World> COMPACT_DIMENSION = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("compactmachines:compact_world"));
+    public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("compactmachines:compact_world"));
 
     // ================================================================================================================
     //   INITIALIZATION
@@ -184,8 +174,13 @@ public class Registration {
 
         BLOCKS.register(eventBus);
         ITEMS.register(eventBus);
-        TILES_ENTITIES.register(eventBus);
+        BLOCK_ENTITIES.register(eventBus);
 
         TUNNEL_DEFINITIONS.register(eventBus);
+    }
+
+    @SubscribeEvent
+    public void onTunnelDefs(RegistryEvent.Register<TunnelDefinition> reg) {
+        Registration.TUNNEL_DEF_REGISTRY = reg.getRegistry();
     }
 }

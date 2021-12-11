@@ -8,8 +8,8 @@ import dev.compactmods.machines.data.graph.CompactMachineConnectionGraph;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.world.ForgeChunkManager;
 
 public class CMRoomChunkloadingManager implements IRoomChunkloadingManager {
@@ -129,7 +129,7 @@ public class CMRoomChunkloadingManager implements IRoomChunkloadingManager {
 
         UUID ticket = tickets.get(room);
 
-        ServerWorld compact = server.getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compact = server.getLevel(Registration.COMPACT_DIMENSION);
 
         if (compact != null) {
             boolean alreadyForced = compact.getForcedChunks().stream()

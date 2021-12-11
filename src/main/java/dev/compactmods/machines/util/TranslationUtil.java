@@ -1,8 +1,8 @@
 package dev.compactmods.machines.util;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class TranslationUtil {
 
@@ -10,43 +10,43 @@ public abstract class TranslationUtil {
         return Util.makeDescriptionId("message", message);
     }
 
-    public static TranslationTextComponent message(ResourceLocation message) {
-        return new TranslationTextComponent(messageId(message));
+    public static TranslatableComponent message(ResourceLocation message) {
+        return new TranslatableComponent(messageId(message));
     }
 
-    public static TranslationTextComponent message(ResourceLocation message, Object... params) {
-        return new TranslationTextComponent(messageId(message), params);
+    public static TranslatableComponent message(ResourceLocation message, Object... params) {
+        return new TranslatableComponent(messageId(message), params);
     }
 
     public static String tooltipId(ResourceLocation tooltip) {
         return Util.makeDescriptionId("tooltip", tooltip);
     }
 
-    public static TranslationTextComponent tooltip(ResourceLocation tooltip) {
-        return new TranslationTextComponent(tooltipId(tooltip));
+    public static TranslatableComponent tooltip(ResourceLocation tooltip) {
+        return new TranslatableComponent(tooltipId(tooltip));
     }
 
-    public static TranslationTextComponent tooltip(ResourceLocation tooltip, Object... params) {
-        return new TranslationTextComponent(tooltipId(tooltip), params);
+    public static TranslatableComponent tooltip(ResourceLocation tooltip, Object... params) {
+        return new TranslatableComponent(tooltipId(tooltip), params);
     }
 
     public static String advId(ResourceLocation tooltip) {
         return Util.makeDescriptionId("advancement", tooltip);
     }
 
-    public static TranslationTextComponent advancement(ResourceLocation advancement) {
-        return new TranslationTextComponent(advId(advancement));
+    public static TranslatableComponent advancement(ResourceLocation advancement) {
+        return new TranslatableComponent(advId(advancement));
     }
 
-    public static TranslationTextComponent advancementTitle(ResourceLocation advancement) {
+    public static TranslatableComponent advancementTitle(ResourceLocation advancement) {
         return advancement(advancement);
     }
 
-    public static TranslationTextComponent advancementDesc(ResourceLocation advancement) {
-        return new TranslationTextComponent(Util.makeDescriptionId("advancement", advancement) + ".desc");
+    public static TranslatableComponent advancementDesc(ResourceLocation advancement) {
+        return new TranslatableComponent(Util.makeDescriptionId("advancement", advancement) + ".desc");
     }
 
-    public static TranslationTextComponent jeiInfo(ResourceLocation jei) {
-        return new TranslationTextComponent(Util.makeDescriptionId("jei", jei));
+    public static TranslatableComponent jeiInfo(ResourceLocation jei) {
+        return new TranslatableComponent(Util.makeDescriptionId("jei", jei));
     }
 }

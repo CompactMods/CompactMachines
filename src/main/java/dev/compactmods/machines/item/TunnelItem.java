@@ -2,30 +2,25 @@ package dev.compactmods.machines.item;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.block.tiles.TunnelWallTile;
 import dev.compactmods.machines.block.walls.SolidWallBlock;
-import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
@@ -33,13 +28,23 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraftforge.registries.RegistryManager;
+
 public class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ITextComponent getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         String key = getDefinition(stack)
                 .map(def -> {
                     ResourceLocation id = def.getRegistryName();
@@ -47,33 +52,33 @@ public class TunnelItem extends Item {
                 })
                 .orElse("item." + CompactMachines.MOD_ID + ".tunnels.unnamed");
 
-        return new TranslationTextComponent(key);
+        return new TranslatableComponent(key);
     }
 
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         getDefinition(stack).ifPresent(tunnelDef -> {
             if (Screen.hasShiftDown()) {
-                IFormattableTextComponent type = new TranslationTextComponent("tooltip." + CompactMachines.MOD_ID + ".tunnel_type", tunnelDef.getRegistryName())
-                        .withStyle(TextFormatting.GRAY)
-                        .withStyle(TextFormatting.ITALIC);
+                MutableComponent type = new TranslatableComponent("tooltip." + CompactMachines.MOD_ID + ".tunnel_type", tunnelDef.getRegistryName())
+                        .withStyle(ChatFormatting.GRAY)
+                        .withStyle(ChatFormatting.ITALIC);
 
                 tooltip.add(type);
             } else {
                 tooltip.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
-                        .withStyle(TextFormatting.DARK_GRAY)
-                        .withStyle(TextFormatting.ITALIC));
+                        .withStyle(ChatFormatting.DARK_GRAY)
+                        .withStyle(ChatFormatting.ITALIC));
             }
         });
     }
 
     @Override
-    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         if (this.allowdedIn(group)) {
-            IForgeRegistry<TunnelDefinition> definitions = GameRegistry.findRegistry(TunnelDefinition.class);
+            IForgeRegistry<TunnelDefinition> definitions = RegistryManager.ACTIVE.getRegistry(TunnelDefinition.class);
             definitions.getValues().forEach(def -> {
                 ItemStack withDef = new ItemStack(this, 1);
-                CompoundNBT defTag = withDef.getOrCreateTagElement("definition");
+                CompoundTag defTag = withDef.getOrCreateTagElement("definition");
                 defTag.putString("id", def.getRegistryName().toString());
 
                 items.add(withDef);
@@ -82,12 +87,12 @@ public class TunnelItem extends Item {
     }
 
     public static Optional<TunnelDefinition> getDefinition(ItemStack stack) {
-        CompoundNBT defTag = stack.getOrCreateTagElement("definition");
+        CompoundTag defTag = stack.getOrCreateTagElement("definition");
         if (defTag.isEmpty() || !defTag.contains("id"))
             return Optional.empty();
 
         ResourceLocation defId = new ResourceLocation(defTag.getString("id"));
-        IForgeRegistry<TunnelDefinition> tunnelReg = GameRegistry.findRegistry(TunnelDefinition.class);
+        IForgeRegistry<TunnelDefinition> tunnelReg = RegistryManager.ACTIVE.getRegistry(TunnelDefinition.class);
 
         if (!tunnelReg.containsKey(defId))
             return Optional.empty();
@@ -96,10 +101,10 @@ public class TunnelItem extends Item {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        final World level = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        final Level level = context.getLevel();
         if(!level.isClientSide) {
-            final PlayerEntity player = context.getPlayer();
+            final Player player = context.getPlayer();
             final BlockState state = level.getBlockState(context.getClickedPos());
 
             if(state.getBlock() instanceof SolidWallBlock && player != null) {
@@ -107,6 +112,6 @@ public class TunnelItem extends Item {
             }
         }
 
-        return ActionResultType.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

@@ -1,9 +1,9 @@
-package dev.compactmods.machines.compat.theoneprobe;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
-
-public interface IProbeDataProvider {
-    void addProbeData(IProbeData data, PlayerEntity player, World world, BlockState state);
-}
+//package dev.compactmods.machines.compat.theoneprobe;
+//
+//import net.minecraft.world.level.block.state.BlockState;
+//import net.minecraft.world.entity.player.Player;
+//import net.minecraft.world.level.Level;
+//
+//public interface IProbeDataProvider {
+//    void addProbeData(IProbeData data, Player player, Level world, BlockState state);
+//}

@@ -1,9 +1,9 @@
 package dev.compactmods.machines.rooms.capability;
 
 import dev.compactmods.machines.CompactMachines;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -13,10 +13,10 @@ public class RoomCapEventHandler {
 
     @SubscribeEvent
     public static void onCapPlayerAttach(final AttachCapabilitiesEvent<Entity> event) {
-        if(!(event.getObject() instanceof ServerPlayerEntity))
+        if(!(event.getObject() instanceof ServerPlayer))
             return;
 
-        ServerPlayerEntity player = (ServerPlayerEntity) event.getObject();
+        ServerPlayer player = (ServerPlayer) event.getObject();
         event.addCapability(
                 new ResourceLocation(CompactMachines.MOD_ID, "room_history"),
                 new PlayerRoomHistoryCapProvider(player));

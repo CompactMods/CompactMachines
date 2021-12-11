@@ -5,7 +5,7 @@ import com.google.common.graph.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.data.codec.CodecExtensions;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 
 import java.util.*;
 import java.util.stream.Collectors;

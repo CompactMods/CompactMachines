@@ -5,8 +5,8 @@ import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.rooms.chunkloading.CMRoomChunkloadingManager;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,7 +22,7 @@ public class CompactMachines {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static ItemGroup COMPACT_MACHINES_ITEMS = new ItemGroup(MOD_ID) {
+    public static CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(MOD_ID) {
         @Override
         public ItemStack makeIcon() {
             return new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get());

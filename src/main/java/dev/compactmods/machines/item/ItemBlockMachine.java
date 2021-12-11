@@ -7,21 +7,26 @@ import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemBlockMachine extends BlockItem {
 
@@ -30,7 +35,7 @@ public class ItemBlockMachine extends BlockItem {
     }
 
     @Override
-    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         super.fillItemCategory(group, items);
     }
 
@@ -38,7 +43,7 @@ public class ItemBlockMachine extends BlockItem {
         if (!stack.hasTag())
             return Optional.empty();
 
-        CompoundNBT machineData = stack.getTagElement("cm");
+        CompoundTag machineData = stack.getTagElement("cm");
         if (machineData == null)
             return Optional.empty();
 
@@ -51,13 +56,13 @@ public class ItemBlockMachine extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         // We need NBT data for the rest of this
         if (stack.hasTag()) {
 
-            CompoundNBT nbt = stack.getTag();
+            CompoundTag nbt = stack.getTag();
             assert nbt != null;
 
             getMachineId(stack).ifPresent(id -> {
@@ -68,11 +73,11 @@ public class ItemBlockMachine extends BlockItem {
                 UUID owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
                 Optional<GameProfile> playerProfile = PlayerUtil.getProfileByUUID(worldIn, owner);
 
-                IFormattableTextComponent player = playerProfile
-                        .map(p -> (IFormattableTextComponent) new StringTextComponent(p.getName()))
+                MutableComponent player = playerProfile
+                        .map(p -> (MutableComponent) new TextComponent(p.getName()))
                         .orElse(TranslationUtil.tooltip(Tooltips.UNKNOWN_PLAYER_NAME));
 
-                IFormattableTextComponent ownerText = TranslationUtil.tooltip(Tooltips.Machines.OWNER)
+                MutableComponent ownerText = TranslationUtil.tooltip(Tooltips.Machines.OWNER)
                         .append(player);
 
                 tooltip.add(ownerText);
@@ -86,15 +91,15 @@ public class ItemBlockMachine extends BlockItem {
                 EnumMachineSize size = ((BlockCompactMachine) b).getSize();
                 int internalSize = size.getInternalSize();
 
-                IFormattableTextComponent text = TranslationUtil.tooltip(Tooltips.Machines.SIZE, internalSize)
-                        .withStyle(TextFormatting.YELLOW);
+                MutableComponent text = TranslationUtil.tooltip(Tooltips.Machines.SIZE, internalSize)
+                        .withStyle(ChatFormatting.YELLOW);
 
                 tooltip.add(text);
             }
         } else {
-            IFormattableTextComponent text = TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
-                    .withStyle(TextFormatting.DARK_GRAY)
-                    .withStyle(TextFormatting.ITALIC);
+            MutableComponent text = TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
+                    .withStyle(ChatFormatting.DARK_GRAY)
+                    .withStyle(ChatFormatting.ITALIC);
 
             tooltip.add(text);
         }

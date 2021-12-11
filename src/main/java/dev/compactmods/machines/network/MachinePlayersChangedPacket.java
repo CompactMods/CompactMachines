@@ -9,11 +9,11 @@ import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraftforge.network.NetworkEvent;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -34,17 +34,13 @@ public class MachinePlayersChangedPacket {
             DimensionalPosition.CODEC.listOf().fieldOf("positions").forGetter(p -> p.machinePositions.asList())
     ).apply(i, MachinePlayersChangedPacket::new));
 
-    public MachinePlayersChangedPacket(PacketBuffer buf) {
-        try {
-            MachinePlayersChangedPacket pkt = buf.readWithCodec(MachinePlayersChangedPacket.CODEC);
+    public MachinePlayersChangedPacket(FriendlyByteBuf buf) {
+        MachinePlayersChangedPacket pkt = buf.readWithCodec(MachinePlayersChangedPacket.CODEC);
 
-            machine = pkt.machine;
-            playerID = pkt.playerID;
-            machinePositions = pkt.machinePositions;
-            type = pkt.type;
-        } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
-        }
+        machine = pkt.machine;
+        playerID = pkt.playerID;
+        machinePositions = pkt.machinePositions;
+        type = pkt.type;
     }
 
     private MachinePlayersChangedPacket(ChunkPos chunkPos, UUID player, String type, Collection<DimensionalPosition> positions) {
@@ -65,12 +61,8 @@ public class MachinePlayersChangedPacket {
         ctx.setPacketHandled(true);
     }
 
-    public static void encode(MachinePlayersChangedPacket pkt, PacketBuffer buf) {
-        try {
-            buf.writeWithCodec(CODEC, pkt);
-        } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
-        }
+    public static void encode(MachinePlayersChangedPacket pkt, FriendlyByteBuf buf) {
+        buf.writeWithCodec(CODEC, pkt);
     }
 
     private UUID getPlayer() {
@@ -128,7 +120,7 @@ public class MachinePlayersChangedPacket {
             return this;
         }
 
-        public Builder forPlayer(ServerPlayerEntity player) {
+        public Builder forPlayer(ServerPlayer player) {
             this.player = player.getUUID();
             return this;
         }

@@ -2,22 +2,22 @@ package dev.compactmods.machines.rooms.capability;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSerializable<CompoundNBT> {
+public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private final PlayerEntity player;
+    private final Player player;
     private final CMRoomHistory history;
     private LazyOptional<IRoomHistory> opt = LazyOptional.empty();
 
-    public PlayerRoomHistoryCapProvider(PlayerEntity player) {
+    public PlayerRoomHistoryCapProvider(Player player) {
         this.player = player;
         this.history = new CMRoomHistory();
         this.opt = LazyOptional.of(() -> this.history);
@@ -33,17 +33,17 @@ public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSe
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.put("history", history.serializeNBT());
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         if(nbt.contains("history")) {
             history.clear();
-            history.deserializeNBT(nbt.getList("history", Constants.NBT.TAG_COMPOUND));
+            history.deserializeNBT(nbt.getList("history", Tag.TAG_COMPOUND));
         }
     }
 }

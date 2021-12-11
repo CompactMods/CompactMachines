@@ -1,5 +1,9 @@
 package dev.compactmods.machines.util;
 
+import javax.annotation.Nonnull;
+import javax.naming.OperationNotSupportedException;
+import java.util.Optional;
+import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
@@ -7,40 +11,35 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.block.tiles.CompactMachineTile;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
+import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.network.CMPacketTargets;
 import dev.compactmods.machines.network.MachinePlayersChangedPacket;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 import dev.compactmods.machines.rooms.capability.CapabilityRoomHistory;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
+import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 import dev.compactmods.machines.rooms.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
-import javax.naming.OperationNotSupportedException;
-import java.util.Optional;
-import java.util.UUID;
-
 public abstract class PlayerUtil {
-    public static Optional<GameProfile> getProfileByUUID(IWorld world, UUID uuid) {
-        PlayerEntity player = world.getPlayerByUUID(uuid);
+    public static Optional<GameProfile> getProfileByUUID(LevelAccessor world, UUID uuid) {
+        Player player = world.getPlayerByUUID(uuid);
         if (player == null)
             return Optional.empty();
 
@@ -48,19 +47,19 @@ public abstract class PlayerUtil {
         return Optional.of(profile);
     }
 
-    public static DimensionalPosition getPlayerDimensionalPosition(PlayerEntity player) {
-        Vector3d pos = player.position();
-        RegistryKey<World> dim = player.level.dimension();
+    public static DimensionalPosition getPlayerDimensionalPosition(Player player) {
+        Vec3 pos = player.position();
+        ResourceKey<Level> dim = player.level.dimension();
 
         return new DimensionalPosition(dim, pos);
     }
 
-    public static void teleportPlayerIntoMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos, EnumMachineSize size) {
-        ServerWorld serverWorld = serverPlayer.getLevel();
+    public static void teleportPlayerIntoMachine(ServerPlayer serverPlayer, BlockPos machinePos, EnumMachineSize size) {
+        ServerLevel serverWorld = serverPlayer.getLevel();
 
         MinecraftServer serv = serverWorld.getServer();
 
-        ServerWorld compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.warn("Compact dimension not found; player attempted to enter machine.");
             return;
@@ -82,7 +81,7 @@ public abstract class PlayerUtil {
             }
 
             int nextId = rooms.getNextId();
-            Vector3i location = MathUtil.getRegionPositionByIndex(nextId);
+            Vec3i location = MathUtil.getRegionPositionByIndex(nextId);
 
             int centerY = ServerConfig.MACHINE_FLOOR_Y.get() + (size.getInternalSize() / 2);
             BlockPos newCenter = MathUtil.getCenterWithY(location, centerY);
@@ -125,9 +124,9 @@ public abstract class PlayerUtil {
                 CompactMachines.LOGGER.error(ex);
             }
 
-            Vector3d sp = spawn.getPosition();
-            Vector3d sr = spawn.getRotation() != Vector3d.ZERO ?
-                    spawn.getRotation() : new Vector3d(serverPlayer.xRot, serverPlayer.yRot, 0);
+            Vec3 sp = spawn.getPosition();
+            Vec3 sr = spawn.getRotation() != Vec3.ZERO ?
+                    spawn.getRotation() : new Vec3(serverPlayer.xRotO, serverPlayer.yRotO, 0);
 
             serverPlayer.teleportTo(
                     compactWorld,
@@ -142,7 +141,7 @@ public abstract class PlayerUtil {
         });
     }
 
-    public static void teleportPlayerOutOfMachine(ServerWorld world, @Nonnull ServerPlayerEntity serverPlayer) {
+    public static void teleportPlayerOutOfMachine(ServerLevel world, @Nonnull ServerPlayer serverPlayer) {
 
         MinecraftServer serv = world.getServer();
 
@@ -161,8 +160,8 @@ public abstract class PlayerUtil {
 
                 DimensionalPosition spawnPoint = prevArea.getEntryLocation();
 
-                ServerWorld w = spawnPoint.getWorld(serv).orElse(serv.overworld());
-                Vector3d worldPos, entryRot;
+                ServerLevel w = spawnPoint.getWorld(serv).orElse(serv.overworld());
+                Vec3 worldPos, entryRot;
 
                 if (serv.getLevel(spawnPoint.getDimension()) != null) {
                     worldPos = spawnPoint.getPosition();
@@ -180,7 +179,7 @@ public abstract class PlayerUtil {
                 teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
             }
 
-            final Chunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
+            final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(currentRoomChunk.x, currentRoomChunk.z);
 
             MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
@@ -192,7 +191,7 @@ public abstract class PlayerUtil {
         });
     }
 
-    private static void howDidYouGetThere(@Nonnull ServerPlayerEntity serverPlayer) {
+    private static void howDidYouGetThere(@Nonnull ServerPlayer serverPlayer) {
         AdvancementTriggers.HOW_DID_YOU_GET_HERE.trigger(serverPlayer);
 
         serverPlayer.displayClientMessage(
@@ -201,9 +200,9 @@ public abstract class PlayerUtil {
         );
     }
 
-    public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @Nonnull ServerPlayerEntity player) {
-        ServerWorld level = Optional.ofNullable(serv.getLevel(player.getRespawnDimension())).orElse(serv.overworld());
-        Vector3d worldPos = LocationUtil.blockPosToVector(level.getSharedSpawnPos());
+    public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @Nonnull ServerPlayer player) {
+        ServerLevel level = Optional.ofNullable(serv.getLevel(player.getRespawnDimension())).orElse(serv.overworld());
+        Vec3 worldPos = LocationUtil.blockPosToVector(level.getSharedSpawnPos());
 
         if (player.getRespawnPosition() != null)
             worldPos = LocationUtil.blockPosToVector(player.getRespawnPosition());
@@ -211,7 +210,7 @@ public abstract class PlayerUtil {
         player.teleportTo(level, worldPos.x(), worldPos.y(), worldPos.z(), 0, player.getRespawnAngle());
     }
 
-    public static void addPlayerToMachine(ServerPlayerEntity serverPlayer, BlockPos machinePos) {
+    public static void addPlayerToMachine(ServerPlayer serverPlayer, BlockPos machinePos) {
         MinecraftServer serv = serverPlayer.getServer();
         if (serv == null)
             return;
@@ -221,7 +220,7 @@ public abstract class PlayerUtil {
             return;
 
         tile.getInternalChunkPos().ifPresent(mChunk -> {
-            final Chunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
+            final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(mChunk.x, mChunk.z);
 
             serverPlayer.getCapability(CapabilityRoomHistory.HISTORY_CAPABILITY)

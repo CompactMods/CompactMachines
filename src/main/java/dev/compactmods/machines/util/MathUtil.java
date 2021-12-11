@@ -1,8 +1,8 @@
 package dev.compactmods.machines.util;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.Vec3i;
 
 public class MathUtil {
     /**
@@ -10,7 +10,7 @@ public class MathUtil {
      * @param i
      * @return
      */
-    public static Vector3i getRegionPositionByIndex(int i) {
+    public static Vec3i getRegionPositionByIndex(int i) {
         // From SO, https://stackoverflow.com/a/41141648
         int index = i + 1;
         // wth
@@ -46,7 +46,7 @@ public class MathUtil {
         x -= s / 2;
         y -= s / 2;
 
-        return new Vector3i(x, 0, y);
+        return new Vec3i(x, 0, y);
     }
 
     public static BlockPos getCenterWithY(ChunkPos chunk, int y) {
@@ -54,7 +54,7 @@ public class MathUtil {
                 .offset(new BlockPos(8, y, 8));
     }
 
-    public static BlockPos getCenterWithY(Vector3i regionIndex, int y) {
+    public static BlockPos getCenterWithY(Vec3i regionIndex, int y) {
         ChunkPos chunk = new ChunkPos(
                 regionIndex.getX() * 64,
                 regionIndex.getZ() * 64);
@@ -63,7 +63,7 @@ public class MathUtil {
     }
 
     public static ChunkPos getChunkForRoomIndex(int roomIndex) {
-        Vector3i region = getRegionPositionByIndex(roomIndex);
+        Vec3i region = getRegionPositionByIndex(roomIndex);
         BlockPos roomCenter = getCenterWithY(region, 0);
         return new ChunkPos(roomCenter);
     }

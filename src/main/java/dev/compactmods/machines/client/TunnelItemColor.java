@@ -2,12 +2,12 @@ package dev.compactmods.machines.client;
 
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.item.TunnelItem;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public class TunnelItemColor implements IItemColor {
+public class TunnelItemColor implements ItemColor {
     @Override
     public int getColor(ItemStack stack, int tintIndex) {
         Optional<TunnelDefinition> definition = TunnelItem.getDefinition(stack);

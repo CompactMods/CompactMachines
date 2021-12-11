@@ -1,6 +1,6 @@
 package dev.compactmods.machines.data.graph;
 
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 
 import java.util.Objects;
 

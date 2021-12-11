@@ -1,17 +1,16 @@
 package dev.compactmods.machines.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.client.gui.guide.GuideSection;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
-
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.client.gui.guide.GuideSection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class PersonalShrinkingDeviceScreen extends Screen {
     private final ResourceLocation GUI = new ResourceLocation(CompactMachines.MOD_ID, "textures/gui/psd_screen.png");
@@ -25,7 +24,7 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     private final GuideSection currentSection;
 
     protected PersonalShrinkingDeviceScreen() {
-        super(new TranslationTextComponent(CompactMachines.MOD_ID + ".gui.psd.title"));
+        super(new TranslatableComponent(CompactMachines.MOD_ID + ".gui.psd.title"));
         this.sections = new HashMap<>();
 
         GuideSection root = new GuideSection();
@@ -68,10 +67,10 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
 
-        RenderSystem.color4f(1, 1, 1, 1);
+        RenderSystem.clearColor(1, 1, 1, 1);
         int relX = (this.width - WIDTH) / 2;
 
         // relY = relative position, places screen against bottom edge of screen
@@ -80,7 +79,7 @@ public class PersonalShrinkingDeviceScreen extends Screen {
         matrixStack.pushPose();
         matrixStack.translate(relX, relY, 0);
 
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem.setShaderTexture(0, GUI);
         this.blit(matrixStack, 0, 0, 0, 0, WIDTH, HEIGHT);
         matrixStack.popPose();
 

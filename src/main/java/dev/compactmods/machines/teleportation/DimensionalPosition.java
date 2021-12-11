@@ -7,27 +7,27 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.NBTDynamicOps;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDimensionalPosition {
+public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDimensionalPosition {
 
-    private RegistryKey<World> dimension;
-    private Vector3d position;
-    private Vector3d rotation;
+    private ResourceKey<Level> dimension;
+    private Vec3 position;
+    private Vec3 rotation;
 
     /*
      Note: We'd use the actual world registry key here, but it static loads the world and does a bunch
@@ -36,25 +36,25 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDime
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
-            CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vector3d.ZERO).forGetter(DimensionalPosition::getRotation)
+            CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
 
     private DimensionalPosition() {
     }
 
-    public DimensionalPosition(RegistryKey<World> world, BlockPos positionBlock) {
-        this(world, Vector3d.ZERO, Vector3d.ZERO);
-        this.position = new Vector3d(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
+    public DimensionalPosition(ResourceKey<Level> world, BlockPos positionBlock) {
+        this(world, Vec3.ZERO, Vec3.ZERO);
+        this.position = new Vec3(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
     }
 
-    public DimensionalPosition(RegistryKey<World> world, Vector3d positionBlock) {
-        this(world, positionBlock, Vector3d.ZERO);
+    public DimensionalPosition(ResourceKey<Level> world, Vec3 positionBlock) {
+        this(world, positionBlock, Vec3.ZERO);
         this.dimension = world;
 
-        this.rotation = Vector3d.ZERO;
+        this.rotation = Vec3.ZERO;
     }
 
-    public DimensionalPosition(RegistryKey<World> dim, Vector3d pos, Vector3d rotation) {
+    public DimensionalPosition(ResourceKey<Level> dim, Vec3 pos, Vec3 rotation) {
         this.dimension = dim;
         this.position = pos;
         this.rotation = rotation;
@@ -64,7 +64,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDime
         return new DimensionalPosition(entity.level.dimension(), entity.position());
     }
 
-    public Optional<ServerWorld> getWorld(@Nonnull MinecraftServer server) {
+    public Optional<ServerLevel> getWorld(@Nonnull MinecraftServer server) {
         return Optional.ofNullable(server.getLevel(this.dimension));
     }
 
@@ -74,7 +74,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDime
                 .orElse(false);
     }
 
-    public static DimensionalPosition fromNBT(CompoundNBT nbt) {
+    public static DimensionalPosition fromNBT(CompoundTag nbt) {
         DimensionalPosition dp = new DimensionalPosition();
         dp.deserializeNBT(nbt);
 
@@ -82,15 +82,15 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDime
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        DataResult<INBT> nbt = CODEC.encodeStart(NBTDynamicOps.INSTANCE, this);
-        return (CompoundNBT) nbt.result().orElse(null);
+    public CompoundTag serializeNBT() {
+        DataResult<Tag> nbt = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        return (CompoundTag) nbt.result().orElse(null);
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         Optional<DimensionalPosition> dimensionalPosition = CODEC
-                .parse(NBTDynamicOps.INSTANCE, nbt)
+                .parse(NbtOps.INSTANCE, nbt)
                 .resultOrPartial(CompactMachines.LOGGER::error);
 
         dimensionalPosition.ifPresent(dp -> {
@@ -100,15 +100,15 @@ public class DimensionalPosition implements INBTSerializable<CompoundNBT>, IDime
         });
     }
 
-    public RegistryKey<World> getDimension() {
+    public ResourceKey<Level> getDimension() {
         return this.dimension;
     }
 
-    public Vector3d getPosition() {
+    public Vec3 getPosition() {
         return this.position;
     }
 
-    public Vector3d getRotation() {
+    public Vec3 getRotation() {
         return this.rotation;
     }
 

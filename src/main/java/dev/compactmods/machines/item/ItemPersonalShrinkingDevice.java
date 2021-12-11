@@ -7,23 +7,25 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemPersonalShrinkingDevice extends Item {
 
@@ -32,39 +34,39 @@ public class ItemPersonalShrinkingDevice extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         if (Screen.hasShiftDown()) {
             tooltip.add(TranslationUtil.tooltip(Tooltips.Details.PERSONAL_SHRINKING_DEVICE)
-                    .withStyle(TextFormatting.YELLOW));
+                    .withStyle(ChatFormatting.YELLOW));
         } else {
             tooltip.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
-                    .withStyle(TextFormatting.DARK_GRAY)
-                    .withStyle(TextFormatting.ITALIC));
+                    .withStyle(ChatFormatting.DARK_GRAY)
+                    .withStyle(ChatFormatting.ITALIC));
         }
 
     }
 
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (hand == Hand.OFF_HAND) {
-            return ActionResult.fail(stack);
+        if (hand == InteractionHand.OFF_HAND) {
+            return InteractionResultHolder.fail(stack);
         }
 
         // If we aren't in the compact dimension, allow PSD guide usage
         // Prevents misfiring if a player is trying to leave a machine or set their spawn
         if (world.isClientSide && world.dimension() != Registration.COMPACT_DIMENSION) {
             PersonalShrinkingDeviceScreen.show();
-            return ActionResult.success(stack);
+            return InteractionResultHolder.success(stack);
         }
 
-        if (world instanceof ServerWorld && player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        if (world instanceof ServerLevel && player instanceof ServerPlayer) {
+            ServerPlayer serverPlayer = (ServerPlayer) player;
 
             if (serverPlayer.level.dimension() == Registration.COMPACT_DIMENSION) {
-                ServerWorld serverWorld = serverPlayer.getLevel();
+                ServerLevel serverWorld = serverPlayer.getLevel();
                 if (player.isShiftKeyDown()) {
                     ChunkPos machineChunk = new ChunkPos(player.blockPosition());
 
@@ -73,8 +75,8 @@ public class ItemPersonalShrinkingDevice extends Item {
                         // Use internal data to set new spawn point
                         intern.setSpawn(machineChunk, player.position());
 
-                        IFormattableTextComponent tc = TranslationUtil.message(Messages.MACHINE_SPAWNPOINT_SET)
-                                .withStyle(TextFormatting.GREEN);
+                        MutableComponent tc = TranslationUtil.message(Messages.MACHINE_SPAWNPOINT_SET)
+                                .withStyle(ChatFormatting.GREEN);
 
                         player.displayClientMessage(tc, true);
                     }
@@ -84,6 +86,6 @@ public class ItemPersonalShrinkingDevice extends Item {
             }
         }
 
-        return ActionResult.success(stack);
+        return InteractionResultHolder.success(stack);
     }
 }

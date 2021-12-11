@@ -1,11 +1,11 @@
 package dev.compactmods.machines.reference;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 
-public enum EnumMachineSize implements IStringSerializable {
+public enum EnumMachineSize implements StringRepresentable {
     TINY    ("tiny", 3),
     SMALL   ("small", 5),
     NORMAL  ("normal", 7),
@@ -16,7 +16,7 @@ public enum EnumMachineSize implements IStringSerializable {
     private final String name;
     private final int internalSize;
 
-    public static final Codec<EnumMachineSize> CODEC = IStringSerializable.fromEnum(
+    public static final Codec<EnumMachineSize> CODEC = StringRepresentable.fromEnum(
             EnumMachineSize::values, EnumMachineSize::getFromSize);
 
     EnumMachineSize(String name, int internalSize) {
@@ -32,8 +32,8 @@ public enum EnumMachineSize implements IStringSerializable {
         return this.name;
     }
 
-    public AxisAlignedBB getBounds(BlockPos center) {
-        AxisAlignedBB bounds = new AxisAlignedBB(center);
+    public AABB getBounds(BlockPos center) {
+        AABB bounds = new AABB(center);
         return bounds.inflate(Math.floorDiv(internalSize, 2));
     }
 

@@ -1,19 +1,19 @@
 package dev.compactmods.machines.util;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 public class LocationUtil {
 
-    public static Vector3d blockPosToVector(BlockPos pos) {
-        return new Vector3d(
+    public static Vec3 blockPosToVector(BlockPos pos) {
+        return new Vec3(
                 pos.getX() + 0.5f,
                 pos.getY(),
                 pos.getZ() + 0.5f
         );
     }
 
-    public static BlockPos vectorToBlockPos(Vector3d position) {
+    public static BlockPos vectorToBlockPos(Vec3 position) {
         return new BlockPos(position.x, position.y, position.z);
     }
 }

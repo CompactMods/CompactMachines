@@ -1,14 +1,10 @@
 package dev.compactmods.machines.network;
 
-import dev.compactmods.machines.client.ClientTunnelHandler;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent;
-
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkEvent;
 
 public class TunnelAddedPacket {
 
@@ -20,7 +16,7 @@ public class TunnelAddedPacket {
         this.type = tunnelType;
     }
 
-    public TunnelAddedPacket(PacketBuffer buf) {
+    public TunnelAddedPacket(FriendlyByteBuf buf) {
         position = buf.readBlockPos();
         type = buf.readResourceLocation();
     }
@@ -28,17 +24,17 @@ public class TunnelAddedPacket {
     public static void handle(TunnelAddedPacket message, Supplier<NetworkEvent.Context> context) {
         NetworkEvent.Context ctx = context.get();
 
-        ctx.enqueueWork(() -> {
-            DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> {
-                ClientTunnelHandler.updateTunnelData(message.position, message.type);
-                return null;
-            });
-        });
+//        ctx.enqueueWork(() -> {
+//            DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> {
+//                ClientTunnelHandler.updateTunnelData(message.position, message.type);
+//                return null;
+//            });
+//        });
 
         ctx.setPacketHandled(true);
     }
 
-    public static void encode(TunnelAddedPacket pkt, PacketBuffer buf) {
+    public static void encode(TunnelAddedPacket pkt, FriendlyByteBuf buf) {
         buf.writeBlockPos(pkt.position);
         buf.writeResourceLocation(pkt.type);
     }

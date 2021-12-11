@@ -3,21 +3,21 @@ package dev.compactmods.machines.advancement;
 import javax.annotation.Nullable;
 import java.util.Map;
 import com.google.common.collect.Maps;
-import net.minecraft.advancements.ICriterionInstance;
-import net.minecraft.advancements.ICriterionTrigger;
-import net.minecraft.advancements.PlayerAdvancements;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ServerPlayer;
 
-public class GenericAdvancementTriggerListenerList<T extends ICriterionInstance> {
+public class GenericAdvancementTriggerListenerList<T extends CriterionTriggerInstance> {
     private final Map<PlayerAdvancements, GenericAdvancementTriggerListener<T>> listeners = Maps.newHashMap();
 
 
-    public void addPlayerListener(PlayerAdvancements advancements, ICriterionTrigger.Listener<T> listener) {
+    public void addPlayerListener(PlayerAdvancements advancements, CriterionTrigger.Listener<T> listener) {
         GenericAdvancementTriggerListener<T> listeners = this.listeners.computeIfAbsent(advancements, GenericAdvancementTriggerListener::new);
         listeners.add(listener);
     }
 
-    public void removePlayerListener(PlayerAdvancements advancements, ICriterionTrigger.Listener<T> listener) {
+    public void removePlayerListener(PlayerAdvancements advancements, CriterionTrigger.Listener<T> listener) {
         GenericAdvancementTriggerListener<T> listeners = this.listeners.get(advancements);
         if (listeners != null) {
             listeners.remove(listener);
@@ -32,7 +32,7 @@ public class GenericAdvancementTriggerListenerList<T extends ICriterionInstance>
     }
 
     @Nullable
-    public GenericAdvancementTriggerListener<T> getListeners(ServerPlayerEntity player) {
+    public GenericAdvancementTriggerListener<T> getListeners(ServerPlayer player) {
         return listeners.get(player.getAdvancements());
     }
 }

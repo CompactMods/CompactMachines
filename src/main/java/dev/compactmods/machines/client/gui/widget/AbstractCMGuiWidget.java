@@ -1,10 +1,10 @@
 package dev.compactmods.machines.client.gui.widget;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.Widget;
 
-public class AbstractCMGuiWidget implements IRenderable, IGuiEventListener {
+public class AbstractCMGuiWidget implements Widget, GuiEventListener {
 
     protected final int x, y, width, height;
 
@@ -16,7 +16,7 @@ public class AbstractCMGuiWidget implements IRenderable, IGuiEventListener {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 
     }
 

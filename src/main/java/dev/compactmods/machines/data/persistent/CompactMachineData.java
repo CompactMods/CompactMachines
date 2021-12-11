@@ -1,5 +1,10 @@
 package dev.compactmods.machines.data.persistent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,24 +12,19 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.codec.NbtListCollector;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTDynamicOps;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.DimensionSavedDataManager;
-import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.common.util.Constants;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
 /**
  * Holds information on the external points of a machine, ie the actual machine blocks.
  */
-public class CompactMachineData extends WorldSavedData {
+public class CompactMachineData extends SavedData {
 
     /**
      * File storage name.
@@ -38,45 +38,47 @@ public class CompactMachineData extends WorldSavedData {
     public Map<Integer, MachineData> data;
 
     public CompactMachineData() {
-        super(DATA_NAME);
         data = new HashMap<>();
     }
 
     @Nullable
     public static CompactMachineData get(MinecraftServer server) {
-        ServerWorld compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
             return null;
         }
 
-        DimensionSavedDataManager sd = compactWorld.getDataStorage();
-        return sd.computeIfAbsent(CompactMachineData::new, DATA_NAME);
+        DimensionDataStorage sd = compactWorld.getDataStorage();
+        return sd.computeIfAbsent(CompactMachineData::fromNbt, CompactMachineData::new, DATA_NAME);
     }
 
-    @Override
-    public void load(CompoundNBT nbt) {
+    public static CompactMachineData fromNbt(CompoundTag nbt) {
+        CompactMachineData machines = new CompactMachineData();
         if(nbt.contains("locations")) {
-            ListNBT nbtLocations = nbt.getList("locations", Constants.NBT.TAG_COMPOUND);
+            ListTag nbtLocations = nbt.getList("locations", Tag.TAG_COMPOUND);
             nbtLocations.forEach(nbtLoc -> {
-                DataResult<MachineData> res = MachineData.CODEC.parse(NBTDynamicOps.INSTANCE, nbtLoc);
+                DataResult<MachineData> res = MachineData.CODEC.parse(NbtOps.INSTANCE, nbtLoc);
                 res.resultOrPartial(err -> {
                     CompactMachines.LOGGER.error("Error while processing machine data: " + err);
-                }).ifPresent(machineInfo -> this.data.put(machineInfo.machineId, machineInfo));
+                }).ifPresent(machineInfo -> machines.data.put(machineInfo.machineId, machineInfo));
             });
         }
+
+        return machines;
     }
 
     @Override
     @Nonnull
-    public CompoundNBT save(@Nonnull CompoundNBT nbt) {
+    public CompoundTag save(@Nonnull CompoundTag nbt) {
         if(!data.isEmpty()) {
-            ListNBT nbtLocations = data.values()
+            ListTag nbtLocations = data.values()
                     .stream()
                     .map(entry -> {
-                        DataResult<INBT> nbtRes = MachineData.CODEC.encodeStart(NBTDynamicOps.INSTANCE, entry);
-                        return nbtRes
-                                .resultOrPartial(err -> CompactMachines.LOGGER.error("Error serializing machine data: " + err));
+                        DataResult<Tag> nbtRes = MachineData.CODEC.encodeStart(NbtOps.INSTANCE, entry);
+                        return nbtRes.resultOrPartial(err -> {
+                            CompactMachines.LOGGER.error("Error serializing machine data: " + err);
+                        });
 
                     })
                     .filter(Optional::isPresent)

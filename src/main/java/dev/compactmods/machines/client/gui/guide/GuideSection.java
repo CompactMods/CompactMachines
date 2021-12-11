@@ -1,13 +1,13 @@
 package dev.compactmods.machines.client.gui.guide;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.Widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuideSection implements IRenderable, IGuiEventListener {
+public class GuideSection implements Widget, GuiEventListener {
     private final List<GuidePage> pages;
     private final int currentPageIndex = 0;
     private final GuidePage currentPage;
@@ -19,7 +19,7 @@ public class GuideSection implements IRenderable, IGuiEventListener {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if(this.currentPage != null)
             currentPage.render(matrixStack, mouseX, mouseY, partialTicks);
     }

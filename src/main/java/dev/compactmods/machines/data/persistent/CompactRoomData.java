@@ -1,5 +1,12 @@
 package dev.compactmods.machines.data.persistent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.naming.OperationNotSupportedException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,76 +18,68 @@ import dev.compactmods.machines.data.codec.NbtListCollector;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import dev.compactmods.machines.util.MathUtil;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTDynamicOps;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.DimensionSavedDataManager;
-import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.naming.OperationNotSupportedException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-public class CompactRoomData extends WorldSavedData {
+public class CompactRoomData extends SavedData {
     public static final String DATA_NAME = CompactMachines.MOD_ID + "_rooms";
 
     private final Map<ChunkPos, RoomData> machineData;
 
     public CompactRoomData() {
-        super(DATA_NAME);
         machineData = new HashMap<>();
     }
 
     @Nullable
     public static CompactRoomData get(MinecraftServer server) {
-        ServerWorld compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
             return null;
         }
 
-        DimensionSavedDataManager sd = compactWorld.getDataStorage();
-        return sd.computeIfAbsent(CompactRoomData::new, DATA_NAME);
+        DimensionDataStorage sd = compactWorld.getDataStorage();
+        return sd.computeIfAbsent(CompactRoomData::fromNbt, CompactRoomData::new, DATA_NAME);
     }
 
-    @Override
-    public void load(CompoundNBT nbt) {
+    public static CompactRoomData fromNbt(CompoundTag nbt) {
+        CompactRoomData data = new CompactRoomData();
         if (nbt.contains("machines")) {
-            ListNBT machines = nbt.getList("machines", Constants.NBT.TAG_COMPOUND);
+            ListTag machines = nbt.getList("machines", Tag.TAG_COMPOUND);
             machines.forEach(machNbt -> {
                 DataResult<RoomData> result =
-                        RoomData.CODEC.parse(NBTDynamicOps.INSTANCE, machNbt);
+                        RoomData.CODEC.parse(NbtOps.INSTANCE, machNbt);
 
                 result
                         .resultOrPartial((err) -> CompactMachines.LOGGER.error("Error loading machine data from file: {}", err))
                         .ifPresent(imd -> {
                             ChunkPos chunk = new ChunkPos(imd.getCenter());
-                            this.machineData.put(chunk, imd);
+                            data.machineData.put(chunk, imd);
                         });
             });
         }
+
+        return data;
     }
 
     @Override
     @Nonnull
-    public CompoundNBT save(@Nonnull CompoundNBT nbt) {
+    public CompoundTag save(@Nonnull CompoundTag nbt) {
         if (!machineData.isEmpty()) {
-            ListNBT collect = machineData.values()
+            ListTag collect = machineData.values()
                     .stream()
                     .map(data -> {
-                        DataResult<INBT> n = RoomData.CODEC.encodeStart(NBTDynamicOps.INSTANCE, data);
+                        DataResult<Tag> n = RoomData.CODEC.encodeStart(NbtOps.INSTANCE, data);
                         return n.result();
                     })
                     .filter(Optional::isPresent)
@@ -121,7 +120,7 @@ public class CompactRoomData extends WorldSavedData {
         return this.machineData.size() + 1;
     }
 
-    public void setSpawn(ChunkPos roomChunk, Vector3d position) {
+    public void setSpawn(ChunkPos roomChunk, Vec3 position) {
         if (!machineData.containsKey(roomChunk))
             return;
 
@@ -131,11 +130,11 @@ public class CompactRoomData extends WorldSavedData {
         setDirty();
     }
 
-    public Optional<AxisAlignedBB> getInnerBounds(ChunkPos roomChunk) {
+    public Optional<AABB> getInnerBounds(ChunkPos roomChunk) {
         if (!machineData.containsKey(roomChunk))
             return Optional.empty();
 
-        AxisAlignedBB bounds = machineData.get(roomChunk).getMachineBounds();
+        AABB bounds = machineData.get(roomChunk).getMachineBounds();
         return Optional.of(bounds);
     }
 
@@ -146,7 +145,7 @@ public class CompactRoomData extends WorldSavedData {
     public static class NewRoomRegistration {
 
         private final CompactRoomData storage;
-        private Vector3d spawn;
+        private Vec3 spawn;
         private ChunkPos chunk = new ChunkPos(0, 0);
         private EnumMachineSize size = EnumMachineSize.TINY;
         private BlockPos center = BlockPos.ZERO;
@@ -160,7 +159,7 @@ public class CompactRoomData extends WorldSavedData {
             BlockPos centerAtFloor = MathUtil.getCenterWithY(chunk, ServerConfig.MACHINE_FLOOR_Y.get());
             BlockPos centerSized = centerAtFloor.above(size.getInternalSize() / 2);
 
-            this.spawn = new Vector3d(centerAtFloor.getX(), centerAtFloor.getY(), centerAtFloor.getZ());
+            this.spawn = new Vec3(centerAtFloor.getX(), centerAtFloor.getY(), centerAtFloor.getZ());
             this.center = centerSized;
         }
 
@@ -176,7 +175,7 @@ public class CompactRoomData extends WorldSavedData {
         }
 
         public NewRoomRegistration spawn(BlockPos spawn) {
-            Vector3d spawnTest = new Vector3d(spawn.getX(), spawn.getY(), spawn.getZ());
+            Vec3 spawnTest = new Vec3(spawn.getX(), spawn.getY(), spawn.getZ());
 
             // Make sure the spawn is inside the new room bounds
             if(size.getBounds(this.center).contains(spawnTest))
@@ -208,10 +207,10 @@ public class CompactRoomData extends WorldSavedData {
 
         private final UUID owner;
         private final BlockPos center;
-        private Vector3d spawn;
+        private Vec3 spawn;
         private final EnumMachineSize size;
 
-        public RoomData(UUID owner, BlockPos center, Vector3d spawn, EnumMachineSize size) {
+        public RoomData(UUID owner, BlockPos center, Vec3 spawn, EnumMachineSize size) {
             this.owner = owner;
             this.center = center;
             this.spawn = spawn;
@@ -226,11 +225,11 @@ public class CompactRoomData extends WorldSavedData {
             return this.owner;
         }
 
-        public Vector3d getSpawn() {
+        public Vec3 getSpawn() {
             if (this.spawn != null)
                 return this.spawn;
 
-            Vector3d newSpawn = new Vector3d(
+            Vec3 newSpawn = new Vec3(
                     center.getX(),
                     center.getY(),
                     center.getZ()
@@ -246,11 +245,11 @@ public class CompactRoomData extends WorldSavedData {
             return this.center;
         }
 
-        public void setSpawn(Vector3d newSpawn) {
+        public void setSpawn(Vec3 newSpawn) {
             this.spawn = newSpawn;
         }
 
-        public AxisAlignedBB getMachineBounds() {
+        public AABB getMachineBounds() {
             return size.getBounds(this.center);
         }
     }

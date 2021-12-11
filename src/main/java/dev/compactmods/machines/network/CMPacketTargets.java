@@ -1,35 +1,37 @@
 package dev.compactmods.machines.network;
 
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.play.ServerPlayNetHandler;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.PacketDistributor;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import dev.compactmods.machines.data.persistent.CompactMachineData;
+import dev.compactmods.machines.data.persistent.MachineConnections;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.PacketDistributor;
 
 public class CMPacketTargets {
 
-    public static final PacketDistributor<Chunk> TRACKING_ROOM = new PacketDistributor<>(
+    public static final PacketDistributor<LevelChunk> TRACKING_ROOM = new PacketDistributor<>(
             CMPacketTargets::trackingRoom, NetworkDirection.PLAY_TO_CLIENT);
 
-    private static Consumer<IPacket<?>> trackingRoom(PacketDistributor<Chunk> dist, Supplier<Chunk> supplier) {
-        Chunk roomChunk = supplier.get();
-        World level = roomChunk.getLevel();
+    private static Consumer<Packet<?>> trackingRoom(PacketDistributor<LevelChunk> dist, Supplier<LevelChunk> supplier) {
+        LevelChunk roomChunk = supplier.get();
+        Level level = roomChunk.getLevel();
 
-        HashMap<UUID, ServerPlayNetHandler> trackingPlayersGlobal = new HashMap<>();
+        HashMap<UUID, ServerGamePacketListenerImpl> trackingPlayersGlobal = new HashMap<>();
 
-        if (level instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) level;
+        if (level instanceof ServerLevel) {
+            ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer server = serverWorld.getServer();
 
             MachineConnections connections = MachineConnections.get(server);
@@ -39,7 +41,7 @@ public class CMPacketTargets {
 
             for (int machine : linked) {
                 machines.getMachineLocation(machine).ifPresent(loc -> {
-                    Optional<ServerWorld> machineWorld = loc.getWorld(server);
+                    Optional<ServerLevel> machineWorld = loc.getWorld(server);
                     BlockPos machineWorldLocation = loc.getBlockPosition();
                     ChunkPos machineWorldChunk = new ChunkPos(machineWorldLocation);
 
