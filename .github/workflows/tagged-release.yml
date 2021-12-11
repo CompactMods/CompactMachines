@@ -110,10 +110,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          java-version: "8.0.282"
+          distribution: 'temurin'
+          java-version: "17"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -189,7 +190,7 @@ jobs:
           file_path: ${{ steps.filename.outputs.fullpath }}
           changelog: ${{ steps.changelog.outputs.changelog }}
           changelog_type: markdown
-          game_versions: java:Java 8,Forge
+          game_versions: java:Java 17,Forge
           release_type: ${{ needs.vars.outputs.release_type }}
 
   publishMaven:
@@ -200,10 +201,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          java-version: "8.0.282"
+          distribution: 'temurin'
+          java-version: "17"
 
       - name: Build JAR with Gradle
         run: ./gradlew build --max-workers 1

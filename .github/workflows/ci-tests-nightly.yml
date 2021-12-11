@@ -1,6 +1,14 @@
 name: Gradle Tests and Nightly (CI)
 
-on: push
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - v*
+    paths-ignore:
+      - 'README.md'
+      - LICENSE
 
 jobs:
   vars:
@@ -35,10 +43,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 8
-        uses: actions/setup-java@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          java-version: "8.0.282"
+          distribution: 'temurin'
+          java-version: "17"
 
       - name: Cache Gradle packages
         uses: actions/cache@v2
@@ -66,10 +75,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 8
-        uses: actions/setup-java@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          java-version: "8.0.282"
+          distribution: 'temurin'
+          java-version: "17"
 
       - name: Cache Gradle packages
         uses: actions/cache@v2
