@@ -34,19 +34,23 @@ sourceSets {
         java {
             srcDir "src/api/java"
         }
+
+        resources.srcDirs = []
         compileClasspath += configurations.getByName("minecraft")
     }
 
     main {
         java {
-            srcDir "src/api/java"
             srcDir "src/main/java"
         }
 
         resources {
             srcDir "src/main/resources"
-            srcDir 'src/generated/resources'
+            srcDir "src/generated/resources"
         }
+
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
     }
 }
 
@@ -77,6 +81,7 @@ minecraft {
             mods {
                 compactmachines {
                     source sourceSets.main
+                    source sourceSets.api
                 }
             }
         }
@@ -96,6 +101,7 @@ minecraft {
             mods {
                 compactmachines {
                     source sourceSets.main
+                    source sourceSets.api
                 }
             }
         }
@@ -120,53 +126,14 @@ minecraft {
             mods {
                 compactmachines {
                     source sourceSets.main
+                    source sourceSets.api
                 }
             }
         }
     }
 }
 
-def getModVersion(filename) {
-    // println(filename);
-    def pattern = /^(?<modid>[^-]+)(?:-(?<mcversion>[0-9.]+))?(?:-(?<modver>[0-9.\-]+))\.jar$/;
-
-    def matcher = filename =~ pattern
-
-    def found = matcher.find()
-
-    if (found) {
-        def mod = matcher.group("modid");
-
-        // Extract MC version or default
-        def mcVersion = matcher.group("mcversion");
-
-        // Extract mod version
-        def version = matcher.group("modver");
-
-        // println("> mod: ${mod}; mc: ${mcVersion}; version: ${version}");
-
-        if (mcVersion == null)
-            return "${mod}:${mod}:${version}";
-        else
-            return "${mod}:${mod}-${mcVersion}:${version}";
-
-    } else {
-        println("> not a mod filename")
-        return filename;
-    }
-}
-
-def dev_mods_dir = "mods"
-
-task("dev") {
-    println(sourceSets.main.output.classesDirs[0]);
-}
 repositories {
-    // Built mods
-    flatDir {
-        dirs dev_mods_dir
-    }
-
     maven {
         url "https://www.cursemaven.com"
         content {
@@ -187,18 +154,11 @@ repositories {
     }
 }
 
-def dev_mods = fileTree(dev_mods_dir).filter { it -> it.isFile() }.files.name.collect({ getModVersion(it) })
-
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-
-    // Deobfuscate each dev mod for runtime
-    dev_mods.each { implementation(fg.deobf(it)) }
-
 
     // JEI
     compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
@@ -218,13 +178,17 @@ dependencies {
 //    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3206395"))
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
+processResources {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
 jar {
-    from sourceSets.api.output
     from sourceSets.main.output
+    from sourceSets.api.output
     destinationDirectory = file("$rootDir/build-out")
 
     finalizedBy('reobfJar')
+
     manifest {
         attributes([
                 "Specification-Title"     : "compactmachines",
@@ -243,14 +207,6 @@ task apiJar(type: Jar) {
     // Sources included because of MinecraftForge/ForgeGradle#369
     archiveClassifier = 'api'
     destinationDirectory = file("$rootDir/build-out")
-}
-
-processApiResources {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
 artifacts {

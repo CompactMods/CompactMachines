@@ -21,7 +21,9 @@
       "conditions": {
         "items": [
           {
-            "item": "compactmachines:personal_shrinking_device"
+            "items": [
+              "compactmachines:personal_shrinking_device"
+            ]
           }
         ]
       }
