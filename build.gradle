@@ -245,6 +245,10 @@ task apiJar(type: Jar) {
     destinationDirectory = file("$rootDir/build-out")
 }
 
+processApiResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
+
 processResources {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
