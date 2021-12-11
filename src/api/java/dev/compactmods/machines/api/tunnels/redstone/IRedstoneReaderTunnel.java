@@ -1,6 +1,6 @@
 package dev.compactmods.machines.api.tunnels.redstone;
 
-import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
+import dev.compactmods.machines.api.tunnels.ITunnelConnection;
 
 /**
  * A redstone reader reads a redstone value from outside the machine (from a given side).
@@ -13,7 +13,7 @@ public interface IRedstoneReaderTunnel extends IRedstoneTunnel {
      * @param connectionInfo
      * @return
      */
-    default int getPowerLevel(ITunnelConnectionInfo connectionInfo) {
+    default int getPowerLevel(ITunnelConnection connectionInfo) {
         return 0;
     }
 
@@ -25,9 +25,9 @@ public interface IRedstoneReaderTunnel extends IRedstoneTunnel {
      * @param connectionInfo Connection information for the tunnel instance.
      * @return
      */
-    default boolean canConnectRedstone(ITunnelConnectionInfo connectionInfo) {
+    default boolean canConnectRedstone(ITunnelConnection connectionInfo) {
         return true;
     }
 
-    default void onPowerChanged(ITunnelConnectionInfo connectionInfo, int latestPower) {}
+    default void onPowerChanged(ITunnelConnection connectionInfo, int latestPower) {}
 }

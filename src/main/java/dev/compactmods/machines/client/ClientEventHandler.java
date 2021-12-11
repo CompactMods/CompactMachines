@@ -1,7 +1,7 @@
 package dev.compactmods.machines.client;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -14,7 +14,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onItemColors(final ColorHandlerEvent.Item colors) {
-        colors.getItemColors().register(new TunnelItemColor(), Registration.ITEM_TUNNEL.get());
+        colors.getItemColors().register(new TunnelItemColor(), Tunnels.ITEM_TUNNEL.get());
     }
 
     @SubscribeEvent

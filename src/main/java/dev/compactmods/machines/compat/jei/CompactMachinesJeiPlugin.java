@@ -3,9 +3,9 @@ package dev.compactmods.machines.compat.jei;
 import java.util.Arrays;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.JeiInfo;
-import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.block.BlockCompactMachine;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.util.TranslationUtil;
 import mezz.jei.api.IModPlugin;
@@ -14,8 +14,8 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 @JeiPlugin
 public class CompactMachinesJeiPlugin implements IModPlugin {
@@ -42,7 +42,7 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.useNbtForSubtypes(Registration.ITEM_TUNNEL.get());
+        registration.useNbtForSubtypes(Tunnels.ITEM_TUNNEL.get());
     }
 
     @Override

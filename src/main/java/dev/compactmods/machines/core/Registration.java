@@ -3,7 +3,6 @@ package dev.compactmods.machines.core;
 import java.util.function.Supplier;
 import dev.compactmods.machines.CompactMachines;
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.block.BlockCompactMachine;
 import dev.compactmods.machines.block.tiles.CompactMachineTile;
 import dev.compactmods.machines.block.walls.BreakableWallBlock;
@@ -11,7 +10,6 @@ import dev.compactmods.machines.block.walls.SolidWallBlock;
 import dev.compactmods.machines.item.ItemBlockMachine;
 import dev.compactmods.machines.item.ItemBlockWall;
 import dev.compactmods.machines.item.ItemPersonalShrinkingDevice;
-import dev.compactmods.machines.item.TunnelItem;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -24,12 +22,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.*;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public class Registration {
@@ -37,28 +34,20 @@ public class Registration {
     //   REGISTRIES
     // ================================================================================================================
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
 
-    public static IForgeRegistry<TunnelDefinition> TUNNEL_DEF_REGISTRY;
-    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
 
-    static {
-        TUNNEL_DEFINITIONS.makeRegistry("tunnel_types",
-                () -> new RegistryBuilder<TunnelDefinition>()
-                        .setType(TunnelDefinition.class)
-                        .tagFolder("tunnel_types"));
-    }
 
     // ================================================================================================================
     //   PROPERTIES
     // ================================================================================================================
-    private static final BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
+    static final BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
             .of(Material.METAL)
             .strength(8.0F, 20.0F)
             .requiresCorrectToolForDrops();
 
-    private static final Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
+    static final Supplier<Item.Properties> BASIC_ITEM_PROPS = () -> new Item.Properties()
             .tab(CompactMachines.COMPACT_MACHINES_ITEMS);
 
     // ================================================================================================================
@@ -142,26 +131,6 @@ public class Registration {
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
 
     // ================================================================================================================
-    //   TUNNELS
-    // ================================================================================================================
-
-    public static final RegistryObject<Item> ITEM_TUNNEL = ITEMS.register("tunnel", () ->
-            new TunnelItem(BASIC_ITEM_PROPS.get()));
-
-//    public static final RegistryObject<BlockEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = BLOCK_ENTITIES.register("tunnel_wall", () ->
-//            BlockEntityType.Builder.of(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
-//                    .build(null));
-
-    // ================================================================================================================
-    //   TUNNEL TYPE DEFINITIONS
-    // ================================================================================================================
-//    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = TUNNEL_DEFINITIONS.register("item", ItemTunnelDefinition::new);
-//
-//    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
-
-    // public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
-
-    // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
     public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("compactmachines:compact_world"));
@@ -169,18 +138,11 @@ public class Registration {
     // ================================================================================================================
     //   INITIALIZATION
     // ================================================================================================================
-    public static void init() {
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-        BLOCKS.register(eventBus);
-        ITEMS.register(eventBus);
-        BLOCK_ENTITIES.register(eventBus);
-
-        TUNNEL_DEFINITIONS.register(eventBus);
+    public static void init(IEventBus bus) {
+        BLOCKS.register(bus);
+        ITEMS.register(bus);
+        BLOCK_ENTITIES.register(bus);
     }
 
-    @SubscribeEvent
-    public void onTunnelDefs(RegistryEvent.Register<TunnelDefinition> reg) {
-        Registration.TUNNEL_DEF_REGISTRY = reg.getRegistry();
-    }
+
 }
