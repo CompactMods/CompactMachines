@@ -1,4 +1,4 @@
-package dev.compactmods.machines.api.teleportation;
+package dev.compactmods.machines.api.location;
 
 import java.util.Optional;
 import net.minecraft.server.MinecraftServer;

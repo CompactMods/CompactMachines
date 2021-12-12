@@ -1,4 +1,4 @@
-package dev.compactmods.machines.capability;
+package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;

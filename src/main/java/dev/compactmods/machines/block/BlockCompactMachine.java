@@ -81,11 +81,11 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     @Override
     public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
 //        TODO Redstone out tunnels
-//        if(!(blockAccess.getTileEntity(pos) instanceof TileEntityMachine)) {
+//        if(!(blockAccess.getTileEntity(position) instanceof TileEntityMachine)) {
 //            return 0;
 //        }
 //
-//        TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(pos);
+//        TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(position);
 //        if(machine.isInsideItself()) {
 //            return 0;
 //        }

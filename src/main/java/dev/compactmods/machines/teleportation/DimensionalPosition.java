@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +35,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
     */
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
-            CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
+            CodecExtensions.VECTOR3D.fieldOf("position").forGetter(DimensionalPosition::getPosition),
             CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
 

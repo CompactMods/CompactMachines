@@ -2,6 +2,7 @@ package dev.compactmods.machines.client;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Tunnels;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -19,12 +20,12 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onBlockColors(final ColorHandlerEvent.Block colors) {
-        // colors.getBlockColors().register(new TunnelColors(), Registration.BLOCK_TUNNEL_WALL.get());
+        colors.getBlockColors().register(new TunnelColors(), Tunnels.BLOCK_TUNNEL_WALL.get());
     }
 
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent client) {
         RenderType cutout = RenderType.cutoutMipped();
-        // ItemBlockRenderTypes.setRenderLayer(Registration.BLOCK_TUNNEL_WALL.get(), cutout);
+        ItemBlockRenderTypes.setRenderLayer(Tunnels.BLOCK_TUNNEL_WALL.get(), cutout);
     }
 }

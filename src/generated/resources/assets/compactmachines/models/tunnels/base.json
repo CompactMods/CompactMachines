@@ -1,0 +1,135 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "tunnel": "compactmachines:block/tunnels/tunnel",
+    "indicator": "compactmachines:block/tunnels/indicator"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#wall",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#wall",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#wall",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#wall",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#wall",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#wall",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#tunnel",
+          "cullface": "down",
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#tunnel",
+          "cullface": "up",
+          "tintindex": 0
+        },
+        "north": {
+          "texture": "#tunnel",
+          "cullface": "north",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#tunnel",
+          "cullface": "south",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#tunnel",
+          "cullface": "west",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#tunnel",
+          "cullface": "east",
+          "tintindex": 0
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#indicator",
+          "cullface": "down",
+          "tintindex": 1
+        },
+        "up": {
+          "texture": "#indicator",
+          "cullface": "up",
+          "tintindex": 1
+        },
+        "north": {
+          "texture": "#indicator",
+          "cullface": "north",
+          "tintindex": 1
+        },
+        "south": {
+          "texture": "#indicator",
+          "cullface": "south",
+          "tintindex": 1
+        },
+        "west": {
+          "texture": "#indicator",
+          "cullface": "west",
+          "tintindex": 1
+        },
+        "east": {
+          "texture": "#indicator",
+          "cullface": "east",
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

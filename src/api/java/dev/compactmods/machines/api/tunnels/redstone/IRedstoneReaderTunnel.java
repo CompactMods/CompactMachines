@@ -1,6 +1,6 @@
 package dev.compactmods.machines.api.tunnels.redstone;
 
-import dev.compactmods.machines.api.tunnels.ITunnelConnection;
+import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 
 /**
  * A redstone reader reads a redstone value from outside the machine (from a given side).

@@ -77,6 +77,8 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             args '--username', 'Dev##'
+            args '--width', 1920
+            args '--height', 1080
 
             mods {
                 compactmachines {
@@ -165,13 +167,22 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
     // The One Probe
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:3550084"))
 //    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
-//    testImplementation(fg.deobf("com.github.alcatrazEscapee:mcjunitlib:1.3.3-${minecraft_version}"))
-
     // Nicephore - Screenshots and Stuff
-//    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3318114"))
+    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3542531"))
+
+    // Testing Mods - Trash Cans, Pipez
+    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3544563"))
+    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3544028"))
+    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3558815"))
+    runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3556768"))
+    runtimeOnly(fg.deobf("curse.maven:create-328085:3556823"))
+
+    // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
+    runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
 
     // Mekanism + Mek Generators - Tunnel testing
 //    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))

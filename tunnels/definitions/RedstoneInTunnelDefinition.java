@@ -1,6 +1,6 @@
 package dev.compactmods.machines.tunnels.definitions;
 
-import dev.compactmods.machines.api.teleportation.IDimensionalPosition;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.EnumTunnelSide;
 import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;

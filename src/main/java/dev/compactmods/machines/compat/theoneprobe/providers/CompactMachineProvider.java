@@ -70,14 +70,14 @@
 //            IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
 //
 //            ServerLevel cm = world.getServer().getLevel(Registration.COMPACT_DIMENSION);
-//            tunnelsForMachineSide.forEach(pos -> {
-//                TunnelWallTile tile = (TunnelWallTile) cm.getBlockEntity(pos);
+//            tunnelsForMachineSide.forEach(position -> {
+//                TunnelWallTile tile = (TunnelWallTile) cm.getBlockEntity(position);
 //                if (tile == null)
 //                    return;
 //
 //                tile.getTunnelDefinition().ifPresent(tunnelDef -> {
 //                    vertical.text(
-//                            new TextComponent(pos + ": " + tunnelDef.getRegistryName().toString())
+//                            new TextComponent(position + ": " + tunnelDef.getRegistryName().toString())
 //                    );
 //                });
 //            });

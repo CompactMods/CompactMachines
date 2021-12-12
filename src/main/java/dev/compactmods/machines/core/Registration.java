@@ -33,10 +33,9 @@ public class Registration {
     // ================================================================================================================
     //   REGISTRIES
     // ================================================================================================================
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
+    static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
     static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
-
+    static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
 
 
     // ================================================================================================================
@@ -91,32 +90,24 @@ public class Registration {
 
     public static final RegistryObject<BlockEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = BLOCK_ENTITIES.register("compact_machine", () ->
             BlockEntityType.Builder.of(CompactMachineTile::new,
-                    MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
-                    MACHINE_BLOCK_LARGE.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
+                            MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
+                            MACHINE_BLOCK_LARGE.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
                     .build(null));
+
 
     // ================================================================================================================
     //   WALLS
     // ================================================================================================================
-//    public static final RegistryObject<Block> BLOCK_TUNNEL_WALL = BLOCKS.register("tunnel_wall", () ->
-//            new TunnelWallBlock(BlockBehaviour.Properties
-//                    .of(Material.METAL, MaterialColor.CLAY)
-//                    .strength(-1.0F, 3600000.8F)
-//                    .sound(SoundType.METAL)
-//                    .lightLevel((state) -> 15)
-//                    .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_SOLID_WALL = BLOCKS.register("solid_wall", () ->
-            new SolidWallBlock(BlockBehaviour.Properties
-                    .of(Material.METAL, MaterialColor.CLAY)
+            new SolidWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.CLAY)
                     .strength(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
                     .lightLevel((state) -> 15)
                     .noDrops()));
 
     public static final RegistryObject<Block> BLOCK_BREAKABLE_WALL = BLOCKS.register("wall", () ->
-            new BreakableWallBlock(BlockBehaviour.Properties
-                    .of(Material.METAL)
+            new BreakableWallBlock(BlockBehaviour.Properties.of(Material.METAL)
                     .strength(3.0f, 128.0f)
                     .requiresCorrectToolForDrops()));
 
@@ -143,6 +134,4 @@ public class Registration {
         ITEMS.register(bus);
         BLOCK_ENTITIES.register(bus);
     }
-
-
 }

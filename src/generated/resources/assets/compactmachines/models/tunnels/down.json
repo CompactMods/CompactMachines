@@ -1,0 +1,6 @@
+{
+  "parent": "compactmachines:tunnels/base",
+  "textures": {
+    "wall": "compactmachines:block/tunnels/down"
+  }
+}

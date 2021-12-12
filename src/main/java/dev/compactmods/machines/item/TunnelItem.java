@@ -1,41 +1,42 @@
 package dev.compactmods.machines.item;
 
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.block.walls.SolidWallBlock;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
-import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.*;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-
+import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
+import dev.compactmods.machines.block.tiles.TunnelWallEntity;
+import dev.compactmods.machines.block.walls.SolidWallBlock;
+import dev.compactmods.machines.block.walls.TunnelWallBlock;
+import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.network.NetworkHandler;
+import dev.compactmods.machines.network.TunnelAddedPacket;
+import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
 
 public class TunnelItem extends Item {
@@ -103,15 +104,38 @@ public class TunnelItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         final Level level = context.getLevel();
-        if(!level.isClientSide) {
-            final Player player = context.getPlayer();
-            final BlockState state = level.getBlockState(context.getClickedPos());
+        if (level.isClientSide) return InteractionResult.SUCCESS;
 
-            if(state.getBlock() instanceof SolidWallBlock && player != null) {
-                player.displayClientMessage(TranslationUtil.message(new ResourceLocation(CompactMachines.MOD_ID, "tunnels_nyi")), true);
-            }
+        final Player player = context.getPlayer();
+        final BlockPos position = context.getClickedPos();
+        final BlockState state = level.getBlockState(position);
+
+        if (state.getBlock() instanceof SolidWallBlock && player != null) {
+            getDefinition(context.getItemInHand()).ifPresent(def -> {
+                boolean redstone = def instanceof IRedstoneTunnel;
+
+                var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
+                        .defaultBlockState()
+                        .setValue(TunnelWallBlock.TUNNEL_SIDE, context.getClickedFace())
+                        .setValue(TunnelWallBlock.CONNECTED_SIDE, Direction.UP)
+                        .setValue(TunnelWallBlock.REDSTONE, redstone);
+
+                level.setBlock(position, tunnelState, Block.UPDATE_ALL);
+                if (level.getBlockEntity(position) instanceof TunnelWallEntity tun)
+                    tun.setTunnelType(def);
+
+                level.getServer().submitAsync(() -> {
+                    NetworkHandler.MAIN_CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
+                            new TunnelAddedPacket(position, def));
+                });
+
+                if (!player.isCreative())
+                    context.getItemInHand().shrink(1);
+            });
+
+            return InteractionResult.CONSUME;
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.FAIL;
     }
 }
