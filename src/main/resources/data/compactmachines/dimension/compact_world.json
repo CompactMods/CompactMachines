@@ -3,7 +3,7 @@
   "generator": {
     "type": "minecraft:flat",
     "settings": {
-      "biome": "minecraft:plains",
+      "biome": "compactmachines:machine",
       "lakes": false,
       "features": false,
       "layers": [

@@ -1,5 +1,8 @@
 package dev.compactmods.machines.teleportation;
 
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,21 +10,18 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
-
-import javax.annotation.Nonnull;
-import java.util.Objects;
-import java.util.Optional;
 
 public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDimensionalPosition {
 
@@ -35,7 +35,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
     */
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
-            CodecExtensions.VECTOR3D.fieldOf("position").forGetter(DimensionalPosition::getPosition),
+            CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
             CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
 
@@ -66,6 +66,11 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
 
     public Optional<ServerLevel> getWorld(@Nonnull MinecraftServer server) {
         return Optional.ofNullable(server.getLevel(this.dimension));
+    }
+
+    @Override
+    public Optional<BlockState> getBlockState(MinecraftServer server) {
+        return getWorld(server).map(sl -> sl.getBlockState(getBlockPosition()));
     }
 
     public boolean isLoaded(MinecraftServer server) {

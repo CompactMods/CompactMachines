@@ -20,6 +20,7 @@ public class DataGeneration {
     }
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
+        generator.addProvider(new LevelBiomeGenerator(generator));
         generator.addProvider(new BlockLootGenerator(generator));
         generator.addProvider(new RecipeGenerator(generator));
 

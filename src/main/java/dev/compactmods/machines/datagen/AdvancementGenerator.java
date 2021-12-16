@@ -23,6 +23,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class AdvancementGenerator implements DataProvider {
 
@@ -34,7 +35,7 @@ public class AdvancementGenerator implements DataProvider {
     }
 
     @Override
-    public void run(HashCache cache) {
+    public void run(@NotNull HashCache cache) {
         Path path = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
         Consumer<Advancement> consumer = (adv) -> {

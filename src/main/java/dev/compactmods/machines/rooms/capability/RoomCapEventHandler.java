@@ -1,9 +1,11 @@
 package dev.compactmods.machines.rooms.capability;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.core.Registration;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -12,13 +14,27 @@ import net.minecraftforge.fml.common.Mod;
 public class RoomCapEventHandler {
 
     @SubscribeEvent
-    public static void onCapPlayerAttach(final AttachCapabilitiesEvent<Entity> event) {
-        if(!(event.getObject() instanceof ServerPlayer))
+    static void onCapPlayerAttach(final AttachCapabilitiesEvent<Entity> event) {
+        if(!(event.getObject() instanceof ServerPlayer player))
             return;
 
-        ServerPlayer player = (ServerPlayer) event.getObject();
         event.addCapability(
                 new ResourceLocation(CompactMachines.MOD_ID, "room_history"),
                 new PlayerRoomHistoryCapProvider(player));
+    }
+
+    @SubscribeEvent
+    static void onCapChunkAttach(final AttachCapabilitiesEvent<LevelChunk> evt) {
+        var chunk = evt.getObject();
+
+        // do not attach room data to client levels
+        if(chunk.getLevel().isClientSide)
+            return;
+
+        // only add room data to compact world chunks
+        if(chunk.getLevel().dimension() != Registration.COMPACT_DIMENSION)
+            return;
+
+        evt.addCapability(new ResourceLocation(CompactMachines.MOD_ID, "room_info"), new RoomChunkDataProvider(chunk));
     }
 }

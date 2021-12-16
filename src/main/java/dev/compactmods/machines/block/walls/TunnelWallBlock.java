@@ -3,14 +3,18 @@ package dev.compactmods.machines.block.walls;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityTeardown;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import dev.compactmods.machines.block.tiles.TunnelWallEntity;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.tunnel.TunnelMachineConnection;
 import dev.compactmods.machines.tunnel.TunnelHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -97,34 +101,47 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.isClientSide())
+        if (!(level instanceof ServerLevel serverLevel))
             return InteractionResult.SUCCESS;
 
-        if (player.isShiftKeyDown()) {
-            Optional<TunnelDefinition> tunnelDef = getTunnelInfo(level, pos);
+        if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
+            return InteractionResult.FAIL;
 
-            if (!tunnelDef.isPresent())
-                return InteractionResult.FAIL;
+        return tunnel.getTunnelDefinition().map(def -> {
+            if (player.isShiftKeyDown()) {
+                BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
-            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+                level.setBlockAndUpdate(pos, solidWall);
 
-            level.setBlockAndUpdate(pos, solidWall);
+                ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+                CompoundTag defTag = stack.getOrCreateTagElement("definition");
+                defTag.putString("id", def.getRegistryName().toString());
 
-            TunnelDefinition tunnelRegistration = tunnelDef.get();
-            ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-            CompoundTag defTag = stack.getOrCreateTagElement("definition");
-            defTag.putString("id", tunnelRegistration.getRegistryName().toString());
+                ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
+                level.addFreshEntity(ie);
 
-            ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
-            level.addFreshEntity(ie);
-        } else {
-            // Rotate tunnel
-            Direction dir = state.getValue(CONNECTED_SIDE);
-            Direction nextDir = TunnelHelper.getNextDirection(dir);
+                if (def instanceof ITunnelCapabilityTeardown teardown) {
+                    level.getChunkAt(pos).getCapability(Capabilities.ROOM)
+                            .ifPresent(room -> {
+                                teardown.teardownCapabilities(room, new TunnelMachineConnection(serverLevel, tunnel));
+                            });
+                }
+            } else {
+                // Rotate tunnel
+                Direction dir = state.getValue(CONNECTED_SIDE);
+                Direction nextDir = TunnelHelper.getNextDirection(dir);
 
-            level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
-        }
+                level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
 
-        return InteractionResult.SUCCESS;
+                if (def instanceof ITunnelCapabilityTeardown teardown) {
+                    level.getChunkAt(pos).getCapability(Capabilities.ROOM)
+                            .ifPresent(room -> {
+                                teardown.teardownCapabilities(room, new TunnelMachineConnection(serverLevel, tunnel));
+                            });
+                }
+            }
+
+            return InteractionResult.SUCCESS;
+        }).orElse(InteractionResult.FAIL);
     }
 }

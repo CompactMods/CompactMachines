@@ -1,11 +1,18 @@
 package dev.compactmods.machines.api.room;
 
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 
 public interface IRoomCapabilities {
 
-    <T> void addCapability(Capability<T> capability, T instance, Direction side);
+    <CapType, TunnType extends TunnelDefinition>
+    void addCapability(TunnType tunnel, Capability<CapType> capability, CapType instance, Direction side);
 
-    <T> void removeCapability(Capability<T> capability, Direction side);
+    <CapType, TunnType extends TunnelDefinition>
+    void removeCapability(TunnType tunnel, Capability<CapType> capability, Direction side);
+
+    <CapType, TunnType extends TunnelDefinition>
+    LazyOptional<CapType> getCapability(Capability<CapType> capability, Direction side);
 }

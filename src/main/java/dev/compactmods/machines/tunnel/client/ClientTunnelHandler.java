@@ -11,7 +11,11 @@ public class ClientTunnelHandler {
         if(level == null) return;
 
         if(level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
-            tun.setTunnelType(type);
+            try {
+                tun.setTunnelType(type);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -30,10 +30,8 @@ public class ItemImportTunnel extends TunnelDefinition implements IItemImportTun
      */
     @Override
     public void setupCapabilities(IMachineRoom room, ITunnelConnection added) {
-        var pos = room.getChunk();
-        var level = room.getLevel();
-
-        room.getCapabilities().addCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new InfiniteItemSource(Items.COBBLESTONE), added.side());
+        room.getCapabilities()
+                .addCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new InfiniteItemSource(Items.COBBLESTONE), added.side());
     }
 
     /**
@@ -44,7 +42,7 @@ public class ItemImportTunnel extends TunnelDefinition implements IItemImportTun
      */
     @Override
     public void teardownCapabilities(IMachineRoom room, ITunnelConnection removed) {
-        room.getCapabilities().removeCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, removed.side());
+        room.getCapabilities().removeCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, removed.side());
     }
 
     private static class InfiniteItemSource extends ItemStackHandler {

@@ -11,9 +11,13 @@ import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.block.tiles.TunnelWallEntity;
 import dev.compactmods.machines.block.walls.SolidWallBlock;
 import dev.compactmods.machines.block.walls.TunnelWallBlock;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
+import dev.compactmods.machines.rooms.capability.IRoomHistory;
+import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -25,6 +29,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -35,6 +40,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
@@ -110,27 +116,52 @@ public class TunnelItem extends Item {
         final BlockPos position = context.getClickedPos();
         final BlockState state = level.getBlockState(position);
 
-        if (state.getBlock() instanceof SolidWallBlock && player != null) {
+        if (state.getBlock() instanceof SolidWallBlock && player instanceof ServerPlayer serverPlayer) {
             getDefinition(context.getItemInHand()).ifPresent(def -> {
                 boolean redstone = def instanceof IRedstoneTunnel;
 
-                var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
-                        .defaultBlockState()
-                        .setValue(TunnelWallBlock.TUNNEL_SIDE, context.getClickedFace())
-                        .setValue(TunnelWallBlock.CONNECTED_SIDE, Direction.UP)
-                        .setValue(TunnelWallBlock.REDSTONE, redstone);
+                final LazyOptional<IRoomHistory> history = player.getCapability(Capabilities.ROOM_HISTORY);
+                if (!history.isPresent()) {
+                    PlayerUtil.howDidYouGetThere(serverPlayer);
+                    return;
+                }
 
-                level.setBlock(position, tunnelState, Block.UPDATE_ALL);
-                if (level.getBlockEntity(position) instanceof TunnelWallEntity tun)
-                    tun.setTunnelType(def);
+                history.ifPresent(hist -> {
+                    if(!hist.hasHistory()) {
+                        PlayerUtil.howDidYouGetThere(serverPlayer);
+                        return;
+                    }
 
-                level.getServer().submitAsync(() -> {
-                    NetworkHandler.MAIN_CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
-                            new TunnelAddedPacket(position, def));
+                    int enteredThrough = hist.peek().getMachine();
+                    var data = CompactMachineData.get(serverPlayer.server);
+                    var machLoc = data.getMachineLocation(enteredThrough).orElse(null);
+                    if(machLoc == null) {
+                        return;
+                    }
+
+                    var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
+                            .defaultBlockState()
+                            .setValue(TunnelWallBlock.TUNNEL_SIDE, context.getClickedFace())
+                            .setValue(TunnelWallBlock.CONNECTED_SIDE, Direction.UP)
+                            .setValue(TunnelWallBlock.REDSTONE, redstone);
+
+                    level.setBlock(position, tunnelState, Block.UPDATE_ALL);
+                    if (level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
+                        try {
+                            tun.setTunnelType(def);
+                            tun.setConnectedTo(enteredThrough);
+
+                            level.getServer().submitAsync(() -> {
+                                NetworkHandler.MAIN_CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
+                                        new TunnelAddedPacket(position, def));
+                            });
+                        } catch (Exception ignored) {
+                        }
+                    }
+
+                    if (!player.isCreative())
+                        context.getItemInHand().shrink(1);
                 });
-
-                if (!player.isCreative())
-                    context.getItemInHand().shrink(1);
             });
 
             return InteractionResult.CONSUME;

@@ -7,8 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    private static int index = 0;
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "4.0.0";
     public static final SimpleChannel MAIN_CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(CompactMachines.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -17,13 +16,13 @@ public class NetworkHandler {
     );
 
     public static void initialize() {
-        MAIN_CHANNEL.messageBuilder(MachinePlayersChangedPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(MachinePlayersChangedPacket::encode)
-                .decoder(MachinePlayersChangedPacket::new)
-                .consumer(MachinePlayersChangedPacket::handle)
-                .add();
+//        MAIN_CHANNEL.messageBuilder(MachinePlayersChangedPacket.class, 0, NetworkDirection.PLAY_TO_CLIENT)
+//                .encoder(MachinePlayersChangedPacket::encode)
+//                .decoder(MachinePlayersChangedPacket::new)
+//                .consumer(MachinePlayersChangedPacket::handle)
+//                .add();
 
-        MAIN_CHANNEL.messageBuilder(TunnelAddedPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+        MAIN_CHANNEL.messageBuilder(TunnelAddedPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(TunnelAddedPacket::encode)
                 .decoder(TunnelAddedPacket::new)
                 .consumer(TunnelAddedPacket::handle)

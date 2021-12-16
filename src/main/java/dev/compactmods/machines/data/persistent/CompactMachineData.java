@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.codec.NbtListCollector;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
@@ -20,6 +21,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraftforge.common.util.LazyOptional;
 
 /**
  * Holds information on the external points of a machine, ie the actual machine blocks.
@@ -35,10 +37,13 @@ public class CompactMachineData extends SavedData {
      * Specifies locations of machines in-world, outside of the compact world.
      * This is used for things like spawn lookups, tunnel handling, and forced ejections.
      */
-    public Map<Integer, MachineData> data;
+    public final Map<Integer, MachineData> data;
+
+    public final Map<Integer, LazyOptional<IDimensionalPosition>> machineLocations;
 
     public CompactMachineData() {
         data = new HashMap<>();
+        machineLocations = new HashMap<>();
     }
 
     @Nullable
@@ -61,7 +66,10 @@ public class CompactMachineData extends SavedData {
                 DataResult<MachineData> res = MachineData.CODEC.parse(NbtOps.INSTANCE, nbtLoc);
                 res.resultOrPartial(err -> {
                     CompactMachines.LOGGER.error("Error while processing machine data: " + err);
-                }).ifPresent(machineInfo -> machines.data.put(machineInfo.machineId, machineInfo));
+                }).ifPresent(machineInfo -> {
+                    machines.data.put(machineInfo.machineId, machineInfo);
+                    machines.machineLocations.put(machineInfo.machineId, LazyOptional.of(() -> machineInfo.location));
+                });
             });
         }
 
@@ -106,12 +114,15 @@ public class CompactMachineData extends SavedData {
         this.setDirty();
     }
 
-    public Optional<DimensionalPosition> getMachineLocation(int machineId) {
+    public LazyOptional<IDimensionalPosition> getMachineLocation(int machineId) {
         if(!data.containsKey(machineId))
-            return Optional.empty();
+            return LazyOptional.empty();
 
         MachineData machineData = this.data.get(machineId);
-        return Optional.ofNullable(machineData.location);
+        if(machineLocations.containsKey(machineId))
+            return machineLocations.get(machineId);
+
+        return machineLocations.put(machineId, LazyOptional.of(() -> machineData.location));
     }
 
     public static class MachineData {

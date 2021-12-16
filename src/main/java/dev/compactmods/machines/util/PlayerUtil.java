@@ -14,9 +14,6 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.network.CMPacketTargets;
-import dev.compactmods.machines.network.MachinePlayersChangedPacket;
-import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.rooms.capability.CapabilityRoomHistory;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
@@ -182,16 +179,17 @@ public abstract class PlayerUtil {
             final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(currentRoomChunk.x, currentRoomChunk.z);
 
-            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
-                    .forMachine(currentRoomChunk)
-                    .forPlayer(serverPlayer)
-                    .build();
-
-            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
+            // TODO
+//            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
+//                    .forMachine(currentRoomChunk)
+//                    .forPlayer(serverPlayer)
+//                    .build();
+//
+//            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
         });
     }
 
-    private static void howDidYouGetThere(@Nonnull ServerPlayer serverPlayer) {
+    public static void howDidYouGetThere(@Nonnull ServerPlayer serverPlayer) {
         AdvancementTriggers.HOW_DID_YOU_GET_HERE.trigger(serverPlayer);
 
         serverPlayer.displayClientMessage(
@@ -229,13 +227,14 @@ public abstract class PlayerUtil {
                         hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
                     });
 
-            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
-                    .forMachine(mChunk)
-                    .forPlayer(serverPlayer)
-                    .enteredFrom(tile.machineId)
-                    .build();
-
-            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
+            // TODO - player tracking
+//            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
+//                    .forMachine(mChunk)
+//                    .forPlayer(serverPlayer)
+//                    .enteredFrom(tile.machineId)
+//                    .build();
+//
+//            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
         });
     }
 
