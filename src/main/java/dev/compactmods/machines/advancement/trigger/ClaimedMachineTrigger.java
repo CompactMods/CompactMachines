@@ -4,14 +4,12 @@ import com.google.gson.JsonObject;
 import dev.compactmods.machines.advancement.GenericAdvancementTriggerListener;
 import dev.compactmods.machines.advancement.GenericAdvancementTriggerListenerList;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.resources.ResourceLocation;
-
-import net.minecraft.advancements.CriterionTrigger.Listener;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ClaimedMachineTrigger implements CriterionTrigger<ClaimedMachineTrigger.Instance> {
 
@@ -55,11 +53,8 @@ public class ClaimedMachineTrigger implements CriterionTrigger<ClaimedMachineTri
 
     public static class Instance extends AbstractCriterionTriggerInstance {
 
-        private final ResourceLocation advId;
-
         public Instance(ResourceLocation advId, EntityPredicate.Composite player) {
             super(advId, player);
-            this.advId = advId;
         }
 
         public static Instance create(ResourceLocation advancement) {

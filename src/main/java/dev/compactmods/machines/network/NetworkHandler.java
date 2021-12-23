@@ -16,12 +16,6 @@ public class NetworkHandler {
     );
 
     public static void initialize() {
-//        MAIN_CHANNEL.messageBuilder(MachinePlayersChangedPacket.class, 0, NetworkDirection.PLAY_TO_CLIENT)
-//                .encoder(MachinePlayersChangedPacket::encode)
-//                .decoder(MachinePlayersChangedPacket::new)
-//                .consumer(MachinePlayersChangedPacket::handle)
-//                .add();
-
         MAIN_CHANNEL.messageBuilder(TunnelAddedPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(TunnelAddedPacket::encode)
                 .decoder(TunnelAddedPacket::new)

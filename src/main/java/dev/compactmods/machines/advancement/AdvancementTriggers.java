@@ -1,5 +1,6 @@
 package dev.compactmods.machines.advancement;
 
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.trigger.ClaimedMachineTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
@@ -17,7 +18,9 @@ public class AdvancementTriggers {
     public static final ClaimedMachineTrigger CLAIMED_GIANT = CriteriaTriggers.register(new ClaimedMachineTrigger(Advancements.CLAIMED_GIANT_MACHINE));
     public static final ClaimedMachineTrigger CLAIMED_MAX = CriteriaTriggers.register(new ClaimedMachineTrigger(Advancements.CLAIMED_MAX_MACHINE));
 
-    public static void init() {}
+    public static void init() {
+        CompactMachines.LOGGER.trace("Registering advancement triggers.");
+    }
 
     public static ClaimedMachineTrigger getTriggerForMachineClaim(EnumMachineSize machineSize) {
         switch (machineSize) {

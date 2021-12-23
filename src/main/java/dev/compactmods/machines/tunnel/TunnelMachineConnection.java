@@ -1,43 +1,34 @@
 package dev.compactmods.machines.tunnel;
 
-import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.block.tiles.TunnelWallEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 public class TunnelMachineConnection implements ITunnelConnection {
 
-    private final TunnelDefinition tunnelType;
-    private IDimensionalPosition location;
-    private BlockState state;
+    private final ServerLevel level;
+    private final BlockState state;
     private final Direction side;
-    private final LazyOptional<IDimensionalPosition> lazy;
+    private final BlockPos position;
 
-    public TunnelMachineConnection(Level level, TunnelWallEntity tunnel) {
-        this.tunnelType = tunnel.getTunnelType();
-        this.location = tunnel.getConnectedPosition();
-        this.lazy = LazyOptional.of(this::position);
-        this.state = location.getBlockState(level.getServer()).orElse(Blocks.AIR.defaultBlockState());
+    public TunnelMachineConnection(MinecraftServer server, TunnelWallEntity tunnel) {
+        var location = tunnel.getConnectedPosition();
+        this.position = location.getBlockPosition();
+        this.level = location.level(server).orElseThrow();
+        this.state = location.state(server).orElse(Blocks.AIR.defaultBlockState());
         this.side = tunnel.getConnectedSide();
     }
 
     @NotNull
     @Override
-    public TunnelDefinition tunnelType() {
-        return tunnelType;
-    }
-
-    @NotNull
-    @Override
-    public IDimensionalPosition position() {
-        return location;
+    public ServerLevel level() {
+        return level;
     }
 
     @NotNull
@@ -55,13 +46,9 @@ public class TunnelMachineConnection implements ITunnelConnection {
         return side;
     }
 
-    public void invalidatePosition() {
-        lazy.invalidate();
-    }
-
-    public void setLocation(IDimensionalPosition pos) {
-        this.location = pos;
-        this.state = location.getBlockState(ServerLifecycleHooks.getCurrentServer()).orElse(Blocks.AIR.defaultBlockState());
-        this.lazy.invalidate();
+    @NotNull
+    @Override
+    public BlockPos position() {
+        return position;
     }
 }

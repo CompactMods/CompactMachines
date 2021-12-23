@@ -10,12 +10,12 @@ import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.block.tiles.CompactMachineTile;
 import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.rooms.capability.CapabilityRoomHistory;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
 import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 import dev.compactmods.machines.rooms.history.PlayerRoomHistoryItem;
@@ -142,7 +142,7 @@ public abstract class PlayerUtil {
 
         MinecraftServer serv = world.getServer();
 
-        final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(CapabilityRoomHistory.HISTORY_CAPABILITY);
+        final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(Capabilities.ROOM_HISTORY);
 
         if (!history.isPresent()) {
             howDidYouGetThere(serverPlayer);
@@ -157,7 +157,7 @@ public abstract class PlayerUtil {
 
                 DimensionalPosition spawnPoint = prevArea.getEntryLocation();
 
-                ServerLevel w = spawnPoint.getWorld(serv).orElse(serv.overworld());
+                ServerLevel w = spawnPoint.level(serv).orElse(serv.overworld());
                 Vec3 worldPos, entryRot;
 
                 if (serv.getLevel(spawnPoint.getDimension()) != null) {
@@ -179,13 +179,7 @@ public abstract class PlayerUtil {
             final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(currentRoomChunk.x, currentRoomChunk.z);
 
-            // TODO
-//            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
-//                    .forMachine(currentRoomChunk)
-//                    .forPlayer(serverPlayer)
-//                    .build();
-//
-//            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
+            // TODO - Send changed players packet to other clients
         });
     }
 
@@ -221,20 +215,13 @@ public abstract class PlayerUtil {
             final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(mChunk.x, mChunk.z);
 
-            serverPlayer.getCapability(CapabilityRoomHistory.HISTORY_CAPABILITY)
+            serverPlayer.getCapability(Capabilities.ROOM_HISTORY)
                     .ifPresent(hist -> {
                         DimensionalPosition pos = DimensionalPosition.fromEntity(serverPlayer);
                         hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
                     });
 
-            // TODO - player tracking
-//            MachinePlayersChangedPacket p = MachinePlayersChangedPacket.Builder.create(serv)
-//                    .forMachine(mChunk)
-//                    .forPlayer(serverPlayer)
-//                    .enteredFrom(tile.machineId)
-//                    .build();
-//
-//            NetworkHandler.MAIN_CHANNEL.send(CMPacketTargets.TRACKING_ROOM.with(() -> chunk), p);
+            // TODO - player tracking packet
         });
     }
 

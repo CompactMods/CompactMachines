@@ -15,7 +15,6 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
-import net.minecraft.data.worldgen.biome.Biomes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -35,7 +34,7 @@ public class LevelBiomeGenerator implements DataProvider {
     }
     
     @Override
-    public void run(@NotNull HashCache cache) throws IOException {
+    public void run(@NotNull HashCache cache) {
         Path data = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
 
@@ -73,7 +72,7 @@ public class LevelBiomeGenerator implements DataProvider {
                 .generationSettings(BiomeGenerationSettings.EMPTY)
                 .mobSpawnSettings(spawns)
                 .precipitation(Biome.Precipitation.NONE)
-                .temperature(Biomes.PLAINS.getBaseTemperature())
+                .temperature(0.8f)
                 .temperatureAdjustment(Biome.TemperatureModifier.NONE)
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .fogColor(12638463)

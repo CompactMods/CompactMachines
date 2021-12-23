@@ -1,6 +1,10 @@
 package dev.compactmods.machines.rooms.capability;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import dev.compactmods.machines.api.room.IMachineRoom;
+import dev.compactmods.machines.api.room.IRoomCapabilities;
+import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
 import dev.compactmods.machines.core.Capabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -11,12 +15,14 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
 public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTag> {
-    private final LevelChunk chunk;
     private final RoomChunkData room;
+    private final RoomChunkCapabilities roomCaps;
+    private final MachineRoomTunnels tunnels;
 
     public RoomChunkDataProvider(LevelChunk chunk) {
-        this.chunk = chunk;
         this.room = new RoomChunkData(chunk);
+        this.roomCaps = new RoomChunkCapabilities(chunk);
+        this.tunnels = new MachineRoomTunnels(chunk);
     }
 
     /**
@@ -34,16 +40,37 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if(cap == Capabilities.ROOM)
-            return LazyOptional.of(() -> room).cast();
+            return LazyOptional.of(this::room).cast();
+
+        if(cap == Capabilities.ROOM_CAPS)
+            return LazyOptional.of(this::caps).cast();
+
+        if(cap == Capabilities.ROOM_TUNNELS)
+            return LazyOptional.of(this::tunnels).cast();
 
         return LazyOptional.empty();
     }
 
+
+    @Nonnull
+    private IRoomTunnels tunnels() {
+        return this.tunnels;
+    }
+
+    @NotNull
+    private IRoomCapabilities caps() {
+        return roomCaps;
+    }
+
+    @NotNull
+    private IMachineRoom room() {
+        return this.room;
+    }
+
     @Override
     public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
         // tag.put("room", room.serializeNBT());
-        return tag;
+        return new CompoundTag();
     }
 
     @Override

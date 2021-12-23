@@ -41,7 +41,7 @@ public class CMPacketTargets {
 
             for (int machine : linked) {
                 machines.getMachineLocation(machine).ifPresent(loc -> {
-                    Optional<ServerLevel> machineWorld = loc.getWorld(server);
+                    Optional<ServerLevel> machineWorld = loc.level(server);
                     BlockPos machineWorldLocation = loc.getBlockPosition();
                     ChunkPos machineWorldChunk = new ChunkPos(machineWorldLocation);
 

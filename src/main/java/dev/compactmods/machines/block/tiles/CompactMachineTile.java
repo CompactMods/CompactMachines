@@ -22,7 +22,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class CompactMachineTile extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
     private final boolean initialized = false;
-    public boolean alreadyNotifiedOnTick = false;
     public long nextSpawnTick = 0;
 
     protected UUID owner;
@@ -31,11 +30,6 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
     public CompactMachineTile(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
-    }
-
-    @Override
-    public void clearRemoved() {
-        super.clearRemoved();
     }
 
     @Override
@@ -88,19 +82,6 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
         if (level instanceof ServerLevel) {
             // TODO - Internal player list
-//            Optional<CompactMachinePlayerData> playerData = Optional.empty();
-//            try {
-//                CompactMachinePlayerData psd = CompactMachinePlayerData.get(level.getServer());
-//                // psd = psd.getPlayersInside(this.machineId);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            playerData.ifPresent(data -> {
-//                CompoundNBT playerNbt = data.serializeNBT();
-//                base.put("players", playerNbt);
-//            });
-
             if (this.owner != null)
                 base.putUUID("owner", this.owner);
         }
@@ -163,13 +144,8 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     }
 
     public boolean hasPlayersInside() {
-        return false;
         // TODO
-//        return CompactMachineCommonData
-//                .getInstance()
-//                .getPlayerData(machineId)
-//                .map(CompactMachinePlayerData::hasPlayers)
-//                .orElse(false);
+        return false;
     }
 
     public void doPostPlaced() {
@@ -190,14 +166,6 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
         extern.setMachineLocation(this.machineId, dp);
 
         this.setChanged();
-    }
-
-    public void handlePlayerLeft(UUID playerID) {
-        // TODO
-    }
-
-    public void handlePlayerEntered(UUID playerID) {
-        // TODO
     }
 
     public boolean mapped() {
@@ -228,67 +196,4 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
         return Optional.empty();
     }
-
-//    @Override
-//    public void update() {
-//        if (!this.initialized && !this.isInvalid() && this.coords != -1) {
-//            initialize();
-//            this.initialized = true;
-//        }
-//
-//        this.alreadyNotifiedOnTick = false;
-//
-//        if (nextSpawnTick == 0) {
-//            nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
-//        }
-//
-//        if (!this.getWorld().isRemote && this.coords != -1 && isInsideItself()) {
-//            if (this.getWorld().getTotalWorldTime() % 20 == 0) {
-//                world.playSound(null, getPos(),
-//                        SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.wither.spawn")),
-//                        SoundCategory.MASTER,
-//                        1.0f,
-//                        1.0f
-//                );
-//            }
-//        }
-//
-//        if (!this.getWorld().isRemote && this.coords != -1 && this.getWorld().getTotalWorldTime() > nextSpawnTick) {
-//            if (ConfigurationHandler.MachineSettings.allowPeacefulSpawns || ConfigurationHandler.MachineSettings.allowHostileSpawns) {
-//                SpawnTools.spawnEntitiesInMachine(coords);
-//            }
-//
-//            nextSpawnTick = this.getWorld().getTotalWorldTime() + ConfigurationHandler.MachineSettings.spawnRate;
-//            this.markDirty();
-//        }
-//
-//        /*
-//        // Use this once we render in world or use the proxy world to determine client side capabilities.
-//        if(!this.getWorld().isRemote && this.getWorld().getTotalWorldTime() % 20 == 0 && this.coords != -1) {
-//            PackageHandler.instance.sendToAllAround(new MessageMachineChunk(this.coords), new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 32.0f));
-//        }
-//        */
-//    }
-
-//    @Override
-//    public void onChunkUnload() {
-//        super.onChunkUnload();
-//        if (this.getWorld().isRemote) {
-//            return;
-//        }
-//
-//        if (ConfigurationHandler.Settings.forceLoadChunks) {
-//            return;
-//        }
-//
-//        ChunkLoadingMachines.unforceChunk(this.coords);
-//    }
-//
-//    public boolean isInsideItself() {
-//        if (this.getWorld().provider.getDimension() != ConfigurationHandler.Settings.dimensionId) {
-//            return false;
-//        }
-//
-//        return StructureTools.getCoordsForPos(this.getPos()) == this.coords;
-//    }
 }

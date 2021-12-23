@@ -172,14 +172,17 @@ dependencies {
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
     // Nicephore - Screenshots and Stuff
-    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3542531"))
+    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3574658"))
 
-    // Testing Mods - Trash Cans, Pipez
+    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
     runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3544563"))
     runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3544028"))
-    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3558815"))
+    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
     runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3556768"))
     runtimeOnly(fg.deobf("curse.maven:create-328085:3556823"))
+    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
+    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
+    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3569563"))
 
     // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
     runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))

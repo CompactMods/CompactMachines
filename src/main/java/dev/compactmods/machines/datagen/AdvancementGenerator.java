@@ -84,7 +84,7 @@ public class AdvancementGenerator implements DataProvider {
                         .build())
                 .save(consumer, Advancements.HOW_DID_YOU_GET_HERE.toString());
 
-        final Advancement wall = Advancement.Builder.advancement()
+        Advancement.Builder.advancement()
                 .parent(root)
                 .addCriterion("obtained_wall", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
                 .display(new DisplayBuilder()
@@ -104,16 +104,16 @@ public class AdvancementGenerator implements DataProvider {
                         .build())
                 .save(consumer, Advancements.GOT_SHRINKING_DEVICE.toString());
 
-        final Advancement tiny = machineAdvancement(consumer, psd, Advancements.CLAIMED_TINY_MACHINE, Registration.MACHINE_BLOCK_ITEM_TINY);
-        final Advancement small = machineAdvancement(consumer, psd, Advancements.CLAIMED_SMALL_MACHINE, Registration.MACHINE_BLOCK_ITEM_SMALL);
-        final Advancement normal = machineAdvancement(consumer, psd, Advancements.CLAIMED_NORMAL_MACHINE, Registration.MACHINE_BLOCK_ITEM_NORMAL);
-        final Advancement large = machineAdvancement(consumer, psd, Advancements.CLAIMED_LARGE_MACHINE, Registration.MACHINE_BLOCK_ITEM_LARGE);
-        final Advancement giant = machineAdvancement(consumer, psd, Advancements.CLAIMED_GIANT_MACHINE, Registration.MACHINE_BLOCK_ITEM_GIANT);
-        final Advancement max = machineAdvancement(consumer, psd, Advancements.CLAIMED_MAX_MACHINE, Registration.MACHINE_BLOCK_ITEM_MAXIMUM);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_TINY_MACHINE, Registration.MACHINE_BLOCK_ITEM_TINY);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_SMALL_MACHINE, Registration.MACHINE_BLOCK_ITEM_SMALL);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_NORMAL_MACHINE, Registration.MACHINE_BLOCK_ITEM_NORMAL);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_LARGE_MACHINE, Registration.MACHINE_BLOCK_ITEM_LARGE);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_GIANT_MACHINE, Registration.MACHINE_BLOCK_ITEM_GIANT);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_MAX_MACHINE, Registration.MACHINE_BLOCK_ITEM_MAXIMUM);
     }
 
-    private Advancement machineAdvancement(Consumer<Advancement> consumer, Advancement root, ResourceLocation advancement, Supplier<Item> item) {
-        return Advancement.Builder.advancement()
+    private void machineAdvancement(Consumer<Advancement> consumer, Advancement root, ResourceLocation advancement, Supplier<Item> item) {
+        Advancement.Builder.advancement()
                 .parent(root)
                 .addCriterion("claimed_machine", ClaimedMachineTrigger.Instance.create(advancement))
                 .display(new DisplayBuilder()

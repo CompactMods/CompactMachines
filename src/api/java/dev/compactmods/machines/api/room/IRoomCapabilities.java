@@ -14,5 +14,5 @@ public interface IRoomCapabilities {
     void removeCapability(TunnType tunnel, Capability<CapType> capability, Direction side);
 
     <CapType, TunnType extends TunnelDefinition>
-    LazyOptional<CapType> getCapability(Capability<CapType> capability, Direction side);
+    LazyOptional<CapType> getCapability(TunnType tunnType, Capability<CapType> capability, Direction side);
 }

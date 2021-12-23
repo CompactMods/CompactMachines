@@ -2,9 +2,9 @@ package dev.compactmods.machines.rooms.capability;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Registration;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,6 +35,8 @@ public class RoomCapEventHandler {
         if(chunk.getLevel().dimension() != Registration.COMPACT_DIMENSION)
             return;
 
-        evt.addCapability(new ResourceLocation(CompactMachines.MOD_ID, "room_info"), new RoomChunkDataProvider(chunk));
+        boolean isRoom = chunk.getPos().x % 64 == 0 && chunk.getPos().z % 64 == 0;
+        if(isRoom)
+            evt.addCapability(new ResourceLocation(CompactMachines.MOD_ID, "room_info"), new RoomChunkDataProvider(chunk));
     }
 }

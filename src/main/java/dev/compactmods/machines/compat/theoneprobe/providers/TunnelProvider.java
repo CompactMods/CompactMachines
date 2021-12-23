@@ -81,7 +81,7 @@ public class TunnelProvider implements IProbeInfoProvider {
                     .text(new TranslatableComponent(CompactMachines.MOD_ID + ".direction.side", sideTranslated));
 
             ServerLevel connectedWorld = (ServerLevel) level;
-            BlockPos outPosBlock = outside.position().getBlockPosition();
+            BlockPos outPosBlock = outside.position();
 
             try {
                 // If connected block isn't air, show a connected block line

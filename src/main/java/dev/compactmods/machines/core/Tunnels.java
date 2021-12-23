@@ -27,7 +27,7 @@ public class Tunnels {
     // region Setup
 
     public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
-    public static Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry("tunnel_types",
+    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry("tunnel_types",
             () -> new RegistryBuilder<TunnelDefinition>()
                     .setType(TunnelDefinition.class)
                     .tagFolder("tunnel_types"));
@@ -53,18 +53,10 @@ public class Tunnels {
     public static final RegistryObject<Item> ITEM_TUNNEL = Registration.ITEMS.register("tunnel", () ->
             new TunnelItem(Registration.BASIC_ITEM_PROPS.get()));
 
-//    public static final RegistryObject<BlockEntityType<TunnelWallTile>> TUNNEL_WALL_TILE = BLOCK_ENTITIES.register("tunnel_wall", () ->
-//            BlockEntityType.Builder.of(TunnelWallTile::new, BLOCK_TUNNEL_WALL.get())
-//                    .build(null));
-
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
     public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemImportTunnel::new);
-
-//    public static final RegistryObject<TunnelDefinition> REDSTONE_IN_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_in", RedstoneInTunnelDefinition::new);
-
-    // public static final RegistryObject<TunnelDefinition> REDSTONE_OUT_TUNNEL = TUNNEL_DEFINITIONS.register("redstone_out", RedstoneOutTunnelDefinition::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES

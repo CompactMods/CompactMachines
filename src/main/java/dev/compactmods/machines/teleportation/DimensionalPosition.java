@@ -11,6 +11,7 @@ import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -64,17 +65,29 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
         return new DimensionalPosition(entity.level.dimension(), entity.position());
     }
 
-    public Optional<ServerLevel> getWorld(@Nonnull MinecraftServer server) {
+    public Optional<ServerLevel> level(@Nonnull MinecraftServer server) {
         return Optional.ofNullable(server.getLevel(this.dimension));
     }
 
     @Override
-    public Optional<BlockState> getBlockState(MinecraftServer server) {
-        return getWorld(server).map(sl -> sl.getBlockState(getBlockPosition()));
+    public Optional<BlockState> state(MinecraftServer server) {
+        return level(server).map(sl -> sl.getBlockState(getBlockPosition()));
+    }
+
+    @Override
+    public IDimensionalPosition relative(Direction direction) {
+        return new DimensionalPosition(this.dimension, this.position.add(direction.getStepX(), direction.getStepY(), direction.getStepZ()));
+    }
+
+    @Override
+    public IDimensionalPosition relative(Direction direction, float amount) {
+        Vec3 a = new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
+        a = a.multiply(amount, amount, amount);
+        return new DimensionalPosition(this.dimension, this.position.add(a));
     }
 
     public boolean isLoaded(MinecraftServer server) {
-        return getWorld(server)
+        return level(server)
                 .map(w -> w.isLoaded(LocationUtil.vectorToBlockPos(position)))
                 .orElse(false);
     }

@@ -1,9 +1,9 @@
 package dev.compactmods.machines.api.tunnels.connection;
 
 import javax.annotation.Nonnull;
-import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -12,11 +12,13 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public interface ITunnelConnection {
 
-    @Nonnull
-    TunnelDefinition tunnelType();
 
+    /**
+     * Gets the level the tunnel is connected to.
+     * @return
+     */
     @Nonnull
-    IDimensionalPosition position();
+    ServerLevel level();
 
     @Nonnull
     BlockState state();
@@ -27,4 +29,7 @@ public interface ITunnelConnection {
      */
     @Nonnull
     Direction side();
+
+    @Nonnull
+    BlockPos position();
 }

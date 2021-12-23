@@ -1,9 +1,11 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.room.IMachineRoom;
+import dev.compactmods.machines.api.tunnels.ITunnelPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.item.IItemImportTunnel;
+import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,27 +24,21 @@ public class ItemImportTunnel extends TunnelDefinition implements IItemImportTun
         return IMPORT_COLOR;
     }
 
-    /**
-     * Handle initialization tasks for the tunnel's capabilities here.
-     *
-     * @param room  The room the tunnel was added to.
-     * @param added The connection being set up from room to machine.
-     */
     @Override
-    public void setupCapabilities(IMachineRoom room, ITunnelConnection added) {
-        room.getCapabilities()
-                .addCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new InfiniteItemSource(Items.COBBLESTONE), added.side());
+    public void setup(IMachineRoom room, ITunnelPosition tunnel, ITunnelConnection added) {
+        room.getTunnels().register(this, tunnel.pos());
+
+        room.getCapabilityManager()
+                .addCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new InfiniteItemSource(Items.COBBLESTONE), tunnel.side());
     }
 
-    /**
-     * Handle teardown of tunnel capabilities here.
-     *
-     * @param room    The room the tunnel was removed from.
-     * @param removed The connection being torn down, from machine to room.
-     */
     @Override
-    public void teardownCapabilities(IMachineRoom room, ITunnelConnection removed) {
-        room.getCapabilities().removeCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, removed.side());
+    public void teardown(IMachineRoom room, ITunnelPosition position, ITunnelConnection removed, TeardownReason reason) {
+        if(reason == TeardownReason.REMOVED)
+            room.getTunnels().unregister(position.pos());
+
+        room.getCapabilityManager()
+                .removeCapability(this, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, removed.side());
     }
 
     private static class InfiniteItemSource extends ItemStackHandler {

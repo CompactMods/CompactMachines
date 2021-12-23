@@ -33,9 +33,11 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
                     .texture("wall", modLoc("block/" + typedTunnelDirectional));
 
 
-            // If we ever do one-side has the texture again
-            // int x = dir == Direction.DOWN ? 180 : dir.getAxis().isHorizontal() ? 90 : 0;
-            // int y = dir.getAxis().isVertical() ? 0 : (((int) dir.getHorizontalAngle()) + 180) % 360;
+            /*
+             If we ever do one-side has the texture again
+             int x = dir == Direction.DOWN ? 180 : dir.getAxis().isHorizontal() ? 90 : 0;
+             int y = dir.getAxis().isVertical() ? 0 : (((int) dir.getHorizontalAngle()) + 180) % 360;
+            */
 
             getVariantBuilder(block)
                     .partialState()

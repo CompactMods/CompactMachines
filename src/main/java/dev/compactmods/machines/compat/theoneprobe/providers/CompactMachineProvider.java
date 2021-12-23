@@ -59,23 +59,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                 }
             });
 
-//            Set<BlockPos> tunnelsForMachineSide = TunnelHelper.getTunnelsForMachineSide(machine.machineId,
-//                    (ServerLevel) level, hitData.getSideHit());
-//
-//            IProbeInfo vertical = info.vertical(info.defaultLayoutStyle().spacing(0));
-//
-//            ServerLevel cm = level.getServer().getLevel(Registration.COMPACT_DIMENSION);
-//            tunnelsForMachineSide.forEach(position -> {
-//                TunnelWallTile tile = (TunnelWallTile) cm.getBlockEntity(position);
-//                if (tile == null)
-//                    return;
-//
-//                tile.getTunnelDefinition().ifPresent(tunnelDef -> {
-//                    vertical.text(
-//                            new TextComponent(position + ": " + tunnelDef.getRegistryName().toString())
-//                    );
-//                });
-//            });
+            // TODO - Connected Tunnels horizontal preview?
         }
     }
 }

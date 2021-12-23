@@ -3,13 +3,13 @@ package dev.compactmods.machines.block.walls;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityTeardown;
+import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
+import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
+import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import dev.compactmods.machines.block.tiles.TunnelWallEntity;
-import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.tunnel.TunnelMachineConnection;
 import dev.compactmods.machines.tunnel.TunnelHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,11 +31,12 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
+@SuppressWarnings("deprecation")
 public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
-    public static DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
-    public static DirectionProperty CONNECTED_SIDE = DirectionProperty.create("connected_side", Direction.values());
+    public static final DirectionProperty TUNNEL_SIDE = DirectionProperty.create("tunnel_side", Direction.values());
+    public static final DirectionProperty CONNECTED_SIDE = DirectionProperty.create("connected_side", Direction.values());
 
-    public static BooleanProperty REDSTONE = BooleanProperty.create("redstone");
+    public static final BooleanProperty REDSTONE = BooleanProperty.create("redstone");
 
     public TunnelWallBlock(Properties props) {
         super(props);
@@ -56,12 +57,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos position, @Nullable Direction side) {
-        return false;
+        return state.getValue(REDSTONE);
     }
 
     @Override
     public boolean isSignalSource(BlockState state) {
-        return false;
+        return state.getValue(REDSTONE);
     }
 
     @Override
@@ -72,19 +73,15 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
     @Override
     public int getSignal(BlockState state, BlockGetter world, BlockPos position, Direction side) {
         Optional<TunnelDefinition> tunnelInfo = getTunnelInfo(world, position);
-        if (!tunnelInfo.isPresent())
-            return 0;
 
-        TunnelDefinition definition = tunnelInfo.get();
-        if (definition instanceof IRedstoneReaderTunnel) {
+        return tunnelInfo.map(definition -> {
             // TODO - Redstone tunnels
-            // ITunnelConnectionInfo conn = TunnelHelper.generateConnectionInfo(world, position);
-            // int weak = ((IRedstoneReaderTunnel) definition).getPowerLevel(conn);
-            // return weak;
-            return 0;
-        }
+            if (definition instanceof IRedstoneReaderTunnel redstone) {
+                return 0;
+            }
 
-        return 0;
+            return 0;
+        }).orElse(0);
     }
 
     @Override
@@ -120,11 +117,8 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
                 level.addFreshEntity(ie);
 
-                if (def instanceof ITunnelCapabilityTeardown teardown) {
-                    level.getChunkAt(pos).getCapability(Capabilities.ROOM)
-                            .ifPresent(room -> {
-                                teardown.teardownCapabilities(room, new TunnelMachineConnection(serverLevel, tunnel));
-                            });
+                if (def instanceof ITunnelTeardown teardown) {
+                    TunnelHelper.teardown(level.getServer(), tunnel.getConnection(), pos, teardown, hitResult.getDirection(), TeardownReason.REMOVED);
                 }
             } else {
                 // Rotate tunnel
@@ -133,11 +127,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                 level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
 
-                if (def instanceof ITunnelCapabilityTeardown teardown) {
-                    level.getChunkAt(pos).getCapability(Capabilities.ROOM)
-                            .ifPresent(room -> {
-                                teardown.teardownCapabilities(room, new TunnelMachineConnection(serverLevel, tunnel));
-                            });
+                if (def instanceof ITunnelTeardown teardown) {
+                    TunnelHelper.teardown(level.getServer(), tunnel.getConnection(), pos, teardown, hitResult.getDirection(), TeardownReason.ROTATED);
+                }
+
+                if(def instanceof ITunnelSetup setup) {
+                    TunnelHelper.setup(level.getServer(), tunnel.getConnectedPosition(), pos, setup, hitResult.getDirection());
                 }
             }
 

@@ -2,6 +2,7 @@ package dev.compactmods.machines.rooms.capability;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import dev.compactmods.machines.core.Capabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -13,12 +14,10 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private final Player player;
     private final CMRoomHistory history;
     private LazyOptional<IRoomHistory> opt = LazyOptional.empty();
 
     public PlayerRoomHistoryCapProvider(Player player) {
-        this.player = player;
         this.history = new CMRoomHistory();
         this.opt = LazyOptional.of(() -> this.history);
     }
@@ -26,7 +25,7 @@ public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSe
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if(cap == CapabilityRoomHistory.HISTORY_CAPABILITY)
+        if(cap == Capabilities.ROOM_HISTORY)
             return opt.cast();
 
         return LazyOptional.empty();

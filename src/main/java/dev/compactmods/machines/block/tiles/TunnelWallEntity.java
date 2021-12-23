@@ -9,23 +9,24 @@ import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilitySetup;
-import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityTeardown;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
+import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
+import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
+import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.tunnel.TunnelMachineConnection;
+import dev.compactmods.machines.tunnel.TunnelPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -38,13 +39,23 @@ public class TunnelWallEntity extends BlockEntity {
     private int connectedMachine;
     private TunnelDefinition tunnelType;
 
+    private final LazyOptional<ITunnelConnection> conn;
     private LazyOptional<IMachineRoom> ROOM = LazyOptional.empty();
-    private static LazyOptional<IRoomCapabilities> CAPS = LazyOptional.empty();
+    private LazyOptional<IRoomCapabilities> CAPS = LazyOptional.empty();
     private TunnelMachineConnection connection;
 
     public TunnelWallEntity(BlockPos pos, BlockState state) {
         super(Tunnels.TUNNEL_BLOCK_ENTITY.get(), pos, state);
         this.tunnelType = Tunnels.UNKNOWN.get();
+        this.conn = LazyOptional.of(this::getConnection);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void setBlockState(@NotNull BlockState newState) {
+        super.setBlockState(newState);
+        if (level != null && !level.isClientSide)
+            this.connection = new TunnelMachineConnection(level.getServer(), this);
     }
 
     @Override
@@ -100,15 +111,20 @@ public class TunnelWallEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
 
-        var chunk = level.getChunkAt(worldPosition);
-        CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
-        ROOM = chunk.getCapability(Capabilities.ROOM);
+        if (level instanceof ServerLevel sl) {
+            this.connection = new TunnelMachineConnection(sl.getServer(), this);
 
-        CAPS.ifPresent(caps -> {
-            if(tunnelType instanceof ITunnelCapabilitySetup setup) {
-                // todo ROOM.ifPresent(room ->setup.setupCapabilities(room, );
+            var chunk = level.getChunkAt(worldPosition);
+            CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
+            ROOM = chunk.getCapability(Capabilities.ROOM);
+
+            if (tunnelType instanceof ITunnelSetup setup) {
+                ROOM.ifPresent(room -> setup.setup(room, new TunnelPosition(sl, worldPosition, getTunnelSide()), this.connection));
             }
-        });
+
+            this.ROOM = chunk.getCapability(Capabilities.ROOM).cast();
+            this.CAPS = chunk.getCapability(Capabilities.ROOM_CAPS).cast();
+        }
     }
 
     @NotNull
@@ -120,21 +136,26 @@ public class TunnelWallEntity extends BlockEntity {
         if (side != getTunnelSide())
             return super.getCapability(cap, side);
 
+        if (cap == Capabilities.TUNNEL_CONNECTION)
+            return conn.cast();
+
         final var chunk = level.getChunkAt(worldPosition);
         if (cap == Capabilities.ROOM)
-            return chunk.getCapability(Capabilities.ROOM).cast();
+            return ROOM.cast();
 
         if (cap == Capabilities.ROOM_CAPS)
-               return chunk.getCapability(Capabilities.ROOM_CAPS).cast();
+            return CAPS.cast();
 
-        return chunk.getCapability(Capabilities.ROOM).lazyMap(caps -> {
-            return caps.getCapabilities().getCapability(cap, side);
-        }).orElseGet(() -> super.getCapability(cap, side));
+        return CAPS.lazyMap(caps -> caps.getCapability(tunnelType, cap, side))
+                .orElseGet(() -> super.getCapability(cap, side));
     }
 
-    public ITunnelConnection getConnection() {
-        if(this.connection == null)
-            this.connection = new TunnelMachineConnection(level, this);
+    /**
+     * Server side only. Gets information about the connection to an outside point.
+     */
+    public @NotNull ITunnelConnection getConnection() {
+        if (this.connection == null)
+            this.connection = new TunnelMachineConnection(level.getServer(), this);
 
         return this.connection;
     }
@@ -148,7 +169,9 @@ public class TunnelWallEntity extends BlockEntity {
 
         var machines = CompactMachineData.get(server);
         var conn = MachineConnections.get(server);
-        var rooms = CompactRoomData.get(server);
+
+        if (machines == null || conn == null)
+            return null;
 
         final Collection<Integer> connected = conn.graph.getMachinesFor(new ChunkPos(worldPosition));
         final Optional<Integer> first = connected.stream().findFirst();
@@ -156,13 +179,13 @@ public class TunnelWallEntity extends BlockEntity {
             return null;
 
         int machine = first.get();
-        return machines.getMachineLocation(machine).orElse(null);
+        return machines.getMachineLocation(machine)
+                .map(dp -> dp.relative(getConnectedSide()))
+                .orElse(null);
     }
 
     /**
      * Gets the side the tunnel is placed on (the wall inside the machine)
-     *
-     * @return
      */
     public Direction getTunnelSide() {
         BlockState state = getBlockState();
@@ -171,8 +194,6 @@ public class TunnelWallEntity extends BlockEntity {
 
     /**
      * Gets the side the tunnel connects to externally (the machine side)
-     *
-     * @return
      */
     public Direction getConnectedSide() {
         BlockState blockState = getBlockState();
@@ -190,39 +211,12 @@ public class TunnelWallEntity extends BlockEntity {
         if (type == tunnelType)
             return;
 
-        if (level.isClientSide) {
+        if (level == null || level.isClientSide || !(level instanceof ServerLevel sl)) {
             tunnelType = type;
             return;
         }
 
-        ITunnelConnection conn = new ITunnelConnection() {
-            @NotNull
-            @Override
-            public TunnelDefinition tunnelType() {
-                return tunnelType;
-            }
-
-            @NotNull
-            @Override
-            public IDimensionalPosition position() {
-                return getConnectedPosition();
-            }
-
-            @NotNull
-            @Override
-            public BlockState state() {
-                var pos = getConnectedPosition();
-                return pos.getWorld(level.getServer())
-                        .map(l -> l.getBlockState(pos.getBlockPosition()))
-                        .orElse(Blocks.AIR.defaultBlockState());
-            }
-
-            @NotNull
-            @Override
-            public Direction side() {
-                return getTunnelSide();
-            }
-        };
+        ITunnelConnection conn = getConnection();
 
         final LevelChunk chunk = level.getChunkAt(worldPosition);
         var roomData = chunk.getCapability(Capabilities.ROOM).orElseThrow(() -> {
@@ -230,13 +224,14 @@ public class TunnelWallEntity extends BlockEntity {
             return new Exception("Missing chunk room data.");
         });
 
-        if (tunnelType instanceof ITunnelCapabilityTeardown teardown) {
-            teardown.teardownCapabilities(roomData, conn);
+        var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
+        if (tunnelType instanceof ITunnelTeardown teardown) {
+            teardown.teardown(roomData, p, conn, TeardownReason.REMOVED);
         }
 
         this.tunnelType = type;
-        if (tunnelType instanceof ITunnelCapabilitySetup setup) {
-            setup.setupCapabilities(roomData, conn);
+        if (tunnelType instanceof ITunnelSetup setup) {
+            setup.setup(roomData, p, conn);
         }
 
         setChanged();
@@ -248,15 +243,19 @@ public class TunnelWallEntity extends BlockEntity {
 
     /**
      * Server only. Changes where the tunnel is connected to.
-     * @param machine
+     *
+     * @param machine Machine ID to connect tunnel to.
      */
     public void setConnectedTo(int machine) {
-        if(level == null || level.isClientSide) return;
-        
+        if (level == null || level.isClientSide) return;
+
         CompactMachineData data = CompactMachineData.get(level.getServer());
-        if(data == null)
+        if (data == null)
             return;
 
-        data.getMachineLocation(machine).ifPresent(this.connection::setLocation);
+        data.getMachineLocation(machine).ifPresent(p -> {
+            this.connection = new TunnelMachineConnection(level.getServer(), this);
+            this.conn.invalidate();
+        });
     }
 }

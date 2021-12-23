@@ -142,6 +142,10 @@ public class CompactRoomData extends SavedData {
         return new NewRoomRegistration(this);
     }
 
+    public boolean isMachineRoomChunk(ChunkPos pos) {
+        return machineData.containsKey(pos);
+    }
+
     public static class NewRoomRegistration {
 
         private final CompactRoomData storage;

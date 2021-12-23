@@ -34,17 +34,11 @@ public class CompactMachineData extends SavedData {
     public final static String DATA_NAME = CompactMachines.MOD_ID + "_machines";
 
     /**
-     * Specifies locations of machines in-world, outside of the compact world.
-     * This is used for things like spawn lookups, tunnel handling, and forced ejections.
+     * Specifies locations of machine blocks, ie in the overworld.
+     * This is used for things like tunnel handling and forced ejections.
      */
-    public final Map<Integer, MachineData> data;
-
-    public final Map<Integer, LazyOptional<IDimensionalPosition>> machineLocations;
-
-    public CompactMachineData() {
-        data = new HashMap<>();
-        machineLocations = new HashMap<>();
-    }
+    private final Map<Integer, MachineData> data = new HashMap<>();
+    private final Map<Integer, LazyOptional<IDimensionalPosition>> locations = new HashMap<>();
 
     @Nullable
     public static CompactMachineData get(MinecraftServer server) {
@@ -60,16 +54,12 @@ public class CompactMachineData extends SavedData {
 
     public static CompactMachineData fromNbt(CompoundTag nbt) {
         CompactMachineData machines = new CompactMachineData();
-        if(nbt.contains("locations")) {
+        if (nbt.contains("locations")) {
             ListTag nbtLocations = nbt.getList("locations", Tag.TAG_COMPOUND);
             nbtLocations.forEach(nbtLoc -> {
                 DataResult<MachineData> res = MachineData.CODEC.parse(NbtOps.INSTANCE, nbtLoc);
-                res.resultOrPartial(err -> {
-                    CompactMachines.LOGGER.error("Error while processing machine data: " + err);
-                }).ifPresent(machineInfo -> {
-                    machines.data.put(machineInfo.machineId, machineInfo);
-                    machines.machineLocations.put(machineInfo.machineId, LazyOptional.of(() -> machineInfo.location));
-                });
+                res.resultOrPartial(err -> CompactMachines.LOGGER.error("Error while processing machine data: " + err))
+                        .ifPresent(machineInfo -> machines.data.put(machineInfo.machineId, machineInfo));
             });
         }
 
@@ -79,15 +69,12 @@ public class CompactMachineData extends SavedData {
     @Override
     @Nonnull
     public CompoundTag save(@Nonnull CompoundTag nbt) {
-        if(!data.isEmpty()) {
+        if (!data.isEmpty()) {
             ListTag nbtLocations = data.values()
                     .stream()
                     .map(entry -> {
                         DataResult<Tag> nbtRes = MachineData.CODEC.encodeStart(NbtOps.INSTANCE, entry);
-                        return nbtRes.resultOrPartial(err -> {
-                            CompactMachines.LOGGER.error("Error serializing machine data: " + err);
-                        });
-
+                        return nbtRes.resultOrPartial(err -> CompactMachines.LOGGER.error("Error serializing machine data: " + err));
                     })
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -99,30 +86,36 @@ public class CompactMachineData extends SavedData {
         return nbt;
     }
 
-    public boolean isPlaced(Integer machineId) {
-        return data.containsKey(machineId);
-    }
-
     public void setMachineLocation(int machineId, DimensionalPosition position) {
         // TODO - Packet/Event for machine changing external location (tunnels)
-        if(data.containsKey(machineId)) {
+        if (data.containsKey(machineId)) {
             data.get(machineId).setLocation(position);
         } else {
             data.put(machineId, new MachineData(machineId, position));
+        }
+
+        if (locations.containsKey(machineId)) {
+            locations.get(machineId).invalidate();
+            locations.remove(machineId);
         }
 
         this.setDirty();
     }
 
     public LazyOptional<IDimensionalPosition> getMachineLocation(int machineId) {
-        if(!data.containsKey(machineId))
+        if (!data.containsKey(machineId))
             return LazyOptional.empty();
 
-        MachineData machineData = this.data.get(machineId);
-        if(machineLocations.containsKey(machineId))
-            return machineLocations.get(machineId);
+        if (locations.containsKey(machineId))
+            return locations.get(machineId);
 
-        return machineLocations.put(machineId, LazyOptional.of(() -> machineData.location));
+        var lazy = LazyOptional.of(() -> {
+            MachineData machineData = this.data.get(machineId);
+            return (IDimensionalPosition) machineData.location;
+        });
+
+        locations.put(machineId, lazy);
+        return lazy;
     }
 
     public static class MachineData {
@@ -147,9 +140,8 @@ public class CompactMachineData extends SavedData {
             return this.location;
         }
 
-        public MachineData setLocation(DimensionalPosition position) {
+        public void setLocation(DimensionalPosition position) {
             this.location = position;
-            return this;
         }
     }
 }

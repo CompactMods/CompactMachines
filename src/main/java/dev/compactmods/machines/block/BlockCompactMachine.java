@@ -1,6 +1,7 @@
 package dev.compactmods.machines.block;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 import dev.compactmods.machines.CompactMachines;
@@ -41,6 +42,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
         float normalHardness = super.getDestroyProgress(state, player, worldIn, pos);
@@ -79,22 +81,15 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
-//        TODO Redstone out tunnels
-//        if(!(blockAccess.getTileEntity(position) instanceof TileEntityMachine)) {
-//            return 0;
-//        }
-//
-//        TileEntityMachine machine = (TileEntityMachine) blockAccess.getTileEntity(position);
-//        if(machine.isInsideItself()) {
-//            return 0;
-//        }
-//
-//        return machine.getRedstonePowerOutput(side.getOpposite());
+        // TODO Redstone out tunnels
         return 0;
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    @ParametersAreNonnullByDefault
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block changedBlock, BlockPos changedPos, boolean isMoving) {
         super.neighborChanged(state, world, pos, changedBlock, changedPos, isMoving);
 
@@ -103,81 +98,37 @@ public class BlockCompactMachine extends Block implements EntityBlock {
 
         ServerLevel serverWorld = (ServerLevel) world;
 
-        BlockState changedState = serverWorld.getBlockState(changedPos);
+        if (serverWorld.getBlockEntity(pos) instanceof CompactMachineTile machine) {
+            ServerLevel compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
+            if (compactWorld == null) {
+                CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
+            }
 
-        CompactMachineTile machine = (CompactMachineTile) serverWorld.getBlockEntity(pos);
-        if (machine == null)
-            return;
-
-        ServerLevel compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
-        if (compactWorld == null) {
-            CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
-            return;
-        }
-    }
-
-
-    public static EnumMachineSize getMachineSizeFromNBT(@Nullable CompoundTag tag) {
-        try {
-            if (tag == null)
-                return EnumMachineSize.TINY;
-
-            if (!tag.contains("size"))
-                return EnumMachineSize.TINY;
-
-            String sizeFromTag = tag.getString("size");
-            return EnumMachineSize.getFromSize(sizeFromTag);
-        } catch (Exception ex) {
-            return EnumMachineSize.TINY;
+            // TODO - Send notification to level tunnel listeners (API)
         }
     }
 
     public static Block getBySize(EnumMachineSize size) {
-        switch (size) {
-            case TINY:
-                return Registration.MACHINE_BLOCK_TINY.get();
+        return switch (size) {
+            case TINY -> Registration.MACHINE_BLOCK_TINY.get();
+            case SMALL -> Registration.MACHINE_BLOCK_SMALL.get();
+            case NORMAL -> Registration.MACHINE_BLOCK_NORMAL.get();
+            case LARGE -> Registration.MACHINE_BLOCK_LARGE.get();
+            case GIANT -> Registration.MACHINE_BLOCK_GIANT.get();
+            case MAXIMUM -> Registration.MACHINE_BLOCK_MAXIMUM.get();
+        };
 
-            case SMALL:
-                return Registration.MACHINE_BLOCK_SMALL.get();
-
-            case NORMAL:
-                return Registration.MACHINE_BLOCK_NORMAL.get();
-
-            case LARGE:
-                return Registration.MACHINE_BLOCK_LARGE.get();
-
-            case GIANT:
-                return Registration.MACHINE_BLOCK_GIANT.get();
-
-            case MAXIMUM:
-                return Registration.MACHINE_BLOCK_MAXIMUM.get();
-        }
-
-        return Registration.MACHINE_BLOCK_NORMAL.get();
     }
 
     public static Item getItemBySize(EnumMachineSize size) {
-        switch (size) {
-            case TINY:
-                return Registration.MACHINE_BLOCK_ITEM_TINY.get();
-
-            case SMALL:
-                return Registration.MACHINE_BLOCK_ITEM_SMALL.get();
-
-            case NORMAL:
-                return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
-
-            case LARGE:
-                return Registration.MACHINE_BLOCK_ITEM_LARGE.get();
-
-            case GIANT:
-                return Registration.MACHINE_BLOCK_ITEM_GIANT.get();
-
-            case MAXIMUM:
-                return Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
-        }
-
-        return Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
+        return switch (size) {
+            case TINY -> Registration.MACHINE_BLOCK_ITEM_TINY.get();
+            case SMALL -> Registration.MACHINE_BLOCK_ITEM_SMALL.get();
+            case NORMAL -> Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
+            case LARGE -> Registration.MACHINE_BLOCK_ITEM_LARGE.get();
+            case GIANT -> Registration.MACHINE_BLOCK_ITEM_GIANT.get();
+            case MAXIMUM -> Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
+        };
     }
 
     @Override
@@ -202,49 +153,40 @@ public class BlockCompactMachine extends Block implements EntityBlock {
         if (worldIn.isClientSide())
             return;
 
-        ServerLevel serverWorld = (ServerLevel) worldIn;
+        if (worldIn.getBlockEntity(pos) instanceof CompactMachineTile tile) {
+            // The machine already has data for some reason
+            if (tile.machineId != -1)
+                return;
 
-        boolean hasProperTile = worldIn.getBlockEntity(pos) instanceof CompactMachineTile;
-        if (!hasProperTile)
-            return;
+            // TODO - Custom machine names
 
-        CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
+            if (!stack.hasTag())
+                return;
 
-        // The machine already has data for some reason
-        if (tile.machineId != -1)
-            return;
+            CompoundTag nbt = stack.getTag();
+            if (nbt == null)
+                return;
 
-//        if (stack.hasDisplayName()) {
-//            tile.setCustomName(stack.getDisplayName());
-//        }
-
-        if(!stack.hasTag())
-            return;
-
-        CompoundTag nbt = stack.getTag();
-        if(nbt == null)
-            return;
-
-        if (nbt.contains("cm")) {
-            CompoundTag machineData = nbt.getCompound("cm");
-            if (machineData.contains("coords")) {
-                int machineID = machineData.getInt("coords");
-                tile.setMachineId(machineID);
+            if (nbt.contains("cm")) {
+                CompoundTag machineData = nbt.getCompound("cm");
+                if (machineData.contains("coords")) {
+                    int machineID = machineData.getInt("coords");
+                    tile.setMachineId(machineID);
+                }
             }
-        }
 
-        tile.doPostPlaced();
+            tile.doPostPlaced();
+        }
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (worldIn.isClientSide())
             return InteractionResult.SUCCESS;
 
         // TODO - Open GUI with machine preview
-        if (player instanceof ServerPlayer) {
-
-            ServerPlayer serverPlayer = (ServerPlayer) player;
+        if (player instanceof ServerPlayer serverPlayer) {
 
             ItemStack mainItem = player.getMainHandItem();
             if (mainItem.isEmpty())

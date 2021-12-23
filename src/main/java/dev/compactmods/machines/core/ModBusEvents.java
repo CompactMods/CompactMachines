@@ -18,11 +18,4 @@ public class ModBusEvents {
         CompactMachines.LOGGER.trace("Registering advancement triggers.");
         AdvancementTriggers.init();
     }
-
-//    @SubscribeEvent
-//    public static void enqueueIMC(final InterModEnqueueEvent event) {
-//        CompactMachines.LOGGER.trace("Sending IMC setup to TOP and other mods.");
-//        if (ModList.get().isLoaded("theoneprobe"))
-//            TheOneProbeCompat.sendIMC();
-//    }
 }

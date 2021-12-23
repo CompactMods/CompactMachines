@@ -1,7 +1,7 @@
 package dev.compactmods.machines.api.room;
 
 import javax.annotation.Nonnull;
-import dev.compactmods.machines.api.tunnels.connection.IMachineTunnels;
+import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
@@ -14,8 +14,8 @@ public interface IMachineRoom {
     ServerLevel getLevel();
 
     @Nonnull
-    IMachineTunnels getTunnels();
+    IRoomTunnels getTunnels();
 
     @Nonnull
-    IRoomCapabilities getCapabilities();
+    IRoomCapabilities getCapabilityManager();
 }
