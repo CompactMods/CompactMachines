@@ -231,6 +231,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             artifactId = mod_id
+            group = "dev.compactmods"
+            
             artifacts {
                 artifact jar
                 artifact(apiJar) {
@@ -241,10 +243,10 @@ publishing {
 
         nightlyMaven(MavenPublication) {
             artifactId = mod_id
+            group = "dev.compactmods.nightly"
+
             artifacts {
-                artifact(jar) {
-                    group = "dev.compactmods.nightly"
-                }
+                artifact(jar)
                 artifact(apiJar) {
                     classifier = "api"
                 }
