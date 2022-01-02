@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.walls;
+package dev.compactmods.machines.tunnel;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -7,10 +7,9 @@ import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
-import dev.compactmods.machines.block.tiles.TunnelWallEntity;
+import dev.compactmods.machines.wall.ProtectedWallBlock;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.tunnel.TunnelHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

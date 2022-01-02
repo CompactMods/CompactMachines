@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.tiles;
+package dev.compactmods.machines.tunnel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,13 +13,10 @@ import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
-import dev.compactmods.machines.block.walls.TunnelWallBlock;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.tunnel.TunnelMachineConnection;
-import dev.compactmods.machines.tunnel.TunnelPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

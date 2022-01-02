@@ -10,7 +10,6 @@ import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
-import dev.compactmods.machines.block.tiles.TunnelWallEntity;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;

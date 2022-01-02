@@ -1,7 +1,6 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.block.tiles.TunnelWallEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;

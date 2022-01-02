@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.block.tiles.TunnelWallEntity;
+import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 

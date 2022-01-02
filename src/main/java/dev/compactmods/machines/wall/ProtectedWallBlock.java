@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.walls;
+package dev.compactmods.machines.wall;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;

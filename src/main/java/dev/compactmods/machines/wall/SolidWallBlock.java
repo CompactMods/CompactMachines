@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.walls;
+package dev.compactmods.machines.wall;
 
 import dev.compactmods.machines.config.ServerConfig;
 import net.minecraft.core.BlockPos;

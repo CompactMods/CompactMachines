@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.walls;
+package dev.compactmods.machines.wall;
 
 import net.minecraft.world.level.block.Block;
 

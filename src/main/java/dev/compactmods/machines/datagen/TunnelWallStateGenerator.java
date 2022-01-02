@@ -2,7 +2,7 @@ package dev.compactmods.machines.datagen;
 
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.block.walls.TunnelWallBlock;
+import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.core.Tunnels;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
