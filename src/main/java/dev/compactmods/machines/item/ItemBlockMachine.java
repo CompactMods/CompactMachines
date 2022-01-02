@@ -1,5 +1,9 @@
 package dev.compactmods.machines.item;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.block.BlockCompactMachine;
@@ -7,26 +11,19 @@ import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 
 public class ItemBlockMachine extends BlockItem {
 
@@ -43,12 +40,9 @@ public class ItemBlockMachine extends BlockItem {
         if (!stack.hasTag())
             return Optional.empty();
 
-        CompoundTag machineData = stack.getTagElement("cm");
-        if (machineData == null)
-            return Optional.empty();
-
-        if (machineData.contains("coords")) {
-            int c = machineData.getInt("coords");
+        CompoundTag machineData = stack.getOrCreateTag();
+        if (machineData.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
+            int c = machineData.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
             return c > -1 ? Optional.of(c) : Optional.empty();
         }
 

@@ -36,7 +36,7 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     public void load(CompoundTag nbt) {
         super.load(nbt);
 
-        machineId = nbt.getInt("coords");
+        machineId = nbt.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
         // TODO customName = nbt.getString("CustomName");
         if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
             owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
@@ -60,7 +60,7 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        nbt.putInt("coords", machineId);
+        nbt.putInt(Reference.CompactMachines.NBT_MACHINE_ID, machineId);
         // nbt.putString("CustomName", customName.getString());
 
         if (owner != null) {

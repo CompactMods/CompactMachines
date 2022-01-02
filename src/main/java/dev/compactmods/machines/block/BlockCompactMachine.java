@@ -10,6 +10,7 @@ import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -136,12 +137,12 @@ public class BlockCompactMachine extends Block implements EntityBlock {
         Block given = getBySize(this.size);
         ItemStack stack = new ItemStack(given, 1);
 
-        CompoundTag nbt = stack.getOrCreateTagElement("cm");
-        nbt.putString("size", this.size.getName());
+        CompoundTag nbt = stack.getOrCreateTag();
+        // nbt.putString("size", this.size.getName());
 
         CompactMachineTile tileEntity = (CompactMachineTile) world.getBlockEntity(pos);
         if (tileEntity != null && tileEntity.mapped()) {
-            nbt.putInt("coords", tileEntity.machineId);
+            nbt.putInt(Reference.CompactMachines.NBT_MACHINE_ID, tileEntity.machineId);
         }
 
         return stack;
@@ -169,8 +170,8 @@ public class BlockCompactMachine extends Block implements EntityBlock {
 
             if (nbt.contains("cm")) {
                 CompoundTag machineData = nbt.getCompound("cm");
-                if (machineData.contains("coords")) {
-                    int machineID = machineData.getInt("coords");
+                if (machineData.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
+                    int machineID = machineData.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
                     tile.setMachineId(machineID);
                 }
             }
