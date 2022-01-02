@@ -94,7 +94,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish gradle nightly jar
-        run: ./gradlew publishNightlyMavenPublicationToGitHubPackagesRepository
+        run: ./gradlew publishNightlyPublicationToGitHubPackagesRepository
         env:
           CM_RELEASE: false
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}

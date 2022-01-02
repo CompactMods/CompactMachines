@@ -209,7 +209,7 @@ jar {
                 "Specification-Vendor"    : "",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
-                "Implementation-Version"  : version,
+                "Implementation-Version"  : archiveVersion,
                 "Implementation-Vendor"   : "",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -229,10 +229,10 @@ artifacts {
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        release(MavenPublication) {
             artifactId = mod_id
-            group = "dev.compactmods"
-            
+            groupId = "dev.compactmods"
+
             artifacts {
                 artifact jar
                 artifact(apiJar) {
@@ -241,9 +241,10 @@ publishing {
             }
         }
 
-        nightlyMaven(MavenPublication) {
+        nightly(MavenPublication) {
             artifactId = mod_id
-            group = "dev.compactmods.nightly"
+            groupId = "dev.compactmods.nightly"
+            version = "${mod_version}+nightly-${gitCommitHash}"
 
             artifacts {
                 artifact(jar)
