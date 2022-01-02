@@ -20,11 +20,12 @@ public class DataGeneration {
     }
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
+        ExistingFileHelper helper = event.getExistingFileHelper();
         generator.addProvider(new LevelBiomeGenerator(generator));
         generator.addProvider(new BlockLootGenerator(generator));
         generator.addProvider(new RecipeGenerator(generator));
-
         generator.addProvider(new AdvancementGenerator(generator));
+        generator.addProvider(new TagGenerator(generator, helper));
     }
 
     private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
