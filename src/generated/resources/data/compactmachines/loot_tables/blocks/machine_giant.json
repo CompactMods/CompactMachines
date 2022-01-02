@@ -27,8 +27,8 @@
               "op": "replace"
             },
             {
-              "source": "coords",
-              "target": "cm.coords",
+              "source": "machine_id",
+              "target": "machine_id",
               "op": "replace"
             }
           ]
