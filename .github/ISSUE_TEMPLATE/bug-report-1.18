@@ -1,8 +1,8 @@
 ---
-name: Bug Report - CM4
-about: Submit a report for Compact Machines 4, for 1.16.x
+name: Bug Report - CM4 (1.18.x)
+about: Submit a report for Compact Machines 4, for 1.18.x
 title: ''
-labels: 1.16, bug, unverified
+labels: 1.18, bug, unverified
 assignees: ''
 
 ---
@@ -18,8 +18,8 @@ assignees: ''
 ### Mod and Forge Versions
 > Do not use "latest" for versions. Be exact; it helps us track down the issue more accurately.
 
-**Mod Version:** 4.0.0 beta 2
-**Forge version:** 1.16.5 - 36.0.55
+**Mod Version:** 4.0.0 beta 3
+**Forge version:** 1.18.1 - 39.0.0
 
 ### Crash Information
 **Link to Crashlog**: [here](url)
