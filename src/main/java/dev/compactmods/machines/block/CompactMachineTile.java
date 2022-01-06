@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block.tiles;
+package dev.compactmods.machines.block;
 
 import java.util.Optional;
 import java.util.UUID;

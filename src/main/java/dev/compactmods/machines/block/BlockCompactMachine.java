@@ -5,16 +5,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.block.tiles.CompactMachineTile;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.reference.EnumMachineSize;
 import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -168,12 +169,9 @@ public class BlockCompactMachine extends Block implements EntityBlock {
             if (nbt == null)
                 return;
 
-            if (nbt.contains("cm")) {
-                CompoundTag machineData = nbt.getCompound("cm");
-                if (machineData.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
-                    int machineID = machineData.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
-                    tile.setMachineId(machineID);
-                }
+            if (nbt.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
+                int machineID = nbt.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
+                tile.setMachineId(machineID);
             }
 
             tile.doPostPlaced();
@@ -211,5 +209,23 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CompactMachineTile(pos, state);
+    }
+
+    @Override
+    public void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean a) {
+        MinecraftServer server = level.getServer();
+        if(level.isClientSide || server == null) {
+            super.onRemove(oldState, level, pos, newState, a);
+            return;
+        }
+
+        if(level.getBlockEntity(pos) instanceof CompactMachineTile entity) {
+            if(entity.mapped()) {
+                var machines = CompactMachineData.get(server);
+                machines.remove(entity.machineId);
+            }
+        }
+
+        super.onRemove(oldState, level, pos, newState, a);
     }
 }

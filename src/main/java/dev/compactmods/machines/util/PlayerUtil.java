@@ -8,7 +8,7 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.block.tiles.CompactMachineTile;
+import dev.compactmods.machines.block.CompactMachineTile;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
