@@ -120,7 +120,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish package
-        run: ./gradlew publishReleasePublicationToGitHubPackagesRepository -x test
+        run: ./gradlew build -x test
         env:
           CM_RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
