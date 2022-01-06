@@ -118,6 +118,12 @@ public class CompactMachineData extends SavedData {
         return lazy;
     }
 
+    public void remove(int id) {
+        var removed = data.remove(id);
+        if(removed != null)
+            setDirty();
+    }
+
     public static class MachineData {
         private final int machineId;
         public DimensionalPosition location;

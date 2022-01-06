@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.block.BlockCompactMachine;
-import dev.compactmods.machines.block.tiles.CompactMachineTile;
+import dev.compactmods.machines.block.CompactMachineTile;
 import dev.compactmods.machines.util.TranslationUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;

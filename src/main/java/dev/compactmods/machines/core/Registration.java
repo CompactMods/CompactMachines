@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 import dev.compactmods.machines.CompactMachines;
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
 import dev.compactmods.machines.block.BlockCompactMachine;
-import dev.compactmods.machines.block.tiles.CompactMachineTile;
+import dev.compactmods.machines.block.CompactMachineTile;
 import dev.compactmods.machines.wall.BreakableWallBlock;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import dev.compactmods.machines.item.ItemBlockMachine;
