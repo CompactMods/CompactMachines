@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.tunnels.lifecycle;
 
 import dev.compactmods.machines.api.tunnels.ITunnel;
+import dev.compactmods.machines.api.tunnels.ITunnelPosition;
 
 /**
  * Indicates that a tunnel has teardown tasks that are performed whenever a tunnel
@@ -14,6 +15,6 @@ public interface ITunnelTeardown<Tunn extends ITunnel> {
      * @param instance The tunnel instance being modified.
      * @param reason The reason the teardown is occurring.
      */
-    void teardown(Tunn instance, TeardownReason reason);
+    void teardown(ITunnelPosition position, Tunn instance, TeardownReason reason);
 
 }

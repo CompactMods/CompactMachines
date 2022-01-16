@@ -116,7 +116,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.addFreshEntity(ie);
 
                 if (def instanceof ITunnelTeardown teardown) {
-                    teardown.teardown(tunnel.getTunnel(), TeardownReason.REMOVED);
+                    teardown.teardown(new TunnelPosition(serverLevel, pos, hitResult.getDirection()), tunnel.getTunnel(), TeardownReason.REMOVED);
                 }
             } else {
                 // Rotate tunnel
@@ -126,7 +126,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
 
                 if (def instanceof ITunnelTeardown teardown) {
-                    teardown.teardown(tunnel.getTunnel(), TeardownReason.ROTATED);
+                    teardown.teardown(new TunnelPosition(serverLevel, pos, hitResult.getDirection()), tunnel.getTunnel(), TeardownReason.ROTATED);
                 }
 
                 var newTunn = def.newInstance(pos, hitResult.getDirection());

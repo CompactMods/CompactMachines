@@ -12,7 +12,6 @@ import dev.compactmods.machines.api.tunnels.ITunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.ICapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.api.tunnels.lifecycle.IPersistentTunnelData;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.core.Capabilities;
@@ -30,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,7 +74,7 @@ public class TunnelWallEntity extends BlockEntity {
                 this.tunnel = tunnelType.newInstance(worldPosition, getTunnelSide());
 
                 try {
-                    if (tunnel instanceof IPersistentTunnelData persist && nbt.contains("tunnel_data")) {
+                    if (tunnel instanceof INBTSerializable persist && nbt.contains("tunnel_data")) {
                         var data = nbt.get("tunnel_data");
                         persist.deserializeNBT(data);
                     }
@@ -93,7 +93,7 @@ public class TunnelWallEntity extends BlockEntity {
         compound.putString("tunnel_type", tunnelType.getRegistryName().toString());
         compound.putInt("machine", connectedMachine);
 
-        if (tunnelType instanceof IPersistentTunnelData<?> persist) {
+        if (tunnel instanceof INBTSerializable persist) {
             var data = persist.serializeNBT();
             compound.put("tunnel_data", data);
         }
@@ -147,7 +147,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (level == null || level.isClientSide)
             return super.getCapability(cap, side);
 
-        if (side != getTunnelSide())
+        if (side != null && side != getTunnelSide())
             return super.getCapability(cap, side);
 
         if (cap == Capabilities.TUNNEL_CONNECTION)
@@ -236,7 +236,7 @@ public class TunnelWallEntity extends BlockEntity {
 
         var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
         if (tunnelType instanceof ITunnelTeardown teardown) {
-            teardown.teardown(tunnel, TeardownReason.REMOVED);
+            teardown.teardown(p, tunnel, TeardownReason.REMOVED);
         }
 
         this.tunnelType = type;

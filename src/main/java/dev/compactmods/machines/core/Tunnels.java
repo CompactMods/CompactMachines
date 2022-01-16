@@ -7,7 +7,7 @@ import dev.compactmods.machines.item.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.UnknownTunnel;
-import dev.compactmods.machines.tunnel.definitions.ItemImportTunnel;
+import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -59,7 +59,7 @@ public class Tunnels {
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemImportTunnel::new);
+    public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemTunnel::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES
