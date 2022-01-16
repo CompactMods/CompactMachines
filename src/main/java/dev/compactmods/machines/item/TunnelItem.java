@@ -11,9 +11,6 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
-import dev.compactmods.machines.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.wall.SolidWallBlock;
-import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
@@ -21,9 +18,11 @@ import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
 import dev.compactmods.machines.tunnel.TunnelHelper;
-import dev.compactmods.machines.tunnel.UnknownTunnel;
+import dev.compactmods.machines.tunnel.TunnelWallBlock;
+import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.wall.SolidWallBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
@@ -90,7 +89,7 @@ public class TunnelItem extends Item {
         if (this.allowdedIn(group)) {
             IForgeRegistry<TunnelDefinition> definitions = RegistryManager.ACTIVE.getRegistry(TunnelDefinition.class);
             definitions.getValues().forEach(def -> {
-                if (def instanceof UnknownTunnel)
+                if (def == Tunnels.UNKNOWN.get())
                     return;
 
                 ItemStack withDef = new ItemStack(this, 1);

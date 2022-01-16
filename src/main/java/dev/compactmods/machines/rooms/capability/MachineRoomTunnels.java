@@ -1,7 +1,9 @@
 package dev.compactmods.machines.rooms.capability;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
@@ -12,35 +14,43 @@ import net.minecraft.world.level.chunk.LevelChunk;
 
 public class MachineRoomTunnels implements IRoomTunnels {
     private final LevelChunk chunk;
-    private final HashMap<BlockPos, TunnelDefinition> tunnels;
+    private final HashMap<TunnelDefinition, Set<BlockPos>> typedPositions;
 
     public MachineRoomTunnels(LevelChunk chunk) {
         this.chunk = chunk;
-        this.tunnels = new HashMap<>();
+        this.typedPositions = new HashMap<>();
     }
 
     /**
      * Registers a new tunnel applied to a position inside a machine room.
      *
-     * @param type   The type of tunnel being registered.
-     * @param at The position of the tunnel being registered.
+     * @param type The type of tunnel being registered.
+     * @param at   The position of the tunnel being registered.
      * @return True if successfully registered, false otherwise.
      */
     @Override
     public <T extends TunnelDefinition> boolean register(T type, BlockPos at) {
-        if(tunnels.containsKey(at))
-            return false;
+        // Reverse position map
+        typedPositions.putIfAbsent(type, new HashSet<>(6));
+        typedPositions.get(type).add(at);
 
-        tunnels.put(at, type);
         return true;
     }
 
     @Override
     public boolean unregister(BlockPos at) {
-        if(!tunnels.containsKey(at))
-            return false;
+        var it = typedPositions.keySet().iterator();
+        while (it.hasNext()) {
+            var positions = typedPositions.get(it.next());
 
-        tunnels.remove(at);
+            // Clean up reverse position map
+            if (positions.contains(at)) {
+                positions.remove(at);
+                if (positions.isEmpty())
+                    it.remove();
+            }
+        }
+
         return true;
     }
 
@@ -53,22 +63,19 @@ public class MachineRoomTunnels implements IRoomTunnels {
      */
     @Override
     public Stream<ITunnelConnection> stream() {
-        return tunnels.keySet().stream()
-                .filter(pos -> chunk.getBlockState(pos).hasBlockEntity())
-                .map(chunk::getBlockEntity)
-                .filter(ent -> ent instanceof TunnelWallEntity)
-                .map(tunnel -> {
-                    return ((TunnelWallEntity) tunnel).getConnection();
-                });
+        var combine = Stream.<BlockPos>of();
+        for (var type : typedPositions.values())
+            combine = Stream.concat(combine, type.stream());
+
+        return combine.map(this::locatedAt)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
     }
 
     @Override
     public Optional<ITunnelConnection> locatedAt(BlockPos pos) {
-        if(!tunnels.containsKey(pos))
-            return Optional.empty();
-
-        if(chunk.getBlockState(pos).hasBlockEntity()) {
-            if(chunk.getBlockEntity(pos) instanceof TunnelWallEntity t) {
+        if (chunk.getBlockState(pos).hasBlockEntity()) {
+            if (chunk.getBlockEntity(pos) instanceof TunnelWallEntity t) {
                 return Optional.of(t.getConnection());
             }
         }
@@ -78,12 +85,9 @@ public class MachineRoomTunnels implements IRoomTunnels {
 
     @Override
     public Stream<BlockPos> stream(TunnelDefinition type) {
-        return tunnels.keySet()
-                .stream()
-                .filter(pos -> tunnels.get(pos).getRegistryName() != null)
-                .filter(pos -> {
-                    var regName = tunnels.get(pos).getRegistryName();
-                    return regName != null && regName.equals(type.getRegistryName());
-                });
+        if (!typedPositions.containsKey(type))
+            return Stream.empty();
+
+        return typedPositions.get(type).stream();
     }
 }

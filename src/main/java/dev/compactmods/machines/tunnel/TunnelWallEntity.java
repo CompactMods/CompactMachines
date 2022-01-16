@@ -8,9 +8,11 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
+import dev.compactmods.machines.api.tunnels.ITunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.capability.ICapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
+import dev.compactmods.machines.api.tunnels.lifecycle.IPersistentTunnelData;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.core.Capabilities;
@@ -40,6 +42,7 @@ public class TunnelWallEntity extends BlockEntity {
     private LazyOptional<IMachineRoom> ROOM = LazyOptional.empty();
     private LazyOptional<IRoomCapabilities> CAPS = LazyOptional.empty();
     private TunnelMachineConnection connection;
+    private ITunnel tunnel;
 
     public TunnelWallEntity(BlockPos pos, BlockState state) {
         super(Tunnels.TUNNEL_BLOCK_ENTITY.get(), pos, state);
@@ -56,17 +59,28 @@ public class TunnelWallEntity extends BlockEntity {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
         try {
+            if (nbt.contains("machine")) {
+                this.connectedMachine = nbt.getInt("machine");
+            }
+
             if (nbt.contains("tunnel_type")) {
                 ResourceLocation type = new ResourceLocation(nbt.getString("tunnel_type"));
                 this.tunnelType = Tunnels.getDefinition(type);
-            }
+                this.tunnel = tunnelType.newInstance(worldPosition, getTunnelSide());
 
-            if (nbt.contains("machine")) {
-                this.connectedMachine = nbt.getInt("machine");
+                try {
+                    if (tunnel instanceof IPersistentTunnelData persist && nbt.contains("tunnel_data")) {
+                        var data = nbt.get("tunnel_data");
+                        persist.deserializeNBT(data);
+                    }
+                } catch (Exception ex) {
+                    CompactMachines.LOGGER.error("Error loading tunnel persistent data at {}; this is likely a cross-mod issue!", worldPosition, ex);
+                }
             }
         } catch (Exception e) {
             this.tunnelType = Tunnels.UNKNOWN.get();
@@ -78,6 +92,11 @@ public class TunnelWallEntity extends BlockEntity {
     public void saveAdditional(CompoundTag compound) {
         compound.putString("tunnel_type", tunnelType.getRegistryName().toString());
         compound.putInt("machine", connectedMachine);
+
+        if (tunnelType instanceof IPersistentTunnelData<?> persist) {
+            var data = persist.serializeNBT();
+            compound.put("tunnel_data", data);
+        }
     }
 
     @Override
@@ -115,12 +134,10 @@ public class TunnelWallEntity extends BlockEntity {
             CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
             ROOM = chunk.getCapability(Capabilities.ROOM);
 
-            if (tunnelType instanceof ITunnelSetup setup) {
-                ROOM.ifPresent(room -> setup.setup(room, new TunnelPosition(sl, worldPosition, getTunnelSide()), this.connection));
-            }
-
-            this.ROOM = chunk.getCapability(Capabilities.ROOM).cast();
-            this.CAPS = chunk.getCapability(Capabilities.ROOM_CAPS).cast();
+            // TODO
+//            if (tunnelType instanceof ITunnelSetup setup) {
+//                ROOM.ifPresent(room -> setup.setup(room, new TunnelPosition(sl, worldPosition, getTunnelSide()), this.connection));
+//            }
         }
     }
 
@@ -136,15 +153,11 @@ public class TunnelWallEntity extends BlockEntity {
         if (cap == Capabilities.TUNNEL_CONNECTION)
             return conn.cast();
 
-        final var chunk = level.getChunkAt(worldPosition);
-        if (cap == Capabilities.ROOM)
-            return ROOM.cast();
+        if (tunnelType instanceof ICapabilityTunnel c) {
+            return c.getCapability(cap, tunnel);
+        }
 
-        if (cap == Capabilities.ROOM_CAPS)
-            return CAPS.cast();
-
-        return CAPS.lazyMap(caps -> caps.getCapability(tunnelType, cap, side))
-                .orElseGet(() -> super.getCapability(cap, side));
+        return super.getCapability(cap, side);
     }
 
     /**
@@ -223,14 +236,11 @@ public class TunnelWallEntity extends BlockEntity {
 
         var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
         if (tunnelType instanceof ITunnelTeardown teardown) {
-            teardown.teardown(roomData, p, conn, TeardownReason.REMOVED);
+            teardown.teardown(tunnel, TeardownReason.REMOVED);
         }
 
         this.tunnelType = type;
-        if (tunnelType instanceof ITunnelSetup setup) {
-            setup.setup(roomData, p, conn);
-        }
-
+        this.tunnel = type.newInstance(p.pos(), p.side());
         setChanged();
     }
 
@@ -254,5 +264,14 @@ public class TunnelWallEntity extends BlockEntity {
             this.connection = new TunnelMachineConnection(level.getServer(), this);
             this.conn.invalidate();
         });
+    }
+
+    public ITunnel getTunnel() {
+        return tunnel;
+    }
+
+    public void setTunnel(ITunnel newTunn) {
+        this.tunnel = newTunn;
+        setChanged();
     }
 }

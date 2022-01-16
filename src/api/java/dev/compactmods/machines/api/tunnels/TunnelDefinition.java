@@ -1,9 +1,10 @@
 package dev.compactmods.machines.api.tunnels;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefinition>
-{
+public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefinition> {
     /**
      * The color of a non-indicator (the same color as the wall)
      */
@@ -23,6 +24,7 @@ public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefiniti
 
     /**
      * The central ring color of the tunnel. Shown in the tunnel item and on blocks.
+     *
      * @return An AARRGGBB-formatted integer indicating color.
      */
     public abstract int getTunnelRingColor();
@@ -37,4 +39,11 @@ public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefiniti
         return NO_INDICATOR_COLOR;
     }
 
+    /**
+     * Handle initialization tasks for the tunnel's data here.
+     *
+     * @param position The location of the new tunnel being created.
+     * @param side The side of the wall the tunnel is being added to.
+     */
+    public abstract ITunnel newInstance(BlockPos position, Direction side);
 }

@@ -3,7 +3,6 @@ package dev.compactmods.machines.tunnel;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelSetup;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
@@ -117,7 +116,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.addFreshEntity(ie);
 
                 if (def instanceof ITunnelTeardown teardown) {
-                    TunnelHelper.teardown(level.getServer(), tunnel.getConnection(), pos, teardown, hitResult.getDirection(), TeardownReason.REMOVED);
+                    teardown.teardown(tunnel.getTunnel(), TeardownReason.REMOVED);
                 }
             } else {
                 // Rotate tunnel
@@ -127,12 +126,11 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
 
                 if (def instanceof ITunnelTeardown teardown) {
-                    TunnelHelper.teardown(level.getServer(), tunnel.getConnection(), pos, teardown, hitResult.getDirection(), TeardownReason.ROTATED);
+                    teardown.teardown(tunnel.getTunnel(), TeardownReason.ROTATED);
                 }
 
-                if(def instanceof ITunnelSetup setup) {
-                    TunnelHelper.setup(level.getServer(), tunnel.getConnectedPosition(), pos, setup, hitResult.getDirection());
-                }
+                var newTunn = def.newInstance(pos, hitResult.getDirection());
+                tunnel.setTunnel(newTunn);
             }
 
             return InteractionResult.SUCCESS;

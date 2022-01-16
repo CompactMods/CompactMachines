@@ -7,6 +7,7 @@ import dev.compactmods.machines.item.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.UnknownTunnel;
+import dev.compactmods.machines.tunnel.definitions.ItemImportTunnel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,10 +26,13 @@ public class Tunnels {
 
     // region Setup
 
-    public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
+    @SuppressWarnings("unchecked")
+    public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create((Class) TunnelDefinition.class, MOD_ID);
+
+    @SuppressWarnings("unchecked")
     public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry("tunnel_types",
             () -> new RegistryBuilder<TunnelDefinition>()
-                    .setType(TunnelDefinition.class)
+                    .setType((Class) TunnelDefinition.class)
                     .tagFolder("tunnel_types"));
 
     public static void init(IEventBus bus) {
@@ -55,7 +59,7 @@ public class Tunnels {
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
-    // public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemImportTunnel::new);
+    public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemImportTunnel::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES

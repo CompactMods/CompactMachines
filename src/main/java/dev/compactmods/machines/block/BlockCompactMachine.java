@@ -212,6 +212,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean a) {
         MinecraftServer server = level.getServer();
         if(level.isClientSide || server == null) {
