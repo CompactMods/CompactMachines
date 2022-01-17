@@ -2,13 +2,20 @@ package dev.compactmods.machines.tunnel;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
-import dev.compactmods.machines.wall.ProtectedWallBlock;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.wall.ProtectedWallBlock;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -45,12 +52,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         );
     }
 
-    public Optional<TunnelDefinition> getTunnelInfo(BlockGetter world, BlockPos position) {
+    public static Optional<TunnelDefinition> getTunnelInfo(BlockGetter world, BlockPos position) {
         TunnelWallEntity tile = (TunnelWallEntity) world.getBlockEntity(position);
         if (tile == null)
             return Optional.empty();
 
-        return tile.getTunnelDefinition();
+        return Optional.of(tile.getTunnelType());
     }
 
     @Override
@@ -102,38 +109,65 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
-        return tunnel.getTunnelDefinition().map(def -> {
-            if (player.isShiftKeyDown()) {
-                BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+        var def = tunnel.getTunnelType();
+        final Direction tunnelWallSide = hitResult.getDirection();
+        var tunnels = level.getChunkAt(pos).getCapability(Capabilities.ROOM_TUNNELS);
 
-                level.setBlockAndUpdate(pos, solidWall);
+        if (player.isShiftKeyDown()) {
+            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
-                ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-                CompoundTag defTag = stack.getOrCreateTagElement("definition");
-                defTag.putString("id", def.getRegistryName().toString());
+            level.setBlockAndUpdate(pos, solidWall);
 
-                ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
-                level.addFreshEntity(ie);
+            ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+            CompoundTag defTag = stack.getOrCreateTagElement("definition");
+            defTag.putString("id", def.getRegistryName().toString());
 
-                if (def instanceof ITunnelTeardown teardown) {
-                    teardown.teardown(new TunnelPosition(serverLevel, pos, hitResult.getDirection()), tunnel.getTunnel(), TeardownReason.REMOVED);
-                }
-            } else {
-                // Rotate tunnel
-                Direction dir = state.getValue(CONNECTED_SIDE);
-                Direction nextDir = TunnelHelper.getNextDirection(dir);
+            ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
+            level.addFreshEntity(ie);
 
-                level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, nextDir));
-
-                if (def instanceof ITunnelTeardown teardown) {
-                    teardown.teardown(new TunnelPosition(serverLevel, pos, hitResult.getDirection()), tunnel.getTunnel(), TeardownReason.ROTATED);
-                }
-
-                var newTunn = def.newInstance(pos, hitResult.getDirection());
-                tunnel.setTunnel(newTunn);
+            if (def instanceof ITunnelTeardown teardown) {
+                teardown.teardown(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), TeardownReason.REMOVED);
             }
 
-            return InteractionResult.SUCCESS;
-        }).orElse(InteractionResult.FAIL);
+            tunnels.ifPresent(t -> t.unregister(pos));
+        } else {
+            // Rotate tunnel
+            Direction dir = state.getValue(CONNECTED_SIDE);
+
+            var next = tunnels.map(t -> {
+                final Set<BlockPos> existing = t.stream(def).collect(Collectors.toSet());
+                final Set<Direction> existingDirs = existing.stream()
+                        .map(t::locatedAt)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(ITunnelConnection::side)
+                        .collect(Collectors.toSet());
+
+                final Optional<Direction> firstNotFound = TunnelHelper.getOrderedSides()
+                        .filter(side -> !existingDirs.contains(side))
+                        .findFirst();
+
+                return firstNotFound.orElse(dir);
+            }).orElse(dir);
+
+            if (next == dir) {
+                // WARN PLAYER - NO OTHER SIDES REMAIN
+                player.displayClientMessage(
+                        TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
+
+                return InteractionResult.FAIL;
+            }
+
+            level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, next));
+
+            if (def instanceof ITunnelTeardown teardown) {
+                teardown.teardown(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), TeardownReason.ROTATED);
+            }
+
+            var newTunn = def.newInstance(pos, tunnelWallSide);
+            tunnel.setTunnel(newTunn);
+        }
+
+        return InteractionResult.SUCCESS;
     }
 }

@@ -2,7 +2,7 @@ package dev.compactmods.machines.client;
 
 import java.util.Optional;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.item.TunnelItem;
+import dev.compactmods.machines.tunnel.TunnelItem;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.ItemStack;
 

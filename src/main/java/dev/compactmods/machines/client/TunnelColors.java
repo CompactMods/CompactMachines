@@ -1,8 +1,6 @@
 package dev.compactmods.machines.client;
 
 import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.Optional;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import net.minecraft.client.color.block.BlockColor;
@@ -16,25 +14,27 @@ public class TunnelColors implements BlockColor {
     @Override
     public int getColor(BlockState state, @Nullable BlockAndTintGetter reader, @Nullable BlockPos position, int tintIndex) {
         try {
+            if(reader == null || position == null)
+                return TunnelDefinition.NO_INDICATOR_COLOR;
+
             BlockEntity tile = reader.getBlockEntity(position);
             if (tile instanceof TunnelWallEntity tunnel) {
-                Optional<TunnelDefinition> tunnelDefinition = tunnel.getTunnelDefinition();
+                TunnelDefinition type = tunnel.getTunnelType();
 
                 switch(tintIndex) {
                     case 0:
-                        return tunnelDefinition.map(TunnelDefinition::getTunnelRingColor)
-                                .orElse(Color.gray.getRGB());
+                        return type.getTunnelRingColor();
+
                     case 1:
-                        return tunnelDefinition.map(TunnelDefinition::getTunnelIndicatorColor)
-                                .orElse(TunnelDefinition.NO_INDICATOR_COLOR);
+                        return type.getTunnelIndicatorColor();
                 }
             }
 
-            return Color.gray.getRGB();
+            return TunnelDefinition.NO_INDICATOR_COLOR;
         }
 
         catch(Exception ex) {
-            return Color.red.getRGB();
+            return TunnelDefinition.NO_INDICATOR_COLOR;
         }
     }
 }

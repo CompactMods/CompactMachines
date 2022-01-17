@@ -9,13 +9,13 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemImportStorage implements ITunnel, INBTSerializable<CompoundTag> {
+public class ItemStorage implements ITunnel, INBTSerializable<CompoundTag> {
 
     Direction side;
     private final LazyOptional<IItemHandler> laze;
     final ItemStackHandler handler;
 
-    public ItemImportStorage(int buffer, Direction side) {
+    public ItemStorage(int buffer, Direction side) {
         this.handler = new ItemStackHandler(buffer);
         this.side = side;
         this.laze = LazyOptional.of(this::getItems);

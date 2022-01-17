@@ -3,7 +3,7 @@ package dev.compactmods.machines.core;
 import java.util.function.Supplier;
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.item.TunnelItem;
+import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.UnknownTunnel;

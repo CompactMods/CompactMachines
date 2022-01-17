@@ -210,13 +210,6 @@ public class TunnelWallEntity extends BlockEntity {
         return blockState.getValue(TunnelWallBlock.CONNECTED_SIDE);
     }
 
-    public Optional<TunnelDefinition> getTunnelDefinition() {
-        if (tunnelType == null)
-            return Optional.empty();
-
-        return Optional.of(tunnelType);
-    }
-
     public void setTunnelType(TunnelDefinition type) throws Exception {
         if (type == tunnelType)
             return;

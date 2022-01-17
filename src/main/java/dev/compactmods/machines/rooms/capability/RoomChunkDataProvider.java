@@ -70,12 +70,14 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
 
     @Override
     public CompoundTag serializeNBT() {
-        // tag.put("room", room.serializeNBT());
-        return new CompoundTag();
+        var tag = new CompoundTag();
+        tag.put("tunnels", tunnels.serializeNBT());
+        return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        // room.deserializeNBT(nbt.getList("room", Tag.TAG_COMPOUND));
+        final CompoundTag t = nbt.getCompound("tunnels");
+        tunnels.deserializeNBT(t);
     }
 }

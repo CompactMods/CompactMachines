@@ -1,14 +1,11 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
-import java.util.Optional;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.tunnel.TunnelWallBlock;
+import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -48,27 +45,15 @@ public class TunnelProvider implements IProbeInfoProvider {
             ITunnelConnection outside = tile.getConnection();
 
             if (probeMode == ProbeMode.EXTENDED) {
-                Optional<TunnelDefinition> definition = tile.getTunnelDefinition();
-                if (definition.isPresent()) {
-                    MutableComponent tunType = new TextComponent(definition.get().getRegistryName().toString())
-                            .withStyle(ChatFormatting.GRAY);
+                TunnelDefinition definition = tile.getTunnelType();
 
-                    CompoundText type = CompoundText.create().name(tunType);
-                    v.horizontal(center)
-                            .item(new ItemStack(Tunnels.ITEM_TUNNEL.get()))
-                            .text(type);
+                MutableComponent tunType = new TextComponent(definition.getRegistryName().toString())
+                        .withStyle(ChatFormatting.GRAY);
 
-                } else {
-                    TunnelDefinition tunnel = tile.getTunnelType();
-
-                    MutableComponent tunType = TranslationUtil.message(Messages.UNKNOWN_TUNNEL, tunnel.getRegistryName())
-                            .withStyle(ChatFormatting.GRAY);
-
-                    CompoundText type = CompoundText.create().name(tunType);
-                    v.horizontal(center)
-                            .item(new ItemStack(Tunnels.ITEM_TUNNEL.get()))
-                            .text(type);
-                }
+                CompoundText type = CompoundText.create().name(tunType);
+                v.horizontal(center)
+                        .item(new ItemStack(Tunnels.ITEM_TUNNEL.get()))
+                        .text(type);
             }
 
             String sideTranslated = IProbeInfo.STARTLOC

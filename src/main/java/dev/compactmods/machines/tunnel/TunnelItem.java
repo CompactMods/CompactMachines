@@ -1,4 +1,4 @@
-package dev.compactmods.machines.item;
+package dev.compactmods.machines.tunnel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,14 +17,10 @@ import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
-import dev.compactmods.machines.tunnel.TunnelHelper;
-import dev.compactmods.machines.tunnel.TunnelWallBlock;
-import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -173,7 +169,7 @@ public class TunnelItem extends Item {
                     .collect(Collectors.toSet());
 
             final Set<Direction> sides = existingOfType.stream()
-                    .map(TunnelWallEntity::getTunnelSide)
+                    .map(TunnelWallEntity::getConnectedSide)
                     .collect(Collectors.toSet());
 
             Optional<Direction> firstAvailable = TunnelHelper.getOrderedSides()
@@ -181,7 +177,8 @@ public class TunnelItem extends Item {
                     .findFirst();
 
             if (firstAvailable.isEmpty()) {
-                player.sendMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), Util.NIL_UUID);
+                player.displayClientMessage(
+                        TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
                 return false;
             }
 
@@ -194,9 +191,7 @@ public class TunnelItem extends Item {
 
             level.setBlock(position, tunnelState, Block.UPDATE_ALL);
 
-            chunk.getCapability(Capabilities.ROOM_TUNNELS).ifPresent(roomTunn -> {
-                roomTunn.register(def, position);
-            });
+            room.register(def, position);
 
             if (level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
                 try {

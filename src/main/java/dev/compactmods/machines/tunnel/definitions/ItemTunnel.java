@@ -17,7 +17,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class ItemTunnel extends TunnelDefinition
-        implements ICapabilityTunnel<ItemImportStorage>, ITunnelTeardown<ItemImportStorage> {
+        implements ICapabilityTunnel<ItemStorage>, ITunnelTeardown<ItemStorage> {
 
     @Override
     public int getTunnelRingColor() {
@@ -36,7 +36,7 @@ public class ItemTunnel extends TunnelDefinition
      */
     @Override
     public ITunnel newInstance(BlockPos pos, Direction side) {
-        return new ItemImportStorage(10, side);
+        return new ItemStorage(10, side);
     }
 
     /**
@@ -46,7 +46,7 @@ public class ItemTunnel extends TunnelDefinition
      * @return LazyOptional instance of the capability, or LO.empty otherwise.
      */
     @Override
-    public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> capType, ItemImportStorage instance) {
+    public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> capType, ItemStorage instance) {
         if(capType == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return instance.lazy();
         }
@@ -61,7 +61,7 @@ public class ItemTunnel extends TunnelDefinition
      * @param reason   The reason the teardown is occurring.
      */
     @Override
-    public void teardown(ITunnelPosition position, ItemImportStorage instance, TeardownReason reason) {
+    public void teardown(ITunnelPosition position, ItemStorage instance, TeardownReason reason) {
         BlockPos dropAt = position.pos().relative(position.side());
 
         NonNullList<ItemStack> stacks = NonNullList.create();

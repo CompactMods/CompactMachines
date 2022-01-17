@@ -36,5 +36,4 @@ public interface IRoomTunnels {
      * @return
      */
     Stream<BlockPos> stream(TunnelDefinition type);
-
 }
