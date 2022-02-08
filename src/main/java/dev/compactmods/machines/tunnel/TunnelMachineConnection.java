@@ -1,5 +1,6 @@
 package dev.compactmods.machines.tunnel;
 
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,13 +16,20 @@ public class TunnelMachineConnection implements ITunnelConnection {
     private final BlockState state;
     private final Direction side;
     private final BlockPos position;
+    private final TunnelDefinition type;
 
     public TunnelMachineConnection(MinecraftServer server, TunnelWallEntity tunnel) {
         var location = tunnel.getConnectedPosition();
+        this.type = tunnel.getTunnelType();
         this.position = location.getBlockPosition();
         this.level = location.level(server).orElseThrow();
         this.state = location.state(server).orElse(Blocks.AIR.defaultBlockState());
         this.side = tunnel.getConnectedSide();
+    }
+
+    @Override
+    public <T extends TunnelDefinition> T type() {
+        return (T) type;
     }
 
     @NotNull

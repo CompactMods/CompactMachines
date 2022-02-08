@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.tunnels.connection;
 
 import javax.annotation.Nonnull;
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public interface ITunnelConnection {
 
+    <T extends TunnelDefinition> T type();
 
     /**
      * Gets the level the tunnel is connected to.

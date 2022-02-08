@@ -73,13 +73,23 @@ public class MachineRoomTunnels implements IRoomTunnels, INBTSerializable<Compou
      */
     @Override
     public Stream<ITunnelConnection> stream() {
+        return streamLocations().map(this::locatedAt)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
+
+    /**
+     * Creates a stream of tunnel locations, untyped.
+     *
+     * @return Stream of positions inside a room that have tunnels at them.
+     */
+    @Override
+    public Stream<BlockPos> streamLocations() {
         var combine = Stream.<BlockPos>of();
         for (var type : typedPositions.values())
             combine = Stream.concat(combine, type.stream());
 
-        return combine.map(this::locatedAt)
-                .filter(Optional::isPresent)
-                .map(Optional::get);
+        return combine;
     }
 
     @Override

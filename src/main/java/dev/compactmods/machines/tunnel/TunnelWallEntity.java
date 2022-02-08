@@ -10,7 +10,7 @@ import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.api.tunnels.ITunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ICapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityProvider;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
@@ -153,7 +153,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (cap == Capabilities.TUNNEL_CONNECTION)
             return conn.cast();
 
-        if (tunnelType instanceof ICapabilityTunnel c) {
+        if (tunnelType instanceof ITunnelCapabilityProvider c) {
             return c.getCapability(cap, tunnel);
         }
 
@@ -254,6 +254,7 @@ public class TunnelWallEntity extends BlockEntity {
             return;
 
         data.getMachineLocation(machine).ifPresent(p -> {
+            this.connectedMachine = machine;
             this.connection = new TunnelMachineConnection(level.getServer(), this);
             this.conn.invalidate();
         });
@@ -266,5 +267,9 @@ public class TunnelWallEntity extends BlockEntity {
     public void setTunnel(ITunnel newTunn) {
         this.tunnel = newTunn;
         setChanged();
+    }
+
+    public int getMachine() {
+        return connectedMachine;
     }
 }

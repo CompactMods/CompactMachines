@@ -1,9 +1,10 @@
 package dev.compactmods.machines.tunnel.definitions;
 
+import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.api.tunnels.ITunnel;
 import dev.compactmods.machines.api.tunnels.ITunnelPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ICapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityProvider;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import net.minecraft.core.BlockPos;
@@ -17,7 +18,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class ItemTunnel extends TunnelDefinition
-        implements ICapabilityTunnel<ItemStorage>, ITunnelTeardown<ItemStorage> {
+        implements ITunnelCapabilityProvider<ItemStorage>, ITunnelTeardown<ItemStorage> {
 
     @Override
     public int getTunnelRingColor() {
@@ -37,6 +38,13 @@ public class ItemTunnel extends TunnelDefinition
     @Override
     public ITunnel newInstance(BlockPos pos, Direction side) {
         return new ItemStorage(10, side);
+    }
+
+    @Override
+    public ImmutableSet<Class> getSupportedCapabilities(ItemStorage instance) {
+        return ImmutableSet.<Class>builder()
+                .add(IItemHandler.class)
+                .build();
     }
 
     /**

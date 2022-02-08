@@ -1,7 +1,11 @@
 package dev.compactmods.machines.block;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
+import dev.compactmods.machines.api.room.IMachineRoom;
+import dev.compactmods.machines.api.room.IRoomCapabilities;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
@@ -9,6 +13,7 @@ import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.reference.Reference;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -17,7 +22,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 
 public class CompactMachineTile extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
@@ -27,13 +35,38 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     protected UUID owner;
     protected String schema;
     protected boolean locked = false;
+    private LazyOptional<IMachineRoom> room = LazyOptional.empty();
+    private LazyOptional<IRoomCapabilities> caps = LazyOptional.empty();
 
     public CompactMachineTile(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
     }
 
+    @NotNull
     @Override
-    public void load(CompoundTag nbt) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if(cap == Capabilities.ROOM) return room.cast();
+        if(cap == Capabilities.ROOM_CAPS) return caps.cast();
+
+        return caps.lazyMap(c -> c.getCapability(cap, side))
+                .orElse(super.getCapability(cap, side));
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+
+        if(level instanceof ServerLevel sl) {
+            getInternalChunkPos().ifPresent(c -> {
+                var inChunk = sl.getChunk(c.x, c.z);
+                this.room = inChunk.getCapability(Capabilities.ROOM);
+                this.caps = inChunk.getCapability(Capabilities.ROOM_CAPS);
+            });
+        }
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
         machineId = nbt.getInt(Reference.CompactMachines.NBT_MACHINE_ID);

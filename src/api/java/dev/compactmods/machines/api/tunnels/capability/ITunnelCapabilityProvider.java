@@ -1,11 +1,14 @@
 package dev.compactmods.machines.api.tunnels.capability;
 
+import com.google.common.collect.ImmutableSet;
 import dev.compactmods.machines.api.tunnels.ITunnel;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
-public interface ICapabilityTunnel<Tunnel extends ITunnel> {
+public interface ITunnelCapabilityProvider<Tunnel extends ITunnel> {
+
+    ImmutableSet<Class> getSupportedCapabilities(Tunnel instance);
 
     /**
      * Fetch a capability instance from a tunnel.

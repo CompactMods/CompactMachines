@@ -23,6 +23,13 @@ public interface IRoomTunnels {
     Stream<ITunnelConnection> stream();
 
     /**
+     * Creates a stream of tunnel locations, untyped.
+     *
+     * @return Stream of positions inside a room that have tunnels at them.
+     */
+    Stream<BlockPos> streamLocations();
+
+    /**
      * Gets information about a given tunnel position.
      * @param pos
      * @return

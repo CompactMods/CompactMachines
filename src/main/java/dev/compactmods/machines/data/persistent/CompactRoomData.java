@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -92,6 +93,10 @@ public class CompactRoomData extends SavedData {
         return nbt;
     }
 
+    public Stream<ChunkPos> stream() {
+        return machineData.keySet().stream();
+    }
+
     public boolean isRegistered(ChunkPos chunkPos) {
         return machineData.containsKey(chunkPos);
     }
@@ -102,6 +107,10 @@ public class CompactRoomData extends SavedData {
 
         machineData.put(pos, data);
         setDirty();
+    }
+
+    public Stream<RoomData> streamRooms() {
+        return machineData.values().stream();
     }
 
     @Nullable
@@ -182,7 +191,7 @@ public class CompactRoomData extends SavedData {
             Vec3 spawnTest = new Vec3(spawn.getX(), spawn.getY(), spawn.getZ());
 
             // Make sure the spawn is inside the new room bounds
-            if(size.getBounds(this.center).contains(spawnTest))
+            if (size.getBounds(this.center).contains(spawnTest))
                 this.spawn = spawnTest;
 
             return this;
@@ -200,7 +209,7 @@ public class CompactRoomData extends SavedData {
         }
     }
 
-    private static class RoomData {
+    public static class RoomData {
 
         public static final Codec<RoomData> CODEC = RecordCodecBuilder.create(i -> i.group(
                 CodecExtensions.UUID_CODEC.fieldOf("owner").forGetter(RoomData::getOwner),
@@ -221,7 +230,7 @@ public class CompactRoomData extends SavedData {
             this.size = size;
         }
 
-        private EnumMachineSize getSize() {
+        public EnumMachineSize getSize() {
             return this.size;
         }
 

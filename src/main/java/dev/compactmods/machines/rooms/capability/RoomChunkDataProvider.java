@@ -16,13 +16,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTag> {
     private final RoomChunkData room;
-    // private final RoomChunkCapabilities roomCaps;
+    private final RoomChunkCapabilities roomCaps;
     private final MachineRoomTunnels tunnels;
 
     public RoomChunkDataProvider(LevelChunk chunk) {
         this.room = new RoomChunkData(chunk);
         this.tunnels = new MachineRoomTunnels(chunk);
-        // this.roomCaps = new RoomChunkCapabilities(chunk, tunnels);
+        this.roomCaps = new RoomChunkCapabilities(chunk, tunnels);
     }
 
     /**
@@ -59,8 +59,7 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
 
     @NotNull
     private IRoomCapabilities caps() {
-        return null;
-        // return roomCaps;
+        return roomCaps;
     }
 
     @NotNull

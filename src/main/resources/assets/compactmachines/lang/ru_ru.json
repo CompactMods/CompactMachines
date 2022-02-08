@@ -54,7 +54,7 @@
   "jei.compactmachines.machines": "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.",
   "jei.compactmachines.shrinking_device": "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. You can also right click it in the overworld for more info.",
   "message.compactmachines.cannot_enter": "Вы возитесь с персональным сжимающим устройством, но безрезультатно. Оно отказывается работать.",
-  "message.compactmachines.fixbiome_bad_dim": "Cannot use fixbiome command outside of a machine room.",
+  "message.compactmachines.not_in_compact_dim": "Cannot use that command outside of a machine room.",
   "message.compactmachines.new_machine": "New Machine",
   "message.compactmachines.no_machine_data": "Данные механизма не загружены; сообщите об этом разработчику.",
   "message.compactmachines.spawnpoint_set": "Новая точка возрождения установлена.",

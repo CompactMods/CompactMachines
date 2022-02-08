@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -122,6 +123,10 @@ public class CompactMachineData extends SavedData {
         var removed = data.remove(id);
         if(removed != null)
             setDirty();
+    }
+
+    public Stream<MachineData> stream() {
+        return data.values().stream();
     }
 
     public static class MachineData {
