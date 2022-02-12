@@ -1,5 +1,6 @@
 package dev.compactmods.machines.datagen;
 
+import java.io.IOException;
 import dev.compactmods.machines.CompactMachines;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -11,7 +12,7 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 public class DataGeneration {
 
     @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent event) throws IOException {
         if (event.includeServer())
             registerServerProviders(event.getGenerator(), event);
 
@@ -19,9 +20,10 @@ public class DataGeneration {
             registerClientProviders(event.getGenerator(), event);
     }
 
-    private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
+    private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) throws IOException {
         ExistingFileHelper helper = event.getExistingFileHelper();
-        generator.addProvider(new LevelBiomeGenerator(generator));
+        generator.addProvider(new LevelBiomeGenerator(generator, helper));
+
         generator.addProvider(new BlockLootGenerator(generator));
         generator.addProvider(new RecipeGenerator(generator));
         generator.addProvider(new AdvancementGenerator(generator));

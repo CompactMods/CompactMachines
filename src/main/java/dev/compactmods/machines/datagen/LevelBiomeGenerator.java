@@ -1,16 +1,18 @@
 package dev.compactmods.machines.datagen;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mojang.serialization.Codec;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
@@ -20,7 +22,15 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.StructureSettings;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class LevelBiomeGenerator implements DataProvider {
@@ -28,28 +38,74 @@ public class LevelBiomeGenerator implements DataProvider {
     private final DataGenerator generator;
 
     private final ResourceLocation COMPACT_BIOME = new ResourceLocation(CompactMachines.MOD_ID, "machine");
+    private final ResourceLocation COMPACT_LEVEL = new ResourceLocation(CompactMachines.MOD_ID, "compact_world");
 
-    LevelBiomeGenerator(DataGenerator generator) {
+    private final ExistingFileHelper existing;
+
+    LevelBiomeGenerator(DataGenerator generator, ExistingFileHelper files) {
         this.generator = generator;
+        this.existing = files;
     }
-    
+
     @Override
     public void run(@NotNull HashCache cache) {
         Path data = this.generator.getOutputFolder();
-        Set<ResourceLocation> set = Sets.newHashSet();
 
-        var biomeWriter = makeWriter(cache, data, ImmutableSet.of("worldgen", "biome"), Biome.DIRECT_CODEC, set);
-        // var dimWriter = makeWriter(cache, data, ImmutableSet.of("dimension"), LevelStem.CODEC, set);
-        var dimTypeWriter = makeWriter(cache, data, ImmutableSet.of("dimension_type"), DimensionType.DIRECT_CODEC, set);
+        HashMap<ResourceLocation, Biome> biomes = Maps.newHashMap();
+        HashMap<ResourceLocation, LevelStem> dims = Maps.newHashMap();
+        HashMap<ResourceLocation, DimensionType> dimTypes = Maps.newHashMap();
+
+        var biomeWriter = DataGenUtil.makeWriter(GSON, cache, data, ImmutableSet.of("worldgen", "biome"), Biome.DIRECT_CODEC, biomes);
+
+        var dimTypeWriter = DataGenUtil.makeWriter(GSON, cache, data, ImmutableSet.of("dimension_type"), DimensionType.DIRECT_CODEC, dimTypes);
+
+        var dimWriter = DataGenUtil.makeCustomWriter(GSON, cache, data, ImmutableSet.of("dimension"), this::writeFlatDimension, dims);
 
         writeBiomes(biomeWriter);
-        // writeDimensions(dimWriter);
         writeDimensionTypes(dimTypeWriter);
+        writeDimensions(biomes, dimTypes, dimWriter);
+    }
+
+    private JsonElement writeFlatDimension(LevelStem dimension) {
+        JsonObject d = new JsonObject();
+
+        d.addProperty("type", COMPACT_LEVEL.toString());
+
+        var gen = ChunkGenerator.CODEC.encodeStart(JsonOps.INSTANCE, dimension.generator())
+                .getOrThrow(false, CompactMachines.LOGGER::error)
+                .getAsJsonObject();
+
+        // transform the chunk generator to add the type reference to the flat gen
+        var fls = Registry.CHUNK_GENERATOR.getResourceKey(FlatLevelSource.CODEC);
+        fls.ifPresent(genType -> gen.addProperty("type", genType.location().toString()));
+
+        // transform the full biome object into a reference
+        var settings = gen.get("settings").getAsJsonObject();
+        settings.remove("biome");
+        settings.addProperty("biome", this.COMPACT_BIOME.toString());
+
+        d.add("generator", gen);
+
+        return d;
+    }
+
+    private void writeDimensions(HashMap<ResourceLocation, Biome> biomes, HashMap<ResourceLocation, DimensionType> dimTypes, BiConsumer<LevelStem, ResourceLocation> consumer) {
+        var struct = new StructureSettings(false);
+        struct.structureConfig().clear();
+
+        var flatSettings = new FlatLevelGeneratorSettings(struct, BuiltinRegistries.BIOME);
+
+        flatSettings.setBiome(() -> biomes.get(COMPACT_BIOME));
+        flatSettings.getLayersInfo().add(new FlatLayerInfo(1, Blocks.AIR));
+        flatSettings.updateLayers();
+
+        var stem = new LevelStem(() -> dimTypes.get(COMPACT_LEVEL), new FlatLevelSource(flatSettings));
+        consumer.accept(stem, COMPACT_LEVEL);
     }
 
     private void writeDimensionTypes(BiConsumer<DimensionType, ResourceLocation> consumer) {
-
         final DimensionType dim = new DimensionTypeBuilder()
+                .ambientLight(15.0f)
                 .bedWorks(false)
                 .respawnAnchorWorks(false)
                 .fixedTime(18000L)
@@ -58,7 +114,7 @@ public class LevelBiomeGenerator implements DataProvider {
                 .heightBounds(0, 256)
                 .build();
 
-        consumer.accept(dim, new ResourceLocation(CompactMachines.MOD_ID, "compact_world"));
+        consumer.accept(dim, COMPACT_LEVEL);
     }
 
     private void writeBiomes(BiConsumer<Biome, ResourceLocation> biomeWriter) {
@@ -86,31 +142,7 @@ public class LevelBiomeGenerator implements DataProvider {
         biomeWriter.accept(compactBiome, COMPACT_BIOME);
     }
 
-    private <T> BiConsumer<T, ResourceLocation> makeWriter(@NotNull HashCache cache, Path dataDir, ImmutableSet<String> pathParts, Codec<T> codec, Set<ResourceLocation> set) {
-        return (T resource, ResourceLocation regName) -> {
-            if (!set.add(regName)) {
-                throw new IllegalStateException("Duplicate resource " + regName);
-            } else {
-                String namespace = regName.getNamespace();
-                String path = regName.getPath();
 
-                Path fileLocation = dataDir.resolve(Path.of("data", CompactMachines.MOD_ID));
-                for(String p : pathParts)
-                        fileLocation = fileLocation.resolve(p);
-
-                fileLocation = fileLocation.resolve(path + ".json");
-
-                try {
-                    //noinspection OptionalGetWithoutIsPresent
-                    DataProvider.save(GSON, cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
-
-                } catch (IOException ioe) {
-                    CompactMachines.LOGGER.error("Couldn't save resource {}", fileLocation, ioe);
-                }
-
-            }
-        };
-    }
 
     @Override
     public String getName() {
