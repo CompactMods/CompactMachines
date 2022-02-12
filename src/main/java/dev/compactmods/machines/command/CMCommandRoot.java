@@ -11,6 +11,7 @@ public class CMCommandRoot {
         final LiteralArgumentBuilder<CommandSourceStack> root = LiteralArgumentBuilder.literal(CompactMachines.MOD_ID);
         root.then(CMEjectSubcommand.register());
         root.then(CMSummarySubcommand.register());
+        root.then(ReaddDimensionCommand.register());
         dispatcher.register(root);
     }
 }

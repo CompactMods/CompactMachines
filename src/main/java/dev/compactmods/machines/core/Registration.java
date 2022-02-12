@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -30,6 +31,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public class Registration {
+
     // ================================================================================================================
     //   REGISTRIES
     // ================================================================================================================
@@ -124,7 +126,11 @@ public class Registration {
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("compactmachines:compact_world"));
+    public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey
+            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
+
+    public static final ResourceKey<DimensionType> COMPACT_DIMENSION_DIM_TYPE = ResourceKey
+            .create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
 
     // ================================================================================================================
     //   INITIALIZATION
