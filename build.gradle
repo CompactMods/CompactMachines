@@ -247,7 +247,6 @@ publishing {
         nightly(MavenPublication) {
             artifactId = mod_id
             groupId = "dev.compactmods.nightly"
-            version = "${mod_version}+nightly-${gitCommitHash}"
 
             artifacts {
                 artifact(jar)
