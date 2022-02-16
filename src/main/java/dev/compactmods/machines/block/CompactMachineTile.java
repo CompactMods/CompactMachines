@@ -45,24 +45,43 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     @NotNull
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if(cap == Capabilities.ROOM) return room.cast();
-        if(cap == Capabilities.ROOM_CAPS) return caps.cast();
+        if (cap == Capabilities.ROOM) return room.cast();
+        if (cap == Capabilities.ROOM_CAPS) return caps.cast();
 
         return caps.lazyMap(c -> c.getCapability(cap, side))
                 .orElse(super.getCapability(cap, side));
+    }
+
+    @Nullable
+    private IMachineRoom getRoom() {
+        if (level instanceof ServerLevel sl) {
+            return getInternalChunkPos().map(c -> {
+                var inChunk = sl.getChunk(c.x, c.z);
+                return inChunk.getCapability(Capabilities.ROOM).orElseThrow(RuntimeException::new);
+            }).orElse(null);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private IRoomCapabilities getRoomCapabilities() {
+        if (level instanceof ServerLevel sl) {
+            return getInternalChunkPos().map(c -> {
+                var inChunk = sl.getChunk(c.x, c.z);
+                return inChunk.getCapability(Capabilities.ROOM_CAPS).orElseThrow(RuntimeException::new);
+            }).orElse(null);
+        }
+
+        return null;
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
 
-        if(level instanceof ServerLevel sl) {
-            getInternalChunkPos().ifPresent(c -> {
-                var inChunk = sl.getChunk(c.x, c.z);
-                this.room = inChunk.getCapability(Capabilities.ROOM);
-                this.caps = inChunk.getCapability(Capabilities.ROOM_CAPS);
-            });
-        }
+        this.room = LazyOptional.of(this::getRoom);
+        this.caps = LazyOptional.of(this::getRoomCapabilities);
     }
 
     @Override
@@ -173,6 +192,8 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
     public void setMachineId(int id) {
         this.machineId = id;
+        this.room.invalidate();
+        this.caps.invalidate();
         this.setChanged();
     }
 
