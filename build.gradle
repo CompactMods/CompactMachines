@@ -20,7 +20,7 @@ apply plugin: "net.minecraftforge.gradle"
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")
 
-version = isRelease ? mod_version : "${mod_version}+nightly-${gitCommitHash}"
+version = mod_version
 group = "dev.compactmods"
 archivesBaseName = mod_id
 

@@ -1,14 +1,11 @@
 package dev.compactmods.machines.command;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executor;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -24,11 +21,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.resources.RegistryResourceAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -76,28 +71,13 @@ public class ReaddDimensionCommand {
 
         final var serverResources = server.getResourceManager();
 
-        Resource dimFile = null;
-        try {
-            dimFile = serverResources.getResource(new ResourceLocation(CompactMachines.MOD_ID, "dimension/compact_world.json"));
-        } catch (IOException e) {
-            CompactMachines.LOGGER.error("Failed to register dimension from datapack settings.", e);
-        }
-
-        if (dimFile == null) {
-            return;
-        }
-
         // only back up level.dat in production
         if (FMLEnvironment.production && !doLevelFileBackup(server)) return;
-
-        var g = new Gson();
-        final var jsonDim = g.fromJson(new InputStreamReader(dimFile.getInputStream()), JsonObject.class);
 
         var reg = server.registryAccess();
         var cmDimType = reg.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY)
                 .get(Registration.COMPACT_DIMENSION_DIM_TYPE);
 
-        // TODO - Figure out how to either re-read dimension info from data structure, or kick the level.dat into behaving
         var ops = RegistryReadOps.create(JsonOps.INSTANCE, serverResources, reg);
 
         var resourceAccess = RegistryResourceAccess.forResourceManager(serverResources);
