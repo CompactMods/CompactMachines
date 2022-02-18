@@ -12,6 +12,7 @@ import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -35,7 +36,7 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
      of initialization, making it impossible to unit test without booting a whole server up.
     */
     public static final Codec<DimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
-            CodecExtensions.WORLD_REGISTRY_KEY.fieldOf("dim").forGetter(DimensionalPosition::getDimension),
+            ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(DimensionalPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(DimensionalPosition::getPosition),
             CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(DimensionalPosition::getRotation)
     ).apply(i, DimensionalPosition::new));
@@ -136,12 +137,20 @@ public class DimensionalPosition implements INBTSerializable<CompoundTag>, IDime
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
         DimensionalPosition that = (DimensionalPosition) o;
-        return Objects.equals(dimension, that.dimension) &&
-                Objects.equals(position, that.position) &&
-                Objects.equals(rotation, rotation);
+        if (!dimension.equals(that.dimension))
+            return false;
+
+        if (!position.equals(that.position))
+            return false;
+
+        return rotation.equals(that.rotation);
     }
 
     @Override

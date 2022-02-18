@@ -34,14 +34,14 @@ public class FileHelper {
         return null;
     }
 
-    public JsonElement getJsonFromFile(String filename) {
+    public static JsonElement getJsonFromFile(String filename) {
         Gson g = new Gson();
-        InputStreamReader isr = openFile(filename);
+        InputStreamReader isr = INSTANCE.openFile(filename);
         return g.fromJson(isr, JsonElement.class);
     }
 
-    public CompoundTag getNbtFromFile(String filename) throws IOException {
-        InputStream isr = getFileStream(filename);
+    public static CompoundTag getNbtFromFile(String filename) throws IOException {
+        InputStream isr = INSTANCE.getFileStream(filename);
         return NbtIo.readCompressed(isr);
     }
 }
