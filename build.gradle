@@ -2,6 +2,7 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
+        mavenLocal()
     }
 
     dependencies {
@@ -48,6 +49,14 @@ sourceSets {
             srcDir "src/main/resources"
             srcDir "src/generated/resources"
         }
+
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+    }
+
+    test {
+        java { srcDir "src/test/java" }
+        resources { srcDir "src/test/resources" }
 
         compileClasspath += sourceSets.api.output
         runtimeClasspath += sourceSets.api.output
@@ -132,10 +141,42 @@ minecraft {
                 }
             }
         }
+
+        gametestserver {
+            workingDirectory project.file('run/gametest')
+
+            // Recommended logging data for a userdev environment
+            // The markers can be added/remove as needed separated by commas.
+            // "SCAN": For mods scan.
+            // "REGISTRIES": For firing of registry events.
+            // "REGISTRYDUMP": For getting the contents of all registries.
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            // Recommended logging level for the console
+            // You can set various levels here.
+            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+            property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            // Only runs gametests which use "examplemod" as the namespace
+            args '--enableNamespace', mod_id
+
+            mods {
+                compactmachines {
+                    source sourceSets.api
+                    source sourceSets.main
+                    source sourceSets.test
+                }
+            }
+        }
     }
 }
 
 repositories {
+    mavenLocal()
+
     maven {
         url "https://www.cursemaven.com"
         content {
@@ -188,7 +229,7 @@ dependencies {
     runtimeOnly(fg.deobf("curse.maven:create-328085:3556823"))
     runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
     runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3569563"))
+    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
 
     // Mekanism + Mek Generators - Tunnel testing
 //    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))
@@ -196,6 +237,10 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
+processTestResources {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
