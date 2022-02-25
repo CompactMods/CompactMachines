@@ -1,12 +1,13 @@
-package dev.compactmods.machines.tests;
-
-import dev.compactmods.machines.util.MathUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3i;
-import org.junit.jupiter.api.*;
+package dev.compactmods.machines.test;
 
 import java.util.HashMap;
+import dev.compactmods.machines.util.MathUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.ChunkPos;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Math")
 public class MathTests {
@@ -33,7 +34,7 @@ public class MathTests {
         tests.put(8, new ChunkPos(-64, -64));
 
         tests.forEach((id, expectedChunk) -> {
-            Vector3i byIndex = MathUtil.getRegionPositionByIndex(id);
+            Vec3i byIndex = MathUtil.getRegionPositionByIndex(id);
             BlockPos finalPos = MathUtil.getCenterWithY(byIndex, 0);
 
             ChunkPos calculatedChunk = new ChunkPos(finalPos);

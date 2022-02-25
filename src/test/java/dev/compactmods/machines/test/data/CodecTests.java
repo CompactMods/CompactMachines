@@ -1,26 +1,27 @@
-package dev.compactmods.machines.tests.codec;
+package dev.compactmods.machines.test.data;
 
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.reference.EnumMachineSize;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTDynamicOps;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.phys.Vec3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+// @GameTestHolder / @ModGameTests here?
 public class CodecTests {
 
     @Test
     void canSerializeVector3d() {
-        Vector3d expected = new Vector3d(1.25d, 2.50d, 3.75d);
+        Vec3 expected = new Vec3(1.25d, 2.50d, 3.75d);
 
-        DataResult<INBT> nbtResult = CodecExtensions.VECTOR3D.encodeStart(NBTDynamicOps.INSTANCE, expected);
+        DataResult<Tag> nbtResult = CodecExtensions.VECTOR3D.encodeStart(NbtOps.INSTANCE, expected);
         nbtResult.resultOrPartial(Assertions::fail)
                 .ifPresent(nbt -> {
-                    ListNBT list = (ListNBT) nbt;
+                    ListTag list = (ListTag) nbt;
 
                     Assertions.assertEquals(expected.x, list.getDouble(0));
                     Assertions.assertEquals(expected.y, list.getDouble(1));
@@ -30,13 +31,13 @@ public class CodecTests {
 
     @Test
     void canSerializeMachineSize() {
-        DataResult<INBT> result = EnumMachineSize.CODEC.encodeStart(NBTDynamicOps.INSTANCE, EnumMachineSize.LARGE);
+        DataResult<Tag> result = EnumMachineSize.CODEC.encodeStart(NbtOps.INSTANCE, EnumMachineSize.LARGE);
 
         result.resultOrPartial(Assertions::fail)
                 .ifPresent(nbt -> {
-                    Assertions.assertEquals(StringNBT.TYPE, nbt.getType());
+                    Assertions.assertEquals(StringTag.TYPE, nbt.getType());
 
-                    StringNBT string = (StringNBT) nbt;
+                    StringTag string = (StringTag) nbt;
                     Assertions.assertNotNull(string);
                     Assertions.assertEquals(EnumMachineSize.LARGE.getSerializedName(), string.getAsString());
                 });

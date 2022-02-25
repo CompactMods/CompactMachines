@@ -1,5 +1,7 @@
-package dev.compactmods.machines.tests;
+package dev.compactmods.machines.test;
 
+import java.util.Collection;
+import java.util.Optional;
 import com.google.common.graph.Graph;
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.data.codec.CodecExtensions;
@@ -8,17 +10,17 @@ import dev.compactmods.machines.data.graph.CompactMachineNode;
 import dev.compactmods.machines.data.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.data.graph.IMachineGraphNode;
 import dev.compactmods.machines.util.MathUtil;
-import net.minecraft.nbt.*;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.ChunkPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
-import java.util.Optional;
-
 @DisplayName("Machine Graph Tests")
+@org.junit.jupiter.api.Tag("minecraft")
 public class GraphTests {
 
     private CompactMachineConnectionGraph generateGraphWithSingleRoom() {
@@ -135,42 +137,34 @@ public class GraphTests {
     void canSerialize() {
         CompactMachineConnectionGraph graph = generateGraphWithSingleRoom();
 
-        DataResult<INBT> nbtResult = CompactMachineConnectionGraph.CODEC.encodeStart(NBTDynamicOps.INSTANCE, graph);
+        DataResult<Tag> nbtResult = CompactMachineConnectionGraph.CODEC.encodeStart(NbtOps.INSTANCE, graph);
 
         nbtResult.resultOrPartial(Assertions::fail)
                 .ifPresent(nbt -> {
-                    Assertions.assertTrue(nbt instanceof CompoundNBT);
+                    Assertions.assertTrue(nbt instanceof CompoundTag);
 
-//                    try {
-//                        File file = FileHelper.RESOURCES_DIR.resolve("graph.dat").toFile();
-//                        file.delete();
-//                        CompressedStreamTools.writeCompressed((CompoundNBT) nbt, file);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-
-                    CompoundNBT c = (CompoundNBT) nbt;
+                    CompoundTag c = (CompoundTag) nbt;
                     Assertions.assertFalse(c.isEmpty());
 
                     Assertions.assertTrue(c.contains("connections"));
 
-                    ListNBT connections = c.getList("connections", Constants.NBT.TAG_COMPOUND);
+                    ListTag connections = c.getList("connections", Tag.TAG_COMPOUND);
                     Assertions.assertEquals(1, connections.size(), "Expected one connection from a machine to a single room.");
 
-                    CompoundNBT conn1 = connections.getCompound(0);
+                    CompoundTag conn1 = connections.getCompound(0);
                     Assertions.assertNotNull(conn1);
 
                     Assertions.assertTrue(conn1.contains("machine"));
                     Assertions.assertTrue(conn1.contains("connections"));
 
-                    INBT machineChunk = conn1.get("machine");
-                    DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS.parse(NBTDynamicOps.INSTANCE, machineChunk);
+                    Tag machineChunk = conn1.get("machine");
+                    DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS.parse(NbtOps.INSTANCE, machineChunk);
                     chunkRes.resultOrPartial(Assertions::fail)
                             .ifPresent(chunk -> {
                                 Assertions.assertEquals(new ChunkPos(0, 0), chunk);
                             });
 
-                    ListNBT connList = conn1.getList("connections", Constants.NBT.TAG_INT);
+                    ListTag connList = conn1.getList("connections", Tag.TAG_COMPOUND);
                     Assertions.assertNotNull(connList);
                     Assertions.assertEquals(1, connList.size());
                     Assertions.assertEquals(0, connList.getInt(0));
@@ -199,88 +193,6 @@ public class GraphTests {
         graph.connectMachineToRoom(1, room1);
 
     }
-//    private void generateData(MutableGraph<IGraphNode> g, HashMap<String, IGraphNode> lookup) {
-//        Random r = new Random();
-//        MachineExternalLocation[] values = MachineExternalLocation.values();
-//        int numInsides = 0;
-//        int numOutsides = 0;
-//
-//        Set<IMachineGraphNode> disconnected = new HashSet<>();
-//        List<CompactMachineExternalNode> externals = new ArrayList<>();
-//        List<CompactMachineInsideNode> internals = new ArrayList<>();
-//
-//        // Seed a couple of machines and insides so they're always there
-//        for(int i = 0; i < 10; i++) {
-//            ChunkPos machineChunk = getMachineChunkPos(numInsides + 1);
-//            CompactMachineExternalNode extern = createMachineExternalNode(g, lookup, i);
-//            CompactMachineInsideNode intern = createMachineInternalNode(g, lookup, machineChunk);
-//
-//            externals.add(extern);
-//            internals.add(intern);
-//
-//            extern.connectTo(intern);
-//            numOutsides++;
-//            numInsides++;
-//        }
-//
-//        for(int i = 0; i < 50; i++) {
-//
-//            if(r.nextBoolean()) {
-//                // Creating the outside of a machine
-//                MachineExternalLocation loc = values[r.nextInt(values.length)];
-//
-//                CompactMachineExternalNode machine = createMachineExternalNode(g, lookup, numOutsides + 1);
-//                externals.add(machine);
-//
-//                switch (loc) {
-//                    case EXTERNAL_DIMENSION:
-//                        int randomMachineInsideE = r.nextInt(internals.size());
-//                        CompactMachineInsideNode miE = internals.get(randomMachineInsideE);
-//                        machine.connectTo(miE);
-//
-//                        // try to remove from disconnected if it exists there
-//                        disconnected.remove(miE);
-//                        break;
-//
-//                    case INSIDE_MACHINE:
-//                        int randomMachineInsideI = r.nextInt(internals.size());
-//                        CompactMachineInsideNode miI = internals.get(randomMachineInsideI);
-//
-//                        // Put the machine inside a randomly chosen existing machine
-//                        g.putEdge(miI, machine);
-//
-//                        boolean connectToAnother = r.nextBoolean();
-//                        if(connectToAnother) {
-//                            System.out.println("connect");
-//                            int randomMachine = r.nextInt(internals.size());
-//                            CompactMachineInsideNode in = internals.get(randomMachine);
-//                            machine.connectTo(in);
-//
-//                            g.successors(machine); // All the connections internally
-//                        }
-//                        break;
-//                }
-//
-//                numOutsides++;
-//            } else {
-//                // Creating the inside of a machine
-//                ChunkPos machineChunk= getMachineChunkPos(numInsides + 1);
-//                CompactMachineInsideNode mi = createMachineInternalNode(g, lookup, machineChunk);
-//                disconnected.add(mi);
-//                numInsides++;
-//            }
-//        }
-//
-//        if(!disconnected.isEmpty()) {
-//            for (IMachineGraphNode di : disconnected) {
-//                CompactMachineExternalNode machine = createMachineExternalNode(g, lookup, numOutsides + 1);
-//                machine.connectTo(di);
-//                numOutsides++;
-//            }
-//        }
-//
-//        disconnected.clear();
-//    }
 
     public static String write(final CompactMachineConnectionGraph graph) {
         StringBuilder sb = new StringBuilder();
@@ -289,20 +201,6 @@ public class GraphTests {
                 .append(System.lineSeparator())
                 .append("\tlayout = fdp;").append(System.lineSeparator())
                 .append("\tnode [shape=square,style=filled,color=lightgray];").append(System.lineSeparator());
-
-//        Set<CompactMachineNode> topLevelMachines = graph.getMachines()
-//                .filter(n -> graph.getConnectedRoom(n.getMachineId()).isPresent())
-//                .collect(Collectors.toSet());
-//
-//        for (CompactMachineNode n : topLevelMachines)
-//            outputExternalNode(sb, n);
-//
-//        graph.nodes().stream()
-//                .filter(n -> n instanceof CompactMachineRoomNode)
-//                .map(n -> (CompactMachineRoomNode) n)
-//                .forEach(n -> {
-//                    outputMachineInside(graph, sb, n);
-//                });
 
         sb.append("}");
         return sb.toString();
