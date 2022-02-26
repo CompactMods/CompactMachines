@@ -1,29 +1,32 @@
 package dev.compactmods.machines.test;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import com.google.common.graph.Graph;
 import com.mojang.serialization.DataResult;
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.data.graph.CompactMachineConnectionGraph;
 import dev.compactmods.machines.data.graph.CompactMachineNode;
 import dev.compactmods.machines.data.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.data.graph.IMachineGraphNode;
 import dev.compactmods.machines.util.MathUtil;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@DisplayName("Machine Graph Tests")
-@org.junit.jupiter.api.Tag("minecraft")
+@PrefixGameTestTemplate(false)
+@GameTestHolder(CompactMachines.MOD_ID)
 public class GraphTests {
 
-    private CompactMachineConnectionGraph generateGraphWithSingleRoom() {
+    private static CompactMachineConnectionGraph generateGraphWithSingleRoom() {
         CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
 
         g.addMachine(0);
@@ -33,7 +36,7 @@ public class GraphTests {
         return g;
     }
 
-    private CompactMachineConnectionGraph generateGraphWithMultipleRooms(int numRooms) {
+    private static CompactMachineConnectionGraph generateGraphWithMultipleRooms(int numRooms) {
         CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
 
         for (int i = 0; i < numRooms; i++) {
@@ -46,69 +49,83 @@ public class GraphTests {
         return g;
     }
 
-    private void verifySingleRoomValid(CompactMachineConnectionGraph graph, int machine, ChunkPos room) {
+    private static void verifySingleRoomValid(GameTestHelper test, CompactMachineConnectionGraph graph, int machine, ChunkPos room) {
         Optional<ChunkPos> connectedRoom = graph.getConnectedRoom(machine);
-        Assertions.assertTrue(connectedRoom.isPresent());
+        if (connectedRoom.isEmpty())
+            test.fail("Connected room not found.");
 
         connectedRoom.ifPresent(cRoom -> {
-            Assertions.assertEquals(room, cRoom);
+            if (!room.equals(cRoom))
+                test.fail("Room not equal.");
         });
     }
 
-    @Test
-    @DisplayName("Can Create Basic Graph")
-    void basicGraph() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
+    public static void basicGraph(final GameTestHelper test) {
 
         CompactMachineConnectionGraph g = new CompactMachineConnectionGraph();
 
-        Assertions.assertEquals(0, g.getMachines().count());
+        if (g.getMachines().findAny().isPresent())
+            test.fail("Graph should have been empty after construction.");
 
         // At construction, no machines or rooms are registered
         // The method itself should just return an empty collection in this scenario
-        Assertions.assertDoesNotThrow(() -> g.getMachinesFor(new ChunkPos(0, 0)));
+        try {
+            g.getMachinesFor(new ChunkPos(0, 0));
+        } catch (Exception e) {
+            test.fail(e.getMessage());
+        }
 
         // Make sure that there's no linked machines here
         Collection<Integer> linkedMachines = g.getMachinesFor(new ChunkPos(0, 0));
-        Assertions.assertNotNull(linkedMachines);
-        Assertions.assertEquals(0, linkedMachines.size());
+        if (linkedMachines == null)
+            test.fail("getMachinesFor should return an empty collection, not null");
+
+        if (!linkedMachines.isEmpty())
+            test.fail("Linked machine collection should be empty.");
 
         // Make sure there's no linked rooms
         Optional<ChunkPos> connectedRoom = g.getConnectedRoom(0);
-        Assertions.assertNotNull(connectedRoom);
-        Assertions.assertFalse(connectedRoom.isPresent());
+        Objects.requireNonNull(connectedRoom);
+        if (connectedRoom.isPresent())
+            test.fail("No room connections should be present.");
+
+        test.succeed();
     }
 
-    @Test
-    @DisplayName("Create Single Linked Machine (1:1)")
-    void canCreateGraphWithLinkedMachine() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
+    public static void canCreateGraphWithLinkedMachine(final GameTestHelper test) {
         int machine = 0;
         ChunkPos room = new ChunkPos(0, 0);
 
         CompactMachineConnectionGraph g = generateGraphWithSingleRoom();
 
-        verifySingleRoomValid(g, machine, room);
+        verifySingleRoomValid(test, g, machine, room);
 
         Collection<Integer> linkedMachines = g.getMachinesFor(room);
-        Assertions.assertEquals(1, linkedMachines.size());
-        Assertions.assertTrue(linkedMachines.contains(machine));
+        if (1 != linkedMachines.size())
+            test.fail("Expected exactly one linked machine; got " + linkedMachines.size());
+
+        if (!linkedMachines.contains(machine))
+            test.fail("Expected machine 0 to be linked; did not exist in linked machine collection");
+
+        test.succeed();
     }
 
 
-    @Test
-    @DisplayName("Create Multiple Rooms (1:1)")
-    void canCreateMultipleRoomsWithSingleLinkedMachine() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
+    public static void canCreateMultipleRoomsWithSingleLinkedMachine(final GameTestHelper test) {
         CompactMachineConnectionGraph graph = generateGraphWithMultipleRooms(10);
 
         for (int roomIndex = 0; roomIndex < 10; roomIndex++) {
             final ChunkPos EXPECTED_CHUNK = MathUtil.getChunkForRoomIndex(roomIndex);
 
-            verifySingleRoomValid(graph, roomIndex, EXPECTED_CHUNK);
+            verifySingleRoomValid(test, graph, roomIndex, EXPECTED_CHUNK);
         }
     }
 
-    @Test
-    @DisplayName("Create Multiple Linked Machines (M:1)")
-    void canCreateRoomWithMultipleLinkedMachines() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
+    public static void canCreateRoomWithMultipleLinkedMachines(final GameTestHelper test) {
         int MACHINE_1 = 0;
         int MACHINE_2 = 1;
         ChunkPos EXPECTED_ROOM = new ChunkPos(0, 0);
@@ -123,55 +140,73 @@ public class GraphTests {
         g.connectMachineToRoom(0, roomChunk);
         g.connectMachineToRoom(1, roomChunk);
 
-        verifySingleRoomValid(g, 0, EXPECTED_ROOM);
-        verifySingleRoomValid(g, 1, EXPECTED_ROOM);
+        verifySingleRoomValid(test, g, 0, EXPECTED_ROOM);
+        verifySingleRoomValid(test, g, 1, EXPECTED_ROOM);
 
         Collection<Integer> linkedMachines = g.getMachinesFor(EXPECTED_ROOM);
-        Assertions.assertEquals(2, linkedMachines.size());
-        Assertions.assertTrue(linkedMachines.contains(MACHINE_1));
-        Assertions.assertTrue(linkedMachines.contains(MACHINE_2));
+        if (2 != linkedMachines.size())
+            test.fail("Linked machine count was not correct");
+
+        if (!linkedMachines.contains(MACHINE_1))
+            test.fail("1st machine not found in linked machine set");
+        ;
+        if (!linkedMachines.contains(MACHINE_2))
+            test.fail("2nd machine not found in linked machine set");
+
+        test.succeed();
     }
 
-    @Test
-    @DisplayName("Correctly serializes to NBT")
-    void canSerialize() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
+    public static void canSerialize(final GameTestHelper test) {
         CompactMachineConnectionGraph graph = generateGraphWithSingleRoom();
 
         DataResult<Tag> nbtResult = CompactMachineConnectionGraph.CODEC.encodeStart(NbtOps.INSTANCE, graph);
 
-        nbtResult.resultOrPartial(Assertions::fail)
+        nbtResult.resultOrPartial(test::fail)
                 .ifPresent(nbt -> {
-                    Assertions.assertTrue(nbt instanceof CompoundTag);
+                    if (!(nbt instanceof CompoundTag graphData)) {
+                        test.fail("Encoded graph not expected tag type");
+                        return;
+                    }
 
-                    CompoundTag c = (CompoundTag) nbt;
-                    Assertions.assertFalse(c.isEmpty());
+                    if(!graphData.isEmpty())
+                        test.fail("Encoded tag does not have any data.");
 
-                    Assertions.assertTrue(c.contains("connections"));
+                    if(!graphData.contains("connections"))
+                        test.fail("Connection info not found.");
 
-                    ListTag connections = c.getList("connections", Tag.TAG_COMPOUND);
-                    Assertions.assertEquals(1, connections.size(), "Expected one connection from a machine to a single room.");
+                    ListTag connections = graphData.getList("connections", Tag.TAG_COMPOUND);
+                    if(1 != connections.size())
+                        test.fail("Expected one connection from a machine to a single room.");
 
-                    CompoundTag conn1 = connections.getCompound(0);
-                    Assertions.assertNotNull(conn1);
+                    CompoundTag room1 = connections.getCompound(0);
 
-                    Assertions.assertTrue(conn1.contains("machine"));
-                    Assertions.assertTrue(conn1.contains("connections"));
+                    if(!room1.contains("machine"))
+                        test.fail("Machine info in connection not found.");
 
-                    Tag machineChunk = conn1.get("machine");
+                    if(!room1.contains("connections"))
+                        test.fail("Machine connection info not found.");
+
+                    Tag machineChunk = room1.get("machine");
                     DataResult<ChunkPos> chunkRes = CodecExtensions.CHUNKPOS.parse(NbtOps.INSTANCE, machineChunk);
-                    chunkRes.resultOrPartial(Assertions::fail)
+                    chunkRes.resultOrPartial(test::fail)
                             .ifPresent(chunk -> {
-                                Assertions.assertEquals(new ChunkPos(0, 0), chunk);
+                                if(!new ChunkPos(0, 0).equals(chunk))
+                                    test.fail("Room chunk location is not correct.");
                             });
 
-                    ListTag connList = conn1.getList("connections", Tag.TAG_COMPOUND);
-                    Assertions.assertNotNull(connList);
-                    Assertions.assertEquals(1, connList.size());
-                    Assertions.assertEquals(0, connList.getInt(0));
+                    ListTag roomMachineConnections = room1.getList("connections", Tag.TAG_COMPOUND);
+                    if(1 != roomMachineConnections.size())
+                        test.fail("Expected exactly 1 machine to be connected to the room.");
+
+                    if(0 != roomMachineConnections.getInt(0))
+                        test.fail("Expected the connected machine ID to be 0.");
                 });
+
+        test.succeed();
     }
 
-    @Test
+    @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
     void simpleNestedMachines() {
         /*
             Overworld - Contains Machine 0, linked to Room 0

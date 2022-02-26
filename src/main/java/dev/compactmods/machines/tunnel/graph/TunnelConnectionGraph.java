@@ -1,8 +1,6 @@
 package dev.compactmods.machines.tunnel.graph;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -160,5 +158,41 @@ public class TunnelConnectionGraph {
         graph.addNode(newType);
         tunnelTypes.put(id, newType);
         return newType;
+    }
+
+    /**
+     * Gets the number of registered nodes in the graph.
+     */
+    public int size() {
+        return graph.nodes().size();
+    }
+
+    public Set<BlockPos> getTunnels(TunnelDefinition type) {
+        var defNode = tunnelTypes.get(type.getRegistryName());
+        if(defNode == null)
+            return Collections.emptySet();
+
+        return graph.predecessors(defNode)
+                .stream()
+                .filter(n -> n instanceof TunnelNode)
+                .map(TunnelNode.class::cast)
+                .map(TunnelNode::position)
+                .map(BlockPos::immutable)
+                .collect(Collectors.toSet());
+    }
+
+    public Optional<Direction> getTunnelSide(BlockPos pos) {
+        if(!tunnels.containsKey(pos))
+            return Optional.empty();
+
+        var node = tunnels.get(pos);
+        return graph.successors(node).stream()
+                .filter(outNode -> outNode instanceof MachineNode)
+                .map(mn -> graph.edgeValue(node, mn))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(TunnelMachineEdge.class::cast)
+                .map(TunnelMachineEdge::side)
+                .findFirst();
     }
 }

@@ -1,20 +1,22 @@
 package dev.compactmods.machines.test;
 
 import java.util.HashMap;
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.ChunkPos;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@DisplayName("Math")
+@PrefixGameTestTemplate(false)
+@GameTestHolder(CompactMachines.MOD_ID)
 public class MathTests {
 
-    @Test
-    @DisplayName("Position Generator Works Correctly")
-    void positionGeneratorWorksCorrectly() {
+    @GameTest(template = "empty_1x1", batch = TestBatches.MATH)
+    public static void positionGeneratorWorksCorrectly(final GameTestHelper test) {
         // Our generation works in a counter-clockwise spiral, starting at 0,0
         /*
          *    6  5  4
@@ -40,7 +42,8 @@ public class MathTests {
             ChunkPos calculatedChunk = new ChunkPos(finalPos);
 
             String error = String.format("Generation did not match for %s.", id);
-            Assertions.assertEquals(expectedChunk, calculatedChunk, error);
+            if(!expectedChunk.equals(calculatedChunk))
+                test.fail(error);
         });
     }
 }
