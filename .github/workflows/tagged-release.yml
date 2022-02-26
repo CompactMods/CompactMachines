@@ -1,10 +1,7 @@
 # Creates releases on Curseforge and Github Releases based on v* tags
 name: Tagged Commit Release
 
-on:
-  push:
-    tags: v*
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   vars:
