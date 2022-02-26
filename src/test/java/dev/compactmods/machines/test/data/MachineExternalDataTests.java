@@ -19,9 +19,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.junit.jupiter.api.DisplayName;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@DisplayName("External Machine Data")
+@PrefixGameTestTemplate(false)
+@GameTestHolder(CompactMachines.MOD_ID)
 public class MachineExternalDataTests {
     final static Path EXTERNAL = Paths.get("scenario", "single-machine-player-inside", "machines_external.dat");
 
@@ -30,7 +32,7 @@ public class MachineExternalDataTests {
             .stable()
             .codec();
 
-    @GameTest(templateNamespace = CompactMachines.MOD_ID, prefixTemplateWithClassname = false, template = "empty_5x", timeoutTicks = 240)
+    @GameTest(template = "empty_5x5", timeoutTicks = 240, batch = "machine_data")
     public static void canLoadSingleMachineData(final GameTestHelper game) throws IOException {
         // The external point is overworld @ 8x4x8 (it was made in a default void superflat)
         DimensionalPosition OUTSIDE = new DimensionalPosition(
@@ -52,8 +54,6 @@ public class MachineExternalDataTests {
             game.fail("Expected machine info; got nothing.");
             return;
         }
-
-        CompactMachines.LOGGER.debug("hi - " + game.getTick());
 
         res.ifPresent(list -> {
             if (list.size() != 1) {

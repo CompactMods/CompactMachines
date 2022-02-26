@@ -2,7 +2,7 @@ package dev.compactmods.machines.test.data;
 
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.data.codec.CodecExtensions;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
@@ -31,7 +31,7 @@ public class CodecTests {
 
     @Test
     void canSerializeMachineSize() {
-        DataResult<Tag> result = EnumMachineSize.CODEC.encodeStart(NbtOps.INSTANCE, EnumMachineSize.LARGE);
+        DataResult<Tag> result = RoomSize.CODEC.encodeStart(NbtOps.INSTANCE, RoomSize.LARGE);
 
         result.resultOrPartial(Assertions::fail)
                 .ifPresent(nbt -> {
@@ -39,7 +39,7 @@ public class CodecTests {
 
                     StringTag string = (StringTag) nbt;
                     Assertions.assertNotNull(string);
-                    Assertions.assertEquals(EnumMachineSize.LARGE.getSerializedName(), string.getAsString());
+                    Assertions.assertEquals(RoomSize.LARGE.getSerializedName(), string.getAsString());
                 });
     }
 }

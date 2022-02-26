@@ -1,4 +1,4 @@
-package dev.compactmods.machines.reference;
+package dev.compactmods.machines.client.gui;
 
 public enum GuiIds {
     PSD_GUIDE,

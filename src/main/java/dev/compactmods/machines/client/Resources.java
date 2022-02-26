@@ -1,4 +1,4 @@
-package dev.compactmods.machines.reference;
+package dev.compactmods.machines.client;
 
 import net.minecraft.resources.ResourceLocation;
 import dev.compactmods.machines.CompactMachines;
