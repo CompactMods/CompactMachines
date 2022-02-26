@@ -44,8 +44,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.4.0
 
-      - name: Tags
-        run: git fetch --tags
+      - name: Unshallow and Get Tags
+        run: git fetch --prune --unshallow --tags
         
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -78,9 +78,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
-      - name: Tags
-        run: git fetch --tags
+
+      - name: Unshallow and Get Tags
+        run: git fetch --prune --unshallow --tags
         
       - name: Set up JDK
         uses: actions/setup-java@v2
