@@ -18,8 +18,21 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle"
 
-def semver = 'git describe --tags --match v*'.execute().text.trim().split('-')[0]
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+def semver = { ->
+    try {
+        def code = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'describe', '--tags', '--match', 'v*'
+            standardOutput = code
+        }
+
+        return Integer.parseInt(code.toString().trim().substring(1).split('-')[0])
+    }
+    catch (ignored) {
+        return "4.0.0";
+    }
+}
 
 def buildNumber = { ->
     try {
