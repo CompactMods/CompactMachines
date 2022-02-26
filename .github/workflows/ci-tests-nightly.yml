@@ -20,10 +20,8 @@ jobs:
       mod_version: ${{steps.mod_version.outputs.value }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-
+        run: git checkout --tags
+        
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
