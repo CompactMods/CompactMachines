@@ -28,7 +28,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" I ")
                 .define('R', Tags.Items.DUSTS_REDSTONE)
                 .define('I', Tags.Items.STORAGE_BLOCKS_IRON)
-                .unlockedBy("picked_up_iron", has(Tags.Items.STORAGE_BLOCKS_IRON))
+                .unlockedBy("picked_up_iron", RecipeProvider.has(Tags.Items.STORAGE_BLOCKS_IRON))
                 .save(consumer);
 
         ShapedRecipeBuilder.shaped(Registration.PERSONAL_SHRINKING_DEVICE.get())
@@ -39,7 +39,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .define('E', Items.ENDER_EYE)
                 .define('B', Items.BOOK)
                 .define('I', Tags.Items.INGOTS_IRON)
-                .unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
+                .unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
                 .save(consumer);
 
         addMachineRecipes(consumer);
@@ -69,7 +69,7 @@ public class RecipeGenerator extends RecipeProvider {
             recipe.define('C', center);
 
         recipe
-                .unlockedBy("has_recipe", has(wall));
+                .unlockedBy("has_recipe", RecipeProvider.has(wall));
 
         ConditionalRecipe.builder()
                 .addCondition(new EnableVanillaRecipesConfigCondition())

@@ -40,6 +40,18 @@ sourceSets {
         compileClasspath += configurations.getByName("minecraft")
     }
 
+    datagen {
+        java {
+            srcDir "src/datagen/java"
+        }
+
+        compileClasspath += configurations.getByName("minecraft")
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+
     main {
         java {
             srcDir "src/main/java"
@@ -106,6 +118,8 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            property 'forge.enabledGameTestNamespaces', mod_id
+
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
@@ -113,6 +127,7 @@ minecraft {
                 compactmachines {
                     source sourceSets.main
                     source sourceSets.api
+                    source sourceSets.test
                 }
             }
         }
@@ -136,13 +151,12 @@ minecraft {
 
             mods {
                 compactmachines {
-                    source sourceSets.main
-                    source sourceSets.api
+                    source sourceSets.datagen
                 }
             }
         }
 
-        gametestserver {
+        gameTestServer {
             workingDirectory project.file('run/gametest')
 
             // Recommended logging data for a userdev environment
@@ -159,9 +173,6 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            // Only runs gametests which use "examplemod" as the namespace
-            args '--enableNamespace', mod_id
 
             mods {
                 compactmachines {

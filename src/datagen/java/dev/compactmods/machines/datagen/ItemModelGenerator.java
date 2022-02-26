@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -14,7 +14,7 @@ public class ItemModelGenerator extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        for (var size : EnumMachineSize.values())
+        for (var size : RoomSize.values())
             machine(size.getSerializedName());
 
         withExistingParent("solid_wall", modLoc("block/wall"));
