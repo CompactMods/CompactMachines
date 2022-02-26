@@ -18,7 +18,6 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle"
 
-def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 def semver = { ->
     try {
         def code = new ByteArrayOutputStream()
@@ -49,7 +48,7 @@ def buildNumber = { ->
     }
 }
 
-def nightlyVersion = "${semver}-nightly.${buildNumber}-${gitCommitHash}"
+def nightlyVersion = "${semver}-nightly.${buildNumber}"
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")
 
 task getBuildInfo() {
@@ -209,6 +208,8 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
+            forceExit false
+            
             mods {
                 compactmachines {
                     source sourceSets.api
