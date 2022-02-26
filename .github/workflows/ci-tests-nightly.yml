@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Get Tags
+        run: git fetch --tags
+
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
