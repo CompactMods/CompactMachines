@@ -21,9 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Get Tags
-        run: git fetch --tags
+        with:
+          fetch-depth: '0'
 
       - name: Release Type
         id: cf_release_type
