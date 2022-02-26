@@ -1,15 +1,16 @@
 package dev.compactmods.machines.data.graph;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
-import com.google.common.graph.*;
+import com.google.common.graph.ElementOrder;
+import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import net.minecraft.world.level.ChunkPos;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Stores information on how external machines connect to the rooms in the compact machine
@@ -90,7 +91,7 @@ public class CompactMachineConnectionGraph {
         CompactMachineNode machineNode = machines.get(machine);
         CompactMachineRoomNode roomNode = rooms.get(room);
 
-        graph.putEdgeValue(machineNode, roomNode, DefaultEdges.MACHINE_LINK);
+        graph.putEdgeValue(machineNode, roomNode, DefaultEdges.machineToRoom());
     }
 
     public Collection<Integer> getMachinesFor(ChunkPos machineChunk) {
