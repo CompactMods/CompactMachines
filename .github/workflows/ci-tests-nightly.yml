@@ -1,6 +1,7 @@
 name: Gradle Tests and Nightly (CI)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - '**'
