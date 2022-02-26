@@ -18,15 +18,22 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle"
 
+def semver = 'git describe --tags --match v*'.execute().text.trim().split('-')[0]
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+
+def nightlyVersion = "${semver}-nightly.${"git describe --tags --match ${semver}*".execute().text.trim().split('-')[2]}+${gitCommitHash}"
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")
 
-version = mod_version
+task getBuildInfo() {
+    println("Mod ID: ${mod_id}")
+    println("Version: ${isRelease ? mod_version : nightlyVersion}")
+    println("Semver Version: ${semver}")
+    println("Nightly Build: ${nightlyVersion}")
+}
+
+version = isRelease ? mod_version : nightlyVersion
 group = "dev.compactmods"
 archivesBaseName = mod_id
-
-println("Mod ID: ${mod_id}");
-println("Version: ${version}");
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 

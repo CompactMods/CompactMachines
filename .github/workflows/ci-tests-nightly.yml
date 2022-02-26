@@ -62,7 +62,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Test JAR with Gradle
-        run: ./gradlew test
+        run: ./gradlew runGameTestServer
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
