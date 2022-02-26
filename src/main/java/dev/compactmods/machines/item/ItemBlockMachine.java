@@ -6,9 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.block.BlockCompactMachine;
-import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.reference.Reference;
+import dev.compactmods.machines.machine.CompactMachineBlock;
+import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.data.NbtConstants;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.ChatFormatting;
@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.Block;
 
 public class ItemBlockMachine extends BlockItem {
 
-    public ItemBlockMachine(Block blockIn, EnumMachineSize size, Properties builder) {
+    public ItemBlockMachine(Block blockIn, RoomSize size, Properties builder) {
         super(blockIn, builder);
     }
 
@@ -41,8 +41,8 @@ public class ItemBlockMachine extends BlockItem {
             return Optional.empty();
 
         CompoundTag machineData = stack.getOrCreateTag();
-        if (machineData.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
-            int c = machineData.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
+        if (machineData.contains(NbtConstants.MACHINE_ID)) {
+            int c = machineData.getInt(NbtConstants.MACHINE_ID);
             return c > -1 ? Optional.of(c) : Optional.empty();
         }
 
@@ -63,8 +63,8 @@ public class ItemBlockMachine extends BlockItem {
                 tooltip.add(TranslationUtil.tooltip(Tooltips.Machines.ID, id));
             });
 
-            if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-                UUID owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
+            if (nbt.contains(NbtConstants.ROOM_OWNER)) {
+                UUID owner = nbt.getUUID(NbtConstants.ROOM_OWNER);
                 Optional<GameProfile> playerProfile = PlayerUtil.getProfileByUUID(worldIn, owner);
 
                 MutableComponent player = playerProfile
@@ -81,8 +81,8 @@ public class ItemBlockMachine extends BlockItem {
 
         if (Screen.hasShiftDown()) {
             Block b = Block.byItem(stack.getItem());
-            if (b instanceof BlockCompactMachine) {
-                EnumMachineSize size = ((BlockCompactMachine) b).getSize();
+            if (b instanceof CompactMachineBlock) {
+                RoomSize size = ((CompactMachineBlock) b).getSize();
                 int internalSize = size.getInternalSize();
 
                 MutableComponent text = TranslationUtil.tooltip(Tooltips.Machines.SIZE, internalSize)

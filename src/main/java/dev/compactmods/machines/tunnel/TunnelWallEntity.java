@@ -183,7 +183,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (machines == null || conn == null)
             return null;
 
-        final Collection<Integer> connected = conn.graph.getMachinesFor(new ChunkPos(worldPosition));
+        final Collection<Integer> connected = conn.getMachinesFor(new ChunkPos(worldPosition));
         final Optional<Integer> first = connected.stream().findFirst();
         if (first.isEmpty())
             return null;

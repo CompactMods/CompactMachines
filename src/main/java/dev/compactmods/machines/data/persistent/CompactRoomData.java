@@ -16,7 +16,7 @@ import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.codec.CodecExtensions;
 import dev.compactmods.machines.data.codec.NbtListCollector;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
@@ -160,7 +160,7 @@ public class CompactRoomData extends SavedData {
         private final CompactRoomData storage;
         private Vec3 spawn;
         private ChunkPos chunk = new ChunkPos(0, 0);
-        private EnumMachineSize size = EnumMachineSize.TINY;
+        private RoomSize size = RoomSize.TINY;
         private BlockPos center = BlockPos.ZERO;
         private UUID owner;
 
@@ -181,7 +181,7 @@ public class CompactRoomData extends SavedData {
             return this;
         }
 
-        public NewRoomRegistration size(EnumMachineSize size) {
+        public NewRoomRegistration size(RoomSize size) {
             this.size = size;
             recalculateSize();
             return this;
@@ -215,22 +215,22 @@ public class CompactRoomData extends SavedData {
                 CodecExtensions.UUID_CODEC.fieldOf("owner").forGetter(RoomData::getOwner),
                 BlockPos.CODEC.fieldOf("center").forGetter(RoomData::getCenter),
                 CodecExtensions.VECTOR3D.fieldOf("spawn").forGetter(RoomData::getSpawn),
-                EnumMachineSize.CODEC.fieldOf("size").forGetter(RoomData::getSize)
+                RoomSize.CODEC.fieldOf("size").forGetter(RoomData::getSize)
         ).apply(i, RoomData::new));
 
         private final UUID owner;
         private final BlockPos center;
         private Vec3 spawn;
-        private final EnumMachineSize size;
+        private final RoomSize size;
 
-        public RoomData(UUID owner, BlockPos center, Vec3 spawn, EnumMachineSize size) {
+        public RoomData(UUID owner, BlockPos center, Vec3 spawn, RoomSize size) {
             this.owner = owner;
             this.center = center;
             this.spawn = spawn;
             this.size = size;
         }
 
-        public EnumMachineSize getSize() {
+        public RoomSize getSize() {
             return this.size;
         }
 

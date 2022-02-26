@@ -1,14 +1,13 @@
 package dev.compactmods.machines.util;
 
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.reference.EnumMachineSize;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
-
 import java.util.Arrays;
+import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.rooms.RoomSize;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class CompactStructureGenerator {
     /**
@@ -19,7 +18,7 @@ public class CompactStructureGenerator {
      * @param cubeCenter
      * @param wallDirection
      */
-    public static void generateCompactWall(LevelAccessor world, EnumMachineSize size, BlockPos cubeCenter, Direction wallDirection) {
+    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeCenter, Direction wallDirection) {
         int s = size.getInternalSize() / 2;
 
         BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
@@ -67,7 +66,7 @@ public class CompactStructureGenerator {
      * @param size
      * @param center
      */
-    public static void generateCompactStructure(LevelAccessor world, EnumMachineSize size, BlockPos center) {
+    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos center) {
         int s = size.getInternalSize() / 2;
 
         BlockPos floorCenter = center.relative(Direction.DOWN, s);

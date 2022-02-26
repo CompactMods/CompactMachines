@@ -3,8 +3,8 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.block.BlockCompactMachine;
-import dev.compactmods.machines.block.CompactMachineTile;
+import dev.compactmods.machines.machine.CompactMachineBlock;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.util.TranslationUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -27,11 +27,11 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, Player player, Level level, BlockState blockState, IProbeHitData hitData) {
-        if(!(blockState.getBlock() instanceof BlockCompactMachine mach))
+        if(!(blockState.getBlock() instanceof CompactMachineBlock mach))
             return;
 
         BlockEntity te = level.getBlockEntity(hitData.getPos());
-        if (te instanceof CompactMachineTile machine) {
+        if (te instanceof CompactMachineBlockEntity machine) {
             if(machine.mapped()) {
                 MutableComponent id = TranslationUtil
                         .tooltip(Tooltips.Machines.ID, machine.machineId)

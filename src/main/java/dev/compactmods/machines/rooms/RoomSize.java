@@ -1,11 +1,11 @@
-package dev.compactmods.machines.reference;
+package dev.compactmods.machines.rooms;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
 
-public enum EnumMachineSize implements StringRepresentable {
+public enum RoomSize implements StringRepresentable {
     TINY    ("tiny", 3),
     SMALL   ("small", 5),
     NORMAL  ("normal", 7),
@@ -16,15 +16,15 @@ public enum EnumMachineSize implements StringRepresentable {
     private final String name;
     private final int internalSize;
 
-    public static final Codec<EnumMachineSize> CODEC = StringRepresentable.fromEnum(
-            EnumMachineSize::values, EnumMachineSize::getFromSize);
+    public static final Codec<RoomSize> CODEC = StringRepresentable.fromEnum(
+            RoomSize::values, RoomSize::getFromSize);
 
-    EnumMachineSize(String name, int internalSize) {
+    RoomSize(String name, int internalSize) {
         this.name = name;
         this.internalSize = internalSize;
     }
 
-    public static EnumMachineSize maximum() {
+    public static RoomSize maximum() {
         return MAXIMUM;
     }
 
@@ -41,7 +41,7 @@ public enum EnumMachineSize implements StringRepresentable {
         return this.internalSize;
     }
 
-    public static EnumMachineSize getFromSize(String size) {
+    public static RoomSize getFromSize(String size) {
         switch (size.toLowerCase()) {
             case "tiny": return TINY;
             case "small": return SMALL;

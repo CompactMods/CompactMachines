@@ -7,7 +7,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.data.graph.CompactMachineConnectionGraph;
+import dev.compactmods.machines.api.room.MachineRoomConnections;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
 import dev.compactmods.machines.util.TranslationUtil;
@@ -43,7 +43,7 @@ public class CMMachineDataExportCommand {
             var writer = Files.newBufferedWriter(out);
             CsvOutput builder = makeCsv(writer);
 
-            machines.stream().forEach(room -> writeMachine(connections.graph, room, builder));
+            machines.stream().forEach(room -> writeMachine(connections, room, builder));
 
             writer.close();
         } catch (IOException e) {
@@ -68,13 +68,13 @@ public class CMMachineDataExportCommand {
                 .build(writer);
     }
 
-    private static void writeMachine(CompactMachineConnectionGraph graph, CompactMachineData.MachineData mach, CsvOutput builder) {
+    private static void writeMachine(MachineRoomConnections connections, CompactMachineData.MachineData mach, CsvOutput builder) {
         try {
             int id = mach.getMachineId();
             var loc = mach.getLocation();
             var placedAt = loc.getBlockPosition();
 
-            var room = graph.getConnectedRoom(id).orElse(new ChunkPos(-1, -1));
+            var room = connections.getConnectedRoom(id).orElse(new ChunkPos(-1, -1));
             builder.writeRow(
                     id,
                     loc.getDimension().location().toString(),

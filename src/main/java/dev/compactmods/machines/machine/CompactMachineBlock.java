@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block;
+package dev.compactmods.machines.machine;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -9,15 +9,14 @@ import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.reference.EnumMachineSize;
-import dev.compactmods.machines.reference.Reference;
+import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.data.NbtConstants;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,11 +33,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class BlockCompactMachine extends Block implements EntityBlock {
+public class CompactMachineBlock extends Block implements EntityBlock {
 
-    private final EnumMachineSize size;
+    private final RoomSize size;
 
-    public BlockCompactMachine(EnumMachineSize size, BlockBehaviour.Properties props) {
+    public CompactMachineBlock(RoomSize size, BlockBehaviour.Properties props) {
         super(props);
         this.size = size;
     }
@@ -46,7 +45,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
     @Override
     @SuppressWarnings("deprecation")
     public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
-        CompactMachineTile tile = (CompactMachineTile) worldIn.getBlockEntity(pos);
+        CompactMachineBlockEntity tile = (CompactMachineBlockEntity) worldIn.getBlockEntity(pos);
         float normalHardness = super.getDestroyProgress(state, player, worldIn, pos);
 
         if (tile == null)
@@ -100,7 +99,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
 
         ServerLevel serverWorld = (ServerLevel) world;
 
-        if (serverWorld.getBlockEntity(pos) instanceof CompactMachineTile machine) {
+        if (serverWorld.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
             ServerLevel compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
             if (compactWorld == null) {
                 CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
@@ -110,7 +109,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
         }
     }
 
-    public static Block getBySize(EnumMachineSize size) {
+    public static Block getBySize(RoomSize size) {
         return switch (size) {
             case TINY -> Registration.MACHINE_BLOCK_TINY.get();
             case SMALL -> Registration.MACHINE_BLOCK_SMALL.get();
@@ -122,7 +121,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
 
     }
 
-    public static Item getItemBySize(EnumMachineSize size) {
+    public static Item getItemBySize(RoomSize size) {
         return switch (size) {
             case TINY -> Registration.MACHINE_BLOCK_ITEM_TINY.get();
             case SMALL -> Registration.MACHINE_BLOCK_ITEM_SMALL.get();
@@ -141,9 +140,9 @@ public class BlockCompactMachine extends Block implements EntityBlock {
         CompoundTag nbt = stack.getOrCreateTag();
         // nbt.putString("size", this.size.getName());
 
-        CompactMachineTile tileEntity = (CompactMachineTile) world.getBlockEntity(pos);
+        CompactMachineBlockEntity tileEntity = (CompactMachineBlockEntity) world.getBlockEntity(pos);
         if (tileEntity != null && tileEntity.mapped()) {
-            nbt.putInt(Reference.CompactMachines.NBT_MACHINE_ID, tileEntity.machineId);
+            nbt.putInt(NbtConstants.MACHINE_ID, tileEntity.machineId);
         }
 
         return stack;
@@ -155,7 +154,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
         if (worldIn.isClientSide())
             return;
 
-        if (worldIn.getBlockEntity(pos) instanceof CompactMachineTile tile) {
+        if (worldIn.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
             // The machine already has data for some reason
             if (tile.machineId != -1)
                 return;
@@ -169,8 +168,8 @@ public class BlockCompactMachine extends Block implements EntityBlock {
             if (nbt == null)
                 return;
 
-            if (nbt.contains(Reference.CompactMachines.NBT_MACHINE_ID)) {
-                int machineID = nbt.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
+            if (nbt.contains(NbtConstants.MACHINE_ID)) {
+                int machineID = nbt.getInt(NbtConstants.MACHINE_ID);
                 tile.setMachineId(machineID);
             }
 
@@ -180,35 +179,32 @@ public class BlockCompactMachine extends Block implements EntityBlock {
 
     @Override
     @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if (worldIn.isClientSide())
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         // TODO - Open GUI with machine preview
-        if (player instanceof ServerPlayer serverPlayer) {
+        ItemStack mainItem = player.getMainHandItem();
+        if (mainItem.isEmpty())
+            return InteractionResult.PASS;
 
-            ItemStack mainItem = player.getMainHandItem();
-            if (mainItem.isEmpty())
-                return InteractionResult.PASS;
-
-            // TODO - Item tags instead of direct item reference here
-            if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
-                // Try teleport to compact machine dimension
-                PlayerUtil.teleportPlayerIntoMachine(serverPlayer, pos, size);
-            }
+        // TODO - Item tags instead of direct item reference here
+        if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
+            // Try teleport to compact machine dimension
+            PlayerUtil.teleportPlayerIntoMachine(level, player, pos, size);
         }
 
         return InteractionResult.SUCCESS;
     }
 
-    public EnumMachineSize getSize() {
+    public RoomSize getSize() {
         return this.size;
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CompactMachineTile(pos, state);
+        return new CompactMachineBlockEntity(pos, state);
     }
 
     @Override
@@ -220,7 +216,7 @@ public class BlockCompactMachine extends Block implements EntityBlock {
             return;
         }
 
-        if(level.getBlockEntity(pos) instanceof CompactMachineTile entity) {
+        if(level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
             if(entity.mapped()) {
                 var machines = CompactMachineData.get(server);
                 machines.remove(entity.machineId);

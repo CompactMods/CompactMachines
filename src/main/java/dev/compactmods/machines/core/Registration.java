@@ -3,14 +3,14 @@ package dev.compactmods.machines.core;
 import java.util.function.Supplier;
 import dev.compactmods.machines.CompactMachines;
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
-import dev.compactmods.machines.block.BlockCompactMachine;
-import dev.compactmods.machines.block.CompactMachineTile;
+import dev.compactmods.machines.machine.CompactMachineBlock;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.wall.BreakableWallBlock;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import dev.compactmods.machines.item.ItemBlockMachine;
 import dev.compactmods.machines.item.ItemBlockWall;
 import dev.compactmods.machines.item.ItemPersonalShrinkingDevice;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -55,43 +55,43 @@ public class Registration {
     //   COMPACT MACHINE BLOCKS
     // ================================================================================================================
     public static final RegistryObject<Block> MACHINE_BLOCK_TINY = BLOCKS.register("machine_tiny", () ->
-            new BlockCompactMachine(EnumMachineSize.TINY, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.TINY, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Block> MACHINE_BLOCK_SMALL = BLOCKS.register("machine_small", () ->
-            new BlockCompactMachine(EnumMachineSize.SMALL, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.SMALL, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Block> MACHINE_BLOCK_NORMAL = BLOCKS.register("machine_normal", () ->
-            new BlockCompactMachine(EnumMachineSize.NORMAL, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.NORMAL, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Block> MACHINE_BLOCK_LARGE = BLOCKS.register("machine_large", () ->
-            new BlockCompactMachine(EnumMachineSize.LARGE, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.LARGE, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Block> MACHINE_BLOCK_GIANT = BLOCKS.register("machine_giant", () ->
-            new BlockCompactMachine(EnumMachineSize.GIANT, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.GIANT, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Block> MACHINE_BLOCK_MAXIMUM = BLOCKS.register("machine_maximum", () ->
-            new BlockCompactMachine(EnumMachineSize.MAXIMUM, MACHINE_BLOCK_PROPS));
+            new CompactMachineBlock(RoomSize.MAXIMUM, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = ITEMS.register("machine_tiny",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_TINY.get(), EnumMachineSize.TINY, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_TINY.get(), RoomSize.TINY, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_SMALL = ITEMS.register("machine_small",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_SMALL.get(), EnumMachineSize.SMALL, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_SMALL.get(), RoomSize.SMALL, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_NORMAL = ITEMS.register("machine_normal",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_NORMAL.get(), EnumMachineSize.NORMAL, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_NORMAL.get(), RoomSize.NORMAL, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_LARGE = ITEMS.register("machine_large",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_LARGE.get(), EnumMachineSize.LARGE, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_LARGE.get(), RoomSize.LARGE, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_GIANT = ITEMS.register("machine_giant",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_GIANT.get(), EnumMachineSize.GIANT, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_GIANT.get(), RoomSize.GIANT, BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), EnumMachineSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
+            () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), RoomSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
 
-    public static final RegistryObject<BlockEntityType<CompactMachineTile>> MACHINE_TILE_ENTITY = BLOCK_ENTITIES.register("compact_machine", () ->
-            BlockEntityType.Builder.of(CompactMachineTile::new,
+    public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = BLOCK_ENTITIES.register("compact_machine", () ->
+            BlockEntityType.Builder.of(CompactMachineBlockEntity::new,
                             MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),
                             MACHINE_BLOCK_LARGE.get(), MACHINE_BLOCK_GIANT.get(), MACHINE_BLOCK_MAXIMUM.get())
                     .build(null));

@@ -8,14 +8,14 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.block.CompactMachineTile;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import dev.compactmods.machines.rooms.capability.IRoomHistory;
 import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
 import dev.compactmods.machines.rooms.history.PlayerRoomHistoryItem;
@@ -51,10 +51,8 @@ public abstract class PlayerUtil {
         return new DimensionalPosition(dim, pos);
     }
 
-    public static void teleportPlayerIntoMachine(ServerPlayer serverPlayer, BlockPos machinePos, EnumMachineSize size) {
-        ServerLevel serverWorld = serverPlayer.getLevel();
-
-        MinecraftServer serv = serverWorld.getServer();
+    public static void teleportPlayerIntoMachine(Level level, Player player, BlockPos machinePos, RoomSize size) {
+        MinecraftServer serv = level.getServer();
 
         ServerLevel compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
@@ -62,7 +60,7 @@ public abstract class PlayerUtil {
             return;
         }
 
-        CompactMachineTile tile = (CompactMachineTile) serverWorld.getBlockEntity(machinePos);
+        CompactMachineBlockEntity tile = (CompactMachineBlockEntity) level.getBlockEntity(machinePos);
         if (tile == null)
             return;
 
@@ -70,7 +68,7 @@ public abstract class PlayerUtil {
         if (!tile.mapped()) {
             CompactMachineData machines = CompactMachineData.get(serv);
             CompactRoomData rooms = CompactRoomData.get(serv);
-            MachineConnections connections = MachineConnections.get(serv);
+            var connections = MachineConnections.get(serv);
 
             if (machines == null || rooms == null || connections == null) {
                 CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.");
@@ -89,16 +87,15 @@ public abstract class PlayerUtil {
             ChunkPos machineChunk = new ChunkPos(newCenter);
             tile.setMachineId(nextId);
 
-            connections.graph.addMachine(nextId);
-            connections.graph.addRoom(machineChunk);
-            connections.graph.connectMachineToRoom(nextId, machineChunk);
-            connections.setDirty();
+            connections.registerMachine(nextId);
+            connections.registerRoom(machineChunk);
+            connections.connectMachineToRoom(nextId, machineChunk);
 
-            machines.setMachineLocation(nextId, new DimensionalPosition(serverWorld.dimension(), machinePos));
+            machines.setMachineLocation(nextId, new DimensionalPosition(level.dimension(), machinePos));
 
             try {
                 rooms.createNew()
-                        .owner(serverPlayer.getUUID())
+                        .owner(player.getUUID())
                         .size(size)
                         .chunk(machineChunk)
                         .register();
@@ -116,25 +113,27 @@ public abstract class PlayerUtil {
 
             try {
                 // Mark the player as inside the machine, set external spawn, and yeet
-                addPlayerToMachine(serverPlayer, machinePos);
+                addPlayerToMachine(player, machinePos);
             } catch (Exception ex) {
                 CompactMachines.LOGGER.error(ex);
             }
 
             Vec3 sp = spawn.getPosition();
             Vec3 sr = spawn.getRotation() != Vec3.ZERO ?
-                    spawn.getRotation() : new Vec3(serverPlayer.xRotO, serverPlayer.yRotO, 0);
+                    spawn.getRotation() : new Vec3(player.xRotO, player.yRotO, 0);
 
-            serverPlayer.teleportTo(
-                    compactWorld,
-                    sp.x,
-                    sp.y,
-                    sp.z,
-                    (float) sr.y,
-                    (float) sr.x);
+            if (player instanceof ServerPlayer servPlayer) {
+                servPlayer.teleportTo(
+                        compactWorld,
+                        sp.x,
+                        sp.y,
+                        sp.z,
+                        (float) sr.y,
+                        (float) sr.x);
 
-            if(grantAdvancement)
-                AdvancementTriggers.getTriggerForMachineClaim(size).trigger(serverPlayer);
+                if (grantAdvancement)
+                    AdvancementTriggers.getTriggerForMachineClaim(size).trigger(servPlayer);
+            }
         });
     }
 
@@ -152,7 +151,7 @@ public abstract class PlayerUtil {
         history.ifPresent(hist -> {
             ChunkPos currentRoomChunk = new ChunkPos(serverPlayer.blockPosition());
 
-            if(hist.hasHistory()) {
+            if (hist.hasHistory()) {
                 final IRoomHistoryItem prevArea = hist.pop();
 
                 DimensionalPosition spawnPoint = prevArea.getEntryLocation();
@@ -202,12 +201,12 @@ public abstract class PlayerUtil {
         player.teleportTo(level, worldPos.x(), worldPos.y(), worldPos.z(), 0, player.getRespawnAngle());
     }
 
-    public static void addPlayerToMachine(ServerPlayer serverPlayer, BlockPos machinePos) {
-        MinecraftServer serv = serverPlayer.getServer();
+    public static void addPlayerToMachine(Player player, BlockPos machinePos) {
+        MinecraftServer serv = player.getServer();
         if (serv == null)
             return;
 
-        CompactMachineTile tile = (CompactMachineTile) serverPlayer.getLevel().getBlockEntity(machinePos);
+        CompactMachineBlockEntity tile = (CompactMachineBlockEntity) player.getLevel().getBlockEntity(machinePos);
         if (tile == null)
             return;
 
@@ -215,9 +214,9 @@ public abstract class PlayerUtil {
             final LevelChunk chunk = serv.getLevel(Registration.COMPACT_DIMENSION)
                     .getChunk(mChunk.x, mChunk.z);
 
-            serverPlayer.getCapability(Capabilities.ROOM_HISTORY)
+            player.getCapability(Capabilities.ROOM_HISTORY)
                     .ifPresent(hist -> {
-                        DimensionalPosition pos = DimensionalPosition.fromEntity(serverPlayer);
+                        DimensionalPosition pos = DimensionalPosition.fromEntity(player);
                         hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
                     });
 

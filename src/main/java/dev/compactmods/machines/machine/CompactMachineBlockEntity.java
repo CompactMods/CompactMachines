@@ -1,4 +1,4 @@
-package dev.compactmods.machines.block;
+package dev.compactmods.machines.machine;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.data.persistent.CompactMachineData;
 import dev.compactmods.machines.data.persistent.CompactRoomData;
 import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.reference.Reference;
+import dev.compactmods.machines.data.NbtConstants;
 import dev.compactmods.machines.teleportation.DimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +27,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
-public class CompactMachineTile extends BlockEntity implements ICapabilityProvider {
+public class CompactMachineBlockEntity extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
     private final boolean initialized = false;
     public long nextSpawnTick = 0;
@@ -38,7 +38,7 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     private LazyOptional<IMachineRoom> room = LazyOptional.empty();
     private LazyOptional<IRoomCapabilities> caps = LazyOptional.empty();
 
-    public CompactMachineTile(BlockPos pos, BlockState state) {
+    public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
     }
 
@@ -88,10 +88,10 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
-        machineId = nbt.getInt(Reference.CompactMachines.NBT_MACHINE_ID);
+        machineId = nbt.getInt(NbtConstants.MACHINE_ID);
         // TODO customName = nbt.getString("CustomName");
-        if (nbt.contains(Reference.CompactMachines.OWNER_NBT)) {
-            owner = nbt.getUUID(Reference.CompactMachines.OWNER_NBT);
+        if (nbt.contains(NbtConstants.ROOM_OWNER)) {
+            owner = nbt.getUUID(NbtConstants.ROOM_OWNER);
         } else {
             owner = null;
         }
@@ -112,11 +112,11 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
 
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        nbt.putInt(Reference.CompactMachines.NBT_MACHINE_ID, machineId);
+        nbt.putInt(NbtConstants.MACHINE_ID, machineId);
         // nbt.putString("CustomName", customName.getString());
 
         if (owner != null) {
-            nbt.putUUID(Reference.CompactMachines.OWNER_NBT, this.owner);
+            nbt.putUUID(NbtConstants.ROOM_OWNER, this.owner);
         }
 
         nbt.putLong("spawntick", nextSpawnTick);
@@ -147,11 +147,11 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
             if (serv == null)
                 return Optional.empty();
 
-            MachineConnections connections = MachineConnections.get(serv);
+            var connections = MachineConnections.get(serv);
             if (connections == null)
                 return Optional.empty();
 
-            return connections.graph.getConnectedRoom(this.machineId);
+            return connections.getConnectedRoom(this.machineId);
         }
 
         return Optional.empty();
@@ -231,11 +231,11 @@ public class CompactMachineTile extends BlockEntity implements ICapabilityProvid
             ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer serv = serverWorld.getServer();
 
-            MachineConnections connections = MachineConnections.get(serv);
+            var connections = MachineConnections.get(serv);
             if (connections == null)
                 return Optional.empty();
 
-            Optional<ChunkPos> connectedRoom = connections.graph.getConnectedRoom(machineId);
+            Optional<ChunkPos> connectedRoom = connections.getConnectedRoom(machineId);
 
             if (!connectedRoom.isPresent())
                 return Optional.empty();

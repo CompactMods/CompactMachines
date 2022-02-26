@@ -1,6 +1,5 @@
 package dev.compactmods.machines.network;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,10 +33,10 @@ public class CMPacketTargets {
             ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer server = serverWorld.getServer();
 
-            MachineConnections connections = MachineConnections.get(server);
-            CompactMachineData machines = CompactMachineData.get(server);
+            var connections = MachineConnections.get(server);
+            var machines = CompactMachineData.get(server);
 
-            Collection<Integer> linked = connections.graph.getMachinesFor(roomChunk.getPos());
+            var linked = connections.getMachinesFor(roomChunk.getPos());
 
             for (int machine : linked) {
                 machines.getMachineLocation(machine).ifPresent(loc -> {

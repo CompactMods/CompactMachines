@@ -4,7 +4,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.trigger.ClaimedMachineTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
-import dev.compactmods.machines.reference.EnumMachineSize;
+import dev.compactmods.machines.rooms.RoomSize;
 import net.minecraft.advancements.CriteriaTriggers;
 
 public class AdvancementTriggers {
@@ -22,7 +22,7 @@ public class AdvancementTriggers {
         CompactMachines.LOGGER.trace("Registering advancement triggers.");
     }
 
-    public static ClaimedMachineTrigger getTriggerForMachineClaim(EnumMachineSize machineSize) {
+    public static ClaimedMachineTrigger getTriggerForMachineClaim(RoomSize machineSize) {
         switch (machineSize) {
             case TINY: return CLAIMED_TINY;
             case SMALL: return CLAIMED_SMALL;
