@@ -26,7 +26,7 @@ def semver = { ->
             standardOutput = code
         }
 
-        return Integer.parseInt(code.toString().trim().substring(1).split('-')[0])
+        return code.toString().trim().substring(1).split('-')[0]
     }
     catch (ignored) {
         return "4.0.0";
