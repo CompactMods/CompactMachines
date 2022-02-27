@@ -122,6 +122,8 @@ public class GraphTests {
 
             verifySingleRoomValid(test, graph, roomIndex, EXPECTED_CHUNK);
         }
+
+        test.succeed();
     }
 
     @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
@@ -169,7 +171,7 @@ public class GraphTests {
                         return;
                     }
 
-                    if(!graphData.isEmpty())
+                    if(graphData.isEmpty())
                         test.fail("Encoded tag does not have any data.");
 
                     if(!graphData.contains("connections"))
@@ -195,7 +197,7 @@ public class GraphTests {
                                     test.fail("Room chunk location is not correct.");
                             });
 
-                    ListTag roomMachineConnections = room1.getList("connections", Tag.TAG_COMPOUND);
+                    ListTag roomMachineConnections = room1.getList("connections", Tag.TAG_INT);
                     if(1 != roomMachineConnections.size())
                         test.fail("Expected exactly 1 machine to be connected to the room.");
 
@@ -207,12 +209,11 @@ public class GraphTests {
     }
 
     @GameTest(template = "empty_1x1", batch = TestBatches.MACHINE_GRAPH)
-    void simpleNestedMachines() {
+    public static void simpleNestedMachines(final GameTestHelper test) {
         /*
             Overworld - Contains Machine 0, linked to Room 0
             CompactWorld - Contains Machine 1, linked to Room 1 (Inside Room 0)
          */
-
         CompactMachineConnectionGraph graph = new CompactMachineConnectionGraph();
 
         graph.addMachine(0);
@@ -227,6 +228,7 @@ public class GraphTests {
         graph.connectMachineToRoom(0, room0);
         graph.connectMachineToRoom(1, room1);
 
+        test.succeed();
     }
 
     public static String write(final CompactMachineConnectionGraph graph) {

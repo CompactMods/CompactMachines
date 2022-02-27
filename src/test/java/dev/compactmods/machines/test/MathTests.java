@@ -45,5 +45,7 @@ public class MathTests {
             if(!expectedChunk.equals(calculatedChunk))
                 test.fail(error);
         });
+
+        test.succeed();
     }
 }
