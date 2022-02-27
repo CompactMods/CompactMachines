@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
@@ -33,7 +33,7 @@ public class CMPacketTargets {
             ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer server = serverWorld.getServer();
 
-            var connections = MachineConnections.get(server);
+            var connections = MachineToRoomConnections.get(server);
             var machines = CompactMachineData.get(server);
 
             var linked = connections.getMachinesFor(roomChunk.getPos());

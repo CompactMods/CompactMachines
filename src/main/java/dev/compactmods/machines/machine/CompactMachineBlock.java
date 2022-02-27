@@ -8,9 +8,9 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.rooms.RoomSize;
-import dev.compactmods.machines.data.NbtConstants;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -142,7 +142,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
         CompactMachineBlockEntity tileEntity = (CompactMachineBlockEntity) world.getBlockEntity(pos);
         if (tileEntity != null && tileEntity.mapped()) {
-            nbt.putInt(NbtConstants.MACHINE_ID, tileEntity.machineId);
+            nbt.putInt(MachineNbt.ID, tileEntity.machineId);
         }
 
         return stack;
@@ -168,8 +168,8 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             if (nbt == null)
                 return;
 
-            if (nbt.contains(NbtConstants.MACHINE_ID)) {
-                int machineID = nbt.getInt(NbtConstants.MACHINE_ID);
+            if (nbt.contains(MachineNbt.ID)) {
+                int machineID = nbt.getInt(MachineNbt.ID);
                 tile.setMachineId(machineID);
             }
 

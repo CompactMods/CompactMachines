@@ -15,9 +15,10 @@ import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -25,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -134,6 +136,13 @@ public class TunnelWallEntity extends BlockEntity {
             CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
             ROOM = chunk.getCapability(Capabilities.ROOM);
 
+            // If tunnel type is unknown, remove the tunnel entirely
+            if(tunnelType.equals(Tunnels.UNKNOWN.get())) {
+                CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
+                sl.setBlock(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
+                return;
+            }
+
             // TODO
 //            if (tunnelType instanceof ITunnelSetup setup) {
 //                ROOM.ifPresent(room -> setup.setup(room, new TunnelPosition(sl, worldPosition, getTunnelSide()), this.connection));
@@ -178,7 +187,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (server == null) return null;
 
         var machines = CompactMachineData.get(server);
-        var conn = MachineConnections.get(server);
+        var conn = MachineToRoomConnections.get(server);
 
         if (machines == null || conn == null)
             return null;

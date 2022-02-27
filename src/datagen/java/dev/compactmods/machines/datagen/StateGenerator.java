@@ -3,7 +3,7 @@ package dev.compactmods.machines.datagen;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;

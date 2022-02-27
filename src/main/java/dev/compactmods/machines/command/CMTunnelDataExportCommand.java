@@ -11,7 +11,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.CompactRoomData;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
@@ -101,13 +101,12 @@ public class CMTunnelDataExportCommand {
 
     @NotNull
     private static CsvOutput makeTunnelCsvOut(BufferedWriter writer) throws IOException {
-        var builder = CsvOutput.builder()
+        return CsvOutput.builder()
                 .addColumn("type")
                 .addColumn("side")
                 .addColumn("pos_x").addColumn("pos_y").addColumn("pos_z")
                 .addColumn("machine_id")
                 .build(writer);
-        return builder;
     }
 
     private static void writeRoomTunnels(LevelChunk chunk1, CsvOutput builder) {

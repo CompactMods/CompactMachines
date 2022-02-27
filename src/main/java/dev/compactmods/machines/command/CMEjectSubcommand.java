@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.rooms.capability.IRoomHistory;
+import dev.compactmods.machines.room.capability.IRoomHistory;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

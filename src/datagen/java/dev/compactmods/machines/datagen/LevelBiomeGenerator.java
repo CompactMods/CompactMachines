@@ -30,7 +30,6 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class LevelBiomeGenerator implements DataProvider {
@@ -40,11 +39,8 @@ public class LevelBiomeGenerator implements DataProvider {
     private final ResourceLocation COMPACT_BIOME = new ResourceLocation(CompactMachines.MOD_ID, "machine");
     private final ResourceLocation COMPACT_LEVEL = new ResourceLocation(CompactMachines.MOD_ID, "compact_world");
 
-    private final ExistingFileHelper existing;
-
-    LevelBiomeGenerator(DataGenerator generator, ExistingFileHelper files) {
+    LevelBiomeGenerator(DataGenerator generator) {
         this.generator = generator;
-        this.existing = files;
     }
 
     @Override

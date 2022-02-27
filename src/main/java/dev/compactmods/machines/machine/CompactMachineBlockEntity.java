@@ -7,11 +7,11 @@ import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.CompactRoomData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.data.NbtConstants;
-import dev.compactmods.machines.teleportation.DimensionalPosition;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.machine.data.MachineToRoomConnections;
+import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.core.DimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -88,10 +88,10 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
-        machineId = nbt.getInt(NbtConstants.MACHINE_ID);
+        machineId = nbt.getInt(MachineNbt.ID);
         // TODO customName = nbt.getString("CustomName");
-        if (nbt.contains(NbtConstants.ROOM_OWNER)) {
-            owner = nbt.getUUID(NbtConstants.ROOM_OWNER);
+        if (nbt.contains(MachineNbt.OWNER)) {
+            owner = nbt.getUUID(MachineNbt.OWNER);
         } else {
             owner = null;
         }
@@ -112,11 +112,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
 
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        nbt.putInt(NbtConstants.MACHINE_ID, machineId);
+        nbt.putInt(MachineNbt.ID, machineId);
         // nbt.putString("CustomName", customName.getString());
 
         if (owner != null) {
-            nbt.putUUID(NbtConstants.ROOM_OWNER, this.owner);
+            nbt.putUUID(MachineNbt.OWNER, this.owner);
         }
 
         nbt.putLong("spawntick", nextSpawnTick);
@@ -147,7 +147,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             if (serv == null)
                 return Optional.empty();
 
-            var connections = MachineConnections.get(serv);
+            var connections = MachineToRoomConnections.get(serv);
             if (connections == null)
                 return Optional.empty();
 
@@ -231,7 +231,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             ServerLevel serverWorld = (ServerLevel) level;
             MinecraftServer serv = serverWorld.getServer();
 
-            var connections = MachineConnections.get(serv);
+            var connections = MachineToRoomConnections.get(serv);
             if (connections == null)
                 return Optional.empty();
 

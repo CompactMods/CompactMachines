@@ -8,7 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.CompactRoomData;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -57,7 +57,7 @@ public class CMRoomDataExportCommand {
 
     @NotNull
     private static CsvOutput makeCsv(BufferedWriter writer) throws IOException {
-        var builder = CsvOutput.builder()
+        return CsvOutput.builder()
                 .addColumn("room_x")
                 .addColumn("room_z")
                 .addColumn("size")
@@ -66,7 +66,6 @@ public class CMRoomDataExportCommand {
                 .addColumn("spawn_y")
                 .addColumn("spawn_z")
                 .build(writer);
-        return builder;
     }
 
     private static void writeRoom(CompactRoomData.RoomData room, CsvOutput builder) {

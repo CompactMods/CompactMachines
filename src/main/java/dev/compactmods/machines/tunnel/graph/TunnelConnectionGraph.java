@@ -6,6 +6,9 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.graph.IGraphEdge;
+import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +23,7 @@ public class TunnelConnectionGraph {
     /**
      * The full data graph. Contains tunnel nodes, machine ids, and tunnel type information.
      */
-    private final MutableValueGraph<ITunnelGraphNode, ITunnelGraphEdge> graph;
+    private final MutableValueGraph<IGraphNode, IGraphEdge> graph;
 
     /**
      * Quick access to tunnel information for specific locations.
@@ -30,7 +33,7 @@ public class TunnelConnectionGraph {
     /**
      * Quick access to machine information nodes.
      */
-    private final Map<Integer, MachineNode> machines;
+    private final Map<Integer, CompactMachineNode> machines;
 
     /**
      * Quick access to tunnel definition nodes.
@@ -61,8 +64,8 @@ public class TunnelConnectionGraph {
         return graph.successors(tNode)
                 .stream()
                 .findFirst()
-                .filter(n -> n instanceof MachineNode)
-                .map(mNode -> ((MachineNode) mNode).machId());
+                .filter(n -> n instanceof CompactMachineNode)
+                .map(mNode -> ((CompactMachineNode) mNode).machineId());
     }
 
     /**
@@ -78,19 +81,19 @@ public class TunnelConnectionGraph {
     public boolean registerTunnel(BlockPos tunnelPos, TunnelDefinition type, int machineId, Direction side) {
         // First we need to get the machine the tunnel is trying to connect to
         var machineRegistered = machines.containsKey(machineId);
-        MachineNode machineNode;
+        CompactMachineNode CompactMachineNode;
         if (!machineRegistered) {
-            machineNode = new MachineNode(machineId);
-            machines.put(machineId, machineNode);
-            graph.addNode(machineNode);
+            CompactMachineNode = new CompactMachineNode(machineId);
+            machines.put(machineId, CompactMachineNode);
+            graph.addNode(CompactMachineNode);
         } else {
-            machineNode = machines.get(machineId);
+            CompactMachineNode = machines.get(machineId);
         }
 
         TunnelNode tunnelNode = getOrCreateTunnelNode(tunnelPos);
-        if(graph.hasEdgeConnecting(tunnelNode, machineNode)) {
+        if(graph.hasEdgeConnecting(tunnelNode, CompactMachineNode)) {
             // connection already formed between the tunnel at pos and the machine
-            graph.edgeValue(tunnelNode, machineNode).ifPresent(edge -> {
+            graph.edgeValue(tunnelNode, CompactMachineNode).ifPresent(edge -> {
                 CompactMachines.LOGGER.info("Tunnel already registered for machine {} at position {}.",
                         machineId,
                         tunnelPos);
@@ -100,10 +103,10 @@ public class TunnelConnectionGraph {
         }
 
         // graph direction is (tunnel)-[connected_to]->(machine)
-        var tunnelsForSide = graph.predecessors(machineNode)
+        var tunnelsForSide = graph.predecessors(CompactMachineNode)
                 .stream()
                 .filter(n -> n instanceof TunnelNode)
-                .filter(tunnel -> graph.edgeValue(machineNode, tunnel)
+                .filter(tunnel -> graph.edgeValue(CompactMachineNode, tunnel)
                         .map(edge -> !((TunnelMachineEdge) edge).side().equals(side))
                         .orElse(false))
                 .map(t -> (TunnelNode) t)
@@ -127,13 +130,13 @@ public class TunnelConnectionGraph {
         }
 
         // no tunnels registered for side yet - free to make new tunnel node
-        createTunnelAndLink(tunnelNode, side, machineNode, tunnelTypeNode);
+        createTunnelAndLink(tunnelNode, side, CompactMachineNode, tunnelTypeNode);
         return true;
     }
 
-    private void createTunnelAndLink(TunnelNode newTunnel, Direction side, MachineNode machineNode, TunnelTypeNode typeNode) {
+    private void createTunnelAndLink(TunnelNode newTunnel, Direction side, CompactMachineNode CompactMachineNode, TunnelTypeNode typeNode) {
         var newEdge = new TunnelMachineEdge(side);
-        graph.putEdgeValue(newTunnel, machineNode, newEdge);
+        graph.putEdgeValue(newTunnel, CompactMachineNode, newEdge);
         graph.putEdgeValue(newTunnel, typeNode, new TunnelTypeEdge());
     }
 
@@ -187,7 +190,7 @@ public class TunnelConnectionGraph {
 
         var node = tunnels.get(pos);
         return graph.successors(node).stream()
-                .filter(outNode -> outNode instanceof MachineNode)
+                .filter(outNode -> outNode instanceof CompactMachineNode)
                 .map(mn -> graph.edgeValue(node, mn))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

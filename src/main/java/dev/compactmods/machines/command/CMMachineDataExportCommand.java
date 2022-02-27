@@ -8,8 +8,8 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -29,7 +29,7 @@ public class CMMachineDataExportCommand {
         var src = ctx.getSource();
         var serv = src.getServer();
 
-        final var connections = MachineConnections.get(serv);
+        final var connections = MachineToRoomConnections.get(serv);
         final var machines = CompactMachineData.get(serv);
 
         var outdir = src.getServer().getFile(CompactMachines.MOD_ID);

@@ -2,8 +2,8 @@ package dev.compactmods.machines.test.data;
 
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.data.codec.CodecExtensions;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;

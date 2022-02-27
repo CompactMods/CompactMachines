@@ -7,10 +7,10 @@ import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.wall.BreakableWallBlock;
 import dev.compactmods.machines.wall.SolidWallBlock;
-import dev.compactmods.machines.item.ItemBlockMachine;
-import dev.compactmods.machines.item.ItemBlockWall;
-import dev.compactmods.machines.item.ItemPersonalShrinkingDevice;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.machine.CompactMachineItem;
+import dev.compactmods.machines.room.ItemBlockWall;
+import dev.compactmods.machines.item.PersonalShrinkingDevice;
+import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -73,22 +73,22 @@ public class Registration {
             new CompactMachineBlock(RoomSize.MAXIMUM, MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = ITEMS.register("machine_tiny",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_TINY.get(), RoomSize.TINY, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_TINY.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_SMALL = ITEMS.register("machine_small",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_SMALL.get(), RoomSize.SMALL, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_SMALL.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_NORMAL = ITEMS.register("machine_normal",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_NORMAL.get(), RoomSize.NORMAL, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_NORMAL.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_LARGE = ITEMS.register("machine_large",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_LARGE.get(), RoomSize.LARGE, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_LARGE.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_GIANT = ITEMS.register("machine_giant",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_GIANT.get(), RoomSize.GIANT, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_GIANT.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = ITEMS.register("machine_maximum",
-            () -> new ItemBlockMachine(MACHINE_BLOCK_MAXIMUM.get(), RoomSize.MAXIMUM, BASIC_ITEM_PROPS.get()));
+            () -> new CompactMachineItem(MACHINE_BLOCK_MAXIMUM.get(), BASIC_ITEM_PROPS.get()));
 
     public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = BLOCK_ENTITIES.register("compact_machine", () ->
             BlockEntityType.Builder.of(CompactMachineBlockEntity::new,
@@ -113,8 +113,8 @@ public class Registration {
                     .strength(3.0f, 128.0f)
                     .requiresCorrectToolForDrops()));
 
-    public static final RegistryObject<ItemPersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
-            () -> new ItemPersonalShrinkingDevice(BASIC_ITEM_PROPS.get()
+    public static final RegistryObject<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = ITEMS.register("personal_shrinking_device",
+            () -> new PersonalShrinkingDevice(BASIC_ITEM_PROPS.get()
                     .stacksTo(1)));
 
     public static final RegistryObject<Item> ITEM_SOLID_WALL = ITEMS.register("solid_wall", () ->

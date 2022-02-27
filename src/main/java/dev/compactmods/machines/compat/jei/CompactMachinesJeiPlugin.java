@@ -6,7 +6,7 @@ import dev.compactmods.machines.api.core.JeiInfo;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.util.TranslationUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;

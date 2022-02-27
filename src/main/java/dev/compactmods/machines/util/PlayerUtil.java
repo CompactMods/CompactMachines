@@ -12,14 +12,14 @@ import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.persistent.CompactMachineData;
-import dev.compactmods.machines.data.persistent.CompactRoomData;
-import dev.compactmods.machines.data.persistent.MachineConnections;
-import dev.compactmods.machines.rooms.RoomSize;
-import dev.compactmods.machines.rooms.capability.IRoomHistory;
-import dev.compactmods.machines.rooms.history.IRoomHistoryItem;
-import dev.compactmods.machines.rooms.history.PlayerRoomHistoryItem;
-import dev.compactmods.machines.teleportation.DimensionalPosition;
+import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.machine.data.MachineToRoomConnections;
+import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.room.capability.IRoomHistory;
+import dev.compactmods.machines.room.history.IRoomHistoryItem;
+import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
+import dev.compactmods.machines.core.DimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceKey;
@@ -68,7 +68,7 @@ public abstract class PlayerUtil {
         if (!tile.mapped()) {
             CompactMachineData machines = CompactMachineData.get(serv);
             CompactRoomData rooms = CompactRoomData.get(serv);
-            var connections = MachineConnections.get(serv);
+            var connections = MachineToRoomConnections.get(serv);
 
             if (machines == null || rooms == null || connections == null) {
                 CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.");

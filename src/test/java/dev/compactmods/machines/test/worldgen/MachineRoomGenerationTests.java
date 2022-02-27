@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.test.util.TestUtil;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;

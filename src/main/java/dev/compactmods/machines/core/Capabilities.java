@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.rooms.capability.IRoomHistory;
+import dev.compactmods.machines.room.capability.IRoomHistory;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;

@@ -9,6 +9,7 @@ import net.minecraft.world.level.dimension.DimensionType;
  * Used for building dimension types, since Mojang hasn't provided one.
  * By default, this pulls all the overworld values. See {@link DimensionType#DEFAULT_OVERWORLD} for more info,
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class DimensionTypeBuilder {
     private OptionalLong fixedTime = OptionalLong.empty();
     private boolean hasSkylight = true;

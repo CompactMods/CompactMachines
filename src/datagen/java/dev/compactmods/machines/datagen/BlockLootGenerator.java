@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.data.NbtConstants;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
@@ -66,8 +66,8 @@ public class BlockLootGenerator extends LootTableProvider {
         }
 
         private final LootItemFunction.Builder CopyOwnerAndReferenceFunction = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
-                .copy(NbtConstants.ROOM_OWNER, NbtConstants.ROOM_OWNER)
-                .copy(NbtConstants.MACHINE_ID, NbtConstants.MACHINE_ID);
+                .copy(MachineNbt.OWNER, MachineNbt.OWNER)
+                .copy(MachineNbt.ID, MachineNbt.ID);
 
         private void registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
             LootPool.Builder builder = LootPool.lootPool()

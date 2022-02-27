@@ -22,7 +22,7 @@ public class DataGeneration {
 
     private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) throws IOException {
         ExistingFileHelper helper = event.getExistingFileHelper();
-        generator.addProvider(new LevelBiomeGenerator(generator, helper));
+        generator.addProvider(new LevelBiomeGenerator(generator));
 
         generator.addProvider(new BlockLootGenerator(generator));
         generator.addProvider(new RecipeGenerator(generator));

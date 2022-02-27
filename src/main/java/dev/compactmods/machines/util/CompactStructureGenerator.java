@@ -2,7 +2,7 @@ package dev.compactmods.machines.util;
 
 import java.util.Arrays;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.rooms.RoomSize;
+import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
