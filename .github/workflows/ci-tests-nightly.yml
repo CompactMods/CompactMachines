@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       release_type: ${{steps.cf_release_type.outputs.value }}
-      mod_version: ${{steps.mod_version.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
@@ -28,13 +27,6 @@ jobs:
         with:
           path: './gradle.properties'
           property: 'cf_release_type'
-
-      - name: Mod Version
-        id: mod_version
-        uses: christian-draeger/read-properties@1.0.1
-        with:
-          path: './gradle.properties'
-          property: 'mod_version'
 
   tests:
     name: Gradle Tests

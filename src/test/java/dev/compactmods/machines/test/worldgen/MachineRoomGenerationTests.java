@@ -1,28 +1,31 @@
 package dev.compactmods.machines.test.worldgen;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.function.Consumer;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.test.util.TestUtil;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.gametest.framework.GameTestGenerator;
-import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
+import net.minecraft.gametest.framework.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.function.Consumer;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(CompactMachines.MOD_ID)
@@ -63,6 +66,7 @@ public class MachineRoomGenerationTests {
     @GameTest(template = "empty_5x5", batch = "dimension")
     public static void usingPsdCreatesRoom(final GameTestHelper test) {
         var player = test.makeMockPlayer();
+        var serv = test.getLevel().getServer();
 
         var machLoc = new BlockPos(3, 0, 3);
         var realMachLoc = test.absolutePos(machLoc);
@@ -87,8 +91,24 @@ public class MachineRoomGenerationTests {
                             test.fail("Machine ID not set after PSD usage.");
 
                         var roomid = mach.getInternalChunkPos();
-                        if(roomid.isEmpty())
+                        if(roomid.isEmpty()) {
                             test.fail("Room was not registered.");
+                            return;
+                        }
+
+                        ChunkPos room = roomid.get();
+                        try {
+                            boolean destroyed = Rooms.destroy(serv, room);
+                            if(!destroyed)
+                                test.fail("Room was not destroyed after test.");
+
+                            final var rooms = CompactRoomData.get(serv);
+                            if(rooms.isRegistered(room))
+                                test.fail("Room was not unregistered after test.");
+
+                        } catch (MissingDimensionException | NonexistentRoomException e) {
+                            test.fail(e.toString());
+                        }
 
                         test.succeed();
                     } else {

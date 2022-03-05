@@ -2,9 +2,11 @@ package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -57,13 +59,13 @@ public class TeleportationEventHandler {
 
         ChunkPos machineChunk = new ChunkPos(entity.chunkPosition().x, entity.chunkPosition().z);
 
-        CompactRoomData intern = CompactRoomData.get(serv);
-        if (intern == null)
+        try {
+            final CompactRoomData intern = CompactRoomData.get(serv);
+            return !intern.getBounds(machineChunk).contains(target);
+        } catch (MissingDimensionException | NonexistentRoomException e) {
+            CompactMachines.LOGGER.error(e);
             return false;
-
-        return intern.getInnerBounds(machineChunk)
-                .map(bounds -> !bounds.contains(target))
-                .orElse(false);
+        }
     }
 
     private static void doEntityTeleportHandle(EntityEvent evt, Vec3 target, Entity ent) {

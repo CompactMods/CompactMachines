@@ -5,7 +5,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;

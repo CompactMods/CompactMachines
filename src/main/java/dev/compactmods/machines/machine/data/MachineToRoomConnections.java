@@ -1,7 +1,5 @@
 package dev.compactmods.machines.machine.data;
 
-import java.util.Collection;
-import java.util.Optional;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
 import dev.compactmods.machines.core.Registration;
@@ -13,7 +11,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Optional;
 
 public class MachineToRoomConnections extends SavedData implements MachineRoomConnections {
     public static final String DATA_NAME = CompactMachines.MOD_ID + "_connections";
@@ -47,9 +48,9 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
         return c;
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public CompoundTag save(@NotNull CompoundTag nbt) {
+    public CompoundTag save(@Nonnull CompoundTag nbt) {
         CompactMachineConnectionGraph.CODEC
                 .encodeStart(NbtOps.INSTANCE, graph)
                 .resultOrPartial(CompactMachines.LOGGER::error)
@@ -59,13 +60,13 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public Optional<ChunkPos> getConnectedRoom(int machineId) {
         return graph.getConnectedRoom(machineId);
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public Collection<Integer> getMachinesFor(ChunkPos chunkPos) {
         return graph.getMachinesFor(chunkPos);
     }

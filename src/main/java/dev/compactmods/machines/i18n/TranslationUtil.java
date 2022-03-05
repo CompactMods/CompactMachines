@@ -1,6 +1,5 @@
-package dev.compactmods.machines.util;
+package dev.compactmods.machines.i18n;
 
-import dev.compactmods.machines.CompactMachines;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -51,11 +50,11 @@ public abstract class TranslationUtil {
         return new TranslatableComponent(Util.makeDescriptionId("jei", jei));
     }
 
-    public static TranslatableComponent command(String s) {
-        return new TranslatableComponent(Util.makeDescriptionId("command", new ResourceLocation(CompactMachines.MOD_ID, s)));
+    public static TranslatableComponent command(ResourceLocation s) {
+        return new TranslatableComponent(Util.makeDescriptionId("command", s));
     }
 
-    public static TranslatableComponent command(String s, Object... params) {
-        return new TranslatableComponent(Util.makeDescriptionId("command", new ResourceLocation(CompactMachines.MOD_ID, s)), params);
+    public static TranslatableComponent command(ResourceLocation s, Object... params) {
+        return new TranslatableComponent(Util.makeDescriptionId("command", s), params);
     }
 }

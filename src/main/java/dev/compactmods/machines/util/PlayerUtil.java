@@ -1,28 +1,25 @@
 package dev.compactmods.machines.util;
 
-import javax.annotation.Nonnull;
-import javax.naming.OperationNotSupportedException;
-import java.util.Optional;
-import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.data.CompactMachineData;
-import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.capability.IRoomHistory;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
-import dev.compactmods.machines.core.DimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +31,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
+import javax.naming.OperationNotSupportedException;
+import java.util.Optional;
+import java.util.UUID;
+
 public abstract class PlayerUtil {
     public static Optional<GameProfile> getProfileByUUID(LevelAccessor world, UUID uuid) {
         Player player = world.getPlayerByUUID(uuid);
@@ -42,13 +44,6 @@ public abstract class PlayerUtil {
 
         GameProfile profile = player.getGameProfile();
         return Optional.of(profile);
-    }
-
-    public static DimensionalPosition getPlayerDimensionalPosition(Player player) {
-        Vec3 pos = player.position();
-        ResourceKey<Level> dim = player.level.dimension();
-
-        return new DimensionalPosition(dim, pos);
     }
 
     public static void teleportPlayerIntoMachine(Level level, Player player, BlockPos machinePos, RoomSize size) {
@@ -66,11 +61,18 @@ public abstract class PlayerUtil {
 
         final boolean grantAdvancement = !tile.mapped();
         if (!tile.mapped()) {
-            CompactMachineData machines = CompactMachineData.get(serv);
-            CompactRoomData rooms = CompactRoomData.get(serv);
-            var connections = MachineToRoomConnections.get(serv);
+            CompactMachineData machines;
+            CompactRoomData rooms;
+            try {
+                machines = CompactMachineData.get(serv);
+                rooms = CompactRoomData.get(serv);
+            } catch (MissingDimensionException e) {
+                CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.", e);
+                return;
+            }
 
-            if (machines == null || rooms == null || connections == null) {
+            var connections = MachineToRoomConnections.get(serv);
+            if (connections == null) {
                 CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.");
                 return;
             }

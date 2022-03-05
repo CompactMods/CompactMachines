@@ -1,15 +1,15 @@
 package dev.compactmods.machines.network;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
-import java.util.function.Supplier;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.tunnel.client.ClientTunnelHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public class TunnelAddedPacket {
 
@@ -19,7 +19,7 @@ public class TunnelAddedPacket {
     @Nonnull
     private final TunnelDefinition type;
 
-    public TunnelAddedPacket(@NotNull BlockPos tunnelPos, @NotNull TunnelDefinition tunnelType) {
+    public TunnelAddedPacket(@Nonnull BlockPos tunnelPos, @Nonnull TunnelDefinition tunnelType) {
         this.position = tunnelPos;
         this.type = tunnelType;
     }

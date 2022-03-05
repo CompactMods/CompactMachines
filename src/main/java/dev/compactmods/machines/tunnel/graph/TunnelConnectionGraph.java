@@ -1,7 +1,5 @@
 package dev.compactmods.machines.tunnel.graph;
 
-import java.util.*;
-import java.util.stream.Collectors;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
@@ -12,7 +10,10 @@ import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a room's tunnel connections in a graph-style format.
@@ -140,7 +141,7 @@ public class TunnelConnectionGraph {
         graph.putEdgeValue(newTunnel, typeNode, new TunnelTypeEdge());
     }
 
-    @NotNull
+    @Nonnull
     private TunnelNode getOrCreateTunnelNode(BlockPos tunnelPos) {
         if(tunnels.containsKey(tunnelPos))
             return tunnels.get(tunnelPos);

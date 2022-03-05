@@ -1,10 +1,7 @@
 package dev.compactmods.machines.network;
 
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import net.minecraft.core.BlockPos;
@@ -18,6 +15,12 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class CMPacketTargets {
 
     public static final PacketDistributor<LevelChunk> TRACKING_ROOM = new PacketDistributor<>(
@@ -29,28 +32,31 @@ public class CMPacketTargets {
 
         HashMap<UUID, ServerGamePacketListenerImpl> trackingPlayersGlobal = new HashMap<>();
 
-        if (level instanceof ServerLevel) {
-            ServerLevel serverWorld = (ServerLevel) level;
+        if (level instanceof ServerLevel serverWorld) {
             MinecraftServer server = serverWorld.getServer();
 
             var connections = MachineToRoomConnections.get(server);
-            var machines = CompactMachineData.get(server);
+            try {
+                final var machines = CompactMachineData.get(server);
 
-            var linked = connections.getMachinesFor(roomChunk.getPos());
+                var linked = connections.getMachinesFor(roomChunk.getPos());
 
-            for (int machine : linked) {
-                machines.getMachineLocation(machine).ifPresent(loc -> {
-                    Optional<ServerLevel> machineWorld = loc.level(server);
-                    BlockPos machineWorldLocation = loc.getBlockPosition();
-                    ChunkPos machineWorldChunk = new ChunkPos(machineWorldLocation);
+                for (int machine : linked) {
+                    machines.getMachineLocation(machine).ifPresent(loc -> {
+                        Optional<ServerLevel> machineWorld = loc.level(server);
+                        BlockPos machineWorldLocation = loc.getBlockPosition();
+                        ChunkPos machineWorldChunk = new ChunkPos(machineWorldLocation);
 
-                    machineWorld.ifPresent(mw -> {
-                        mw.getChunkSource().chunkMap.getPlayers(machineWorldChunk, false).forEach(player -> {
-                            if (!trackingPlayersGlobal.containsKey(player.getUUID()))
-                                trackingPlayersGlobal.put(player.getUUID(), player.connection);
+                        machineWorld.ifPresent(mw -> {
+                            mw.getChunkSource().chunkMap.getPlayers(machineWorldChunk, false).forEach(player -> {
+                                if (!trackingPlayersGlobal.containsKey(player.getUUID()))
+                                    trackingPlayersGlobal.put(player.getUUID(), player.connection);
+                            });
                         });
                     });
-                });
+                }
+            } catch (MissingDimensionException e) {
+                CompactMachines.LOGGER.fatal(e);
             }
         }
 

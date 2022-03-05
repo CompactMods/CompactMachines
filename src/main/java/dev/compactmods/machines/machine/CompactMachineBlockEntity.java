@@ -1,17 +1,16 @@
 package dev.compactmods.machines.machine;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.UUID;
+import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.core.DimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -25,7 +24,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.UUID;
 
 public class CompactMachineBlockEntity extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
@@ -42,9 +45,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == Capabilities.ROOM) return room.cast();
         if (cap == Capabilities.ROOM_CAPS) return caps.cast();
 
@@ -85,7 +88,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     }
 
     @Override
-    public void load(@NotNull CompoundTag nbt) {
+    public void load(@Nonnull CompoundTag nbt) {
         super.load(nbt);
 
         machineId = nbt.getInt(MachineNbt.ID);
@@ -216,10 +219,14 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
                 this.worldPosition
         );
 
-        CompactMachineData extern = CompactMachineData.get(serv);
-        extern.setMachineLocation(this.machineId, dp);
+        try {
+            CompactMachineData extern = CompactMachineData.get(serv);
+            extern.setMachineLocation(this.machineId, dp);
 
-        this.setChanged();
+            this.setChanged();
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+        }
     }
 
     public boolean mapped() {
@@ -227,8 +234,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     }
 
     public Optional<DimensionalPosition> getSpawn() {
-        if (level instanceof ServerLevel) {
-            ServerLevel serverWorld = (ServerLevel) level;
+        if (level instanceof ServerLevel serverWorld) {
             MinecraftServer serv = serverWorld.getServer();
 
             var connections = MachineToRoomConnections.get(serv);
@@ -237,15 +243,18 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
 
             Optional<ChunkPos> connectedRoom = connections.getConnectedRoom(machineId);
 
-            if (!connectedRoom.isPresent())
+            if (connectedRoom.isEmpty())
                 return Optional.empty();
 
-            CompactRoomData roomData = CompactRoomData.get(serv);
-            if (roomData == null)
-                return Optional.empty();
+            try {
+                final var roomData = CompactRoomData.get(serv);
 
-            ChunkPos chunk = connectedRoom.get();
-            return Optional.ofNullable(roomData.getSpawn(chunk));
+                ChunkPos chunk = connectedRoom.get();
+                return Optional.ofNullable(roomData.getSpawn(chunk));
+            } catch (MissingDimensionException e) {
+                CompactMachines.LOGGER.fatal(e);
+                return Optional.empty();
+            }
         }
 
         return Optional.empty();

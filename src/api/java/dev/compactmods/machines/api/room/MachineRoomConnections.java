@@ -1,14 +1,16 @@
 package dev.compactmods.machines.api.room;
 
+import net.minecraft.world.level.ChunkPos;
+
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Optional;
-import net.minecraft.world.level.ChunkPos;
-import org.jetbrains.annotations.NotNull;
 
 public interface MachineRoomConnections {
-    @NotNull Optional<ChunkPos> getConnectedRoom(int machineId);
+    @Nonnull
+    Optional<ChunkPos> getConnectedRoom(int machineId);
 
-    @NotNull Collection<Integer> getMachinesFor(ChunkPos chunkPos);
+    @Nonnull Collection<Integer> getMachinesFor(ChunkPos chunkPos);
 
     void registerMachine(int machine);
 

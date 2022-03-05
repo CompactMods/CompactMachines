@@ -1,10 +1,5 @@
 package dev.compactmods.machines.datagen;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,17 +8,25 @@ import dev.compactmods.machines.advancement.trigger.ClaimedMachineTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.util.TranslationUtil;
-import net.minecraft.advancements.*;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.advancements.FrameType;
 import net.minecraft.advancements.critereon.ImpossibleTrigger;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class AdvancementGenerator implements DataProvider {
 
@@ -35,7 +38,7 @@ public class AdvancementGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@NotNull HashCache cache) {
+    public void run(@Nonnull HashCache cache) {
         Path path = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
         Consumer<Advancement> consumer = (adv) -> {

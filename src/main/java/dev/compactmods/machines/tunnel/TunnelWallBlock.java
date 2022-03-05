@@ -13,7 +13,7 @@ import dev.compactmods.machines.api.tunnels.redstone.IRedstoneReaderTunnel;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

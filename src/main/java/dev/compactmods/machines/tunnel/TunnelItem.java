@@ -1,24 +1,19 @@
 package dev.compactmods.machines.tunnel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
 import dev.compactmods.machines.room.capability.IRoomHistory;
 import dev.compactmods.machines.util.PlayerUtil;
-import dev.compactmods.machines.util.TranslationUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -45,6 +40,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
@@ -120,13 +122,13 @@ public class TunnelItem extends Item {
         final BlockPos position = context.getClickedPos();
         final BlockState state = level.getBlockState(position);
 
-        if (state.getBlock() instanceof SolidWallBlock && player instanceof ServerPlayer serverPlayer) {
+        if (state.getBlock() instanceof SolidWallBlock && player instanceof ServerPlayer sPlayer) {
             getDefinition(context.getItemInHand()).ifPresent(def -> {
                 try {
-                    boolean success = setupTunnelWall(level, position, context.getClickedFace(), serverPlayer, def);
+                    boolean success = setupTunnelWall(level, position, context.getClickedFace(), sPlayer, def);
                     if (success && !player.isCreative())
                         context.getItemInHand().shrink(1);
-                } catch (Exception e) {
+                } catch (Exception | MissingDimensionException e) {
                     CompactMachines.LOGGER.error(e);
                 }
             });
@@ -137,7 +139,7 @@ public class TunnelItem extends Item {
         return InteractionResult.FAIL;
     }
 
-    private static boolean setupTunnelWall(Level level, BlockPos position, Direction side, ServerPlayer player, TunnelDefinition def) throws Exception {
+    private static boolean setupTunnelWall(Level level, BlockPos position, Direction side, ServerPlayer player, TunnelDefinition def) throws Exception, MissingDimensionException {
         boolean redstone = def instanceof IRedstoneTunnel;
         final LazyOptional<IRoomHistory> history = player.getCapability(Capabilities.ROOM_HISTORY);
         if (!history.isPresent()) {

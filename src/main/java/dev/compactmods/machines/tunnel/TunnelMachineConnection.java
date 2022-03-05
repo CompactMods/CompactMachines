@@ -8,7 +8,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class TunnelMachineConnection implements ITunnelConnection {
 
@@ -32,13 +33,13 @@ public class TunnelMachineConnection implements ITunnelConnection {
         return (T) type;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ServerLevel level() {
         return level;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public BlockState state() {
         return state;
@@ -47,13 +48,13 @@ public class TunnelMachineConnection implements ITunnelConnection {
     /**
      * Gets the side of the machine the tunnel is bound to.
      */
-    @NotNull
+    @Nonnull
     @Override
     public Direction side() {
         return side;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public BlockPos position() {
         return position;

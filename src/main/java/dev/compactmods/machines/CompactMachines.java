@@ -14,7 +14,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 @Mod(CompactMachines.MOD_ID)
 public class CompactMachines {
@@ -24,7 +25,8 @@ public class CompactMachines {
 
     public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(MOD_ID) {
         @Override
-        public @NotNull ItemStack makeIcon() {
+        public @Nonnull
+        ItemStack makeIcon() {
             return new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get());
         }
     };

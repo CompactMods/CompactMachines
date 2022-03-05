@@ -1,14 +1,9 @@
 package dev.compactmods.machines.datagen;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.core.Registration;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
@@ -28,7 +23,13 @@ import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BlockLootGenerator extends LootTableProvider {
 
@@ -42,7 +43,7 @@ public class BlockLootGenerator extends LootTableProvider {
     }
 
     @Override
-    protected void validate(Map<ResourceLocation, LootTable> map, @NotNull ValidationContext val) {
+    protected void validate(Map<ResourceLocation, LootTable> map, @Nonnull ValidationContext val) {
         map.forEach((name, table) -> LootTables.validate(val, name, table));
     }
 

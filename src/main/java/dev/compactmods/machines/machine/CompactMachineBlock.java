@@ -1,16 +1,13 @@
 package dev.compactmods.machines.machine;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
-import java.util.UUID;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.room.RoomSize;
-import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,6 +29,11 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
+import java.util.UUID;
 
 public class CompactMachineBlock extends Block implements EntityBlock {
 
@@ -211,15 +213,19 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean a) {
         MinecraftServer server = level.getServer();
-        if(level.isClientSide || server == null) {
+        if (level.isClientSide || server == null) {
             super.onRemove(oldState, level, pos, newState, a);
             return;
         }
 
-        if(level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
-            if(entity.mapped()) {
-                var machines = CompactMachineData.get(server);
-                machines.remove(entity.machineId);
+        if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
+            if (entity.mapped()) {
+                try {
+                    final CompactMachineData machines = CompactMachineData.get(server);
+                    machines.remove(entity.machineId);
+                } catch (MissingDimensionException e) {
+                    CompactMachines.LOGGER.fatal(e);
+                }
             }
         }
 

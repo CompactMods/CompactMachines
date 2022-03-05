@@ -1,23 +1,17 @@
 package dev.compactmods.machines.room.data;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.naming.OperationNotSupportedException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.codec.NbtListCollector;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -32,21 +26,30 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.naming.OperationNotSupportedException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 public class CompactRoomData extends SavedData {
     public static final String DATA_NAME = CompactMachines.MOD_ID + "_rooms";
 
-    private final Map<ChunkPos, RoomData> machineData;
+    private final Map<ChunkPos, RoomData> roomData;
 
     public CompactRoomData() {
-        machineData = new HashMap<>();
+        roomData = new HashMap<>();
     }
 
-    @Nullable
-    public static CompactRoomData get(MinecraftServer server) {
+    @Nonnull
+    public static CompactRoomData get(MinecraftServer server) throws MissingDimensionException {
         ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
-            return null;
+            throw new MissingDimensionException("Compact dimension not found.");
         }
 
         DimensionDataStorage sd = compactWorld.getDataStorage();
@@ -65,7 +68,7 @@ public class CompactRoomData extends SavedData {
                         .resultOrPartial((err) -> CompactMachines.LOGGER.error("Error loading machine data from file: {}", err))
                         .ifPresent(imd -> {
                             ChunkPos chunk = new ChunkPos(imd.getCenter());
-                            data.machineData.put(chunk, imd);
+                            data.roomData.put(chunk, imd);
                         });
             });
         }
@@ -76,8 +79,8 @@ public class CompactRoomData extends SavedData {
     @Override
     @Nonnull
     public CompoundTag save(@Nonnull CompoundTag nbt) {
-        if (!machineData.isEmpty()) {
-            ListTag collect = machineData.values()
+        if (!roomData.isEmpty()) {
+            ListTag collect = roomData.values()
                     .stream()
                     .map(data -> {
                         DataResult<Tag> n = RoomData.CODEC.encodeStart(NbtOps.INSTANCE, data);
@@ -94,28 +97,28 @@ public class CompactRoomData extends SavedData {
     }
 
     public Stream<ChunkPos> stream() {
-        return machineData.keySet().stream();
+        return roomData.keySet().stream();
     }
 
     public boolean isRegistered(ChunkPos chunkPos) {
-        return machineData.containsKey(chunkPos);
+        return roomData.containsKey(chunkPos);
     }
 
     private void register(ChunkPos pos, RoomData data) throws OperationNotSupportedException {
         if (isRegistered(pos))
             throw new OperationNotSupportedException("Machine already registered.");
 
-        machineData.put(pos, data);
+        roomData.put(pos, data);
         setDirty();
     }
 
     public Stream<RoomData> streamRooms() {
-        return machineData.values().stream();
+        return roomData.values().stream();
     }
 
     @Nullable
     public DimensionalPosition getSpawn(ChunkPos roomChunk) {
-        RoomData roomData = machineData.get(roomChunk);
+        RoomData roomData = this.roomData.get(roomChunk);
         if (roomData == null)
             return null;
 
@@ -126,25 +129,24 @@ public class CompactRoomData extends SavedData {
     }
 
     public int getNextId() {
-        return this.machineData.size() + 1;
+        return this.roomData.size() + 1;
     }
 
     public void setSpawn(ChunkPos roomChunk, Vec3 position) {
-        if (!machineData.containsKey(roomChunk))
+        if (!roomData.containsKey(roomChunk))
             return;
 
-        RoomData roomData = machineData.get(roomChunk);
+        RoomData roomData = this.roomData.get(roomChunk);
         roomData.setSpawn(position);
 
         setDirty();
     }
 
-    public Optional<AABB> getInnerBounds(ChunkPos roomChunk) {
-        if (!machineData.containsKey(roomChunk))
-            return Optional.empty();
+    public AABB getBounds(ChunkPos roomChunk) throws NonexistentRoomException {
+        if (!roomData.containsKey(roomChunk))
+            throw new NonexistentRoomException(roomChunk);
 
-        AABB bounds = machineData.get(roomChunk).getMachineBounds();
-        return Optional.of(bounds);
+        return roomData.get(roomChunk).getMachineBounds();
     }
 
     public NewRoomRegistration createNew() {
@@ -152,7 +154,12 @@ public class CompactRoomData extends SavedData {
     }
 
     public boolean isMachineRoomChunk(ChunkPos pos) {
-        return machineData.containsKey(pos);
+        return roomData.containsKey(pos);
+    }
+
+    public void remove(ChunkPos room) {
+        roomData.remove(room);
+        setDirty();
     }
 
     public static class NewRoomRegistration {

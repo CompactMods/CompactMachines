@@ -1,8 +1,5 @@
 package dev.compactmods.machines.command;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -10,16 +7,21 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.CsvOutput;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class CMTunnelDataExportCommand {
 
@@ -30,7 +32,7 @@ public class CMTunnelDataExportCommand {
                 .executes(CMTunnelDataExportCommand::exec);
 
         return Commands.literal("tunnels")
-                .requires(cs -> cs.hasPermission(2))
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(CMTunnelDataExportCommand::execAll)
                 .then(chunk);
     }
@@ -40,7 +42,13 @@ public class CMTunnelDataExportCommand {
         var serv = src.getServer();
         var compact = src.getServer().getLevel(Registration.COMPACT_DIMENSION);
 
-        final CompactRoomData rooms = CompactRoomData.get(serv);
+        final CompactRoomData rooms;
+        try {
+            rooms = CompactRoomData.get(serv);
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            return -1;
+        }
 
         var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
         var out = outdir.toPath()
@@ -99,7 +107,7 @@ public class CMTunnelDataExportCommand {
         return 0;
     }
 
-    @NotNull
+    @Nonnull
     private static CsvOutput makeTunnelCsvOut(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
                 .addColumn("type")

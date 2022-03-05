@@ -1,7 +1,5 @@
 package dev.compactmods.machines.room.capability;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
@@ -12,7 +10,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTag> {
     private final RoomChunkData room;
@@ -36,9 +36,9 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
      *             <strong>CAN BE NULL</strong>. Null is defined to represent 'internal' or 'self'
      * @return The requested an optional holding the requested capability.
      */
-    @NotNull
+    @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if(cap == Capabilities.ROOM)
             return LazyOptional.of(this::room).cast();
 
@@ -57,12 +57,12 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
         return this.tunnels;
     }
 
-    @NotNull
+    @Nonnull
     private IRoomCapabilities caps() {
         return roomCaps;
     }
 
-    @NotNull
+    @Nonnull
     private IMachineRoom room() {
         return this.room;
     }

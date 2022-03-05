@@ -1,8 +1,5 @@
 package dev.compactmods.machines.datagen;
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.function.BiConsumer;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -30,7 +27,11 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.function.BiConsumer;
 
 public class LevelBiomeGenerator implements DataProvider {
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
@@ -44,7 +45,7 @@ public class LevelBiomeGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@NotNull HashCache cache) {
+    public void run(@Nonnull HashCache cache) {
         Path data = this.generator.getOutputFolder();
 
         HashMap<ResourceLocation, Biome> biomes = Maps.newHashMap();

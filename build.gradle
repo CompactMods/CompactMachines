@@ -53,12 +53,12 @@ def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true"
 
 task getBuildInfo() {
     println("Mod ID: ${mod_id}")
-    println("Version: ${isRelease ? mod_version : nightlyVersion}")
+    println("Version: ${isRelease ? semver : nightlyVersion}")
     println("Semver Version: ${semver}")
     println("Nightly Build: ${nightlyVersion}")
 }
 
-version = isRelease ? mod_version : nightlyVersion
+version = isRelease ? semver : nightlyVersion
 group = "dev.compactmods"
 archivesBaseName = mod_id
 

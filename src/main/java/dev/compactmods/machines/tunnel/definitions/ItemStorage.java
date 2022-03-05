@@ -7,7 +7,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class ItemStorage implements ITunnel, INBTSerializable<CompoundTag> {
 
@@ -21,7 +22,8 @@ public class ItemStorage implements ITunnel, INBTSerializable<CompoundTag> {
         this.laze = LazyOptional.of(this::getItems);
     }
 
-    private @NotNull IItemHandler getItems() {
+    private @Nonnull
+    IItemHandler getItems() {
         return handler;
     }
 

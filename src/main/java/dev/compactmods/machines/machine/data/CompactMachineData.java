@@ -1,19 +1,14 @@
 package dev.compactmods.machines.machine.data;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -24,9 +19,18 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * Holds information on the external points of a machine, ie the actual machine blocks.
+ *
+ * @deprecated This data should move to the connection graph or to the machine blocks, to be removed in 1.19
  */
+@Deprecated(forRemoval = true, since = "4.0.7")
 public class CompactMachineData extends SavedData {
 
     /**
@@ -41,12 +45,13 @@ public class CompactMachineData extends SavedData {
     private final Map<Integer, MachineData> data = new HashMap<>();
     private final Map<Integer, LazyOptional<IDimensionalPosition>> locations = new HashMap<>();
 
-    @Nullable
-    public static CompactMachineData get(MinecraftServer server) {
+
+    @Nonnull
+    public static CompactMachineData get(MinecraftServer server) throws MissingDimensionException {
         ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
-            return null;
+            throw new MissingDimensionException();
         }
 
         DimensionDataStorage sd = compactWorld.getDataStorage();

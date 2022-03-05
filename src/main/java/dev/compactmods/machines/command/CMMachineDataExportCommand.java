@@ -1,21 +1,23 @@
 package dev.compactmods.machines.command;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
-import dev.compactmods.machines.util.TranslationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.util.CsvOutput;
 import net.minecraft.world.level.ChunkPos;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class CMMachineDataExportCommand {
 
@@ -30,7 +32,13 @@ public class CMMachineDataExportCommand {
         var serv = src.getServer();
 
         final var connections = MachineToRoomConnections.get(serv);
-        final var machines = CompactMachineData.get(serv);
+        final CompactMachineData machines;
+        try {
+            machines = CompactMachineData.get(serv);
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            return -1;
+        }
 
         var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
         var out = outdir.toPath()
@@ -55,7 +63,7 @@ public class CMMachineDataExportCommand {
         return 0;
     }
 
-    @NotNull
+    @Nonnull
     private static CsvOutput makeCsv(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
                 .addColumn("id")

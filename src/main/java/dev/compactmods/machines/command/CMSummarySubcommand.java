@@ -3,11 +3,15 @@ package dev.compactmods.machines.command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -23,22 +27,30 @@ public class CMSummarySubcommand {
         var serv = src.getServer();
 
         var compactLevel = serv.getLevel(Registration.COMPACT_DIMENSION);
-        if(compactLevel != null) {
-            src.sendSuccess(TranslationUtil.command("level_registered").withStyle(ChatFormatting.DARK_GREEN), false);
+        if (compactLevel != null) {
+            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         } else {
-            src.sendSuccess(TranslationUtil.command("level_not_found").withStyle(ChatFormatting.RED), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND).withStyle(ChatFormatting.RED), false);
         }
 
-        var machineData = CompactMachineData.get(serv);
-        if(machineData != null) {
+        try {
+            final var machineData = CompactMachineData.get(serv);
+
             long numRegistered = machineData.stream().count();
-            src.sendSuccess(TranslationUtil.command("machine_reg_count", numRegistered), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_COUNT, numRegistered), false);
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND));
         }
 
-        var roomData = CompactRoomData.get(serv);
-        if(roomData != null) {
+        try {
+            final var roomData = CompactRoomData.get(serv);
+
             long numRegistered = roomData.stream().count();
-            src.sendSuccess(TranslationUtil.command("room_reg_count", numRegistered), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, numRegistered), false);
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND));
         }
 
         return 0;

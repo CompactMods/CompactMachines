@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.util.TranslationUtil;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;

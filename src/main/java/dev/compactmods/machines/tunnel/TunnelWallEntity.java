@@ -1,9 +1,5 @@
 package dev.compactmods.machines.tunnel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Optional;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.IMachineRoom;
@@ -15,6 +11,7 @@ import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
 import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
 import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.machine.data.CompactMachineData;
@@ -33,7 +30,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Optional;
 
 public class TunnelWallEntity extends BlockEntity {
 
@@ -54,7 +55,7 @@ public class TunnelWallEntity extends BlockEntity {
 
     @Override
     @SuppressWarnings("deprecation")
-    public void setBlockState(@NotNull BlockState newState) {
+    public void setBlockState(@Nonnull BlockState newState) {
         super.setBlockState(newState);
         if (level != null && !level.isClientSide)
             this.connection = new TunnelMachineConnection(level.getServer(), this);
@@ -62,7 +63,7 @@ public class TunnelWallEntity extends BlockEntity {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void load(@NotNull CompoundTag nbt) {
+    public void load(@Nonnull CompoundTag nbt) {
         super.load(nbt);
 
         try {
@@ -150,9 +151,9 @@ public class TunnelWallEntity extends BlockEntity {
         }
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (level == null || level.isClientSide)
             return super.getCapability(cap, side);
 
@@ -172,7 +173,7 @@ public class TunnelWallEntity extends BlockEntity {
     /**
      * Server side only. Gets information about the connection to an outside point.
      */
-    public @NotNull ITunnelConnection getConnection() {
+    public @Nonnull ITunnelConnection getConnection() {
         if (this.connection == null)
             this.connection = new TunnelMachineConnection(level.getServer(), this);
 
@@ -186,10 +187,16 @@ public class TunnelWallEntity extends BlockEntity {
         final MinecraftServer server = level.getServer();
         if (server == null) return null;
 
-        var machines = CompactMachineData.get(server);
-        var conn = MachineToRoomConnections.get(server);
+        CompactMachineData machines;
+        try {
+            machines = CompactMachineData.get(server);
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            return null;
+        }
 
-        if (machines == null || conn == null)
+        var conn = MachineToRoomConnections.get(server);
+        if (conn == null)
             return null;
 
         final Collection<Integer> connected = conn.getMachinesFor(new ChunkPos(worldPosition));
@@ -258,9 +265,13 @@ public class TunnelWallEntity extends BlockEntity {
     public void setConnectedTo(int machine) {
         if (level == null || level.isClientSide) return;
 
-        CompactMachineData data = CompactMachineData.get(level.getServer());
-        if (data == null)
+        CompactMachineData data;
+        try {
+            data = CompactMachineData.get(level.getServer());
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
             return;
+        }
 
         data.getMachineLocation(machine).ifPresent(p -> {
             this.connectedMachine = machine;
