@@ -14,9 +14,11 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @PrefixGameTestTemplate(false)
 @GameTestHolder(CompactMachines.MOD_ID)
@@ -44,7 +46,7 @@ public class TunnelGraphTests {
             if (!registered)
                 test.fail("Expected tunnel to be registered without error");
 
-            var typed = graph.getTunnels(Tunnels.UNKNOWN.get());
+            var typed = graph.getTunnelsByType(Tunnels.UNKNOWN.get());
             if (typed.size() != 1)
                 test.fail("Tunnel not found when searching by type.");
 
@@ -62,6 +64,44 @@ public class TunnelGraphTests {
         } catch (Exception e) {
             test.fail(e.getMessage());
         }
+
+        test.succeed();
+    }
+
+    @GameTest(template = "empty_1x1", batch = TestBatches.TUNNEL_DATA)
+    public static void canFetchSupportingTunnelsOnSide(final GameTestHelper test) {
+        var graph = new TunnelConnectionGraph();
+
+        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_IN_DEF.get(), 1, Direction.NORTH);
+        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_IN_DEF.get(), 1, Direction.SOUTH);
+        graph.registerTunnel(BlockPos.ZERO.below(), Tunnels.UNKNOWN.get(), 1, Direction.NORTH);
+
+        final var positions = graph.getTunnelsSupporting(1, Direction.NORTH, IItemHandler.class)
+                .collect(Collectors.toSet());
+
+        if(positions.isEmpty())
+            test.fail("Items are supported on the item tunnel type.");
+
+        if(positions.size() != 1)
+            test.fail("Should only have one position found.");
+
+        test.succeed();
+    }
+
+    @GameTest(template = "empty_1x1", batch = TestBatches.TUNNEL_DATA)
+    public static void canFetchSidedTypes(final GameTestHelper test) {
+        var graph = new TunnelConnectionGraph();
+
+        // Register three tunnels - two types on the north side (different positions), one on south
+        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_IN_DEF.get(), 1, Direction.NORTH);
+        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_IN_DEF.get(), 1, Direction.SOUTH);
+        graph.registerTunnel(BlockPos.ZERO.below(), Tunnels.UNKNOWN.get(), 1, Direction.NORTH);
+
+        final var positions = graph.getTypesForSide(1, Direction.NORTH)
+                .collect(Collectors.toSet());
+
+        if(positions.size() != 2)
+            test.fail("Should have two tunnel types for the machine side.");
 
         test.succeed();
     }

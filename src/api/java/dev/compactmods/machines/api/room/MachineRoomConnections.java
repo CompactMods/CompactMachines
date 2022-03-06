@@ -19,4 +19,6 @@ public interface MachineRoomConnections {
     void connectMachineToRoom(int machine, ChunkPos room);
 
     void disconnect(int machine);
+
+    void unregisterRoom(ChunkPos room);
 }

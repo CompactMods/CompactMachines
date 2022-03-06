@@ -35,6 +35,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @GameTestHolder(CompactMachines.MOD_ID)
 public class TunnelTests {
@@ -106,12 +107,16 @@ public class TunnelTests {
         t.startSequence()
                 .thenExecute(() -> {
                     t.setBlock(machineBlock, Registration.MACHINE_BLOCK_NORMAL.get());
+
                     try {
-                        currentRoom.set(Machines.createNew(serv, lev, t.absolutePos(machineBlock)));
-                        Machines.link(serv, currentRoom.get(), TESTING_ROOM);
-                        TESTING_MACHINES.add(currentRoom.get());
+                        int newMachine = Machines.createNew(serv, lev, t.absolutePos(machineBlock));
+                        Machines.link(serv, newMachine, TESTING_ROOM);
+                        TESTING_MACHINES.add(newMachine);
+
+                        currentRoom.set(newMachine);
                     } catch (MissingDimensionException e) {
                         e.printStackTrace();
+                        t.fail(e.getMessage());
                     }
                 })
 
@@ -141,6 +146,7 @@ public class TunnelTests {
                 })
 
                 .thenExecuteAfter(5, () -> {
+                    int machine = currentRoom.get();
                     var wallLoc = randomWallRelative.get();
 
                     final var wallState = comLev.getBlockState(wallLoc);
@@ -153,19 +159,15 @@ public class TunnelTests {
                     try {
                         final var roomTunnels = RoomTunnelData.get(serv, TESTING_ROOM);
                         final var graph = roomTunnels.getGraph();
-                        var placed = graph.getTunnels(Tunnels.ITEM_IN_DEF.get());
-                        if (placed.size() != 6)
-                            t.fail("Should have had 6 tunnels placed; got " + placed);
 
-                        if (!placed.equals(PLACED_TUNNELS))
+                        var placed = graph.getMachineTunnels(machine, Tunnels.ITEM_IN_DEF.get())
+                                .collect(Collectors.toSet());
+
+                        if (placed.size() != 1)
+                            t.fail("Should have had only one tunnel placed; got " + placed);
+
+                        if (!PLACED_TUNNELS.containsAll(placed))
                             t.fail("Tunnel placement locations did not match what was expected.");
-
-                        var set = new HashSet<Integer>();
-                        for (var pb : placed)
-                            set.add(graph.connectedMachine(pb).orElse(-1));
-
-                        if (!set.equals(TESTING_MACHINES))
-                            t.fail("Connected machine ids are not what was expected");
                     } catch (MissingDimensionException e) {
                         t.fail(e.getMessage());
                     }

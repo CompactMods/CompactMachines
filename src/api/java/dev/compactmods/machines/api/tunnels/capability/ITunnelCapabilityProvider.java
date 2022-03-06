@@ -8,7 +8,7 @@ import net.minecraftforge.items.IItemHandler;
 
 public interface ITunnelCapabilityProvider<Tunnel extends ITunnel> {
 
-    ImmutableSet<Class> getSupportedCapabilities(Tunnel instance);
+    ImmutableSet<Class> getSupportedCapabilities();
 
     /**
      * Fetch a capability instance from a tunnel.

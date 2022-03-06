@@ -1,10 +1,10 @@
 package dev.compactmods.machines.tunnel.graph;
 
-import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.ValueGraphBuilder;
+import com.google.common.graph.*;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityProvider;
 import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.graph.CompactGraphs;
@@ -13,7 +13,10 @@ import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -72,7 +75,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         return graph.successors(tNode)
                 .stream()
                 .findFirst()
-                .filter(n -> n instanceof CompactMachineNode)
+                .filter(CompactMachineNode.class::isInstance)
                 .map(mNode -> ((CompactMachineNode) mNode).machineId());
     }
 
@@ -184,15 +187,19 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         return graph.nodes().size();
     }
 
-    public Set<BlockPos> getTunnels(TunnelDefinition type) {
+    public Stream<TunnelNode> getTunnelNodesByType(TunnelDefinition type) {
         var defNode = tunnelTypes.get(type.getRegistryName());
         if (defNode == null)
-            return Collections.emptySet();
+            return Stream.empty();
 
         return graph.predecessors(defNode)
                 .stream()
                 .filter(n -> n instanceof TunnelNode)
-                .map(TunnelNode.class::cast)
+                .map(TunnelNode.class::cast);
+    }
+
+    public Set<BlockPos> getTunnelsByType(TunnelDefinition type) {
+        return getTunnelNodesByType(type)
                 .map(TunnelNode::position)
                 .map(BlockPos::immutable)
                 .collect(Collectors.toSet());
@@ -310,26 +317,26 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         }
 
         // No edges - skip rest of processing
-        if(!tag.contains("edges"))
+        if (!tag.contains("edges"))
             return;
 
         final var edgeTags = tag.getList("edges", Tag.TAG_COMPOUND);
-        for(var edgeTag : edgeTags) {
-            if(!(edgeTag instanceof CompoundTag edge))
+        for (var edgeTag : edgeTags) {
+            if (!(edgeTag instanceof CompoundTag edge))
                 continue;
 
             // invalid edge data
-            if(!edge.contains("data") || !edge.hasUUID("from") || !edge.hasUUID("to"))
+            if (!edge.contains("data") || !edge.hasUUID("from") || !edge.hasUUID("to"))
                 continue;
 
             var nodeFrom = nodeMap.get(edge.getUUID("from"));
             var nodeTo = nodeMap.get(edge.getUUID("to"));
 
-            if(nodeFrom == null || nodeTo == null)
+            if (nodeFrom == null || nodeTo == null)
                 continue;
 
             var edgeCodec = CompactGraphs.getCodecForEdge(new ResourceLocation(edge.getCompound("data").getString("type")));
-            if(edgeCodec == null)
+            if (edgeCodec == null)
                 continue;
 
             var edgeData = edgeCodec.parse(NbtOps.INSTANCE, edge.getCompound("data"))
@@ -343,31 +350,107 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         return tunnels.containsKey(zero);
     }
 
+    public Stream<BlockPos> getTunnelsForSide(Direction side) {
+        return graph.edges().stream()
+                .filter(ep -> {
+                    final var edge = graph.edgeValue(ep);
+                    return edge.map(e -> e instanceof TunnelMachineEdge tme && tme.side() == side).orElse(false);
+                })
+                .map(EndpointPair::source)
+                .map(TunnelNode.class::cast)
+                .map(TunnelNode::position)
+                .map(BlockPos::immutable);
+    }
+
+    public <T> Stream<BlockPos> getTunnelsSupporting(int machine, Direction side, Class<T> capability) {
+        final IGraphNode node = machines.get(machine);
+        if (node == null) return Stream.empty();
+
+        return getTunnelsForSide(machine, side)
+                .filter(sided -> {
+                    return graph.successors(sided).stream()
+                            .filter(TunnelTypeNode.class::isInstance)
+                            .map(TunnelTypeNode.class::cast)
+                            .anyMatch(ttn -> {
+                                var def = Tunnels.getDefinition(ttn.id());
+                                if (!(def instanceof ITunnelCapabilityProvider<?> tcp))
+                                    return false;
+
+                                return tcp.getSupportedCapabilities().contains(capability);
+                            });
+                }).map(TunnelNode::position);
+    }
+
+    public Stream<TunnelDefinition> getTypesForSide(int machine, Direction side) {
+        final IGraphNode node = machines.get(machine);
+        if (node == null) return Stream.empty();
+
+        return getTunnelsForSide(machine, side)
+                .flatMap(tn -> graph.successors(tn).stream())
+                .filter(TunnelTypeNode.class::isInstance)
+                .map(TunnelTypeNode.class::cast)
+                .map(type -> Tunnels.getDefinition(type.id()))
+                .distinct();
+    }
+
+    public Stream<TunnelNode> getTunnelsForSide(int machine, Direction side) {
+        final var node = machines.get(machine);
+        if (node == null) return Stream.empty();
+
+        return graph.incidentEdges(node).stream()
+                .filter(e -> graph.edgeValue(e)
+                        .map(ed -> ed instanceof TunnelMachineEdge tme && tme.side() == side)
+                        .orElse(false)
+                )
+                .map(EndpointPair::nodeU)
+                .filter(TunnelNode.class::isInstance)
+                .map(TunnelNode.class::cast);
+    }
+
+    public Stream<Direction> getSides() {
+        return graph.edges().stream()
+                .map(graph::edgeValue)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(TunnelMachineEdge.class::isInstance)
+                .map(TunnelMachineEdge.class::cast)
+                .map(TunnelMachineEdge::side)
+                .distinct();
+    }
+
     public Stream<Direction> getTunnelSides(TunnelDefinition type) {
-        return getTunnels(type).stream()
+        return getTunnelsByType(type).stream()
                 .map(this::getTunnelSide)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
     }
 
     public void deleteMachine(int machine) {
-        if(!machines.containsKey(machine)) return;
+        if (!machines.containsKey(machine)) return;
 
         final var node = machines.get(machine);
         graph.removeNode(node);
     }
 
     public void clear() {
-        for(var machine : machines.values())
+        for (var machine : machines.values())
             graph.removeNode(machine);
         machines.clear();
 
-        for(var t : tunnelTypes.values())
+        for (var t : tunnelTypes.values())
             graph.removeNode(t);
         tunnelTypes.clear();
 
-        for(var tun : tunnels.values())
+        for (var tun : tunnels.values())
             graph.removeNode(tun);
         tunnels.clear();
+    }
+
+
+    public Stream<BlockPos> getMachineTunnels(int machine, TunnelDefinition type) {
+        return getTunnelNodesByType(type)
+                .map(TunnelNode::position)
+                .filter(position -> connectedMachine(position).map(m -> m == machine).orElse(false))
+                .map(BlockPos::immutable);
     }
 }

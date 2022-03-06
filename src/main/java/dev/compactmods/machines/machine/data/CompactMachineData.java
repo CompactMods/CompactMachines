@@ -135,7 +135,7 @@ public class CompactMachineData extends SavedData {
     }
 
     public int getNextMachineId() {
-        return data.size() + 1;
+        return data.size() + 2;
     }
 
     public static class MachineData {

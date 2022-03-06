@@ -4,6 +4,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.graph.CompactMachineConnectionGraph;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class MachineToRoomConnections extends SavedData implements MachineRoomConnections {
@@ -36,7 +38,7 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
         return sd.computeIfAbsent(MachineToRoomConnections::fromNbt, MachineToRoomConnections::new, DATA_NAME);
     }
 
-    public static MachineToRoomConnections fromNbt(CompoundTag nbt) {
+    static MachineToRoomConnections fromNbt(CompoundTag nbt) {
         MachineToRoomConnections c = new MachineToRoomConnections();
         if (nbt.contains("graph")) {
             CompoundTag graphNbt = nbt.getCompound("graph");
@@ -59,18 +61,38 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
         return nbt;
     }
 
+    /**
+     * @deprecated Integer machines are planned to be removed in 1.19; plan is to replace them with dimensional positions
+     * @param machineId
+     * @return
+     */
     @Override
     @Nonnull
     public Optional<ChunkPos> getConnectedRoom(int machineId) {
         return graph.getConnectedRoom(machineId);
     }
 
+    /**
+     * @param chunkPos Room to get machine IDs for
+     * @return
+     * @deprecated Integer machines are planned to be removed in 1.19; plan is to replace them with dimensional positions
+     */
     @Override
     @Nonnull
+    @Deprecated(since = "1.7.0")
     public Collection<Integer> getMachinesFor(ChunkPos chunkPos) {
-        return graph.getMachinesFor(chunkPos);
+        try {
+            return graph.getMachinesFor(chunkPos);
+        } catch (NonexistentRoomException e) {
+            CompactMachines.LOGGER.error("Tried to get machine info for nonexistent room: " + chunkPos, e);
+            return Collections.emptySet();
+        }
     }
 
+    /**
+     * @deprecated Integer machines are planned to be removed in 1.19; plan is to replace them with dimensional positions
+     * @param machine
+     */
     @Override
     public void registerMachine(int machine) {
         graph.addMachine(machine);
@@ -84,11 +106,26 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
     }
 
     @Override
+    public void unregisterRoom(ChunkPos roomChunk) {
+        graph.removeRoom(roomChunk);
+        setDirty();
+    }
+
+    /**
+     * @deprecated Integer machines are planned to be removed in 1.19; plan is to replace them with dimensional positions
+     * @param machine
+     * @param room
+     */
+    @Override
     public void connectMachineToRoom(int machine, ChunkPos room) {
         graph.connectMachineToRoom(machine, room);
         setDirty();
     }
 
+    /**
+     * @deprecated Integer machines are planned to be removed in 1.19; plan is to replace them with dimensional positions
+     * @param machine
+     */
     @Override
     public void disconnect(int machine) {
         graph.disconnectAndUnregister(machine);

@@ -5,8 +5,10 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import net.minecraft.world.level.ChunkPos;
 
@@ -56,9 +58,13 @@ public class CompactMachineConnectionGraph {
     private List<CompactMachineConnectionInfo> buildConnections() {
         List<CompactMachineConnectionInfo> result = new ArrayList<>();
         this.rooms.forEach((chunk, node) -> {
-            Collection<Integer> machines = this.getMachinesFor(chunk);
-            CompactMachineConnectionInfo roomInfo = new CompactMachineConnectionInfo(chunk, machines);
-            result.add(roomInfo);
+            try {
+                Collection<Integer> machines = this.getMachinesFor(chunk);
+                CompactMachineConnectionInfo roomInfo = new CompactMachineConnectionInfo(chunk, machines);
+                result.add(roomInfo);
+            } catch (NonexistentRoomException e) {
+                CompactMachines.LOGGER.error(e);
+            }
         });
 
         return result;
@@ -95,10 +101,10 @@ public class CompactMachineConnectionGraph {
         graph.putEdgeValue(machineNode, roomNode, DefaultEdges.machineToRoom());
     }
 
-    public Collection<Integer> getMachinesFor(ChunkPos machineChunk) {
+    public Collection<Integer> getMachinesFor(ChunkPos machineChunk) throws NonexistentRoomException {
         var node = this.rooms.get(machineChunk);
         if(node == null)
-            return Collections.emptySet();
+            throw new NonexistentRoomException(machineChunk);
 
         var inbound = graph.predecessors(node);
         return inbound.stream()
@@ -132,6 +138,14 @@ public class CompactMachineConnectionGraph {
         final var node = machines.get(machine);
         graph.removeNode(node);
         machines.remove(machine);
+    }
+
+    public void removeRoom(ChunkPos room) {
+        if(!this.rooms.containsKey(room))
+            return;
+
+        graph.removeNode(rooms.get(room));
+        rooms.remove(room);
     }
 
     /**

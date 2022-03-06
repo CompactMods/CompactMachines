@@ -34,8 +34,8 @@ public class Machines {
         }
 
         int nextId = machines.getNextMachineId();
-        connections.registerMachine(nextId);
         machines.setMachineLocation(nextId, new DimensionalPosition(level.dimension(), machinePos));
+        connections.registerMachine(nextId);
         return nextId;
     }
 

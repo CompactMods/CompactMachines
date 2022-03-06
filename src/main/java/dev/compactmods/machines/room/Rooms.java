@@ -104,6 +104,8 @@ public class Rooms {
         for(int mid : connected) {
             d.getMachineLocation(mid);
         }
+
+        conns.unregisterRoom(room);
         return true;
     }
 }

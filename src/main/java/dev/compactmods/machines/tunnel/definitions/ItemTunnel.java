@@ -41,7 +41,7 @@ public class ItemTunnel extends TunnelDefinition
     }
 
     @Override
-    public ImmutableSet<Class> getSupportedCapabilities(ItemStorage instance) {
+    public ImmutableSet<Class> getSupportedCapabilities() {
         return ImmutableSet.<Class>builder()
                 .add(IItemHandler.class)
                 .build();
