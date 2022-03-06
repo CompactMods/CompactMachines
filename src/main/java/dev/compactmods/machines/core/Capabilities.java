@@ -3,7 +3,6 @@ package dev.compactmods.machines.core;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.IMachineRoom;
 import dev.compactmods.machines.api.room.IRoomCapabilities;
-import dev.compactmods.machines.api.tunnels.connection.IRoomTunnels;
 import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.room.capability.IRoomHistory;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,9 +21,6 @@ public class Capabilities {
     public static final Capability<IRoomCapabilities> ROOM_CAPS = CapabilityManager.get(new CapabilityToken<IRoomCapabilities>() {
     });
 
-    public static final Capability<IRoomTunnels> ROOM_TUNNELS = CapabilityManager.get(new CapabilityToken<IRoomTunnels>() {
-    });
-
     public static final Capability<ITunnelConnection> TUNNEL_CONNECTION = CapabilityManager.get(new CapabilityToken<ITunnelConnection>() {
     });
 
@@ -35,7 +31,6 @@ public class Capabilities {
     void onCapRegistration(final RegisterCapabilitiesEvent evt) {
         evt.register(IMachineRoom.class);
         evt.register(IRoomCapabilities.class);
-        evt.register(IRoomTunnels.class);
         evt.register(ITunnelConnection.class);
         evt.register(IRoomHistory.class);
     }

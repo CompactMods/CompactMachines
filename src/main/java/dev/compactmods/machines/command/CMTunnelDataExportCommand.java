@@ -6,12 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -118,24 +116,25 @@ public class CMTunnelDataExportCommand {
     }
 
     private static void writeRoomTunnels(LevelChunk chunk1, CsvOutput builder) {
-        chunk1.getCapability(Capabilities.ROOM_TUNNELS).ifPresent(tunnels -> {
-            tunnels.streamLocations().forEach(pos -> {
-                tunnels.locatedAt(pos).ifPresent(conn -> {
-                    try {
-                        if(chunk1.getBlockEntity(pos) instanceof TunnelWallEntity tun) {
-                            builder.writeRow(
-                                    conn.type().getRegistryName().toString(),
-                                    conn.side().getSerializedName(),
-                                    pos.getX(), pos.getY(), pos.getZ(),
-                                    tun.getMachine()
-                            );
-                        }
-                    } catch (IOException e) {
-                        CompactMachines.LOGGER.error(e);
-                    }
-                });
-            });
-
-        });
+        // TODO Reimplement
+//        chunk1.getCapability(Capabilities.ROOM_TUNNELS).ifPresent(tunnels -> {
+//            tunnels.streamLocations().forEach(pos -> {
+//                tunnels.locatedAt(pos).ifPresent(conn -> {
+//                    try {
+//                        if(chunk1.getBlockEntity(pos) instanceof TunnelWallEntity tun) {
+//                            builder.writeRow(
+//                                    conn.type().getRegistryName().toString(),
+//                                    conn.side().getSerializedName(),
+//                                    pos.getX(), pos.getY(), pos.getZ(),
+//                                    tun.getMachine()
+//                            );
+//                        }
+//                    } catch (IOException e) {
+//                        CompactMachines.LOGGER.error(e);
+//                    }
+//                });
+//            });
+//
+//        });
     }
 }

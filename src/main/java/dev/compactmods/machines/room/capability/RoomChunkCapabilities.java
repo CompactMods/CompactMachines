@@ -8,11 +8,9 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class RoomChunkCapabilities implements IRoomCapabilities {
     private final LevelChunk chunk;
-    private final MachineRoomTunnels tunnels;
 
-    public RoomChunkCapabilities(LevelChunk chunk, MachineRoomTunnels tunnels) {
+    public RoomChunkCapabilities(LevelChunk chunk) {
         this.chunk = chunk;
-        this.tunnels = tunnels;
     }
 
     @Override

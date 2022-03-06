@@ -128,7 +128,7 @@ public class CompactRoomData extends SavedData {
         );
     }
 
-    public int getNextId() {
+    public int getNextSpiralPosition() {
         return this.roomData.size() + 1;
     }
 

@@ -15,26 +15,21 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.machine.data.CompactMachineData;
-import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Optional;
 
 public class TunnelWallEntity extends BlockEntity {
 
@@ -49,7 +44,6 @@ public class TunnelWallEntity extends BlockEntity {
 
     public TunnelWallEntity(BlockPos pos, BlockState state) {
         super(Tunnels.TUNNEL_BLOCK_ENTITY.get(), pos, state);
-        this.tunnelType = Tunnels.UNKNOWN.get();
         this.conn = LazyOptional.of(this::getConnection);
     }
 
@@ -93,7 +87,11 @@ public class TunnelWallEntity extends BlockEntity {
 
     @Override
     public void saveAdditional(CompoundTag compound) {
-        compound.putString("tunnel_type", tunnelType.getRegistryName().toString());
+        if(tunnelType != null)
+            compound.putString("tunnel_type", tunnelType.getRegistryName().toString());
+        else
+            compound.putString("tunnel_type", Tunnels.UNKNOWN.getId().toString());
+
         compound.putInt("machine", connectedMachine);
 
         if (tunnel instanceof INBTSerializable persist) {
@@ -131,14 +129,15 @@ public class TunnelWallEntity extends BlockEntity {
         super.onLoad();
 
         if (level instanceof ServerLevel sl) {
-            this.connection = new TunnelMachineConnection(sl.getServer(), this);
+            if(this.getConnectedPosition() != null)
+                this.connection = new TunnelMachineConnection(sl.getServer(), this);
 
             var chunk = level.getChunkAt(worldPosition);
             CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
             ROOM = chunk.getCapability(Capabilities.ROOM);
 
             // If tunnel type is unknown, remove the tunnel entirely
-            if(tunnelType.equals(Tunnels.UNKNOWN.get())) {
+            if(tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
                 CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
                 sl.setBlock(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
                 return;
@@ -183,31 +182,21 @@ public class TunnelWallEntity extends BlockEntity {
     public IDimensionalPosition getConnectedPosition() {
         if (level == null || level.isClientSide) return null;
 
-        // TODO - Needs massive clean up here
         final MinecraftServer server = level.getServer();
-        if (server == null) return null;
+        if (server == null)
+            return null;
 
-        CompactMachineData machines;
         try {
-            machines = CompactMachineData.get(server);
+            CompactMachineData machines = CompactMachineData.get(server);
+
+            return machines.getMachineLocation(this.connectedMachine)
+                .map(dp -> dp.relative(getConnectedSide()))
+                .orElse(null);
+
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.fatal(e);
             return null;
         }
-
-        var conn = MachineToRoomConnections.get(server);
-        if (conn == null)
-            return null;
-
-        final Collection<Integer> connected = conn.getMachinesFor(new ChunkPos(worldPosition));
-        final Optional<Integer> first = connected.stream().findFirst();
-        if (first.isEmpty())
-            return null;
-
-        int machine = first.get();
-        return machines.getMachineLocation(machine)
-                .map(dp -> dp.relative(getConnectedSide()))
-                .orElse(null);
     }
 
     /**
@@ -226,7 +215,7 @@ public class TunnelWallEntity extends BlockEntity {
         return blockState.getValue(TunnelWallBlock.CONNECTED_SIDE);
     }
 
-    public void setTunnelType(TunnelDefinition type) throws Exception {
+    public void setTunnelType(TunnelDefinition type) {
         if (type == tunnelType)
             return;
 
@@ -234,14 +223,6 @@ public class TunnelWallEntity extends BlockEntity {
             tunnelType = type;
             return;
         }
-
-        ITunnelConnection conn = getConnection();
-
-        final LevelChunk chunk = level.getChunkAt(worldPosition);
-        var roomData = chunk.getCapability(Capabilities.ROOM).orElseThrow(() -> {
-            CompactMachines.LOGGER.fatal("Failed to get room data off a chunk. This is a bug, report it!");
-            return new Exception("Missing chunk room data.");
-        });
 
         var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
         if (tunnelType instanceof ITunnelTeardown teardown) {

@@ -3,6 +3,7 @@ package dev.compactmods.machines.tunnel;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.core.Capabilities;
@@ -13,6 +14,8 @@ import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
 import dev.compactmods.machines.room.capability.IRoomHistory;
+import dev.compactmods.machines.room.history.IRoomHistoryItem;
+import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import net.minecraft.ChatFormatting;
@@ -25,6 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -33,6 +37,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,12 +50,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TunnelItem extends Item {
     public TunnelItem(Properties properties) {
         super(properties);
+    }
+
+    public static void setTunnelType(ItemStack stack, TunnelDefinition definition) {
+        CompoundTag defTag = stack.getOrCreateTagElement("definition");
+        defTag.putString("id", definition.getRegistryName().toString());
     }
 
     @Override
@@ -105,12 +114,11 @@ public class TunnelItem extends Item {
             return Optional.empty();
 
         ResourceLocation defId = new ResourceLocation(defTag.getString("id"));
-        IForgeRegistry<TunnelDefinition> tunnelReg = RegistryManager.ACTIVE.getRegistry(TunnelDefinition.class);
-
-        if (!tunnelReg.containsKey(defId))
+        if (!Tunnels.isRegistered(defId))
             return Optional.empty();
 
-        return Optional.ofNullable(tunnelReg.getValue(defId));
+        TunnelDefinition tunnelReg = Tunnels.getDefinition(defId);
+        return Optional.ofNullable(tunnelReg);
     }
 
     @Override
@@ -122,10 +130,10 @@ public class TunnelItem extends Item {
         final BlockPos position = context.getClickedPos();
         final BlockState state = level.getBlockState(position);
 
-        if (state.getBlock() instanceof SolidWallBlock && player instanceof ServerPlayer sPlayer) {
+        if (state.getBlock() instanceof SolidWallBlock && player != null) {
             getDefinition(context.getItemInHand()).ifPresent(def -> {
                 try {
-                    boolean success = setupTunnelWall(level, position, context.getClickedFace(), sPlayer, def);
+                    boolean success = setupTunnelWall(level, position, context.getClickedFace(), player, def);
                     if (success && !player.isCreative())
                         context.getItemInHand().shrink(1);
                 } catch (Exception | MissingDimensionException e) {
@@ -139,76 +147,93 @@ public class TunnelItem extends Item {
         return InteractionResult.FAIL;
     }
 
-    private static boolean setupTunnelWall(Level level, BlockPos position, Direction side, ServerPlayer player, TunnelDefinition def) throws Exception, MissingDimensionException {
-        boolean redstone = def instanceof IRedstoneTunnel;
+    public static Optional<IRoomHistoryItem> getMachineBindingInfo(Player player) {
         final LazyOptional<IRoomHistory> history = player.getCapability(Capabilities.ROOM_HISTORY);
-        if (!history.isPresent()) {
-            PlayerUtil.howDidYouGetThere(player);
+
+        var mapped = history.resolve().map(hist -> {
+            if (!hist.hasHistory() && player instanceof ServerPlayer sp) {
+                PlayerUtil.howDidYouGetThere(sp);
+                return null;
+            }
+
+            return hist.peek();
+        }).orElse(null);
+
+        return Optional.ofNullable(mapped);
+    }
+
+    public static Optional<IDimensionalPosition> getLastEnteredMachinePosition(Player player) {
+        var lastEnteredMachine = getMachineBindingInfo(player);
+        return lastEnteredMachine.flatMap(bound -> {
+            try {
+                CompactMachineData data = CompactMachineData.get(player.level.getServer());
+                return data.getMachineLocation(bound.getMachine()).resolve();
+            } catch (MissingDimensionException e) {
+                CompactMachines.LOGGER.fatal(e);
+                return Optional.empty();
+            }
+        });
+    }
+
+    private static boolean setupTunnelWall(Level level, BlockPos position, Direction side, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
+        boolean redstone = def instanceof IRedstoneTunnel;
+
+        final var roomTunnels = RoomTunnelData.get(level.getServer(), new ChunkPos(position));
+        final var tunnelGraph = roomTunnels.getGraph();
+
+        var placedSides = tunnelGraph.getTunnelSides(def).collect(Collectors.toSet());
+
+        // all tunnels already placed for type
+        if (placedSides.size() == 6)
+            return false;
+
+        var newlyPlacedSide = TunnelHelper.getOrderedSides()
+                .filter(s -> !placedSides.contains(s))
+                .findFirst();
+
+        if (newlyPlacedSide.isEmpty()) {
+            player.displayClientMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
             return false;
         }
 
-        var hist = history.orElseThrow(() -> new Exception("Player machine history not found. If this is an error, report it."));
-        if (!hist.hasHistory()) {
-            PlayerUtil.howDidYouGetThere(player);
-            return false;
-        }
-
-        int enteredThrough = hist.peek().getMachine();
-        var data = CompactMachineData.get(player.server);
-        var machLoc = data.getMachineLocation(enteredThrough);
-        if (!machLoc.isPresent()) {
+        var lastEnteredMachine = getMachineBindingInfo(player);
+        if (lastEnteredMachine.isEmpty()) {
             CompactMachines.LOGGER.warn("Player does not appear to have entered room via a machine;" +
                     " history is empty. If this is an error, report it.");
             return false;
         }
 
-        var chunk = level.getChunkAt(position);
-        return chunk.getCapability(Capabilities.ROOM_TUNNELS).map(room -> {
-            final Set<TunnelWallEntity> existingOfType = room.stream(def)
-                    .map(level::getBlockEntity)
-                    .filter(be -> be instanceof TunnelWallEntity)
-                    .map(be -> (TunnelWallEntity) be)
-                    .collect(Collectors.toSet());
+        Direction first = newlyPlacedSide.get();
+        var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
+                .defaultBlockState()
+                .setValue(TunnelWallBlock.TUNNEL_SIDE, side)
+                .setValue(TunnelWallBlock.CONNECTED_SIDE, first)
+                .setValue(TunnelWallBlock.REDSTONE, redstone);
 
-            final Set<Direction> sides = existingOfType.stream()
-                    .map(TunnelWallEntity::getConnectedSide)
-                    .collect(Collectors.toSet());
 
-            Optional<Direction> firstAvailable = TunnelHelper.getOrderedSides()
-                    .filter(s -> !sides.contains(s))
-                    .findFirst();
+        var hist = lastEnteredMachine.get();
+        boolean connected = tunnelGraph.registerTunnel(position, def, hist.getMachine(), first);
+        if (!connected) {
+            player.displayClientMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE), true);
+            return false;
+        }
 
-            if (firstAvailable.isEmpty()) {
-                player.displayClientMessage(
-                        TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
-                return false;
+        level.setBlock(position, tunnelState, Block.UPDATE_ALL_IMMEDIATE);
+
+        var serv = level.getServer();
+        serv.tell(new TickTask(serv.getTickCount() + 3, () -> {
+            if (!(level.getBlockEntity(position) instanceof TunnelWallEntity tun)) {
+                return;
             }
 
-            Direction first = firstAvailable.get();
-            var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
-                    .defaultBlockState()
-                    .setValue(TunnelWallBlock.TUNNEL_SIDE, side)
-                    .setValue(TunnelWallBlock.CONNECTED_SIDE, first)
-                    .setValue(TunnelWallBlock.REDSTONE, redstone);
+            tun.setTunnelType(def);
+            tun.setConnectedTo(hist.getMachine());
 
-            level.setBlock(position, tunnelState, Block.UPDATE_ALL);
+            NetworkHandler.MAIN_CHANNEL.send(
+                    PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
+                    new TunnelAddedPacket(position, def));
+        }));
 
-            room.register(def, position);
-
-            if (level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
-                try {
-                    tun.setTunnelType(def);
-                    tun.setConnectedTo(enteredThrough);
-
-                    level.getServer().submitAsync(() -> {
-                        NetworkHandler.MAIN_CHANNEL.send(
-                                PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
-                                new TunnelAddedPacket(position, def));
-                    });
-                } catch (Exception ignored) {
-                }
-            }
-            return true;
-        }).orElse(false);
+        return true;
     }
 }

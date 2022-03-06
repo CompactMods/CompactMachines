@@ -8,18 +8,18 @@ import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.TestUtil;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.*;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestGenerator;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -45,8 +45,7 @@ public class MachineRoomGenerationTests {
                 var centerSpawn = t.absolutePos(new BlockPos(7, 8, 7));
                 CompactStructureGenerator.generateCompactStructure(lev, size, centerSpawn);
 
-                BlockPos
-                        .betweenClosedStream(BlockPos.ZERO.above(), new BlockPos(15, 16, 15))
+                BlockPos.betweenClosedStream(BlockPos.ZERO.above(), new BlockPos(15, 16, 15))
                         .forEach(pos -> {
                             var compare = pos.above(16);
                             t.assertSameBlockState(pos, compare);
@@ -55,10 +54,10 @@ public class MachineRoomGenerationTests {
                 t.succeed();
             };
 
-            var testf = new TestFunction("room_generation", "room_" + size.getSerializedName(), "compactmachines:empty_15x31", 50, 0, true, test);
+            var testf = new TestFunction(TestBatches.ROOM_GENERATION, "room_" + size.getSerializedName(),
+                    "compactmachines:empty_15x31", 50, 0, true, test);
             tests.add(testf);
         }
-        ;
 
         return tests;
     }
@@ -69,29 +68,24 @@ public class MachineRoomGenerationTests {
         var serv = test.getLevel().getServer();
 
         var machLoc = new BlockPos(3, 0, 3);
-        var realMachLoc = test.absolutePos(machLoc);
 
         test.setBlock(machLoc, Registration.MACHINE_BLOCK_NORMAL.get());
 
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()));
 
         test.startSequence()
-                .thenExecute(() -> {
-                    BlockState blockstate = test.getBlockState(machLoc);
-                    blockstate.use(test.getLevel(), player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(realMachLoc), Direction.NORTH, realMachLoc, true));
-
-                })
+                .thenExecute(() -> TestUtil.useItemOnBlockAt(test, player, machLoc))
                 .thenExecuteAfter(2, () -> {
-                    if(test.getBlockEntity(machLoc) instanceof CompactMachineBlockEntity mach) {
+                    if (test.getBlockEntity(machLoc) instanceof CompactMachineBlockEntity mach) {
 
-                        if(!mach.mapped())
+                        if (!mach.mapped())
                             test.fail("Machine was not mapped to a room.");
 
-                        if(mach.machineId == -1)
+                        if (mach.machineId == -1)
                             test.fail("Machine ID not set after PSD usage.");
 
                         var roomid = mach.getInternalChunkPos();
-                        if(roomid.isEmpty()) {
+                        if (roomid.isEmpty()) {
                             test.fail("Room was not registered.");
                             return;
                         }
@@ -99,11 +93,11 @@ public class MachineRoomGenerationTests {
                         ChunkPos room = roomid.get();
                         try {
                             boolean destroyed = Rooms.destroy(serv, room);
-                            if(!destroyed)
+                            if (!destroyed)
                                 test.fail("Room was not destroyed after test.");
 
                             final var rooms = CompactRoomData.get(serv);
-                            if(rooms.isRegistered(room))
+                            if (rooms.isRegistered(room))
                                 test.fail("Room was not unregistered after test.");
 
                         } catch (MissingDimensionException | NonexistentRoomException e) {
@@ -116,4 +110,6 @@ public class MachineRoomGenerationTests {
                     }
                 });
     }
+
+
 }

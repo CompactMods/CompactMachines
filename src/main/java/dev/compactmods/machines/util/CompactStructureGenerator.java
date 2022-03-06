@@ -1,47 +1,38 @@
 package dev.compactmods.machines.util;
 
-import java.util.Arrays;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
+import java.util.Arrays;
+
 public class CompactStructureGenerator {
-    /**
-     * Generates a wall or platform in a given direction.
-     *
-     * @param world
-     * @param size
-     * @param cubeCenter
-     * @param wallDirection
-     */
-    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeCenter, Direction wallDirection) {
+
+    public static AABB getWallBounds(RoomSize size, BlockPos cubeCenter, Direction wall) {
         int s = size.getInternalSize() / 2;
 
-        BlockState unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
-
-        BlockPos start = BlockPos.ZERO;
+        BlockPos start;
         AABB wallBounds;
 
-        boolean horiz = wallDirection.getAxis().getPlane() == Direction.Plane.HORIZONTAL;
+        boolean horiz = wall.getAxis().getPlane() == Direction.Plane.HORIZONTAL;
         if (horiz) {
             start = cubeCenter
                     .below(s)
-                    .relative(wallDirection, s + 1);
+                    .relative(wall, s + 1);
 
             wallBounds = new AABB(start, start)
                     .expandTowards(0, (s * 2) + 1, 0);
         } else {
-            start = cubeCenter.relative(wallDirection, s + 1);
+            start = cubeCenter.relative(wall, s + 1);
 
             wallBounds = new AABB(start, start)
                     .inflate(s + 1, 0, s + 1);
         }
 
-        switch (wallDirection) {
+        switch (wall) {
             case NORTH:
             case SOUTH:
                 wallBounds = wallBounds.inflate(s + 1, 0, 0);
@@ -52,6 +43,20 @@ public class CompactStructureGenerator {
                 wallBounds = wallBounds.inflate(0, 0, s + 1);
                 break;
         }
+
+        return wallBounds;
+    }
+    /**
+     * Generates a wall or platform in a given direction.
+     *
+     * @param world
+     * @param size
+     * @param cubeCenter
+     * @param wallDirection
+     */
+    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeCenter, Direction wallDirection) {
+        final var unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+        final var wallBounds = getWallBounds(size, cubeCenter, wallDirection);
 
         BlockPos.betweenClosedStream(wallBounds)
                 .filter(world::isEmptyBlock)

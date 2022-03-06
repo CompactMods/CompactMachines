@@ -88,4 +88,10 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
         graph.connectMachineToRoom(machine, room);
         setDirty();
     }
+
+    @Override
+    public void disconnect(int machine) {
+        graph.disconnectAndUnregister(machine);
+        setDirty();
+    }
 }

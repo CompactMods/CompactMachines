@@ -1,13 +1,14 @@
 package dev.compactmods.machines.codec;
 
-import java.util.UUID;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.Util;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 public abstract class CodecExtensions {
     public static final Codec<UUID> UUID_CODEC = Codec.STRING
@@ -26,4 +27,5 @@ public abstract class CodecExtensions {
     public static final Codec<ChunkPos> CHUNKPOS = Codec.INT_STREAM
             .comapFlatMap(i -> Util.fixedSize(i, 2)
                     .map(arr -> new ChunkPos(arr[0], arr[1])), pos -> IntStream.of(pos.x, pos.z));
+
 }

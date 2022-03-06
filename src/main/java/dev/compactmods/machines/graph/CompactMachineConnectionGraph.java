@@ -1,8 +1,5 @@
 package dev.compactmods.machines.graph;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -12,6 +9,10 @@ import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import net.minecraft.world.level.ChunkPos;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Stores information on how external machines connect to the rooms in the compact machine
@@ -122,6 +123,15 @@ public class CompactMachineConnectionGraph {
 
     public Stream<CompactMachineNode> getMachines() {
         return this.machines.values().stream();
+    }
+
+    public void disconnectAndUnregister(int machine) {
+        if(!machines.containsKey(machine))
+            return;
+
+        final var node = machines.get(machine);
+        graph.removeNode(node);
+        machines.remove(machine);
     }
 
     /**

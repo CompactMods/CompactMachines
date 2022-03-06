@@ -134,6 +134,10 @@ public class CompactMachineData extends SavedData {
         return data.values().stream();
     }
 
+    public int getNextMachineId() {
+        return data.size() + 1;
+    }
+
     public static class MachineData {
         private final int machineId;
         public DimensionalPosition location;

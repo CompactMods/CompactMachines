@@ -3,8 +3,8 @@ package dev.compactmods.machines.room.capability;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Registration;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,7 +15,7 @@ public class RoomCapEventHandler {
 
     @SubscribeEvent
     static void onCapPlayerAttach(final AttachCapabilitiesEvent<Entity> event) {
-        if(!(event.getObject() instanceof ServerPlayer player))
+        if(!(event.getObject() instanceof Player player))
             return;
 
         event.addCapability(
