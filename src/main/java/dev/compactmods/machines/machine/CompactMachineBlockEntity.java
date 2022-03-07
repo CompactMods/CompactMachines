@@ -11,6 +11,8 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.tunnel.TunnelWallEntity;
+import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -49,18 +51,51 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == Capabilities.ROOM) return room.cast();
-        if (cap == Capabilities.ROOM_CAPS) return caps.cast();
 
-        return caps.lazyMap(c -> c.getCapability(cap, side))
-                .orElse(super.getCapability(cap, side));
+        if(level instanceof ServerLevel sl) {
+            return room.map(r -> {
+                var roomId = r.getChunk();
+                try {
+                    final var serv = sl.getServer();
+
+                    final var tunnels = RoomTunnelData.get(serv, roomId);
+                    final var graph = tunnels.getGraph();
+
+                    final var supportingTunnels = graph.getTunnelsSupporting(machineId, side, cap);
+                    final var firstSupported = supportingTunnels.findFirst();
+                    if (firstSupported.isEmpty())
+                        return super.getCapability(cap, side);
+
+                    final var compact = serv.getLevel(Registration.COMPACT_DIMENSION);
+                    if(compact == null)
+                        throw new MissingDimensionException();
+
+                    if(compact.getBlockEntity(firstSupported.get()) instanceof TunnelWallEntity tunnel) {
+                        return tunnel.getCapability(cap, side);
+                    } else {
+                        return super.getCapability(cap, side);
+                    }
+                } catch (MissingDimensionException e) {
+                    CompactMachines.LOGGER.fatal(e);
+                    return super.getCapability(cap, side);
+                }
+            }).orElse(super.getCapability(cap, side));
+        }
+
+        return super.getCapability(cap, side);
     }
 
     @Nullable
     private IMachineRoom getRoom() {
         if (level instanceof ServerLevel sl) {
             return getInternalChunkPos().map(c -> {
-                var inChunk = sl.getChunk(c.x, c.z);
-                return inChunk.getCapability(Capabilities.ROOM).orElseThrow(RuntimeException::new);
+                final var compact = sl.getServer().getLevel(Registration.COMPACT_DIMENSION);
+                if(compact != null) {
+                    var inChunk = compact.getChunk(c.x, c.z);
+                    return inChunk.getCapability(Capabilities.ROOM).orElseThrow(RuntimeException::new);
+                }
+
+                return null;
             }).orElse(null);
         }
 
@@ -70,9 +105,12 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     @Nullable
     private IRoomCapabilities getRoomCapabilities() {
         if (level instanceof ServerLevel sl) {
-            return getInternalChunkPos().map(c -> {
+            getInternalChunkPos().map(c -> {
                 var inChunk = sl.getChunk(c.x, c.z);
-                return inChunk.getCapability(Capabilities.ROOM_CAPS).orElseThrow(RuntimeException::new);
+
+                CompactMachines.LOGGER.debug(inChunk.toString());
+
+                return null;
             }).orElse(null);
         }
 

@@ -1,5 +1,6 @@
 package dev.compactmods.machines.tunnel;
 
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
@@ -58,7 +59,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (tile == null)
             return Optional.empty();
 
-        return Optional.of(tile.getTunnelType());
+        return Optional.ofNullable(tile.getTunnelType());
     }
 
     @Override
@@ -129,7 +130,14 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 teardown.teardown(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), TeardownReason.REMOVED);
             }
 
-            // todo tunnels.ifPresent(t -> t.unregister(pos));
+            try {
+                final var tunnels = RoomTunnelData.get(serverLevel.getServer(), new ChunkPos(pos));
+                final var tunnelGraph = tunnels.getGraph();
+
+                tunnelGraph.unregister(pos);
+            } catch (MissingDimensionException e) {
+                CompactMachines.LOGGER.fatal(e);
+            }
         } else {
             // Rotate tunnel
             Direction dir = state.getValue(CONNECTED_SIDE);
@@ -170,4 +178,6 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
         return InteractionResult.SUCCESS;
     }
+
+    // todo - breaking block unregisters tunnel info
 }

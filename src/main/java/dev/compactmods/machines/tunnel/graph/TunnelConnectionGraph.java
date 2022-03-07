@@ -228,6 +228,8 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
 
     @Override
     public CompoundTag serializeNBT() {
+        cleanupOrphans();
+
         CompoundTag tag = new CompoundTag();
 
         HashMap<IGraphNode, UUID> nodeIds = new HashMap<>();
@@ -453,5 +455,59 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
                 .map(TunnelNode::position)
                 .filter(position -> connectedMachine(position).map(m -> m == machine).orElse(false))
                 .map(BlockPos::immutable);
+    }
+
+    public void unregister(BlockPos pos) {
+        if(!hasTunnel(pos))
+            return;
+
+        final var existing = tunnels.get(pos);
+        graph.removeNode(existing);
+        tunnels.remove(pos);
+
+        cleanupOrphanedTypes();
+        cleanupOrphanedMachines();
+    }
+
+    private void cleanupOrphans() {
+        cleanupOrphanedTunnels();
+        cleanupOrphanedTypes();
+        cleanupOrphanedMachines();
+    }
+
+    private void cleanupOrphanedTypes() {
+        HashSet<ResourceLocation> removedTypes = new HashSet<>();
+        tunnelTypes.forEach((type, node) -> {
+            if(graph.degree(node) == 0) {
+                graph.removeNode(node);
+                removedTypes.add(type);
+            }
+        });
+
+        removedTypes.forEach(tunnelTypes::remove);
+    }
+
+    private void cleanupOrphanedTunnels() {
+        HashSet<BlockPos> removed = new HashSet<>();
+        tunnels.forEach((pos, node) -> {
+            if(graph.degree(node) == 0) {
+                graph.removeNode(node);
+                removed.add(pos);
+            }
+        });
+
+        removed.forEach(tunnels::remove);
+    }
+
+    private void cleanupOrphanedMachines() {
+        HashSet<Integer> removed = new HashSet<>();
+        machines.forEach((machine, node) -> {
+            if(graph.degree(node) == 0) {
+                graph.removeNode(node);
+                removed.add(machine);
+            }
+        });
+
+        removed.forEach(machines::remove);
     }
 }

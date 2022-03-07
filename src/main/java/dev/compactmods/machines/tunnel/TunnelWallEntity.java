@@ -156,7 +156,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (level == null || level.isClientSide)
             return super.getCapability(cap, side);
 
-        if (side != null && side != getTunnelSide())
+        if (side != null && side != getConnectedSide())
             return super.getCapability(cap, side);
 
         if (cap == Capabilities.TUNNEL_CONNECTION)
