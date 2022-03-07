@@ -14,7 +14,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -76,7 +76,7 @@ public class TunnelGraphTests {
         graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_IN_DEF.get(), 1, Direction.SOUTH);
         graph.registerTunnel(BlockPos.ZERO.below(), Tunnels.UNKNOWN.get(), 1, Direction.NORTH);
 
-        final var positions = graph.getTunnelsSupporting(1, Direction.NORTH, IItemHandler.class)
+        final var positions = graph.getTunnelsSupporting(1, Direction.NORTH, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .collect(Collectors.toSet());
 
         if(positions.isEmpty())

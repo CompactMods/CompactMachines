@@ -18,6 +18,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
@@ -362,7 +363,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
                 .map(BlockPos::immutable);
     }
 
-    public <T> Stream<BlockPos> getTunnelsSupporting(int machine, Direction side, Class<T> capability) {
+    public <T> Stream<BlockPos> getTunnelsSupporting(int machine, Direction side, Capability<T> capability) {
         final IGraphNode node = machines.get(machine);
         if (node == null) return Stream.empty();
 

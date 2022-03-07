@@ -32,8 +32,6 @@ public class ItemTunnel extends TunnelDefinition
 
     /**
      * Handle initialization tasks for the tunnel's data here.
-     *
-     * @param tunnel The location of the new tunnel being created.
      */
     @Override
     public ITunnel newInstance(BlockPos pos, Direction side) {
@@ -41,9 +39,9 @@ public class ItemTunnel extends TunnelDefinition
     }
 
     @Override
-    public ImmutableSet<Class> getSupportedCapabilities() {
-        return ImmutableSet.<Class>builder()
-                .add(IItemHandler.class)
+    public ImmutableSet<Capability<?>> getSupportedCapabilities() {
+        return ImmutableSet.<Capability<?>>builder()
+                .add(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .build();
     }
 
