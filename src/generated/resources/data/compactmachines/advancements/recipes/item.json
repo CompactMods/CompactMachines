@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "compactmachines:item"
+    ]
+  },
+  "criteria": {
+    "observer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:observer"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "compactmachines:tunnels/item"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "observer",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -185,6 +185,8 @@ minecraft {
 
             mods {
                 compactmachines {
+                    source sourceSets.main
+                    source sourceSets.api
                     source sourceSets.datagen
                 }
             }

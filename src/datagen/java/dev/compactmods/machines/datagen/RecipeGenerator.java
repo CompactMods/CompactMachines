@@ -1,9 +1,9 @@
 package dev.compactmods.machines.datagen;
 
-import java.util.Objects;
-import java.util.function.Consumer;
+import dev.compactmods.machines.api.tunnels.recipe.TunnelRecipeBuilder;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -15,6 +15,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
+
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class RecipeGenerator extends RecipeProvider {
     public RecipeGenerator(DataGenerator generatorIn) {
@@ -40,6 +43,14 @@ public class RecipeGenerator extends RecipeProvider {
                 .define('B', Items.BOOK)
                 .define('I', Tags.Items.INGOTS_IRON)
                 .unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
+                .save(consumer);
+
+        TunnelRecipeBuilder.tunnel(Tunnels.ITEM_TUNNEL_DEF.get(), 2)
+                .requires(Tags.Items.CHESTS)
+                .requires(Items.ENDER_PEARL)
+                .requires(Items.REDSTONE)
+                .requires(Items.OBSERVER)
+                .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
         addMachineRecipes(consumer);
