@@ -61,7 +61,7 @@ public class Tunnels {
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS
     // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> ITEM_IN_DEF = DEFINITIONS.register("item_in", ItemTunnel::new);
+    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = DEFINITIONS.register("item", ItemTunnel::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES

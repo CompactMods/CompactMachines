@@ -151,12 +151,27 @@ public class TunnelWallEntity extends BlockEntity {
     }
 
     @Nonnull
+    public <T> LazyOptional<T> getTunnelCapability(@Nonnull Capability<T> cap, @Nullable Direction outerSide) {
+        if (level == null || level.isClientSide)
+            return LazyOptional.empty();
+
+        if (outerSide != null && outerSide != getConnectedSide())
+            return LazyOptional.empty();
+
+        if (tunnelType instanceof ITunnelCapabilityProvider c) {
+            return c.getCapability(cap, tunnel);
+        }
+
+        return LazyOptional.empty();
+    }
+
+    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (level == null || level.isClientSide)
             return super.getCapability(cap, side);
 
-        if (side != null && side != getConnectedSide())
+        if (side != null && side != getTunnelSide())
             return super.getCapability(cap, side);
 
         if (cap == Capabilities.TUNNEL_CONNECTION)

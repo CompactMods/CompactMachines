@@ -72,8 +72,8 @@ public class TunnelGraphTests {
     public static void canFetchSupportingTunnelsOnSide(final GameTestHelper test) {
         var graph = new TunnelConnectionGraph();
 
-        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_IN_DEF.get(), 1, Direction.NORTH);
-        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_IN_DEF.get(), 1, Direction.SOUTH);
+        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_TUNNEL_DEF.get(), 1, Direction.NORTH);
+        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_TUNNEL_DEF.get(), 1, Direction.SOUTH);
         graph.registerTunnel(BlockPos.ZERO.below(), Tunnels.UNKNOWN.get(), 1, Direction.NORTH);
 
         final var positions = graph.getTunnelsSupporting(1, Direction.NORTH, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
@@ -93,8 +93,8 @@ public class TunnelGraphTests {
         var graph = new TunnelConnectionGraph();
 
         // Register three tunnels - two types on the north side (different positions), one on south
-        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_IN_DEF.get(), 1, Direction.NORTH);
-        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_IN_DEF.get(), 1, Direction.SOUTH);
+        graph.registerTunnel(BlockPos.ZERO, Tunnels.ITEM_TUNNEL_DEF.get(), 1, Direction.NORTH);
+        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.ITEM_TUNNEL_DEF.get(), 1, Direction.SOUTH);
         graph.registerTunnel(BlockPos.ZERO.below(), Tunnels.UNKNOWN.get(), 1, Direction.NORTH);
 
         final var positions = graph.getTypesForSide(1, Direction.NORTH)

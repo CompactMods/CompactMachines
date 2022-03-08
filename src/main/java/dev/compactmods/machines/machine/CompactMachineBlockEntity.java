@@ -71,7 +71,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
                         throw new MissingDimensionException();
 
                     if(compact.getBlockEntity(firstSupported.get()) instanceof TunnelWallEntity tunnel) {
-                        return tunnel.getCapability(cap, side);
+                        return tunnel.getTunnelCapability(cap, side);
                     } else {
                         return super.getCapability(cap, side);
                     }

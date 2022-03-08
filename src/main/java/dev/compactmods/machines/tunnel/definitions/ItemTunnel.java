@@ -35,7 +35,7 @@ public class ItemTunnel extends TunnelDefinition
      */
     @Override
     public ITunnel newInstance(BlockPos pos, Direction side) {
-        return new ItemStorage(10, side);
+        return new ItemStorage(10);
     }
 
     @Override

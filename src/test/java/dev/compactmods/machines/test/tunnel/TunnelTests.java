@@ -132,7 +132,7 @@ public class TunnelTests {
                     });
 
                     ItemStack tunnelStack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-                    TunnelItem.setTunnelType(tunnelStack, Tunnels.ITEM_IN_DEF.get());
+                    TunnelItem.setTunnelType(tunnelStack, Tunnels.ITEM_TUNNEL_DEF.get());
 
                     playerInRoom.setItemInHand(InteractionHand.MAIN_HAND, tunnelStack);
 
@@ -160,7 +160,7 @@ public class TunnelTests {
                         final var roomTunnels = RoomTunnelData.get(serv, TESTING_ROOM);
                         final var graph = roomTunnels.getGraph();
 
-                        var placed = graph.getMachineTunnels(machine, Tunnels.ITEM_IN_DEF.get())
+                        var placed = graph.getMachineTunnels(machine, Tunnels.ITEM_TUNNEL_DEF.get())
                                 .collect(Collectors.toSet());
 
                         if (placed.size() != 1)
