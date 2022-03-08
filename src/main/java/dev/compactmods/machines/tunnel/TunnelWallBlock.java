@@ -144,18 +144,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
             try {
                 final var tunnelData = RoomTunnelData.get(serverLevel.getServer(), new ChunkPos(pos));
+                final var tunnelGraph = tunnelData.getGraph();
+                final var existingDirs = tunnelGraph
+                        .getTunnelSides(def)
+                        .collect(Collectors.toSet());
 
-                final var existingDirs = tunnelData.getGraph()
-                    .getTunnelSides(def)
-                    .collect(Collectors.toSet());
-
-                final Optional<Direction> firstNotFound = TunnelHelper.getOrderedSides()
-                        .filter(side -> !existingDirs.contains(side))
-                        .findFirst();
-
-                final var next = firstNotFound.orElse(dir);
-
-                if (next == dir) {
+                if (existingDirs.size() == 6) {
                     // WARN PLAYER - NO OTHER SIDES REMAIN
                     player.displayClientMessage(
                             TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
@@ -163,17 +157,23 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     return InteractionResult.FAIL;
                 }
 
-                level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, next));
+                final var next = TunnelHelper.getNextDirection(dir, existingDirs);
+                next.ifPresent(newSide -> {
+                    level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
+
+                    if (def instanceof ITunnelTeardown teardown) {
+                        teardown.teardown(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), TeardownReason.ROTATED);
+                    }
+
+                    var newTunn = def.newInstance(pos, newSide);
+                    tunnel.setTunnel(newTunn);
+
+                    tunnelGraph.rotateTunnel(pos, newSide);
+                    tunnelData.setDirty();
+                });
             } catch (MissingDimensionException e) {
                 return InteractionResult.FAIL;
             }
-
-            if (def instanceof ITunnelTeardown teardown) {
-                teardown.teardown(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), TeardownReason.ROTATED);
-            }
-
-            var newTunn = def.newInstance(pos, tunnelWallSide);
-            tunnel.setTunnel(newTunn);
         }
 
         return InteractionResult.SUCCESS;

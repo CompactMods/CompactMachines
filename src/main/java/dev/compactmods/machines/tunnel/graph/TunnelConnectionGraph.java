@@ -510,4 +510,20 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
 
         removed.forEach(machines::remove);
     }
+
+    public void rotateTunnel(BlockPos tunnel, Direction newSide) {
+        if(!tunnels.containsKey(tunnel))
+            return;
+
+        final var connected = connectedMachine(tunnel);
+        connected.ifPresent(machine -> {
+            if(!machines.containsKey(machine))
+                return;
+
+            final var t = tunnels.get(tunnel);
+            final var m = machines.get(machine);
+            graph.removeEdge(t, m);
+            graph.putEdgeValue(t, m, new TunnelMachineEdge(newSide));
+        });
+    }
 }

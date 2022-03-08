@@ -1,8 +1,12 @@
 package dev.compactmods.machines.tunnel;
 
-import javax.annotation.Nonnull;
-import java.util.stream.Stream;
 import net.minecraft.core.Direction;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class TunnelHelper {
 
@@ -20,5 +24,13 @@ public class TunnelHelper {
 
     public static Stream<Direction> getOrderedSides() {
         return Stream.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST);
+    }
+
+    public static Optional<Direction> getNextDirection(Direction current, Set<Direction> used) {
+        final var ordered = getOrderedSides().toList();
+        final var found = ordered.indexOf(current);
+        final var stream = Stream.generate(() -> ordered).flatMap(Collection::stream);
+
+        return stream.skip(found + 1).filter(dir -> !used.contains(dir)).findFirst();
     }
 }
