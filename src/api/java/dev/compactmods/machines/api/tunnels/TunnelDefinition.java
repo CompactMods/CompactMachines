@@ -45,5 +45,5 @@ public abstract class TunnelDefinition extends ForgeRegistryEntry<TunnelDefiniti
      * @param position The location of the new tunnel being created.
      * @param side The side of the wall the tunnel is being added to.
      */
-    public abstract ITunnel newInstance(BlockPos position, Direction side);
+    public abstract ITunnelInstance newInstance(BlockPos position, Direction side);
 }
