@@ -32,3 +32,5 @@ logs/
 /build-out/
 
 *.dot
+
+src/generated/
