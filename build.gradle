@@ -197,6 +197,8 @@ minecraft {
             args '--all'
             args '--output', file('src/generated/resources/')
 
+            forceExit false
+
             mods {
                 compactmachines {
                     source sourceSets.tunnels

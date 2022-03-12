@@ -58,6 +58,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Create datagen assets
+        continue-on-error: true
         run: ./gradlew runData
 
       - name: Test JAR with GameTest Server
