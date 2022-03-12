@@ -95,6 +95,13 @@ jobs:
       - name: Generate Resources
         run: ./gradlew runData
 
+      - name: Upload build failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-data
+          path: run/gametest
+
       - name: Publish gradle nightly jar
         run: ./gradlew publishNightlyPublicationToGitHubPackagesRepository
         env:
