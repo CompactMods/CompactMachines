@@ -15,6 +15,7 @@ import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import dev.compactmods.machines.util.CompactStructureGenerator;
+import dev.compactmods.machines.util.DimensionUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.AfterBatch;
@@ -51,6 +52,12 @@ public class TunnelTests {
         final var server = level.getServer();
 
         try {
+            var compactLevel = server.getLevel(Registration.COMPACT_DIMENSION);
+            if (compactLevel == null) {
+                CompactMachines.LOGGER.warn("Compact dimension not found; recreating it.");
+                DimensionUtil.createAndRegisterWorldAndDimension(server);
+            }
+
             LOG.info("Starting tunnel tests; creating a new room...");
 
             TESTING_ROOM = Rooms.createNew(server, RoomSize.NORMAL, UUID.randomUUID());

@@ -14,10 +14,9 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onServerStarted(final ServerStartedEvent evt) {
         final MinecraftServer serv = evt.getServer();
-
         var compactLevel = serv.getLevel(Registration.COMPACT_DIMENSION);
-
         if (compactLevel == null) {
+            CompactMachines.LOGGER.warn("Compact dimension not found; recreating it.");
             DimensionUtil.createAndRegisterWorldAndDimension(serv);
         }
     }
