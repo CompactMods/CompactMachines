@@ -125,9 +125,9 @@ public class CompactMachineData extends SavedData {
     }
 
     public void remove(int id) {
-        var removed = data.remove(id);
-        if(removed != null)
-            setDirty();
+        data.remove(id);
+        locations.remove(id);
+        setDirty();
     }
 
     public Stream<MachineData> stream() {

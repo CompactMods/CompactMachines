@@ -3,7 +3,6 @@ package dev.compactmods.machines.machine;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.IMachineRoom;
-import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.DimensionalPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
@@ -41,7 +40,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     protected String schema;
     protected boolean locked = false;
     private LazyOptional<IMachineRoom> room = LazyOptional.empty();
-    private LazyOptional<IRoomCapabilities> caps = LazyOptional.empty();
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
@@ -102,27 +100,10 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         return null;
     }
 
-    @Nullable
-    private IRoomCapabilities getRoomCapabilities() {
-        if (level instanceof ServerLevel sl) {
-            getInternalChunkPos().map(c -> {
-                var inChunk = sl.getChunk(c.x, c.z);
-
-                CompactMachines.LOGGER.debug(inChunk.toString());
-
-                return null;
-            }).orElse(null);
-        }
-
-        return null;
-    }
-
     @Override
     public void onLoad() {
         super.onLoad();
-
         this.room = LazyOptional.of(this::getRoom);
-        this.caps = LazyOptional.of(this::getRoomCapabilities);
     }
 
     @Override
@@ -234,7 +215,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     public void setMachineId(int id) {
         this.machineId = id;
         this.room.invalidate();
-        this.caps.invalidate();
         this.setChanged();
     }
 

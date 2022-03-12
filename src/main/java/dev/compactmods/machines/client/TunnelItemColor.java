@@ -15,9 +15,9 @@ public class TunnelItemColor implements ItemColor {
 
         TunnelDefinition actualDef = definition.get();
         if (tintIndex == 0) {
-            return actualDef.getTunnelRingColor();
+            return actualDef.ringColor();
         }
 
-        return actualDef.getTunnelIndicatorColor();
+        return actualDef.indicatorColor();
     }
 }

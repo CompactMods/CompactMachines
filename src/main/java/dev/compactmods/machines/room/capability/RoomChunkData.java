@@ -1,8 +1,6 @@
 package dev.compactmods.machines.room.capability;
 
 import dev.compactmods.machines.api.room.IMachineRoom;
-import dev.compactmods.machines.api.room.IRoomCapabilities;
-import dev.compactmods.machines.core.Capabilities;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -26,12 +24,6 @@ public class RoomChunkData implements IMachineRoom {
     @Override
     public ServerLevel getLevel() {
         return (ServerLevel) chunk.getLevel();
-    }
-
-    @Nonnull
-    @Override
-    public IRoomCapabilities getCapabilityManager() {
-        return this.chunk.getCapability(Capabilities.ROOM_CAPS).resolve().orElseThrow();
     }
 
 }

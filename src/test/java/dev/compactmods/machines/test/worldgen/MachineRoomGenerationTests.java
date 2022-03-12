@@ -62,7 +62,7 @@ public class MachineRoomGenerationTests {
         return tests;
     }
 
-    @GameTest(template = "empty_5x5", batch = "dimension")
+    @GameTest(template = "empty_5x5", batch = TestBatches.DIMENSION)
     public static void usingPsdCreatesRoom(final GameTestHelper test) {
         var player = test.makeMockPlayer();
         var serv = test.getLevel().getServer();

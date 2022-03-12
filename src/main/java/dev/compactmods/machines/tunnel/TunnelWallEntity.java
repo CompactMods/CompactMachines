@@ -3,13 +3,12 @@ package dev.compactmods.machines.tunnel;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.IMachineRoom;
-import dev.compactmods.machines.api.room.IRoomCapabilities;
-import dev.compactmods.machines.api.tunnels.ITunnel;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityProvider;
-import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
-import dev.compactmods.machines.api.tunnels.lifecycle.ITunnelTeardown;
-import dev.compactmods.machines.api.tunnels.lifecycle.TeardownReason;
+import dev.compactmods.machines.api.tunnels.TunnelPosition;
+import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
+import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
+import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
@@ -36,23 +35,13 @@ public class TunnelWallEntity extends BlockEntity {
     private int connectedMachine;
     private TunnelDefinition tunnelType;
 
-    private final LazyOptional<ITunnelConnection> conn;
     private LazyOptional<IMachineRoom> ROOM = LazyOptional.empty();
-    private LazyOptional<IRoomCapabilities> CAPS = LazyOptional.empty();
-    private TunnelMachineConnection connection;
-    private ITunnel tunnel;
+
+    @Nullable
+    private TunnelInstance tunnel;
 
     public TunnelWallEntity(BlockPos pos, BlockState state) {
         super(Tunnels.TUNNEL_BLOCK_ENTITY.get(), pos, state);
-        this.conn = LazyOptional.of(this::getConnection);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void setBlockState(@Nonnull BlockState newState) {
-        super.setBlockState(newState);
-        if (level != null && !level.isClientSide)
-            this.connection = new TunnelMachineConnection(level.getServer(), this);
     }
 
     @Override
@@ -68,9 +57,11 @@ public class TunnelWallEntity extends BlockEntity {
             if (nbt.contains("tunnel_type")) {
                 ResourceLocation type = new ResourceLocation(nbt.getString("tunnel_type"));
                 this.tunnelType = Tunnels.getDefinition(type);
-                this.tunnel = tunnelType.newInstance(worldPosition, getTunnelSide());
 
                 try {
+                    if (tunnelType instanceof InstancedTunnel it)
+                        this.tunnel = it.newInstance(worldPosition, getTunnelSide());
+
                     if (tunnel instanceof INBTSerializable persist && nbt.contains("tunnel_data")) {
                         var data = nbt.get("tunnel_data");
                         persist.deserializeNBT(data);
@@ -86,8 +77,8 @@ public class TunnelWallEntity extends BlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound) {
-        if(tunnelType != null)
+    public void saveAdditional(@Nonnull CompoundTag compound) {
+        if (tunnelType != null)
             compound.putString("tunnel_type", tunnelType.getRegistryName().toString());
         else
             compound.putString("tunnel_type", Tunnels.UNKNOWN.getId().toString());
@@ -129,24 +120,14 @@ public class TunnelWallEntity extends BlockEntity {
         super.onLoad();
 
         if (level instanceof ServerLevel sl) {
-            if(this.getConnectedPosition() != null)
-                this.connection = new TunnelMachineConnection(sl.getServer(), this);
-
             var chunk = level.getChunkAt(worldPosition);
-            CAPS = chunk.getCapability(Capabilities.ROOM_CAPS);
             ROOM = chunk.getCapability(Capabilities.ROOM);
 
             // If tunnel type is unknown, remove the tunnel entirely
-            if(tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
+            if (tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
                 CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
                 sl.setBlock(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
-                return;
             }
-
-            // TODO
-//            if (tunnelType instanceof ITunnelSetup setup) {
-//                ROOM.ifPresent(room -> setup.setup(room, new TunnelPosition(sl, worldPosition, getTunnelSide()), this.connection));
-//            }
         }
     }
 
@@ -158,7 +139,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (outerSide != null && outerSide != getConnectedSide())
             return LazyOptional.empty();
 
-        if (tunnelType instanceof ITunnelCapabilityProvider c) {
+        if (tunnelType instanceof CapabilityTunnel c) {
             return c.getCapability(cap, tunnel);
         }
 
@@ -174,24 +155,11 @@ public class TunnelWallEntity extends BlockEntity {
         if (side != null && side != getTunnelSide())
             return super.getCapability(cap, side);
 
-        if (cap == Capabilities.TUNNEL_CONNECTION)
-            return conn.cast();
-
-        if (tunnelType instanceof ITunnelCapabilityProvider c) {
+        if (tunnelType instanceof CapabilityTunnel c) {
             return c.getCapability(cap, tunnel);
         }
 
         return super.getCapability(cap, side);
-    }
-
-    /**
-     * Server side only. Gets information about the connection to an outside point.
-     */
-    public @Nonnull ITunnelConnection getConnection() {
-        if (this.connection == null)
-            this.connection = new TunnelMachineConnection(level.getServer(), this);
-
-        return this.connection;
     }
 
     public IDimensionalPosition getConnectedPosition() {
@@ -205,8 +173,8 @@ public class TunnelWallEntity extends BlockEntity {
             CompactMachineData machines = CompactMachineData.get(server);
 
             return machines.getMachineLocation(this.connectedMachine)
-                .map(dp -> dp.relative(getConnectedSide()))
-                .orElse(null);
+                    .map(dp -> dp.relative(getConnectedSide()))
+                    .orElse(null);
 
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.fatal(e);
@@ -239,13 +207,15 @@ public class TunnelWallEntity extends BlockEntity {
             return;
         }
 
-        var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
-        if (tunnelType instanceof ITunnelTeardown teardown) {
-            teardown.teardown(p, tunnel, TeardownReason.REMOVED);
+        final var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
+        if (tunnelType instanceof TunnelTeardownHandler teardown) {
+            teardown.onRemoved(p, tunnel);
         }
 
         this.tunnelType = type;
-        this.tunnel = type.newInstance(p.pos(), p.side());
+        if(type instanceof InstancedTunnel it)
+            this.tunnel = it.newInstance(p.pos(), p.side());
+
         setChanged();
     }
 
@@ -271,21 +241,40 @@ public class TunnelWallEntity extends BlockEntity {
 
         data.getMachineLocation(machine).ifPresent(p -> {
             this.connectedMachine = machine;
-            this.connection = new TunnelMachineConnection(level.getServer(), this);
-            this.conn.invalidate();
         });
     }
 
-    public ITunnel getTunnel() {
+    @Nullable
+    public TunnelInstance getTunnel() {
         return tunnel;
     }
 
-    public void setTunnel(ITunnel newTunn) {
+    public void setInstance(TunnelInstance newTunn) {
         this.tunnel = newTunn;
         setChanged();
     }
 
     public int getMachine() {
         return connectedMachine;
+    }
+
+    public void disconnect() {
+
+        if (level == null || level.isClientSide) {
+            this.connectedMachine = -1;
+            return;
+        }
+
+        CompactMachineData data;
+        try {
+            data = CompactMachineData.get(level.getServer());
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.fatal(e);
+            return;
+        }
+
+        data.remove(this.connectedMachine);
+        this.connectedMachine = -1;
+        this.setChanged();
     }
 }

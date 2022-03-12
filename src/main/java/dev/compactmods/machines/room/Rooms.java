@@ -8,6 +8,7 @@ import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.machine.data.MachineToRoomConnections;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import dev.compactmods.machines.util.MathUtil;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import javax.naming.OperationNotSupportedException;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Rooms {
     public static ChunkPos createNew(MinecraftServer serv, RoomSize size, UUID owner) throws MissingDimensionException {
@@ -32,7 +34,7 @@ public class Rooms {
             throw new MissingDimensionException("Could not load world saved data while creating new room.");
         }
 
-        if(compactWorld == null)
+        if (compactWorld == null)
             throw new MissingDimensionException();
 
         int nextPosition = rooms.getNextSpiralPosition();
@@ -73,7 +75,9 @@ public class Rooms {
         final var roomBounds = roomData.getBounds(room);
         final var innerBounds = roomBounds.deflate(1);
 
-        final var states = level.getBlockStates(innerBounds).collect(Collectors.toSet());
+        final var states = level.getBlockStates(innerBounds)
+                .collect(Collectors.toSet());
+
         final var nonAir = states.stream()
                 .filter(state -> !state.isAir())
                 .findAny();
@@ -84,13 +88,23 @@ public class Rooms {
         }
 
         // clear tunnel connection info
-        final var tunnels = RoomTunnelData.get(server, room);
-        final var tGraph = tunnels.getGraph();
-        tGraph.clear();
-        tunnels.setDirty();
+        final var tunnels = RoomTunnelData.getFile(server, room);
+        final var filename = RoomTunnelData.getDataFilename(room);
+        if(!tunnels.delete()) {
+            CompactMachines.LOGGER.warn("Could not delete tunnel data for room {}; clearing the connection graph as an alternative.", room);
+            CompactMachines.LOGGER.warn("Data file to delete: {}", filename);
+
+            var td = RoomTunnelData.get(server, room);
+            td.getGraph().clear();
+            td.setDirty();
+        } else {
+            // File deletion successful, delete cached data
+            final var compactDataCache = level.getDataStorage().cache;
+            compactDataCache.remove(filename);
+        }
 
         // reset everything for the room boundary
-        BlockPos.betweenClosedStream(roomBounds)
+        BlockPos.betweenClosedStream(roomBounds.inflate(1))
                 .forEach(p -> level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL));
 
         // Remove room registration
@@ -101,11 +115,28 @@ public class Rooms {
         var d = CompactMachineData.get(server);
 
         var connected = conns.getMachinesFor(room);
-        for(int mid : connected) {
-            d.getMachineLocation(mid);
+        for (int mid : connected) {
+            var location = d.getMachineLocation(mid);
+            location.ifPresent(p -> {
+                var pos = p.getBlockPosition();
+                var l = p.level(server).orElseThrow();
+                if (l.getBlockEntity(pos) instanceof TunnelWallEntity tunn) {
+                    tunn.disconnect();
+                }
+            });
         }
 
         conns.unregisterRoom(room);
         return true;
+    }
+
+    public static Stream<Integer> getConnectedMachines(MinecraftServer server, ChunkPos room) {
+        try {
+            var conns = MachineToRoomConnections.get(server);
+            var d = CompactMachineData.get(server);
+            return conns.getMachinesFor(room).stream();
+        } catch (MissingDimensionException e) {
+            return Stream.empty();
+        }
     }
 }

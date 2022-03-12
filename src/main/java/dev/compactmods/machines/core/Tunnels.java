@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.tunnel.UnknownTunnel;
+import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
 import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

@@ -33,7 +33,7 @@ public class TestUtil {
     }
 
     public static void useHeldItemOnBlockAt(ServerLevel level, Player player, InteractionHand hand, BlockPos position, Direction side) {
-        final var hitResult = new BlockHitResult(Vec3.atCenterOf(position), side, position, true);
+        final var hitResult = new BlockHitResult(Vec3.atCenterOf(position), side, position, false);
 
         var item = player.getItemInHand(hand);
 

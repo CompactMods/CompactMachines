@@ -10,4 +10,6 @@ public class TestBatches {
     public static final String MACHINE_GRAPH = "machine_graph_data";
     public static final String CODEC_TESTS = "codecs";
     public static final String MATH = "math";
+    public static final String MACHINE_DATA = "machine_data";
+    public static final String DIMENSION = "dimension";
 }

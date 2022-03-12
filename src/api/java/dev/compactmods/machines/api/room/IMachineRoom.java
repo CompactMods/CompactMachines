@@ -12,7 +12,4 @@ public interface IMachineRoom {
 
     @Nonnull
     ServerLevel getLevel();
-
-    @Nonnull
-    IRoomCapabilities getCapabilityManager();
 }

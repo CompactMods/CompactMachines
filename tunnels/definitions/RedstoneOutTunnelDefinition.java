@@ -1,4 +1,4 @@
-package dev.compactmods.machines.tunnels.definitions;
+package dev.compactmods.machines.tunnel.definitions;
 
 import dev.compactmods.machines.api.tunnels.ITunnelConnectionInfo;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;

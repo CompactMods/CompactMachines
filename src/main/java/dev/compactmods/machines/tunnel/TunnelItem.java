@@ -28,7 +28,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -220,19 +219,14 @@ public class TunnelItem extends Item {
 
         level.setBlock(position, tunnelState, Block.UPDATE_ALL_IMMEDIATE);
 
-        var serv = level.getServer();
-        serv.tell(new TickTask(serv.getTickCount() + 3, () -> {
-            if (!(level.getBlockEntity(position) instanceof TunnelWallEntity tun)) {
-                return;
-            }
-
-            tun.setTunnelType(def);
-            tun.setConnectedTo(hist.getMachine());
+        if (level.getBlockEntity(position) instanceof TunnelWallEntity twe) {
+            twe.setTunnelType(def);
+            twe.setConnectedTo(hist.getMachine());
 
             NetworkHandler.MAIN_CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
                     new TunnelAddedPacket(position, def));
-        }));
+        }
 
         return true;
     }

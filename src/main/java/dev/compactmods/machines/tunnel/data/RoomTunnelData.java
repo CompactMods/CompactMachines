@@ -9,6 +9,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 
 public class RoomTunnelData extends SavedData {
 
@@ -18,13 +19,24 @@ public class RoomTunnelData extends SavedData {
         graph = new TunnelConnectionGraph();
     }
 
-    @Nonnull
+    public static String getDataFilename(ChunkPos room) {
+        return "tunnels_" + room.x + "_" + room.z;
+    }
+
     public static RoomTunnelData get(MinecraftServer server, ChunkPos room) throws MissingDimensionException {
         final var level = server.getLevel(Registration.COMPACT_DIMENSION);
         if (level == null) throw new MissingDimensionException();
 
         final var storage = level.getDataStorage();
-        return storage.computeIfAbsent(RoomTunnelData::fromDisk, RoomTunnelData::new, "tunnels_" + room.x + "_" + room.z);
+        return storage.computeIfAbsent(RoomTunnelData::fromDisk, RoomTunnelData::new, getDataFilename(room));
+    }
+
+    public static File getFile(MinecraftServer server, ChunkPos room) throws MissingDimensionException {
+        final var level = server.getLevel(Registration.COMPACT_DIMENSION);
+        if (level == null) throw new MissingDimensionException();
+
+        final var storage = level.getDataStorage();
+        return storage.getDataFile(getDataFilename(room));
     }
 
     private static RoomTunnelData fromDisk(CompoundTag tag) {

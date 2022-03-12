@@ -86,6 +86,16 @@ sourceSets {
         runtimeClasspath += sourceSets.main.output
     }
 
+    tunnels {
+        java {
+            srcDir("src/main/tunnels")
+        }
+
+        compileClasspath += configurations.getByName("minecraft")
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+    }
+
     main {
         java {
             srcDir "src/main/java"
@@ -98,6 +108,8 @@ sourceSets {
 
         compileClasspath += sourceSets.api.output
         runtimeClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.tunnels.output
+        runtimeClasspath += sourceSets.tunnels.output
     }
 
     test {
@@ -137,6 +149,7 @@ minecraft {
 
             mods {
                 compactmachines {
+                    source sourceSets.tunnels
                     source sourceSets.main
                     source sourceSets.api
                 }
@@ -159,6 +172,7 @@ minecraft {
 
             mods {
                 compactmachines {
+                    source sourceSets.tunnels
                     source sourceSets.main
                     source sourceSets.api
                     source sourceSets.test
@@ -185,6 +199,7 @@ minecraft {
 
             mods {
                 compactmachines {
+                    source sourceSets.tunnels
                     source sourceSets.main
                     source sourceSets.api
                     source sourceSets.datagen
@@ -200,12 +215,12 @@ minecraft {
             // "SCAN": For mods scan.
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', ''
 
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
@@ -214,6 +229,7 @@ minecraft {
             
             mods {
                 compactmachines {
+                    source sourceSets.tunnels
                     source sourceSets.api
                     source sourceSets.main
                     source sourceSets.test
@@ -291,6 +307,7 @@ processTestResources {
 }
 
 jar {
+    from sourceSets.tunnels.output
     from sourceSets.main.output
     from sourceSets.api.output
     destinationDirectory = file("$rootDir/build-out")
@@ -299,7 +316,7 @@ jar {
 
     manifest {
         attributes([
-                "Specification-Title"     : "compactmachines",
+                "Specification-Title"     : "Compact Machines",
                 "Specification-Vendor"    : "",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,

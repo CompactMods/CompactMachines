@@ -4,7 +4,7 @@ import com.google.common.graph.*;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.capability.ITunnelCapabilityProvider;
+import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.graph.CompactGraphs;
@@ -75,8 +75,8 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         var tNode = tunnels.get(tunnel);
         return graph.successors(tNode)
                 .stream()
-                .findFirst()
                 .filter(CompactMachineNode.class::isInstance)
+                .findFirst()
                 .map(mNode -> ((CompactMachineNode) mNode).machineId());
     }
 
@@ -107,14 +107,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         }
 
         // graph direction is (tunnel)-[connected_to]->(machine)
-        var tunnelsForSide = graph.predecessors(machineNode)
-                .stream()
-                .filter(n -> n instanceof TunnelNode)
-                .filter(tunnel -> graph.edgeValue(machineNode, tunnel)
-                        .map(edge -> !((TunnelMachineEdge) edge).side().equals(side))
-                        .orElse(false))
-                .map(t -> (TunnelNode) t)
-                .collect(Collectors.toSet());
+        var tunnelsForSide = getTunnelsForSide(machineId, side).collect(Collectors.toSet());
 
         var tunnelTypeNode = getOrCreateTunnelTypeNode(type);
 
@@ -138,9 +131,9 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         return true;
     }
 
-    private void createTunnelAndLink(TunnelNode newTunnel, Direction side, CompactMachineNode CompactMachineNode, TunnelTypeNode typeNode) {
+    private void createTunnelAndLink(TunnelNode newTunnel, Direction side, CompactMachineNode machNode, TunnelTypeNode typeNode) {
         var newEdge = new TunnelMachineEdge(side);
-        graph.putEdgeValue(newTunnel, CompactMachineNode, newEdge);
+        graph.putEdgeValue(newTunnel, machNode, newEdge);
         graph.putEdgeValue(newTunnel, typeNode, new TunnelTypeEdge());
     }
 
@@ -353,18 +346,6 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         return tunnels.containsKey(zero);
     }
 
-    public Stream<BlockPos> getTunnelsForSide(Direction side) {
-        return graph.edges().stream()
-                .filter(ep -> {
-                    final var edge = graph.edgeValue(ep);
-                    return edge.map(e -> e instanceof TunnelMachineEdge tme && tme.side() == side).orElse(false);
-                })
-                .map(EndpointPair::source)
-                .map(TunnelNode.class::cast)
-                .map(TunnelNode::position)
-                .map(BlockPos::immutable);
-    }
-
     public <T> Stream<BlockPos> getTunnelsSupporting(int machine, Direction side, Capability<T> capability) {
         final IGraphNode node = machines.get(machine);
         if (node == null) return Stream.empty();
@@ -376,7 +357,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
                             .map(TunnelTypeNode.class::cast)
                             .anyMatch(ttn -> {
                                 var def = Tunnels.getDefinition(ttn.id());
-                                if (!(def instanceof ITunnelCapabilityProvider<?> tcp))
+                                if (!(def instanceof CapabilityTunnel<?> tcp))
                                     return false;
 
                                 return tcp.getSupportedCapabilities().contains(capability);
@@ -410,18 +391,10 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
                 .map(TunnelNode.class::cast);
     }
 
-    public Stream<Direction> getSides() {
-        return graph.edges().stream()
-                .map(graph::edgeValue)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(TunnelMachineEdge.class::isInstance)
-                .map(TunnelMachineEdge.class::cast)
-                .map(TunnelMachineEdge::side)
-                .distinct();
-    }
-
     public Stream<Direction> getTunnelSides(TunnelDefinition type) {
+        if (!tunnelTypes.containsKey(type.getRegistryName()))
+            return Stream.empty();
+
         return getTunnelsByType(type).stream()
                 .map(this::getTunnelSide)
                 .filter(Optional::isPresent)
@@ -432,7 +405,19 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
         if (!machines.containsKey(machine)) return;
 
         final var node = machines.get(machine);
+
+        // Remove all connected tunnels
+        graph.predecessors(node).stream()
+                .filter(TunnelNode.class::isInstance)
+                .map(TunnelNode.class::cast)
+                .forEach(node1 -> {
+                    var p = node1.position();
+                    tunnels.remove(p);
+                    graph.removeNode(node1);
+                });
+
         graph.removeNode(node);
+        machines.remove(machine);
     }
 
     public void clear() {
@@ -458,7 +443,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
     }
 
     public void unregister(BlockPos pos) {
-        if(!hasTunnel(pos))
+        if (!hasTunnel(pos))
             return;
 
         final var existing = tunnels.get(pos);
@@ -478,7 +463,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
     private void cleanupOrphanedTypes() {
         HashSet<ResourceLocation> removedTypes = new HashSet<>();
         tunnelTypes.forEach((type, node) -> {
-            if(graph.degree(node) == 0) {
+            if (graph.degree(node) == 0) {
                 graph.removeNode(node);
                 removedTypes.add(type);
             }
@@ -490,7 +475,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
     private void cleanupOrphanedTunnels() {
         HashSet<BlockPos> removed = new HashSet<>();
         tunnels.forEach((pos, node) -> {
-            if(graph.degree(node) == 0) {
+            if (graph.degree(node) == 0) {
                 graph.removeNode(node);
                 removed.add(pos);
             }
@@ -502,7 +487,7 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
     private void cleanupOrphanedMachines() {
         HashSet<Integer> removed = new HashSet<>();
         machines.forEach((machine, node) -> {
-            if(graph.degree(node) == 0) {
+            if (graph.degree(node) == 0) {
                 graph.removeNode(node);
                 removed.add(machine);
             }
@@ -512,12 +497,12 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
     }
 
     public void rotateTunnel(BlockPos tunnel, Direction newSide) {
-        if(!tunnels.containsKey(tunnel))
+        if (!tunnels.containsKey(tunnel))
             return;
 
         final var connected = connectedMachine(tunnel);
         connected.ifPresent(machine -> {
-            if(!machines.containsKey(machine))
+            if (!machines.containsKey(machine))
                 return;
 
             final var t = tunnels.get(tunnel);
@@ -525,5 +510,9 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
             graph.removeEdge(t, m);
             graph.putEdgeValue(t, m, new TunnelMachineEdge(newSide));
         });
+    }
+
+    public Stream<Integer> getMachines() {
+        return this.machines.keySet().stream();
     }
 }

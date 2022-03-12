@@ -2,7 +2,6 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.connection.ITunnelConnection;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
@@ -42,7 +41,7 @@ public class TunnelProvider implements IProbeInfoProvider {
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
         if (level.getBlockEntity(hitData.getPos()) instanceof TunnelWallEntity tile) {
-            ITunnelConnection outside = tile.getConnection();
+            final var connectedTo = tile.getConnectedPosition();
 
             if (probeMode == ProbeMode.EXTENDED) {
                 TunnelDefinition definition = tile.getTunnelType();
@@ -63,29 +62,30 @@ public class TunnelProvider implements IProbeInfoProvider {
 
             v.horizontal(center)
                     .item(new ItemStack(Items.COMPASS))
-                    .text(new TranslatableComponent(CompactMachines.MOD_ID + ".direction.side", sideTranslated));
+                    .text(new TranslatableComponent(sideTranslated));
 
             ServerLevel connectedWorld = (ServerLevel) level;
-            BlockPos outPosBlock = outside.position();
+            BlockPos outPosBlock = connectedTo.getBlockPosition();
 
             try {
                 // If connected block isn't air, show a connected block line
-                final BlockState state = outside.state();
+                connectedTo.state(level.getServer()).ifPresent(state -> {
+                    if (!state.isAir()) {
+                        String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
+                        HitResult trace = new BlockHitResult(
+                                hitData.getHitVec(), hitData.getSideHit(),
+                                outPosBlock, false);
 
-                if (!state.isAir()) {
-                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
-                    HitResult trace = new BlockHitResult(
-                            hitData.getHitVec(), hitData.getSideHit(),
-                            outPosBlock, false);
+                        ItemStack pick = state
+                                .getBlock()
+                                .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
 
-                    ItemStack pick = state
-                            .getBlock()
-                            .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
+                        v.horizontal(center)
+                                .item(pick)
+                                .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
+                    }
+                });
 
-                    v.horizontal(center)
-                            .item(pick)
-                            .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
-                }
             } catch (Exception ex) {
                 // no-op: we don't want to spam the log here
             }

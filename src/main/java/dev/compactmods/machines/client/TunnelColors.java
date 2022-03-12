@@ -23,10 +23,10 @@ public class TunnelColors implements BlockColor {
 
                 switch(tintIndex) {
                     case 0:
-                        return type.getTunnelRingColor();
+                        return type.ringColor();
 
                     case 1:
-                        return type.getTunnelIndicatorColor();
+                        return type.indicatorColor();
                 }
             }
 

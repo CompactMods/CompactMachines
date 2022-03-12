@@ -1,6 +1,5 @@
 package dev.compactmods.machines.test.tunnel;
 
-import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.machine.Machines;
@@ -14,50 +13,51 @@ import dev.compactmods.machines.test.util.TestUtil;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
+import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.gametest.framework.AfterBatch;
+import net.minecraft.gametest.framework.BeforeBatch;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @GameTestHolder(CompactMachines.MOD_ID)
 public class TunnelTests {
 
     private static AABB ROOM_BOUNDS;
-    private static UUID TEST_PLAYER;
-    private static HashSet<Integer> TESTING_MACHINES;
-    private static HashSet<BlockPos> PLACED_TUNNELS;
     private static ChunkPos TESTING_ROOM;
+
+    private static Logger LOG = LogManager.getLogger();
 
     @BeforeBatch(batch = TestBatches.TUNNELS)
     public static void beforeTunnelTests(final ServerLevel level) {
         final var server = level.getServer();
 
         try {
-            TESTING_MACHINES = new HashSet<>();
-            PLACED_TUNNELS = new HashSet<>();
-            TEST_PLAYER = UUID.randomUUID();
-            TESTING_ROOM = Rooms.createNew(server, RoomSize.NORMAL, TEST_PLAYER);
+            LOG.info("Starting tunnel tests; creating a new room...");
 
-            ROOM_BOUNDS = CompactRoomData.get(server)
-                    .getBounds(TESTING_ROOM);
+            TESTING_ROOM = Rooms.createNew(server, RoomSize.NORMAL, UUID.randomUUID());
+
+            LOG.info("New room generated at chunk: {}", TESTING_ROOM);
+
+            ROOM_BOUNDS = CompactRoomData.get(server).getBounds(TESTING_ROOM);
         } catch (MissingDimensionException | NonexistentRoomException e) {
             e.printStackTrace();
         }
@@ -68,109 +68,127 @@ public class TunnelTests {
         final var server = level.getServer();
 
         try {
-            for (var mach : TESTING_MACHINES) Machines.destroy(server, mach);
+            LOG.info("Starting test room destruction.");
+            Stream<Integer> connected = Rooms.getConnectedMachines(server, TESTING_ROOM);
+            connected.forEach(mach -> Machines.destroy(server, mach));
+
             Rooms.destroy(server, TESTING_ROOM);
+            LOG.info("Finished destruction of test room.");
         } catch (MissingDimensionException | NonexistentRoomException e) {
             e.printStackTrace();
         }
     }
 
-    @GameTestGenerator
-    public static Collection<TestFunction> usingTunnelItemOnWall() {
-        HashSet<TestFunction> tests = new HashSet<>();
-
-        // TestFunction(String batch, String testName, String structure, int testTime, long setupTime, boolean isRequired, Consumer<GameTestHelper> tester)
-        for (var dir : Direction.values()) {
-            var template = new ResourceLocation(CompactMachines.MOD_ID, "empty_1x1");
-            Consumer<GameTestHelper> test = (t) -> sidedTunnelTest(dir, t);
-
-            var testf = new TestFunction(TestBatches.TUNNELS, "tunnel_creation_" + dir.getSerializedName(), template.toString(), 100, 0, true, test);
-            tests.add(testf);
-        }
-
-        return tests;
-    }
-
-    private static void sidedTunnelTest(Direction dir, GameTestHelper t) {
-        var lev = t.getLevel();
-        var serv = t.getLevel().getServer();
+    @PrefixGameTestTemplate(false)
+    @GameTest(template = "empty_1x1", batch = TestBatches.TUNNELS, timeoutTicks = 150)
+    public static void tunnel_item_transforms_wall(final GameTestHelper test) {
+        var serv = test.getLevel().getServer();
         var comLev = serv.getLevel(Registration.COMPACT_DIMENSION);
 
-        final var profile = new GameProfile(TEST_PLAYER, "CMRoomPlayer");
+        final var seq = test.startSequence();
+        int offset = 0;
+        for (var dir : Direction.values()) {
+            seq.thenExecuteAfter(offset, () -> {
+                try {
+                    useTunnelItem(test, comLev, dir);
+                } catch (MissingDimensionException e) {
+                    e.printStackTrace();
+                }
+            });
 
-        BlockPos machineBlock = BlockPos.ZERO.above();
+            offset += 5;
+        }
 
-        AtomicReference<BlockPos> randomWallRelative = new AtomicReference<>();
+        seq.thenIdle(60)
+                .thenExecute(() -> checkTunnelWalls(test, comLev))
+                .thenSucceed();
+    }
 
-        AtomicInteger currentRoom = new AtomicInteger();
+    private static void checkTunnelWalls(GameTestHelper test, ServerLevel comLev) {
+        RoomTunnelData roomTunnels = null;
+        try {
+            roomTunnels = RoomTunnelData.get(comLev.getServer(), TESTING_ROOM);
+        } catch (MissingDimensionException e) {
+            test.fail(e.getMessage());
+        }
 
-        t.startSequence()
-                .thenExecute(() -> {
-                    t.setBlock(machineBlock, Registration.MACHINE_BLOCK_NORMAL.get());
+        final var graph = roomTunnels.getGraph();
 
-                    try {
-                        int newMachine = Machines.createNew(serv, lev, t.absolutePos(machineBlock));
-                        Machines.link(serv, newMachine, TESTING_ROOM);
-                        TESTING_MACHINES.add(newMachine);
+        final long countedTunnels = comLev.getBlockStates(ROOM_BOUNDS.inflate(1))
+                .filter(s -> s.getBlock() instanceof TunnelWallBlock)
+                .count();
 
-                        currentRoom.set(newMachine);
-                    } catch (MissingDimensionException e) {
-                        e.printStackTrace();
-                        t.fail(e.getMessage());
-                    }
-                })
+        final var positions = graph.getTunnelNodesByType(Tunnels.ITEM_TUNNEL_DEF.get())
+                .map(TunnelNode::position)
+                .map(BlockPos::immutable)
+                .collect(Collectors.toSet());
 
-                .thenExecuteAfter(5, () -> {
-                    // 5 ticks later, room should be generated - find a random wall position
-                    var playerInRoom = FakePlayerFactory.get(comLev, profile);
-                    playerInRoom.setLevel(comLev);
-                    playerInRoom.setPos(ROOM_BOUNDS.getCenter());
+        if (countedTunnels != 6)
+            test.fail("Expected 6 tunnel walls inside the room boundaries. Got " + countedTunnels);
 
-                    playerInRoom.getCapability(Capabilities.ROOM_HISTORY).ifPresent(rooms -> {
-                        var d = new DimensionalPosition(Level.OVERWORLD, t.absolutePos(machineBlock));
-                        rooms.addHistory(new PlayerRoomHistoryItem(d, currentRoom.get()));
-                    });
+        if (positions.size() != 6)
+            test.fail("Expected a tunnel to be placed on all 6 sides. Got " + positions.size());
 
-                    ItemStack tunnelStack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-                    TunnelItem.setTunnelType(tunnelStack, Tunnels.ITEM_TUNNEL_DEF.get());
+        for (var tunnelLocation : positions) {
 
-                    playerInRoom.setItemInHand(InteractionHand.MAIN_HAND, tunnelStack);
+            final var machine = graph.connectedMachine(tunnelLocation).orElse(-1);
+            if (machine == -1)
+                test.fail("Tunnel not connected to a machine: " + tunnelLocation);
 
-                    final var wallBounds = CompactStructureGenerator.getWallBounds(RoomSize.NORMAL, new BlockPos(ROOM_BOUNDS.getCenter()), dir);
-                    final var wallPositions = BlockPos.betweenClosedStream(wallBounds).map(BlockPos::immutable).toList();
-                    final var randomWall = wallPositions.get(RandomUtils.nextInt(0, wallPositions.size()));
+            var side = graph.getTunnelSide(tunnelLocation);
+            if (side.isEmpty()) {
+                test.fail("Did not find side for tunnel: " + tunnelLocation);
+                return;
+            }
 
-                    randomWallRelative.set(randomWall);
-                    PLACED_TUNNELS.add(randomWall);
-                    TestUtil.useHeldItemOnBlockAt(comLev, playerInRoom, InteractionHand.MAIN_HAND, randomWall, dir);
-                })
+            final var dir = side.get();
 
-                .thenExecuteAfter(5, () -> {
-                    int machine = currentRoom.get();
-                    var wallLoc = randomWallRelative.get();
+            final var wallState = comLev.getBlockState(tunnelLocation);
+            if (!(wallState.getBlock() instanceof TunnelWallBlock))
+                test.fail("Bad wall block data", tunnelLocation);
 
-                    final var wallState = comLev.getBlockState(wallLoc);
-                    if (!(wallState.getBlock() instanceof TunnelWallBlock))
-                        t.fail("Bad wall block data", wallLoc);
+            graph.connectedMachine(tunnelLocation).ifPresentOrElse(m -> {
+                if (!Objects.equals(m, machine))
+                    test.fail("Tunnel " + tunnelLocation + " (" + dir + ") is not linked to the correct machine. Got: " + m + "; Expected: " + machine);
+            }, () -> test.fail("Tunnel " + tunnelLocation + " (" + dir + ") is not linked to a machine."));
 
-                    if (wallState.getValue(TunnelWallBlock.TUNNEL_SIDE) != dir)
-                        t.fail("Did not match clicked side", wallLoc);
+            var placed = graph.getMachineTunnels(machine, Tunnels.ITEM_TUNNEL_DEF.get())
+                    .collect(Collectors.toSet());
 
-                    try {
-                        final var roomTunnels = RoomTunnelData.get(serv, TESTING_ROOM);
-                        final var graph = roomTunnels.getGraph();
+            if (placed.size() != 1)
+                test.fail("Should have had one tunnel placed; got " + placed);
+        }
+    }
 
-                        var placed = graph.getMachineTunnels(machine, Tunnels.ITEM_TUNNEL_DEF.get())
-                                .collect(Collectors.toSet());
+    private static void useTunnelItem(GameTestHelper test, ServerLevel comLev, Direction dir) throws MissingDimensionException {
+        // room should be generated - find a random wall position
+        var playerInRoom = test.makeMockPlayer();
+        playerInRoom.level = comLev;
+        playerInRoom.setPos(ROOM_BOUNDS.getCenter());
 
-                        if (placed.size() != 1)
-                            t.fail("Should have had only one tunnel placed; got " + placed);
+        ItemStack tunnelStack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+        TunnelItem.setTunnelType(tunnelStack, Tunnels.ITEM_TUNNEL_DEF.get());
 
-                        if (!PLACED_TUNNELS.containsAll(placed))
-                            t.fail("Tunnel placement locations did not match what was expected.");
-                    } catch (MissingDimensionException e) {
-                        t.fail(e.getMessage());
-                    }
-                }).thenSucceed();
+        playerInRoom.setItemInHand(InteractionHand.MAIN_HAND, tunnelStack);
+
+        int machine = Machines.createNew(comLev.getServer(), test.getLevel(), new BlockPos(2, 2, 2).relative(dir, 2));
+
+        LOG.info("Created new machine " + machine + "; using it for side: " + dir);
+
+        BlockPos machineBlock = new BlockPos(2, 2, 2)
+                .relative(dir, 2);
+
+        playerInRoom.getCapability(Capabilities.ROOM_HISTORY).ifPresent(rooms -> {
+            var d = new DimensionalPosition(Level.OVERWORLD, test.absolutePos(machineBlock));
+            rooms.addHistory(new PlayerRoomHistoryItem(d, machine));
+        });
+
+        final var wallBounds = CompactStructureGenerator.getWallBounds(RoomSize.NORMAL, new BlockPos(ROOM_BOUNDS.getCenter()), dir);
+        final var wallPositions = BlockPos.betweenClosedStream(wallBounds).map(BlockPos::immutable).toList();
+        final var randomWall = wallPositions.get(RandomUtils.nextInt(0, wallPositions.size()));
+
+        LOG.info("Using tunnel item on wall at {} (machine {}, chunk {})", randomWall, machine, new ChunkPos(randomWall));
+
+        TestUtil.useHeldItemOnBlockAt(comLev, playerInRoom, InteractionHand.MAIN_HAND, randomWall, dir.getOpposite());
     }
 }

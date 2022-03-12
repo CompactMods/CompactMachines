@@ -1,7 +1,6 @@
 package dev.compactmods.machines.room.capability;
 
 import dev.compactmods.machines.api.room.IMachineRoom;
-import dev.compactmods.machines.api.room.IRoomCapabilities;
 import dev.compactmods.machines.core.Capabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,11 +14,9 @@ import javax.annotation.Nullable;
 
 public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTag> {
     private final RoomChunkData room;
-    private final RoomChunkCapabilities roomCaps;
 
     public RoomChunkDataProvider(LevelChunk chunk) {
         this.room = new RoomChunkData(chunk);
-        this.roomCaps = new RoomChunkCapabilities(chunk);
     }
 
     /**
@@ -39,15 +36,7 @@ public class RoomChunkDataProvider implements ICapabilitySerializable<CompoundTa
         if(cap == Capabilities.ROOM)
             return LazyOptional.of(this::room).cast();
 
-        if(cap == Capabilities.ROOM_CAPS)
-            return LazyOptional.of(this::caps).cast();
-
         return LazyOptional.empty();
-    }
-
-    @Nonnull
-    private IRoomCapabilities caps() {
-        return roomCaps;
     }
 
     @Nonnull

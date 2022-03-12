@@ -10,6 +10,7 @@ import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.FileHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -32,7 +33,7 @@ public class MachineDataTests {
             .stable()
             .codec();
 
-    @GameTest(template = "empty_5x5", timeoutTicks = 240, batch = "machine_data")
+    @GameTest(template = "empty_5x5", timeoutTicks = 240, batch = TestBatches.MACHINE_DATA)
     public static void canLoadSingleMachineData(final GameTestHelper game) throws IOException {
         // The external point is overworld @ 8x4x8 (it was made in a default void superflat)
         DimensionalPosition OUTSIDE = new DimensionalPosition(
