@@ -57,7 +57,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Test JAR with Gradle
+      - name: Create datagen assets
+        run: ./gradlew runData
+
+      - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -69,7 +72,7 @@ jobs:
         with:
           name: test-data
           path: run/gametest
-          
+
   nightly:
     name: Publish Nightly
     runs-on: ubuntu-20.04
