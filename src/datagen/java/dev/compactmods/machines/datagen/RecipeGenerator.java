@@ -53,6 +53,14 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
+        TunnelRecipeBuilder.tunnel(Tunnels.FLUID_TUNNEL_DEF.get(), 2)
+                .requires(Items.BUCKET)
+                .requires(Items.ENDER_PEARL)
+                .requires(Items.REDSTONE)
+                .requires(Items.OBSERVER)
+                .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
+                .save(consumer);
+
         addMachineRecipes(consumer);
     }
 

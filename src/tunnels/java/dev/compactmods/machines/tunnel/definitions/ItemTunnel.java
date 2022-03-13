@@ -30,11 +30,6 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
         return 0xffcd8f24;
     }
 
-    @Override
-    public int indicatorColor() {
-        return IMPORT_COLOR;
-    }
-
     /**
      * Handle initialization tasks for the tunnel's data here.
      */
