@@ -15,8 +15,6 @@ import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -33,12 +31,12 @@ import java.util.UUID;
 
 public class CompactMachineBlockEntity extends BlockEntity implements ICapabilityProvider {
     public int machineId = -1;
-    private final boolean initialized = false;
     public long nextSpawnTick = 0;
 
     protected UUID owner;
     protected String schema;
     protected boolean locked = false;
+    private ChunkPos roomChunk;
     private LazyOptional<IMachineRoom> room = LazyOptional.empty();
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
@@ -51,8 +49,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         if (cap == Capabilities.ROOM) return room.cast();
 
         if(level instanceof ServerLevel sl) {
-            return room.map(r -> {
-                var roomId = r.getChunk();
+            return getInternalChunkPos().map(roomId -> {
                 try {
                     final var serv = sl.getServer();
 
@@ -165,6 +162,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
 
     public Optional<ChunkPos> getInternalChunkPos() {
         if (level instanceof ServerLevel) {
+            if(roomChunk != null)
+                return Optional.of(roomChunk);
+
             MinecraftServer serv = level.getServer();
             if (serv == null)
                 return Optional.empty();
@@ -173,7 +173,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             if (connections == null)
                 return Optional.empty();
 
-            return connections.getConnectedRoom(this.machineId);
+            var chunk = connections.getConnectedRoom(this.machineId);
+            chunk.ifPresent(c -> this.roomChunk = c);
+            return chunk;
         }
 
         return Optional.empty();
@@ -194,16 +196,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             owner = tag.getUUID("owner");
     }
 
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        BlockState state = null;
-        if (this.level != null) {
-            state = this.level.getBlockState(worldPosition);
-        }
-
-        super.onDataPacket(net, pkt);
-    }
-
     public Optional<UUID> getOwnerUUID() {
         return Optional.ofNullable(this.owner);
     }
@@ -215,6 +207,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     public void setMachineId(int id) {
         this.machineId = id;
         this.room.invalidate();
+        this.roomChunk = null;
         this.setChanged();
     }
 
