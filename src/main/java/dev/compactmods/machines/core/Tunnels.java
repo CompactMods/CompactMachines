@@ -5,6 +5,7 @@ import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.definitions.FluidTunnel;
+import dev.compactmods.machines.tunnel.definitions.ForgeEnergyTunnel;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
 import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
 import net.minecraft.resources.ResourceLocation;
@@ -65,6 +66,8 @@ public class Tunnels {
     public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = DEFINITIONS.register("item", ItemTunnel::new);
 
     public static final RegistryObject<TunnelDefinition> FLUID_TUNNEL_DEF = DEFINITIONS.register("fluid", FluidTunnel::new);
+
+    public static final RegistryObject<TunnelDefinition> FORGE_ENERGY = DEFINITIONS.register("energy", ForgeEnergyTunnel::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES
