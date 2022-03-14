@@ -286,8 +286,8 @@ dependencies {
     runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
 
     // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3544563"))
-    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3544028"))
+    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
+    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
     runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
     runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3687357"))
     runtimeOnly(fg.deobf("curse.maven:create-328085:3687358"))

@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
@@ -27,7 +28,7 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
 
     @Override
     public int ringColor() {
-        return 0xffcd8f24;
+        return FastColor.ARGB32.color(255, 205, 143, 36);
     }
 
     /**
@@ -39,9 +40,7 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
 
     @Override
     public ImmutableSet<Capability<?>> getSupportedCapabilities() {
-        return ImmutableSet.<Capability<?>>builder()
-                .add(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .build();
+        return ImmutableSet.of(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
     }
 
     /**
@@ -52,7 +51,7 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
      */
     @Override
     public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> capType, Instance instance) {
-        if(capType == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (capType == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return instance.lazy();
         }
 
@@ -69,9 +68,9 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
         BlockPos dropAt = position.pos().relative(position.side());
 
         NonNullList<ItemStack> stacks = NonNullList.create();
-        for(int i = 0; i < instance.handler.getSlots(); i++) {
+        for (int i = 0; i < instance.handler.getSlots(); i++) {
             ItemStack stack = instance.handler.getStackInSlot(i);
-            if(!stack.isEmpty())
+            if (!stack.isEmpty())
                 stacks.add(stack);
         }
 

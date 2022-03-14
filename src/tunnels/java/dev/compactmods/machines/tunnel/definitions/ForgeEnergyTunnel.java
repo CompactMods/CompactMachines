@@ -22,7 +22,7 @@ public class ForgeEnergyTunnel extends ForgeRegistryEntry<TunnelDefinition>
         implements TunnelDefinition, CapabilityTunnel<ForgeEnergyTunnel.Instance> {
     @Override
     public int ringColor() {
-        return FastColor.ARGB32.color(255, 193, 100, 222);
+        return FastColor.ARGB32.color(255, 0, 166, 88);
     }
 
     @Override
