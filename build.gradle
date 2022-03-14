@@ -295,6 +295,14 @@ dependencies {
     runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
     runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
 
+    // Scalable Cat's Force, BdLib, Advanced Generators
+    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
+    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
+    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
+
+    // Immersive Eng - 7.1.0-145 (Dec 31)
+    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
+
     // Mekanism + Mek Generators - Tunnel testing
 //    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))
 //    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3206395"))

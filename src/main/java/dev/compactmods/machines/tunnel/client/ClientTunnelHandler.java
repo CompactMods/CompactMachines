@@ -10,12 +10,14 @@ public class ClientTunnelHandler {
         var level = Minecraft.getInstance().level;
         if(level == null) return;
 
-        if(level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
-            try {
-                tun.setTunnelType(type);
-            } catch (Exception e) {
-                e.printStackTrace();
+        Minecraft.getInstance().tell(() -> {
+            if (level.getBlockEntity(position) instanceof TunnelWallEntity tun) {
+                try {
+                    tun.setTunnelType(type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        });
     }
 }
