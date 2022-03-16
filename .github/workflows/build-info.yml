@@ -10,7 +10,7 @@ jobs:
       release_type: ${{steps.cf_release_type.outputs.value }}
       cf_project: ${{steps.cf_project.outputs.value }}
       mod_id: ${{steps.mod_id.outputs.value }}
-      version: ${{steps.version.outputs.value }}
+      version: ${{steps.version.outputs.version }}
 
     steps:
       - name: Checkout
@@ -52,8 +52,8 @@ jobs:
       - name: Semver Version
         id: version
         run: |
-          id=$(echo ${{steps.current.outputs.value}} | cut -dv -f2)
-          echo "::set-output name=id::$id"
+          version=$(echo ${{steps.current.outputs.value}} | cut -dv -f2)
+          echo "::set-output name=version::$version"
 
   output:
       name: Output Info
