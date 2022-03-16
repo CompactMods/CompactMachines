@@ -52,7 +52,7 @@ jobs:
       - name: Semver Version
         id: version
         run: |
-          version=$(echo ${{steps.current.outputs.value}} | cut -dv -f2)
+          version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
           echo "::set-output name=version::$version"
 
   output:
