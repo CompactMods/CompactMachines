@@ -119,6 +119,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+        
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
