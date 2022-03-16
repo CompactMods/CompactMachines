@@ -58,7 +58,7 @@ task getBuildInfo() {
     println("Nightly Build: ${nightlyVersion}")
 }
 
-version = isRelease ? semver : nightlyVersion
+version = isRelease ? "${semver}" : nightlyVersion
 group = "dev.compactmods"
 archivesBaseName = mod_id
 
