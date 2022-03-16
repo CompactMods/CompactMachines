@@ -54,3 +54,10 @@ jobs:
         run: |
           id=$(echo ${{steps.current.outputs.value}} | cut -d=v -f2)
           echo "::set-output name=id::$id"
+
+  output:
+      name: Output Info
+      runs-on: ubuntu-20.04
+      needs: [ info ]
+      steps:
+        - run: echo "${{needs.info.outputs.mod_id}} version ${{needs.info.outputs.version}}; releasing as ${{needs.info.outputs.release_type}}"
