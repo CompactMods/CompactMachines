@@ -70,7 +70,7 @@
   "tooltip.compactmachines.details.psd": "Used as in-game documentation and to enter Compact Machines.",
   "tooltip.compactmachines.details.solid_wall": "Warning! Unbreakable for non-creative players!",
   "tooltip.compactmachines.hint.hold_shift": "Hold shift for details.",
-  "tooltip.compactmachines.machine.id": "Machine ID: %s",
+  "tooltip.compactmachines.machine.id": "Machine #%s (%s)",
   "tooltip.compactmachines.machine.owner": "Owner: %s",
   "tooltip.compactmachines.machine.size": "Internal Size: %1$sx%1$sx%1$s",
   "tooltip.compactmachines.tunnel_type": "Type ID: %1$s",

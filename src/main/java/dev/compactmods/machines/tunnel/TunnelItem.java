@@ -61,6 +61,13 @@ public class TunnelItem extends Item {
         defTag.putString("id", definition.getRegistryName().toString());
     }
 
+    @Nonnull
+    public static ItemStack createStack(TunnelDefinition definition) {
+        var stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+        setTunnelType(stack, definition);
+        return stack;
+    }
+
     @Override
     public Component getName(ItemStack stack) {
         String key = getDefinition(stack)
