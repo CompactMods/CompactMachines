@@ -5,16 +5,20 @@ on: workflow_dispatch
 
 jobs:
   vars:
-    name: Get Variables
+    name: Gather Variables
     runs-on: ubuntu-20.04
     outputs:
       release_type: ${{steps.cf_release_type.outputs.value }}
       cf_project: ${{steps.cf_project.outputs.value }}
-      mod_version: ${{steps.mod_version.outputs.value }}
       mod_id: ${{steps.mod_id.outputs.value }}
+      version: ${{steps.version.outputs.version }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
 
       - name: Release Type
         id: cf_release_type
@@ -30,19 +34,27 @@ jobs:
           path: './gradle.properties'
           property: 'cf_project'
 
-      - name: Mod Version
-        id: mod_version
-        uses: christian-draeger/read-properties@1.0.1
-        with:
-          path: './gradle.properties'
-          property: 'mod_version'
-
       - name: Mod ID
         id: mod_id
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: './gradle.properties'
           property: 'mod_id'
+
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+
+      - name: Semver Version
+        id: version
+        run: |
+          version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
+          echo "::set-output name=version::$version"
 
   changelog:
     name: Generate Changelog (tags)
@@ -116,8 +128,25 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Publish package
-        run: ./gradlew build -x test
+      - name: Create datagen assets
+        continue-on-error: true
+        run: ./gradlew runData
+
+      - name: Test JAR with GameTest Server
+        run: ./gradlew runGameTestServer
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-data
+          path: run/gametest
+
+      - name: Build JAR
+        run: ./gradlew build
         env:
           CM_RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -128,8 +157,8 @@ jobs:
         with:
           name: libs
           path: |
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}-api.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
 
   view:
     name: View Changelog Output
@@ -171,12 +200,12 @@ jobs:
           prerelease: false
           files: |
             changelog/CHANGELOG.md
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}-api.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
+            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
 
       - name: Full File
         id: filename
-        run: echo "::set-output name=fullpath::build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.mod_version }}.jar"
+        run: echo "::set-output name=fullpath::build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar"
 
       - name: Create CurseForge Release
         uses: itsmeow/curseforge-upload@master
@@ -204,8 +233,15 @@ jobs:
           distribution: 'temurin'
           java-version: "17"
 
-      - name: Build JAR with Gradle
-        run: ./gradlew build --max-workers 1
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Generate Resources
+        run: ./gradlew runData
+
+      - name: Publish gradle nightly jar
+        run: ./gradlew publishReleasePublicationToGitHubPackagesRepository
         env:
+          CM_RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
