@@ -135,9 +135,13 @@ jobs:
       - name: Create datagen assets
         continue-on-error: true
         run: ./gradlew runData
-
+        timeout-minutes: 10
+        env:
+          CM_RELEASE: true
+          
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
+        timeout-minutes: 20
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -151,6 +155,7 @@ jobs:
 
       - name: Build JAR
         run: ./gradlew build
+        timeout-minutes: 10
         env:
           CM_RELEASE: true
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
