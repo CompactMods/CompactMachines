@@ -9,9 +9,10 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
@@ -46,7 +47,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .save(consumer);
 
         TunnelRecipeBuilder.tunnel(Tunnels.ITEM_TUNNEL_DEF.get(), 2)
-                .requires(Tags.Items.CHESTS)
+                .requires(Ingredient.of(Tags.Items.CHESTS))
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
                 .requires(Items.OBSERVER)
@@ -81,7 +82,7 @@ public class RecipeGenerator extends RecipeProvider {
         registerMachineRecipe(consumer, Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get(), Tags.Items.STORAGE_BLOCKS_EMERALD);
     }
 
-    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ItemLike out, Tag<Item> center) {
+    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ItemLike out, TagKey<Item> center) {
         Item wall = Registration.ITEM_BREAKABLE_WALL.get();
         ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(out)
                 .pattern("WWW");

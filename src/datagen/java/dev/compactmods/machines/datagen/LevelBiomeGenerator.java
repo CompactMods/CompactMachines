@@ -8,7 +8,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -24,13 +26,13 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class LevelBiomeGenerator implements DataProvider {
@@ -87,16 +89,17 @@ public class LevelBiomeGenerator implements DataProvider {
     }
 
     private void writeDimensions(HashMap<ResourceLocation, Biome> biomes, HashMap<ResourceLocation, DimensionType> dimTypes, BiConsumer<LevelStem, ResourceLocation> consumer) {
-        var struct = new StructureSettings(false);
-        struct.structureConfig().clear();
 
-        var flatSettings = new FlatLevelGeneratorSettings(struct, BuiltinRegistries.BIOME);
+        RegistryAccess.Frozen reg = RegistryAccess.BUILTIN.get();
+        final var ssreg = reg.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
 
-        flatSettings.setBiome(() -> biomes.get(COMPACT_BIOME));
+        var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), BuiltinRegistries.BIOME);
+
+        flatSettings.setBiome(Holder.direct(biomes.get(COMPACT_BIOME)));
         flatSettings.getLayersInfo().add(new FlatLayerInfo(1, Blocks.AIR));
         flatSettings.updateLayers();
 
-        var stem = new LevelStem(() -> dimTypes.get(COMPACT_LEVEL), new FlatLevelSource(flatSettings));
+        var stem = new LevelStem(Holder.direct(dimTypes.get(COMPACT_LEVEL)), new FlatLevelSource(ssreg, flatSettings));
         consumer.accept(stem, COMPACT_LEVEL);
     }
 
