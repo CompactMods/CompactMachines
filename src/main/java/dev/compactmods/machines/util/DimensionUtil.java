@@ -1,17 +1,12 @@
 package dev.compactmods.machines.util;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.Executor;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.Lifecycle;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Registration;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryReadOps;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -28,6 +23,12 @@ import net.minecraft.world.level.storage.WorldData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Executor;
 
 public class DimensionUtil {
 
@@ -50,7 +51,7 @@ public class DimensionUtil {
         var cmDimType = reg.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY)
                 .get(Registration.COMPACT_DIMENSION_DIM_TYPE);
 
-        var ops = RegistryReadOps.create(JsonOps.INSTANCE, serverResources, reg);
+        var ops = RegistryOps.create(JsonOps.INSTANCE, reg);
 
         var resourceAccess = RegistryResourceAccess.forResourceManager(serverResources);
         var dims = resourceAccess.listResources(Registry.DIMENSION_REGISTRY);
@@ -80,7 +81,7 @@ public class DimensionUtil {
             // then instantiate level, add border listener, add to map, fire world load event
 
             // register the actual dimension
-            worldGenSettings.dimensions().register(dimensionKey, stem, Lifecycle.experimental());
+            worldGenSettings.dimensions().register(reg.registryOrThrow(Registry.LEVEL_STEM_REGISTRY), dimensionKey, stem);
 
             // create the world instance
             final ServerLevel newWorld = new ServerLevel(
@@ -89,7 +90,7 @@ public class DimensionUtil {
                     anvilConverter,
                     derivedLevelData,
                     Registration.COMPACT_DIMENSION,
-                    cmDimType,
+                    Holder.direct(cmDimType),
                     chunkProgressListener,
                     stem.generator(),
                     worldGenSettings.isDebug(),

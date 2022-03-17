@@ -1,9 +1,12 @@
 package dev.compactmods.machines.datagen;
 
-import java.util.OptionalLong;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.DimensionType;
+
+import java.util.OptionalLong;
 
 /**
  * Used for building dimension types, since Mojang hasn't provided one.
@@ -24,7 +27,7 @@ public class DimensionTypeBuilder {
     private int minY = 0;
     private int height = 256;
     private int logicalHeight = 256;
-    private ResourceLocation infiniburn = BlockTags.INFINIBURN_OVERWORLD.getName();
+    private TagKey<Block> infiniburn = BlockTags.INFINIBURN_OVERWORLD;
     private ResourceLocation effectsLocation = DimensionType.OVERWORLD_EFFECTS;
     private float ambientLight = 0;
 
@@ -104,7 +107,7 @@ public class DimensionTypeBuilder {
         return this;
     }
 
-    public DimensionTypeBuilder infiniburn(ResourceLocation infiburn) {
+    public DimensionTypeBuilder infiniburn(TagKey<Block> infiburn) {
         this.infiniburn = infiburn;
         return this;
     }

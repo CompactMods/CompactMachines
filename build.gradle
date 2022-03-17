@@ -275,33 +275,33 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
     // The One Probe
-    implementation(fg.deobf("curse.maven:theoneprobe-245211:3550084"))
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
 //    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
     // Nicephore - Screenshots and Stuff
-    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3574658"))
+    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3651214"))
 
     // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
     runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
 
-    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
-    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
-    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
-    runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3687357"))
-    runtimeOnly(fg.deobf("curse.maven:create-328085:3687358"))
-    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
-
-    // Scalable Cat's Force, BdLib, Advanced Generators
-    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
-    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
-    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
-
-    // Immersive Eng - 7.1.0-145 (Dec 31)
-    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
+//    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
+//    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
+//    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
+//    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
+//    runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3687357"))
+//    runtimeOnly(fg.deobf("curse.maven:create-328085:3687358"))
+//    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
+//    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
+//    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+//
+//    // Scalable Cat's Force, BdLib, Advanced Generators
+//    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
+//    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
+//    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
+//
+//    // Immersive Eng - 7.1.0-145 (Dec 31)
+//    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
 
     // Mekanism + Mek Generators - Tunnel testing
 //    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))

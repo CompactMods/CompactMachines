@@ -12,8 +12,6 @@ import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
@@ -41,10 +39,6 @@ public class TunnelRecipeBuilder {
 
     public static TunnelRecipeBuilder tunnel(TunnelDefinition definition, int count) {
         return new TunnelRecipeBuilder(definition, count);
-    }
-
-    public TunnelRecipeBuilder requires(Tag<Item> itemTag) {
-        return this.requires(Ingredient.of(itemTag));
     }
 
     public TunnelRecipeBuilder requires(ItemLike item) {

@@ -30,14 +30,11 @@ public class Tunnels {
 
     // region Setup
 
-    @SuppressWarnings("unchecked")
     public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
 
-    @SuppressWarnings("unchecked")
     public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry("tunnel_types",
             () -> new RegistryBuilder<TunnelDefinition>()
-                    .setType((Class) TunnelDefinition.class)
-                    .tagFolder("tunnel_types"));
+                    .setType(TunnelDefinition.class));
 
     public static void init(IEventBus bus) {
         DEFINITIONS.register(bus);
