@@ -5,6 +5,7 @@ import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.core.Registration;
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;
@@ -81,8 +82,15 @@ public class DimensionUtil {
             // then instantiate level, add border listener, add to map, fire world load event
 
             // register the actual dimension
-            worldGenSettings.dimensions().register(reg.registryOrThrow(Registry.LEVEL_STEM_REGISTRY), dimensionKey, stem);
-
+            if(worldGenSettings.dimensions() instanceof MappedRegistry<LevelStem> stems) {
+                stems.unfreeze();
+                Registry.register(stems, dimensionKey, stem);
+                stems.freeze();
+            } else {
+                CompactMachines.LOGGER.fatal("Failed to re-register compact machines dimension; registry was not the expected class type.");
+                return;
+            }
+            
             // create the world instance
             final ServerLevel newWorld = new ServerLevel(
                     server,
