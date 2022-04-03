@@ -7,6 +7,7 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import mcjty.theoneprobe.api.*;
@@ -67,6 +68,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
             machine.getInternalChunkPos().ifPresent(room -> {
                 try {
+                    final var roomData = CompactRoomData.get(server);
                     final var tunnels = RoomTunnelData.get(server, room);
                     final var graph = tunnels.getGraph();
 
@@ -90,9 +92,9 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                             final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
                             applied.forEach(tn -> {
                                 final var tg = tgg.horizontal(new LayoutStyle()
-                                    .alignment(ElementAlignment.ALIGN_CENTER)
-                                    .hPadding(2).vPadding(2)
-                                    .spacing(0));
+                                        .alignment(ElementAlignment.ALIGN_CENTER)
+                                        .hPadding(2).vPadding(2)
+                                        .spacing(0));
 
                                 ItemStack item = TunnelItem.createStack(tn);
                                 tg.item(item, new ItemStyle().bounds(8, 8));
@@ -100,6 +102,13 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                             });
                             break;
                     }
+
+                    final var rd = roomData.forRoom(room);
+                    rd.ifPresent(r -> {
+//                        final var el = new RoomPreviewElement(new RoomPreview(room, r.getSize()));
+//                        el.loadBlocks(server, r);
+//                        info.element(el);
+                    });
                 } catch (MissingDimensionException e) {
                     CompactMachines.LOGGER.fatal(e);
                 }

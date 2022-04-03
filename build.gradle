@@ -259,7 +259,11 @@ repositories {
 
     // TheOneProbe
     maven {
-        name 'tterrag maven'
+        url "https://maven.k-4u.nl"
+    }
+
+    maven {
+        name "tterrag maven"
         url "https://maven.tterrag.com/"
     }
 }
@@ -276,14 +280,18 @@ dependencies {
 
     // The One Probe
     implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
-//    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
-//    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
+//    compileOnly fg.deobf("mcjty.theoneprobe:theoneprobe:${top_version}:api")
+//    runtimeOnly fg.deobf("mcjty.theoneprobe:theoneprobe:${top_version}") {
+//        transitive = false
+//    }
 
     // Nicephore - Screenshots and Stuff
     runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3651214"))
 
     // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
     runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
+
+    implementation fg.deobf("com.jozufozu.flywheel:Flywheel-Forge:${flywheel_version}")
 
 //    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
 //    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))

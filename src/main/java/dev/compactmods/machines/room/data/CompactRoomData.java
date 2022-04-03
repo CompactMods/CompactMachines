@@ -112,6 +112,13 @@ public class CompactRoomData extends SavedData {
         setDirty();
     }
 
+    public Optional<RoomData> forRoom(ChunkPos room) {
+        if(roomData.containsKey(room))
+            return Optional.ofNullable(roomData.get(room));
+
+        return Optional.empty();
+    }
+
     public Stream<RoomData> streamRooms() {
         return roomData.values().stream();
     }
@@ -146,7 +153,7 @@ public class CompactRoomData extends SavedData {
         if (!roomData.containsKey(roomChunk))
             throw new NonexistentRoomException(roomChunk);
 
-        return roomData.get(roomChunk).getMachineBounds();
+        return roomData.get(roomChunk).getRoomBounds();
     }
 
     public NewRoomRegistration createNew() {
@@ -269,7 +276,7 @@ public class CompactRoomData extends SavedData {
             this.spawn = newSpawn;
         }
 
-        public AABB getMachineBounds() {
+        public AABB getRoomBounds() {
             return size.getBounds(this.center);
         }
     }
