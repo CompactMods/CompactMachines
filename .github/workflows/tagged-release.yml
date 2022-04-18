@@ -133,9 +133,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Create datagen assets
-        continue-on-error: true
         run: ./gradlew runData
-        timeout-minutes: 10
+        timeout-minutes: 15
         env:
           CM_RELEASE: true
           
