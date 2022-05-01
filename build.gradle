@@ -63,7 +63,6 @@ group = "dev.compactmods"
 archivesBaseName = mod_id
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 sourceSets {
     api {
         java {
@@ -143,7 +142,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            args '--username', 'Dev##'
+            args '--username', 'Dev'
             args '--width', 1920
             args '--height', 1080
 
