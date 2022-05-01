@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -39,6 +41,17 @@ public class CompactMachineItem extends BlockItem {
         }
 
         return Optional.empty();
+    }
+
+    public static Item getItemBySize(RoomSize size) {
+        return switch (size) {
+            case TINY -> Registration.MACHINE_BLOCK_ITEM_TINY.get();
+            case SMALL -> Registration.MACHINE_BLOCK_ITEM_SMALL.get();
+            case NORMAL -> Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
+            case LARGE -> Registration.MACHINE_BLOCK_ITEM_LARGE.get();
+            case GIANT -> Registration.MACHINE_BLOCK_ITEM_GIANT.get();
+            case MAXIMUM -> Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
+        };
     }
 
     @Override

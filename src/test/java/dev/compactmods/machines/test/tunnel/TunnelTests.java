@@ -186,7 +186,7 @@ public class TunnelTests {
                 .relative(dir, 2);
 
         playerInRoom.getCapability(Capabilities.ROOM_HISTORY).ifPresent(rooms -> {
-            var d = new DimensionalPosition(Level.OVERWORLD, test.absolutePos(machineBlock));
+            var d = new LevelBlockPosition(Level.OVERWORLD, test.absolutePos(machineBlock));
             rooms.addHistory(new PlayerRoomHistoryItem(d, machine));
         });
 

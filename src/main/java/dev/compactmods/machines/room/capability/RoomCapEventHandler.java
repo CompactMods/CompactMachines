@@ -22,21 +22,4 @@ public class RoomCapEventHandler {
                 new ResourceLocation(CompactMachines.MOD_ID, "room_history"),
                 new PlayerRoomHistoryCapProvider(player));
     }
-
-    @SubscribeEvent
-    static void onCapChunkAttach(final AttachCapabilitiesEvent<LevelChunk> evt) {
-        var chunk = evt.getObject();
-
-        // do not attach room data to client levels
-        if(chunk.getLevel().isClientSide)
-            return;
-
-        // only add room data to compact world chunks
-        if(chunk.getLevel().dimension() != Registration.COMPACT_DIMENSION)
-            return;
-
-        boolean isRoom = chunk.getPos().x % 64 == 0 && chunk.getPos().z % 64 == 0;
-        if(isRoom)
-            evt.addCapability(new ResourceLocation(CompactMachines.MOD_ID, "room_info"), new RoomChunkDataProvider(chunk));
-    }
 }

@@ -17,6 +17,7 @@ public interface MachineRoomConnections {
     void registerRoom(ChunkPos roomChunk);
 
     void connectMachineToRoom(int machine, ChunkPos room);
+    void changeMachineLink(int machine, ChunkPos newRoom);
 
     void disconnect(int machine);
 

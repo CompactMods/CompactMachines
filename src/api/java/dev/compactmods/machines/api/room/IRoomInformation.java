@@ -5,11 +5,11 @@ import net.minecraft.world.level.ChunkPos;
 
 import javax.annotation.Nonnull;
 
-public interface IMachineRoom {
+public interface IRoomInformation {
 
     @Nonnull
-    ChunkPos getChunk();
+    ChunkPos chunk();
 
     @Nonnull
-    ServerLevel getLevel();
+    ServerLevel level();
 }

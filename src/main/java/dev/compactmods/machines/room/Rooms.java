@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import javax.naming.OperationNotSupportedException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,7 +91,7 @@ public class Rooms {
         // clear tunnel connection info
         final var tunnels = RoomTunnelData.getFile(server, room);
         final var filename = RoomTunnelData.getDataFilename(room);
-        if(!tunnels.delete()) {
+        if (!tunnels.delete()) {
             CompactMachines.LOGGER.warn("Could not delete tunnel data for room {}; clearing the connection graph as an alternative.", room);
             CompactMachines.LOGGER.warn("Data file to delete: {}", filename);
 
@@ -119,7 +120,7 @@ public class Rooms {
             var location = d.getMachineLocation(mid);
             location.ifPresent(p -> {
                 var pos = p.getBlockPosition();
-                var l = p.level(server).orElseThrow();
+                var l = p.level(server);
                 if (l.getBlockEntity(pos) instanceof TunnelWallEntity tunn) {
                     tunn.disconnect();
                 }
@@ -133,10 +134,15 @@ public class Rooms {
     public static Stream<Integer> getConnectedMachines(MinecraftServer server, ChunkPos room) {
         try {
             var conns = MachineToRoomConnections.get(server);
-            var d = CompactMachineData.get(server);
             return conns.getMachinesFor(room).stream();
         } catch (MissingDimensionException e) {
             return Stream.empty();
         }
+    }
+
+    public static RoomSize sizeOf(MinecraftServer server, ChunkPos room) throws MissingDimensionException, NonexistentRoomException {
+        return CompactRoomData.get(server)
+                .getData(room)
+                .getSize();
     }
 }

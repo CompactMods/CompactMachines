@@ -1,6 +1,7 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
@@ -69,7 +70,8 @@ public class TunnelProvider implements IProbeInfoProvider {
 
             try {
                 // If connected block isn't air, show a connected block line
-                connectedTo.state(level.getServer()).ifPresent(state -> {
+                if(connectedTo instanceof IDimensionalBlockPosition dbp) {
+                    final var state = dbp.state(level.getServer());
                     if (!state.isAir()) {
                         String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
                         HitResult trace = new BlockHitResult(
@@ -84,8 +86,7 @@ public class TunnelProvider implements IProbeInfoProvider {
                                 .item(pick)
                                 .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
                     }
-                });
-
+                }
             } catch (Exception ex) {
                 // no-op: we don't want to spam the log here
             }

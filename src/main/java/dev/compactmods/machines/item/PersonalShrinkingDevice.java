@@ -74,7 +74,7 @@ public class PersonalShrinkingDevice extends Item {
                         // Use internal data to set new spawn point
                         intern.setSpawn(machineChunk, player.position());
 
-                        MutableComponent tc = TranslationUtil.message(Messages.MACHINE_SPAWNPOINT_SET)
+                        MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
                                 .withStyle(ChatFormatting.GREEN);
 
                         player.displayClientMessage(tc, true);

@@ -2,9 +2,10 @@ package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.api.room.IMachineRoom;
+import dev.compactmods.machines.api.room.IRoomInformation;
+import dev.compactmods.machines.api.room.MachineRoomConnections;
 import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
@@ -37,7 +38,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     protected String schema;
     protected boolean locked = false;
     private ChunkPos roomChunk;
-    private LazyOptional<IMachineRoom> room = LazyOptional.empty();
+    private LazyOptional<IRoomInformation> room = LazyOptional.empty();
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
@@ -81,7 +82,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
     }
 
     @Nullable
-    private IMachineRoom getRoom() {
+    private IRoomInformation getRoom() {
         if (level instanceof ServerLevel sl) {
             return getInternalChunkPos().map(c -> {
                 final var compact = sl.getServer().getLevel(Registration.COMPACT_DIMENSION);
@@ -169,9 +170,12 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             if (serv == null)
                 return Optional.empty();
 
-            var connections = MachineToRoomConnections.get(serv);
-            if (connections == null)
+            MachineRoomConnections connections;
+            try {
+                connections = MachineToRoomConnections.get(serv);
+            } catch (MissingDimensionException e) {
                 return Optional.empty();
+            }
 
             var chunk = connections.getConnectedRoom(this.machineId);
             chunk.ifPresent(c -> this.roomChunk = c);
@@ -206,9 +210,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
 
     public void setMachineId(int id) {
         this.machineId = id;
-        this.room.invalidate();
-        this.roomChunk = null;
-        this.setChanged();
+        this.updateMapping();
     }
 
     public boolean hasPlayersInside() {
@@ -225,7 +227,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         if (serv == null)
             return;
 
-        DimensionalPosition dp = new DimensionalPosition(
+        LevelBlockPosition dp = new LevelBlockPosition(
                 this.level.dimension(),
                 this.worldPosition
         );
@@ -244,13 +246,16 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         return getInternalChunkPos().isPresent();
     }
 
-    public Optional<DimensionalPosition> getSpawn() {
+    public Optional<LevelBlockPosition> getSpawn() {
         if (level instanceof ServerLevel serverWorld) {
             MinecraftServer serv = serverWorld.getServer();
 
-            var connections = MachineToRoomConnections.get(serv);
-            if (connections == null)
+            MachineRoomConnections connections = null;
+            try {
+                connections = MachineToRoomConnections.get(serv);
+            } catch (MissingDimensionException e) {
                 return Optional.empty();
+            }
 
             Optional<ChunkPos> connectedRoom = connections.getConnectedRoom(machineId);
 
@@ -269,5 +274,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
         }
 
         return Optional.empty();
+    }
+
+    public void updateMapping() {
+        this.room.invalidate();
+        this.roomChunk = null;
+        this.setChanged();
     }
 }

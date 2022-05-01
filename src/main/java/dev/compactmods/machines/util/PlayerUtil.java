@@ -5,7 +5,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -13,8 +13,8 @@ import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.capability.IRoomHistory;
-import dev.compactmods.machines.room.history.IRoomHistoryItem;
+import dev.compactmods.machines.api.room.IRoomHistory;
+import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -68,7 +68,7 @@ public abstract class PlayerUtil {
         }
 
         serv.submitAsync(() -> {
-            DimensionalPosition spawn = tile.getSpawn().orElse(null);
+            LevelBlockPosition spawn = tile.getSpawn().orElse(null);
             if (spawn == null) {
                 CompactMachines.LOGGER.error("Machine " + tile.machineId + " could not load spawn info.");
                 return;
@@ -81,9 +81,8 @@ public abstract class PlayerUtil {
                 CompactMachines.LOGGER.error(ex);
             }
 
-            Vec3 sp = spawn.getPosition();
-            Vec3 sr = spawn.getRotation() != Vec3.ZERO ?
-                    spawn.getRotation() : new Vec3(player.xRotO, player.yRotO, 0);
+            Vec3 sp = spawn.getExactPosition();
+            Vec3 sr = spawn.getRotation().orElse(new Vec3(player.xRotO, player.yRotO, 0));
 
             if (player instanceof ServerPlayer servPlayer) {
                 servPlayer.teleportTo(
@@ -117,20 +116,15 @@ public abstract class PlayerUtil {
             if (hist.hasHistory()) {
                 final IRoomHistoryItem prevArea = hist.pop();
 
-                DimensionalPosition spawnPoint = prevArea.getEntryLocation();
+                var spawnPoint = prevArea.getEntryLocation();
 
-                ServerLevel w = spawnPoint.level(serv).orElse(serv.overworld());
+                final var level = spawnPoint.level(serv);
+
                 Vec3 worldPos, entryRot;
+                worldPos = spawnPoint.getExactPosition();
+                entryRot = spawnPoint.getRotation().orElse(Vec3.ZERO);
 
-                if (serv.getLevel(spawnPoint.getDimension()) != null) {
-                    worldPos = spawnPoint.getPosition();
-                    entryRot = spawnPoint.getRotation();
-
-                    serverPlayer.teleportTo(w, worldPos.x(), worldPos.y(), worldPos.z(), (float) entryRot.y, (float) entryRot.x);
-                } else {
-                    hist.clear();
-                    teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-                }
+                serverPlayer.teleportTo(level, worldPos.x(), worldPos.y(), worldPos.z(), (float) entryRot.y, (float) entryRot.x);
             } else {
                 howDidYouGetThere(serverPlayer);
 
@@ -179,7 +173,7 @@ public abstract class PlayerUtil {
 
             player.getCapability(Capabilities.ROOM_HISTORY)
                     .ifPresent(hist -> {
-                        DimensionalPosition pos = DimensionalPosition.fromEntity(player);
+                        LevelBlockPosition pos = LevelBlockPosition.fromEntity(player);
                         hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
                     });
 

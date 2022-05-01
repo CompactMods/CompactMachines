@@ -3,9 +3,9 @@ package dev.compactmods.machines.compat.jei;
 import java.util.Arrays;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.JeiInfo;
-import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.machine.CompactMachineItem;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import mezz.jei.api.IModPlugin;
@@ -27,7 +27,7 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         Arrays.stream(RoomSize.values())
-                .map(CompactMachineBlock::getItemBySize)
+                .map(CompactMachineItem::getItemBySize)
                 .forEach(i -> registration.addIngredientInfo(
                         new ItemStack(i),
                         VanillaTypes.ITEM,

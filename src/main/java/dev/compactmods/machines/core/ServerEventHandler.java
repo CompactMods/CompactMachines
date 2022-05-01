@@ -2,7 +2,7 @@ package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.command.CMCommandRoot;
-import dev.compactmods.machines.command.CMDataCommand;
+import dev.compactmods.machines.command.data.CMDataCommand;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -35,23 +35,21 @@ public class CMPacketTargets {
         if (level instanceof ServerLevel serverWorld) {
             MinecraftServer server = serverWorld.getServer();
 
-            var connections = MachineToRoomConnections.get(server);
             try {
+                final var connections = MachineToRoomConnections.get(server);
                 final var machines = CompactMachineData.get(server);
 
                 var linked = connections.getMachinesFor(roomChunk.getPos());
 
                 for (int machine : linked) {
                     machines.getMachineLocation(machine).ifPresent(loc -> {
-                        Optional<ServerLevel> machineWorld = loc.level(server);
+                        final var machineWorld = loc.level(server);
                         BlockPos machineWorldLocation = loc.getBlockPosition();
                         ChunkPos machineWorldChunk = new ChunkPos(machineWorldLocation);
 
-                        machineWorld.ifPresent(mw -> {
-                            mw.getChunkSource().chunkMap.getPlayers(machineWorldChunk, false).forEach(player -> {
-                                if (!trackingPlayersGlobal.containsKey(player.getUUID()))
-                                    trackingPlayersGlobal.put(player.getUUID(), player.connection);
-                            });
+                        machineWorld.getChunkSource().chunkMap.getPlayers(machineWorldChunk, false).forEach(player -> {
+                            if (!trackingPlayersGlobal.containsKey(player.getUUID()))
+                                trackingPlayersGlobal.put(player.getUUID(), player.connection);
                         });
                     });
                 }

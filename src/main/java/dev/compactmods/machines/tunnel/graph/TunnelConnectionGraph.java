@@ -11,6 +11,7 @@ import dev.compactmods.machines.graph.CompactGraphs;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
+import dev.compactmods.machines.machine.graph.MachineLinkEdge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -514,5 +515,24 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
 
     public Stream<Integer> getMachines() {
         return this.machines.keySet().stream();
+    }
+
+    public Stream<BlockPos> getConnections(int machineId) {
+        if (!machines.containsKey(machineId))
+            return Stream.empty();
+
+        final var mNode = machines.get(machineId);
+        return graph.incidentEdges(mNode).stream()
+                .filter(e -> graph.edgeValue(e).orElseThrow() instanceof MachineLinkEdge)
+                .map(edge -> {
+                    if (edge.nodeU() instanceof TunnelNode cmn) return cmn;
+                    if (edge.nodeV() instanceof TunnelNode cmn2) return cmn2;
+                    return null;
+                }).filter(Objects::nonNull).map(TunnelNode::position);
+
+    }
+
+    public boolean hasAnyConnectedTo(int machineId) {
+        return getConnections(machineId).findAny().isPresent();
     }
 }

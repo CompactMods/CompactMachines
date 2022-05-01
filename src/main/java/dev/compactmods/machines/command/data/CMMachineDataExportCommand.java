@@ -1,9 +1,9 @@
-package dev.compactmods.machines.command;
+package dev.compactmods.machines.command.data;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -31,10 +31,11 @@ public class CMMachineDataExportCommand {
         var src = ctx.getSource();
         var serv = src.getServer();
 
-        final var connections = MachineToRoomConnections.get(serv);
         final CompactMachineData machines;
+        final MachineRoomConnections connections;
         try {
             machines = CompactMachineData.get(serv);
+            connections = MachineToRoomConnections.get(serv);
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.fatal(e);
             return -1;
@@ -56,7 +57,7 @@ public class CMMachineDataExportCommand {
             writer.close();
         } catch (IOException e) {
             CompactMachines.LOGGER.error(e);
-            src.sendFailure(TranslationUtil.message(Messages.FAILED_CMD_FILE_ERROR));
+            src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
             return -1;
         }
 

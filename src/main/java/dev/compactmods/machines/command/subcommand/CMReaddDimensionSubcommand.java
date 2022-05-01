@@ -1,4 +1,4 @@
-package dev.compactmods.machines.command;
+package dev.compactmods.machines.command.subcommand;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,11 +11,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
-public class ReaddDimensionCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> register() {
+public class CMReaddDimensionSubcommand {
+    public static ArgumentBuilder<CommandSourceStack, ?> make() {
         return Commands.literal("registerdim")
                 .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .executes(ReaddDimensionCommand::exec);
+                .executes(CMReaddDimensionSubcommand::exec);
     }
 
     private static int exec(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -24,11 +24,11 @@ public class ReaddDimensionCommand {
 
         var compactLevel = serv.getLevel(Registration.COMPACT_DIMENSION);
         if (compactLevel == null) {
-            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND).withStyle(ChatFormatting.RED), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
 
             DimensionUtil.createAndRegisterWorldAndDimension(serv);
         } else {
-            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         }
 
         return 0;

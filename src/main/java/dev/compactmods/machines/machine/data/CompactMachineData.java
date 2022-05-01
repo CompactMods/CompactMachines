@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.codec.NbtListCollector;
-import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import net.minecraft.nbt.CompoundTag;
@@ -92,7 +92,7 @@ public class CompactMachineData extends SavedData {
         return nbt;
     }
 
-    public void setMachineLocation(int machineId, DimensionalPosition position) {
+    public void setMachineLocation(int machineId, LevelBlockPosition position) {
         // TODO - Packet/Event for machine changing external location (tunnels)
         if (data.containsKey(machineId)) {
             data.get(machineId).setLocation(position);
@@ -135,19 +135,28 @@ public class CompactMachineData extends SavedData {
     }
 
     public int getNextMachineId() {
-        return data.size() + 2;
+        // TODO - Optimize for gaps, in-memory during data loading process
+        int i = 1;
+        while (true) {
+            if(data.containsKey(i)){
+                i++;
+                continue;
+            }
+
+            return i;
+        }
     }
 
     public static class MachineData {
         private final int machineId;
-        public DimensionalPosition location;
+        public LevelBlockPosition location;
 
         public static final Codec<MachineData> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("machine").forGetter(MachineData::getMachineId),
-                DimensionalPosition.CODEC.fieldOf("location").forGetter(MachineData::getLocation)
+                LevelBlockPosition.CODEC.fieldOf("location").forGetter(MachineData::getLocation)
         ).apply(i, MachineData::new));
 
-        public MachineData(int machineId, DimensionalPosition location) {
+        public MachineData(int machineId, LevelBlockPosition location) {
             this.machineId = machineId;
             this.location = location;
         }
@@ -156,11 +165,11 @@ public class CompactMachineData extends SavedData {
             return this.machineId;
         }
 
-        public DimensionalPosition getLocation() {
+        public LevelBlockPosition getLocation() {
             return this.location;
         }
 
-        public void setLocation(DimensionalPosition position) {
+        public void setLocation(LevelBlockPosition position) {
             this.location = position;
         }
     }

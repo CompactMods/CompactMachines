@@ -90,10 +90,10 @@ public class CompactMachineConnectionGraph {
 
     public void connectMachineToRoom(int machine, ChunkPos room) {
         if(!machines.containsKey(machine))
-            return;
+            addMachine(machine);
 
         if(!rooms.containsKey(room))
-            return;
+            addRoom(room);
 
         CompactMachineNode machineNode = machines.get(machine);
         CompactMachineRoomNode roomNode = rooms.get(room);
@@ -146,6 +146,16 @@ public class CompactMachineConnectionGraph {
 
         graph.removeNode(rooms.get(room));
         rooms.remove(room);
+    }
+
+    public void disconnect(int machine) {
+        if(!machines.containsKey(machine))
+            return;
+
+        final var node = machines.get(machine);
+        graph.successors(node).stream()
+                .filter(cn -> cn instanceof CompactMachineRoomNode)
+                .forEach(room -> graph.removeEdge(node, room));
     }
 
     /**

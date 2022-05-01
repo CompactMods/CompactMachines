@@ -1,4 +1,4 @@
-package dev.compactmods.machines.command;
+package dev.compactmods.machines.command.subcommand;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,7 +16,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
 public class CMSummarySubcommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> register() {
+    public static ArgumentBuilder<CommandSourceStack, ?> make() {
         return Commands.literal("summary")
                 .requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
                 .executes(CMSummarySubcommand::exec);
@@ -28,9 +28,9 @@ public class CMSummarySubcommand {
 
         var compactLevel = serv.getLevel(Registration.COMPACT_DIMENSION);
         if (compactLevel != null) {
-            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         } else {
-            src.sendSuccess(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND).withStyle(ChatFormatting.RED), false);
+            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
         }
 
         try {
@@ -40,7 +40,7 @@ public class CMSummarySubcommand {
             src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_COUNT, numRegistered), false);
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.fatal(e);
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND));
+            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
         }
 
         try {
@@ -50,7 +50,7 @@ public class CMSummarySubcommand {
             src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, numRegistered), false);
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.fatal(e);
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.CMD_DIM_NOT_FOUND));
+            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
         }
 
         return 0;

@@ -2,7 +2,7 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.api.room.IMachineRoom;
+import dev.compactmods.machines.api.room.IRoomInformation;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
@@ -35,7 +35,7 @@ public class TunnelWallEntity extends BlockEntity {
     private int connectedMachine;
     private TunnelDefinition tunnelType;
 
-    private LazyOptional<IMachineRoom> ROOM = LazyOptional.empty();
+    private LazyOptional<IRoomInformation> ROOM = LazyOptional.empty();
 
     @Nullable
     private TunnelInstance tunnel;

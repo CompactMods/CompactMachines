@@ -2,25 +2,20 @@ package dev.compactmods.machines.room.history;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
+import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
+import dev.compactmods.machines.core.LevelBlockPosition;
 
-public class PlayerRoomHistoryItem implements IRoomHistoryItem {
+public record PlayerRoomHistoryItem(LevelBlockPosition entry, int machine) implements IRoomHistoryItem {
 
-    private final DimensionalPosition entry;
-    private final int machine;
-
-    public static final Codec<IRoomHistoryItem> CODEC = RecordCodecBuilder.create(i -> i.group(
-            DimensionalPosition.CODEC.fieldOf("position").forGetter(IRoomHistoryItem::getEntryLocation),
+    public static final Codec<PlayerRoomHistoryItem> CODEC = RecordCodecBuilder.create(i -> i.group(
+            LevelBlockPosition.CODEC.fieldOf("position").forGetter(PlayerRoomHistoryItem::entry),
             Codec.INT.fieldOf("machine").forGetter(IRoomHistoryItem::getMachine)
     ).apply(i, PlayerRoomHistoryItem::new));
 
-    public PlayerRoomHistoryItem(DimensionalPosition entry, int machine) {
-        this.entry = entry;
-        this.machine = machine;
-    }
-
     @Override
-    public DimensionalPosition getEntryLocation() {
+    public IDimensionalPosition getEntryLocation() {
         return entry;
     }
 

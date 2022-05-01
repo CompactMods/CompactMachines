@@ -2,6 +2,7 @@ package dev.compactmods.machines.machine.data;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
+import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.graph.CompactMachineConnectionGraph;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -27,11 +28,12 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
         graph = new CompactMachineConnectionGraph();
     }
 
-    public static MachineRoomConnections get(MinecraftServer server) {
+    @Nonnull
+    public static MachineRoomConnections get(MinecraftServer server) throws MissingDimensionException {
         ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
         if (compactWorld == null) {
             CompactMachines.LOGGER.error("No compact dimension found. Report this.");
-            return null;
+            throw new MissingDimensionException();
         }
 
         DimensionDataStorage sd = compactWorld.getDataStorage();
@@ -119,6 +121,13 @@ public class MachineToRoomConnections extends SavedData implements MachineRoomCo
     @Override
     public void connectMachineToRoom(int machine, ChunkPos room) {
         graph.connectMachineToRoom(machine, room);
+        setDirty();
+    }
+
+    @Override
+    public void changeMachineLink(int machine, ChunkPos newRoom) {
+        graph.disconnect(machine);
+        graph.connectMachineToRoom(machine, newRoom);
         setDirty();
     }
 

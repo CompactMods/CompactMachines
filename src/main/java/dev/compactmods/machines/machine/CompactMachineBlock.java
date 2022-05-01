@@ -18,7 +18,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -121,17 +120,6 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             case MAXIMUM -> Registration.MACHINE_BLOCK_MAXIMUM.get();
         };
 
-    }
-
-    public static Item getItemBySize(RoomSize size) {
-        return switch (size) {
-            case TINY -> Registration.MACHINE_BLOCK_ITEM_TINY.get();
-            case SMALL -> Registration.MACHINE_BLOCK_ITEM_SMALL.get();
-            case NORMAL -> Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
-            case LARGE -> Registration.MACHINE_BLOCK_ITEM_LARGE.get();
-            case GIANT -> Registration.MACHINE_BLOCK_ITEM_GIANT.get();
-            case MAXIMUM -> Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
-        };
     }
 
     @Override

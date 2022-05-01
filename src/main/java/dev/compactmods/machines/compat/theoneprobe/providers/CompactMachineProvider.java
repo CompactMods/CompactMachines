@@ -2,17 +2,22 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.styles.ItemStyle;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -44,6 +49,17 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                         .withStyle(ChatFormatting.GREEN);
 
                 info.text(id);
+
+                try {
+                    Machines.getConnectedRoom(server, machine.machineId).ifPresent(roomInfo -> {
+                        final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, roomInfo.chunk());
+                        info.text(boundTo);
+                    });
+                } catch (MissingDimensionException e) {
+                    e.printStackTrace();
+                } catch (NonexistentRoomException e) {
+                    e.printStackTrace();
+                }
             } else {
                 MutableComponent newMachine = TranslationUtil
                         .message(new ResourceLocation(CompactMachines.MOD_ID, "new_machine"))

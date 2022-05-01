@@ -7,7 +7,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.DimensionalPosition;
+import dev.compactmods.machines.core.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
@@ -117,12 +117,12 @@ public class CompactRoomData extends SavedData {
     }
 
     @Nullable
-    public DimensionalPosition getSpawn(ChunkPos roomChunk) {
+    public LevelBlockPosition getSpawn(ChunkPos roomChunk) {
         RoomData roomData = this.roomData.get(roomChunk);
         if (roomData == null)
             return null;
 
-        return new DimensionalPosition(
+        return new LevelBlockPosition(
                 Registration.COMPACT_DIMENSION,
                 roomData.getSpawn()
         );
@@ -160,6 +160,13 @@ public class CompactRoomData extends SavedData {
     public void remove(ChunkPos room) {
         roomData.remove(room);
         setDirty();
+    }
+
+    public RoomData getData(ChunkPos room) throws NonexistentRoomException {
+        if(!roomData.containsKey(room))
+            throw new NonexistentRoomException(room);
+
+        return roomData.get(room);
     }
 
     public static class NewRoomRegistration {

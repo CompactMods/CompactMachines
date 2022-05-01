@@ -6,13 +6,14 @@ import java.util.Optional;
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.codec.NbtListCollector;
+import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 
-public class CMRoomHistory implements IRoomHistory {
+public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem> {
 
-    private final Deque<IRoomHistoryItem> history;
+    private final Deque<PlayerRoomHistoryItem> history;
 
     public CMRoomHistory() {
         history = new ArrayDeque<>(10);
@@ -29,17 +30,17 @@ public class CMRoomHistory implements IRoomHistory {
     }
 
     @Override
-    public IRoomHistoryItem peek() {
+    public PlayerRoomHistoryItem peek() {
         return history.peekLast();
     }
 
     @Override
-    public IRoomHistoryItem pop() {
+    public PlayerRoomHistoryItem pop() {
         return history.removeLast();
     }
 
     @Override
-    public void addHistory(IRoomHistoryItem item) {
+    public void addHistory(PlayerRoomHistoryItem item) {
         history.add(item);
     }
 
