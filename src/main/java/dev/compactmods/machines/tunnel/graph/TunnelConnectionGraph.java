@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
-import dev.compactmods.machines.codec.NbtListCollector;
+import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.graph.CompactGraphs;
 import dev.compactmods.machines.graph.IGraphEdge;

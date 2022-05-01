@@ -5,7 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.codec.NbtListCollector;
+import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.core.DimensionalPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;

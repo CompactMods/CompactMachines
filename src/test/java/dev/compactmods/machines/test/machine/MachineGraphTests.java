@@ -2,7 +2,7 @@ package dev.compactmods.machines.test.machine;
 
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.graph.CompactMachineConnectionGraph;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.test.TestBatches;

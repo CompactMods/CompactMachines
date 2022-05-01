@@ -1,4 +1,4 @@
-package dev.compactmods.machines.codec;
+package dev.compactmods.machines.api.codec;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.Tag;

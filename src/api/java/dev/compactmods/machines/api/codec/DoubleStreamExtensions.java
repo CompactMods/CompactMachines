@@ -1,4 +1,4 @@
-package dev.compactmods.machines.codec;
+package dev.compactmods.machines.api.codec;
 
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;

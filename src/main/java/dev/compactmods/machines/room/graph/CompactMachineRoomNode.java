@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.graph.IGraphNode;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
