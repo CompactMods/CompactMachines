@@ -65,19 +65,11 @@ archivesBaseName = mod_id
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 sourceSets {
     api {
-        java {
-            srcDir "src/api/java"
-        }
-
         resources.srcDirs = []
         compileClasspath += configurations.getByName("minecraft")
     }
 
     datagen {
-        java {
-            srcDir "src/datagen/java"
-        }
-
         compileClasspath += configurations.getByName("minecraft")
         compileClasspath += sourceSets.api.output
         runtimeClasspath += sourceSets.api.output
@@ -86,10 +78,6 @@ sourceSets {
     }
 
     tunnels {
-        java {
-            srcDir("src/main/tunnels")
-        }
-
         compileClasspath += configurations.getByName("minecraft")
         compileClasspath += sourceSets.api.output
         runtimeClasspath += sourceSets.api.output
