@@ -50,11 +50,19 @@ public abstract class TranslationUtil {
         return new TranslatableComponent(Util.makeDescriptionId("jei", jei));
     }
 
+    public static String commandId(ResourceLocation s) {
+        return Util.makeDescriptionId("command", s);
+    }
+
     public static TranslatableComponent command(ResourceLocation s) {
-        return new TranslatableComponent(Util.makeDescriptionId("command", s));
+        return new TranslatableComponent(commandId(s));
     }
 
     public static TranslatableComponent command(ResourceLocation s, Object... params) {
-        return new TranslatableComponent(Util.makeDescriptionId("command", s), params);
+        return new TranslatableComponent(commandId(s), params);
+    }
+
+    public static String tunnelId(ResourceLocation id) {
+        return "item." + id.getNamespace() + ".tunnels." + id.getPath().replace('/', '.');
     }
 }

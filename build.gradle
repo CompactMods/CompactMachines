@@ -316,6 +316,10 @@ processTestResources {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
+compileDatagenJava {
+    options.encoding = 'UTF-8'
+}
+
 jar {
     from sourceSets.tunnels.output
     from sourceSets.main.output

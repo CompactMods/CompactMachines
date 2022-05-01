@@ -13,8 +13,8 @@ import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.network.NetworkHandler;
 import dev.compactmods.machines.network.TunnelAddedPacket;
-import dev.compactmods.machines.room.capability.IRoomHistory;
-import dev.compactmods.machines.room.history.IRoomHistoryItem;
+import dev.compactmods.machines.api.room.IRoomHistory;
+import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
@@ -73,7 +73,7 @@ public class TunnelItem extends Item {
         String key = getDefinition(stack)
                 .map(def -> {
                     ResourceLocation id = def.getRegistryName();
-                    return "item." + id.getNamespace() + ".tunnels." + id.getPath().replace('/', '.');
+                    return TranslationUtil.tunnelId(id);
                 })
                 .orElse("item." + CompactMachines.MOD_ID + ".tunnels.unnamed");
 

@@ -5,11 +5,14 @@ import net.minecraft.resources.ResourceLocation;
 public abstract class Tooltips {
 
     public static final ResourceLocation UNKNOWN_PLAYER_NAME = new ResourceLocation(Constants.MOD_ID, "unknown_player");
+    public static final ResourceLocation TUNNEL_TYPE = new ResourceLocation(Constants.MOD_ID, "tunnel_type");
+    public static final ResourceLocation UNKNOWN_TUNNEL_TYPE = new ResourceLocation(Constants.MOD_ID, "unknown_tunnel_type");
 
     public static abstract class Machines {
         public static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "machine.id");
         public static final ResourceLocation OWNER = new ResourceLocation(Constants.MOD_ID, "machine.owner");
         public static final ResourceLocation SIZE = new ResourceLocation(Constants.MOD_ID, "machine.size");
+        public static final ResourceLocation BOUND_TO = new ResourceLocation(Constants.MOD_ID, "machine.bound_to");
     }
 
     //#region Hints and Details
