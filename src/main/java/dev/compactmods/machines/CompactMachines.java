@@ -5,6 +5,7 @@ import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.core.UIRegistration;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -37,6 +38,7 @@ public class CompactMachines {
         // Register blocks and items
         var eb = FMLJavaModLoadingContext.get().getModEventBus();
         Registration.init(eb);
+        UIRegistration.init(eb);
         Tunnels.init(eb);
 
         ModLoadingContext mlCtx = ModLoadingContext.get();

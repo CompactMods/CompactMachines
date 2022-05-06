@@ -246,7 +246,11 @@ repositories {
 
     // TheOneProbe
     maven {
-        name 'tterrag maven'
+        url "https://maven.k-4u.nl"
+    }
+
+    maven {
+        name "tterrag maven"
         url "https://maven.tterrag.com/"
     }
 }

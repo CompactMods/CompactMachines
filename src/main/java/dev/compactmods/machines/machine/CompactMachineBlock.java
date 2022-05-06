@@ -8,12 +8,14 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.ui.CompactMachineRoomMenu;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,6 +30,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -173,10 +176,11 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
-        // TODO - Open GUI with machine preview
         ItemStack mainItem = player.getMainHandItem();
-        if (mainItem.isEmpty())
-            return InteractionResult.PASS;
+        if (mainItem.isEmpty()) {
+            NetworkHooks.openGui((ServerPlayer) player, CompactMachineRoomMenu.makeProvider(pos, player), pos);
+            return InteractionResult.SUCCESS;
+        }
 
         // TODO - Item tags instead of direct item reference here
         if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
