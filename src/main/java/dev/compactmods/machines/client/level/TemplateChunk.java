@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.FluidState;
 
 import javax.annotation.Nonnull;
@@ -24,25 +25,23 @@ public class TemplateChunk extends EmptyLevelChunk {
     private final Map<BlockPos, BlockEntity> tiles;
     private final Predicate<BlockPos> shouldShow;
 
-    public TemplateChunk(Level worldIn, ChunkPos chunkPos, Map<BlockPos, BlockState> blocksInChunk, Predicate<BlockPos> shouldShow) {
+    public TemplateChunk(Level worldIn, ChunkPos chunkPos, Map<BlockPos, StructureTemplate.StructureBlockInfo> blocksInChunk, Predicate<BlockPos> shouldShow) {
         super(worldIn, chunkPos, worldIn.getUncachedNoiseBiome(0, 0, 0));
         this.shouldShow = shouldShow;
         this.blocksInChunk = new HashMap<>();
+
         tiles = new HashMap<>();
         for (var pos : blocksInChunk.keySet()) {
-            final var state = blocksInChunk.get(pos);
-            this.blocksInChunk.put(pos, state);
+            final var blockInfo = blocksInChunk.get(pos);
+            this.blocksInChunk.put(pos, blockInfo.state);
 
-            // TODO - Block Entities
-//            if(info.nbt!=null)
-//            {
-//                BlockEntity tile = BlockEntity.loadStatic(info.pos, info.state, info.nbt);
-//                if(tile!=null)
-//                {
-//                    tile.setLevel(worldIn);
-//                    tiles.put(info.pos, tile);
-//                }
-//            }
+            if(blockInfo.nbt != null) {
+                BlockEntity tile = BlockEntity.loadStatic(blockInfo.pos, blockInfo.state, blockInfo.nbt);
+                if (tile != null) {
+                    tile.setLevel(worldIn);
+                    tiles.put(blockInfo.pos, tile);
+                }
+            }
         }
     }
 
@@ -70,6 +69,7 @@ public class TemplateChunk extends EmptyLevelChunk {
     public BlockEntity getBlockEntity(@Nonnull BlockPos pos, @Nonnull EntityCreationType creationMode) {
         if (!shouldShow.test(pos))
             return null;
+
         return tiles.get(pos);
     }
 }

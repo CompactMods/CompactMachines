@@ -11,8 +11,8 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.CompactMachineData;
-import dev.compactmods.machines.network.NetworkHandler;
-import dev.compactmods.machines.network.TunnelAddedPacket;
+import dev.compactmods.machines.core.CompactMachinesNet;
+import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.tunnel.data.RoomTunnelData;
@@ -230,7 +230,7 @@ public class TunnelItem extends Item {
             twe.setTunnelType(def);
             twe.setConnectedTo(hist.getMachine());
 
-            NetworkHandler.MAIN_CHANNEL.send(
+            CompactMachinesNet.CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(position)),
                     new TunnelAddedPacket(position, def));
         }

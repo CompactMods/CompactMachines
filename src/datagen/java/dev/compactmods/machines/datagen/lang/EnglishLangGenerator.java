@@ -35,7 +35,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
         addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
         addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s does not have an associated ID.");
-        addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered machine blocks: %s");
+        addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered rooms: %s");
+        addCommand(CMCommands.MACHINE_REG_COUNT, "Number of registered machines: %s");
         addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
         addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
         addCommand(CMCommands.CMD_ROOM_NOT_REGISTERED, "");
@@ -72,7 +73,13 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.TUNNEL_TYPE, "Type ID: %1$s");
         addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");
 
+        addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
+        addCommand(CMCommands.CANNOT_GIVE_MACHINE, "Failed to give a new machine to player.");
+        addCommand(CMCommands.MACHINE_GIVEN, "Created a new machine item and gave it to %s.");
+
         add("itemGroup." + CompactMachines.MOD_ID, "Compact Machines");
+
+        add("biome." + CompactMachines.MOD_ID + ".machine", "Compact Machine");
 
         add("compactmachines.psd.pages.machines.title", "Compact Machines");
         add("compactmachines.psd.pages.machines", "Compact Machines are the core mechanic of this mod. They allow you to build large " +

@@ -22,6 +22,7 @@ import dev.compactmods.machines.tunnel.data.RoomTunnelData;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
@@ -29,6 +30,16 @@ import net.minecraftforge.common.util.LazyOptional;
 import java.util.Optional;
 
 public class Machines {
+    /**
+     * Registers a new machine ID and connects it to an existing room.
+     *
+     * @param server
+     * @param level
+     * @param machinePos
+     * @param tile
+     * @param room
+     * @return
+     */
     public static boolean createAndLink(MinecraftServer server, Level level, BlockPos machinePos, CompactMachineBlockEntity tile, ChunkPos room) {
         try {
             int nextId = createNew(server, level, machinePos);
@@ -64,13 +75,16 @@ public class Machines {
 
     public static boolean destroy(MinecraftServer server, int machine) {
         MachineRoomConnections connections;
+        CompactMachineData machineData;
         try {
+            machineData = CompactMachineData.get(server);
             connections = MachineToRoomConnections.get(server);
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.error("Could not load world saved data while creating new machine and room.", e);
             return false;
         }
 
+        machineData.remove(machine);
         connections.getConnectedRoom(machine).ifPresent(room -> {
             try {
                 var tunnels = RoomTunnelData.get(server, room);
@@ -153,5 +167,17 @@ public class Machines {
         final RoomSize size = Rooms.sizeOf(server, cp);
 
         return Optional.of(new RoomInformation(compactLevel, cp, size));
+    }
+
+    public static ItemStack createBoundItem(MinecraftServer server, ChunkPos roomPos) throws MissingDimensionException, NonexistentRoomException {
+        final var newSize = Rooms.sizeOf(server, roomPos);
+        final var data = CompactMachineData.get(server);
+        final int newMach = data.getNextMachineId();
+
+        final var item = CompactMachineItem.getItemBySize(newSize);
+        ItemStack stack = new ItemStack(item);
+        CompactMachineItem.setRoom(stack, roomPos);
+
+        return stack;
     }
 }

@@ -32,7 +32,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     @SuppressWarnings("unused")
     protected String getDirectionTranslation(Direction dir) {
-        return dir.getSerializedName();
+        return capitalize(dir.getSerializedName());
     }
 
     protected String getMachineTranslation() {
@@ -48,7 +48,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
         // Direction Names
         for (var dir : Direction.values()) {
-            add(CompactMachines.MOD_ID + ".direction." + dir.name(), getDirectionTranslation(dir));
+            add(CompactMachines.MOD_ID + ".direction." + dir.getSerializedName(), getDirectionTranslation(dir));
         }
     }
 
@@ -98,6 +98,10 @@ public abstract class BaseLangGenerator extends LanguageProvider {
                 .description("Which machine is the player in?!");
 
         advancement(Advancements.ROOT).title("Compact Machines").noDesc();
+
+        advancement(Advancements.RECURSIVE_ROOMS)
+                .title("Recursive Rooms")
+                .description("To understand recursion, you must first understand recursion.");
     }
 
     protected AdvancementLangBuilder advancement(ResourceLocation advancement) {

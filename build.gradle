@@ -184,8 +184,6 @@ minecraft {
             args '--all'
             args '--output', file('src/generated/resources/')
 
-            forceExit false
-
             mods {
                 compactmachines {
                     source sourceSets.tunnels
@@ -271,10 +269,7 @@ dependencies {
 //    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
     // Nicephore - Screenshots and Stuff
-    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3651214"))
-
-    // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
-    runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
+    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
 
 //    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
 //    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
@@ -294,9 +289,15 @@ dependencies {
 //    // Immersive Eng - 7.1.0-145 (Dec 31)
 //    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
 
+    // FTB Chunks
+    runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
+    runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
+    runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
+    runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
+
     // Mekanism + Mek Generators - Tunnel testing
-//    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))
-//    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3206395"))
+    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3743835"))
+    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3743837"))
 }
 
 processResources {

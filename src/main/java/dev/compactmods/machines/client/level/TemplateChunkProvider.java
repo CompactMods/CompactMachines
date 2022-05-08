@@ -5,16 +5,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.lighting.LevelLightEngine;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
@@ -29,21 +31,33 @@ public class TemplateChunkProvider extends ChunkSource {
     private final Level world;
     private final LevelLightEngine lightManager;
 
-    public TemplateChunkProvider(Map<BlockPos, BlockState> blocks, Level world, Predicate<BlockPos> shouldShow)
-    {
+    public TemplateChunkProvider(List<StructureTemplate.StructureBlockInfo> blocks, RenderingLevel world, Predicate<BlockPos> shouldShow) {
         this.world = world;
         this.lightManager = new LevelLightEngine(this, true, true);
-        Map<ChunkPos, Map<BlockPos, BlockState>> byChunk = new HashMap<>();
+
+        HashMap<BlockPos, StructureTemplate.StructureBlockInfo> blockInfo = new HashMap<>();
+        blocks.forEach(sbi -> {
+            blockInfo.put(sbi.pos, sbi);
+        });
+
+        chunks = loadChunkData(blockInfo, world, shouldShow);
+    }
+
+    @NotNull
+    private Map<ChunkPos, ChunkAccess> loadChunkData(Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks, Level world, Predicate<BlockPos> shouldShow) {
+        Map<ChunkPos, Map<BlockPos, StructureTemplate.StructureBlockInfo>> byChunk = new HashMap<>();
         for(var info : blocks.entrySet())
         {
             final var bc = byChunk.computeIfAbsent(new ChunkPos(info.getKey()), $ -> new HashMap<>());
             bc.put(info.getKey(), info.getValue());
         }
 
-        chunks = byChunk.entrySet().stream()
+        return byChunk.entrySet().stream()
                 .map(e -> Pair.of(e.getKey(), new TemplateChunk(world, e.getKey(), e.getValue(), shouldShow)))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
+
+
 
     @Nullable
     @Override

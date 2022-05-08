@@ -1,15 +1,19 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.CompactMachineData;
 import dev.compactmods.machines.room.RoomSize;
-import dev.compactmods.machines.ui.CompactMachineRoomMenu;
+import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.util.PlayerUtil;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -22,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -130,12 +135,10 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         Block given = getBySize(this.size);
         ItemStack stack = new ItemStack(given, 1);
 
-        CompoundTag nbt = stack.getOrCreateTag();
-        // nbt.putString("size", this.size.getName());
-
-        CompactMachineBlockEntity tileEntity = (CompactMachineBlockEntity) world.getBlockEntity(pos);
-        if (tileEntity != null && tileEntity.mapped()) {
-            nbt.putInt(MachineNbt.ID, tileEntity.machineId);
+        if (world.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+            tile.getInternalChunkPos().ifPresent(room -> {
+                CompactMachineItem.setRoom(stack, room);
+            });
         }
 
         return stack;
@@ -161,6 +164,12 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             if (nbt == null)
                 return;
 
+            // Machine was previously bound to a room - make a new binding post-place
+            CompactMachineItem.getRoom(stack).ifPresent(room -> {
+                Machines.createAndLink(worldIn.getServer(), worldIn, pos, tile, room);
+            });
+
+            // TODO: Remove pre-4.3.0 code
             if (nbt.contains(MachineNbt.ID)) {
                 int machineID = nbt.getInt(MachineNbt.ID);
                 tile.setMachineId(machineID);
@@ -176,16 +185,47 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
+        MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
-        if (mainItem.isEmpty()) {
-            NetworkHooks.openGui((ServerPlayer) player, CompactMachineRoomMenu.makeProvider(pos, player), pos);
-            return InteractionResult.SUCCESS;
+
+        if (mainItem.isEmpty() && level.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
+            if(machine.mapped()) {
+                if (state.getBlock() instanceof CompactMachineBlock cmBlock) {
+                    machine.getInternalChunkPos().ifPresent(room -> {
+                        var size = cmBlock.getSize();
+                        NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, machine.machineId, room), (buf) -> {
+                            buf.writeBlockPos(pos);
+                            buf.writeInt(machine.machineId);
+                            buf.writeChunkPos(room);
+                        });
+                    });
+                }
+
+                return InteractionResult.SUCCESS;
+            }
         }
 
         // TODO - Item tags instead of direct item reference here
         if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
             // Try teleport to compact machine dimension
-            PlayerUtil.teleportPlayerIntoMachine(level, player, pos, size);
+            try {
+                if(level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+                    if (!tile.mapped()) {
+                        ChunkPos newRoomPos;
+                        try {
+                            newRoomPos = Rooms.createNew(server, size, player.getUUID());
+                            Machines.createAndLink(server, level, pos, tile, newRoomPos);
+                        } catch (MissingDimensionException e) {
+                            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
+                            throw e;
+                        }
+                    }
+
+                    PlayerUtil.teleportPlayerIntoMachine(level, player, pos);
+                }
+            } catch (MissingDimensionException e) {
+                player.sendMessage(TranslationUtil.message(Messages.UNREGISTERED_CM_DIM), Util.NIL_UUID);
+            }
         }
 
         return InteractionResult.SUCCESS;

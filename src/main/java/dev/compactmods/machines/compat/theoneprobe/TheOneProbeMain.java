@@ -1,6 +1,5 @@
 package dev.compactmods.machines.compat.theoneprobe;
 
-import dev.compactmods.machines.compat.theoneprobe.element.RoomPreviewElementFactory;
 import dev.compactmods.machines.compat.theoneprobe.providers.CompactMachineProvider;
 import dev.compactmods.machines.compat.theoneprobe.providers.TunnelProvider;
 import mcjty.theoneprobe.api.ITheOneProbe;
@@ -16,7 +15,6 @@ public class TheOneProbeMain implements Function<Object, Void> {
         PROBE.registerProvider(new CompactMachineProvider());
         PROBE.registerProvider(new TunnelProvider());
 
-        PROBE.registerElementFactory(new RoomPreviewElementFactory());
         return null;
     }
 

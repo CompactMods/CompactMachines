@@ -33,21 +33,13 @@ public class RenderingLevel extends Level {
 
     private final TemplateChunkProvider chunkProvider;
 
-    public RenderingLevel(Map<BlockPos, BlockState> blocks) {
-        super(new FakeSpawnInfo(), Level.OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD),
-                () -> InactiveProfiler.INSTANCE, true, false, 0);
-        this.chunkProvider = new TemplateChunkProvider(blocks, this, (p) -> true);
-    }
-
     public RenderingLevel(StructureTemplate blocks) {
         super(new FakeSpawnInfo(), Level.OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD),
                 () -> InactiveProfiler.INSTANCE, true, false, 0);
 
         StructurePlaceSettings s = new StructurePlaceSettings();
         var p = s.getRandomPalette(blocks.palettes, null);
-        HashMap<BlockPos, BlockState> states = new HashMap<>();
-        p.blocks().forEach(sbi -> states.put(sbi.pos, sbi.state));
-        this.chunkProvider = new TemplateChunkProvider(states, this, (po) -> true);
+        this.chunkProvider = new TemplateChunkProvider(p.blocks(), this, (po) -> true);
     }
 
     @Override

@@ -29,4 +29,7 @@ public class CMCommands {
     public static final ResourceLocation WRONG_DIMENSION = new ResourceLocation(MOD_ID, "not_in_compact_dimension");
     public static final ResourceLocation NOT_IN_COMPACT_DIMENSION = new ResourceLocation(MOD_ID, "not_in_compact_dim");
     public static final ResourceLocation FAILED_CMD_FILE_ERROR = new ResourceLocation(MOD_ID, "failed_command_file_error");
+
+    public static final ResourceLocation CANNOT_GIVE_MACHINE = new ResourceLocation(MOD_ID, "cannot_give_machine_item");
+    public static final ResourceLocation MACHINE_GIVEN = new ResourceLocation(MOD_ID, "machine_given_successfully");
 }

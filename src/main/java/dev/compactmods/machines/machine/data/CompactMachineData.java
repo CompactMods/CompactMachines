@@ -20,9 +20,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -30,21 +28,23 @@ import java.util.stream.Stream;
  *
  * @deprecated This data should move to the connection graph or to the machine blocks, to be removed in 1.19
  */
-@Deprecated(forRemoval = true, since = "4.0.7")
+@Deprecated(since = "4.0.7")
 public class CompactMachineData extends SavedData {
 
     /**
      * File storage name.
      */
     public final static String DATA_NAME = CompactMachines.MOD_ID + "_machines";
+    private static final String AVAIL_IDS = "available_ids";
+    private static final String MACH_LOCATIONS = "locations";
 
     /**
      * Specifies locations of machine blocks, ie in the overworld.
      * This is used for things like tunnel handling and forced ejections.
      */
     private final Map<Integer, MachineData> data = new HashMap<>();
+    private final List<Integer> availableIds = new ArrayList<>();
     private final Map<Integer, LazyOptional<IDimensionalPosition>> locations = new HashMap<>();
-
 
     @Nonnull
     public static CompactMachineData get(MinecraftServer server) throws MissingDimensionException {
@@ -60,13 +60,19 @@ public class CompactMachineData extends SavedData {
 
     public static CompactMachineData fromNbt(CompoundTag nbt) {
         CompactMachineData machines = new CompactMachineData();
-        if (nbt.contains("locations")) {
-            ListTag nbtLocations = nbt.getList("locations", Tag.TAG_COMPOUND);
+
+        if (nbt.contains(MACH_LOCATIONS)) {
+            ListTag nbtLocations = nbt.getList(MACH_LOCATIONS, Tag.TAG_COMPOUND);
             nbtLocations.forEach(nbtLoc -> {
                 DataResult<MachineData> res = MachineData.CODEC.parse(NbtOps.INSTANCE, nbtLoc);
                 res.resultOrPartial(err -> CompactMachines.LOGGER.error("Error while processing machine data: " + err))
                         .ifPresent(machineInfo -> machines.data.put(machineInfo.machineId, machineInfo));
             });
+        }
+
+        if(nbt.contains(AVAIL_IDS)) {
+            for (int avail : nbt.getIntArray(AVAIL_IDS))
+                machines.availableIds.add(avail);
         }
 
         return machines;
@@ -86,14 +92,19 @@ public class CompactMachineData extends SavedData {
                     .map(Optional::get)
                     .collect(NbtListCollector.toNbtList());
 
-            nbt.put("locations", nbtLocations);
+            nbt.put(MACH_LOCATIONS, nbtLocations);
         }
 
+        nbt.putIntArray(AVAIL_IDS, availableIds.stream().toList());
         return nbt;
     }
 
     public void setMachineLocation(int machineId, LevelBlockPosition position) {
         // TODO - Packet/Event for machine changing external location (tunnels)
+        if(availableIds.contains(machineId)) {
+            availableIds.remove(availableIds.indexOf(machineId));
+        }
+        
         if (data.containsKey(machineId)) {
             data.get(machineId).setLocation(position);
         } else {
@@ -127,6 +138,7 @@ public class CompactMachineData extends SavedData {
     public void remove(int id) {
         data.remove(id);
         locations.remove(id);
+        availableIds.add(id);
         setDirty();
     }
 
@@ -135,16 +147,11 @@ public class CompactMachineData extends SavedData {
     }
 
     public int getNextMachineId() {
-        // TODO - Optimize for gaps, in-memory during data loading process
-        int i = 1;
-        while (true) {
-            if(data.containsKey(i)){
-                i++;
-                continue;
-            }
-
-            return i;
+        if(!availableIds.isEmpty()) {
+            return availableIds.get(0);
         }
+
+        return data.size() + 1;
     }
 
     public static class MachineData {

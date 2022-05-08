@@ -1,6 +1,7 @@
 package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
@@ -18,6 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.Optional;
@@ -144,5 +146,32 @@ public class Rooms {
         return CompactRoomData.get(server)
                 .getData(room)
                 .getSize();
+    }
+
+    public static IDimensionalPosition getSpawn(MinecraftServer serv, ChunkPos room) throws MissingDimensionException {
+        return CompactRoomData.get(serv).getSpawn(room);
+    }
+
+    public static boolean exists(MinecraftServer server, ChunkPos room) {
+        try {
+            return CompactRoomData.get(server).isRegistered(room);
+        } catch (MissingDimensionException e) {
+            return false;
+        }
+    }
+
+    public static StructureTemplate getInternalBlocks(MinecraftServer server, ChunkPos room) throws MissingDimensionException, NonexistentRoomException {
+        final var tem = new StructureTemplate();
+
+        final var lev = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var data = CompactRoomData.get(server);
+        final var roomInfo = data.getData(room);
+
+        final var bounds = roomInfo.getRoomBounds();
+        final int inside = roomInfo.getSize().getInternalSize();
+        tem.fillFromWorld(lev, new BlockPos(bounds.minX, bounds.minY - 1, bounds.minZ),
+                new Vec3i(inside, inside + 1, inside), false, null);
+
+        return tem;
     }
 }

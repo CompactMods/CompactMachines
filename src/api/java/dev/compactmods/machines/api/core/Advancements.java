@@ -15,4 +15,6 @@ public class Advancements {
     public static final ResourceLocation CLAIMED_LARGE_MACHINE = new ResourceLocation(Constants.MOD_ID, "claimed_machine_large");
     public static final ResourceLocation CLAIMED_GIANT_MACHINE = new ResourceLocation(Constants.MOD_ID, "claimed_machine_giant");
     public static final ResourceLocation CLAIMED_MAX_MACHINE = new ResourceLocation(Constants.MOD_ID, "claimed_machine_max");
+
+    public static final ResourceLocation RECURSIVE_ROOMS = new ResourceLocation(Constants.MOD_ID, "recursion");
 }

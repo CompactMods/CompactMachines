@@ -5,6 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.command.argument.RoomCoordinates;
+import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
@@ -17,15 +19,17 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 
 public class CMRebindSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
-        final LiteralArgumentBuilder<CommandSourceStack> subRoot = LiteralArgumentBuilder.literal("rebind");
+        final var subRoot = Commands.literal("rebind")
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
-                .then(Commands.argument("bindTo", ColumnPosArgument.columnPos())
+                .then(Commands.argument("bindTo", RoomPositionArgument.room())
                 .executes(CMRebindSubcommand::doRebind)));
 
         return subRoot;
@@ -36,8 +40,9 @@ public class CMRebindSubcommand {
         final var level = ctx.getSource().getLevel();
 
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
-        final var roomPos = ColumnPosArgument.getColumnPos(ctx, "bindTo");
-        final var roomPos2 = new ChunkPos(roomPos.x, roomPos.z);
+        final var roomPos = RoomPositionArgument.get(ctx, "bindTo");
+
+        CompactMachines.LOGGER.debug("Binding machine at {} to room chunk {}", rebindingMachine, roomPos);
 
         if(!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machineData)) {
             CompactMachines.LOGGER.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
@@ -45,12 +50,16 @@ public class CMRebindSubcommand {
         }
 
         if(!machineData.mapped()) {
-            CompactMachines.LOGGER.error("Refusing to change binding for machine at {}; machine has no ID assigned yet. (Unmapped)", rebindingMachine);
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.MACHINE_NOT_BOUND, rebindingMachine.toShortString()));
+            var linked = Machines.createAndLink(server, level, rebindingMachine, machineData, roomPos);
+            if(!linked) {
+                CompactMachines.LOGGER.error("Failed to register and bind new machine.");
+                throw new CommandRuntimeException(TranslationUtil.command(new ResourceLocation(CompactMachines.MOD_ID, "failed_to_bind_new")));
+            }
+            return 1;
         }
 
         try {
-            Machines.changeLink(server, machineData.machineId, roomPos2);
+            Machines.changeLink(server, machineData.machineId, roomPos);
         } catch (MissingDimensionException e) {
             CompactMachines.LOGGER.error("Failed to rebind a machine to a different room: room data not found", e);
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.ROOM_DATA_NOT_FOUND));

@@ -31,6 +31,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class CompactMachineBlockEntity extends BlockEntity implements ICapabilityProvider {
+    private static final String ROOM_NBT = "room_pos";
+
     public int machineId = -1;
     public long nextSpawnTick = 0;
 
@@ -149,16 +151,20 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
 
     @Override
     public CompoundTag getUpdateTag() {
-        CompoundTag base = super.getUpdateTag();
-        base.putInt("machine", this.machineId);
+        CompoundTag data = super.getUpdateTag();
+        data.putInt("machine", this.machineId);
+
+        getInternalChunkPos().ifPresent(room -> {
+            data.putIntArray(ROOM_NBT, new int[] { room.x, room.z });
+        });
 
         if (level instanceof ServerLevel) {
             // TODO - Internal player list
             if (this.owner != null)
-                base.putUUID("owner", this.owner);
+                data.putUUID("owner", this.owner);
         }
 
-        return base;
+        return data;
     }
 
     public Optional<ChunkPos> getInternalChunkPos() {
@@ -182,6 +188,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             return chunk;
         }
 
+        if(roomChunk != null)
+            return Optional.of(roomChunk);
+
         return Optional.empty();
     }
 
@@ -194,6 +203,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             CompoundTag players = tag.getCompound("players");
             // playerData = CompactMachinePlayerData.fromNBT(players);
 
+        }
+
+        if(tag.contains(ROOM_NBT)) {
+            int[] room = tag.getIntArray(ROOM_NBT);
+            this.roomChunk = new ChunkPos(room[0], room[1]);
         }
 
         if (tag.contains("owner"))

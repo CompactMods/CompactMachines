@@ -215,6 +215,30 @@ public class TunnelConnectionGraph implements INBTSerializable<CompoundTag> {
                 .findFirst();
     }
 
+    public Optional<TunnelMachineInfo> getTunnelInfo(BlockPos tunnel) {
+        if(!tunnels.containsKey(tunnel))
+            return Optional.empty();
+
+        var node = tunnels.get(tunnel);
+        var typeNode = graph.successors(node).stream()
+                .filter(n -> n instanceof TunnelTypeNode)
+                .map(TunnelTypeNode.class::cast)
+                .findFirst()
+                .orElseThrow();
+
+        int mach = connectedMachine(tunnel).orElseThrow();
+        var side = getTunnelSide(tunnel).orElseThrow();
+        var type = typeNode.id();
+
+        return Optional.of(new TunnelMachineInfo(tunnel, type, mach, side));
+    }
+
+    public Stream<TunnelMachineInfo> tunnels() {
+        return tunnels.keySet().stream()
+                .map(this::getTunnelInfo)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
 
     public Stream<IGraphNode> nodes() {
         return graph.nodes().stream();
