@@ -9,6 +9,7 @@ public class ClientRoomNetworkHandler {
         final var mc = Minecraft.getInstance();
         if(mc.screen instanceof MachineRoomScreen mrs) {
             mrs.getMenu().setBlocks(blockData.blocks());
+            mrs.updateBlockRender();
         }
     }
 }

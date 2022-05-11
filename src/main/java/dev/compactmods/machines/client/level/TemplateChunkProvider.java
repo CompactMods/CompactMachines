@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Taken from Immersive Engineering's manual code.
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public class TemplateChunkProvider extends ChunkSource {
     private final Map<ChunkPos, ChunkAccess> chunks;
-    private final Level world;
+    private final RenderingLevel world;
     private final LevelLightEngine lightManager;
 
     public TemplateChunkProvider(List<StructureTemplate.StructureBlockInfo> blocks, RenderingLevel world, Predicate<BlockPos> shouldShow) {
@@ -44,7 +45,7 @@ public class TemplateChunkProvider extends ChunkSource {
     }
 
     @NotNull
-    private Map<ChunkPos, ChunkAccess> loadChunkData(Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks, Level world, Predicate<BlockPos> shouldShow) {
+    private Map<ChunkPos, ChunkAccess> loadChunkData(Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks, RenderingLevel world, Predicate<BlockPos> shouldShow) {
         Map<ChunkPos, Map<BlockPos, StructureTemplate.StructureBlockInfo>> byChunk = new HashMap<>();
         for(var info : blocks.entrySet())
         {
@@ -57,13 +58,18 @@ public class TemplateChunkProvider extends ChunkSource {
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
 
+    public Stream<ChunkAccess> chunks() {
+        return this.chunks.values().stream();
+    }
 
 
     @Nullable
     @Override
     public ChunkAccess getChunk(int chunkX, int chunkZ, @Nonnull ChunkStatus requiredStatus, boolean load)
     {
-        return chunks.computeIfAbsent(new ChunkPos(chunkX, chunkZ), p -> new EmptyLevelChunk(world, p, world.getUncachedNoiseBiome(0, 0, 0)));
+        return chunks.computeIfAbsent(new ChunkPos(chunkX, chunkZ), p -> {
+            return new EmptyLevelChunk(world, p, world.getUncachedNoiseBiome(0, 0, 0));
+        });
     }
 
     @Override

@@ -13,6 +13,8 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -37,9 +39,18 @@ public class RenderingLevel extends Level {
         super(new FakeSpawnInfo(), Level.OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD),
                 () -> InactiveProfiler.INSTANCE, true, false, 0);
 
-        StructurePlaceSettings s = new StructurePlaceSettings();
-        var p = s.getRandomPalette(blocks.palettes, null);
-        this.chunkProvider = new TemplateChunkProvider(p.blocks(), this, (po) -> true);
+        if(!blocks.palettes.isEmpty()) {
+            StructurePlaceSettings s = new StructurePlaceSettings();
+            var p = s.getRandomPalette(blocks.palettes, null);
+            this.chunkProvider = new TemplateChunkProvider(p.blocks(), this, (po) -> true);
+        } else {
+            this.chunkProvider = new TemplateChunkProvider(Collections.emptyList(), this, p -> true);
+        }
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return true;
     }
 
     @Override
@@ -152,5 +163,23 @@ public class RenderingLevel extends Level {
     @Override
     public int getBrightness(LightLayer p_45518_, BlockPos p_45519_) {
         return Level.MAX_BRIGHTNESS;
+    }
+
+    @Override
+    public long getGameTime() {
+        return Minecraft.getInstance().level.getGameTime();
+    }
+
+    public void tbe() {
+        tickBlockEntities();
+    }
+
+    @Override
+    protected void tickBlockEntities() {
+        super.tickBlockEntities();
+        chunkProvider.chunks()
+                .filter(ca -> ca instanceof TemplateChunk)
+                .map(TemplateChunk.class::cast)
+                .forEach(TemplateChunk::tick);
     }
 }

@@ -1,13 +1,16 @@
 package dev.compactmods.machines.room.client;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.client.gui.widget.PSDIconButton;
 import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
+import dev.compactmods.machines.client.render.SuperRenderTypeBuffer;
 import dev.compactmods.machines.client.util.TransformingVertexBuilder;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
@@ -16,12 +19,13 @@ import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.room.network.RoomNetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -30,12 +34,15 @@ import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 
+import java.util.Random;
+
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
     private final Inventory inv;
     protected double rotateX = 45.0f;
     protected double rotateY = 20.0f;
     private PSDIconButton psdButton;
+    private RenderingLevel renderer;
 
     public MachineRoomScreen(MachineRoomMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -46,6 +53,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
         // Send packet to server for block data
         RoomNetworkHandler.CHANNEL.sendToServer(new PlayerStartedRoomTrackingPacket(inv.player.getUUID(), menu.getRoom()));
+        updateBlockRender();
     }
 
     @Override
@@ -53,8 +61,13 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         super.init();
 
         this.psdButton = addRenderableWidget(new PSDIconButton(this, leftPos + 220, topPos + 210));
-        if(hasPsdItem())
+        if (hasPsdItem())
             this.psdButton.setEnabled(true);
+    }
+
+    public void updateBlockRender() {
+        var struct = menu.getBlocks();
+        this.renderer = new RenderingLevel(struct);
     }
 
     private boolean hasPsdItem() {
@@ -64,13 +77,14 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     @Override
     protected void containerTick() {
         super.containerTick();
-        psdButton.setEnabled(hasPsdItem());
+        psdButton.setEnabled(this.inv.player.isCreative() || hasPsdItem());
+        renderer.tbe();
     }
 
     @Override
     public boolean mouseDragged(double mx, double my, int mButton, double dx, double dy) {
         var s = super.mouseDragged(mx, my, mButton, dx, dy);
-        if(!s) return false;
+        if (!s) return false;
 
         rotateX += dx;
         rotateY += dy;
@@ -81,8 +95,8 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     protected void renderLabels(PoseStack pose, int mouseX, int mouseY) {
         pose.pushPose();
         pose.translate(0, 0, 500);
-        float mid =(this.imageWidth / 2f) - (font.width("Room Preview") / 2f);
-        this.font.draw(pose, new TextComponent("Room Preview"), mid, (float)this.titleLabelY, 0x00000000);
+        float mid = (this.imageWidth / 2f) - (font.width("Room Preview") / 2f);
+        this.font.draw(pose, new TextComponent("Room Preview"), mid, (float) this.titleLabelY, 0x00000000);
         pose.popPose();
     }
 
@@ -91,16 +105,30 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         this.renderBackground(pose);
         super.render(pose, mouseX, mouseY, partial);
 
-        final var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        var buffer = SuperRenderTypeBuffer.getInstance();
+
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        RenderSystem.backupProjectionMatrix();
+
+        // has to be outside of MS transforms, important for vertex sorting
+        Matrix4f matrix4f = new Matrix4f(RenderSystem.getProjectionMatrix());
+        matrix4f.multiplyWithTranslation(0, 0, 800);
+        RenderSystem.setProjectionMatrix(matrix4f);
+
         PoseStack.Pose lastEntryBeforeTry = pose.last();
+
+        var cam = minecraft.cameraEntity;
+
 
         try {
             pose.pushPose();
+            pose.translate(0, 0, -800);
 
             final var blockRenderer = Minecraft.getInstance().getBlockRenderer();
+            final var beRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher();
 
-            final var struct = menu.getBlocks();
-            final var renderer = new RenderingLevel(struct);
+            var struct = menu.getBlocks();
 
             pose.pushPose();
             {
@@ -123,14 +151,16 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                 pose.mulPose(Vector3f.XP.rotationDegrees((float) rotateY));
                 pose.mulPose(Vector3f.YP.rotationDegrees((float) rotateX));
 
-                final var tSize = menu.getBlocks().getSize();
+                final var tSize = struct.getSize();
                 final float s = tSize.getX() / 2f;
-                pose.translate(-s, -s+1, -s);
+                pose.translate(-s, -s + 1, -s);
 
                 final var transformer = new TransformingVertexBuilder(buffer, RenderTypes.TRANSLUCENT_FULLBRIGHT);
 
                 var bb = struct.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO);
 
+                var as = new ArmorStand(renderer, 0, 0, 0);
+                minecraft.cameraEntity = as;
 
                 BlockPos.betweenClosedStream(bb).forEach(pos -> {
                     pose.pushPose();
@@ -140,29 +170,49 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                         final var state = renderer.getBlockState(pos);
                         transformer.setOverlay(OverlayTexture.NO_OVERLAY);
 
+
+
                         IModelData modelData = EmptyModelData.INSTANCE;
-                        if(state.hasBlockEntity()) {
+                        if (state.hasBlockEntity()) {
                             final var be = renderer.getBlockEntity(pos);
-                            if(be != null)
+                            if (be != null) {
                                 modelData = be.getModelData();
+                                final var ber = beRenderer.getRenderer(be);
+                                if (ber != null) {
+                                    ber.render(be, 1f, pose, buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                                }
+                            }
                         }
 
-                        blockRenderer.getModelRenderer().tesselateBlock(renderer, blockRenderer.getBlockModel(state), state,
-                                pos, pose, transformer, false, renderer.random, state.getSeed(pos),
-                                OverlayTexture.NO_OVERLAY, modelData);
+                        try {
+                            pose.pushPose();
 
+                            for (var type : RenderType.chunkBufferLayers()) {
+                                if(!ItemBlockRenderTypes.canRenderInLayer(state, type))
+                                    continue;
+
+                                blockRenderer.renderBatched(state, pos, renderer, pose, buffer.getBuffer(type), true, renderer.random, modelData);
+                            }
+
+                            pose.popPose();
+                        } catch (Exception e) {
+                        }
                     }
                     pose.popPose();
                 });
             }
             pose.popPose();
             pose.popPose();
+
         } catch (Exception e) {
             while (lastEntryBeforeTry != pose.last())
                 pose.popPose();
         }
 
-        buffer.endBatch();
+        minecraft.cameraEntity = cam;
+
+        buffer.draw();
+        RenderSystem.restoreProjectionMatrix();
     }
 
     @Override
@@ -171,6 +221,6 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        this.blit(pose, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+        // this.blit(pose, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 }

@@ -1,12 +1,14 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
         mavenCentral()
         mavenLocal()
     }
 
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
+        classpath "org.spongepowered:mixingradle:${mixingradle_version}"
     }
 }
 
@@ -17,6 +19,7 @@ plugins {
 }
 
 apply plugin: "net.minecraftforge.gradle"
+apply plugin: 'org.spongepowered.mixin'
 
 def semver = { ->
     try {
@@ -130,6 +133,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
+            arg '-mixin.config=compactmachines.mixin.json'
             args '--username', 'Dev'
             args '--width', 1920
             args '--height', 1080
@@ -156,6 +160,8 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            arg '-mixin.config=compactmachines.mixin.json'
 
             mods {
                 compactmachines {
@@ -268,19 +274,21 @@ dependencies {
     // The One Probe
     implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
 
-    if (System.getenv("TESTMODS") == "true") {
+    if (include_test_mods) {
         // Nicephore - Screenshots and Stuff
         runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
 
         //    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-        //    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
-        //    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
-        //    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
-        //    runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3687357"))
-        //    runtimeOnly(fg.deobf("curse.maven:create-328085:3687358"))
+            runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
+            runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
+            runtimeOnly(fg.deobf("curse.maven:pipez-443900:3760255"))
+
+            runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3737402"))
+            runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
+
         //    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
         //    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-        //    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+            // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
         //
         //    // Scalable Cat's Force, BdLib, Advanced Generators
         //    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
@@ -300,6 +308,10 @@ dependencies {
         runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3743835"))
         runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3743837"))
     }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
 }
 
 processResources {
@@ -330,7 +342,8 @@ jar {
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : archiveVersion,
                 "Implementation-Vendor"   : "",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs': "${mod_id}.mixin.json"
         ])
     }
 }
