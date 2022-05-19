@@ -34,8 +34,10 @@ public class PSDIconButton extends ExtendedButton {
 
     private static void onClicked(Button button) {
         if (button instanceof PSDIconButton psd && button.active) {
-            var room = psd.parent.getMenu().getRoom();
-            CompactMachinesNet.CHANNEL.sendToServer(new PlayerRequestedTeleportPacket(psd.parent.getMenu().getMachineId(), room));
+            var menu = psd.parent.getMenu();
+            var mach = psd.parent.getMachine();
+            var room = menu.getRoom();
+            CompactMachinesNet.CHANNEL.sendToServer(new PlayerRequestedTeleportPacket(mach, room));
         }
     }
 

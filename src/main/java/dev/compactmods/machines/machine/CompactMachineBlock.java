@@ -1,19 +1,15 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
-import dev.compactmods.machines.core.MissingDimensionException;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.util.PlayerUtil;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -26,7 +22,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -114,7 +109,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                 CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
             }
 
-            // TODO - Send notification to level tunnel listeners (API)
+            // TODO - Send notification to dimension tunnel listeners (API)
         }
     }
 
@@ -136,7 +131,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         ItemStack stack = new ItemStack(given, 1);
 
         if (world.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
-            tile.getInternalChunkPos().ifPresent(room -> {
+            tile.getConnectedRoom().ifPresent(room -> {
                 CompactMachineItem.setRoom(stack, room);
             });
         }
@@ -150,13 +145,8 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (worldIn.isClientSide())
             return;
 
-        if (worldIn.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
-            // The machine already has data for some reason
-            if (tile.machineId != -1)
-                return;
-
+        if (worldIn.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile && worldIn instanceof ServerLevel sl) {
             // TODO - Custom machine names
-
             if (!stack.hasTag())
                 return;
 
@@ -166,16 +156,10 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
             // Machine was previously bound to a room - make a new binding post-place
             CompactMachineItem.getRoom(stack).ifPresent(room -> {
-                Machines.createAndLink(worldIn.getServer(), worldIn, pos, tile, room);
+                final var g = DimensionMachineGraph.forDimension(sl);
+                g.connectMachineToRoom(pos, room);
+                tile.syncConnectedRoom();
             });
-
-            // TODO: Remove pre-4.3.0 code
-            if (nbt.contains(MachineNbt.ID)) {
-                int machineID = nbt.getInt(MachineNbt.ID);
-                tile.setMachineId(machineID);
-            }
-
-            tile.doPostPlaced();
         }
     }
 
@@ -189,42 +173,36 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         ItemStack mainItem = player.getMainHandItem();
 
         if (mainItem.isEmpty() && level.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
-            if(machine.mapped()) {
-                if (state.getBlock() instanceof CompactMachineBlock cmBlock) {
-                    machine.getInternalChunkPos().ifPresent(room -> {
-                        var size = cmBlock.getSize();
-                        NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, machine.machineId, room), (buf) -> {
-                            buf.writeBlockPos(pos);
-                            buf.writeInt(machine.machineId);
-                            buf.writeChunkPos(room);
-                        });
+            if (state.getBlock() instanceof CompactMachineBlock cmBlock) {
+                machine.getConnectedRoom().ifPresent(room -> {
+                    var size = cmBlock.getSize();
+                    NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
+                        buf.writeBlockPos(pos);
+                        buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
+                        buf.writeChunkPos(room);
                     });
-                }
-
-                return InteractionResult.SUCCESS;
+                });
             }
         }
 
         // TODO - Item tags instead of direct item reference here
         if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
             // Try teleport to compact machine dimension
-            try {
-                if(level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
-                    if (!tile.mapped()) {
-                        ChunkPos newRoomPos;
-                        try {
-                            newRoomPos = Rooms.createNew(server, size, player.getUUID());
-                            Machines.createAndLink(server, level, pos, tile, newRoomPos);
-                        } catch (MissingDimensionException e) {
-                            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
-                            throw e;
-                        }
+            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+                tile.getConnectedRoom().ifPresentOrElse(room -> {
+                    try {
+                        PlayerUtil.teleportPlayerIntoMachine(level, player, pos);
+                    } catch (MissingDimensionException e) {
+                        e.printStackTrace();
                     }
+                }, () -> {
+                    try {
+                        final var newRoomPos = Rooms.createNew(server, size, player.getUUID());
 
-                    PlayerUtil.teleportPlayerIntoMachine(level, player, pos);
-                }
-            } catch (MissingDimensionException e) {
-                player.sendMessage(TranslationUtil.message(Messages.UNREGISTERED_CM_DIM), Util.NIL_UUID);
+                    } catch (MissingDimensionException e) {
+                        CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
+                    }
+                });
             }
         }
 
@@ -250,14 +228,21 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             return;
         }
 
-        if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
-            if (entity.mapped()) {
-                try {
-                    final CompactMachineData machines = CompactMachineData.get(server);
-                    machines.remove(entity.machineId);
-                } catch (MissingDimensionException e) {
-                    CompactMachines.LOGGER.fatal(e);
-                }
+        if (level instanceof ServerLevel sl) {
+            final var serv = sl.getServer();
+            final var compactDim = serv.getLevel(Registration.COMPACT_DIMENSION);
+
+            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
+                entity.getConnectedRoom().ifPresent(room -> {
+                    final var dimGraph = DimensionMachineGraph.forDimension(sl);
+                    dimGraph.disconnect(pos);
+
+                    if (compactDim == null)
+                        return;
+
+                    final var tunnels = TunnelConnectionGraph.forRoom(compactDim, room);
+                    tunnels.unregister(pos);
+                });
             }
         }
 

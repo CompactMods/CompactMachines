@@ -12,7 +12,8 @@ public class CMCommands {
     /**
      * Used for displaying the number of registered machines via summary commands.
      */
-    public static final ResourceLocation MACHINE_REG_COUNT = new ResourceLocation(MOD_ID, "machine_reg_count");
+    public static final ResourceLocation MACHINE_REG_DIM = new ResourceLocation(MOD_ID, "summary.machines.dimension");
+    public static final ResourceLocation MACHINE_REG_TOTAL = new ResourceLocation(MOD_ID, "summary.machines.total");
 
     /**
      * Used for displaying the number of registered rooms via summary commands.

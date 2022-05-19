@@ -26,7 +26,7 @@ public class CopyRoomBindingFunction extends LootItemConditionalFunction {
     protected ItemStack run(ItemStack stack, LootContext ctx) {
         var data = ctx.getParam(LootContextParams.BLOCK_ENTITY);
         if(data instanceof CompactMachineBlockEntity machine) {
-            machine.getInternalChunkPos().ifPresent(room -> {
+            machine.getConnectedRoom().ifPresent(room -> {
                 CompactMachineItem.setRoom(stack, room);
             });
         }

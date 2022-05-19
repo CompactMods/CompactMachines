@@ -14,7 +14,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class TestUtil {
+public final class TestUtil {
 
     public static void loadStructureIntoTestArea(GameTestHelper test, ResourceLocation structure, BlockPos relLocation) {
         final var structures = test.getLevel().getStructureManager();

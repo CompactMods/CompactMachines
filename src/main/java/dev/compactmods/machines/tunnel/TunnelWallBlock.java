@@ -9,7 +9,7 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.tunnel.data.RoomTunnelData;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -97,46 +97,39 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!(level instanceof ServerLevel serverLevel))
+        if (level.isClientSide)
             return InteractionResult.SUCCESS;
 
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
-        var def = tunnel.getTunnelType();
-        final Direction tunnelWallSide = hitResult.getDirection();
+        if(level.dimension().equals(Registration.COMPACT_DIMENSION) && level instanceof ServerLevel compactDim) {
+            var def = tunnel.getTunnelType();
+            final Direction tunnelWallSide = hitResult.getDirection();
 
-        if (player.isShiftKeyDown()) {
-            BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+            if (player.isShiftKeyDown()) {
+                BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
 
-            level.setBlockAndUpdate(pos, solidWall);
+                level.setBlockAndUpdate(pos, solidWall);
 
-            ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-            CompoundTag defTag = stack.getOrCreateTagElement("definition");
-            defTag.putString("id", def.getRegistryName().toString());
+                ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+                CompoundTag defTag = stack.getOrCreateTagElement("definition");
+                defTag.putString("id", def.getRegistryName().toString());
 
-            ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
-            level.addFreshEntity(ie);
+                ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
+                level.addFreshEntity(ie);
 
-            if (def instanceof TunnelTeardownHandler teardown) {
-                teardown.onRemoved(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel());
-            }
+                if (def instanceof TunnelTeardownHandler teardown) {
+                    teardown.onRemoved(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel());
+                }
 
-            try {
-                final var tunnels = RoomTunnelData.get(serverLevel.getServer(), new ChunkPos(pos));
-                final var tunnelGraph = tunnels.getGraph();
+                final var tunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
+                tunnels.unregister(pos);
+            } else {
+                // Rotate tunnel
+                Direction dir = state.getValue(CONNECTED_SIDE);
 
-                tunnelGraph.unregister(pos);
-            } catch (MissingDimensionException e) {
-                CompactMachines.LOGGER.fatal(e);
-            }
-        } else {
-            // Rotate tunnel
-            Direction dir = state.getValue(CONNECTED_SIDE);
-
-            try {
-                final var tunnelData = RoomTunnelData.get(serverLevel.getServer(), new ChunkPos(pos));
-                final var tunnelGraph = tunnelData.getGraph();
+                final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
                 final var existingDirs = tunnelGraph
                         .getTunnelSides(def)
                         .collect(Collectors.toSet());
@@ -154,14 +147,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
                     if (def instanceof TunnelTeardownHandler teardown) {
-                        teardown.onRotated(new TunnelPosition(serverLevel, pos, tunnelWallSide), tunnel.getTunnel(), dir, newSide);
+                        teardown.onRotated(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel(), dir, newSide);
                     }
 
                     tunnelGraph.rotateTunnel(pos, newSide);
-                    tunnelData.setDirty();
+                    tunnelGraph.setDirty();
                 });
-            } catch (MissingDimensionException e) {
-                return InteractionResult.FAIL;
             }
         }
 

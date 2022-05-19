@@ -15,6 +15,7 @@ import java.io.IOException;
 public class CM4Shaders
 {
     private static ShaderInstance blockFullbrightShader;
+    private static ShaderInstance wallShader;
 
     @SubscribeEvent
     public static void registerShaders(final RegisterShadersEvent ev) throws IOException
@@ -23,9 +24,15 @@ public class CM4Shaders
                 new ShaderInstance(ev.getResourceManager(), new ResourceLocation(CompactMachines.MOD_ID, "block_fullbright"), DefaultVertexFormat.BLOCK),
                 shader -> blockFullbrightShader = shader
         );
+
+        ev.registerShader(
+                new ShaderInstance(ev.getResourceManager(), new ResourceLocation(CompactMachines.MOD_ID, "wall"), DefaultVertexFormat.BLOCK),
+                shader -> wallShader = shader
+        );
     }
 
-    public static ShaderInstance getBlockFullbrightShader()
+    public static ShaderInstance wall() { return wallShader; }
+    public static ShaderInstance fullbright()
     {
         return blockFullbrightShader;
     }

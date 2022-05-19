@@ -8,23 +8,15 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.machine.Machines;
-import dev.compactmods.machines.machine.exceptions.InvalidMachineStateException;
-import dev.compactmods.machines.machine.exceptions.NonexistentMachineException;
+import dev.compactmods.machines.machine.CompactMachineItem;
+import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
-
-import javax.crypto.Mac;
 
 public class CMGiveMachineSubcommand {
 
@@ -52,17 +44,21 @@ public class CMGiveMachineSubcommand {
         }
 
         try {
-            ItemStack newItem = Machines.createBoundItem(server, roomPos);
+            final RoomSize size = Rooms.sizeOf(server, roomPos);
+
+            ItemStack newItem = new ItemStack(CompactMachineItem.getItemBySize(size));
+            CompactMachineItem.setRoom(newItem, roomPos);
+
             if(!player.addItem(newItem)) {
                 src.sendFailure(TranslationUtil.command(CMCommands.CANNOT_GIVE_MACHINE));
             } else {
                 src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_GIVEN, player.getDisplayName()), true);
             }
-
-        } catch (MissingDimensionException | NonexistentRoomException e) {
-            e.printStackTrace();
+        } catch (NonexistentRoomException e) {
+            CompactMachines.LOGGER.fatal(e);
         }
 
         return 0;
     }
 }
+

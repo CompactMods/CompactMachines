@@ -25,7 +25,7 @@ public class RenderTypes extends RenderStateShard {
 
 	protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
 
-	protected static final RenderStateShard.ShaderStateShard FULLBRIGHT_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::getBlockFullbrightShader);
+	protected static final RenderStateShard.ShaderStateShard FULLBRIGHT_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::fullbright);
 
     public static final RenderType TRANSLUCENT_FULLBRIGHT = RenderType.create(
 			CompactMachines.MOD_ID + ":full_bright",
@@ -39,6 +39,21 @@ public class RenderTypes extends RenderStateShard {
 						.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 						.createCompositeState(false)
 		);
+
+	protected static final RenderStateShard.ShaderStateShard WALL_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::wall);
+
+	public static final RenderType WALLS = RenderType.create(
+			CompactMachines.MOD_ID + ":wall",
+			BLOCK_WITH_OVERLAY, VertexFormat.Mode.QUADS,
+			256, false, false,
+			RenderType.CompositeState.builder()
+					.setShaderState(WALL_BLOCKS)
+					.setLightmapState(LIGHTMAP_DISABLED)
+					.setOverlayState(OVERLAY)
+					.setTextureState(BLOCK_SHEET_MIPPED)
+					.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+					.createCompositeState(false)
+	);
 
 	public RenderTypes(String p_110161_, Runnable p_110162_, Runnable p_110163_) {
 		super(p_110161_, p_110162_, p_110163_);

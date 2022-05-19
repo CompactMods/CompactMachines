@@ -1,5 +1,6 @@
 package dev.compactmods.machines.core;
 
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
@@ -30,11 +31,11 @@ public class Tunnels {
 
     // region Setup
 
-    public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(TunnelDefinition.class, MOD_ID);
+    public static final ResourceLocation DEFINITIONS_RL = new ResourceLocation(MOD_ID, "tunnel_types");
+    public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(DEFINITIONS_RL, MOD_ID);
 
-    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry("tunnel_types",
-            () -> new RegistryBuilder<TunnelDefinition>()
-                    .setType(TunnelDefinition.class));
+    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry(TunnelDefinition.class,
+            () -> new RegistryBuilder<TunnelDefinition>().setName(DEFINITIONS_RL));
 
     public static void init(IEventBus bus) {
         DEFINITIONS.register(bus);

@@ -41,7 +41,7 @@ public class ServerConfig {
                         EnumGetMethod.NAME_IGNORECASE);
 
         MACHINE_FLOOR_Y = builder
-                .comment("The Y-level to spawn machine floors at.")
+                .comment("The Y-dimension to spawn machine floors at.")
                 .defineInRange("floor", 40, 10, 200);
 
         builder.pop();

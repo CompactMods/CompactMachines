@@ -4,7 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
+import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.GraphNodeBase;
 import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.graph.IGraphNodeType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 
@@ -13,7 +16,7 @@ import java.util.Objects;
 /**
  * Represents the inside of a Compact Machine.
  */
-public record CompactMachineRoomNode(ChunkPos pos) implements IGraphNode {
+public final class CompactMachineRoomNode extends GraphNodeBase implements IGraphNodeType, IGraphNode {
 
     private static final ResourceLocation TYPE = new ResourceLocation(CompactMachines.MOD_ID, "room");
 
@@ -21,6 +24,17 @@ public record CompactMachineRoomNode(ChunkPos pos) implements IGraphNode {
             CodecExtensions.CHUNKPOS.fieldOf("chunk").forGetter(CompactMachineRoomNode::pos),
             ResourceLocation.CODEC.fieldOf("type").forGetter(x -> TYPE)
     ).apply(i, (pos, type) -> new CompactMachineRoomNode(pos)));
+    private final ChunkPos pos;
+
+    public CompactMachineRoomNode() {
+        this.pos = ChunkPos.ZERO;
+    }
+
+    /**
+     */
+    public CompactMachineRoomNode(ChunkPos pos) {
+        this.pos = pos;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -38,5 +52,20 @@ public record CompactMachineRoomNode(ChunkPos pos) implements IGraphNode {
     @Override
     public Codec<CompactMachineRoomNode> codec() {
         return CODEC;
+    }
+
+    public ChunkPos pos() {
+        return pos;
+    }
+
+    @Override
+    public String toString() {
+        return "CompactMachineRoomNode[" +
+                "pos=" + pos + ']';
+    }
+
+    @Override
+    public IGraphNodeType getType() {
+        return CMGraphRegistration.ROOM_NODE.get();
     }
 }

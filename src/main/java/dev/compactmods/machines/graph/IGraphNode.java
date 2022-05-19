@@ -1,8 +1,7 @@
 package dev.compactmods.machines.graph;
 
-import com.mojang.serialization.Codec;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public interface IGraphNode {
-
-    <T extends IGraphNode> Codec<T> codec();
+    IGraphNodeType getType();
 }

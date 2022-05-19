@@ -11,14 +11,13 @@ import net.minecraftforge.network.PacketDistributor;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public record PlayerStartedRoomTrackingPacket(UUID player, ChunkPos room) {
+public record PlayerStartedRoomTrackingPacket(ChunkPos room) {
 
     public PlayerStartedRoomTrackingPacket(FriendlyByteBuf buf) {
-        this(buf.readUUID(), buf.readChunkPos());
+        this(buf.readChunkPos());
     }
 
     public void encode(FriendlyByteBuf buf) {
-        buf.writeUUID(player);
         buf.writeChunkPos(room);
     }
 

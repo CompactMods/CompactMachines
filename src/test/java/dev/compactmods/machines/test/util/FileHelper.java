@@ -11,7 +11,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 
-public class FileHelper {
+public final class FileHelper {
     public static final FileHelper INSTANCE = new FileHelper();
     public static Path RESOURCES_DIR = Paths.get("src","test","resources");
 

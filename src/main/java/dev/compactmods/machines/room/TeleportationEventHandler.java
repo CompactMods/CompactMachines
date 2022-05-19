@@ -7,6 +7,7 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -53,19 +54,23 @@ public class TeleportationEventHandler {
      * @return True if teleportation should be cancelled; false otherwise.
      */
     private static boolean cancelOutOfBoxTeleport(Entity entity, Vec3 target) {
-        MinecraftServer serv = entity.getServer();
-        if (serv == null)
+        final var level = entity.level;
+        if (!level.dimension().equals(Registration.COMPACT_DIMENSION))
             return false;
 
-        ChunkPos machineChunk = new ChunkPos(entity.chunkPosition().x, entity.chunkPosition().z);
+        if(level instanceof ServerLevel compactDim) {
+            ChunkPos machineChunk = new ChunkPos(entity.chunkPosition().x, entity.chunkPosition().z);
 
-        try {
-            final CompactRoomData intern = CompactRoomData.get(serv);
-            return !intern.getBounds(machineChunk).contains(target);
-        } catch (MissingDimensionException | NonexistentRoomException e) {
-            CompactMachines.LOGGER.error(e);
-            return false;
+            try {
+                final CompactRoomData intern = CompactRoomData.get(compactDim);
+                return !intern.getBounds(machineChunk).contains(target);
+            } catch (NonexistentRoomException e) {
+                CompactMachines.LOGGER.error(e);
+                return false;
+            }
         }
+
+        return false;
     }
 
     private static void doEntityTeleportHandle(EntityEvent evt, Vec3 target, Entity ent) {

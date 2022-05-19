@@ -5,13 +5,12 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.core.LevelBlockPosition;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.machine.Machines;
-import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
@@ -52,28 +51,30 @@ public abstract class PlayerUtil {
         }
 
         if(machineLevel.getBlockEntity(machinePos) instanceof CompactMachineBlockEntity tile) {
-            final boolean grantAdvancement = !tile.mapped();
+            final var targetRoom = tile.getConnectedRoom();
+            boolean grantAdvancement = targetRoom.isEmpty();
 
-            ChunkPos targetRoom = tile.getInternalChunkPos().orElseThrow();
-            if (player.level.dimension().equals(Registration.COMPACT_DIMENSION) && player.chunkPosition().equals(targetRoom)) {
-                if (player instanceof ServerPlayer sp) {
-                    AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
+            targetRoom.ifPresent(room -> {
+                if (player.level.dimension().equals(Registration.COMPACT_DIMENSION) && player.chunkPosition().equals(room)) {
+                    if (player instanceof ServerPlayer sp) {
+                        AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
+                    }
+
+                    return;
                 }
 
-                return;
-            }
+                try {
+                    teleportPlayerIntoRoom(serv, player, room, grantAdvancement);
 
-            try {
-                teleportPlayerIntoRoom(serv, player, targetRoom, grantAdvancement);
-
-                // Mark the player as inside the machine, set external spawn, and yeet
-                player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(hist -> {
-                    LevelBlockPosition pos = LevelBlockPosition.fromEntity(player);
-                    hist.addHistory(new PlayerRoomHistoryItem(pos, tile.machineId));
-                });
-            } catch (NonexistentRoomException e) {
-                CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
-            }
+                    // Mark the player as inside the machine, set external spawn, and yeet
+                    player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(hist -> {
+                        var entry = PreciseDimensionalPosition.fromPlayer(player);
+                        hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
+                    });
+                } catch (MissingDimensionException | NonexistentRoomException e) {
+                    CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
+                }
+            });
         }
     }
 

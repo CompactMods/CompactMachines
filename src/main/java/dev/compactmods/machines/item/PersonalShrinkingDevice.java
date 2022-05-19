@@ -63,27 +63,23 @@ public class PersonalShrinkingDevice extends Item {
         }
 
         if (world instanceof ServerLevel && player instanceof ServerPlayer serverPlayer) {
-            if (serverPlayer.level.dimension() == Registration.COMPACT_DIMENSION) {
-                ServerLevel serverWorld = serverPlayer.getLevel();
+            ServerLevel playerDim = serverPlayer.getLevel();
+            if (playerDim.dimension().equals(Registration.COMPACT_DIMENSION)) {
                 if (player.isShiftKeyDown()) {
                     ChunkPos machineChunk = new ChunkPos(player.blockPosition());
 
-                    try {
-                        final CompactRoomData intern = CompactRoomData.get(serverWorld.getServer());
+                    final CompactRoomData intern = CompactRoomData.get(playerDim);
 
-                        // Use internal data to set new spawn point
-                        intern.setSpawn(machineChunk, player.position());
+                    // Use internal data to set new spawn point
+                    intern.setSpawn(machineChunk, player.position());
 
-                        MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
-                                .withStyle(ChatFormatting.GREEN);
+                    MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
+                            .withStyle(ChatFormatting.GREEN);
 
-                        player.displayClientMessage(tc, true);
+                    player.displayClientMessage(tc, true);
 
-                    } catch (MissingDimensionException e) {
-                        CompactMachines.LOGGER.fatal(e);
-                    }
                 } else {
-                    PlayerUtil.teleportPlayerOutOfMachine(serverWorld, serverPlayer);
+                    PlayerUtil.teleportPlayerOutOfMachine(playerDim, serverPlayer);
                 }
             }
         }

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -16,10 +16,10 @@ public class UIRegistration {
     public static final RegistryObject<MenuType<MachineRoomMenu>> MACHINE_MENU = CONTAINERS.register("machine", () -> IForgeMenuType.create(
             ((windowId, inv, data) -> {
                 data.readBlockPos();
-                final int mach = data.readInt();
+                final var mach = data.readWithCodec(LevelBlockPosition.CODEC);
                 final var room = data.readChunkPos();
 
-                return new MachineRoomMenu(windowId, mach, room);
+                return new MachineRoomMenu(windowId, room, mach);
             })
     ));
 

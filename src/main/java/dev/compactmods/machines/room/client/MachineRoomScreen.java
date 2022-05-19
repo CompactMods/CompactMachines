@@ -1,9 +1,7 @@
 package dev.compactmods.machines.room.client;
 
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import dev.compactmods.machines.CompactMachines;
@@ -12,8 +10,8 @@ import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
 import dev.compactmods.machines.client.render.SuperRenderTypeBuffer;
 import dev.compactmods.machines.client.util.TransformingVertexBuilder;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.room.network.RoomNetworkHandler;
@@ -29,12 +27,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
-import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
-
-import java.util.Random;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
@@ -52,7 +46,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         this.inv = inv;
 
         // Send packet to server for block data
-        RoomNetworkHandler.CHANNEL.sendToServer(new PlayerStartedRoomTrackingPacket(inv.player.getUUID(), menu.getRoom()));
+        RoomNetworkHandler.CHANNEL.sendToServer(new PlayerStartedRoomTrackingPacket(menu.getRoom()));
         updateBlockRender();
     }
 
@@ -96,7 +90,8 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         pose.pushPose();
         pose.translate(0, 0, 500);
         float mid = (this.imageWidth / 2f) - (font.width("Room Preview") / 2f);
-        this.font.draw(pose, new TextComponent("Room Preview"), mid, (float) this.titleLabelY, 0x00000000);
+        this.font.draw(pose, new TextComponent("Room Preview"), mid, (float) this.titleLabelY, 0xFFFFFFFF);
+        this.font.draw(pose, new TextComponent(menu.getRoom().toString()), leftPos, (float) topPos + this.imageHeight - 12, 0xFFFFFFFF);
         pose.popPose();
     }
 
@@ -155,7 +150,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                 final float s = tSize.getX() / 2f;
                 pose.translate(-s, -s + 1, -s);
 
-                final var transformer = new TransformingVertexBuilder(buffer, RenderTypes.TRANSLUCENT_FULLBRIGHT);
+                final var transformer = new TransformingVertexBuilder(buffer, RenderTypes.WALLS);
 
                 var bb = struct.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO);
 
@@ -168,9 +163,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                         pose.translate(pos.getX(), pos.getY(), pos.getZ());
 
                         final var state = renderer.getBlockState(pos);
-                        transformer.setOverlay(OverlayTexture.NO_OVERLAY);
-
-
+                        transformer.setOverlay(OverlayTexture.RED_OVERLAY_V);
 
                         IModelData modelData = EmptyModelData.INSTANCE;
                         if (state.hasBlockEntity()) {
@@ -203,7 +196,6 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
             }
             pose.popPose();
             pose.popPose();
-
         } catch (Exception e) {
             while (lastEntryBeforeTry != pose.last())
                 pose.popPose();
@@ -222,5 +214,9 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
         // this.blit(pose, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+    }
+
+    public LevelBlockPosition getMachine() {
+        return menu.getMachine();
     }
 }

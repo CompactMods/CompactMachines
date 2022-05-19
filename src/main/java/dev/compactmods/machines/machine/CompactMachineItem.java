@@ -36,6 +36,7 @@ public class CompactMachineItem extends BlockItem {
         super(blockIn, builder);
     }
 
+    @Deprecated(forRemoval = true)
     public static Optional<Integer> getMachineId(ItemStack stack) {
         if (!stack.hasTag())
             return Optional.empty();

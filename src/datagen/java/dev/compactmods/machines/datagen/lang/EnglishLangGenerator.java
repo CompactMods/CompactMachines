@@ -36,7 +36,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
         addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s does not have an associated ID.");
         addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered rooms: %s");
-        addCommand(CMCommands.MACHINE_REG_COUNT, "Number of registered machines: %s");
+        addCommand(CMCommands.MACHINE_REG_DIM, "Number of registered machines: %s");
         addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
         addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
         addCommand(CMCommands.CMD_ROOM_NOT_REGISTERED, "");

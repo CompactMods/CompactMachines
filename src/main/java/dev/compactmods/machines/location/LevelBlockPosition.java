@@ -1,4 +1,4 @@
-package dev.compactmods.machines.core;
+package dev.compactmods.machines.location;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -8,7 +8,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
-import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.util.LocationUtil;
 import net.minecraft.core.BlockPos;
@@ -32,10 +31,6 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     private Vec3 position;
     private Vec3 rotation;
 
-    /*
-     Note: We'd use the actual world registry key here, but it static loads the world and does a bunch
-     of initialization, making it impossible to unit test without booting a whole server up.
-    */
     public static final Codec<LevelBlockPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(LevelBlockPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(LevelBlockPosition::getExactPosition),
@@ -43,6 +38,11 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     ).apply(i, LevelBlockPosition::new));
 
     private LevelBlockPosition() {
+    }
+
+    public LevelBlockPosition(IDimensionalBlockPosition base) {
+        this.dimension = base.dimensionKey();
+        this.position = base.getExactPosition();
     }
 
     public LevelBlockPosition(ResourceKey<Level> world, BlockPos positionBlock) {
@@ -67,6 +67,8 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
         return new LevelBlockPosition(entity.level.dimension(), entity.position());
     }
 
+
+
     public ServerLevel level(@Nonnull MinecraftServer server) {
         return server.getLevel(this.dimension);
     }
@@ -77,15 +79,8 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     }
 
     @Override
-    public IDimensionalPosition relative(Direction direction) {
+    public IDimensionalBlockPosition relative(Direction direction) {
         return new LevelBlockPosition(this.dimension, this.position.add(direction.getStepX(), direction.getStepY(), direction.getStepZ()));
-    }
-
-    @Override
-    public IDimensionalPosition relative(Direction direction, float amount) {
-        Vec3 a = new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
-        a = a.multiply(amount, amount, amount);
-        return new LevelBlockPosition(this.dimension, this.position.add(a));
     }
 
     public boolean isLoaded(MinecraftServer server) {

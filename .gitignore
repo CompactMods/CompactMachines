@@ -34,3 +34,5 @@ logs/
 *.dot
 
 src/generated/
+
+raw-assets/

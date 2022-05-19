@@ -13,8 +13,6 @@ import net.minecraft.world.phys.Vec3;
 
 public interface IDimensionalPosition {
 
-    IDimensionalPosition relative(Direction direction, float amount);
-
     BlockPos getBlockPosition();
     Vec3 getExactPosition();
 

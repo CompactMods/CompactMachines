@@ -32,14 +32,9 @@ public class CMRoomDataExportCommand {
     private static int execAll(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
-        var compact = src.getServer().getLevel(Registration.COMPACT_DIMENSION);
+        var compact = serv.getLevel(Registration.COMPACT_DIMENSION);
 
-        final CompactRoomData rooms;
-        try {
-            rooms = CompactRoomData.get(serv);
-        } catch (MissingDimensionException e) {
-            throw new CommandRuntimeException(new TextComponent(e.getMessage()));
-        }
+        final CompactRoomData rooms = CompactRoomData.get(compact);
 
         var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
         var out = outdir.toPath()
