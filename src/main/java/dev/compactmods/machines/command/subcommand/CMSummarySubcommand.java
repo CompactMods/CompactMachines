@@ -19,11 +19,10 @@ import java.util.HashMap;
 public class CMSummarySubcommand {
     public static ArgumentBuilder<CommandSourceStack, ?> make() {
         return Commands.literal("summary")
-                // .requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
                 .executes(CMSummarySubcommand::exec);
     }
 
-    private static int exec(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    private static int exec(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
 

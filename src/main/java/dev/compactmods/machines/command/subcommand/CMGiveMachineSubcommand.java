@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineItem;
@@ -22,7 +23,7 @@ public class CMGiveMachineSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("give")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
+                .requires(cs -> cs.hasPermission(ServerConfig.giveMachineLevel()));
 
         subRoot.then(Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("room", RoomPositionArgument.room())
