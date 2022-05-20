@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.api.room.IRoomHistory;
@@ -168,12 +169,22 @@ public class TunnelItem extends Item {
         return Optional.ofNullable(mapped);
     }
 
-    private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction side, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
+    private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction innerFace, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
         boolean redstone = def instanceof IRedstoneTunnel;
 
-        final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(position));
+        final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, player.chunkPosition());
 
-        var placedSides = roomTunnels.getTunnelSides(def).collect(Collectors.toSet());
+        var lastEnteredMachine = getMachineBindingInfo(player);
+        if (lastEnteredMachine.isEmpty()) {
+            CompactMachines.LOGGER.warn("Player does not appear to have entered room via a machine;" +
+                    " history is empty. If this is an error, report it.");
+            return false;
+        }
+
+        var hist = lastEnteredMachine.get();
+        var placedSides = roomTunnels
+                .getTunnelSides(def)
+                .collect(Collectors.toSet());
 
         // all tunnels already placed for type
         if (placedSides.size() == 6)
@@ -188,39 +199,32 @@ public class TunnelItem extends Item {
             return false;
         }
 
-        var lastEnteredMachine = getMachineBindingInfo(player);
-        if (lastEnteredMachine.isEmpty()) {
-            CompactMachines.LOGGER.warn("Player does not appear to have entered room via a machine;" +
-                    " history is empty. If this is an error, report it.");
-            return false;
-        }
-
         Direction first = newlyPlacedSide.get();
         var tunnelState = Tunnels.BLOCK_TUNNEL_WALL.get()
                 .defaultBlockState()
-                .setValue(TunnelWallBlock.TUNNEL_SIDE, side)
+                .setValue(TunnelWallBlock.TUNNEL_SIDE, innerFace)
                 .setValue(TunnelWallBlock.CONNECTED_SIDE, first)
                 .setValue(TunnelWallBlock.REDSTONE, redstone);
 
-
-        var hist = lastEnteredMachine.get();
         boolean connected = roomTunnels.registerTunnel(position, def, hist.getMachine(), first);
         if (!connected) {
             player.displayClientMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE), true);
             return false;
         }
 
-        compactDim.setBlock(position, tunnelState, Block.UPDATE_ALL_IMMEDIATE);
+        final var oldState = compactDim.getBlockState(position);
+        compactDim.setBlock(position, tunnelState, Block.UPDATE_NEIGHBORS);
 
         if (compactDim.getBlockEntity(position) instanceof TunnelWallEntity twe) {
             twe.setTunnelType(def);
-            twe.setConnectedTo(hist.getMachine(), side);
+            twe.setConnectedTo(hist.getMachine(), first);
 
             CompactMachinesNet.CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
                     new TunnelAddedPacket(position, def));
         }
 
+        compactDim.sendBlockUpdated(position, oldState, tunnelState, Block.UPDATE_ALL);
         return true;
     }
 }

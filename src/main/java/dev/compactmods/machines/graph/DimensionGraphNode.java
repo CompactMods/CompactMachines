@@ -8,42 +8,11 @@ import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 
-public final class DimensionGraphNode extends GraphNodeBase implements IGraphNodeType {
+public record DimensionGraphNode(ResourceKey<Level> dimension) implements IGraphNode {
 
-    private static final Codec<DimensionGraphNode> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final Codec<DimensionGraphNode> CODEC = RecordCodecBuilder.create(i -> i.group(
             ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(DimensionGraphNode::dimension)
     ).apply(i, DimensionGraphNode::new));
-    private final ResourceKey<Level> dimension;
-
-    public DimensionGraphNode() {
-        this.dimension = null;
-    }
-
-    public DimensionGraphNode(ResourceKey<Level> dimension) {
-        this.dimension = dimension;
-    }
-
-    @Override
-    public Codec<DimensionGraphNode> codec() {
-        return CODEC;
-    }
-
-    public ResourceKey<Level> dimension() {
-        return dimension;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (DimensionGraphNode) obj;
-        return Objects.equals(this.dimension, that.dimension);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(dimension);
-    }
 
     @Override
     public String toString() {

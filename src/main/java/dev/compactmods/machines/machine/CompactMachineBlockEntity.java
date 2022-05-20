@@ -7,7 +7,7 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
-import dev.compactmods.machines.machine.graph.LegacyMachineConnections;
+import dev.compactmods.machines.machine.graph.legacy.LegacyMachineConnections;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;

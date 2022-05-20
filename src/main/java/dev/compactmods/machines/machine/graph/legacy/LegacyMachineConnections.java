@@ -1,4 +1,4 @@
-package dev.compactmods.machines.machine.graph;
+package dev.compactmods.machines.machine.graph.legacy;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -6,10 +6,8 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;

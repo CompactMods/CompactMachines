@@ -27,14 +27,17 @@ public class CMGraphRegistration {
             () -> new RegistryBuilder<IGraphEdgeType>().setName(EDGES_RL));
 
 
-    public static final RegistryObject<CompactMachineNode> MACH_NODE = NODE_TYPES.register("machine", CompactMachineNode::new);
-    public static final RegistryObject<DimensionGraphNode> DIM_NODE = NODE_TYPES.register("dimension", DimensionGraphNode::new);
-    public static final RegistryObject<CompactMachineRoomNode> ROOM_NODE = NODE_TYPES.register("room", CompactMachineRoomNode::new);
-    public static final RegistryObject<TunnelNode> TUNNEL_NODE = NODE_TYPES.register("tunnel", TunnelNode::new);
-    public static final RegistryObject<TunnelTypeNode> TUNNEL_TYPE_NODE = NODE_TYPES.register("tunnel_type", TunnelTypeNode::new);
+    public static final RegistryObject<IGraphNodeType> MACH_NODE = NODE_TYPES.register("machine", () -> GraphNodeType.MACHINE);
+    public static final RegistryObject<IGraphNodeType> DIM_NODE = NODE_TYPES.register("dimension", () -> GraphNodeType.DIMENSION);
+    public static final RegistryObject<IGraphNodeType> ROOM_NODE = NODE_TYPES.register("room", () -> GraphNodeType.ROOM);
+    public static final RegistryObject<IGraphNodeType> TUNNEL_NODE = NODE_TYPES.register("tunnel", () -> GraphNodeType.TUNNEL);
+    public static final RegistryObject<IGraphNodeType> TUNNEL_TYPE_NODE = NODE_TYPES.register("tunnel_type", () -> GraphNodeType.TUNNEL_TYPE);
 
     public static final RegistryObject<IGraphEdgeType> MACHINE_LINK = EDGE_TYPES.register("machine_link", () -> GraphEdgeType.MACHINE_LINK);
+
+    // Tunnel edges
     public static final RegistryObject<IGraphEdgeType> TUNNEL_TYPE = EDGE_TYPES.register("tunnel_type", () -> GraphEdgeType.TUNNEL_TYPE);
+    public static final RegistryObject<IGraphEdgeType> TUNNEL_MACHINE_LINK = EDGE_TYPES.register("tunnel_machine", () -> GraphEdgeType.TUNNEL_MACHINE);
 
     public static void init(IEventBus bus) {
         NODE_TYPES.register(bus);

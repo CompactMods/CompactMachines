@@ -47,7 +47,9 @@ public class Tunnels {
     }
 
     public static TunnelDefinition getDefinition(ResourceLocation id) {
-        return isRegistered(id) ? TUNNEL_DEF_REGISTRY.get().getValue(id) : Tunnels.UNKNOWN.get();
+        if (isRegistered(id)) return TUNNEL_DEF_REGISTRY.get().getValue(id);
+        CompactMachines.LOGGER.warn("Unknown tunnel requested: {}", id);
+        return Tunnels.UNKNOWN.get();
     }
 
     // ================================================================================================================

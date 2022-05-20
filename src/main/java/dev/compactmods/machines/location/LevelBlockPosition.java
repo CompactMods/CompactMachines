@@ -43,17 +43,18 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     public LevelBlockPosition(IDimensionalBlockPosition base) {
         this.dimension = base.dimensionKey();
         this.position = base.getExactPosition();
+        this.rotation = Vec3.ZERO;
     }
 
     public LevelBlockPosition(ResourceKey<Level> world, BlockPos positionBlock) {
         this(world, Vec3.ZERO, Vec3.ZERO);
         this.position = new Vec3(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
+        this.rotation = Vec3.ZERO;
     }
 
     public LevelBlockPosition(ResourceKey<Level> world, Vec3 positionBlock) {
         this(world, positionBlock, Vec3.ZERO);
         this.dimension = world;
-
         this.rotation = Vec3.ZERO;
     }
 
@@ -66,8 +67,6 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     public static LevelBlockPosition fromEntity(LivingEntity entity) {
         return new LevelBlockPosition(entity.level.dimension(), entity.position());
     }
-
-
 
     public ServerLevel level(@Nonnull MinecraftServer server) {
         return server.getLevel(this.dimension);
@@ -97,6 +96,9 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
 
     @Override
     public CompoundTag serializeNBT() {
+        if(this.rotation == null)
+            this.rotation = Vec3.ZERO;
+
         DataResult<Tag> nbt = CODEC.encodeStart(NbtOps.INSTANCE, this);
         return (CompoundTag) nbt.result().orElse(null);
     }

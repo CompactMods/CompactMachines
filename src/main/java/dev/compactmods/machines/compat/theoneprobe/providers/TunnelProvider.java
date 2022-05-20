@@ -42,7 +42,9 @@ public class TunnelProvider implements IProbeInfoProvider {
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
         if (level.getBlockEntity(hitData.getPos()) instanceof TunnelWallEntity tile) {
-            final var connectedTo = tile.getConnectedPosition();
+
+
+
 
             if (probeMode == ProbeMode.EXTENDED) {
                 TunnelDefinition definition = tile.getTunnelType();
@@ -65,29 +67,32 @@ public class TunnelProvider implements IProbeInfoProvider {
                     .item(new ItemStack(Items.COMPASS))
                     .text(new TranslatableComponent(sideTranslated));
 
-            ServerLevel connectedWorld = (ServerLevel) level;
-            BlockPos outPosBlock = connectedTo.getBlockPosition();
+            final var connectedTo = tile.getConnectedPosition();
+            if(connectedTo != null) {
+                ServerLevel connectedWorld = (ServerLevel) level;
+                BlockPos outPosBlock = connectedTo.getBlockPosition();
 
-            try {
-                final var state = connectedTo.state(level.getServer());
-                
-                // If connected block isn't air, show a connected block line
-                if (!state.isAir()) {
-                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
-                    HitResult trace = new BlockHitResult(
-                            hitData.getHitVec(), hitData.getSideHit(),
-                            outPosBlock, false);
+                try {
+                    final var state = connectedTo.state(level.getServer());
 
-                    ItemStack pick = state
-                            .getBlock()
-                            .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
+                    // If connected block isn't air, show a connected block line
+                    if (!state.isAir()) {
+                        String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
+                        HitResult trace = new BlockHitResult(
+                                hitData.getHitVec(), hitData.getSideHit(),
+                                outPosBlock, false);
 
-                    v.horizontal(center)
-                            .item(pick)
-                            .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
+                        ItemStack pick = state
+                                .getBlock()
+                                .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
+
+                        v.horizontal(center)
+                                .item(pick)
+                                .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
+                    }
+                } catch (Exception ex) {
+                    // no-op: we don't want to spam the log here
                 }
-            } catch (Exception ex) {
-                // no-op: we don't want to spam the log here
             }
         }
     }

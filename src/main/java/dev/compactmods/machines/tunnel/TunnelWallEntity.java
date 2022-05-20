@@ -11,6 +11,7 @@ import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.machine.graph.legacy.LegacyMachineLocationsGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,11 +26,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.server.ServerLifecycleEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TunnelWallEntity extends BlockEntity {
+
+    private static final String NBT_LEGACY_MACHINE_KEY = "machine";
+
+    @Deprecated(forRemoval = true)
+    private int legacyMachineId = -1;
 
     private LevelBlockPosition connectedMachine;
     private TunnelDefinition tunnelType;
@@ -49,26 +56,75 @@ public class TunnelWallEntity extends BlockEntity {
         super.load(nbt);
 
         try {
-            final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, nbt)
-                    .getOrThrow(false, CompactMachines.LOGGER::fatal);
+            // TODO - Remove in 5.0
+            if(nbt.contains(NBT_LEGACY_MACHINE_KEY)) {
+                // 4.2 and below
+                this.legacyMachineId = nbt.getInt(NBT_LEGACY_MACHINE_KEY);
+                this.tunnelType = Tunnels.getDefinition(new ResourceLocation(nbt.getString(BaseTunnelWallData.KEY_TUNNEL_TYPE)));
+            } else {
+                // 4.3 and above
+                final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, nbt)
+                        .getOrThrow(true, CompactMachines.LOGGER::fatal);
 
-            this.connectedMachine = baseData.connection();
-            this.tunnelType = baseData.tunnel();
-
-            try {
-                if (tunnelType instanceof InstancedTunnel it)
-                    this.tunnel = it.newInstance(worldPosition, getTunnelSide());
-
-                if (tunnel instanceof INBTSerializable persist && nbt.contains("tunnel_data")) {
-                    var data = nbt.get("tunnel_data");
-                    persist.deserializeNBT(data);
-                }
-            } catch (Exception ex) {
-                CompactMachines.LOGGER.error("Error loading tunnel persistent data at {}; this is likely a cross-mod issue!", worldPosition, ex);
+                this.connectedMachine = baseData.connection();
+                this.tunnelType = baseData.tunnel();
             }
         } catch (Exception e) {
             this.tunnelType = Tunnels.UNKNOWN.get();
             this.connectedMachine = null;
+        }
+
+        try {
+            if (tunnelType instanceof InstancedTunnel it)
+                this.tunnel = it.newInstance(worldPosition, getTunnelSide());
+
+            if (tunnel instanceof INBTSerializable persist && nbt.contains("tunnel_data")) {
+                var data = nbt.get("tunnel_data");
+                persist.deserializeNBT(data);
+            }
+        } catch (Exception ex) {
+            CompactMachines.LOGGER.error("Error loading tunnel persistent data at {}; this is likely a cross-mod issue!", worldPosition, ex);
+        }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+
+        if (level instanceof ServerLevel sl) {
+            var chunk = level.getChunkAt(worldPosition);
+            ROOM = chunk.getCapability(Capabilities.ROOM);
+
+            if(legacyMachineId > -1) {
+                try {
+                    this.upgradeLegacyData();
+                } catch (MissingDimensionException e) {
+                    CompactMachines.LOGGER.error(CompactMachines.CONN_MARKER, "Failed to load legacy location info for tunnel conversion at: {}; removing the tunnel instance.", worldPosition);
+                    this.tunnelType = Tunnels.UNKNOWN.get();
+                }
+            }
+
+            // If tunnel type is unknown, remove the tunnel entirely
+            // Null tunnel types here mean it's being loaded into the world
+            if (this.tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
+                CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
+                sl.setBlock(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
+            }
+        }
+    }
+
+    private void upgradeLegacyData() throws MissingDimensionException {
+        if(level != null && level.isClientSide) return;
+        if(this.legacyMachineId == -1) return;
+
+        if(level instanceof ServerLevel sl) {
+            var leg = LegacyMachineLocationsGraph.get(sl.getServer());
+            if(leg != null)
+                this.connectedMachine = leg.getLocation(this.legacyMachineId);
+            else {
+                CompactMachines.LOGGER.error(CompactMachines.CONN_MARKER, "Failed to load legacy location info for tunnel conversion at: {}; removing the tunnel instance.", worldPosition);
+                this.tunnelType = Tunnels.UNKNOWN.get();
+            }
         }
     }
 
@@ -79,7 +135,8 @@ public class TunnelWallEntity extends BlockEntity {
         else
             compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.UNKNOWN.getId().toString());
 
-        compound.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
+        if(connectedMachine != null)
+            compound.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
 
         if (tunnel instanceof INBTSerializable persist) {
             var data = persist.serializeNBT();
@@ -109,22 +166,6 @@ public class TunnelWallEntity extends BlockEntity {
         }
 
         setChanged();
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-
-        if (level instanceof ServerLevel sl) {
-            var chunk = level.getChunkAt(worldPosition);
-            ROOM = chunk.getCapability(Capabilities.ROOM);
-
-            // If tunnel type is unknown, remove the tunnel entirely
-            if (tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
-                CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
-                sl.setBlock(worldPosition, Registration.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
-            }
-        }
     }
 
     @Nonnull
@@ -159,6 +200,9 @@ public class TunnelWallEntity extends BlockEntity {
     }
 
     public IDimensionalBlockPosition getConnectedPosition() {
+        if(this.connectedMachine == null)
+            return null;
+
         return this.connectedMachine.relative(getConnectedSide());
     }
 

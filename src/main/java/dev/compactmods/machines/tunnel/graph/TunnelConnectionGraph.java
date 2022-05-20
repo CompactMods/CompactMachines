@@ -1,14 +1,16 @@
 package dev.compactmods.machines.tunnel.graph;
 
-import com.google.common.graph.*;
+import com.google.common.graph.EndpointPair;
+import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
-import dev.compactmods.machines.api.codec.NbtListCollector;
+import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.graph.*;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.MachineRoomEdge;
 import net.minecraft.core.BlockPos;
@@ -17,11 +19,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -48,11 +48,6 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     private final Map<BlockPos, TunnelNode> tunnels;
 
     /**
-     * Quick access to the various dimension nodes in the graph.
-     */
-    private final Map<ResourceKey<Level>, DimensionGraphNode> dimensionNodes;
-
-    /**
      * Quick access to machine information nodes.
      */
     private final Map<IDimensionalBlockPosition, CompactMachineNode> machines;
@@ -70,7 +65,6 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         tunnels = new HashMap<>();
         machines = new HashMap<>();
         tunnelTypes = new HashMap<>();
-        dimensionNodes = new HashMap<>();
     }
 
     private TunnelConnectionGraph(CompoundTag nbt) {
@@ -92,21 +86,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     public CompoundTag save(CompoundTag tag) {
         var gData = this.serializeNBT();
         tag.put("graph", gData);
-
         return tag;
     }
 
     public static String getDataFilename(ChunkPos room) {
         return "tunnels_" + room.x + "_" + room.z;
-    }
-
-    public void registerDimension(ServerLevel level) {
-        if(dimensionNodes.containsKey(level.dimension()))
-            return;
-
-        DimensionGraphNode dimNode = new DimensionGraphNode(level.dimension());
-        dimensionNodes.put(level.dimension(), dimNode);
-        setDirty();
     }
 
     /**
@@ -115,7 +99,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
      * @param tunnel The tunnel to find a connection for.
      * @return The id of the connected machine.
      */
-    public Optional<LevelBlockPosition> connectedMachine(BlockPos tunnel) {
+    public Optional<IDimensionalBlockPosition> connectedMachine(BlockPos tunnel) {
         if (!tunnels.containsKey(tunnel))
             return Optional.empty();
 
@@ -141,48 +125,28 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     public boolean registerTunnel(BlockPos tunnelPos, TunnelDefinition type, IDimensionalBlockPosition machine, Direction side) {
         // First we need to get the machine the tunnel is trying to connect to
         var machineNode = getOrCreateMachineNode(machine);
-
-        TunnelNode tunnelNode = getOrCreateTunnelNode(tunnelPos);
+        var tunnelNode = getOrCreateTunnelNode(tunnelPos);
         if (graph.hasEdgeConnecting(tunnelNode, machineNode)) {
             // connection already formed between the tunnel at pos and the machine
-            graph.edgeValue(tunnelNode, machineNode).ifPresent(edge -> {
-                CompactMachines.LOGGER.info("Tunnel already registered for machine {} at position {}.",
-                        machine,
-                        tunnelPos);
-            });
+            CompactMachines.LOGGER.info("Tunnel already registered for machine {} at position {}.",
+                    machine,
+                    tunnelPos);
 
             return false;
         }
 
-        // graph direction is (tunnel)-[connected_to]->(machine)
-        var tunnelsForSide = getTunnelsForSide(machine, side).collect(Collectors.toSet());
-
         var tunnelTypeNode = getOrCreateTunnelTypeNode(type);
 
-        // If tunnels are registered for the requested side, make sure there isn't a type conflict
-        if (!tunnelsForSide.isEmpty()) {
-            for (var sidedTunnel : tunnelsForSide) {
-                // if we already have a tunnel with the same side and type, log the conflict and early exit
-                var existingConn = graph.edgeValue(sidedTunnel, tunnelTypeNode);
-                if (existingConn.isPresent()) {
-                    CompactMachines.LOGGER.info("Tunnel type {} already registered for side {} at position {}.", type.getRegistryName(),
-                            side.getSerializedName(),
-                            sidedTunnel.position());
-
-                    return false;
-                }
-            }
-        }
-
         // no tunnels registered for side yet - free to make new tunnel node
-        createTunnelAndLink(tunnelNode, side, machineNode, tunnelTypeNode);
+        var newTM = graph.putEdgeValue(tunnelNode, machineNode, new TunnelMachineEdge(side));
+        var newTT = graph.putEdgeValue(tunnelNode, tunnelTypeNode, new TunnelTypeEdge());
+
+        setDirty();
         return true;
     }
 
     private void createTunnelAndLink(TunnelNode newTunnel, Direction side, CompactMachineNode machNode, TunnelTypeNode typeNode) {
-        var newEdge = new TunnelMachineEdge(side);
-        graph.putEdgeValue(newTunnel, machNode, newEdge);
-        graph.putEdgeValue(newTunnel, typeNode, new TunnelTypeEdge());
+
     }
 
     @Nonnull
@@ -191,8 +155,10 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             return tunnels.get(tunnelPos);
 
         var newTunnel = new TunnelNode(tunnelPos);
-        graph.addNode(newTunnel);
         tunnels.put(tunnelPos, newTunnel);
+        graph.addNode(newTunnel);
+        setDirty();
+
         return newTunnel;
     }
 
@@ -203,6 +169,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             node = new CompactMachineNode(machine.dimensionKey(), machine.getBlockPosition());
             machines.put(machine, node);
             graph.addNode(node);
+            setDirty();
         } else {
             node = machines.get(machine);
         }
@@ -217,8 +184,9 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             return tunnelTypes.get(id);
 
         TunnelTypeNode newType = new TunnelTypeNode(id);
-        graph.addNode(newType);
         tunnelTypes.put(id, newType);
+        graph.addNode(newType);
+        setDirty();
         return newType;
     }
 
@@ -234,9 +202,9 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         if (defNode == null)
             return Stream.empty();
 
-        return graph.predecessors(defNode)
+        return graph.adjacentNodes(defNode)
                 .stream()
-                .filter(n -> n instanceof TunnelNode)
+                .filter(TunnelNode.class::isInstance)
                 .map(TunnelNode.class::cast);
     }
 
@@ -247,13 +215,24 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                 .collect(Collectors.toSet());
     }
 
+    public Optional<Direction> getTunnelSide(TunnelNode node) {
+        return graph.adjacentNodes(node).stream()
+                .filter(CompactMachineNode.class::isInstance)
+                .map(mn -> graph.edgeValue(node, mn))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(TunnelMachineEdge.class::cast)
+                .map(TunnelMachineEdge::side)
+                .findFirst();
+    }
+
     public Optional<Direction> getTunnelSide(BlockPos pos) {
         if (!tunnels.containsKey(pos))
             return Optional.empty();
 
         var node = tunnels.get(pos);
-        return graph.successors(node).stream()
-                .filter(outNode -> outNode instanceof CompactMachineNode)
+        return graph.adjacentNodes(node).stream()
+                .filter(CompactMachineNode.class::isInstance)
                 .map(mn -> graph.edgeValue(node, mn))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -263,12 +242,12 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     }
 
     public Optional<TunnelMachineInfo> getTunnelInfo(BlockPos tunnel) {
-        if(!tunnels.containsKey(tunnel))
+        if (!tunnels.containsKey(tunnel))
             return Optional.empty();
 
         var node = tunnels.get(tunnel);
         var typeNode = graph.successors(node).stream()
-                .filter(n -> n instanceof TunnelTypeNode)
+                .filter(TunnelTypeNode.class::isInstance)
                 .map(TunnelTypeNode.class::cast)
                 .findFirst()
                 .orElseThrow();
@@ -277,7 +256,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         var side = getTunnelSide(tunnel).orElseThrow();
         var type = typeNode.id();
 
-        return Optional.of(new TunnelMachineInfo(tunnel, type, mach, side));
+        return Optional.of(new TunnelMachineInfo(tunnel, type, new LevelBlockPosition(mach), side));
     }
 
     public Stream<TunnelMachineInfo> tunnels() {
@@ -306,7 +285,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         var nodeList = nodes().map(node -> {
             CompoundTag nodeInfo = new CompoundTag();
 
-            var encoded = node.getType().codec().encodeStart(NbtOps.INSTANCE, node);
+            var encoded = nodeRegCodec.encodeStart(NbtOps.INSTANCE, node);
             var nodeEncoded = encoded.getOrThrow(false, CompactMachines.LOGGER::error);
 
             var id = UUID.randomUUID();
@@ -343,9 +322,9 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        // Early exit if there are no nodes - no data to load
-        if (!tag.contains("nodes"))
-            return;
+        if (!tag.contains("graph")) return;
+
+        final var g = tag.getCompound("graph");
 
         final var nodeReg = CMGraphRegistration.NODE_TYPE_REG.get();
         final var nodeRegCodec = nodeReg.getCodec()
@@ -354,66 +333,67 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         final var edgeRegCodec = CMGraphRegistration.EDGE_TYPE_REG.get().getCodec()
                 .dispatchStable(IGraphEdge::getEdgeType, IGraphEdgeType::codec);
 
-        final var nodes = tag.getList("nodes", Tag.TAG_COMPOUND);
+        final var nodes = g.getList("nodes", Tag.TAG_COMPOUND);
         HashMap<UUID, IGraphNode> nodeMap = new HashMap<>(nodes.size());
 
-        for (var nodeNbt : nodes) {
-            if (!(nodeNbt instanceof CompoundTag nt))
-                continue;
+        if (tag.contains("nodes", Tag.TAG_LIST)) {
+            for (var nodeNbt : nodes) {
+                if (!(nodeNbt instanceof CompoundTag nt))
+                    continue;
 
-            if (!nt.contains("data") || !nt.hasUUID("id"))
-                continue;
+                if (!nt.contains("data") || !nt.hasUUID("id"))
+                    continue;
 
-            UUID nodeId = nt.getUUID("id");
-            CompoundTag nodeData = nt.getCompound("data");
+                UUID nodeId = nt.getUUID("id");
+                CompoundTag nodeData = nt.getCompound("data");
 
-            var result = nodeRegCodec.parse(NbtOps.INSTANCE, nt)
-                    .getOrThrow(false, CompactMachines.LOGGER::error);
+                var result = nodeRegCodec.parse(NbtOps.INSTANCE, nodeData)
+                        .getOrThrow(false, CompactMachines.LOGGER::error);
 
-            if (result == null) continue;
+                if (result == null) continue;
 
-            try {
-                if (result instanceof CompactMachineNode m) {
-                    nodeMap.putIfAbsent(nodeId, m);
+                try {
+                    if (result instanceof CompactMachineNode m) {
+                        nodeMap.putIfAbsent(nodeId, m);
+                    }
+
+                    if (result instanceof TunnelNode t) {
+                        final var tn = getOrCreateTunnelNode(t.position());
+                        nodeMap.putIfAbsent(nodeId, tn);
+                    }
+
+                    if (result instanceof TunnelTypeNode tt) {
+                        final var ttn = getOrCreateTunnelTypeNode(Tunnels.getDefinition(tt.id()));
+                        nodeMap.putIfAbsent(nodeId, ttn);
+                    }
+
+                } catch (RuntimeException ignored) {
                 }
-
-                if (result instanceof TunnelNode t) {
-                    final var tn = getOrCreateTunnelNode(t.position());
-                    nodeMap.putIfAbsent(nodeId, tn);
-                }
-
-                if (result instanceof TunnelTypeNode tt) {
-                    final var ttn = getOrCreateTunnelTypeNode(Tunnels.getDefinition(tt.id()));
-                    nodeMap.putIfAbsent(nodeId, ttn);
-                }
-
-            } catch (RuntimeException ignored) {
             }
         }
 
         // No edges - skip rest of processing
-        if (!tag.contains("edges"))
-            return;
+        if (g.contains("edges", Tag.TAG_LIST)) {
+            final var edgeTags = g.getList("edges", Tag.TAG_COMPOUND);
+            for (var edgeTag : edgeTags) {
+                if (!(edgeTag instanceof CompoundTag edge))
+                    continue;
 
-        final var edgeTags = tag.getList("edges", Tag.TAG_COMPOUND);
-        for (var edgeTag : edgeTags) {
-            if (!(edgeTag instanceof CompoundTag edge))
-                continue;
+                // invalid edge data
+                if (!edge.contains("data") || !edge.hasUUID("from") || !edge.hasUUID("to"))
+                    continue;
 
-            // invalid edge data
-            if (!edge.contains("data") || !edge.hasUUID("from") || !edge.hasUUID("to"))
-                continue;
+                var nodeFrom = nodeMap.get(edge.getUUID("from"));
+                var nodeTo = nodeMap.get(edge.getUUID("to"));
 
-            var nodeFrom = nodeMap.get(edge.getUUID("from"));
-            var nodeTo = nodeMap.get(edge.getUUID("to"));
+                if (nodeFrom == null || nodeTo == null)
+                    continue;
 
-            if (nodeFrom == null || nodeTo == null)
-                continue;
+                var edgeData = edgeRegCodec.parse(NbtOps.INSTANCE, edge.getCompound("data"))
+                        .getOrThrow(false, CompactMachines.LOGGER::error);
 
-            var edgeData = edgeRegCodec.parse(NbtOps.INSTANCE, edge.getCompound("data"))
-                    .getOrThrow(false, CompactMachines.LOGGER::error);
-
-            graph.putEdgeValue(nodeFrom, nodeTo, edgeData);
+                graph.putEdgeValue(nodeFrom, nodeTo, edgeData);
+            }
         }
     }
 
@@ -468,29 +448,10 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         if (!tunnelTypes.containsKey(type.getRegistryName()))
             return Stream.empty();
 
-        return getTunnelsByType(type).stream()
+        return getTunnelNodesByType(type)
                 .map(this::getTunnelSide)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
-    }
-
-    public void deleteMachine(int machine) {
-        if (!machines.containsKey(machine)) return;
-
-        final var node = machines.get(machine);
-
-        // Remove all connected tunnels
-        graph.predecessors(node).stream()
-                .filter(TunnelNode.class::isInstance)
-                .map(TunnelNode.class::cast)
-                .forEach(node1 -> {
-                    var p = node1.position();
-                    tunnels.remove(p);
-                    graph.removeNode(node1);
-                });
-
-        graph.removeNode(node);
-        machines.remove(machine);
     }
 
     public void clear() {
@@ -507,8 +468,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         tunnels.clear();
     }
 
-
-    public Stream<BlockPos> getMachineTunnels(LevelBlockPosition machine, TunnelDefinition type) {
+    public Stream<BlockPos> getMachineTunnels(IDimensionalBlockPosition machine, TunnelDefinition type) {
         return getTunnelNodesByType(type)
                 .map(TunnelNode::position)
                 .filter(position -> connectedMachine(position).map(machine::equals).orElse(false))
@@ -517,11 +477,14 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
     /**
      * Unlinks a tunnel at a specified point inside the machine room.
+     *
      * @param pos Tunnel position inside the room.
      */
     public void unregister(BlockPos pos) {
         if (!hasTunnel(pos))
             return;
+
+        CompactMachines.LOGGER.debug("Unregistering tunnel at {}", pos);
 
         final var existing = tunnels.get(pos);
         graph.removeNode(existing);
@@ -548,7 +511,12 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             }
         });
 
-        removedTypes.forEach(tunnelTypes::remove);
+        if (!removedTypes.isEmpty()) {
+            CompactMachines.LOGGER.debug("Removed {} tunnel type nodes during cleanup.", removedTypes.size());
+            removedTypes.forEach(tunnelTypes::remove);
+            setDirty();
+        }
+
     }
 
     private void cleanupOrphanedTunnels() {
@@ -560,7 +528,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             }
         });
 
-        removed.forEach(tunnels::remove);
+        if (!removed.isEmpty()) {
+            CompactMachines.LOGGER.debug("Removed {} tunnel nodes during cleanup.", removed.size());
+            removed.forEach(tunnels::remove);
+            setDirty();
+        }
     }
 
     private void cleanupOrphanedMachines() {
@@ -572,7 +544,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             }
         });
 
-        removed.forEach(machines::remove);
+        if (!removed.isEmpty()) {
+            CompactMachines.LOGGER.debug("Removed {} machine nodes during cleanup.", removed.size());
+            removed.forEach(machines::remove);
+            setDirty();
+        }
     }
 
     public void rotateTunnel(BlockPos tunnel, Direction newSide) {
@@ -588,6 +564,8 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             final var m = machines.get(machine);
             graph.removeEdge(t, m);
             graph.putEdgeValue(t, m, new TunnelMachineEdge(newSide));
+
+            setDirty();
         });
     }
 
@@ -615,12 +593,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     }
 
     public void rebind(BlockPos tunnel, IDimensionalBlockPosition newMachine, Direction side) {
-        if(this.hasTunnel(tunnel)) {
-            connectedMachine(tunnel).ifPresent(oldMachine -> {
-                final var oldMachineNode = machines.get(oldMachine);
-                graph.removeNode(oldMachineNode);
-            });
-        }
+        CompactMachines.LOGGER.debug("Rebinding tunnel at {} to machine {}", tunnel, newMachine);
 
         final var tunnelNode = getOrCreateTunnelNode(tunnel);
         final var newMachineNode = getOrCreateMachineNode(newMachine);
