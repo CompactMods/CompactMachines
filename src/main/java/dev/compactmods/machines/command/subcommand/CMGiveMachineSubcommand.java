@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.MissingDimensionException;
@@ -40,8 +41,9 @@ public class CMGiveMachineSubcommand {
         final var roomPos = RoomPositionArgument.get(ctx, "room");
 
         if(!Rooms.exists(server, roomPos)) {
-            CompactMachines.LOGGER.error("Error giving player a new machine block: compact dimension not found.");
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
+            CompactMachines.LOGGER.error("Error giving player a new machine block: room not found.");
+            src.sendFailure(TranslationUtil.message(Messages.UNKNOWN_ROOM_CHUNK, "%s, %s".formatted(roomPos.x, roomPos.z)));
+            return -1;
         }
 
         try {

@@ -15,6 +15,7 @@ import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -80,7 +81,10 @@ public class CMRoomsSubcommand {
             ctx.getSource().sendSuccess(m, false);
         } catch (NonexistentRoomException e) {
             CompactMachines.LOGGER.error("Player is inside an unregistered chunk ({}) in the compact world.", playerChunk, e);
-            throw new CommandRuntimeException(TranslationUtil.message(Messages.UNKNOWN_ROOM_CHUNK));
+            final var tc = new TextComponent("%s, %s".formatted(playerChunk.x, playerChunk.z))
+                    .withStyle(ChatFormatting.RED);
+
+            throw new CommandRuntimeException(TranslationUtil.message(Messages.UNKNOWN_ROOM_CHUNK, tc));
         }
 
         return 0;

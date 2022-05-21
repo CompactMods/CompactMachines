@@ -76,6 +76,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.CANNOT_GIVE_MACHINE, "Failed to give a new machine to player.");
         addCommand(CMCommands.MACHINE_GIVEN, "Created a new machine item and gave it to %s.");
 
+        addMessage(Messages.UNKNOWN_ROOM_CHUNK, "Unknown room at %s; please verify it exists.");
+
         add("itemGroup." + CompactMachines.MOD_ID, "Compact Machines");
 
         add("biome." + CompactMachines.MOD_ID + ".machine", "Compact Machine");
