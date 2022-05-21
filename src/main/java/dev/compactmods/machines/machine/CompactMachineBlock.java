@@ -3,10 +3,13 @@ package dev.compactmods.machines.machine;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.util.PlayerUtil;
@@ -195,18 +198,30 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                     } catch (MissingDimensionException e) {
                         e.printStackTrace();
                     }
-                }, () -> {
-                    try {
-                        final var newRoomPos = Rooms.createNew(server, size, player.getUUID());
-
-                    } catch (MissingDimensionException e) {
-                        CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
-                    }
-                });
+                }, () -> createAndEnterRoom(player, server, tile));
             }
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    private void createAndEnterRoom(Player player, MinecraftServer server, CompactMachineBlockEntity tile) {
+        try {
+            final var newRoomPos = Rooms.createNew(server, size, player.getUUID());
+            tile.setConnectedRoom(newRoomPos);
+
+            PlayerUtil.teleportPlayerIntoRoom(server, player, newRoomPos, true);
+
+            // Mark the player as inside the machine, set external spawn, and yeet
+            player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(hist -> {
+                var entry = PreciseDimensionalPosition.fromPlayer(player);
+                hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
+            });
+        } catch (MissingDimensionException e) {
+            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
+        } catch (NonexistentRoomException e) {
+            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
+        }
     }
 
     public RoomSize getSize() {

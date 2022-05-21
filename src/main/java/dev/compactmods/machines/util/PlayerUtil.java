@@ -78,7 +78,7 @@ public abstract class PlayerUtil {
         }
     }
 
-    private static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, ChunkPos room, boolean grantAdvancement) throws MissingDimensionException, NonexistentRoomException {
+    public static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, ChunkPos room, boolean grantAdvancement) throws MissingDimensionException, NonexistentRoomException {
         final var compactDim = serv.getLevel(Registration.COMPACT_DIMENSION);
         final var spawn = Rooms.getSpawn(serv, room);
         final var roomSize = Rooms.sizeOf(serv, room);

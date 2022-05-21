@@ -14,6 +14,7 @@ public class CMCommandRoot {
         root.then(CMEjectSubcommand.make());
         root.then(CMSummarySubcommand.make());
         root.then(CMRebindSubcommand.make());
+        root.then(CMUnbindSubcommand.make());
         root.then(CMReaddDimensionSubcommand.make());
         root.then(CMRoomsSubcommand.make());
         root.then(CMDataSubcommand.make());

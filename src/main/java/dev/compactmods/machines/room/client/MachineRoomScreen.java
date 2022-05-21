@@ -16,6 +16,7 @@ import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.room.network.RoomNetworkHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -89,9 +90,16 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     protected void renderLabels(PoseStack pose, int mouseX, int mouseY) {
         pose.pushPose();
         pose.translate(0, 0, 500);
-        float mid = (this.imageWidth / 2f) - (font.width("Room Preview") / 2f);
-        this.font.draw(pose, new TextComponent("Room Preview"), mid, (float) this.titleLabelY, 0xFFFFFFFF);
-        this.font.draw(pose, new TextComponent(menu.getRoom().toString()), leftPos, (float) topPos + this.imageHeight - 12, 0xFFFFFFFF);
+
+        pose.translate(this.imageWidth / 2f, 0, 0);
+
+        var p = new TextComponent("Room Preview");
+        Screen.drawCenteredString(pose, font, p, 0, this.titleLabelY, 0xFFFFFFFF);
+
+        var room = menu.getRoom();
+        var rt =  new TextComponent("(%s, %s)".formatted(room.x, room.z));
+        pose.scale(0.8f, 0.8f, 0.8f);
+        Screen.drawCenteredString(pose, font, rt, 0,this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
         pose.popPose();
     }
 

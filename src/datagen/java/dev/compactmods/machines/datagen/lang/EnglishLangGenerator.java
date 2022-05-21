@@ -34,7 +34,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
         addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
-        addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s does not have an associated ID.");
+        addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s is not bound to a room.");
         addCommand(CMCommands.ROOM_REG_COUNT, "Number of registered rooms: %s");
         addCommand(CMCommands.MACHINE_REG_DIM, "[%s]: %s");
         addCommand(CMCommands.MACHINE_REG_TOTAL, "Total: %s");

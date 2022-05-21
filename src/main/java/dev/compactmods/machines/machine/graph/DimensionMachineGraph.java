@@ -186,6 +186,8 @@ public class DimensionMachineGraph extends SavedData {
         graph.successors(node).stream()
                 .filter(cn -> cn instanceof CompactMachineRoomNode)
                 .forEach(room -> graph.removeEdge(node, room));
+
+        setDirty();
     }
 
     public Optional<CompactMachineNode> getMachineNode(BlockPos worldPosition) {

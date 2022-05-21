@@ -235,6 +235,27 @@ public class CompactMachineBlockEntity extends BlockEntity implements ICapabilit
             this.getConnectedRoom()
                     .flatMap(room -> graph.getRoomNode(this.roomChunk))
                     .ifPresent(roomNode -> this.roomNode = new WeakReference<>(roomNode));
+
+            this.setChanged();
+        }
+    }
+
+    public void setConnectedRoom(ChunkPos room) {
+        if(level instanceof ServerLevel sl) {
+            final var dimMachines = DimensionMachineGraph.forDimension(sl);
+            dimMachines.connectMachineToRoom(worldPosition, room);
+            syncConnectedRoom();
+        }
+    }
+
+    public void disconnect() {
+        if(level instanceof ServerLevel sl) {
+            final var dimMachines = DimensionMachineGraph.forDimension(sl);
+            dimMachines.disconnect(worldPosition);
+
+            this.roomChunk = null;
+            this.graphNode.clear();
+            setChanged();
         }
     }
 }

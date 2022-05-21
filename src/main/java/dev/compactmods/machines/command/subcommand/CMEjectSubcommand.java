@@ -17,7 +17,8 @@ public class CMEjectSubcommand {
         return Commands.literal("eject")
                 .executes(CMEjectSubcommand::execExecutingPlayer)
                     .then(Commands.argument("player", EntityArgument.player())
-                    .executes(CMEjectSubcommand::execSpecificPlayer));
+                    .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .executes(CMEjectSubcommand::execSpecificPlayer));
     }
 
     private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

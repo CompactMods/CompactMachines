@@ -19,6 +19,10 @@ public class CMCommands {
      */
     public static final ResourceLocation ROOM_REG_COUNT = new ResourceLocation(MOD_ID, "room_reg_count");
     public static final ResourceLocation NOT_A_MACHINE_BLOCK = new ResourceLocation(MOD_ID, "not_a_machine_block");
+
+    /**
+     * Shows a machine is not bound. Takes in a single param, the machine position in world.
+     */
     public static final ResourceLocation MACHINE_NOT_BOUND = new ResourceLocation(MOD_ID, "machine_not_bound");
 
     public static final ResourceLocation WRONG_DIMENSION = new ResourceLocation(MOD_ID, "not_in_compact_dimension");
@@ -27,4 +31,5 @@ public class CMCommands {
 
     public static final ResourceLocation CANNOT_GIVE_MACHINE = new ResourceLocation(MOD_ID, "cannot_give_machine_item");
     public static final ResourceLocation MACHINE_GIVEN = new ResourceLocation(MOD_ID, "machine_given_successfully");
+    public static final ResourceLocation NO_REBIND_TUNNEL_PRESENT = new ResourceLocation(MOD_ID, "cannot_rebind_tunnel_present");
 }

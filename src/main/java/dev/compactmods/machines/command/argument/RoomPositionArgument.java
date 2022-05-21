@@ -5,12 +5,16 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.level.ChunkPos;
+
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.commands.arguments.coordinates.WorldCoordinate.ERROR_EXPECTED_INT;
 
@@ -42,5 +46,10 @@ public class RoomPositionArgument implements ArgumentType<RoomCoordinates> {
                 throw ERROR_NOT_COMPLETE.createWithContext(reader);
             }
         }
+    }
+
+    @Override
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return Suggestions.empty();
     }
 }
