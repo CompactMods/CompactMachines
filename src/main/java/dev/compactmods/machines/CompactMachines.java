@@ -1,5 +1,6 @@
 package dev.compactmods.machines;
 
+import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
 import dev.compactmods.machines.config.ServerConfig;
@@ -7,6 +8,8 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.graph.CMGraphRegistration;
+import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -51,5 +54,7 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
+
+        ArgumentTypes.register("room_pos", RoomPositionArgument.class, new EmptyArgumentSerializer<>(RoomPositionArgument::room));
     }
 }

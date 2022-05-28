@@ -180,6 +180,7 @@ public class RenderingLevel extends Level {
         chunkProvider.chunks()
                 .filter(ca -> ca instanceof TemplateChunk)
                 .map(TemplateChunk.class::cast)
+                .toList()
                 .forEach(TemplateChunk::tick);
     }
 }
