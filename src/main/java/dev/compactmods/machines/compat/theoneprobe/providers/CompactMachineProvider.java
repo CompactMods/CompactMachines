@@ -2,22 +2,18 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.machine.Machines;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.tunnel.TunnelItem;
-import dev.compactmods.machines.tunnel.data.RoomTunnelData;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.styles.ItemStyle;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -40,33 +36,24 @@ public class CompactMachineProvider implements IProbeInfoProvider {
             return;
 
         final var server = level.getServer();
+        if (server == null)
+            return;
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
         final var te = level.getBlockEntity(hitData.getPos());
 
         if (te instanceof CompactMachineBlockEntity machine) {
-            if (machine.mapped()) {
-                MutableComponent id = TranslationUtil
-                        .tooltip(Tooltips.Machines.ID, machine.machineId, hitData.getSideHit())
-                        .withStyle(ChatFormatting.GREEN);
-
-                info.text(id);
-
-                try {
-                    Machines.getConnectedRoom(server, machine.machineId).ifPresent(roomInfo -> {
-                        final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, roomInfo.chunk());
-                        info.text(boundTo);
-                    });
-                } catch (MissingDimensionException e) {
-                    e.printStackTrace();
-                } catch (NonexistentRoomException e) {
-                    e.printStackTrace();
-                }
-            } else {
+            machine.getConnectedRoom().ifPresentOrElse(room -> {
+                final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, room);
+                info.text(boundTo);
+            }, () -> {
                 MutableComponent newMachine = TranslationUtil
                         .message(new ResourceLocation(CompactMachines.MOD_ID, "new_machine"))
                         .withStyle(ChatFormatting.GREEN);
 
                 info.text(newMachine);
-            }
+            });
 
             machine.getOwnerUUID().ifPresent(ownerID -> {
                 // Owner Name
@@ -81,44 +68,50 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                 }
             });
 
-            machine.getInternalChunkPos().ifPresent(room -> {
-                try {
-                    final var tunnels = RoomTunnelData.get(server, room);
-                    final var graph = tunnels.getGraph();
+            machine.getConnectedRoom().ifPresent(room -> {
+                if (compactDim == null)
+                    return;
 
-                    final var applied = graph.getTypesForSide(machine.machineId, hitData.getSideHit())
-                            .collect(Collectors.toSet());
+                final var roomData = CompactRoomData.get(compactDim);
+                final var graph = TunnelConnectionGraph.forRoom(compactDim, room);
 
-                    switch (probeMode) {
-                        case NORMAL:
-                            final var group = info.horizontal(new LayoutStyle()
-                                    .alignment(ElementAlignment.ALIGN_TOPLEFT)
-                                    .padding(0)
-                                    .spacing(0));
+                final var applied = graph.getTypesForSide(machine.getLevelPosition(), hitData.getSideHit())
+                        .collect(Collectors.toSet());
 
-                            applied.forEach(tn -> {
-                                ItemStack item = TunnelItem.createStack(tn);
-                                group.item(item, new ItemStyle().bounds(8, 8));
-                            });
-                            break;
+                switch (probeMode) {
+                    case NORMAL:
+                        final var group = info.horizontal(new LayoutStyle()
+                                .alignment(ElementAlignment.ALIGN_TOPLEFT)
+                                .padding(0)
+                                .spacing(0));
 
-                        case EXTENDED:
-                            final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
-                            applied.forEach(tn -> {
-                                final var tg = tgg.horizontal(new LayoutStyle()
+                        applied.forEach(tn -> {
+                            ItemStack item = TunnelItem.createStack(tn);
+                            group.item(item, new ItemStyle().bounds(8, 8));
+                        });
+                        break;
+
+                    case EXTENDED:
+                        final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
+                        applied.forEach(tn -> {
+                            final var tg = tgg.horizontal(new LayoutStyle()
                                     .alignment(ElementAlignment.ALIGN_CENTER)
                                     .hPadding(2).vPadding(2)
                                     .spacing(0));
 
-                                ItemStack item = TunnelItem.createStack(tn);
-                                tg.item(item, new ItemStyle().bounds(8, 8));
-                                tg.itemLabel(item);
-                            });
-                            break;
-                    }
-                } catch (MissingDimensionException e) {
-                    CompactMachines.LOGGER.fatal(e);
+                            ItemStack item = TunnelItem.createStack(tn);
+                            tg.item(item, new ItemStyle().bounds(8, 8));
+                            tg.itemLabel(item);
+                        });
+                        break;
                 }
+
+                final var rd = roomData.forRoom(room);
+                rd.ifPresent(r -> {
+//                        final var el = new RoomPreviewElement(new RoomPreview(room, r.getSize()));
+//                        el.loadBlocks(server, r);
+//                        info.element(el);
+                });
             });
         }
     }

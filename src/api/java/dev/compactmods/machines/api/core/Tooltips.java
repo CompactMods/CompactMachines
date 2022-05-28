@@ -7,6 +7,7 @@ public abstract class Tooltips {
     public static final ResourceLocation UNKNOWN_PLAYER_NAME = new ResourceLocation(Constants.MOD_ID, "unknown_player");
     public static final ResourceLocation TUNNEL_TYPE = new ResourceLocation(Constants.MOD_ID, "tunnel_type");
     public static final ResourceLocation UNKNOWN_TUNNEL_TYPE = new ResourceLocation(Constants.MOD_ID, "unknown_tunnel_type");
+    public static final ResourceLocation ROOM_NAME = new ResourceLocation(Constants.MOD_ID, "room_name");
 
     public static abstract class Machines {
         public static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "machine.id");

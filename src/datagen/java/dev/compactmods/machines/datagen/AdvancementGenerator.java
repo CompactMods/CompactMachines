@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.advancement.trigger.ClaimedMachineTrigger;
+import dev.compactmods.machines.advancement.trigger.BasicPlayerAdvTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.core.Registration;
@@ -89,6 +89,17 @@ public class AdvancementGenerator implements DataProvider {
 
         Advancement.Builder.advancement()
                 .parent(root)
+                .addCriterion("recursion", BasicPlayerAdvTrigger.Instance.create(Advancements.RECURSIVE_ROOMS))
+                .display(new DisplayBuilder()
+                        .frame(FrameType.CHALLENGE)
+                        .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                        .id(Advancements.RECURSIVE_ROOMS)
+                        .toast(false).hidden(true)
+                        .build())
+                .save(consumer, Advancements.RECURSIVE_ROOMS.toString());
+
+        Advancement.Builder.advancement()
+                .parent(root)
                 .addCriterion("obtained_wall", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
@@ -118,7 +129,7 @@ public class AdvancementGenerator implements DataProvider {
     private void machineAdvancement(Consumer<Advancement> consumer, Advancement root, ResourceLocation advancement, Supplier<Item> item) {
         Advancement.Builder.advancement()
                 .parent(root)
-                .addCriterion("claimed_machine", ClaimedMachineTrigger.Instance.create(advancement))
+                .addCriterion("claimed_machine", BasicPlayerAdvTrigger.Instance.create(advancement))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
                         .item(new ItemStack(item.get()))

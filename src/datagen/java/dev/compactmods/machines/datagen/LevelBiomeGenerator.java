@@ -105,7 +105,6 @@ public class LevelBiomeGenerator implements DataProvider {
 
     private void writeDimensionTypes(BiConsumer<DimensionType, ResourceLocation> consumer) {
         final DimensionType dim = new DimensionTypeBuilder()
-                .ambientLight(15.0f)
                 .bedWorks(false)
                 .respawnAnchorWorks(false)
                 .fixedTime(18000L)

@@ -3,42 +3,41 @@ package dev.compactmods.machines.machine.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.graph.CMGraphRegistration;
 import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.graph.IGraphNodeType;
+import dev.compactmods.machines.location.LevelBlockPosition;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 
 /**
  * Represents a machine's external point. This can be either inside a machine or in a dimension somewhere.
  */
-public record CompactMachineNode(int machineId) implements IGraphNode {
+public record CompactMachineNode(ResourceKey<Level> dimension, BlockPos position)
+        implements IGraphNode {
 
     public static final ResourceLocation TYPE = new ResourceLocation(CompactMachines.MOD_ID, "machine");
 
     public static final Codec<CompactMachineNode> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.INT.fieldOf("machine").forGetter(CompactMachineNode::machineId),
+            Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(CompactMachineNode::dimension),
+            BlockPos.CODEC.fieldOf("position").forGetter(CompactMachineNode::position),
             ResourceLocation.CODEC.fieldOf("type").forGetter(x -> TYPE)
-    ).apply(i, (id, type) -> new CompactMachineNode(id)));
+    ).apply(i, (dim, pos, type) -> new CompactMachineNode(dim, pos)));
 
-    public String label() {
-        return "Compact Machine #" + machineId;
+    public String toString() {
+        return "Compact Machine {%s}".formatted(position);
+    }
+
+    public LevelBlockPosition dimpos() {
+        return new LevelBlockPosition(dimension, position);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CompactMachineNode that = (CompactMachineNode) o;
-        return machineId == that.machineId;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(machineId);
-    }
-
-    @Override
-    public Codec<CompactMachineNode> codec() {
-        return CODEC;
+    public IGraphNodeType getType() {
+        return CMGraphRegistration.MACH_NODE.get();
     }
 }

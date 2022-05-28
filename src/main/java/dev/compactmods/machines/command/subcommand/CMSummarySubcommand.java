@@ -3,26 +3,26 @@ package dev.compactmods.machines.command.subcommand;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.machine.data.CompactMachineData;
+import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+
+import java.util.HashMap;
 
 public class CMSummarySubcommand {
     public static ArgumentBuilder<CommandSourceStack, ?> make() {
         return Commands.literal("summary")
-                .requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
                 .executes(CMSummarySubcommand::exec);
     }
 
-    private static int exec(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    private static int exec(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
 
@@ -33,25 +33,24 @@ public class CMSummarySubcommand {
             src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
         }
 
-        try {
-            final var machineData = CompactMachineData.get(serv);
+        HashMap<ResourceKey<Level>, Long> levelCounts = new HashMap<>();
+        serv.getAllLevels().forEach(sl -> {
+            final var machineData = DimensionMachineGraph.forDimension(sl);
+            long numRegistered = machineData.getMachines().count();
 
-            long numRegistered = machineData.stream().count();
-            src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_COUNT, numRegistered), false);
-        } catch (MissingDimensionException e) {
-            CompactMachines.LOGGER.fatal(e);
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
-        }
+            if(numRegistered > 0) {
+                src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().toString(), numRegistered), false);
+                levelCounts.put(sl.dimension(), numRegistered);
+            }
+        });
 
-        try {
-            final var roomData = CompactRoomData.get(serv);
+        long grandTotal = levelCounts.values().stream().reduce(0L, Long::sum);
+        src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);
 
-            long numRegistered = roomData.stream().count();
-            src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, numRegistered), false);
-        } catch (MissingDimensionException e) {
-            CompactMachines.LOGGER.fatal(e);
-            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
-        }
+        final var roomData = CompactRoomData.get(compactLevel);
+
+        long numRegistered = roomData.stream().count();
+        src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, numRegistered), false);
 
         return 0;
     }

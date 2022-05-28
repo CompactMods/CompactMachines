@@ -37,15 +37,15 @@ public class DimensionUtil {
     public static void createAndRegisterWorldAndDimension(final MinecraftServer server) {
         final var map = server.forgeGetWorldMap();
 
-        // get everything we need to create the dimension and the level
+        // get everything we need to create the dimension and the dimension
         final ServerLevel overworld = server.getLevel(Level.OVERWORLD);
 
-        // dimension keys have a 1:1 relationship with level keys, they have the same IDs as well
+        // dimension keys have a 1:1 relationship with dimension keys, they have the same IDs as well
         final ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, Registration.COMPACT_DIMENSION.location());
 
         final var serverResources = server.getResourceManager();
 
-        // only back up level.dat in production
+        // only back up dimension.dat in production
         if (FMLEnvironment.production && !doLevelFileBackup(server)) return;
 
         var reg = server.registryAccess();
@@ -76,10 +76,10 @@ public class DimensionUtil {
             final WorldGenSettings worldGenSettings = worldData.worldGenSettings();
             final DerivedLevelData derivedLevelData = new DerivedLevelData(worldData, worldData.overworldData());
 
-            // now we have everything we need to create the dimension and the level
+            // now we have everything we need to create the dimension and the dimension
             // this is the same order server init creates levels:
             // the dimensions are already registered when levels are created, we'll do that first
-            // then instantiate level, add border listener, add to map, fire world load event
+            // then instantiate dimension, add border listener, add to map, fire world load event
 
             // register the actual dimension
             if(worldGenSettings.dimensions() instanceof MappedRegistry<LevelStem> stems) {
@@ -115,10 +115,10 @@ public class DimensionUtil {
             */
             overworld.getWorldBorder().addListener(new BorderChangeListener.DelegateBorderChangeListener(newWorld.getWorldBorder()));
 
-            // register level
+            // register dimension
             map.put(Registration.COMPACT_DIMENSION, newWorld);
 
-            // update forge's world cache so the new level can be ticked
+            // update forge's world cache so the new dimension can be ticked
             server.markWorldsDirty();
 
             // fire world load event
@@ -130,12 +130,12 @@ public class DimensionUtil {
         var levelRoot = server.getWorldPath(LevelResource.ROOT);
         var levelFile = server.getWorldPath(LevelResource.LEVEL_DATA_FILE);
 
-        var formatter = DateTimeFormatter.ofPattern("'cm4-level-'yyyyMMdd-HHmmss'.dat'");
+        var formatter = DateTimeFormatter.ofPattern("'cm4-dimension-'yyyyMMdd-HHmmss'.dat'");
         var timestamp = formatter.format(ZonedDateTime.now());
         try {
             Files.copy(levelFile, levelRoot.resolve(timestamp));
         } catch (IOException e) {
-            CompactMachines.LOGGER.error("Failed to backup level.dat file before modification; canceling register dim attempt.");
+            CompactMachines.LOGGER.error("Failed to backup dimension.dat file before modification; canceling register dim attempt.");
             return false;
         }
 

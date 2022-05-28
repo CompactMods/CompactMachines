@@ -15,10 +15,10 @@ import net.minecraft.server.level.ServerPlayer;
 public class CMEjectSubcommand {
     public static ArgumentBuilder<CommandSourceStack, ?> make() {
         return Commands.literal("eject")
-                .requires(cs -> cs.hasPermission(2))
                 .executes(CMEjectSubcommand::execExecutingPlayer)
                     .then(Commands.argument("player", EntityArgument.player())
-                    .executes(CMEjectSubcommand::execSpecificPlayer));
+                    .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .executes(CMEjectSubcommand::execSpecificPlayer));
     }
 
     private static int execSpecificPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

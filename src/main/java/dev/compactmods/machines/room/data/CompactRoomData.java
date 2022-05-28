@@ -7,8 +7,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.LevelBlockPosition;
-import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -18,7 +17,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -45,14 +43,8 @@ public class CompactRoomData extends SavedData {
     }
 
     @Nonnull
-    public static CompactRoomData get(MinecraftServer server) throws MissingDimensionException {
-        ServerLevel compactWorld = server.getLevel(Registration.COMPACT_DIMENSION);
-        if (compactWorld == null) {
-            CompactMachines.LOGGER.error("No compact dimension found. Report this.");
-            throw new MissingDimensionException("Compact dimension not found.");
-        }
-
-        DimensionDataStorage sd = compactWorld.getDataStorage();
+    public static CompactRoomData get(ServerLevel compactDim) {
+        DimensionDataStorage sd = compactDim.getDataStorage();
         return sd.computeIfAbsent(CompactRoomData::fromNbt, CompactRoomData::new, DATA_NAME);
     }
 
@@ -112,6 +104,13 @@ public class CompactRoomData extends SavedData {
         setDirty();
     }
 
+    public Optional<RoomData> forRoom(ChunkPos room) {
+        if(roomData.containsKey(room))
+            return Optional.ofNullable(roomData.get(room));
+
+        return Optional.empty();
+    }
+
     public Stream<RoomData> streamRooms() {
         return roomData.values().stream();
     }
@@ -146,7 +145,7 @@ public class CompactRoomData extends SavedData {
         if (!roomData.containsKey(roomChunk))
             throw new NonexistentRoomException(roomChunk);
 
-        return roomData.get(roomChunk).getMachineBounds();
+        return roomData.get(roomChunk).getRoomBounds();
     }
 
     public NewRoomRegistration createNew() {
@@ -276,7 +275,7 @@ public class CompactRoomData extends SavedData {
             this.spawn = newSpawn;
         }
 
-        public AABB getMachineBounds() {
+        public AABB getRoomBounds() {
             return size.getBounds(this.center);
         }
     }

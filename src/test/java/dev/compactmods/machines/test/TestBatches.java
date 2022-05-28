@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test;
 
-public class TestBatches {
+public final class TestBatches {
 
     public static final String TUNNELS = "tunnels";
     public static final String TUNNEL_DATA = "tunnel_data";

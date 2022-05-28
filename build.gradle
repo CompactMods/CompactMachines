@@ -1,12 +1,14 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
         mavenCentral()
         mavenLocal()
     }
 
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
+        classpath "org.spongepowered:mixingradle:${mixingradle_version}"
     }
 }
 
@@ -17,6 +19,7 @@ plugins {
 }
 
 apply plugin: "net.minecraftforge.gradle"
+apply plugin: 'org.spongepowered.mixin'
 
 def semver = { ->
     try {
@@ -130,6 +133,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
+            arg '-mixin.config=compactmachines.mixin.json'
             args '--username', 'Dev'
             args '--width', 1920
             args '--height', 1080
@@ -156,6 +160,8 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            arg '-mixin.config=compactmachines.mixin.json'
 
             mods {
                 compactmachines {
@@ -215,7 +221,7 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             forceExit false
-            
+
             mods {
                 compactmachines {
                     source sourceSets.tunnels
@@ -246,7 +252,11 @@ repositories {
 
     // TheOneProbe
     maven {
-        name 'tterrag maven'
+        url "https://maven.k-4u.nl"
+    }
+
+    maven {
+        name "tterrag maven"
         url "https://maven.tterrag.com/"
     }
 }
@@ -263,36 +273,45 @@ dependencies {
 
     // The One Probe
     implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
-//    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
-//    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
 
-    // Nicephore - Screenshots and Stuff
-    runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3651214"))
+    if (!System.getenv().containsKey("CI") && include_test_mods) {
+        // Nicephore - Screenshots and Stuff
+        runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
 
-    // Shut up Experimental Settings - so we don't have to deal with that CONSTANTLY
-    runtimeOnly(fg.deobf("curse.maven:shutupexperimental-407174:3544525"))
+        //    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
+            runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
+            runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
+            runtimeOnly(fg.deobf("curse.maven:pipez-443900:3760255"))
 
-//    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-//    runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
-//    runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
-//    runtimeOnly(fg.deobf("curse.maven:pipez-443900:3569514"))
-//    runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3687357"))
-//    runtimeOnly(fg.deobf("curse.maven:create-328085:3687358"))
-//    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-//    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-//    runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
-//
-//    // Scalable Cat's Force, BdLib, Advanced Generators
-//    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
-//    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
-//    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
-//
-//    // Immersive Eng - 7.1.0-145 (Dec 31)
-//    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
+            runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3737402"))
+            runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
 
-    // Mekanism + Mek Generators - Tunnel testing
-//    runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3206392"))
-//    runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3206395"))
+        //    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
+        //    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
+            // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+        //
+        //    // Scalable Cat's Force, BdLib, Advanced Generators
+        //    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
+        //    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
+        //    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
+        //
+        //    // Immersive Eng - 7.1.0-145 (Dec 31)
+        //    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
+
+        // FTB Chunks
+        runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
+        runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
+        runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
+        runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
+
+        // Mekanism + Mek Generators - Tunnel testing
+        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3743835"))
+        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3743837"))
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
 }
 
 processResources {
@@ -323,7 +342,8 @@ jar {
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : archiveVersion,
                 "Implementation-Vendor"   : "",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs': "${mod_id}.mixin.json"
         ])
     }
 }
