@@ -14,8 +14,8 @@ body:
   - type: markdown
     attributes:
       value: > 
-        *Tunnels are not supported in 1.16.5, hence the lack of recipes and no fluid/energy tunnels.*
-        Please do not submit reports for tunnels. They will be closed.
+        ***Tunnels are not supported in 1.16.5, hence the lack of recipes and no fluid/energy tunnels.***
+        **Please do not submit reports for tunnels. They will be closed.**
         
   - type: checkboxes
     attributes:
