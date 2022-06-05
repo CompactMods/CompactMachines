@@ -1,7 +1,8 @@
-name: Bug Report - Compact Machines 4
+name: Bug Report - Compact Machines 4 (1.18)
 description: Submit a report for Compact Machines 4
 labels:
   - triage
+  - 1.18
   - bug
   - unverified
 assignees: []
@@ -39,14 +40,14 @@ body:
   - type: input
     attributes:
       label: Mod Version
-      placeholder: 4.0.0 beta 3
+      placeholder: 4.3.0
     validations:
       required: true
 
   - type: input
     attributes:
       label: Forge Version
-      placeholder: 1.16.5 - 36.0.55
+      placeholder: 1.18.2 - 40.1.0
     validations:
       required: true
 

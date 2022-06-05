@@ -1,8 +1,8 @@
-name: Bug Report - Compact Machines 3
-description: Submit a report for Compact Machines 3
+name: Bug Report - Compact Machines 4 (1.16.5)
+description: Submit a report for Compact Machines 4
 labels:
-  - 1.12
   - triage
+  - 1.16
   - bug
   - unverified
 assignees: []
@@ -10,7 +10,13 @@ body:
   - type: markdown
     attributes:
       value: "*Please do not create an issue if you have not tried fixing it by using the latest version of the mod!*"
-
+      
+  - type: markdown
+    attributes:
+      value: > 
+        ***Tunnels are not supported in 1.16.5, hence the lack of recipes and no fluid/energy tunnels.***
+        **Please do not submit reports for tunnels. They will be closed.**
+        
   - type: checkboxes
     attributes:
       label: I am not using performance mods.
@@ -40,14 +46,14 @@ body:
   - type: input
     attributes:
       label: Mod Version
-      placeholder: CM3-3.0.18-b278
+      placeholder: 4.0.0 beta 2
     validations:
       required: true
 
   - type: input
     attributes:
       label: Forge Version
-      placeholder: 1.12.2 - 14.23.5.2854
+      placeholder: 1.16.5 - 39.1.0
     validations:
       required: true
 
