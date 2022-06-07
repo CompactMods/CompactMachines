@@ -324,7 +324,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     public void deserializeNBT(CompoundTag tag) {
         if (!tag.contains("graph")) return;
 
-        final var g = tag.getCompound("graph");
+        final var graphRoot = tag.getCompound("graph");
 
         final var nodeReg = CMGraphRegistration.NODE_TYPE_REG.get();
         final var nodeRegCodec = nodeReg.getCodec()
@@ -333,10 +333,10 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         final var edgeRegCodec = CMGraphRegistration.EDGE_TYPE_REG.get().getCodec()
                 .dispatchStable(IGraphEdge::getEdgeType, IGraphEdgeType::codec);
 
-        final var nodes = g.getList("nodes", Tag.TAG_COMPOUND);
+        final var nodes = graphRoot.getList("nodes", Tag.TAG_COMPOUND);
         HashMap<UUID, IGraphNode> nodeMap = new HashMap<>(nodes.size());
 
-        if (tag.contains("nodes", Tag.TAG_LIST)) {
+        if (graphRoot.contains("nodes", Tag.TAG_LIST)) {
             for (var nodeNbt : nodes) {
                 if (!(nodeNbt instanceof CompoundTag nt))
                     continue;
@@ -354,17 +354,21 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
                 try {
                     if (result instanceof CompactMachineNode m) {
+                        graph.addNode(m);
+                        machines.put(m.dimpos(), m);
                         nodeMap.putIfAbsent(nodeId, m);
                     }
 
                     if (result instanceof TunnelNode t) {
-                        final var tn = getOrCreateTunnelNode(t.position());
-                        nodeMap.putIfAbsent(nodeId, tn);
+                        graph.addNode(t);
+                        tunnels.put(t.position(), t);
+                        nodeMap.putIfAbsent(nodeId, t);
                     }
 
                     if (result instanceof TunnelTypeNode tt) {
-                        final var ttn = getOrCreateTunnelTypeNode(Tunnels.getDefinition(tt.id()));
-                        nodeMap.putIfAbsent(nodeId, ttn);
+                        graph.addNode(tt);
+                        tunnelTypes.put(tt.id(), tt);
+                        nodeMap.putIfAbsent(nodeId, tt);
                     }
 
                 } catch (RuntimeException ignored) {
@@ -373,8 +377,8 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         }
 
         // No edges - skip rest of processing
-        if (g.contains("edges", Tag.TAG_LIST)) {
-            final var edgeTags = g.getList("edges", Tag.TAG_COMPOUND);
+        if (graphRoot.contains("edges", Tag.TAG_LIST)) {
+            final var edgeTags = graphRoot.getList("edges", Tag.TAG_COMPOUND);
             for (var edgeTag : edgeTags) {
                 if (!(edgeTag instanceof CompoundTag edge))
                     continue;
