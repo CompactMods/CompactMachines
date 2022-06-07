@@ -13,6 +13,10 @@ import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 public class CMCommandRoot {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+
+        // TODO: /cm create <size:RoomSize> <owner:Player> <giveMachine:true|false>
+        // TODO: /cm spawn set <room> <pos>
+
         final LiteralArgumentBuilder<CommandSourceStack> root = LiteralArgumentBuilder.literal(CompactMachines.MOD_ID);
         root.then(CMEjectSubcommand.make());
         root.then(CMSummarySubcommand.make());
@@ -22,6 +26,7 @@ public class CMCommandRoot {
         root.then(CMRoomsSubcommand.make());
         root.then(CMDataSubcommand.make());
         root.then(CMGiveMachineSubcommand.make());
+        root.then(SpawnSubcommand.make());
 
         dispatcher.register(root);
     }

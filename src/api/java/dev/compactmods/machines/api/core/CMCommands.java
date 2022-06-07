@@ -8,6 +8,8 @@ public class CMCommands {
     public static final ResourceLocation LEVEL_REGISTERED = new ResourceLocation(MOD_ID, "level_registered");
     public static final ResourceLocation LEVEL_NOT_FOUND = new ResourceLocation(MOD_ID, "level_not_found");
 
+    public static final ResourceLocation ROOM_NOT_FOUND = new ResourceLocation(MOD_ID, "room_not_found");
+
     /**
      * Used for displaying the number of registered machines via summary commands.
      */
@@ -32,4 +34,5 @@ public class CMCommands {
     public static final ResourceLocation CANNOT_GIVE_MACHINE = new ResourceLocation(MOD_ID, "cannot_give_machine_item");
     public static final ResourceLocation MACHINE_GIVEN = new ResourceLocation(MOD_ID, "machine_given_successfully");
     public static final ResourceLocation NO_REBIND_TUNNEL_PRESENT = new ResourceLocation(MOD_ID, "cannot_rebind_tunnel_present");
+    public static final ResourceLocation SPAWN_CHANGED_SUCCESSFULLY = new ResourceLocation(MOD_ID, "spawn_changed_successfully");
 }

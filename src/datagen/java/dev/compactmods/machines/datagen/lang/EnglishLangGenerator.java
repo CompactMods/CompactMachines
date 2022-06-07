@@ -40,6 +40,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.MACHINE_REG_TOTAL, "Total: %s");
         addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
         addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
+        addCommand(CMCommands.ROOM_NOT_FOUND, "Room [%s] could not be found.");
+        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawnpoint for room [%s] was changed successfully.");
 
         addAdvancementTranslations();
 

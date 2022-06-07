@@ -1,7 +1,6 @@
 package dev.compactmods.machines.config;
 
 import com.electronwill.nightconfig.core.EnumGetMethod;
-import dev.compactmods.machines.client.level.EmptyLevelEntityGetter;
 import dev.compactmods.machines.core.EnumMachinePlayersBreakHandling;
 import net.minecraft.commands.Commands;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -19,6 +18,7 @@ public class ServerConfig {
 
     private static ForgeConfigSpec.IntValue REBIND_LEVEL;
     private static ForgeConfigSpec.IntValue GIVE_MACHINE;
+    private static ForgeConfigSpec.IntValue CHANGE_SPAWN_LEVEL;
 
     static {
         generateConfig();
@@ -58,8 +58,17 @@ public class ServerConfig {
                 .comment("0 = ALL, 1 = ADMIN, 2 = OP, 4 = OWNER");
 
 
-        REBIND_LEVEL = builder.defineInRange("rebind", Commands.LEVEL_ALL, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
-        GIVE_MACHINE = builder.defineInRange("give", Commands.LEVEL_ALL, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
+        REBIND_LEVEL = builder
+                .comment("Command level required for using the rebind and unbind commands.")
+                .defineInRange("rebind", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
+
+        GIVE_MACHINE = builder
+                .comment("Command level required for giving new machines to players.")
+                .defineInRange("give", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
+
+        CHANGE_SPAWN_LEVEL = builder
+                .comment("Command level required for changing room spawn information.")
+                .defineInRange("spawn", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
 
         builder.pop(2);
 
@@ -72,5 +81,9 @@ public class ServerConfig {
 
     public static int giveMachineLevel() {
         return GIVE_MACHINE.get();
+    }
+
+    public static int changeRoomSpawn() {
+        return CHANGE_SPAWN_LEVEL.get();
     }
 }
