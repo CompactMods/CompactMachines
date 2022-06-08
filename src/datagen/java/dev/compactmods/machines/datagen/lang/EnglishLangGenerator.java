@@ -32,6 +32,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addMessage(Messages.PLAYER_ROOM_INFO, "Player '%1$s' is inside a %3$s room at %2$s.");
         addMessage(Messages.MACHINE_ROOM_INFO, "Machine at %1$s is bound to a %2$s size room at %3$s");
 
+        addMessage(Messages.CANNOT_RENAME_NOT_OWNER, "Only %s may rename this room.");
+
         addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
         addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
         addCommand(CMCommands.MACHINE_NOT_BOUND, "Machine at %s is not bound to a room.");

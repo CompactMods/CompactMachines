@@ -22,12 +22,14 @@ import javax.annotation.Nullable;
 
 public class MachineRoomMenu extends AbstractContainerMenu {
     private final ChunkPos room;
+    private String roomName;
     private final LevelBlockPosition machine;
     private StructureTemplate roomBlocks;
 
-    public MachineRoomMenu(int win, ChunkPos room, LevelBlockPosition machine) {
+    public MachineRoomMenu(int win, ChunkPos room, LevelBlockPosition machine, String roomName) {
         super(UIRegistration.MACHINE_MENU.get(), win);
         this.room = room;
+        this.roomName = roomName;
         this.roomBlocks = new StructureTemplate();
         this.machine = machine;
     }
@@ -50,14 +52,16 @@ public class MachineRoomMenu extends AbstractContainerMenu {
             @Nullable
             @Override
             public AbstractContainerMenu createMenu(int winId, Inventory inv, Player player2) {
-                var menu = new MachineRoomMenu(winId, roomId, machinePos);
                 try {
+                    final var title = Rooms.getRoomName(server, roomId);
+
+                    var menu = new MachineRoomMenu(winId, roomId, machinePos, title.orElse("Room Preview"));
                     menu.roomBlocks = Rooms.getInternalBlocks(server, roomId);
+                    return menu;
+
                 } catch (MissingDimensionException | NonexistentRoomException e) {
                     return null;
                 }
-
-                return menu;
             }
         };
     }
@@ -80,5 +84,9 @@ public class MachineRoomMenu extends AbstractContainerMenu {
 
     public void setBlocks(StructureTemplate blocks) {
         this.roomBlocks = blocks;
+    }
+
+    public String getRoomName() {
+        return roomName;
     }
 }

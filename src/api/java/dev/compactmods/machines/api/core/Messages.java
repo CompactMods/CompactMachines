@@ -23,4 +23,9 @@ public abstract class Messages {
      * Used to show information about a room, accessed via a bound machine.
      */
     public static final ResourceLocation MACHINE_ROOM_INFO = new ResourceLocation(Constants.MOD_ID, "machine_room_info");
+
+    /**
+     * Shown when a non-owner tries to rename a room. Takes the owner's display name.
+     */
+    public static final ResourceLocation CANNOT_RENAME_NOT_OWNER = new ResourceLocation(Constants.MOD_ID, "cannot_rename_not_owner");
 }

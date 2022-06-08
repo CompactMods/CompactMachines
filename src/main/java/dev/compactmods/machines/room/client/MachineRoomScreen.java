@@ -93,7 +93,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
         pose.translate(this.imageWidth / 2f, 0, 0);
 
-        var p = new TextComponent("Room Preview");
+        var p = new TextComponent(menu.getRoomName());
         Screen.drawCenteredString(pose, font, p, 0, this.titleLabelY, 0xFFFFFFFF);
 
         var room = menu.getRoom();

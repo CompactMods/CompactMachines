@@ -1,8 +1,10 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -24,6 +26,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -179,11 +182,22 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             if (state.getBlock() instanceof CompactMachineBlock cmBlock) {
                 machine.getConnectedRoom().ifPresent(room -> {
                     var size = cmBlock.getSize();
-                    NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
-                        buf.writeBlockPos(pos);
-                        buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
-                        buf.writeChunkPos(room);
-                    });
+                    try {
+                        final var roomName = Rooms.getRoomName(server, room);
+                        NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
+                            buf.writeBlockPos(pos);
+                            buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
+                            buf.writeChunkPos(room);
+                            roomName.ifPresentOrElse(name -> {
+                                buf.writeBoolean(true);
+                                buf.writeUtf(name);
+                            }, () -> {
+                                buf.writeBoolean(false);
+                            });
+                        });
+                    } catch (NonexistentRoomException e) {
+                        e.printStackTrace();
+                    }
                 });
             }
         }
@@ -199,6 +213,26 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                         e.printStackTrace();
                     }
                 }, () -> createAndEnterRoom(player, server, tile));
+            }
+        }
+
+        // Try and pull the name off the nametag and apply it to the room
+        if (mainItem.getItem() instanceof NameTagItem && mainItem.hasCustomHoverName()) {
+            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+                tile.getConnectedRoom().ifPresent(room -> {
+                    try {
+                        UUID owner = Rooms.getOwner(server, room);
+                        if (player.getUUID().equals(owner)) {
+                            final var newName = mainItem.getHoverName().getContents();
+                            Rooms.updateName(server, room, newName);
+                        } else {
+                            player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER, server.getPlayerList()
+                                    .getPlayer(owner).getDisplayName()), true);
+                        }
+                    } catch (NonexistentRoomException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         }
 

@@ -18,8 +18,10 @@ public class UIRegistration {
                 data.readBlockPos();
                 final var mach = data.readWithCodec(LevelBlockPosition.CODEC);
                 final var room = data.readChunkPos();
+                final boolean hasName = data.readBoolean();
+                final var roomName = hasName ? data.readUtf() : "Room Preview";
 
-                return new MachineRoomMenu(windowId, room, mach);
+                return new MachineRoomMenu(windowId, room, mach, roomName);
             })
     ));
 

@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -184,5 +185,39 @@ public class Rooms {
         final var newSpawn = centerPoint.subtract(0, (roomInfo.getSize().getInternalSize() / 2f), 0);
 
         data.setSpawn(room, newSpawn);
+    }
+
+    public static Optional<String> getRoomName(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+        return roomInfo.getName();
+    }
+
+    public static UUID getOwner(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+        return roomInfo.getOwner();
+    }
+
+    public static void updateName(MinecraftServer server, ChunkPos room, String newName) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+        roomInfo.setName(newName);
+        data.setDirty();
     }
 }
