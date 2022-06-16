@@ -30,8 +30,11 @@ public class CMGraphRegistration {
     public static final RegistryObject<IGraphNodeType> MACH_NODE = NODE_TYPES.register("machine", () -> GraphNodeType.MACHINE);
     public static final RegistryObject<IGraphNodeType> DIM_NODE = NODE_TYPES.register("dimension", () -> GraphNodeType.DIMENSION);
     public static final RegistryObject<IGraphNodeType> ROOM_NODE = NODE_TYPES.register("room", () -> GraphNodeType.ROOM);
+
     public static final RegistryObject<IGraphNodeType> TUNNEL_NODE = NODE_TYPES.register("tunnel", () -> GraphNodeType.TUNNEL);
     public static final RegistryObject<IGraphNodeType> TUNNEL_TYPE_NODE = NODE_TYPES.register("tunnel_type", () -> GraphNodeType.TUNNEL_TYPE);
+
+    public static final RegistryObject<IGraphNodeType> ROOM_UPGRADE_NODE = NODE_TYPES.register("room_upgrade", () -> GraphNodeType.ROOM_UPGRADE);
 
     public static final RegistryObject<IGraphEdgeType> MACHINE_LINK = EDGE_TYPES.register("machine_link", () -> GraphEdgeType.MACHINE_LINK);
 

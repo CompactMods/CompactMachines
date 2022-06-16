@@ -6,6 +6,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
 import dev.compactmods.machines.command.subcommand.*;
+import dev.compactmods.machines.command.upgrade.CMUpgradeRoomCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
@@ -27,6 +28,7 @@ public class CMCommandRoot {
         root.then(CMDataSubcommand.make());
         root.then(CMGiveMachineSubcommand.make());
         root.then(SpawnSubcommand.make());
+        root.then(CMUpgradeRoomCommand.make());
 
         dispatcher.register(root);
     }

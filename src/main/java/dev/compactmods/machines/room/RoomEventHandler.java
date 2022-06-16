@@ -55,6 +55,7 @@ public class RoomEventHandler {
     public static void onEntityTeleport(final EntityTeleportEvent evt) {
         // Allow teleport commands, we don't want to trap people anywhere
         if (evt instanceof EntityTeleportEvent.TeleportCommand) return;
+        if(!evt.getEntity().level.dimension().equals(Registration.COMPACT_DIMENSION)) return;
 
         Entity ent = evt.getEntity();
         doEntityTeleportHandle(evt, evt.getTarget(), ent);

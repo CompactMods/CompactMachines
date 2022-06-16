@@ -3,6 +3,7 @@ package dev.compactmods.machines.graph;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
+import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeGraphNode;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import dev.compactmods.machines.tunnel.graph.TunnelTypeNode;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +14,7 @@ public enum GraphNodeType implements IGraphNodeType {
     TUNNEL(TunnelNode.CODEC),
     ROOM(CompactMachineRoomNode.CODEC),
     TUNNEL_TYPE(TunnelTypeNode.CODEC),
-    DIMENSION(DimensionGraphNode.CODEC);
+    DIMENSION(DimensionGraphNode.CODEC), ROOM_UPGRADE(RoomUpgradeGraphNode.CODEC);
 
     private final Codec<IGraphNode> codec;
     private ResourceLocation regName;

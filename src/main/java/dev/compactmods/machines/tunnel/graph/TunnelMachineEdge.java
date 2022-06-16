@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import net.minecraft.core.Direction;
@@ -31,6 +32,6 @@ public record TunnelMachineEdge(Direction side) implements IGraphEdge {
 
     @Override
     public IGraphEdgeType getEdgeType() {
-        return CMGraphRegistration.TUNNEL_MACHINE_LINK.get();
+        return GraphEdgeType.TUNNEL_MACHINE;
     }
 }

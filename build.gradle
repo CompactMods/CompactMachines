@@ -307,6 +307,14 @@ dependencies {
         // Mekanism + Mek Generators - Tunnel testing
         runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3743835"))
         runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3743837"))
+
+        // Soul Shards (FTB)
+        runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))
+        runtimeOnly(fg.deobf("curse.maven:soulshards-551523:3757202"))
+
+        // Everlasting Abilities
+        runtimeOnly(fg.deobf("curse.maven:cyclopscore-232758:3809427"))
+        runtimeOnly(fg.deobf("curse.maven:everlastabilities-248353:3768481"))
     }
 }
 

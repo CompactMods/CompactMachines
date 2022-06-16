@@ -3,6 +3,7 @@ package dev.compactmods.machines.machine.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,6 @@ public record MachineRoomEdge() implements IGraphEdge {
 
     @Override
     public @NotNull IGraphEdgeType getEdgeType() {
-        return CMGraphRegistration.MACHINE_LINK.get();
+        return GraphEdgeType.MACHINE_LINK;
     }
 }

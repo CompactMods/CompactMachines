@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +37,6 @@ public final class TunnelTypeEdge implements IGraphEdge {
 
     @Override
     public @NotNull IGraphEdgeType getEdgeType() {
-        return CMGraphRegistration.TUNNEL_TYPE.get();
+        return GraphEdgeType.TUNNEL_TYPE;
     }
 }
