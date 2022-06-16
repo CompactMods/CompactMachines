@@ -1,6 +1,7 @@
 package dev.compactmods.machines.compat;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.compat.carryon.CarryOnCompat;
 import dev.compactmods.machines.compat.theoneprobe.TheOneProbeCompat;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -14,5 +15,8 @@ public class InterModCompat {
     public static void enqueueCompatMessages(final InterModEnqueueEvent evt) {
         if(ModList.get().isLoaded("theoneprobe"))
             TheOneProbeCompat.sendIMC();
+
+        if(ModList.get().isLoaded("carryon"))
+            CarryOnCompat.sendIMC();
     }
 }
