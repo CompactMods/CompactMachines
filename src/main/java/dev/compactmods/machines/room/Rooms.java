@@ -1,5 +1,6 @@
 package dev.compactmods.machines.room;
 
+import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
@@ -198,15 +199,21 @@ public class Rooms {
         return roomInfo.getName();
     }
 
-    public static UUID getOwner(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
+    public static Optional<GameProfile> getOwner(MinecraftServer server, ChunkPos room) {
         if(!exists(server, room))
-            throw new NonexistentRoomException(room);
+            return Optional.empty();
 
         final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
-
         final var data = CompactRoomData.get(compactDim);
-        final var roomInfo = data.getData(room);
-        return roomInfo.getOwner();
+
+        try {
+            final CompactRoomData.RoomData roomInfo = data.getData(room);
+            final var ownerUUID = roomInfo.getOwner();
+
+            return server.getProfileCache().get(ownerUUID);
+        } catch (NonexistentRoomException e) {
+            return Optional.empty();
+        }
     }
 
     public static void updateName(MinecraftServer server, ChunkPos room, String newName) throws NonexistentRoomException {

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.datagen;
+package dev.compactmods.machines.datagen.tags;
 
 import java.util.Set;
 import dev.compactmods.machines.CompactMachines;
@@ -8,9 +8,9 @@ import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class TagGenerator extends BlockTagsProvider {
+public class BlockTagGenerator extends BlockTagsProvider {
 
-    public TagGenerator(DataGenerator generator, ExistingFileHelper files) {
+    public BlockTagGenerator(DataGenerator generator, ExistingFileHelper files) {
         super(generator, CompactMachines.MOD_ID, files);
     }
 
@@ -34,6 +34,5 @@ public class TagGenerator extends BlockTagsProvider {
             pickaxe.add(mach);
             ironTool.add(mach);
         });
-
     }
 }

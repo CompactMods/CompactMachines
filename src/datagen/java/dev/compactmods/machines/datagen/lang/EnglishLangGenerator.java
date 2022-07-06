@@ -4,6 +4,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.room.RoomSize;
@@ -56,6 +57,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
         add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
 
+        add(RoomUpgrade.UNNAMED_TRANS_KEY, "Unnamed Room Upgrade");
+
         addTunnel(Tunnels.ITEM_TUNNEL_DEF.get(), "Item Tunnel");
         addTunnel(Tunnels.FLUID_TUNNEL_DEF.get(), "Fluid Tunnel");
         addTunnel(Tunnels.FORGE_ENERGY.get(), "Energy Tunnel");
@@ -77,6 +80,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");
 
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
+        addTooltip(Tooltips.ROOM_UPGRADE_TYPE, "Type: %s");
+
         addCommand(CMCommands.CANNOT_GIVE_MACHINE, "Failed to give a new machine to player.");
         addCommand(CMCommands.MACHINE_GIVEN, "Created a new machine item and gave it to %s.");
 

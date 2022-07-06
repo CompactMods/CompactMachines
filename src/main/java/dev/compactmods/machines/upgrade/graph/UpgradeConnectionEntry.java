@@ -1,10 +1,10 @@
-package dev.compactmods.machines.room.upgrade.graph;
+package dev.compactmods.machines.upgrade.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.room.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 

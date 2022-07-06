@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -25,6 +26,9 @@ public class ItemModelGenerator extends ItemModelProvider {
 
         withExistingParent("tunnel", mcLoc("item/generated"))
                 .texture("layer0", modLoc("item/tunnel"));
+
+        withExistingParent(MachineRoomUpgrades.CHUNKLOADER.getId().toString(), mcLoc("item/generated"))
+                .texture("layer0", modLoc("upgrades/chunkloader"));
     }
 
     private void machine(String size) {

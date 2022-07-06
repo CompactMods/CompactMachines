@@ -8,7 +8,7 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.graph.CMGraphRegistration;
-import dev.compactmods.machines.room.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.world.item.CreativeModeTab;

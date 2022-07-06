@@ -1,18 +1,17 @@
-package dev.compactmods.machines.room.upgrade;
+package dev.compactmods.machines.upgrade;
 
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
-import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeConnection;
-import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeGraphNode;
-import dev.compactmods.machines.room.upgrade.graph.UpgradeConnectionEntry;
+import dev.compactmods.machines.upgrade.graph.RoomUpgradeConnection;
+import dev.compactmods.machines.upgrade.graph.RoomUpgradeGraphNode;
+import dev.compactmods.machines.upgrade.graph.UpgradeConnectionEntry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -24,10 +23,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -125,6 +121,20 @@ public class RoomUpgradeManager extends SavedData {
         return true;
     }
 
+    public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, ChunkPos room) {
+        if(!upgradeNodes.containsKey(upgrade.getRegistryName()))
+            return true;
+
+        if(!roomNodes.containsKey(room))
+            return true;
+
+        final var uNode = upgradeNodes.get(upgrade.getRegistryName());
+        final var rNode = roomNodes.get(room);
+        graph.removeEdge(uNode, rNode);
+        setDirty();
+        return true;
+    }
+
     public Stream<ChunkPos> roomsWith(ResourceKey<RoomUpgrade> upgradeKey) {
         if (!upgradeNodes.containsKey(upgradeKey.location()))
             return Stream.empty();
@@ -170,5 +180,18 @@ public class RoomUpgradeManager extends SavedData {
 
         // Stream the instances off the set built above
         return instances.stream();
+    }
+
+    public boolean hasUpgrade(ChunkPos room, RoomUpgrade upgrade) {
+        if(!upgradeNodes.containsKey(upgrade.getRegistryName()))
+            return false;
+
+        if(!roomNodes.containsKey(room))
+            return false;
+
+        final var upgNode = upgradeNodes.get(upgrade.getRegistryName());
+        final var roomNode = roomNodes.get(room);
+
+        return graph.hasEdgeConnecting(upgNode, roomNode);
     }
 }

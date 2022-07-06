@@ -104,10 +104,7 @@ public class TunnelItem extends Item {
                 if (def == Tunnels.UNKNOWN.get())
                     return;
 
-                ItemStack withDef = new ItemStack(this, 1);
-                CompoundTag defTag = withDef.getOrCreateTagElement("definition");
-                defTag.putString("id", def.getRegistryName().toString());
-
+                ItemStack withDef = createStack(def);
                 items.add(withDef);
             });
         }

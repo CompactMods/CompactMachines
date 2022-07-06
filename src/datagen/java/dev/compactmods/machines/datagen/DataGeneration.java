@@ -1,9 +1,10 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.datagen.lang.BaseLangGenerator;
 import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
+import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
+import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,10 +29,10 @@ public class DataGeneration {
         generator.addProvider(new BlockLootGenerator(generator));
         generator.addProvider(new RecipeGenerator(generator));
         generator.addProvider(new AdvancementGenerator(generator));
-        generator.addProvider(new TagGenerator(generator, helper));
 
-        generator.addProvider(new EnglishLangGenerator(generator));
-        generator.addProvider(new RussianLangGenerator(generator));
+        final var blocks = new BlockTagGenerator(generator, helper);
+        generator.addProvider(blocks);
+        generator.addProvider(new ItemTagGenerator(generator, blocks, helper));
     }
 
     private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
@@ -40,5 +41,7 @@ public class DataGeneration {
         generator.addProvider(new TunnelWallStateGenerator(generator, helper));
         generator.addProvider(new ItemModelGenerator(generator, helper));
 
+        generator.addProvider(new EnglishLangGenerator(generator));
+        generator.addProvider(new RussianLangGenerator(generator));
     }
 }

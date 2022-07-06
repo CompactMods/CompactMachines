@@ -1,9 +1,6 @@
-package dev.compactmods.machines.room.upgrade;
+package dev.compactmods.machines.upgrade;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Encoder;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;

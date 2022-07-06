@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room.upgrade.graph;
+package dev.compactmods.machines.upgrade.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -6,7 +6,7 @@ import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
-import dev.compactmods.machines.room.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import org.jetbrains.annotations.NotNull;
 
 public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge {

@@ -4,7 +4,8 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.command.CMCommandRoot;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
-import dev.compactmods.machines.room.upgrade.RoomUpgradeManager;
+import dev.compactmods.machines.upgrade.RoomUpgradeManager;
+import dev.compactmods.machines.upgrade.command.CMUpgradeRoomCommand;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -22,13 +23,6 @@ import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
 public class ServerEventHandler {
-
-    @SubscribeEvent
-    public static void onCommandsRegister(final RegisterCommandsEvent event) {
-        final var dispatcher = event.getDispatcher();
-        CMCommandRoot.register(dispatcher);
-        CMDataSubcommand.make();
-    }
 
     @SubscribeEvent
     public static void onWorldLoaded(final WorldEvent.Load evt) {

@@ -2,7 +2,7 @@ package dev.compactmods.machines.graph;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.machine.graph.MachineRoomEdge;
-import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeConnection;
+import dev.compactmods.machines.upgrade.graph.RoomUpgradeConnection;
 import dev.compactmods.machines.tunnel.graph.TunnelMachineEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelTypeEdge;
 import net.minecraft.resources.ResourceLocation;

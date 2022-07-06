@@ -1,5 +1,7 @@
 package dev.compactmods.machines.api.core;
 
+import com.mojang.datafixers.kinds.Const;
+import io.netty.util.Constant;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class Messages {
@@ -28,4 +30,12 @@ public abstract class Messages {
      * Shown when a non-owner tries to rename a room. Takes the owner's display name.
      */
     public static final ResourceLocation CANNOT_RENAME_NOT_OWNER = new ResourceLocation(Constants.MOD_ID, "cannot_rename_not_owner");
+
+    /**
+     * Shown to players when they try to interact with a room they do not own. Provides the owner's display name.
+     */
+    public static final ResourceLocation NOT_ROOM_OWNER = new ResourceLocation(Constants.MOD_ID, "not_the_room_owner");
+    public static final ResourceLocation UPGRADE_APPLIED = new ResourceLocation(Constants.MOD_ID, "upgrade_applied");
+    public static final ResourceLocation UPGRADE_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_failed");
+    public static final ResourceLocation ALREADY_HAS_UPGRADE = new ResourceLocation(Constants.MOD_ID, "upgrade_already_present");
 }
