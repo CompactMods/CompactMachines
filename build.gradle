@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.parchmentmc.org' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
         mavenCentral()
         mavenLocal()
@@ -8,6 +9,7 @@ buildscript {
 
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
+        classpath 'org.parchmentmc:librarian:1.+'
         classpath "org.spongepowered:mixingradle:${mixingradle_version}"
     }
 }
@@ -19,6 +21,7 @@ plugins {
 }
 
 apply plugin: "net.minecraftforge.gradle"
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
 def semver = { ->
@@ -113,7 +116,7 @@ sourceSets {
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'official', version: minecraft_version
+    mappings channel: 'parchment', version: parchment_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
