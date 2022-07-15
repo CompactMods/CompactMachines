@@ -1,7 +1,5 @@
 package dev.compactmods.machines.api.core;
 
-import com.mojang.datafixers.kinds.Const;
-import io.netty.util.Constant;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class Messages {
@@ -36,6 +34,9 @@ public abstract class Messages {
      */
     public static final ResourceLocation NOT_ROOM_OWNER = new ResourceLocation(Constants.MOD_ID, "not_the_room_owner");
     public static final ResourceLocation UPGRADE_APPLIED = new ResourceLocation(Constants.MOD_ID, "upgrade_applied");
-    public static final ResourceLocation UPGRADE_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_failed");
+    public static final ResourceLocation UPGRADE_ADD_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_add_failed");
+    public static final ResourceLocation UPGRADE_REMOVED = new ResourceLocation(Constants.MOD_ID, "upgrade_removed");
+    public static final ResourceLocation UPGRADE_REM_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_remove_failed");
     public static final ResourceLocation ALREADY_HAS_UPGRADE = new ResourceLocation(Constants.MOD_ID, "upgrade_already_present");
+    public static final ResourceLocation UPGRADE_NOT_PRESENT = new ResourceLocation(Constants.MOD_ID, "upgrade_not_present");
 }

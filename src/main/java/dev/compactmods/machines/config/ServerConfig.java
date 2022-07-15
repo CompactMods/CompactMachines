@@ -20,6 +20,8 @@ public class ServerConfig {
     private static ForgeConfigSpec.IntValue GIVE_MACHINE;
     private static ForgeConfigSpec.IntValue CHANGE_SPAWN_LEVEL;
 
+    private static ForgeConfigSpec.IntValue CHANGE_ROOM_UPGRADES;
+
     static {
         generateConfig();
     }
@@ -70,6 +72,10 @@ public class ServerConfig {
                 .comment("Command level required for changing room spawn information.")
                 .defineInRange("spawn", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
 
+        CHANGE_ROOM_UPGRADES = builder
+                .comment("Command level required for changing room upgrades.")
+                .defineInRange("upgrades", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
+
         builder.pop(2);
 
         CONFIG = builder.build();
@@ -86,4 +92,6 @@ public class ServerConfig {
     public static int changeRoomSpawn() {
         return CHANGE_SPAWN_LEVEL.get();
     }
+
+    public static int changeUpgrades() { return CHANGE_ROOM_UPGRADES.get(); }
 }

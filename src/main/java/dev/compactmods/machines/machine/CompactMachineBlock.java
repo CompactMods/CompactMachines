@@ -3,7 +3,6 @@ package dev.compactmods.machines.machine;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeHelper;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -17,6 +16,7 @@ import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.RoomUpgradeItem;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
@@ -250,23 +250,20 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
         // Upgrade Item
         if (mainItem.is(CMTags.ROOM_UPGRADE_ITEM)) {
-            RoomUpgradeHelper.getTypeFrom(mainItem).ifPresent(type -> {
-                final var reg = MachineRoomUpgrades.REGISTRY.get();
-                if (!reg.containsKey(type))
-                    return;
-
+            final var reg = MachineRoomUpgrades.REGISTRY.get();
+            if(mainItem.getItem() instanceof RoomUpgradeItem upItem) {
                 if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
                     tile.getConnectedRoom().ifPresent(room -> {
                         Rooms.getOwner(server, room).ifPresent(prof -> {
-                            if(!player.getUUID().equals(prof.getId())) {
+                            if (!player.getUUID().equals(prof.getId())) {
                                 player.displayClientMessage(TranslationUtil.message(Messages.NOT_ROOM_OWNER, prof.getName()), true);
                                 return;
                             }
 
-                            final var upg = reg.getValue(type);
+                            final var upg = upItem.getUpgradeType();
                             final var manager = RoomUpgradeManager.get(server.getLevel(Registration.COMPACT_DIMENSION));
 
-                            if(manager.hasUpgrade(room, upg)) {
+                            if (manager.hasUpgrade(room, upg)) {
                                 player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
                             } else {
                                 final var added = manager.addUpgrade(upg, room);
@@ -275,14 +272,14 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                                     player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_APPLIED)
                                             .withStyle(ChatFormatting.DARK_GREEN), true);
                                 } else {
-                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_FAILED)
+                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED)
                                             .withStyle(ChatFormatting.DARK_RED), true);
                                 }
                             }
                         });
                     });
                 }
-            });
+            }
         }
 
         return InteractionResult.SUCCESS;

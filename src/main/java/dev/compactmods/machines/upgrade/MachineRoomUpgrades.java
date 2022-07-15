@@ -25,7 +25,7 @@ public class MachineRoomUpgrades {
     public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = UPGRADES.makeRegistry(RoomUpgrade.class, RegistryBuilder::new);
 
     // ================================================================================================================
-    static final RegistryObject<RoomUpgrade> CHUNKLOAD = UPGRADES.register(ChunkloadUpgrade.REG_ID.getPath(), ChunkloadUpgrade::new);
+    public static final RegistryObject<RoomUpgrade> CHUNKLOAD = UPGRADES.register(ChunkloadUpgrade.REG_ID.getPath(), ChunkloadUpgrade::new);
 
     public static final RegistryObject<Item> CHUNKLOADER = Registration.ITEMS.register("chunkloader_upgrade", () -> new ChunkloadUpgradeItem(new Item.Properties()
             .tab(CompactMachines.COMPACT_MACHINES_ITEMS)

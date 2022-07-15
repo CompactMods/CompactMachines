@@ -130,7 +130,7 @@ public class RoomUpgradeManager extends SavedData {
 
         final var uNode = upgradeNodes.get(upgrade.getRegistryName());
         final var rNode = roomNodes.get(room);
-        graph.removeEdge(uNode, rNode);
+        graph.removeEdge(rNode,  uNode);
         setDirty();
         return true;
     }
@@ -192,6 +192,6 @@ public class RoomUpgradeManager extends SavedData {
         final var upgNode = upgradeNodes.get(upgrade.getRegistryName());
         final var roomNode = roomNodes.get(room);
 
-        return graph.hasEdgeConnecting(upgNode, roomNode);
+        return graph.hasEdgeConnecting(roomNode, upgNode);
     }
 }

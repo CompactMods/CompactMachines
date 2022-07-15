@@ -23,16 +23,24 @@ public class ChunkloadUpgrade extends ForgeRegistryEntry<RoomUpgrade> implements
     ).apply(i, t -> new ChunkloadUpgrade()));
 
     @Override
-    public void onAdded(ServerLevel level, ChunkPos room) { forceLoad(level, room); }
+    public void onAdded(ServerLevel level, ChunkPos room) {
+        forceLoad(level, room);
+    }
 
     @Override
-    public void onRemoved(ServerLevel level, ChunkPos room) { normalLoad(level, room); }
+    public void onRemoved(ServerLevel level, ChunkPos room) {
+        normalLoad(level, room);
+    }
 
     @Override
-    public void onLevelLoaded(ServerLevel level, ChunkPos room) { forceLoad(level, room); }
+    public void onLevelLoaded(ServerLevel level, ChunkPos room) {
+        forceLoad(level, room);
+    }
 
     @Override
-    public void onLevelUnloaded(ServerLevel level, ChunkPos room) { normalLoad(level, room); }
+    public void onLevelUnloaded(ServerLevel level, ChunkPos room) {
+        normalLoad(level, room);
+    }
 
     private void forceLoad(ServerLevel level, ChunkPos room) {
         final var chunks = level.getChunkSource();

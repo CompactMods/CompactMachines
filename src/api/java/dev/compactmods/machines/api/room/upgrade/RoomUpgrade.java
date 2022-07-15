@@ -18,6 +18,11 @@ public interface RoomUpgrade extends IForgeRegistryEntry<RoomUpgrade> {
 
     String UNNAMED_TRANS_KEY = "item." + MOD_ID + ".upgrades.unnamed";
 
+    default String getTranslationKey() {
+        final var rid = this.getRegistryName();
+        return "item." + rid.getNamespace() + ".upgrades." + rid.getPath().replace('/', '.');
+    }
+
     default String getTranslationKey(ItemStack stack) {
         final var rid = this.getRegistryName();
         return "item." + rid.getNamespace() + ".upgrades." + rid.getPath().replace('/', '.');
