@@ -14,12 +14,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 
-public class FluidTunnel extends ForgeRegistryEntry<TunnelDefinition>
-        implements TunnelDefinition, CapabilityTunnel<FluidTunnel.Instance> {
+public class FluidTunnel implements TunnelDefinition, CapabilityTunnel<FluidTunnel.Instance> {
     @Override
     public int ringColor() {
         return FastColor.ARGB32.color(255, 0, 138, 224);

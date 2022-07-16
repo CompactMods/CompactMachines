@@ -6,8 +6,8 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 class DataGenUtil {
-    static <T> BiConsumer<T, ResourceLocation> makeWriter(Gson gson, @Nonnull HashCache cache, Path dataDir, ImmutableSet<String> pathParts, Codec<T> codec, HashMap<ResourceLocation, T> set) {
+    static <T> BiConsumer<T, ResourceLocation> makeWriter(Gson gson, @Nonnull CachedOutput cache, Path dataDir, ImmutableSet<String> pathParts, Codec<T> codec, HashMap<ResourceLocation, T> set) {
         return (T resource, ResourceLocation regName) -> {
             if (set.containsKey(regName)) {
                 throw new IllegalStateException("Duplicate resource " + regName);
@@ -34,7 +34,7 @@ class DataGenUtil {
 
                 try {
                     //noinspection OptionalGetWithoutIsPresent
-                    DataProvider.save(gson, cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
+                    DataProvider.saveStable(cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
 
                     set.put(regName, resource);
                 } catch (IOException ioe) {
@@ -44,7 +44,7 @@ class DataGenUtil {
         };
     }
 
-    static <T> BiConsumer<T, ResourceLocation> makeCustomWriter(Gson gson, @Nonnull HashCache cache, Path dataDir, ImmutableSet<String> pathParts, Function<T, JsonElement> writer, HashMap<ResourceLocation, T> set) {
+    static <T> BiConsumer<T, ResourceLocation> makeCustomWriter(Gson gson, @Nonnull CachedOutput cache, Path dataDir, ImmutableSet<String> pathParts, Function<T, JsonElement> writer, HashMap<ResourceLocation, T> set) {
         return (T resource, ResourceLocation regName) -> {
             if (set.containsKey(regName)) {
                 throw new IllegalStateException("Duplicate resource " + regName);
@@ -59,7 +59,7 @@ class DataGenUtil {
                 fileLocation = fileLocation.resolve(path + ".json");
 
                 try {
-                    DataProvider.save(gson, cache, writer.apply(resource), fileLocation);
+                    DataProvider.saveStable(cache, writer.apply(resource), fileLocation);
 
                     set.put(regName, resource);
                 } catch (IOException ioe) {

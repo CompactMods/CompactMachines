@@ -16,7 +16,7 @@ public class EnableVanillaRecipesConfigCondition implements ICondition {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(IContext ctx) {
         return CommonConfig.ENABLE_VANILLA_RECIPES.get();
     }
 

@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -28,17 +29,22 @@ public class TunnelRecipeBuilder {
     private int count;
     private ResourceLocation tunnelType;
 
-    private TunnelRecipeBuilder(TunnelDefinition definition, int count) {
-        this.tunnelType = definition.getRegistryName();
+    private TunnelRecipeBuilder(RegistryObject<TunnelDefinition> definition, int count) {
+        this.tunnelType = definition.getId();
         this.count = count;
     }
 
-    public static TunnelRecipeBuilder tunnel(TunnelDefinition definition) {
+    public static TunnelRecipeBuilder tunnel(RegistryObject<TunnelDefinition> definition) {
         return new TunnelRecipeBuilder(definition, 1);
     }
 
-    public static TunnelRecipeBuilder tunnel(TunnelDefinition definition, int count) {
+    public static TunnelRecipeBuilder tunnel(RegistryObject<TunnelDefinition> definition, int count) {
         return new TunnelRecipeBuilder(definition, count);
+    }
+
+    public TunnelRecipeBuilder setType(ResourceLocation id) {
+        this.tunnelType = id;
+        return this;
     }
 
     public TunnelRecipeBuilder requires(ItemLike item) {

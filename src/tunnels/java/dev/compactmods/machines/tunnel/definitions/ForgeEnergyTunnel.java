@@ -14,12 +14,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 
-public class ForgeEnergyTunnel extends ForgeRegistryEntry<TunnelDefinition>
-        implements TunnelDefinition, CapabilityTunnel<ForgeEnergyTunnel.Instance> {
+public class ForgeEnergyTunnel implements TunnelDefinition, CapabilityTunnel<ForgeEnergyTunnel.Instance> {
     @Override
     public int ringColor() {
         return FastColor.ARGB32.color(255, 0, 166, 88);

@@ -13,9 +13,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -47,7 +47,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.ITEM_TUNNEL_DEF.get(), 2)
+        TunnelRecipeBuilder.tunnel(Tunnels.ITEM_TUNNEL_DEF, 2)
                 .requires(Ingredient.of(Tags.Items.CHESTS))
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -55,7 +55,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.FLUID_TUNNEL_DEF.get(), 2)
+        TunnelRecipeBuilder.tunnel(Tunnels.FLUID_TUNNEL_DEF, 2)
                 .requires(Items.BUCKET)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -63,7 +63,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.FORGE_ENERGY.get(), 2)
+        TunnelRecipeBuilder.tunnel(Tunnels.FORGE_ENERGY, 2)
                 .requires(Items.GLOWSTONE_DUST)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -102,6 +102,6 @@ public class RecipeGenerator extends RecipeProvider {
         ConditionalRecipe.builder()
                 .addCondition(new EnableVanillaRecipesConfigCondition())
                 .addRecipe(recipe::save)
-                .build(consumer, Objects.requireNonNull(out.asItem().getRegistryName()));
+                .build(consumer, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(out.asItem())));
     }
 }

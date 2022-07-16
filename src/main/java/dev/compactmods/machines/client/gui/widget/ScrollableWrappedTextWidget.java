@@ -4,9 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
 
     private void recalculate() {
         String t = I18n.get(localeKey);
-        lines = fontRenderer.split(new TextComponent(t), width);
+        lines = fontRenderer.split(Component.literal(t), width);
 
         charSize = fontRenderer.width("M");
         int maxOnScreen = height / (charSize + 4);

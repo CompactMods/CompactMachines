@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.level;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.profiling.InactiveProfiler;
@@ -13,31 +14,31 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class RenderingLevel extends Level {
 
     private final TemplateChunkProvider chunkProvider;
 
     public RenderingLevel(StructureTemplate blocks) {
-        super(new FakeSpawnInfo(), Level.OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD),
-                () -> InactiveProfiler.INSTANCE, true, false, 0);
+        super(new FakeSpawnInfo(), Level.OVERWORLD, BuiltinRegistries.DIMENSION_TYPE.getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
+                () -> InactiveProfiler.INSTANCE, true, false, 0, 1000000);
 
         if(!blocks.palettes.isEmpty()) {
             StructurePlaceSettings s = new StructurePlaceSettings();
@@ -55,6 +56,16 @@ public class RenderingLevel extends Level {
 
     @Override
     public void sendBlockUpdated(BlockPos p_46612_, BlockState p_46613_, BlockState p_46614_, int p_46615_) {
+
+    }
+
+    @Override
+    public void playSeededSound(@Nullable Player p_220363_, double p_220364_, double p_220365_, double p_220366_, SoundEvent p_220367_, SoundSource p_220368_, float p_220369_, float p_220370_, long p_220371_) {
+
+    }
+
+    @Override
+    public void playSeededSound(@Nullable Player p_220372_, Entity p_220373_, SoundEvent p_220374_, SoundSource p_220375_, float p_220376_, float p_220377_, long p_220378_) {
 
     }
 
@@ -132,6 +143,11 @@ public class RenderingLevel extends Level {
 
     @Override
     public void levelEvent(@Nullable Player p_46771_, int p_46772_, BlockPos p_46773_, int p_46774_) {
+
+    }
+
+    @Override
+    public void gameEvent(GameEvent p_220404_, Vec3 p_220405_, GameEvent.Context p_220406_) {
 
     }
 

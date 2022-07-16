@@ -11,9 +11,9 @@ public class CommonEventHandler {
 
     @SubscribeEvent
     public static void onLeftClickBlock(final PlayerInteractEvent.LeftClickBlock evt) {
-        final var player = evt.getPlayer();
+        final var player = evt.getEntity();
         final var pos = evt.getPos();
-        final var lev = evt.getWorld();
+        final var lev = evt.getLevel();
 
         final var state = lev.getBlockState(pos);
         if(state.getBlock() instanceof ProtectedWallBlock pwb) {

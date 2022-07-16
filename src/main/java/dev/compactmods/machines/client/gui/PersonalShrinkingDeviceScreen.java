@@ -1,16 +1,17 @@
 package dev.compactmods.machines.client.gui;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.client.gui.guide.GuideSection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersonalShrinkingDeviceScreen extends Screen {
     private final ResourceLocation GUI = new ResourceLocation(CompactMachines.MOD_ID, "textures/gui/psd_screen.png");
@@ -24,7 +25,7 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     private final GuideSection currentSection;
 
     protected PersonalShrinkingDeviceScreen() {
-        super(new TranslatableComponent(CompactMachines.MOD_ID + ".gui.psd.title"));
+        super(Component.translatable(CompactMachines.MOD_ID + ".gui.psd.title"));
         this.sections = new HashMap<>();
 
         GuideSection root = new GuideSection();

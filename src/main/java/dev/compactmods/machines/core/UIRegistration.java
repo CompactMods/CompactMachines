@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class UIRegistration {
-    private static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, CompactMachines.MOD_ID);
+    private static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, CompactMachines.MOD_ID);
 
     public static final RegistryObject<MenuType<MachineRoomMenu>> MACHINE_MENU = CONTAINERS.register("machine", () -> IForgeMenuType.create(
             ((windowId, inv, data) -> {

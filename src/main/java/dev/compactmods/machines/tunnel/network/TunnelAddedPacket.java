@@ -40,6 +40,6 @@ public class TunnelAddedPacket {
 
     public static void encode(@Nonnull TunnelAddedPacket pkt, FriendlyByteBuf buf) {
         buf.writeBlockPos(pkt.position);
-        buf.writeResourceLocation(Objects.requireNonNull(pkt.type.getRegistryName()));
+        buf.writeResourceLocation(Objects.requireNonNull(Tunnels.getRegistryId(pkt.type)));
     }
 }

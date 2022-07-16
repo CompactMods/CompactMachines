@@ -1,10 +1,10 @@
 package dev.compactmods.machines.tunnel.definitions;
 
 import com.google.common.collect.ImmutableSet;
-import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
-import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
+import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,12 +19,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 
-public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
-        implements TunnelDefinition, CapabilityTunnel<ItemTunnel.Instance>, TunnelTeardownHandler<ItemTunnel.Instance> {
+public class ItemTunnel implements TunnelDefinition, CapabilityTunnel<ItemTunnel.Instance>, TunnelTeardownHandler<ItemTunnel.Instance> {
 
     @Override
     public int ringColor() {
@@ -65,7 +63,7 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
      */
     @Override
     public void onRemoved(TunnelPosition position, Instance instance) {
-        BlockPos dropAt = position.pos().relative(position.side());
+        BlockPos dropAt = position.pos().relative(position.side(), 1);
 
         NonNullList<ItemStack> stacks = NonNullList.create();
         for (int i = 0; i < instance.handler.getSlots(); i++) {

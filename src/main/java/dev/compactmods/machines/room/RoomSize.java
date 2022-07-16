@@ -16,8 +16,7 @@ public enum RoomSize implements StringRepresentable {
     private final String name;
     private final int internalSize;
 
-    public static final Codec<RoomSize> CODEC = StringRepresentable.fromEnum(
-            RoomSize::values, RoomSize::getFromSize);
+    public static final Codec<RoomSize> CODEC = StringRepresentable.fromEnum(RoomSize::values);
 
     RoomSize(String name, int internalSize) {
         this.name = name;

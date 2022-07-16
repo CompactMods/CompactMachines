@@ -14,9 +14,9 @@ import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.advancements.FrameType;
 import net.minecraft.advancements.critereon.ImpossibleTrigger;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +38,7 @@ public class AdvancementGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@Nonnull HashCache cache) {
+    public void run(@Nonnull CachedOutput cache) {
         Path path = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
         Consumer<Advancement> consumer = (adv) -> {
@@ -48,7 +48,7 @@ public class AdvancementGenerator implements DataProvider {
                 Path path1 = path.resolve("data/" + adv.getId().getNamespace() + "/advancements/" + adv.getId().getPath() + ".json");
 
                 try {
-                    DataProvider.save(GSON, cache, adv.deconstruct().serializeToJson(), path1);
+                    DataProvider.saveStable(cache, adv.deconstruct().serializeToJson(), path1);
                 } catch (IOException ioexception) {
                     CompactMachines.LOGGER.error("Couldn't save advancement {}", path1, ioexception);
                 }

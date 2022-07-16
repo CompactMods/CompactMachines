@@ -102,7 +102,9 @@ public class RoomUpgradeManager extends SavedData {
     }
 
     public <T extends RoomUpgrade> boolean addUpgrade(T upgrade, ChunkPos room) {
-        final var upgradeNode = upgradeNodes.computeIfAbsent(upgrade.getRegistryName(), rl -> {
+        final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
+
+        final var upgradeNode = upgradeNodes.computeIfAbsent(upgRegistry.getKey(upgrade), rl -> {
             final var node = new RoomUpgradeGraphNode(rl);
             return graph.addNode(node) ? node : null;
         });
@@ -122,13 +124,17 @@ public class RoomUpgradeManager extends SavedData {
     }
 
     public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, ChunkPos room) {
-        if(!upgradeNodes.containsKey(upgrade.getRegistryName()))
+        final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
+        if(!upgRegistry.containsValue(upgrade)) return false;
+
+        final var upgId = upgRegistry.getKey(upgrade);
+        if(!upgradeNodes.containsKey(upgId))
             return true;
 
         if(!roomNodes.containsKey(room))
             return true;
 
-        final var uNode = upgradeNodes.get(upgrade.getRegistryName());
+        final var uNode = upgradeNodes.get(upgId);
         final var rNode = roomNodes.get(room);
         graph.removeEdge(rNode,  uNode);
         setDirty();
@@ -148,12 +154,12 @@ public class RoomUpgradeManager extends SavedData {
     }
 
     public <T extends RoomUpgrade> Stream<RoomUpgradeInstance<T>> implementing(Class<T> inter) {
-        final var reg = MachineRoomUpgrades.REGISTRY.get();
+        final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
 
         // Find all applicable upgrades in registry
-        final var matchedUpgrades = reg.getValues().stream()
+        final var matchedUpgrades = upgRegistry.getValues().stream()
                 .filter(inter::isInstance)
-                .map(RoomUpgrade::getRegistryName)
+                .map(upgRegistry::getKey)
                 .collect(Collectors.toSet());
 
         // Filter graph upgrades, find matching root nodes
@@ -163,8 +169,6 @@ public class RoomUpgradeManager extends SavedData {
                 .collect(Collectors.toSet());
 
         // Build a set of matched upgrade instance nodes
-
-        // TODO - Figure out why this filter isn't working (in edgeValue - comparison?)
         HashSet<RoomUpgradeInstance<T>> instances = new HashSet<>();
         final var roomNodes = new HashSet<>();
         for (RoomUpgradeGraphNode upgNode : matchedUpgradeNodes) {
@@ -183,13 +187,18 @@ public class RoomUpgradeManager extends SavedData {
     }
 
     public boolean hasUpgrade(ChunkPos room, RoomUpgrade upgrade) {
-        if(!upgradeNodes.containsKey(upgrade.getRegistryName()))
+        final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
+        if(!upgRegistry.containsValue(upgrade))
+            return false;
+
+        final var upgId = upgRegistry.getKey(upgrade);
+        if(!upgradeNodes.containsKey(upgId))
             return false;
 
         if(!roomNodes.containsKey(room))
             return false;
 
-        final var upgNode = upgradeNodes.get(upgrade.getRegistryName());
+        final var upgNode = upgradeNodes.get(upgId);
         final var roomNode = roomNodes.get(room);
 
         return graph.hasEdgeConnecting(roomNode, upgNode);

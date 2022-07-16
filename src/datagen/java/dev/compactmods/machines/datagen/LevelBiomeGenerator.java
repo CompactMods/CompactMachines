@@ -11,10 +11,7 @@ import dev.compactmods.machines.CompactMachines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
+import net.minecraft.data.*;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -47,7 +44,7 @@ public class LevelBiomeGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@Nonnull HashCache cache) {
+    public void run(@Nonnull CachedOutput cache) {
         Path data = this.generator.getOutputFolder();
 
         HashMap<ResourceLocation, Biome> biomes = Maps.newHashMap();
@@ -122,7 +119,6 @@ public class LevelBiomeGenerator implements DataProvider {
         var spawns = spawnBuilder.build();
 
         final Biome compactBiome = new Biome.BiomeBuilder()
-                .biomeCategory(Biome.BiomeCategory.NONE)
                 .downfall(0)
                 .generationSettings(BiomeGenerationSettings.EMPTY)
                 .mobSpawnSettings(spawns)
@@ -137,7 +133,6 @@ public class LevelBiomeGenerator implements DataProvider {
                         .build())
                 .build();
 
-        compactBiome.setRegistryName(COMPACT_BIOME);
         biomeWriter.accept(compactBiome, COMPACT_BIOME);
     }
 

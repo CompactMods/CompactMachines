@@ -194,7 +194,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                     var size = cmBlock.getSize();
                     try {
                         final var roomName = Rooms.getRoomName(server, room);
-                        NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
+                        NetworkHooks.openScreen((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
                             buf.writeBlockPos(pos);
                             buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
                             buf.writeChunkPos(room);
@@ -233,7 +233,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                     Rooms.getOwner(server, room).ifPresent(profile -> {
                         try {
                             if (player.getUUID().equals(profile.getId())) {
-                                final var newName = mainItem.getHoverName().getContents();
+                                final var newName = mainItem.getHoverName().getString(120);
                                 Rooms.updateName(server, room, newName);
                             } else {
                                 player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER, profile.getName()), true);

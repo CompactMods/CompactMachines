@@ -5,12 +5,9 @@ import dev.compactmods.machines.core.CompactMachinesNet;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.client.MachineRoomScreen;
 import dev.compactmods.machines.room.network.PlayerRequestedTeleportPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +15,7 @@ public class PSDIconButton extends ExtendedButton {
     private final MachineRoomScreen parent;
 
     public PSDIconButton(MachineRoomScreen parent, int xPos, int yPos) {
-        super(xPos, yPos, 20, 22, new TextComponent(""), PSDIconButton::onClicked);
+        super(xPos, yPos, 20, 22, Component.empty(), PSDIconButton::onClicked);
         this.active = false;
         this.parent = parent;
     }

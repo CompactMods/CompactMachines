@@ -1,8 +1,6 @@
 package dev.compactmods.machines.api.tunnels;
 
-import net.minecraftforge.registries.IForgeRegistryEntry;
-
-public interface TunnelDefinition extends IForgeRegistryEntry<TunnelDefinition> {
+public interface TunnelDefinition {
     /**
      * The color of a non-indicator (the same color as the wall)
      */

@@ -1,10 +1,6 @@
 package dev.compactmods.machines.graph;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.machine.graph.CompactMachineNode;
-import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
-import dev.compactmods.machines.tunnel.graph.TunnelNode;
-import dev.compactmods.machines.tunnel.graph.TunnelTypeNode;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,12 +14,12 @@ public class CMGraphRegistration {
 
     public static final ResourceLocation NODES_RL = new ResourceLocation(CompactMachines.MOD_ID, "graph_nodes");
     public static final DeferredRegister<IGraphNodeType> NODE_TYPES = DeferredRegister.create(NODES_RL, CompactMachines.MOD_ID);
-    public static final Supplier<IForgeRegistry<IGraphNodeType>> NODE_TYPE_REG = NODE_TYPES.makeRegistry(IGraphNodeType.class,
+    public static final Supplier<IForgeRegistry<IGraphNodeType>> NODE_TYPE_REG = NODE_TYPES.makeRegistry(
             () -> new RegistryBuilder<IGraphNodeType>().setName(NODES_RL));
 
     public static final ResourceLocation EDGES_RL = new ResourceLocation(CompactMachines.MOD_ID, "graph_edges");
     public static final DeferredRegister<IGraphEdgeType> EDGE_TYPES = DeferredRegister.create(EDGES_RL, CompactMachines.MOD_ID);
-    public static final Supplier<IForgeRegistry<IGraphEdgeType>> EDGE_TYPE_REG = EDGE_TYPES.makeRegistry(IGraphEdgeType.class,
+    public static final Supplier<IForgeRegistry<IGraphEdgeType>> EDGE_TYPE_REG = EDGE_TYPES.makeRegistry(
             () -> new RegistryBuilder<IGraphEdgeType>().setName(EDGES_RL));
 
 

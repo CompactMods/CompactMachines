@@ -1,11 +1,9 @@
 package dev.compactmods.machines.tunnel;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -114,7 +112,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                 ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
                 CompoundTag defTag = stack.getOrCreateTagElement("definition");
-                defTag.putString("id", def.getRegistryName().toString());
+                defTag.putString("id", Tunnels.getRegistryId(def).toString());
 
                 ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
                 level.addFreshEntity(ie);

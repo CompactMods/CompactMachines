@@ -1,8 +1,5 @@
 package dev.compactmods.machines.client.gui.guide;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.client.gui.widget.AbstractCMGuiWidget;
@@ -13,7 +10,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class GuidePage implements Widget, GuiEventListener {
 
@@ -30,7 +31,7 @@ public class GuidePage implements Widget, GuiEventListener {
     public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
         Font fr = Minecraft.getInstance().font;
         GuiComponent.drawString(ms, fr,
-                new TranslatableComponent(CompactMachines.MOD_ID + ".psd.pages.machines.title")
+                Component.translatable(CompactMachines.MOD_ID + ".psd.pages.machines.title")
                 .withStyle(ChatFormatting.GOLD),
                 2, 2, 0);
 

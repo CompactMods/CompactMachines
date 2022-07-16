@@ -1,8 +1,8 @@
 package dev.compactmods.machines.i18n;
 
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.Util;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class TranslationUtil {
@@ -11,56 +11,56 @@ public abstract class TranslationUtil {
         return Util.makeDescriptionId("message", message);
     }
 
-    public static TranslatableComponent message(ResourceLocation message) {
-        return new TranslatableComponent(messageId(message));
+    public static MutableComponent message(ResourceLocation message) {
+        return Component.translatable(messageId(message));
     }
 
-    public static TranslatableComponent message(ResourceLocation message, Object... params) {
-        return new TranslatableComponent(messageId(message), params);
+    public static MutableComponent message(ResourceLocation message, Object... params) {
+        return Component.translatable(messageId(message), params);
     }
 
     public static String tooltipId(ResourceLocation tooltip) {
         return Util.makeDescriptionId("tooltip", tooltip);
     }
 
-    public static TranslatableComponent tooltip(ResourceLocation tooltip) {
-        return new TranslatableComponent(tooltipId(tooltip));
+    public static MutableComponent tooltip(ResourceLocation tooltip) {
+        return Component.translatable(tooltipId(tooltip));
     }
 
-    public static TranslatableComponent tooltip(ResourceLocation tooltip, Object... params) {
-        return new TranslatableComponent(tooltipId(tooltip), params);
+    public static MutableComponent tooltip(ResourceLocation tooltip, Object... params) {
+        return Component.translatable(tooltipId(tooltip), params);
     }
 
     public static String advId(ResourceLocation tooltip) {
         return Util.makeDescriptionId("advancement", tooltip);
     }
 
-    public static TranslatableComponent advancement(ResourceLocation advancement) {
-        return new TranslatableComponent(advId(advancement));
+    public static MutableComponent advancement(ResourceLocation advancement) {
+        return Component.translatable(advId(advancement));
     }
 
-    public static TranslatableComponent advancementTitle(ResourceLocation advancement) {
+    public static MutableComponent advancementTitle(ResourceLocation advancement) {
         return advancement(advancement);
     }
 
-    public static TranslatableComponent advancementDesc(ResourceLocation advancement) {
-        return new TranslatableComponent(Util.makeDescriptionId("advancement", advancement) + ".desc");
+    public static MutableComponent advancementDesc(ResourceLocation advancement) {
+        return Component.translatable(Util.makeDescriptionId("advancement", advancement) + ".desc");
     }
 
-    public static TranslatableComponent jeiInfo(ResourceLocation jei) {
-        return new TranslatableComponent(Util.makeDescriptionId("jei", jei));
+    public static MutableComponent jeiInfo(ResourceLocation jei) {
+        return Component.translatable(Util.makeDescriptionId("jei", jei));
     }
 
     public static String commandId(ResourceLocation s) {
         return Util.makeDescriptionId("command", s);
     }
 
-    public static TranslatableComponent command(ResourceLocation s) {
-        return new TranslatableComponent(commandId(s));
+    public static MutableComponent command(ResourceLocation s) {
+        return Component.translatable(commandId(s));
     }
 
-    public static TranslatableComponent command(ResourceLocation s, Object... params) {
-        return new TranslatableComponent(commandId(s), params);
+    public static MutableComponent command(ResourceLocation s, Object... params) {
+        return Component.translatable(commandId(s), params);
     }
 
     public static String tunnelId(ResourceLocation id) {

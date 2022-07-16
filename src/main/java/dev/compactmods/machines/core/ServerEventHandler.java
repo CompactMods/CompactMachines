@@ -2,19 +2,15 @@ package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
-import dev.compactmods.machines.command.CMCommandRoot;
-import dev.compactmods.machines.command.data.CMDataSubcommand;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
-import dev.compactmods.machines.upgrade.command.CMUpgradeRoomCommand;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
@@ -25,8 +21,8 @@ import java.util.stream.Collectors;
 public class ServerEventHandler {
 
     @SubscribeEvent
-    public static void onWorldLoaded(final WorldEvent.Load evt) {
-        if(evt.getWorld() instanceof ServerLevel sl && sl.dimension().equals(Registration.COMPACT_DIMENSION))
+    public static void onWorldLoaded(final LevelEvent.Load evt) {
+        if(evt.getLevel() instanceof ServerLevel sl && sl.dimension().equals(Registration.COMPACT_DIMENSION))
         {
             final var serv = sl.getServer();
             final var owBorder = serv.overworld().getWorldBorder();
@@ -59,7 +55,7 @@ public class ServerEventHandler {
 
     @SubscribeEvent
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent evt) {
-        final var player = evt.getPlayer();
+        final var player = evt.getEntity();
         if(player.level.dimension().equals(Registration.COMPACT_DIMENSION) && player instanceof ServerPlayer sp) {
             // Send a fake world border to the player instead of the "real" one in overworld
             sp.connection.send(new ClientboundInitializeBorderPacket(new WorldBorder()));
@@ -69,7 +65,7 @@ public class ServerEventHandler {
     @SubscribeEvent
     public static void onPlayerDimChange(final PlayerEvent.PlayerChangedDimensionEvent evt) {
         if(evt.getTo().equals(Registration.COMPACT_DIMENSION)) {
-            final var player = evt.getPlayer();
+            final var player = evt.getEntity();
             if(player instanceof ServerPlayer sp) {
                 // Send a fake world border to the player instead of the "real" one in overworld
                 sp.connection.send(new ClientboundInitializeBorderPacket(new WorldBorder()));

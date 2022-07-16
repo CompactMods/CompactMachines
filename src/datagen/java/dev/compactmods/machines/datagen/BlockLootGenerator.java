@@ -2,7 +2,6 @@ package dev.compactmods.machines.datagen;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.data.CopyRoomBindingFunction;
 import net.minecraft.data.DataGenerator;
@@ -16,12 +15,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
-import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -53,7 +49,7 @@ public class BlockLootGenerator extends LootTableProvider {
         protected void addTables() {
             this.add(Registration.BLOCK_BREAKABLE_WALL.get(), LootTable.lootTable().withPool(LootPool
                     .lootPool()
-                    .name(Registration.BLOCK_BREAKABLE_WALL.get().getRegistryName().toString())
+                    .name(Registration.BLOCK_BREAKABLE_WALL.getId().toString())
                     .setRolls(ConstantValue.exactly(1))
                     .when(ExplosionCondition.survivesExplosion())
                     .add(LootItem.lootTableItem(Registration.ITEM_BREAKABLE_WALL.get()))));
@@ -69,7 +65,7 @@ public class BlockLootGenerator extends LootTableProvider {
 
         private void registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
             LootPool.Builder builder = LootPool.lootPool()
-                    .name(block.get().getRegistryName().toString())
+                    .name(block.getId().toString())
                     .setRolls(ConstantValue.exactly(1))
                     .when(ExplosionCondition.survivesExplosion())
                     .apply(CopyRoomBindingFunction.binding())

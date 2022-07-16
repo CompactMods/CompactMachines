@@ -6,12 +6,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -21,7 +19,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.ChunkPos;
 
 public class CMRoomsSubcommand {
@@ -81,7 +79,7 @@ public class CMRoomsSubcommand {
             ctx.getSource().sendSuccess(m, false);
         } catch (NonexistentRoomException e) {
             CompactMachines.LOGGER.error("Player is inside an unregistered chunk ({}) in the compact world.", playerChunk, e);
-            final var tc = new TextComponent("%s, %s".formatted(playerChunk.x, playerChunk.z))
+            final var tc = Component.literal("%s, %s".formatted(playerChunk.x, playerChunk.z))
                     .withStyle(ChatFormatting.RED);
 
             throw new CommandRuntimeException(TranslationUtil.message(Messages.UNKNOWN_ROOM_CHUNK, tc));
@@ -99,7 +97,7 @@ public class CMRoomsSubcommand {
         rooms.streamRooms()
                 .filter(r -> r.getOwner().equals(owner.getUUID()))
                 .forEach(data -> {
-                    ctx.getSource().sendSuccess(new TextComponent("Room: " + new ChunkPos(data.getCenter())), false);
+                    ctx.getSource().sendSuccess(Component.literal("Room: " + new ChunkPos(data.getCenter())), false);
                 });
 
         return 0;

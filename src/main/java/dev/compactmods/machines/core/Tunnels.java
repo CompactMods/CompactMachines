@@ -7,8 +7,8 @@ import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.definitions.FluidTunnel;
 import dev.compactmods.machines.tunnel.definitions.ForgeEnergyTunnel;
-import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
 import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
+import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -34,8 +34,8 @@ public class Tunnels {
     public static final ResourceLocation DEFINITIONS_RL = new ResourceLocation(MOD_ID, "tunnel_types");
     public static final DeferredRegister<TunnelDefinition> DEFINITIONS = DeferredRegister.create(DEFINITIONS_RL, MOD_ID);
 
-    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry(TunnelDefinition.class,
-            () -> new RegistryBuilder<TunnelDefinition>().setName(DEFINITIONS_RL));
+    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = DEFINITIONS.makeRegistry(() -> new RegistryBuilder<TunnelDefinition>()
+            .setName(DEFINITIONS_RL));
 
     public static void init(IEventBus bus) {
         DEFINITIONS.register(bus);
@@ -76,9 +76,14 @@ public class Tunnels {
             new TunnelWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.CLAY)
                     .strength(-1.0F, 3600000.8F)
                     .sound(SoundType.METAL)
-                    .lightLevel((state) -> 15)
-                    .noDrops()));
+                    .lightLevel((state) -> 15)));
 
     public static final RegistryObject<BlockEntityType<TunnelWallEntity>> TUNNEL_BLOCK_ENTITY = Registration.BLOCK_ENTITIES
             .register("tunnel_wall", () -> BlockEntityType.Builder.of(TunnelWallEntity::new, BLOCK_TUNNEL_WALL.get()).build(null));
+
+    public static ResourceLocation getRegistryId(TunnelDefinition definition) {
+        final var reg = TUNNEL_DEF_REGISTRY.get();
+        if (!reg.containsValue(definition)) return new ResourceLocation(MOD_ID, "unknown");
+        return reg.getKey(definition);
+    }
 }

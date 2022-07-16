@@ -3,15 +3,11 @@ package dev.compactmods.machines.tunnel.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.graph.CMGraphRegistration;
 import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-
-import java.util.Objects;
 
 /**
  * Bridges connection between a tunnel and a given machine side.

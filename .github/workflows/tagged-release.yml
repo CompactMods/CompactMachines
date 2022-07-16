@@ -3,9 +3,6 @@ name: Tagged Commit Release
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - v**
 
 jobs:
   vars:

@@ -3,18 +3,18 @@ package dev.compactmods.machines.room;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.ChatFormatting;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 public class RoomEventHandler {
 
     @SubscribeEvent
-    public static void entityJoined(final EntityJoinWorldEvent evt) {
+    public static void entityJoined(final EntityJoinLevelEvent evt) {
         Entity ent = evt.getEntity();
 
         // Early exit if spawning in non-CM dimensions

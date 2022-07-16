@@ -1,7 +1,6 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
@@ -10,9 +9,8 @@ import mcjty.theoneprobe.api.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -48,8 +46,8 @@ public class TunnelProvider implements IProbeInfoProvider {
 
             if (probeMode == ProbeMode.EXTENDED) {
                 TunnelDefinition definition = tile.getTunnelType();
-
-                MutableComponent tunType = new TextComponent(definition.getRegistryName().toString())
+                final var tunnelReg = Tunnels.TUNNEL_DEF_REGISTRY.get();
+                MutableComponent tunType = Component.literal(tunnelReg.getKey(definition).toString())
                         .withStyle(ChatFormatting.GRAY);
 
                 CompoundText type = CompoundText.create().name(tunType);
@@ -65,7 +63,7 @@ public class TunnelProvider implements IProbeInfoProvider {
 
             v.horizontal(center)
                     .item(new ItemStack(Items.COMPASS))
-                    .text(new TranslatableComponent(sideTranslated));
+                    .text(Component.translatable(sideTranslated));
 
             final var connectedTo = tile.getConnectedPosition();
             if(connectedTo != null) {
@@ -88,7 +86,7 @@ public class TunnelProvider implements IProbeInfoProvider {
 
                         v.horizontal(center)
                                 .item(pick)
-                                .text(new TranslatableComponent(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
+                                .text(Component.translatable(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
                     }
                 } catch (Exception ex) {
                     // no-op: we don't want to spam the log here

@@ -10,7 +10,6 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
         classpath 'org.parchmentmc:librarian:1.+'
-        classpath "org.spongepowered:mixingradle:${mixingradle_version}"
     }
 }
 
@@ -22,7 +21,6 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle"
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
 
 def semver = { ->
     try {
@@ -136,7 +134,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            arg '-mixin.config=compactmachines.mixin.json'
+            // arg '-mixin.config=compactmachines.mixin.json'
             args '--username', 'Dev'
             args '--width', 1920
             args '--height', 1080
@@ -271,13 +269,14 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     // JEI
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
 
     // The One Probe
-    implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:3871444"))
 
-    if (!System.getenv().containsKey("CI") && include_test_mods) {
+    if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
         // Nicephore - Screenshots and Stuff
         runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
 
@@ -321,10 +320,6 @@ dependencies {
     }
 }
 
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-}
-
 processResources {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
@@ -353,8 +348,7 @@ jar {
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : archiveVersion,
                 "Implementation-Vendor"   : "",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'MixinConfigs': "${mod_id}.mixin.json"
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }

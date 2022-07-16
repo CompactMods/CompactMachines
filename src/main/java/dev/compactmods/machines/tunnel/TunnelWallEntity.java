@@ -9,7 +9,10 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.legacy.LegacyMachineLocationsGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -26,7 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -131,7 +133,7 @@ public class TunnelWallEntity extends BlockEntity {
     @Override
     public void saveAdditional(@Nonnull CompoundTag compound) {
         if (tunnelType != null)
-            compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, tunnelType.getRegistryName().toString());
+            compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.getRegistryId(tunnelType).toString());
         else
             compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.UNKNOWN.getId().toString());
 
@@ -148,7 +150,7 @@ public class TunnelWallEntity extends BlockEntity {
     @Nonnull
     public CompoundTag getUpdateTag() {
         CompoundTag nbt = super.getUpdateTag();
-        nbt.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, tunnelType.getRegistryName().toString());
+        nbt.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.getRegistryId(tunnelType).toString());
         nbt.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
         return nbt;
     }

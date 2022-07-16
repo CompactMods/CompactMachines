@@ -5,43 +5,34 @@ import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
-import net.minecraft.data.DataGenerator;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGeneration {
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
-        if (event.includeServer())
-            registerServerProviders(event.getGenerator(), event);
+        final var helper = event.getExistingFileHelper();
+        final var generator = event.getGenerator();
 
-        if (event.includeClient())
-            registerClientProviders(event.getGenerator(), event);
-    }
-
-    private static void registerServerProviders(DataGenerator generator, GatherDataEvent event) {
-        ExistingFileHelper helper = event.getExistingFileHelper();
-        generator.addProvider(new LevelBiomeGenerator(generator));
-        generator.addProvider(new BlockLootGenerator(generator));
-        generator.addProvider(new RecipeGenerator(generator));
-        generator.addProvider(new AdvancementGenerator(generator));
+        // Server
+        generator.addProvider(event.includeServer(), new LevelBiomeGenerator(generator));
+        generator.addProvider(event.includeServer(), new BlockLootGenerator(generator));
+        generator.addProvider(event.includeServer(), new RecipeGenerator(generator));
+        generator.addProvider(event.includeServer(), new AdvancementGenerator(generator));
 
         final var blocks = new BlockTagGenerator(generator, helper);
-        generator.addProvider(blocks);
-        generator.addProvider(new ItemTagGenerator(generator, blocks, helper));
-    }
+        generator.addProvider(event.includeServer(), blocks);
+        generator.addProvider(event.includeServer(), new ItemTagGenerator(generator, blocks, helper));
 
-    private static void registerClientProviders(DataGenerator generator, GatherDataEvent event) {
-        ExistingFileHelper helper = event.getExistingFileHelper();
-        generator.addProvider(new StateGenerator(generator, helper));
-        generator.addProvider(new TunnelWallStateGenerator(generator, helper));
-        generator.addProvider(new ItemModelGenerator(generator, helper));
+        // Client
+        generator.addProvider(event.includeClient(), new StateGenerator(generator, helper));
+        generator.addProvider(event.includeClient(), new TunnelWallStateGenerator(generator, helper));
+        generator.addProvider(event.includeClient(), new ItemModelGenerator(generator, helper));
 
-        generator.addProvider(new EnglishLangGenerator(generator));
-        generator.addProvider(new RussianLangGenerator(generator));
+        generator.addProvider(event.includeClient(), new EnglishLangGenerator(generator));
+        generator.addProvider(event.includeClient(), new RussianLangGenerator(generator));
     }
 }

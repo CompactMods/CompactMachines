@@ -3,7 +3,9 @@ package dev.compactmods.machines.datagen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 
 import java.util.OptionalLong;
@@ -28,7 +30,7 @@ public class DimensionTypeBuilder {
     private int height = 256;
     private int logicalHeight = 256;
     private TagKey<Block> infiniburn = BlockTags.INFINIBURN_OVERWORLD;
-    private ResourceLocation effectsLocation = DimensionType.OVERWORLD_EFFECTS;
+    private ResourceLocation effectsLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS;
     private float ambientLight = 0;
 
     public DimensionTypeBuilder() {
@@ -68,6 +70,7 @@ public class DimensionTypeBuilder {
 
     /**
      * Coordinate scale against overworld. 1 = OVERWORLD, 8 = NETHER.
+     *
      * @param coordinateScale
      * @return
      */
@@ -123,6 +126,9 @@ public class DimensionTypeBuilder {
     }
 
     public DimensionType build() {
-        return DimensionType.create(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, false, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight);
+        // TODO: Add MonsterSettings here, right now it copies overworld
+        return new DimensionType(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks,
+                respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight,
+                new DimensionType.MonsterSettings(piglinSafe, hasRaids, UniformInt.of(0, 7), 0));
     }
 }

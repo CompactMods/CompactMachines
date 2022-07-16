@@ -22,7 +22,7 @@ public class MachineRoomUpgrades {
 
     private static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(REGISTRY_KEY, CompactMachines.MOD_ID);
 
-    public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = UPGRADES.makeRegistry(RoomUpgrade.class, RegistryBuilder::new);
+    public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = UPGRADES.makeRegistry(RegistryBuilder::new);
 
     // ================================================================================================================
     public static final RegistryObject<RoomUpgrade> CHUNKLOAD = UPGRADES.register(ChunkloadUpgrade.REG_ID.getPath(), ChunkloadUpgrade::new);

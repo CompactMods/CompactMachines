@@ -7,10 +7,8 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import mcjty.theoneprobe.Tools;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.config.Config;
-import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,14 +28,14 @@ public class CompactMachineNameOverride implements IBlockDisplayOverride {
                         final var config = Config.getRealConfig();
 
                         final var modName = Tools.getModName(blockState.getBlock());
-                        BaseComponent roomName;
+                        Component roomName;
 
                         try {
                             roomName = Rooms.getRoomName(level.getServer(), room)
-                                    .map(n -> (BaseComponent) new TextComponent(n))
-                                    .orElse((BaseComponent) pickBlock.getHoverName());
+                                    .map(Component::literal)
+                                    .orElse((MutableComponent) pickBlock.getHoverName());
                         } catch (NonexistentRoomException e) {
-                            roomName = (BaseComponent) pickBlock.getHoverName();
+                            roomName = pickBlock.getHoverName();
                         }
 
                         if (Tools.show(mode, config.getShowModName())) {
