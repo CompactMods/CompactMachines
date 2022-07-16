@@ -17,6 +17,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -105,7 +107,7 @@ public class CompactRoomData extends SavedData {
     }
 
     public Optional<RoomData> forRoom(ChunkPos room) {
-        if(roomData.containsKey(room))
+        if (roomData.containsKey(room))
             return Optional.ofNullable(roomData.get(room));
 
         return Optional.empty();
@@ -162,7 +164,7 @@ public class CompactRoomData extends SavedData {
     }
 
     public RoomData getData(ChunkPos room) throws NonexistentRoomException {
-        if(!roomData.containsKey(room))
+        if (!roomData.containsKey(room))
             throw new NonexistentRoomException(room);
 
         return roomData.get(room);
@@ -217,7 +219,7 @@ public class CompactRoomData extends SavedData {
         }
 
         public void register() throws OperationNotSupportedException {
-            RoomData data = new RoomData(owner, center, spawn, size);
+            RoomData data = new RoomData(owner, center, spawn, size, Optional.empty());
             storage.register(chunk, data);
         }
     }
@@ -228,19 +230,29 @@ public class CompactRoomData extends SavedData {
                 CodecExtensions.UUID_CODEC.fieldOf("owner").forGetter(RoomData::getOwner),
                 BlockPos.CODEC.fieldOf("center").forGetter(RoomData::getCenter),
                 CodecExtensions.VECTOR3D.fieldOf("spawn").forGetter(RoomData::getSpawn),
-                RoomSize.CODEC.fieldOf("size").forGetter(RoomData::getSize)
+                RoomSize.CODEC.fieldOf("size").forGetter(RoomData::getSize),
+                Codec.STRING.optionalFieldOf("name").forGetter(RoomData::getName)
         ).apply(i, RoomData::new));
 
         private final UUID owner;
         private final BlockPos center;
         private Vec3 spawn;
         private final RoomSize size;
+        private boolean hasCustomName;
+        private String name;
 
-        public RoomData(UUID owner, BlockPos center, Vec3 spawn, RoomSize size) {
+        public RoomData(UUID owner, BlockPos center, Vec3 spawn, RoomSize size, Optional<String> name) {
             this.owner = owner;
             this.center = center;
             this.spawn = spawn;
             this.size = size;
+
+            name.ifPresentOrElse(n -> {
+                this.name = n;
+                this.hasCustomName = true;
+            }, () -> {
+                this.hasCustomName = false;
+            });
         }
 
         public RoomSize getSize() {
@@ -277,6 +289,19 @@ public class CompactRoomData extends SavedData {
 
         public AABB getRoomBounds() {
             return size.getBounds(this.center);
+        }
+
+        public boolean hasName() {
+            return this.hasCustomName;
+        }
+
+        public void setName(String newName) {
+            this.hasCustomName = true;
+            this.name = newName;
+        }
+
+        public Optional<String> getName() {
+            return hasCustomName ? Optional.ofNullable(name) : Optional.empty();
         }
     }
 }

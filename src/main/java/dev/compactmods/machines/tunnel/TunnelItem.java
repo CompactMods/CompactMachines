@@ -99,15 +99,12 @@ public class TunnelItem extends Item {
     @Override
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         if (this.allowdedIn(group)) {
-            IForgeRegistry<TunnelDefinition> definitions = RegistryManager.ACTIVE.getRegistry(TunnelDefinition.class);
+            IForgeRegistry<TunnelDefinition> definitions = Tunnels.TUNNEL_DEF_REGISTRY.get();
             definitions.getValues().forEach(def -> {
                 if (def == Tunnels.UNKNOWN.get())
                     return;
 
-                ItemStack withDef = new ItemStack(this, 1);
-                CompoundTag defTag = withDef.getOrCreateTagElement("definition");
-                defTag.putString("id", def.getRegistryName().toString());
-
+                ItemStack withDef = createStack(def);
                 items.add(withDef);
             });
         }

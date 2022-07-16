@@ -1,8 +1,11 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -12,18 +15,26 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.RoomUpgradeItem;
+import dev.compactmods.machines.upgrade.RoomUpgradeManager;
 import dev.compactmods.machines.util.PlayerUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -41,6 +52,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class CompactMachineBlock extends Block implements EntityBlock {
+
+    public static final TagKey<Block> TAG = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(CompactMachines.MOD_ID, "machine"));
 
     private final RoomSize size;
 
@@ -179,11 +192,22 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             if (state.getBlock() instanceof CompactMachineBlock cmBlock) {
                 machine.getConnectedRoom().ifPresent(room -> {
                     var size = cmBlock.getSize();
-                    NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
-                        buf.writeBlockPos(pos);
-                        buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
-                        buf.writeChunkPos(room);
-                    });
+                    try {
+                        final var roomName = Rooms.getRoomName(server, room);
+                        NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
+                            buf.writeBlockPos(pos);
+                            buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
+                            buf.writeChunkPos(room);
+                            roomName.ifPresentOrElse(name -> {
+                                buf.writeBoolean(true);
+                                buf.writeUtf(name);
+                            }, () -> {
+                                buf.writeBoolean(false);
+                            });
+                        });
+                    } catch (NonexistentRoomException e) {
+                        e.printStackTrace();
+                    }
                 });
             }
         }
@@ -202,6 +226,62 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             }
         }
 
+        // Try and pull the name off the nametag and apply it to the room
+        if (mainItem.getItem() instanceof NameTagItem && mainItem.hasCustomHoverName()) {
+            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+                tile.getConnectedRoom().ifPresentOrElse(room -> {
+                    Rooms.getOwner(server, room).ifPresent(profile -> {
+                        try {
+                            if (player.getUUID().equals(profile.getId())) {
+                                final var newName = mainItem.getHoverName().getContents();
+                                Rooms.updateName(server, room, newName);
+                            } else {
+                                player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER, profile.getName()), true);
+                            }
+                        } catch (NonexistentRoomException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }, () -> {
+                    CompactMachines.LOGGER.warn("Tried to apply upgrade to a 'claimed' machine, but there was no owner data attached.");
+                });
+            }
+        }
+
+        // Upgrade Item
+        if (mainItem.is(CMTags.ROOM_UPGRADE_ITEM)) {
+            final var reg = MachineRoomUpgrades.REGISTRY.get();
+            if(mainItem.getItem() instanceof RoomUpgradeItem upItem) {
+                if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+                    tile.getConnectedRoom().ifPresent(room -> {
+                        Rooms.getOwner(server, room).ifPresent(prof -> {
+                            if (!player.getUUID().equals(prof.getId())) {
+                                player.displayClientMessage(TranslationUtil.message(Messages.NOT_ROOM_OWNER, prof.getName()), true);
+                                return;
+                            }
+
+                            final var upg = upItem.getUpgradeType();
+                            final var manager = RoomUpgradeManager.get(server.getLevel(Registration.COMPACT_DIMENSION));
+
+                            if (manager.hasUpgrade(room, upg)) {
+                                player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
+                            } else {
+                                final var added = manager.addUpgrade(upg, room);
+
+                                if (added) {
+                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_APPLIED)
+                                            .withStyle(ChatFormatting.DARK_GREEN), true);
+                                } else {
+                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED)
+                                            .withStyle(ChatFormatting.DARK_RED), true);
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+        }
+
         return InteractionResult.SUCCESS;
     }
 
@@ -217,9 +297,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                 var entry = PreciseDimensionalPosition.fromPlayer(player);
                 hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
             });
-        } catch (MissingDimensionException e) {
-            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
-        } catch (NonexistentRoomException e) {
+        } catch (MissingDimensionException | NonexistentRoomException e) {
             CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
         }
     }

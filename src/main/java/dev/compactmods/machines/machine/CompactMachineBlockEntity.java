@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CompactMachineBlockEntity extends BlockEntity implements ICapabilityProvider {
+public class CompactMachineBlockEntity extends BlockEntity {
     private static final String ROOM_NBT = "room_pos";
     private static final String LEGACY_MACH_ID = "machine_id";
 

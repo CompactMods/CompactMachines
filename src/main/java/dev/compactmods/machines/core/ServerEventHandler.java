@@ -1,8 +1,11 @@
 package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.command.CMCommandRoot;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
+import dev.compactmods.machines.upgrade.RoomUpgradeManager;
+import dev.compactmods.machines.upgrade.command.CMUpgradeRoomCommand;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -22,19 +25,18 @@ import java.util.stream.Collectors;
 public class ServerEventHandler {
 
     @SubscribeEvent
-    public static void onCommandsRegister(final RegisterCommandsEvent event) {
-        final var dispatcher = event.getDispatcher();
-        CMCommandRoot.register(dispatcher);
-        CMDataSubcommand.make();
-    }
-
-    @SubscribeEvent
     public static void onWorldLoaded(final WorldEvent.Load evt) {
         if(evt.getWorld() instanceof ServerLevel sl && sl.dimension().equals(Registration.COMPACT_DIMENSION))
         {
             final var serv = sl.getServer();
             final var owBorder = serv.overworld().getWorldBorder();
             final var cwBorder = sl.getWorldBorder();
+
+            final var levelUpgrades = RoomUpgradeManager.get(sl);
+            levelUpgrades.implementing(ILevelLoadedUpgradeListener.class).forEach(inst -> {
+                final var upg = inst.upgrade();
+                upg.onLevelLoaded(sl, inst.room());
+            });
 
             // Filter border listeners down to the compact world, then remove them from the OW listener list
             final var listeners = owBorder.listeners.stream()

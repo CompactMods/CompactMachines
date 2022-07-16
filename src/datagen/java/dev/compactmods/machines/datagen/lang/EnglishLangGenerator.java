@@ -4,10 +4,14 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.registries.RegistryObject;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -28,9 +32,13 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addMessage(Messages.TELEPORT_OUT_OF_BOUNDS, "An otherworldly force prevents your teleportation.");
         addMessage(Messages.NO_TUNNEL_SIDE, "There are no available sides for this tunnel type.");
 
+        addMessage(Messages.NOT_ROOM_OWNER, "You are not the room owner; only %s may make changes.");
+
         // 1 = Display Name, 2 = Chunk, 3 = Size
         addMessage(Messages.PLAYER_ROOM_INFO, "Player '%1$s' is inside a %3$s room at %2$s.");
         addMessage(Messages.MACHINE_ROOM_INFO, "Machine at %1$s is bound to a %2$s size room at %3$s");
+
+        addMessage(Messages.CANNOT_RENAME_NOT_OWNER, "Only %s may rename this room.");
 
         addCommand(CMCommands.NOT_IN_COMPACT_DIMENSION, "Cannot use that command outside of a machine room.");
         addCommand(CMCommands.FAILED_CMD_FILE_ERROR, "Failed to execute command; there was a file error. Check logs.");
@@ -40,21 +48,25 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.MACHINE_REG_TOTAL, "Total: %s");
         addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
         addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
+        addCommand(CMCommands.ROOM_NOT_FOUND, "Room [%s] could not be found.");
+        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawnpoint for room [%s] was changed successfully.");
 
         addAdvancementTranslations();
 
-        add(Registration.BLOCK_BREAKABLE_WALL.get(), "Compact Machine Wall");
-        add(Registration.BLOCK_SOLID_WALL.get(), "Solid Compact Machine Wall");
-        add(Tunnels.BLOCK_TUNNEL_WALL.get(), "Solid Compact Machine Wall (with Tunnel)");
+        addBlock(Registration.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
+        addBlock(Registration.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
+        addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
 
         add(Registration.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
 
         add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
         add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
 
-        addTunnel(Tunnels.ITEM_TUNNEL_DEF.get(), "Item Tunnel");
-        addTunnel(Tunnels.FLUID_TUNNEL_DEF.get(), "Fluid Tunnel");
-        addTunnel(Tunnels.FORGE_ENERGY.get(), "Energy Tunnel");
+        add(RoomUpgrade.UNNAMED_TRANS_KEY, "Unnamed Room Upgrade");
+
+        addTunnel(Tunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
+        addTunnel(Tunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
+        addTunnel(Tunnels.FORGE_ENERGY, "Energy Tunnel");
         // addTunnel(Tunnels.REDSTONE_IN_DEF.get(), "Redstone Tunnel (In)");
         // addTunnel(Tunnels.REDSTONE_OUT_DEF.get(), "Redstone Tunnel (Out)");
 
@@ -73,6 +85,23 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");
 
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
+
+        //region Upgrades
+        addUpgradeItem(MachineRoomUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
+
+        addMessage(Messages.ALREADY_HAS_UPGRADE, "Upgrade has already been applied to room.");
+        addMessage(Messages.UPGRADE_NOT_PRESENT, "Upgrade is not applied to the room.");
+
+        addMessage(Messages.UPGRADE_APPLIED, "Upgrade applied to room.");
+        addMessage(Messages.UPGRADE_ADD_FAILED, "Upgrade failed to apply to room.");
+
+        addMessage(Messages.UPGRADE_REMOVED, "Upgrade removed from room.");
+        addMessage(Messages.UPGRADE_REM_FAILED, "Upgrade removal failed to apply to room.");
+
+        addTooltip(Tooltips.ROOM_UPGRADE_TYPE, "Type: %s");
+        addTooltip(Tooltips.TUTORIAL_APPLY_ROOM_UPGRADE, "Use on a bound machine block to apply upgrade.");
+        //endregion
+
         addCommand(CMCommands.CANNOT_GIVE_MACHINE, "Failed to give a new machine to player.");
         addCommand(CMCommands.MACHINE_GIVEN, "Created a new machine item and gave it to %s.");
 

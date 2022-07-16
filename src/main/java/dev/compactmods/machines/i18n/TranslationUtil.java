@@ -1,5 +1,6 @@
 package dev.compactmods.machines.i18n;
 
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;

@@ -23,4 +23,20 @@ public abstract class Messages {
      * Used to show information about a room, accessed via a bound machine.
      */
     public static final ResourceLocation MACHINE_ROOM_INFO = new ResourceLocation(Constants.MOD_ID, "machine_room_info");
+
+    /**
+     * Shown when a non-owner tries to rename a room. Takes the owner's display name.
+     */
+    public static final ResourceLocation CANNOT_RENAME_NOT_OWNER = new ResourceLocation(Constants.MOD_ID, "cannot_rename_not_owner");
+
+    /**
+     * Shown to players when they try to interact with a room they do not own. Provides the owner's display name.
+     */
+    public static final ResourceLocation NOT_ROOM_OWNER = new ResourceLocation(Constants.MOD_ID, "not_the_room_owner");
+    public static final ResourceLocation UPGRADE_APPLIED = new ResourceLocation(Constants.MOD_ID, "upgrade_applied");
+    public static final ResourceLocation UPGRADE_ADD_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_add_failed");
+    public static final ResourceLocation UPGRADE_REMOVED = new ResourceLocation(Constants.MOD_ID, "upgrade_removed");
+    public static final ResourceLocation UPGRADE_REM_FAILED = new ResourceLocation(Constants.MOD_ID, "upgrade_remove_failed");
+    public static final ResourceLocation ALREADY_HAS_UPGRADE = new ResourceLocation(Constants.MOD_ID, "upgrade_already_present");
+    public static final ResourceLocation UPGRADE_NOT_PRESENT = new ResourceLocation(Constants.MOD_ID, "upgrade_not_present");
 }

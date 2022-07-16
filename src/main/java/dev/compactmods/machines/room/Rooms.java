@@ -1,5 +1,6 @@
 package dev.compactmods.machines.room;
 
+import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
@@ -17,9 +18,11 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.phys.Vec3;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -168,5 +171,60 @@ public class Rooms {
                 new Vec3i(inside, inside + 1, inside), false, null);
 
         return tem;
+    }
+
+    public static void resetSpawn(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+
+        final var centerPoint = Vec3.atCenterOf(roomInfo.getCenter());
+        final var newSpawn = centerPoint.subtract(0, (roomInfo.getSize().getInternalSize() / 2f), 0);
+
+        data.setSpawn(room, newSpawn);
+    }
+
+    public static Optional<String> getRoomName(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+        return roomInfo.getName();
+    }
+
+    public static Optional<GameProfile> getOwner(MinecraftServer server, ChunkPos room) {
+        if(!exists(server, room))
+            return Optional.empty();
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var data = CompactRoomData.get(compactDim);
+
+        try {
+            final CompactRoomData.RoomData roomInfo = data.getData(room);
+            final var ownerUUID = roomInfo.getOwner();
+
+            return server.getProfileCache().get(ownerUUID);
+        } catch (NonexistentRoomException e) {
+            return Optional.empty();
+        }
+    }
+
+    public static void updateName(MinecraftServer server, ChunkPos room, String newName) throws NonexistentRoomException {
+        if(!exists(server, room))
+            throw new NonexistentRoomException(room);
+
+        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+
+        final var data = CompactRoomData.get(compactDim);
+        final var roomInfo = data.getData(room);
+        roomInfo.setName(newName);
+        data.setDirty();
     }
 }
