@@ -24,35 +24,8 @@ apply plugin: "net.minecraftforge.gradle"
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-def semver = { ->
-    try {
-        def code = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'describe', '--tags', '--match', 'v*'
-            standardOutput = code
-        }
-
-        return code.toString().trim().substring(1).split('-')[0]
-    }
-    catch (ignored) {
-        return "4.0.0";
-    }
-}
-
-def buildNumber = { ->
-    try {
-        def code = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'describe', '--tags', '--match', 'v*'
-            standardOutput = code
-        }
-
-        return Integer.parseInt(code.toString().trim().split('-')[1])
-    }
-    catch (ignored) {
-        return 0;
-    }
-}
+def semver = System.getenv("CM_SEMVER_VERSION")
+def buildNumber = System.getenv("CM_BUILD_NUM")
 
 def nightlyVersion = "${semver}.${buildNumber}"
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")

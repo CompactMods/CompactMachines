@@ -154,6 +154,8 @@ jobs:
         timeout-minutes: 10
         env:
           CM_RELEASE: true
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: "0"
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -248,5 +250,7 @@ jobs:
         run: ./gradlew publishReleasePublicationToGitHubPackagesRepository
         env:
           CM_RELEASE: true
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: "0"
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
