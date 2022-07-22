@@ -134,11 +134,15 @@ jobs:
         timeout-minutes: 15
         env:
           CM_RELEASE: true
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: "0"
           
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         timeout-minutes: 20
         env:
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: "0"
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -179,8 +183,8 @@ jobs:
           path: changelog
       - run: cat changelog/CHANGELOG.md
 
-  release:
-    name: Make Releases
+  release-gh:
+    name: Make Github Release
     runs-on: ubuntu-20.04
     needs: [changelog, vars, jar]
     steps:
@@ -202,13 +206,34 @@ jobs:
       - name: Create GitHub Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Release ${{ github.event.release.tag_name }}"
+          title: "Release ${{ needs.vars.outputs.version }}"
+          automatic_release_tag: "${{ needs.vars.outputs.version }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
             changelog/CHANGELOG.md
             build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
             build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
+
+  release-cf:
+    name: Make Curseforge Release
+    runs-on: ubuntu-20.04
+    needs: [changelog, vars, jar]
+    steps:
+      - name: Download Build Results
+        uses: actions/download-artifact@v2
+        with:
+          name: libs
+          path: build-out
+      - name: Download Changelog Results
+        uses: actions/download-artifact@v2
+        with:
+          name: out
+          path: changelog
+
+      - name: Load Changelog File
+        id: changelog
+        run: echo ::set-output name=changelog::$(cat changelog/CHANGELOG.md)
 
       - name: Full File
         id: filename
