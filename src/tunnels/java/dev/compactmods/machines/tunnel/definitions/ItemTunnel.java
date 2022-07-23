@@ -55,7 +55,6 @@ public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
             return instance.lazy();
         }
 
-
         return LazyOptional.empty();
     }
 
