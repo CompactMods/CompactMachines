@@ -21,9 +21,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-
 import javax.annotation.Nonnull;
-
 
 public class ItemTunnel extends ForgeRegistryEntry<TunnelDefinition>
         implements TunnelDefinition, CapabilityTunnel<ItemTunnel.Instance>, TunnelTeardownHandler<ItemTunnel.Instance> {
