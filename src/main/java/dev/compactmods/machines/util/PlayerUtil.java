@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
@@ -17,11 +18,13 @@ import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -144,6 +147,38 @@ public abstract class PlayerUtil {
                     .getChunk(currentRoomChunk.x, currentRoomChunk.z);
 
             // TODO - Send changed players packet to other clients
+        });
+    }
+
+    public static void teleportPlayerBackToMachine(ServerLevel world, @Nonnull ServerPlayer serverPlayer) {
+        MinecraftServer serv = world.getServer();
+
+        final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(Capabilities.ROOM_HISTORY);
+
+        if (!history.isPresent()) {
+            howDidYouGetThere(serverPlayer);
+            return;
+        }
+
+        history.ifPresent(hist -> {
+            if (hist.hasHistory()) {
+                final IRoomHistoryItem currentArea = hist.peek();
+                final Level machineLevel = currentArea.getMachine().level(serv);
+                final BlockPos machinePos = currentArea.getMachine().getBlockPosition();
+
+                if(machineLevel.getBlockEntity(machinePos) instanceof CompactMachineBlockEntity tile) {
+                    final var targetRoom = tile.getConnectedRoom();
+                    targetRoom.ifPresent(room -> {
+                        // No need to change history since we just warping player back!
+
+                        try {
+                            teleportPlayerIntoRoom(serv, serverPlayer, room, false);
+                        } catch (MissingDimensionException | NonexistentRoomException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            }
         });
     }
 

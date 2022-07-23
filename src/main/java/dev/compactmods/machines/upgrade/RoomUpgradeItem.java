@@ -24,6 +24,8 @@ public abstract class RoomUpgradeItem extends Item {
 
     public abstract RoomUpgrade getUpgradeType();
 
+
+
     @Override
     public Component getName(ItemStack stack) {
         String key = RoomUpgradeHelper.getTypeFrom(stack)
