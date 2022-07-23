@@ -121,7 +121,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
-        add("death.attack." + MachineVoidAir.DAMAGE_SOURCE.msgId, "%1$s Died from Machine Void Air");
+        add("death.attack." + MachineVoidAir.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
     }
 
     @Override
