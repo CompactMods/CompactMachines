@@ -92,6 +92,7 @@ public class CompactStructureGenerator {
 
             BlockPos.betweenClosedStream(machineInternal)
                     .forEach(p -> world.setBlock(p, Blocks.AIR.defaultBlockState(), 7));
+
         }
     }
 }
