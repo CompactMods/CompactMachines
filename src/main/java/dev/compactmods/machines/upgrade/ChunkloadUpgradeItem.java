@@ -11,7 +11,6 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
     public ChunkloadUpgradeItem(Properties props) {
         super(props);
     }
-
     @Override
     public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> stacks) {
         if (tab != CompactMachines.COMPACT_MACHINES_ITEMS) return;
@@ -22,7 +21,6 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
 
         stacks.add(stack);
     }
-
     @Override
     public RoomUpgrade getUpgradeType() {
         return MachineRoomUpgrades.CHUNKLOAD.get();

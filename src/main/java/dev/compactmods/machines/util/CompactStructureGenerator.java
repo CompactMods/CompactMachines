@@ -91,7 +91,6 @@ public class CompactStructureGenerator {
                     .forEach(d -> generateCompactWall(world, size, center, d));
 
             BlockPos.betweenClosedStream(machineInternal)
-                    .filter(world::isEmptyBlock)
                     .forEach(p -> world.setBlock(p, Blocks.AIR.defaultBlockState(), 7));
         }
     }
