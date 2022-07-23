@@ -22,6 +22,7 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
 
         stacks.add(stack);
     }
+
     @Override
     public RoomUpgrade getUpgradeType() {
         return MachineRoomUpgrades.CHUNKLOAD.get();
