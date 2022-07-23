@@ -36,8 +36,6 @@ public class ForgeEnergyTunnel extends ForgeRegistryEntry<TunnelDefinition>
             return instance.lazy().cast();
         }
 
-
-
         return LazyOptional.empty();
     }
 
