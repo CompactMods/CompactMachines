@@ -157,6 +157,7 @@ public abstract class PlayerUtil {
 
         if (!history.isPresent()) {
             howDidYouGetThere(serverPlayer);
+
             return;
         }
 
