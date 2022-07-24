@@ -22,6 +22,8 @@ public class ServerConfig {
 
     private static ForgeConfigSpec.IntValue CHANGE_ROOM_UPGRADES;
 
+    private static ForgeConfigSpec.BooleanValue ALLOWED_OUTSIDE_MACHINE;
+
     static {
         generateConfig();
     }
@@ -76,6 +78,10 @@ public class ServerConfig {
                 .comment("Command level required for changing room upgrades.")
                 .defineInRange("upgrades", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
 
+        ALLOWED_OUTSIDE_MACHINE = builder
+                .comment("If true it'll teleport player out of machine dimension if player is outside of the machine (default: false)")
+                .define("allowoutside", false);
+
         builder.pop(2);
 
         CONFIG = builder.build();
@@ -94,4 +100,8 @@ public class ServerConfig {
     }
 
     public static int changeUpgrades() { return CHANGE_ROOM_UPGRADES.get(); }
+
+    public static Boolean isAllowedOutsideOfMachine() {
+        return ALLOWED_OUTSIDE_MACHINE.get();
+    }
 }

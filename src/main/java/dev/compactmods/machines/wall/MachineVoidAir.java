@@ -1,6 +1,7 @@
 package dev.compactmods.machines.wall;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
@@ -29,6 +30,7 @@ public class MachineVoidAir extends AirBlock {
 
     @Override
     public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
+        if (ServerConfig.isAllowedOutsideOfMachine()) return;
         if (pLevel.isClientSide) return;
 
         if (pEntity instanceof ServerPlayer player) {
