@@ -1,0 +1,41 @@
+name: Gradle Tests and Nightly (CI)
+
+on:
+  pull_request:
+    paths:
+      - src
+
+jobs:
+  tests:
+    name: Gradle Tests
+    runs-on: ubuntu-20.04
+    needs: [ vars ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "17"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create datagen assets
+        continue-on-error: true
+        run: ./gradlew runData
+
+      - name: Test JAR with GameTest Server
+        run: ./gradlew runGameTestServer
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-data
+          path: run/gametest

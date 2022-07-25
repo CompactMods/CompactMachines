@@ -8,8 +8,9 @@ on:
     tags-ignore:
       - v*
     paths-ignore:
-      - 'README.md'
-      - LICENSE
+      - "README.md"
+      - "LICENSE"
+      - ".github"
 
 jobs:
   vars:
