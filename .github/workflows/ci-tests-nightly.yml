@@ -24,7 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
-        
+
+      - name: Unshallow and Get Tags
+        run: git fetch --prune --unshallow --tags
+
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
