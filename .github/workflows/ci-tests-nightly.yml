@@ -10,6 +10,7 @@ on:
     paths-ignore:
       - 'README.md'
       - LICENSE
+      - ".github/**/*"
 
 jobs:
   vars:
@@ -59,10 +60,12 @@ jobs:
 
       - name: Create datagen assets
         continue-on-error: true
+        timeout-minutes: 20
         run: ./gradlew runData
 
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
+        timeout-minutes: 20
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
