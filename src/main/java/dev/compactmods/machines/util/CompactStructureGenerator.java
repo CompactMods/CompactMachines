@@ -4,11 +4,15 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.StructureBlockEntity;
+import net.minecraft.world.level.block.state.properties.StructureMode;
 import net.minecraft.world.phys.AABB;
 
-import java.util.Arrays;
+import static dev.compactmods.machines.CompactMachines.MOD_ID;
 
 public class CompactStructureGenerator {
 
@@ -73,26 +77,14 @@ public class CompactStructureGenerator {
      * @param center
      */
     public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos center) {
-        int s = size.getInternalSize() / 2;
+        world.setBlock(center, Blocks.STRUCTURE_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
+        int s = (int) Math.ceil((size.getInternalSize() / 2) + 1);
 
-        BlockPos floorCenter = center.relative(Direction.DOWN, s);
-        BlockPos machineTopCenter = center.relative(Direction.UP, s);
-
-        AABB floorBlocks = new AABB(floorCenter, floorCenter)
-                .inflate(s, 0, s);
-        AABB machineInternal = new AABB(machineTopCenter, floorCenter)
-                .inflate(s, 0, s);
-
-
-        boolean anyAir = BlockPos.betweenClosedStream(floorBlocks).anyMatch(world::isEmptyBlock);
-
-        if (anyAir) {            // Generate the walls
-            Arrays.stream(Direction.values())
-                    .forEach(d -> generateCompactWall(world, size, center, d));
-
-            BlockPos.betweenClosedStream(machineInternal)
-                    .forEach(p -> world.setBlock(p, Blocks.AIR.defaultBlockState(), 7));
-
+        if (world.getBlockEntity(center) instanceof StructureBlockEntity SBE) {
+            SBE.setMode(StructureMode.LOAD);
+            SBE.setStructureName(MOD_ID + ":" + size.getName());
+            SBE.setStructurePos(new BlockPos(-s, -s, -s));
+            SBE.loadStructure((ServerLevel) world, false);
         }
     }
 }
