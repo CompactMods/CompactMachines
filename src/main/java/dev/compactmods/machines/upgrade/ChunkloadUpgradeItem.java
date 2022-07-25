@@ -1,6 +1,5 @@
 package dev.compactmods.machines.upgrade;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.upgrade.RoomUpgradeHelper;
 import net.minecraft.core.NonNullList;

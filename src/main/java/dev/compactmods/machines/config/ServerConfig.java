@@ -53,6 +53,11 @@ public class ServerConfig {
                 .comment("The Y-dimension to spawn machine floors at.")
                 .defineInRange("floor", 40, 10, 200);
 
+        ALLOWED_OUTSIDE_MACHINE = builder
+                .comment("Specify if we want to damage player's that managed to escape the boundries")
+                .comment("default: false")
+                .define("allowOutside", false);
+
         builder.pop();
 
         builder
@@ -78,9 +83,6 @@ public class ServerConfig {
                 .comment("Command level required for changing room upgrades.")
                 .defineInRange("upgrades", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
 
-        ALLOWED_OUTSIDE_MACHINE = builder
-                .comment("If true it'll teleport player out of machine dimension if player is outside of the machine (default: false)")
-                .define("allowoutside", false);
 
         builder.pop(2);
 
