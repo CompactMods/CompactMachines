@@ -9,6 +9,7 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.wall.MachineVoidAir;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
@@ -120,6 +121,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
+        add("death.attack." + MachineVoidAir.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
     }
 
     @Override

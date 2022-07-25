@@ -22,6 +22,8 @@ public class ServerConfig {
 
     private static ForgeConfigSpec.IntValue CHANGE_ROOM_UPGRADES;
 
+    private static ForgeConfigSpec.BooleanValue ALLOWED_OUTSIDE_MACHINE;
+
     static {
         generateConfig();
     }
@@ -51,6 +53,11 @@ public class ServerConfig {
                 .comment("The Y-dimension to spawn machine floors at.")
                 .defineInRange("floor", 40, 10, 200);
 
+        ALLOWED_OUTSIDE_MACHINE = builder
+                .comment("Specify if we want to damage player's that managed to escape the boundries")
+                .comment("default: false")
+                .define("allowOutside", false);
+
         builder.pop();
 
         builder
@@ -76,6 +83,7 @@ public class ServerConfig {
                 .comment("Command level required for changing room upgrades.")
                 .defineInRange("upgrades", Commands.LEVEL_GAMEMASTERS, Commands.LEVEL_ALL, Commands.LEVEL_OWNERS);
 
+
         builder.pop(2);
 
         CONFIG = builder.build();
@@ -94,4 +102,8 @@ public class ServerConfig {
     }
 
     public static int changeUpgrades() { return CHANGE_ROOM_UPGRADES.get(); }
+
+    public static Boolean isAllowedOutsideOfMachine() {
+        return ALLOWED_OUTSIDE_MACHINE.get();
+    }
 }

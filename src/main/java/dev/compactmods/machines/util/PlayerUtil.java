@@ -5,7 +5,6 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
-
 import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.UUID;
