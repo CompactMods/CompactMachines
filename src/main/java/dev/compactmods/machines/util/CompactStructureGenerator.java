@@ -4,13 +4,18 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.properties.StructureMode;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
+
+import java.util.Random;
 
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
 
@@ -76,15 +81,9 @@ public class CompactStructureGenerator {
      * @param size
      * @param center
      */
-    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos center) {
-        world.setBlock(center, Blocks.STRUCTURE_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
+    public static void generateCompactStructure(ServerLevelAccessor world, RoomSize size, BlockPos center) {
+        var machine = world.getLevel().getStructureManager().get(new ResourceLocation(MOD_ID, size.getName())).get();
         int s = (int) Math.ceil((size.getInternalSize() / 2) + 1);
-
-        if (world.getBlockEntity(center) instanceof StructureBlockEntity SBE) {
-            SBE.setMode(StructureMode.LOAD);
-            SBE.setStructureName(MOD_ID + ":" + size.getName());
-            SBE.setStructurePos(new BlockPos(-s, -s, -s));
-            SBE.loadStructure((ServerLevel) world, false);
-        }
+        machine.placeInWorld(world, center.subtract(new BlockPos(s, s, s)), BlockPos.ZERO, new StructurePlaceSettings(), new Random(), Block.UPDATE_ALL);
     }
 }
