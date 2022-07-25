@@ -17,7 +17,10 @@ jobs:
     name: Get Variables
     runs-on: ubuntu-20.04
     outputs:
-      release_type: ${{steps.cf_release_type.outputs.value }}
+      release_type: ${{steps.cf_release_type.outputs.value}}
+      version: ${{steps.version.outputs.version}}
+      build: ${{steps.build.outputs.buildver}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
@@ -29,6 +32,26 @@ jobs:
           path: './gradle.properties'
           property: 'cf_release_type'
 
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+
+      - name: Semver Version
+        id: version
+        run: |
+          version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
+          echo "::set-output name=version::$version"
+
+      - name: Build Version
+        id: build
+        run: |
+          buildver=$(git describe --tags --match v* | cut -d- -f2)
+          echo "::set-output name=buildver::$buildver"
   tests:
     name: Gradle Tests
     runs-on: ubuntu-20.04
@@ -108,10 +131,16 @@ jobs:
 
       - name: Generate Resources
         run: ./gradlew runData
+        env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
 
       - name: Publish gradle nightly jar
         run: ./gradlew publishNightlyPublicationToGitHubPackagesRepository
         env:
           CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
