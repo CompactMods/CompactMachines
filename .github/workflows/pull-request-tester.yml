@@ -1,4 +1,4 @@
-name: Gradle Tests and Nightly (CI)
+name: Pull Request Tester
 
 on:
   pull_request:
@@ -9,7 +9,6 @@ jobs:
   tests:
     name: Gradle Tests
     runs-on: ubuntu-20.04
-    needs: [ vars ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
