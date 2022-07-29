@@ -1,11 +1,10 @@
 package dev.compactmods.machines.wall;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Capabilities;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -36,13 +35,13 @@ public class MachineVoidAir extends AirBlock {
         if (pEntity instanceof ServerPlayer player) {
             if (player.isCreative()) return;
 
-            if (player.getActiveEffectsMap().containsKey(MobEffects.BLINDNESS))
-                PlayerUtil.teleportPlayerOutOfMachine((ServerLevel) pLevel, player);
-
-
             player.addEffect(new MobEffectInstance(MobEffects.POISON, 5 * 20));
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 5 * 20));
             player.hurt(DAMAGE_SOURCE, 1);
+
+            PlayerUtil.howDidYouGetThere(player);
+            player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
+            PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
         }
     }
 }
