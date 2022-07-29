@@ -250,7 +250,7 @@ dependencies {
     // The One Probe
     implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
 
-    if (!System.getenv().containsKey("CI") && include_test_mods) {
+    if (!System.getenv().containsKey("CI") && Boolean.valueOf(include_test_mods)) {
         // Nicephore - Screenshots and Stuff
         runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
 
