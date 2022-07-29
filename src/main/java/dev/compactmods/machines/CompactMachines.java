@@ -9,6 +9,7 @@ import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.graph.CMGraphRegistration;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.upgrade.command.RoomUpgradeArgument;
 import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.world.item.CreativeModeTab;
@@ -58,5 +59,6 @@ public class CompactMachines {
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
 
         ArgumentTypes.register("room_pos", RoomPositionArgument.class, new EmptyArgumentSerializer<>(RoomPositionArgument::room));
+        ArgumentTypes.register("upgrade_type", RoomUpgradeArgument.class, new EmptyArgumentSerializer<>(RoomUpgradeArgument::upgrade));
     }
 }
