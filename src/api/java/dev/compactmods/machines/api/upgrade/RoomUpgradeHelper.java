@@ -9,7 +9,7 @@ import java.util.Optional;
 public abstract class RoomUpgradeHelper {
 
     public static final String NBT_UPGRADE_NODE = "upgrade_info";
-    public static final String NBT_UPDATE_ID = "key";
+    public static final String NBT_UPGRADE_ID = "key";
 
     public static Optional<ResourceLocation> getTypeFrom(@NotNull ItemStack stack) {
         if(!stack.hasTag()) return Optional.empty();
@@ -17,9 +17,9 @@ public abstract class RoomUpgradeHelper {
         if(!tag.contains(NBT_UPGRADE_NODE)) return Optional.empty();
 
         final var upg = tag.getCompound(NBT_UPGRADE_NODE);
-        if(!upg.contains(NBT_UPDATE_ID)) return Optional.empty();
+        if(!upg.contains(NBT_UPGRADE_ID)) return Optional.empty();
 
-        final var upg2 = new ResourceLocation(upg.getString(NBT_UPDATE_ID));
+        final var upg2 = new ResourceLocation(upg.getString(NBT_UPGRADE_ID));
         return Optional.of(upg2);
     }
 }

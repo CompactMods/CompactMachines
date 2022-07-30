@@ -3,9 +3,10 @@ package dev.compactmods.machines.datagen.lang;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 
@@ -48,8 +49,8 @@ public class RussianLangGenerator extends BaseLangGenerator {
         super.addTranslations();
 
         // Walls (Solid, Breakable, Tunnel)
-        add(Registration.BLOCK_SOLID_WALL.get(), "Прочная стена компактного механизма");
-        add(Registration.BLOCK_BREAKABLE_WALL.get(), "Стена компактного механизма");
+        add(Walls.BLOCK_SOLID_WALL.get(), "Прочная стена компактного механизма");
+        add(Walls.BLOCK_BREAKABLE_WALL.get(), "Стена компактного механизма");
         add(Tunnels.BLOCK_TUNNEL_WALL.get(), "Прочная стена компактного механизма (с Туннелем)");
 
         // Basics
@@ -57,7 +58,7 @@ public class RussianLangGenerator extends BaseLangGenerator {
         add(CompactMachines.MOD_ID + ".direction.side", "Сторона: %s");
 
         // PSD
-        add(Registration.PERSONAL_SHRINKING_DEVICE.get(), "Персональное сжимающее устройство");
+        add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Персональное сжимающее устройство");
 
         // Built-In Tunnels
         add(Tunnels.ITEM_TUNNEL.get(), "Предметный туннель");

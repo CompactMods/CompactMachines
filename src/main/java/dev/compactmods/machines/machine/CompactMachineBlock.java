@@ -4,16 +4,19 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
+import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.upgrade.RoomUpgradeItem;
@@ -120,7 +123,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         ServerLevel serverWorld = (ServerLevel) world;
 
         if (serverWorld.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
-            ServerLevel compactWorld = serverWorld.getServer().getLevel(Registration.COMPACT_DIMENSION);
+            ServerLevel compactWorld = serverWorld.getServer().getLevel(Dimension.COMPACT_DIMENSION);
             if (compactWorld == null) {
                 CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
             }
@@ -131,12 +134,12 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
     public static Block getBySize(RoomSize size) {
         return switch (size) {
-            case TINY -> Registration.MACHINE_BLOCK_TINY.get();
-            case SMALL -> Registration.MACHINE_BLOCK_SMALL.get();
-            case NORMAL -> Registration.MACHINE_BLOCK_NORMAL.get();
-            case LARGE -> Registration.MACHINE_BLOCK_LARGE.get();
-            case GIANT -> Registration.MACHINE_BLOCK_GIANT.get();
-            case MAXIMUM -> Registration.MACHINE_BLOCK_MAXIMUM.get();
+            case TINY -> Machines.MACHINE_BLOCK_TINY.get();
+            case SMALL -> Machines.MACHINE_BLOCK_SMALL.get();
+            case NORMAL -> Machines.MACHINE_BLOCK_NORMAL.get();
+            case LARGE -> Machines.MACHINE_BLOCK_LARGE.get();
+            case GIANT -> Machines.MACHINE_BLOCK_GIANT.get();
+            case MAXIMUM -> Machines.MACHINE_BLOCK_MAXIMUM.get();
         };
 
     }
@@ -213,7 +216,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         }
 
         // TODO - Item tags instead of direct item reference here
-        if (mainItem.getItem() == Registration.PERSONAL_SHRINKING_DEVICE.get()) {
+        if (mainItem.getItem() == Shrinking.PERSONAL_SHRINKING_DEVICE.get()) {
             // Try teleport to compact machine dimension
             if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
                 tile.getConnectedRoom().ifPresentOrElse(room -> {
@@ -261,7 +264,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                             }
 
                             final var upg = upItem.getUpgradeType();
-                            final var manager = RoomUpgradeManager.get(server.getLevel(Registration.COMPACT_DIMENSION));
+                            final var manager = RoomUpgradeManager.get(server.getLevel(Dimension.COMPACT_DIMENSION));
 
                             if (manager.hasUpgrade(room, upg)) {
                                 player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
@@ -293,7 +296,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             PlayerUtil.teleportPlayerIntoRoom(server, player, newRoomPos, true);
 
             // Mark the player as inside the machine, set external spawn, and yeet
-            player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(hist -> {
+            player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
                 var entry = PreciseDimensionalPosition.fromPlayer(player);
                 hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
             });
@@ -323,7 +326,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
         if (level instanceof ServerLevel sl) {
             final var serv = sl.getServer();
-            final var compactDim = serv.getLevel(Registration.COMPACT_DIMENSION);
+            final var compactDim = serv.getLevel(Dimension.COMPACT_DIMENSION);
 
             if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
                 entity.getConnectedRoom().ifPresent(room -> {

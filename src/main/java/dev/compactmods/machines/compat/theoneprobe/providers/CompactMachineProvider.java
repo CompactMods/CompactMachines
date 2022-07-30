@@ -3,13 +3,11 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import mcjty.theoneprobe.api.*;
@@ -41,7 +39,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
         if (server == null)
             return;
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var te = level.getBlockEntity(hitData.getPos());
 

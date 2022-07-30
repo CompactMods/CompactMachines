@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.core.Tunnels;
 import net.minecraft.resources.ResourceLocation;
 
 public record BaseTunnelWallData(LevelBlockPosition connection, ResourceLocation tunnelType) {

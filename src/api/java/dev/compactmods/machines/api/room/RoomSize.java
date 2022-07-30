@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.api.room;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;

@@ -7,7 +7,10 @@ import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.room.RoomCapabilities;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.util.PlayerUtil;
@@ -124,7 +127,7 @@ public class TunnelItem extends Item {
         final BlockPos position = context.getClickedPos();
         final BlockState state = level.getBlockState(position);
 
-        if(level instanceof ServerLevel sl && sl.dimension().equals(Registration.COMPACT_DIMENSION)) {
+        if(level instanceof ServerLevel sl && sl.dimension().equals(Dimension.COMPACT_DIMENSION)) {
             if (state.getBlock() instanceof SolidWallBlock && player != null) {
                 getDefinition(context.getItemInHand()).ifPresent(def -> {
                     try {
@@ -144,7 +147,7 @@ public class TunnelItem extends Item {
     }
 
     public static Optional<IRoomHistoryItem> getMachineBindingInfo(Player player) {
-        final var history = player.getCapability(Capabilities.ROOM_HISTORY);
+        final var history = player.getCapability(RoomCapabilities.ROOM_HISTORY);
 
         var mapped = history.resolve().map(hist -> {
             if (!hist.hasHistory() && player instanceof ServerPlayer sp) {

@@ -4,8 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
-import dev.compactmods.machines.core.MissingDimensionException;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.dimension.Dimension;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
@@ -27,7 +27,7 @@ public class LegacyMachineConnections extends SavedData {
     }
 
     public static LegacyMachineConnections get(MinecraftServer server) throws MissingDimensionException {
-        var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         if(compactDim == null)
             throw new MissingDimensionException();
 

@@ -12,9 +12,11 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
     }
     @Override
     public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> stacks) {
+        if(!allowedIn(tab)) return;
+
         final var stack = new ItemStack(MachineRoomUpgrades.CHUNKLOADER.get(), 1);
         final var info = stack.getOrCreateTagElement(RoomUpgradeHelper.NBT_UPGRADE_NODE);
-        info.putString(RoomUpgradeHelper.NBT_UPDATE_ID, ChunkloadUpgrade.REG_ID.toString());
+        info.putString(RoomUpgradeHelper.NBT_UPGRADE_ID, ChunkloadUpgrade.REG_ID.toString());
 
         stacks.add(stack);
     }

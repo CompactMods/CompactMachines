@@ -3,7 +3,7 @@ package dev.compactmods.machines.tunnel.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.GraphNodeBase;
 import dev.compactmods.machines.graph.IGraphNodeType;
 import net.minecraft.core.BlockPos;
@@ -58,6 +58,6 @@ public final class TunnelNode extends GraphNodeBase implements IGraphNodeType {
 
     @Override
     public IGraphNodeType getType() {
-        return CMGraphRegistration.TUNNEL_NODE.get();
+        return Graph.TUNNEL_NODE.get();
     }
 }

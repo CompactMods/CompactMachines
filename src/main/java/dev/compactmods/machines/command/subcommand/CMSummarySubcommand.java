@@ -2,9 +2,8 @@ package dev.compactmods.machines.command.subcommand;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -26,7 +25,7 @@ public class CMSummarySubcommand {
         var src = ctx.getSource();
         var serv = src.getServer();
 
-        var compactLevel = serv.getLevel(Registration.COMPACT_DIMENSION);
+        var compactLevel = serv.getLevel(Dimension.COMPACT_DIMENSION);
         if (compactLevel != null) {
             src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         } else {

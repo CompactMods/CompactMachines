@@ -1,7 +1,7 @@
 package dev.compactmods.machines.compat.carryon;
 
 import dev.compactmods.machines.machine.CompactMachineBlock;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.registries.ForgeRegistries;
 

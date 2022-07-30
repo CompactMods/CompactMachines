@@ -1,5 +1,8 @@
 package dev.compactmods.machines.api.tunnels;
 
+import dev.compactmods.machines.api.core.Constants;
+import net.minecraft.resources.ResourceLocation;
+
 public interface TunnelDefinition {
     /**
      * The color of a non-indicator (the same color as the wall)
@@ -17,6 +20,7 @@ public interface TunnelDefinition {
      * a machine room.
      */
     int EXPORT_COLOR = 0xffe6a709;
+    ResourceLocation TUNNEL_ID = new ResourceLocation(Constants.MOD_ID, "tunnel");
 
     /**
      * The central ring color of the tunnel. Shown in the tunnel item and on blocks.

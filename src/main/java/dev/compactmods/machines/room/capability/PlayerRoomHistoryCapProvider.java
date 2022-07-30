@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.room.RoomCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -27,7 +27,7 @@ public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSe
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if(cap == Capabilities.ROOM_HISTORY)
+        if(cap == RoomCapabilities.ROOM_HISTORY)
             return opt.cast();
 
         return LazyOptional.empty();

@@ -1,9 +1,6 @@
-package dev.compactmods.machines.room;
+package dev.compactmods.machines.wall;
 
-import javax.annotation.Nullable;
-import java.util.List;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,6 +12,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 public class ItemBlockWall extends BlockItem {
 
     public ItemBlockWall(Block blockIn, Properties builder) {
@@ -25,7 +25,7 @@ public class ItemBlockWall extends BlockItem {
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
-        if (stack.getItem() == Registration.ITEM_SOLID_WALL.get()) {
+        if (stack.getItem() == Walls.ITEM_SOLID_WALL.get()) {
             MutableComponent text;
             if (Screen.hasShiftDown()) {
                 text = TranslationUtil.tooltip(Tooltips.Details.SOLID_WALL)

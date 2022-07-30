@@ -1,7 +1,7 @@
 package dev.compactmods.machines.tunnel.network;
 
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.client.ClientTunnelHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

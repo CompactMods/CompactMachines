@@ -2,7 +2,7 @@ package dev.compactmods.machines.upgrade.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +15,6 @@ public record RoomUpgradeGraphNode(ResourceLocation key) implements IGraphNode {
 
     @Override
     public IGraphNodeType getType() {
-        return CMGraphRegistration.ROOM_UPGRADE_NODE.get();
+        return Graph.ROOM_UPGRADE_NODE.get();
     }
 }

@@ -6,9 +6,9 @@ import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
-import dev.compactmods.machines.core.Capabilities;
-import dev.compactmods.machines.core.MissingDimensionException;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.location.SimpleTeleporter;
@@ -44,7 +44,7 @@ public abstract class PlayerUtil {
     public static void teleportPlayerIntoMachine(Level machineLevel, Player player, BlockPos machinePos) throws MissingDimensionException {
         MinecraftServer serv = machineLevel.getServer();
 
-        ServerLevel compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
+        ServerLevel compactWorld = serv.getLevel(Dimension.COMPACT_DIMENSION);
         if (compactWorld == null) {
             throw new MissingDimensionException("Compact dimension not found; player attempted to enter machine.");
         }
@@ -54,7 +54,7 @@ public abstract class PlayerUtil {
             boolean grantAdvancement = targetRoom.isEmpty();
 
             targetRoom.ifPresent(room -> {
-                if (player.level.dimension().equals(Registration.COMPACT_DIMENSION) && player.chunkPosition().equals(room)) {
+                if (player.level.dimension().equals(Dimension.COMPACT_DIMENSION) && player.chunkPosition().equals(room)) {
                     if (player instanceof ServerPlayer sp) {
                         AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
                     }
@@ -68,7 +68,7 @@ public abstract class PlayerUtil {
                     teleportPlayerIntoRoom(serv, player, room, grantAdvancement);
 
                     // Mark the player as inside the machine, set external spawn, and yeet
-                    player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(hist -> {
+                    player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
                         hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
                     });
                 } catch (MissingDimensionException | NonexistentRoomException e) {
@@ -79,7 +79,7 @@ public abstract class PlayerUtil {
     }
 
     public static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, ChunkPos room, boolean grantAdvancement) throws MissingDimensionException, NonexistentRoomException {
-        final var compactDim = serv.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = serv.getLevel(Dimension.COMPACT_DIMENSION);
         final var spawn = Rooms.getSpawn(serv, room);
         final var roomSize = Rooms.sizeOf(serv, room);
 
@@ -105,7 +105,7 @@ public abstract class PlayerUtil {
 
         MinecraftServer serv = world.getServer();
 
-        final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(Capabilities.ROOM_HISTORY);
+        final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(RoomCapabilities.ROOM_HISTORY);
 
         if (!history.isPresent()) {
             howDidYouGetThere(serverPlayer);

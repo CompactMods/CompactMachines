@@ -4,7 +4,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.trigger.BasicPlayerAdvTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
 import net.minecraft.advancements.CriteriaTriggers;
 
 public class AdvancementTriggers {

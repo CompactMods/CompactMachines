@@ -10,11 +10,11 @@ import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
 import dev.compactmods.machines.client.render.SuperRenderTypeBuffer;
 import dev.compactmods.machines.client.util.TransformingVertexBuilder;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.room.network.RoomNetworkHandler;
+import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -64,7 +64,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     }
 
     private boolean hasPsdItem() {
-        return inv.contains(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()));
+        return inv.contains(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()));
     }
 
     @Override

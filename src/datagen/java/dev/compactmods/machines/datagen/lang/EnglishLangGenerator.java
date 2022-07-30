@@ -5,14 +5,13 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.dimension.VoidAirBlock;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
-import dev.compactmods.machines.wall.MachineVoidAir;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.RegistryObject;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -54,11 +53,11 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addAdvancementTranslations();
 
-        addBlock(Registration.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
-        addBlock(Registration.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
+        addBlock(Walls.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
+        addBlock(Walls.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
         addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
 
-        add(Registration.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
+        add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
 
         add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
         add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
@@ -121,7 +120,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
-        add("death.attack." + MachineVoidAir.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
+        add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
     }
 
     @Override

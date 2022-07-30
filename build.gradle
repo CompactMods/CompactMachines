@@ -107,8 +107,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            // arg '-mixin.config=compactmachines.mixin.json'
-            args '--username', 'Dev'
+            args '--username', 'Nano'
             args '--width', 1920
             args '--height', 1080
 
@@ -134,8 +133,6 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            arg '-mixin.config=compactmachines.mixin.json'
 
             mods {
                 compactmachines {

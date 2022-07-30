@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ItemModelProvider;

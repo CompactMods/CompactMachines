@@ -4,11 +4,11 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -101,12 +101,12 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
-        if(level.dimension().equals(Registration.COMPACT_DIMENSION) && level instanceof ServerLevel compactDim) {
+        if(level.dimension().equals(Dimension.COMPACT_DIMENSION) && level instanceof ServerLevel compactDim) {
             var def = tunnel.getTunnelType();
             final Direction tunnelWallSide = hitResult.getDirection();
 
             if (player.isShiftKeyDown()) {
-                BlockState solidWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+                BlockState solidWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
 
                 level.setBlockAndUpdate(pos, solidWall);
 

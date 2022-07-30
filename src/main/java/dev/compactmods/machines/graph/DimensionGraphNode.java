@@ -6,8 +6,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-import java.util.Objects;
-
 public record DimensionGraphNode(ResourceKey<Level> dimension) implements IGraphNode {
 
     public static final Codec<DimensionGraphNode> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -22,6 +20,6 @@ public record DimensionGraphNode(ResourceKey<Level> dimension) implements IGraph
 
     @Override
     public IGraphNodeType getType() {
-        return CMGraphRegistration.DIM_NODE.get();
+        return Graph.DIM_NODE.get();
     }
 }

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.core;
+package dev.compactmods.machines.dimension;
 
 public class MissingDimensionException extends Throwable {
     public MissingDimensionException() {

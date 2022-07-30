@@ -3,7 +3,7 @@ package dev.compactmods.machines.machine.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -11,8 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-
-import java.util.Objects;
 
 /**
  * Represents a machine's external point. This can be either inside a machine or in a dimension somewhere.
@@ -38,6 +36,6 @@ public record CompactMachineNode(ResourceKey<Level> dimension, BlockPos position
 
     @Override
     public IGraphNodeType getType() {
-        return CMGraphRegistration.MACH_NODE.get();
+        return Graph.MACH_NODE.get();
     }
 }

@@ -2,7 +2,7 @@ package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import mcjty.theoneprobe.api.*;

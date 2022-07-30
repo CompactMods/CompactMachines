@@ -7,8 +7,10 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.trigger.BasicPlayerAdvTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.advancements.FrameType;
@@ -70,7 +72,7 @@ public class AdvancementGenerator implements DataProvider {
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
                         .background(modLoc("textures/block/wall.png"))
-                        .item(new ItemStack(Registration.MACHINE_BLOCK_ITEM_NORMAL.get()))
+                        .item(new ItemStack(Machines.MACHINE_BLOCK_ITEM_NORMAL.get()))
                         .id(Advancements.ROOT)
                         .toast(false).hidden(false).chat(false)
                         .build())
@@ -81,7 +83,7 @@ public class AdvancementGenerator implements DataProvider {
                 .addCriterion("got_stuck", HowDidYouGetHereTrigger.Instance.create())
                 .display(new DisplayBuilder()
                         .frame(FrameType.CHALLENGE)
-                        .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                        .item(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()))
                         .id(Advancements.HOW_DID_YOU_GET_HERE)
                         .toast(false).hidden(true)
                         .build())
@@ -92,7 +94,7 @@ public class AdvancementGenerator implements DataProvider {
                 .addCriterion("recursion", BasicPlayerAdvTrigger.Instance.create(Advancements.RECURSIVE_ROOMS))
                 .display(new DisplayBuilder()
                         .frame(FrameType.CHALLENGE)
-                        .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                        .item(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()))
                         .id(Advancements.RECURSIVE_ROOMS)
                         .toast(false).hidden(true)
                         .build())
@@ -100,30 +102,30 @@ public class AdvancementGenerator implements DataProvider {
 
         Advancement.Builder.advancement()
                 .parent(root)
-                .addCriterion("obtained_wall", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.BLOCK_BREAKABLE_WALL.get()))
+                .addCriterion("obtained_wall", InventoryChangeTrigger.TriggerInstance.hasItems(Walls.BLOCK_BREAKABLE_WALL.get()))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
-                        .item(new ItemStack(Registration.BLOCK_BREAKABLE_WALL.get()))
+                        .item(new ItemStack(Walls.BLOCK_BREAKABLE_WALL.get()))
                         .id(Advancements.FOUNDATIONS)
                         .build())
                 .save(consumer, Advancements.FOUNDATIONS.toString());
 
         final Advancement psd = Advancement.Builder.advancement()
                 .parent(root)
-                .addCriterion("obtained_psd", InventoryChangeTrigger.TriggerInstance.hasItems(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                .addCriterion("obtained_psd", InventoryChangeTrigger.TriggerInstance.hasItems(Shrinking.PERSONAL_SHRINKING_DEVICE.get()))
                 .display(new DisplayBuilder()
                         .frame(FrameType.TASK)
-                        .item(new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()))
+                        .item(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()))
                         .id(Advancements.GOT_SHRINKING_DEVICE)
                         .build())
                 .save(consumer, Advancements.GOT_SHRINKING_DEVICE.toString());
 
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_TINY_MACHINE, Registration.MACHINE_BLOCK_ITEM_TINY);
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_SMALL_MACHINE, Registration.MACHINE_BLOCK_ITEM_SMALL);
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_NORMAL_MACHINE, Registration.MACHINE_BLOCK_ITEM_NORMAL);
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_LARGE_MACHINE, Registration.MACHINE_BLOCK_ITEM_LARGE);
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_GIANT_MACHINE, Registration.MACHINE_BLOCK_ITEM_GIANT);
-        machineAdvancement(consumer, psd, Advancements.CLAIMED_MAX_MACHINE, Registration.MACHINE_BLOCK_ITEM_MAXIMUM);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_TINY_MACHINE, Machines.MACHINE_BLOCK_ITEM_TINY);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_SMALL_MACHINE, Machines.MACHINE_BLOCK_ITEM_SMALL);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_NORMAL_MACHINE, Machines.MACHINE_BLOCK_ITEM_NORMAL);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_LARGE_MACHINE, Machines.MACHINE_BLOCK_ITEM_LARGE);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_GIANT_MACHINE, Machines.MACHINE_BLOCK_ITEM_GIANT);
+        machineAdvancement(consumer, psd, Advancements.CLAIMED_MAX_MACHINE, Machines.MACHINE_BLOCK_ITEM_MAXIMUM);
     }
 
     private void machineAdvancement(Consumer<Advancement> consumer, Advancement root, ResourceLocation advancement, Supplier<Item> item) {

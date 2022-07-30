@@ -1,7 +1,6 @@
-package dev.compactmods.machines.core;
+package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.room.IRoomInformation;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -11,17 +10,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
-public class Capabilities {
-
-    public static final Capability<IRoomInformation> ROOM = CapabilityManager.get(new CapabilityToken<>() {
-    });
+public class RoomCapabilities {
 
     public static final Capability<IRoomHistory> ROOM_HISTORY = CapabilityManager.get(new CapabilityToken<>() {
     });
 
     @SubscribeEvent
     void onCapRegistration(final RegisterCapabilitiesEvent evt) {
-        evt.register(IRoomInformation.class);
         evt.register(IRoomHistory.class);
     }
 }

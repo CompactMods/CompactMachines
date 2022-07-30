@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
-public class CMCommands {
+public abstract class CMCommands {
     public static final ResourceLocation LEVEL_REGISTERED = new ResourceLocation(MOD_ID, "level_registered");
     public static final ResourceLocation LEVEL_NOT_FOUND = new ResourceLocation(MOD_ID, "level_not_found");
 

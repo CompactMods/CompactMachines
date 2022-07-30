@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
@@ -69,7 +69,7 @@ public class CMRoomsSubcommand {
         final var playerChunk = player.chunkPosition();
         final var playerLevel = player.getLevel();
 
-        if (!playerLevel.dimension().equals(Registration.COMPACT_DIMENSION)) {
+        if (!playerLevel.dimension().equals(Dimension.COMPACT_DIMENSION)) {
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.WRONG_DIMENSION));
         }
 
@@ -91,7 +91,7 @@ public class CMRoomsSubcommand {
     public static int findByOwner(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var owner = EntityArgument.getPlayer(ctx, "owner");
         final var server = ctx.getSource().getServer();
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var rooms = CompactRoomData.get(compactDim);
         rooms.streamRooms()

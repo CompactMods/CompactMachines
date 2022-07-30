@@ -2,9 +2,8 @@ package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
@@ -46,12 +45,12 @@ public class CompactMachineItem extends BlockItem {
 
     public static Item getItemBySize(RoomSize size) {
         return switch (size) {
-            case TINY -> Registration.MACHINE_BLOCK_ITEM_TINY.get();
-            case SMALL -> Registration.MACHINE_BLOCK_ITEM_SMALL.get();
-            case NORMAL -> Registration.MACHINE_BLOCK_ITEM_NORMAL.get();
-            case LARGE -> Registration.MACHINE_BLOCK_ITEM_LARGE.get();
-            case GIANT -> Registration.MACHINE_BLOCK_ITEM_GIANT.get();
-            case MAXIMUM -> Registration.MACHINE_BLOCK_ITEM_MAXIMUM.get();
+            case TINY -> Machines.MACHINE_BLOCK_ITEM_TINY.get();
+            case SMALL -> Machines.MACHINE_BLOCK_ITEM_SMALL.get();
+            case NORMAL -> Machines.MACHINE_BLOCK_ITEM_NORMAL.get();
+            case LARGE -> Machines.MACHINE_BLOCK_ITEM_LARGE.get();
+            case GIANT -> Machines.MACHINE_BLOCK_ITEM_GIANT.get();
+            case MAXIMUM -> Machines.MACHINE_BLOCK_ITEM_MAXIMUM.get();
         };
     }
 

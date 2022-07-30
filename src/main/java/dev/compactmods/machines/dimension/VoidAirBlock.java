@@ -1,8 +1,8 @@
-package dev.compactmods.machines.wall;
+package dev.compactmods.machines.dimension;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.room.RoomCapabilities;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,11 +19,11 @@ import net.minecraft.world.level.material.Material;
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
 
 
-public class MachineVoidAir extends AirBlock {
+public class VoidAirBlock extends AirBlock {
     final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
-    public MachineVoidAir() {
-        super(BlockBehaviour.Properties.of(Material.AIR).noCollission().noDrops().air());
+    public VoidAirBlock() {
+        super(BlockBehaviour.Properties.of(Material.AIR).noCollission().air().noLootTable());
     }
 
 
@@ -40,7 +40,7 @@ public class MachineVoidAir extends AirBlock {
             player.hurt(DAMAGE_SOURCE, 1);
 
             PlayerUtil.howDidYouGetThere(player);
-            player.getCapability(Capabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
+            player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
             PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
         }
     }

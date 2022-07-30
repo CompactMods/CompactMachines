@@ -36,7 +36,7 @@ public class CopyRoomBindingFunction extends LootItemConditionalFunction {
 
     @Override
     public LootItemFunctionType getType() {
-        return CompactMachinesLootFunctions.COPY_ROOM_BINDING.get();
+        return LootFunctions.COPY_ROOM_BINDING.get();
     }
 
     public static class Serializer extends LootItemConditionalFunction.Serializer<CopyRoomBindingFunction> {

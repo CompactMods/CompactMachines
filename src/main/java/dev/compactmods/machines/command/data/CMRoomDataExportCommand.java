@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import net.minecraft.commands.CommandSourceStack;
@@ -29,7 +29,7 @@ public class CMRoomDataExportCommand {
     private static int execAll(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
-        var compact = serv.getLevel(Registration.COMPACT_DIMENSION);
+        var compact = serv.getLevel(Dimension.COMPACT_DIMENSION);
 
         final CompactRoomData rooms = CompactRoomData.get(compact);
 

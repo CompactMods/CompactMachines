@@ -4,10 +4,11 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.core.MissingDimensionException;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
 
 public class Rooms {
     public static ChunkPos createNew(MinecraftServer serv, RoomSize size, UUID owner) throws MissingDimensionException {
-        final var compactWorld = serv.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactWorld = serv.getLevel(Dimension.COMPACT_DIMENSION);
 
         if (compactWorld == null)
             throw new MissingDimensionException();
@@ -141,26 +142,26 @@ public class Rooms {
     }
 
     public static RoomSize sizeOf(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         return CompactRoomData.get(compactDim)
                 .getData(room)
                 .getSize();
     }
 
     public static IDimensionalPosition getSpawn(MinecraftServer server, ChunkPos room) {
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         return CompactRoomData.get(compactDim).getSpawn(room);
     }
 
     public static boolean exists(MinecraftServer server, ChunkPos room) {
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         return CompactRoomData.get(compactDim).isRegistered(room);
     }
 
     public static StructureTemplate getInternalBlocks(MinecraftServer server, ChunkPos room) throws MissingDimensionException, NonexistentRoomException {
         final var tem = new StructureTemplate();
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var data = CompactRoomData.get(compactDim);
         final var roomInfo = data.getData(room);
@@ -177,7 +178,7 @@ public class Rooms {
         if(!exists(server, room))
             throw new NonexistentRoomException(room);
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var data = CompactRoomData.get(compactDim);
         final var roomInfo = data.getData(room);
@@ -192,7 +193,7 @@ public class Rooms {
         if(!exists(server, room))
             throw new NonexistentRoomException(room);
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var data = CompactRoomData.get(compactDim);
         final var roomInfo = data.getData(room);
@@ -203,7 +204,7 @@ public class Rooms {
         if(!exists(server, room))
             return Optional.empty();
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         final var data = CompactRoomData.get(compactDim);
 
         try {
@@ -220,7 +221,7 @@ public class Rooms {
         if(!exists(server, room))
             throw new NonexistentRoomException(room);
 
-        final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
 
         final var data = CompactRoomData.get(compactDim);
         final var roomInfo = data.getData(room);

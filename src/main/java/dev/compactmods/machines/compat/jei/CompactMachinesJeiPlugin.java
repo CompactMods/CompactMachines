@@ -2,11 +2,11 @@ package dev.compactmods.machines.compat.jei;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.JeiInfo;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.core.Tunnels;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineItem;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
@@ -35,7 +35,7 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
 
 
         registration.addIngredientInfo(
-                new ItemStack(Registration.PERSONAL_SHRINKING_DEVICE.get()),
+                new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
                 VanillaTypes.ITEM_STACK,
                 TranslationUtil.jeiInfo(JeiInfo.SHRINKING_DEVICE));
     }

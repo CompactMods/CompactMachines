@@ -1,7 +1,7 @@
 package dev.compactmods.machines.util;
 
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -56,7 +56,7 @@ public class CompactStructureGenerator {
      * @param wallDirection
      */
     public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeCenter, Direction wallDirection) {
-        final var unbreakableWall = Registration.BLOCK_SOLID_WALL.get().defaultBlockState();
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
         final var wallBounds = getWallBounds(size, cubeCenter, wallDirection);
 
         BlockPos.betweenClosedStream(wallBounds)

@@ -3,7 +3,6 @@ package dev.compactmods.machines.api.tunnels.recipe;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
@@ -121,7 +120,7 @@ public class TunnelRecipeBuilder {
             output.add("ingredients", jsonarray);
 
             JsonObject result = new JsonObject();
-            result.addProperty("item", Constants.TUNNEL_ID.toString());
+            result.addProperty("item", TunnelDefinition.TUNNEL_ID.toString());
             if (this.count > 1) {
                 result.addProperty("count", this.count);
             }

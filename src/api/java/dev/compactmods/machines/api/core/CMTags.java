@@ -5,7 +5,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
-public class CMTags {
+public abstract class CMTags {
 
     public static final TagKey<Item> ROOM_UPGRADE_ITEM = ItemTags.create(new ResourceLocation(Constants.MOD_ID, "room_upgrade"));
 }

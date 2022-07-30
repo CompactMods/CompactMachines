@@ -3,14 +3,12 @@ package dev.compactmods.machines.machine.graph.legacy;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.core.MissingDimensionException;
-import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.HashMap;
@@ -27,7 +25,7 @@ public class LegacyMachineLocationsGraph extends SavedData {
     }
 
     public static LegacyMachineLocationsGraph get(MinecraftServer server) throws MissingDimensionException {
-        var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
+        var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
         if(compactDim == null)
             throw new MissingDimensionException();
 

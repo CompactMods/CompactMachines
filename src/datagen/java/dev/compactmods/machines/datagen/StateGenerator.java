@@ -2,8 +2,8 @@ package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.machine.CompactMachineBlock;
-import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
@@ -18,8 +18,8 @@ public class StateGenerator extends BlockStateProvider {
     protected void registerStatesAndModels() {
         // Wall block model
         var wall = models().cubeAll("block/wall", modLoc("block/wall"));
-        simpleBlock(Registration.BLOCK_SOLID_WALL.get(), wall);
-        simpleBlock(Registration.BLOCK_BREAKABLE_WALL.get(), wall);
+        simpleBlock(Walls.BLOCK_SOLID_WALL.get(), wall);
+        simpleBlock(Walls.BLOCK_BREAKABLE_WALL.get(), wall);
 
         // Machine models
         for(RoomSize size : RoomSize.values()) {
