@@ -4,6 +4,9 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.item.PersonalShrinkingDevice;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.wall.BreakableWallBlock;
+import dev.compactmods.machines.wall.MachineVoidAir;
+import dev.compactmods.machines.wall.SolidWallBlock;
 import dev.compactmods.machines.machine.CompactMachineItem;
 import dev.compactmods.machines.room.ItemBlockWall;
 import dev.compactmods.machines.room.RoomSize;
@@ -123,6 +126,12 @@ public class Registration {
 
     public static final RegistryObject<Item> ITEM_BREAKABLE_WALL = ITEMS.register("wall", () ->
             new ItemBlockWall(BLOCK_BREAKABLE_WALL.get(), BASIC_ITEM_PROPS.get()));
+
+    // ================================================================================================================
+    //   Machine Void Air
+    // ================================================================================================================
+    public static final RegistryObject<Block> BLOCK_MACHINE_VOID_AIR = BLOCKS.register("machine_void_air", () ->
+            new MachineVoidAir());
 
     // ================================================================================================================
     //   DIMENSION

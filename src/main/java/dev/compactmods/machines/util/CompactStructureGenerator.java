@@ -5,6 +5,7 @@ import dev.compactmods.machines.room.RoomSize;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Arrays;
@@ -75,15 +76,23 @@ public class CompactStructureGenerator {
         int s = size.getInternalSize() / 2;
 
         BlockPos floorCenter = center.relative(Direction.DOWN, s);
+        BlockPos machineTopCenter = center.relative(Direction.UP, s);
+
         AABB floorBlocks = new AABB(floorCenter, floorCenter)
                 .inflate(s, 0, s);
+        AABB machineInternal = new AABB(machineTopCenter, floorCenter)
+                .inflate(s, 0, s);
+
 
         boolean anyAir = BlockPos.betweenClosedStream(floorBlocks).anyMatch(world::isEmptyBlock);
 
-        if (anyAir) {
-            // Generate the walls
+        if (anyAir) {            // Generate the walls
             Arrays.stream(Direction.values())
                     .forEach(d -> generateCompactWall(world, size, center, d));
+
+            BlockPos.betweenClosedStream(machineInternal)
+                    .forEach(p -> world.setBlock(p, Blocks.AIR.defaultBlockState(), 7));
+
         }
     }
 }

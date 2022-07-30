@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.core.Registration;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -93,7 +93,7 @@ public class LevelBiomeGenerator implements DataProvider {
         var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), BuiltinRegistries.BIOME);
 
         flatSettings.setBiome(Holder.direct(biomes.get(COMPACT_BIOME)));
-        flatSettings.getLayersInfo().add(new FlatLayerInfo(1, Blocks.AIR));
+        flatSettings.getLayersInfo().add(new FlatLayerInfo(dimTypes.get(COMPACT_LEVEL).height(), Registration.BLOCK_MACHINE_VOID_AIR.get()));
         flatSettings.updateLayers();
 
         var stem = new LevelStem(Holder.direct(dimTypes.get(COMPACT_LEVEL)), new FlatLevelSource(ssreg, flatSettings));
