@@ -3,11 +3,10 @@ package dev.compactmods.machines.machine;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.dimension.MissingDimensionException;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
-import dev.compactmods.machines.machine.graph.legacy.LegacyMachineConnections;
+import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -29,7 +28,6 @@ import java.util.UUID;
 
 public class CompactMachineBlockEntity extends BlockEntity {
     private static final String ROOM_NBT = "room_pos";
-    private static final String LEGACY_MACH_ID = "machine_id";
 
     public long nextSpawnTick = 0;
 
@@ -37,7 +35,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
     protected String schema;
     protected boolean locked = false;
     private ChunkPos roomChunk;
-    private int legacyMachineId = -1;
 
     private WeakReference<CompactMachineNode> graphNode;
     private WeakReference<CompactMachineRoomNode> roomNode;
@@ -83,9 +80,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        if (this.legacyMachineId != -1)
-            this.updateLegacyData();
-
         this.syncConnectedRoom();
     }
 
@@ -93,15 +87,10 @@ public class CompactMachineBlockEntity extends BlockEntity {
     public void load(@Nonnull CompoundTag nbt) {
         super.load(nbt);
 
-        // TODO customName = nbt.getString("CustomName");
         if (nbt.contains(MachineNbt.OWNER)) {
             owner = nbt.getUUID(MachineNbt.OWNER);
         } else {
             owner = null;
-        }
-
-        if (nbt.contains(LEGACY_MACH_ID)) {
-            this.legacyMachineId = nbt.getInt(LEGACY_MACH_ID);
         }
 
         nextSpawnTick = nbt.getLong("spawntick");
@@ -115,25 +104,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
             locked = nbt.getBoolean("locked");
         } else {
             locked = false;
-        }
-    }
-
-    private void updateLegacyData() {
-        if (level instanceof ServerLevel sl) {
-            try {
-                final var legacy = LegacyMachineConnections.get(sl.getServer());
-
-                DimensionMachineGraph graph = DimensionMachineGraph.forDimension(sl);
-                graph.addMachine(worldPosition);
-
-                final ChunkPos oldRoom = legacy.getConnectedRoom(this.legacyMachineId);
-                CompactMachines.LOGGER.info(CompactMachines.CONN_MARKER, "Rebinding machine {} ({}/{}) to room {}", legacyMachineId, worldPosition, level.dimension(), roomChunk);
-
-                this.roomChunk = oldRoom;
-                graph.connectMachineToRoom(worldPosition, roomChunk);
-            } catch (MissingDimensionException e) {
-                CompactMachines.LOGGER.fatal(CompactMachines.CONN_MARKER, "Could not load connection info from legacy data; machine at {} in dimension {} will be unmapped.", worldPosition, level.dimension());
-            }
         }
     }
 

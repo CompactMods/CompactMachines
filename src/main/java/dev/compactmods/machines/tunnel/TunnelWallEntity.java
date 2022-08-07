@@ -9,9 +9,7 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.machine.graph.legacy.LegacyMachineLocationsGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
@@ -35,9 +33,6 @@ public class TunnelWallEntity extends BlockEntity {
 
     private static final String NBT_LEGACY_MACHINE_KEY = "machine";
 
-    @Deprecated(forRemoval = true)
-    private int legacyMachineId = -1;
-
     private LevelBlockPosition connectedMachine;
     private TunnelDefinition tunnelType;
 
@@ -54,19 +49,11 @@ public class TunnelWallEntity extends BlockEntity {
         super.load(nbt);
 
         try {
-            // TODO - Remove in 5.0
-            if(nbt.contains(NBT_LEGACY_MACHINE_KEY)) {
-                // 4.2 and below
-                this.legacyMachineId = nbt.getInt(NBT_LEGACY_MACHINE_KEY);
-                this.tunnelType = Tunnels.getDefinition(new ResourceLocation(nbt.getString(BaseTunnelWallData.KEY_TUNNEL_TYPE)));
-            } else {
-                // 4.3 and above
-                final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, nbt)
-                        .getOrThrow(true, CompactMachines.LOGGER::fatal);
+            final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, nbt)
+                    .getOrThrow(true, CompactMachines.LOGGER::fatal);
 
-                this.connectedMachine = baseData.connection();
-                this.tunnelType = baseData.tunnel();
-            }
+            this.connectedMachine = baseData.connection();
+            this.tunnelType = baseData.tunnel();
         } catch (Exception e) {
             this.tunnelType = Tunnels.UNKNOWN.get();
             this.connectedMachine = null;
@@ -90,35 +77,11 @@ public class TunnelWallEntity extends BlockEntity {
         super.onLoad();
 
         if (level instanceof ServerLevel sl) {
-            if(legacyMachineId > -1) {
-                try {
-                    this.upgradeLegacyData();
-                } catch (MissingDimensionException e) {
-                    CompactMachines.LOGGER.error(CompactMachines.CONN_MARKER, "Failed to load legacy location info for tunnel conversion at: {}; removing the tunnel instance.", worldPosition);
-                    this.tunnelType = Tunnels.UNKNOWN.get();
-                }
-            }
-
             // If tunnel type is unknown, remove the tunnel entirely
             // Null tunnel types here mean it's being loaded into the world
             if (this.tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
                 CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
                 sl.setBlock(worldPosition, Walls.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
-            }
-        }
-    }
-
-    private void upgradeLegacyData() throws MissingDimensionException {
-        if(level != null && level.isClientSide) return;
-        if(this.legacyMachineId == -1) return;
-
-        if(level instanceof ServerLevel sl) {
-            var leg = LegacyMachineLocationsGraph.get(sl.getServer());
-            if(leg != null)
-                this.connectedMachine = leg.getLocation(this.legacyMachineId);
-            else {
-                CompactMachines.LOGGER.error(CompactMachines.CONN_MARKER, "Failed to load legacy location info for tunnel conversion at: {}; removing the tunnel instance.", worldPosition);
-                this.tunnelType = Tunnels.UNKNOWN.get();
             }
         }
     }
