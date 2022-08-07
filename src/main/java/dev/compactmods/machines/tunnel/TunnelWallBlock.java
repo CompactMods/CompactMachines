@@ -104,6 +104,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if(level.dimension().equals(CompactDimension.LEVEL_KEY) && level instanceof ServerLevel compactDim) {
             var def = tunnel.getTunnelType();
             final Direction tunnelWallSide = hitResult.getDirection();
+            var tunnelConnectedSide = tunnel.getConnectedSide();
 
             if (player.isShiftKeyDown()) {
                 BlockState solidWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
@@ -118,7 +119,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.addFreshEntity(ie);
 
                 if (def instanceof TunnelTeardownHandler teardown) {
-                    teardown.onRemoved(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel());
+                    teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
                 }
 
                 final var tunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
@@ -145,7 +146,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
                     if (def instanceof TunnelTeardownHandler teardown) {
-                        teardown.onRotated(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel(), dir, newSide);
+                        teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
                     }
 
                     tunnelGraph.rotateTunnel(pos, newSide);

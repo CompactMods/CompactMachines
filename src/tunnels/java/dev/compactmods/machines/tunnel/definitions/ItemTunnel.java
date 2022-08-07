@@ -1,6 +1,7 @@
 package dev.compactmods.machines.tunnel.definitions;
 
 import com.google.common.collect.ImmutableSet;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
@@ -10,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
@@ -62,8 +64,8 @@ public class ItemTunnel implements TunnelDefinition, CapabilityTunnel<ItemTunnel
      * @param instance The tunnel instance being modified.
      */
     @Override
-    public void onRemoved(TunnelPosition position, Instance instance) {
-        BlockPos dropAt = position.pos().relative(position.side(), 1);
+    public void onRemoved(MinecraftServer server, TunnelPosition position, Instance instance) {
+        BlockPos dropAt = position.pos().relative(position.wallSide(), 1);
 
         NonNullList<ItemStack> stacks = NonNullList.create();
         for (int i = 0; i < instance.handler.getSlots(); i++) {
@@ -72,7 +74,9 @@ public class ItemTunnel implements TunnelDefinition, CapabilityTunnel<ItemTunnel
                 stacks.add(stack);
         }
 
-        Containers.dropContents(position.level(), dropAt, stacks);
+        final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
+        if(compactDim != null)
+            Containers.dropContents(compactDim, dropAt, stacks);
     }
 
     public static class Instance implements TunnelInstance, INBTSerializable<CompoundTag> {

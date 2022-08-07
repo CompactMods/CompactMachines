@@ -189,14 +189,14 @@ public class TunnelWallEntity extends BlockEntity {
             return;
         }
 
-        final var p = new TunnelPosition(sl, worldPosition, getTunnelSide());
+        final var p = new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
         if (tunnelType instanceof TunnelTeardownHandler teardown) {
-            teardown.onRemoved(p, tunnel);
+            teardown.onRemoved(sl.getServer(), p, tunnel);
         }
 
         this.tunnelType = type;
         if (type instanceof InstancedTunnel it)
-            this.tunnel = it.newInstance(p.pos(), p.side());
+            this.tunnel = it.newInstance(p.pos(), p.wallSide());
 
         setChanged();
     }
