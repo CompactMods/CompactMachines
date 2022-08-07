@@ -2,6 +2,7 @@ package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.dimension.MissingDimensionException;
@@ -56,7 +57,7 @@ import java.util.UUID;
 
 public class CompactMachineBlock extends Block implements EntityBlock {
 
-    public static final TagKey<Block> TAG = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(CompactMachines.MOD_ID, "machine"));
+    public static final TagKey<Block> TAG = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(Constants.MOD_ID, "machine"));
 
     private final RoomSize size;
 

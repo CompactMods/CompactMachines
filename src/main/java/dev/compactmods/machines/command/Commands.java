@@ -1,7 +1,7 @@
 package dev.compactmods.machines.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
 import dev.compactmods.machines.command.subcommand.*;
@@ -15,7 +15,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class Commands {
 
     // TODO: /cm create <size:RoomSize> <owner:Player> <giveMachine:true|false>
@@ -31,7 +31,7 @@ public class Commands {
 
     @SubscribeEvent
     public static void onCommandsRegister(final RegisterCommandsEvent event) {
-        final LiteralArgumentBuilder<CommandSourceStack> root = LiteralArgumentBuilder.literal(CompactMachines.MOD_ID);
+        final LiteralArgumentBuilder<CommandSourceStack> root = LiteralArgumentBuilder.literal(Constants.MOD_ID);
         root.then(CMEjectSubcommand.make());
         root.then(CMSummarySubcommand.make());
         root.then(CMRebindSubcommand.make());

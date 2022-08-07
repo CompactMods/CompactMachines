@@ -1,12 +1,12 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class CommonEventHandler {
 
     @SubscribeEvent

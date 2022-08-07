@@ -1,6 +1,7 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
@@ -69,7 +70,7 @@ public class TunnelItem extends Item {
                     ResourceLocation id = Tunnels.getRegistryId(def);
                     return TranslationUtil.tunnelId(id);
                 })
-                .orElse("item." + CompactMachines.MOD_ID + ".tunnels.unnamed");
+                .orElse("item." + Constants.MOD_ID + ".tunnels.unnamed");
 
         return Component.translatable(key);
     }
@@ -78,7 +79,7 @@ public class TunnelItem extends Item {
     public void appendHoverText(@Nonnull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         getDefinition(stack).ifPresent(tunnelDef -> {
             if (Screen.hasShiftDown()) {
-                MutableComponent type = Component.translatable("tooltip." + CompactMachines.MOD_ID + ".tunnel_type", Tunnels.getRegistryId(tunnelDef))
+                MutableComponent type = Component.translatable("tooltip." + Constants.MOD_ID + ".tunnel_type", Tunnels.getRegistryId(tunnelDef))
                         .withStyle(ChatFormatting.GRAY)
                         .withStyle(ChatFormatting.ITALIC);
 

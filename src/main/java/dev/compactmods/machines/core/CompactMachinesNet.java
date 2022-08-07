@@ -1,6 +1,6 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.room.network.PlayerRequestedTeleportPacket;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.util.VersionUtil;
@@ -19,14 +19,14 @@ public class CompactMachinesNet {
 
     static {
         if(FMLEnvironment.production) {
-            PROTOCOL_VERSION = new DefaultArtifactVersion(ModList.get().getModFileById(CompactMachines.MOD_ID).versionString());
+            PROTOCOL_VERSION = new DefaultArtifactVersion(ModList.get().getModFileById(Constants.MOD_ID).versionString());
         } else {
             PROTOCOL_VERSION = new DefaultArtifactVersion("9.99.999");
         }
     }
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CompactMachines.MOD_ID, "main"),
+            new ResourceLocation(Constants.MOD_ID, "main"),
             PROTOCOL_VERSION::toString,
             clientVer -> VersionUtil.checkMajor(clientVer, PROTOCOL_VERSION),
             serverVer -> VersionUtil.checkMajor(serverVer, PROTOCOL_VERSION)

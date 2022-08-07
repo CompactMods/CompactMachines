@@ -1,7 +1,7 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import com.mojang.authlib.GameProfile;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -27,7 +27,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
     @Override
     public ResourceLocation getID() {
-        return new ResourceLocation(CompactMachines.MOD_ID, "machine");
+        return new ResourceLocation(Constants.MOD_ID, "machine");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                 info.text(boundTo);
             }, () -> {
                 MutableComponent newMachine = TranslationUtil
-                        .message(new ResourceLocation(CompactMachines.MOD_ID, "new_machine"))
+                        .message(new ResourceLocation(Constants.MOD_ID, "new_machine"))
                         .withStyle(ChatFormatting.GREEN);
 
                 info.text(newMachine);

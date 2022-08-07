@@ -2,8 +2,8 @@ package dev.compactmods.machines.room.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.ChunkPos;
  */
 public record CompactMachineRoomNode(ChunkPos pos) implements IGraphNode {
 
-    private static final ResourceLocation TYPE = new ResourceLocation(CompactMachines.MOD_ID, "room");
+    private static final ResourceLocation TYPE = new ResourceLocation(Constants.MOD_ID, "room");
 
     public static final Codec<CompactMachineRoomNode> CODEC = RecordCodecBuilder.create((i) -> i.group(
             CodecExtensions.CHUNKPOS.fieldOf("chunk").forGetter(CompactMachineRoomNode::pos),

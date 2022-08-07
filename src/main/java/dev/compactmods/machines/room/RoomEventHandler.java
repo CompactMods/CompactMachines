@@ -1,6 +1,6 @@
 package dev.compactmods.machines.room;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -21,7 +21,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class RoomEventHandler {
 
     @SubscribeEvent

@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import net.minecraft.commands.CommandSourceStack;
@@ -33,7 +33,7 @@ public class CMRoomDataExportCommand {
 
         final CompactRoomData rooms = CompactRoomData.get(compact);
 
-        var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
+        var outdir = src.getServer().getFile(Constants.MOD_ID);
         var out = outdir.toPath()
                 .resolve("rooms.csv")
                 .toAbsolutePath();

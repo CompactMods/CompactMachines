@@ -3,6 +3,7 @@ package dev.compactmods.machines.command.data;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.room.MachineRoomConnections;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.util.CsvOutput;

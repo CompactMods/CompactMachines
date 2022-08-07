@@ -1,14 +1,14 @@
 package dev.compactmods.machines.config;
 
 import com.google.gson.JsonObject;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class EnableVanillaRecipesConfigCondition implements ICondition {
 
-    public static final ResourceLocation ID = new ResourceLocation(CompactMachines.MOD_ID, "config_enable_vanilla_recipes");
+    public static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "config_enable_vanilla_recipes");
 
     @Override
     public ResourceLocation getID() {

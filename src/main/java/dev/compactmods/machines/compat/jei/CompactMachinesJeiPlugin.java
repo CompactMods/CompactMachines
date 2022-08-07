@@ -1,12 +1,12 @@
 package dev.compactmods.machines.compat.jei;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.JeiInfo;
-import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineItem;
-import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
@@ -21,7 +21,7 @@ import java.util.Arrays;
 public class CompactMachinesJeiPlugin implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(CompactMachines.MOD_ID, "main");
+        return new ResourceLocation(Constants.MOD_ID, "main");
     }
 
     @Override

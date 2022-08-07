@@ -1,8 +1,8 @@
 package dev.compactmods.machines.room.menu;
 
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.core.UIRegistration;
+import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -45,7 +45,7 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         return new MenuProvider() {
             @Override
             public Component getDisplayName() {
-                return Component.translatable(CompactMachines.MOD_ID + ".ui.room");
+                return Component.translatable(Constants.MOD_ID + ".ui.room");
             }
 
             @Nullable

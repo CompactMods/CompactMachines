@@ -1,10 +1,10 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
+import dev.compactmods.machines.tunnel.Tunnels;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -25,7 +25,7 @@ public class TunnelProvider implements IProbeInfoProvider {
 
     @Override
     public ResourceLocation getID() {
-        return new ResourceLocation(CompactMachines.MOD_ID, "tunnel");
+        return new ResourceLocation(Constants.MOD_ID, "tunnel");
     }
 
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, Player playerEntity, Level level, BlockState queryState, IProbeHitData hitData) {
@@ -57,7 +57,7 @@ public class TunnelProvider implements IProbeInfoProvider {
             }
 
             String sideTranslated = IProbeInfo.STARTLOC
-                    .concat(CompactMachines.MOD_ID + ".direction.")
+                    .concat(Constants.MOD_ID + ".direction.")
                     .concat(side.getName())
                     .concat(IProbeInfo.ENDLOC);
 
@@ -86,7 +86,7 @@ public class TunnelProvider implements IProbeInfoProvider {
 
                         v.horizontal(center)
                                 .item(pick)
-                                .text(Component.translatable(CompactMachines.MOD_ID.concat(".connected_block"), blockName));
+                                .text(Component.translatable(Constants.MOD_ID.concat(".connected_block"), blockName));
                     }
                 } catch (Exception ex) {
                     // no-op: we don't want to spam the log here

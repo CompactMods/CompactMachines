@@ -2,7 +2,7 @@ package dev.compactmods.machines.machine.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 public record CompactMachineNode(ResourceKey<Level> dimension, BlockPos position)
         implements IGraphNode {
 
-    public static final ResourceLocation TYPE = new ResourceLocation(CompactMachines.MOD_ID, "machine");
+    public static final ResourceLocation TYPE = new ResourceLocation(Constants.MOD_ID, "machine");
 
     public static final Codec<CompactMachineNode> CODEC = RecordCodecBuilder.create(i -> i.group(
             Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(CompactMachineNode::dimension),

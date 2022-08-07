@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.dimension.Dimension;
@@ -43,7 +44,7 @@ public class CMTunnelDataExportCommand {
 
         final CompactRoomData rooms = CompactRoomData.get(compact);
 
-        var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
+        var outdir = src.getServer().getFile(Constants.MOD_ID);
         var out = outdir.toPath()
                 .resolve("tunnels.csv")
                 .toAbsolutePath();
@@ -79,7 +80,7 @@ public class CMTunnelDataExportCommand {
         final var room = RoomPositionArgument.get(ctx, "room");
         final var compactDim = src.getServer().getLevel(Dimension.COMPACT_DIMENSION);
 
-        var outdir = src.getServer().getFile(CompactMachines.MOD_ID);
+        var outdir = src.getServer().getFile(Constants.MOD_ID);
         var out = outdir.toPath()
                 .resolve(String.format("tunnels_%s_%s.csv", room.x, room.z))
                 .toAbsolutePath();

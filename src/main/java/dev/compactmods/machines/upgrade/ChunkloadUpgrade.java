@@ -2,7 +2,7 @@ package dev.compactmods.machines.upgrade;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.resources.ResourceLocation;
@@ -14,8 +14,8 @@ import java.util.Comparator;
 
 public class ChunkloadUpgrade implements RoomUpgrade, ILevelLoadedUpgradeListener {
 
-    public static final ResourceLocation REG_ID = new ResourceLocation(CompactMachines.MOD_ID, "chunkloader");
-    private static final TicketType<ChunkPos> CM4_LOAD_TYPE = TicketType.create(CompactMachines.MOD_ID + ":rooms", Comparator.comparingLong(ChunkPos::toLong));
+    public static final ResourceLocation REG_ID = new ResourceLocation(Constants.MOD_ID, "chunkloader");
+    private static final TicketType<ChunkPos> CM4_LOAD_TYPE = TicketType.create(Constants.MOD_ID + ":rooms", Comparator.comparingLong(ChunkPos::toLong));
 
     private static final Codec<ChunkloadUpgrade> CODEC = RecordCodecBuilder.create(i -> i.group(
             ResourceLocation.CODEC.fieldOf("type").forGetter(x -> REG_ID)

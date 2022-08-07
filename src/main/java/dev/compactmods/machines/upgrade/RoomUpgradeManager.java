@@ -4,6 +4,7 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;
@@ -29,7 +30,7 @@ import java.util.stream.Stream;
 
 public class RoomUpgradeManager extends SavedData {
 
-    public static final String DATA_NAME = CompactMachines.MOD_ID + "_upgrades";
+    public static final String DATA_NAME = Constants.MOD_ID + "_upgrades";
 
     private final HashMap<ResourceLocation, RoomUpgradeGraphNode> upgradeNodes;
     private final HashMap<ChunkPos, CompactMachineRoomNode> roomNodes;

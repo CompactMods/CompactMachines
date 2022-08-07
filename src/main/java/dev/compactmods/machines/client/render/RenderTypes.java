@@ -3,7 +3,7 @@ package dev.compactmods.machines.client.render;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.shader.CM4Shaders;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -25,25 +25,10 @@ public class RenderTypes extends RenderStateShard {
 
 	protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
 
-	protected static final RenderStateShard.ShaderStateShard FULLBRIGHT_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::fullbright);
-
-    public static final RenderType TRANSLUCENT_FULLBRIGHT = RenderType.create(
-			CompactMachines.MOD_ID + ":full_bright",
-            BLOCK_WITH_OVERLAY, VertexFormat.Mode.QUADS,
-			256, false, false,
-            RenderType.CompositeState.builder()
-						.setShaderState(FULLBRIGHT_BLOCKS)
-						.setLightmapState(LIGHTMAP_DISABLED)
-						.setOverlayState(OVERLAY)
-						.setTextureState(BLOCK_SHEET_MIPPED)
-						.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-						.createCompositeState(false)
-		);
-
 	protected static final RenderStateShard.ShaderStateShard WALL_BLOCKS = new RenderStateShard.ShaderStateShard(CM4Shaders::wall);
 
 	public static final RenderType WALLS = RenderType.create(
-			CompactMachines.MOD_ID + ":wall",
+			Constants.MOD_ID + ":wall",
 			BLOCK_WITH_OVERLAY, VertexFormat.Mode.QUADS,
 			256, false, false,
 			RenderType.CompositeState.builder()

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.client.gui.guide;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.widget.AbstractCMGuiWidget;
 import dev.compactmods.machines.client.gui.widget.ScrollableWrappedTextWidget;
 import net.minecraft.ChatFormatting;
@@ -23,7 +23,7 @@ public class GuidePage implements Widget, GuiEventListener {
     public GuidePage() {
         widgets = new ArrayList<>();
 
-        ScrollableWrappedTextWidget sc = new ScrollableWrappedTextWidget(CompactMachines.MOD_ID + ".psd.pages.machines", 2, 18, 222, 160);
+        ScrollableWrappedTextWidget sc = new ScrollableWrappedTextWidget(Constants.MOD_ID + ".psd.pages.machines", 2, 18, 222, 160);
         widgets.add(sc);
     }
 
@@ -31,7 +31,7 @@ public class GuidePage implements Widget, GuiEventListener {
     public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
         Font fr = Minecraft.getInstance().font;
         GuiComponent.drawString(ms, fr,
-                Component.translatable(CompactMachines.MOD_ID + ".psd.pages.machines.title")
+                Component.translatable(Constants.MOD_ID + ".psd.pages.machines.title")
                 .withStyle(ChatFormatting.GOLD),
                 2, 2, 0);
 

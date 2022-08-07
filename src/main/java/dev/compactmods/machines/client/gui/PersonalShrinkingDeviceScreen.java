@@ -2,7 +2,7 @@ package dev.compactmods.machines.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.guide.GuideSection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,22 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PersonalShrinkingDeviceScreen extends Screen {
-    private final ResourceLocation GUI = new ResourceLocation(CompactMachines.MOD_ID, "textures/gui/psd_screen.png");
+    private final ResourceLocation GUI = new ResourceLocation(Constants.MOD_ID, "textures/gui/psd_screen.png");
     private static final int WIDTH = 256;
     private static final int HEIGHT = 201;
 
     private final Map<ResourceLocation, GuideSection> sections;
-    private final ResourceLocation emptySection = new ResourceLocation(CompactMachines.MOD_ID, "empty");
+    private final ResourceLocation emptySection = new ResourceLocation(Constants.MOD_ID, "empty");
 
     @Nullable
     private final GuideSection currentSection;
 
     protected PersonalShrinkingDeviceScreen() {
-        super(Component.translatable(CompactMachines.MOD_ID + ".gui.psd.title"));
+        super(Component.translatable(Constants.MOD_ID + ".gui.psd.title"));
         this.sections = new HashMap<>();
 
         GuideSection root = new GuideSection();
-        sections.put(new ResourceLocation(CompactMachines.MOD_ID, "root"), root);
+        sections.put(new ResourceLocation(Constants.MOD_ID, "root"), root);
         this.currentSection = root;
     }
 

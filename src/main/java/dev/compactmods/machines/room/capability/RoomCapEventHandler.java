@@ -1,6 +1,6 @@
 package dev.compactmods.machines.room.capability;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -8,7 +8,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RoomCapEventHandler {
 
     @SubscribeEvent
@@ -17,7 +17,7 @@ public class RoomCapEventHandler {
             return;
 
         event.addCapability(
-                new ResourceLocation(CompactMachines.MOD_ID, "room_history"),
+                new ResourceLocation(Constants.MOD_ID, "room_history"),
                 new PlayerRoomHistoryCapProvider(player));
     }
 }

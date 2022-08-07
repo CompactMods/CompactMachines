@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.widget.PSDIconButton;
 import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
@@ -212,7 +212,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
     @Override
     protected void renderBg(PoseStack pose, float p_97788_, int p_97789_, int p_97790_) {
-        RenderSystem.setShaderTexture(0, new ResourceLocation(CompactMachines.MOD_ID, "textures/gui/room_menu.png"));
+        RenderSystem.setShaderTexture(0, new ResourceLocation(Constants.MOD_ID, "textures/gui/room_menu.png"));
 
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;

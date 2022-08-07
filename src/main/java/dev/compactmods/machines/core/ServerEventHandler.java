@@ -1,6 +1,6 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
@@ -18,7 +18,7 @@ import net.minecraftforge.network.PacketDistributor;
 
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEventHandler {
 
     @SubscribeEvent

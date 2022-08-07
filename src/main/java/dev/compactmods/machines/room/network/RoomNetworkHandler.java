@@ -1,7 +1,6 @@
 package dev.compactmods.machines.room.network;
 
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.util.VersionUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
@@ -15,7 +14,7 @@ public class RoomNetworkHandler {
     private static final ArtifactVersion ROOM_TRACK_VERSION = new DefaultArtifactVersion("1.0.0");
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CompactMachines.MOD_ID, "room_tracking"),
+            new ResourceLocation(Constants.MOD_ID, "room_tracking"),
             ROOM_TRACK_VERSION::toString,
             clientVer -> VersionUtil.checkMajor(clientVer, ROOM_TRACK_VERSION),
             serverVer -> VersionUtil.checkMajor(serverVer, ROOM_TRACK_VERSION)

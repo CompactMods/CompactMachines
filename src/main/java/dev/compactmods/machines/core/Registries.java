@@ -1,6 +1,5 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.graph.IGraphEdgeType;
@@ -17,7 +16,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import static dev.compactmods.machines.CompactMachines.MOD_ID;
+import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 public class Registries {
 
@@ -35,14 +34,14 @@ public class Registries {
 
     // MachineRoomUpgrades
     public static final ResourceKey<Registry<RoomUpgrade>> ROOM_UPGRADES_REG_KEY = ResourceKey
-            .createRegistryKey(new ResourceLocation(CompactMachines.MOD_ID, "room_upgrades"));
+            .createRegistryKey(new ResourceLocation(MOD_ID, "room_upgrades"));
     public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(ROOM_UPGRADES_REG_KEY, MOD_ID);
 
     // Graph
     public static final ResourceKey<Registry<IGraphNodeType>> NODES_REG_KEY = ResourceKey
-            .createRegistryKey(new ResourceLocation(CompactMachines.MOD_ID, "graph_nodes"));
+            .createRegistryKey(new ResourceLocation(MOD_ID, "graph_nodes"));
     public static final ResourceKey<Registry<IGraphEdgeType>> EDGES_REG_KEY = ResourceKey
-            .createRegistryKey(new ResourceLocation(CompactMachines.MOD_ID, "graph_edges"));
+            .createRegistryKey(new ResourceLocation(MOD_ID, "graph_edges"));
     public static final DeferredRegister<IGraphNodeType> NODE_TYPES = DeferredRegister.create(NODES_REG_KEY, MOD_ID);
     public static final DeferredRegister<IGraphEdgeType> EDGE_TYPES = DeferredRegister.create(EDGES_REG_KEY, MOD_ID);
 

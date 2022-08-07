@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.codec.NbtListCollector;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -34,7 +35,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class CompactRoomData extends SavedData {
-    public static final String DATA_NAME = CompactMachines.MOD_ID + "_rooms";
+    public static final String DATA_NAME = Constants.MOD_ID + "_rooms";
 
     private final Map<ChunkPos, RoomData> roomData;
 
