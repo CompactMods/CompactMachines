@@ -37,13 +37,13 @@ public class CompactMachinesNet {
         CHANNEL.messageBuilder(TunnelAddedPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(TunnelAddedPacket::encode)
                 .decoder(TunnelAddedPacket::new)
-                .consumer(TunnelAddedPacket::handle)
+                .consumerMainThread(TunnelAddedPacket::handle)
                 .add();
 
         CHANNEL.messageBuilder(PlayerRequestedTeleportPacket.class, 2, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(PlayerRequestedTeleportPacket::encode)
                 .decoder(PlayerRequestedTeleportPacket::new)
-                .consumer(PlayerRequestedTeleportPacket::handle)
+                .consumerMainThread(PlayerRequestedTeleportPacket::handle)
                 .add();
     }
 }
