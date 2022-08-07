@@ -164,6 +164,7 @@ public class TunnelItem extends Item {
 
     private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction innerFace, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
         boolean redstone = def instanceof RedstoneTunnel;
+        final var tunnelId = Tunnels.getRegistryId(def);
 
         final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, player.chunkPosition());
 
@@ -176,7 +177,7 @@ public class TunnelItem extends Item {
 
         var hist = lastEnteredMachine.get();
         var placedSides = roomTunnels
-                .getTunnelSides(def)
+                .getTunnelSides(tunnelId)
                 .collect(Collectors.toSet());
 
         // all tunnels already placed for type

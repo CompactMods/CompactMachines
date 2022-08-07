@@ -106,6 +106,8 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
             final Direction tunnelWallSide = hitResult.getDirection();
             var tunnelConnectedSide = tunnel.getConnectedSide();
 
+            final var tunnelId = Tunnels.getRegistryId(def);
+
             if (player.isShiftKeyDown()) {
                 BlockState solidWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
 
@@ -113,7 +115,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                 ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
                 CompoundTag defTag = stack.getOrCreateTagElement("definition");
-                defTag.putString("id", Tunnels.getRegistryId(def).toString());
+                defTag.putString("id", tunnelId.toString());
 
                 ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
                 level.addFreshEntity(ie);
@@ -130,7 +132,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                 final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
                 final var existingDirs = tunnelGraph
-                        .getTunnelSides(def)
+                        .getTunnelSides(tunnelId)
                         .collect(Collectors.toSet());
 
                 if (existingDirs.size() == 6) {
