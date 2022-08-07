@@ -30,7 +30,8 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
             String typedTunnelDirectional = "tunnels/" + dir.getSerializedName();
             models()
                     .withExistingParent(typedTunnelDirectional, modLoc("tunnels/base"))
-                    .texture("wall", modLoc("block/" + typedTunnelDirectional));
+                    .texture("wall", modLoc("block/" + typedTunnelDirectional))
+                    .renderType(mcLoc("cutout")); // NamedRenderTypeManager
 
 
             /*
