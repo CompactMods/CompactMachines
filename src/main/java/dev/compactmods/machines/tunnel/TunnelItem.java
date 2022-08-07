@@ -4,13 +4,13 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
 import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.room.RoomCapabilities;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
@@ -128,7 +128,7 @@ public class TunnelItem extends Item {
         final BlockPos position = context.getClickedPos();
         final BlockState state = level.getBlockState(position);
 
-        if(level instanceof ServerLevel sl && sl.dimension().equals(Dimension.COMPACT_DIMENSION)) {
+        if(level instanceof ServerLevel sl && sl.dimension().equals(CompactDimension.LEVEL_KEY)) {
             if (state.getBlock() instanceof SolidWallBlock && player != null) {
                 getDefinition(context.getItemInHand()).ifPresent(def -> {
                     try {

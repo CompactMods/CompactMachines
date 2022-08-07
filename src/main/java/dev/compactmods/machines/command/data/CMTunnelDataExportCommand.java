@@ -6,9 +6,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.dimension.MissingDimensionException;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -40,7 +40,7 @@ public class CMTunnelDataExportCommand {
     private static int execAll(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
-        var compact = serv.getLevel(Dimension.COMPACT_DIMENSION);
+        var compact = serv.getLevel(CompactDimension.LEVEL_KEY);
 
         final CompactRoomData rooms = CompactRoomData.get(compact);
 
@@ -78,7 +78,7 @@ public class CMTunnelDataExportCommand {
         ServerPlayer player = src.getPlayerOrException();
 
         final var room = RoomPositionArgument.get(ctx, "room");
-        final var compactDim = src.getServer().getLevel(Dimension.COMPACT_DIMENSION);
+        final var compactDim = src.getServer().getLevel(CompactDimension.LEVEL_KEY);
 
         var outdir = src.getServer().getFile(Constants.MOD_ID);
         var out = outdir.toPath()

@@ -1,8 +1,8 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -53,7 +53,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
             return getConnectedRoom().map(roomId -> {
                 try {
                     final var serv = sl.getServer();
-                    final var compactDim = serv.getLevel(Dimension.COMPACT_DIMENSION);
+                    final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
 
                     final var graph = TunnelConnectionGraph.forRoom(compactDim, roomId);
 
@@ -62,11 +62,10 @@ public class CompactMachineBlockEntity extends BlockEntity {
                     if (firstSupported.isEmpty())
                         return super.getCapability(cap, side);
 
-                    final var compact = serv.getLevel(Dimension.COMPACT_DIMENSION);
-                    if (compact == null)
+                    if (compactDim == null)
                         throw new MissingDimensionException();
 
-                    if (compact.getBlockEntity(firstSupported.get()) instanceof TunnelWallEntity tunnel) {
+                    if (compactDim.getBlockEntity(firstSupported.get()) instanceof TunnelWallEntity tunnel) {
                         return tunnel.getTunnelCapability(cap, side);
                     } else {
                         return super.getCapability(cap, side);

@@ -4,8 +4,8 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
@@ -47,7 +47,7 @@ public class CMUpgradeRoomCommand {
         final var level = ctx.getSource().getLevel();
         final var serv = ctx.getSource().getServer();
 
-        if (!level.dimension().equals(Dimension.COMPACT_DIMENSION))
+        if (!level.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
         final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");
@@ -89,7 +89,7 @@ public class CMUpgradeRoomCommand {
         final var level = ctx.getSource().getLevel();
         final var serv = ctx.getSource().getServer();
 
-        if (!level.dimension().equals(Dimension.COMPACT_DIMENSION))
+        if (!level.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
         final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");

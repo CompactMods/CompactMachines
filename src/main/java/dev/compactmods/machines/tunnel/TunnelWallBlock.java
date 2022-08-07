@@ -1,10 +1,10 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
@@ -101,7 +101,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
-        if(level.dimension().equals(Dimension.COMPACT_DIMENSION) && level instanceof ServerLevel compactDim) {
+        if(level.dimension().equals(CompactDimension.LEVEL_KEY) && level instanceof ServerLevel compactDim) {
             var def = tunnel.getTunnelType();
             final Direction tunnelWallSide = hitResult.getDirection();
 

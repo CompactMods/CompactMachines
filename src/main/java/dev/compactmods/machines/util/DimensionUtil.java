@@ -2,7 +2,7 @@ package dev.compactmods.machines.util;
 
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;
@@ -29,7 +29,7 @@ public class DimensionUtil {
         final ServerLevel overworld = server.getLevel(Level.OVERWORLD);
 
         // dimension keys have a 1:1 relationship with dimension keys, they have the same IDs as well
-        final ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, Dimension.COMPACT_DIMENSION.location());
+        final ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, CompactDimension.LEVEL_KEY.location());
 
         final var serverResources = server.getResourceManager();
 
@@ -38,7 +38,7 @@ public class DimensionUtil {
 
         var reg = server.registryAccess();
         var cmDimType = reg.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY)
-                .get(Dimension.COMPACT_DIMENSION_DIM_TYPE);
+                .get(CompactDimension.DIM_TYPE_KEY);
 
         var ops = RegistryOps.create(JsonOps.INSTANCE, reg);
 

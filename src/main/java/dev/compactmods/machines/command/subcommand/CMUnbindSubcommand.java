@@ -5,8 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -30,7 +30,7 @@ public class CMUnbindSubcommand {
     private static int doUnbind(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var server = ctx.getSource().getServer();
         final var level = ctx.getSource().getLevel();
-        final var compactDim = server.getLevel(Dimension.COMPACT_DIMENSION);
+        final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
         if (compactDim == null) {
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND));
         }

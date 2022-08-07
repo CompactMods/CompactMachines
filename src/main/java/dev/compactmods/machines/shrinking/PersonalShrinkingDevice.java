@@ -2,8 +2,8 @@ package dev.compactmods.machines.shrinking;
 
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.client.gui.PersonalShrinkingDeviceScreen;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.data.CompactRoomData;
 import dev.compactmods.machines.util.PlayerUtil;
@@ -55,14 +55,14 @@ public class PersonalShrinkingDevice extends Item {
 
         // If we aren't in the compact dimension, allow PSD guide usage
         // Prevents misfiring if a player is trying to leave a machine or set their spawn
-        if (world.isClientSide && world.dimension() != Dimension.COMPACT_DIMENSION) {
+        if (world.isClientSide && !world.dimension().equals(CompactDimension.LEVEL_KEY)) {
             PersonalShrinkingDeviceScreen.show();
             return InteractionResultHolder.success(stack);
         }
 
         if (world instanceof ServerLevel && player instanceof ServerPlayer serverPlayer) {
             ServerLevel playerDim = serverPlayer.getLevel();
-            if (playerDim.dimension().equals(Dimension.COMPACT_DIMENSION)) {
+            if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
                 if (player.isShiftKeyDown()) {
                     ChunkPos machineChunk = new ChunkPos(player.blockPosition());
 

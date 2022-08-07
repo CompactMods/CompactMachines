@@ -4,15 +4,15 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
-import dev.compactmods.machines.room.RoomCapabilities;
 import dev.compactmods.machines.dimension.MissingDimensionException;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.location.SimpleTeleporter;
 import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.RoomCapabilities;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
@@ -44,7 +44,7 @@ public abstract class PlayerUtil {
     public static void teleportPlayerIntoMachine(Level machineLevel, Player player, BlockPos machinePos) throws MissingDimensionException {
         MinecraftServer serv = machineLevel.getServer();
 
-        ServerLevel compactWorld = serv.getLevel(Dimension.COMPACT_DIMENSION);
+        ServerLevel compactWorld = serv.getLevel(CompactDimension.LEVEL_KEY);
         if (compactWorld == null) {
             throw new MissingDimensionException("Compact dimension not found; player attempted to enter machine.");
         }
@@ -54,7 +54,7 @@ public abstract class PlayerUtil {
             boolean grantAdvancement = targetRoom.isEmpty();
 
             targetRoom.ifPresent(room -> {
-                if (player.level.dimension().equals(Dimension.COMPACT_DIMENSION) && player.chunkPosition().equals(room)) {
+                if (player.level.dimension().equals(CompactDimension.LEVEL_KEY) && player.chunkPosition().equals(room)) {
                     if (player instanceof ServerPlayer sp) {
                         AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
                     }
@@ -79,7 +79,7 @@ public abstract class PlayerUtil {
     }
 
     public static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, ChunkPos room, boolean grantAdvancement) throws MissingDimensionException, NonexistentRoomException {
-        final var compactDim = serv.getLevel(Dimension.COMPACT_DIMENSION);
+        final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
         final var spawn = Rooms.getSpawn(serv, room);
         final var roomSize = Rooms.sizeOf(serv, room);
 

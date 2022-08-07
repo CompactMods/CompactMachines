@@ -1,6 +1,7 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
@@ -8,7 +9,6 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.legacy.LegacyMachineLocationsGraph;
@@ -130,7 +130,7 @@ public class TunnelWallEntity extends BlockEntity {
         else
             compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.UNKNOWN.getId().toString());
 
-        if(connectedMachine != null)
+        if (connectedMachine != null)
             compound.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
 
         if (tunnel instanceof INBTSerializable persist) {
@@ -195,7 +195,7 @@ public class TunnelWallEntity extends BlockEntity {
     }
 
     public IDimensionalBlockPosition getConnectedPosition() {
-        if(this.connectedMachine == null)
+        if (this.connectedMachine == null)
             return null;
 
         return this.connectedMachine.relative(getConnectedSide());
@@ -251,7 +251,7 @@ public class TunnelWallEntity extends BlockEntity {
         if (level == null || level.isClientSide) return;
         this.connectedMachine = new LevelBlockPosition(machine);
 
-        if(level instanceof ServerLevel sl) {
+        if (level instanceof ServerLevel sl) {
             final var graph = TunnelConnectionGraph.forRoom(sl, new ChunkPos(worldPosition));
             graph.rebind(worldPosition, machine, side);
         }
@@ -273,7 +273,7 @@ public class TunnelWallEntity extends BlockEntity {
             return;
         }
 
-        if(level instanceof ServerLevel compactDim && compactDim.dimension().equals(Dimension.COMPACT_DIMENSION)) {
+        if (level instanceof ServerLevel compactDim && compactDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
             final var tunnelData = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(worldPosition));
             tunnelData.unregister(worldPosition);
 

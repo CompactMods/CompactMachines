@@ -7,10 +7,10 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.dimension.Dimension;
-import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
@@ -123,7 +123,7 @@ public class CompactRoomData extends SavedData {
             return null;
 
         return new LevelBlockPosition(
-                Dimension.COMPACT_DIMENSION,
+                CompactDimension.LEVEL_KEY,
                 roomData.getSpawn()
         );
     }

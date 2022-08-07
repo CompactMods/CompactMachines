@@ -3,10 +3,10 @@ package dev.compactmods.machines.command.subcommand;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -25,7 +25,7 @@ public class CMSummarySubcommand {
         var src = ctx.getSource();
         var serv = src.getServer();
 
-        var compactLevel = serv.getLevel(Dimension.COMPACT_DIMENSION);
+        var compactLevel = serv.getLevel(CompactDimension.LEVEL_KEY);
         if (compactLevel != null) {
             src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         } else {

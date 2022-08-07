@@ -4,15 +4,15 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.dimension.Dimension;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.RoomCapabilities;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
@@ -124,7 +124,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         ServerLevel serverWorld = (ServerLevel) world;
 
         if (serverWorld.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
-            ServerLevel compactWorld = serverWorld.getServer().getLevel(Dimension.COMPACT_DIMENSION);
+            ServerLevel compactWorld = serverWorld.getServer().getLevel(CompactDimension.LEVEL_KEY);
             if (compactWorld == null) {
                 CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
             }
@@ -265,7 +265,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                             }
 
                             final var upg = upItem.getUpgradeType();
-                            final var manager = RoomUpgradeManager.get(server.getLevel(Dimension.COMPACT_DIMENSION));
+                            final var manager = RoomUpgradeManager.get(server.getLevel(CompactDimension.LEVEL_KEY));
 
                             if (manager.hasUpgrade(room, upg)) {
                                 player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
@@ -327,7 +327,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
         if (level instanceof ServerLevel sl) {
             final var serv = sl.getServer();
-            final var compactDim = serv.getLevel(Dimension.COMPACT_DIMENSION);
+            final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
 
             if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
                 entity.getConnectedRoom().ifPresent(room -> {
