@@ -4,9 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.util.MathUtil;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -28,6 +25,8 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
 
     private final ResourceKey<Level> dimension;
     private final Vec3 position;
+
+    // TODO 1.20 - Change to vec2
     private final Vec3 rotation;
 
     public PreciseDimensionalPosition(ResourceKey<Level> dimension, Vec3 position) {
@@ -47,11 +46,6 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
     }
 
     @Override
-    public BlockPos getBlockPosition() {
-        return new BlockPos(position.x, position.y, position.z);
-    }
-
-    @Override
     public Vec3 getExactPosition() {
         return position;
     }
@@ -68,12 +62,6 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
     @Override
     public ServerLevel level(MinecraftServer server) {
         return server.getLevel(dimension);
-    }
-
-    @Override
-    public IDimensionalPosition relative(Direction direction) {
-        final var newPos = position.add(direction.getStepX(), direction.getStepY(), direction.getStepZ());
-        return new PreciseDimensionalPosition(dimension, newPos);
     }
 
     @Override
