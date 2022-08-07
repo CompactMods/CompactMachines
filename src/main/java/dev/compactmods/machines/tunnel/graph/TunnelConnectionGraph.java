@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.graph.*;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -410,6 +411,26 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
     public boolean hasTunnel(BlockPos location) {
         return tunnels.containsKey(location);
+    }
+
+    /**
+     * Fetches the locations of all redstone-enabled tunnels for a specific wallSide.
+     * @param machine
+     * @param side
+     * @return
+     */
+    public Stream<BlockPos> getRedstoneTunnels(IDimensionalBlockPosition machine, Direction side) {
+        final var node = machines.get(machine);
+        if (node == null) return Stream.empty();
+
+        return getTunnelsForSide(machine, side)
+                .filter(sided -> graph.successors(sided).stream()
+                        .filter(TunnelTypeNode.class::isInstance)
+                        .map(TunnelTypeNode.class::cast)
+                        .anyMatch(ttn -> {
+                            var def = Tunnels.getDefinition(ttn.id());
+                            return def instanceof RedstoneTunnel;
+                        })).map(TunnelNode::position);
     }
 
     public <T> Stream<BlockPos> getTunnelsSupporting(LevelBlockPosition machine, Direction side, Capability<T> capability) {

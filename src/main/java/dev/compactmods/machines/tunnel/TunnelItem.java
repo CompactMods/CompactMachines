@@ -7,8 +7,8 @@ import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
-import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
+import dev.compactmods.machines.core.CompactMachinesNet;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.RoomCapabilities;
@@ -163,7 +163,7 @@ public class TunnelItem extends Item {
     }
 
     private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction innerFace, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
-        boolean redstone = def instanceof IRedstoneTunnel;
+        boolean redstone = def instanceof RedstoneTunnel;
 
         final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, player.chunkPosition());
 
