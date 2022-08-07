@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.Block;
 
 import static dev.compactmods.machines.CompactMachines.MOD_ID;
 
@@ -23,7 +24,7 @@ public class MachineVoidAir extends AirBlock {
     final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
     public MachineVoidAir() {
-        super(BlockBehaviour.Properties.of(Material.AIR).noCollission().noDrops().air());
+        super(BlockBehaviour.Properties.of(Material.BARRIER).noCollission().noDrops().air().strength(Block.INDESTRUCTIBLE));
     }
 
 
