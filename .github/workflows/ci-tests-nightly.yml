@@ -48,12 +48,14 @@ jobs:
         id: version
         run: |
           version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
+          echo "semver = $version"
           echo "::set-output name=version::$version"
 
       - name: Build Version
         id: build
         run: |
           buildver=$(git describe --tags --match v* | cut -d- -f2)
+          echo "build = $buildver"
           echo "::set-output name=buildver::$buildver"
   tests:
     name: Gradle Tests
@@ -88,11 +90,18 @@ jobs:
         continue-on-error: true
         timeout-minutes: 20
         run: ./gradlew runData
-
+        env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+          
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         timeout-minutes: 20
         env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
