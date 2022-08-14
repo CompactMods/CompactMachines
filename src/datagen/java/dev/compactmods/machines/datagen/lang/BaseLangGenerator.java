@@ -1,14 +1,14 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Advancements;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.datagen.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
-import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +23,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     private final String locale;
 
     public BaseLangGenerator(DataGenerator gen, String locale) {
-        super(gen, CompactMachines.MOD_ID, locale);
+        super(gen, Constants.MOD_ID, locale);
         this.locale = locale;
     }
 
@@ -47,7 +47,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
         // Direction Names
         for (var dir : Direction.values()) {
-            add(CompactMachines.MOD_ID + ".direction." + dir.getSerializedName(), getDirectionTranslation(dir));
+            add(Constants.MOD_ID + ".direction." + dir.getSerializedName(), getDirectionTranslation(dir));
         }
     }
 

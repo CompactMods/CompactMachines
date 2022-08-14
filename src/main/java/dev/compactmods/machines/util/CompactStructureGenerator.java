@@ -4,60 +4,86 @@ import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
-
-import java.util.Arrays;
+import net.minecraft.world.phys.Vec3;
 
 public class CompactStructureGenerator {
 
-    public static AABB getWallBounds(RoomSize size, BlockPos cubeCenter, Direction wall) {
-        int s = size.getInternalSize() / 2;
-
+    public static AABB getWallBounds(Vec3i size, BlockPos cubeFloor, Direction wall) {
         BlockPos start;
-        AABB wallBounds;
-
-        boolean horiz = wall.getAxis().getPlane() == Direction.Plane.HORIZONTAL;
-        if (horiz) {
-            start = cubeCenter
-                    .below(s)
-                    .relative(wall, s + 1);
-
-            wallBounds = new AABB(start, start)
-                    .expandTowards(0, (s * 2) + 1, 0);
-        } else {
-            start = cubeCenter.relative(wall, s + 1);
-
-            wallBounds = new AABB(start, start)
-                    .inflate(s + 1, 0, s + 1);
-        }
 
         switch (wall) {
-            case NORTH:
-            case SOUTH:
-                wallBounds = wallBounds.inflate(s + 1, 0, 0);
-                break;
+            case NORTH, SOUTH -> {
+                int offsetNorthSouth = (int) Math.ceil(size.getZ() / 2f);
+                start = cubeFloor.relative(wall,  offsetNorthSouth);
 
-            case WEST:
-            case EAST:
-                wallBounds = wallBounds.inflate(0, 0, s + 1);
-                break;
+                return new AABB(start, start)
+                        .expandTowards(0, size.getY(), 0)
+                        .inflate(Math.ceil(size.getX() / 2f), 0, 0);
+            }
+
+            case WEST, EAST -> {
+                final var offsetWestEast = (int) Math.ceil(size.getX() / 2f);
+                start = cubeFloor.relative(wall,  offsetWestEast);
+
+                return new AABB(start, start)
+                        .expandTowards(0, size.getY(), 0)
+                        .inflate(0, 0, Math.ceil(size.getZ() / 2f));
+            }
+
+            case UP, DOWN -> {
+                start = wall == Direction.DOWN ? cubeFloor : cubeFloor.relative(wall, size.getY());
+                var aabb = new AABB(start, start)
+                        .inflate(Math.ceil(size.getX() / 2f), 0, Math.ceil(size.getZ() / 2f));
+
+                if(wall == Direction.UP)
+                    aabb = aabb.inflate(0, 1, 0);
+
+                return aabb;
+            }
         }
 
-        return wallBounds;
+        // catch-all
+        return AABB.ofSize(Vec3.ZERO, 0, 0, 0);
     }
+
+    /**
+     * Generates a wall or platform in a given direction.
+     *
+     * @param world
+     * @param dimensions
+     * @param cubeCenter
+     * @param wallDirection
+     */
+    public static void generateCompactWall(LevelAccessor world, Vec3i dimensions, BlockPos cubeCenter, Direction wallDirection) {
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+        final var wallBounds = getWallBounds(dimensions, cubeCenter, wallDirection);
+
+        BlockPos.betweenClosedStream(wallBounds)
+                // .filter(world::isEmptyBlock)
+                .map(BlockPos::immutable)
+                .forEach(p -> world.setBlock(p, unbreakableWall, 7));
+    }
+
     /**
      * Generates a wall or platform in a given direction.
      *
      * @param world
      * @param size
-     * @param cubeCenter
+     * @param cubeFloor
      * @param wallDirection
      */
-    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeCenter, Direction wallDirection) {
+    @Deprecated(forRemoval = true)
+    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeFloor, Direction wallDirection) {
         final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
-        final var wallBounds = getWallBounds(size, cubeCenter, wallDirection);
+        final var wallBounds = getWallBounds(size.toVec3(), cubeFloor, wallDirection);
 
         BlockPos.betweenClosedStream(wallBounds)
                 .filter(world::isEmptyBlock)
@@ -69,30 +95,58 @@ public class CompactStructureGenerator {
      * Generates a machine "internal" structure in a world via a machine size and a central point.
      *
      * @param world
-     * @param size
-     * @param center
+     * @param dimensions Internal dimensions of the room.
+     * @param cubeFloorCenter
      */
-    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos center) {
-        int s = size.getInternalSize() / 2;
-
-        BlockPos floorCenter = center.relative(Direction.DOWN, s);
-        BlockPos machineTopCenter = center.relative(Direction.UP, s);
-
-        AABB floorBlocks = new AABB(floorCenter, floorCenter)
-                .inflate(s, 0, s);
-        AABB machineInternal = new AABB(machineTopCenter, floorCenter)
-                .inflate(s, 0, s);
+    public static void generateCompactStructure(LevelAccessor world, Vec3i dimensions, BlockPos cubeFloorCenter) {
+        AABB floorBlocks = getWallBounds(dimensions, cubeFloorCenter, Direction.DOWN);
+        AABB machineInternal = floorBlocks
+                .move(1, 1, 1)
+                .contract(2, 0, 2)
+                .expandTowards(0, dimensions.getY() - 1, 0);
 
 
         boolean anyAir = BlockPos.betweenClosedStream(floorBlocks).anyMatch(world::isEmptyBlock);
 
-        if (anyAir) {            // Generate the walls
-            Arrays.stream(Direction.values())
-                    .forEach(d -> generateCompactWall(world, size, center, d));
+        if (anyAir) {
+            // Generate the walls
+            for(final var dir : Direction.values())
+                generateCompactWall(world, dimensions, cubeFloorCenter, dir);
 
+            // Clear out the inside of the room
             BlockPos.betweenClosedStream(machineInternal)
                     .forEach(p -> world.setBlock(p, Blocks.AIR.defaultBlockState(), 7));
 
         }
+    }
+
+    public static BlockPos cornerFromSize(Vec3i dimensions, BlockPos cubeFloorCenter) {
+        Vec3i offset = new Vec3i(
+                -Math.floor(dimensions.getX() / 2f),
+                1,
+                -Math.floor(dimensions.getZ() / 2f)
+        );
+
+        return cubeFloorCenter.offset(offset);
+    }
+
+    /**
+     * Generates a machine "internal" structure in a world via a machine size and a central point.
+     *
+     * @param world
+     * @param size
+     * @param cubeFloorCenter
+     */
+    @Deprecated(forRemoval = true)
+    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos cubeFloorCenter) {
+        int s = size.getInternalSize();
+        generateCompactStructure(world, new Vec3i(s, s, s), cubeFloorCenter);
+    }
+
+    public static void fillRoomTemplate(ServerLevel level, ResourceLocation template, Vec3i dimensions, BlockPos cubeFloorCenter) {
+        level.getStructureManager().get(template).ifPresent(tem -> {
+            BlockPos placeAt = cornerFromSize(dimensions, cubeFloorCenter);
+            tem.placeInWorld(level, placeAt, placeAt, new StructurePlaceSettings(), level.random, Block.UPDATE_ALL);
+        });
     }
 }

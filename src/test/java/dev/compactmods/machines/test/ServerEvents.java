@@ -1,6 +1,7 @@
 package dev.compactmods.machines.test;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.util.DimensionUtil;
 import net.minecraft.server.MinecraftServer;
@@ -8,7 +9,7 @@ import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEvents {
 
     @SubscribeEvent

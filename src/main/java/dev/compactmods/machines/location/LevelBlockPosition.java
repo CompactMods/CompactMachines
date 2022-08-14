@@ -1,15 +1,11 @@
 package dev.compactmods.machines.location;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
-import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.codec.CodecExtensions;
-import dev.compactmods.machines.util.LocationUtil;
+import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -24,6 +20,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
+
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Optional;
 
 public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimensionalBlockPosition {
 
@@ -84,7 +84,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
 
     public boolean isLoaded(MinecraftServer server) {
         final var level = level(server);
-        return level.isLoaded(LocationUtil.vectorToBlockPos(position));
+        return level.isLoaded(new BlockPos(position));
     }
 
     public static LevelBlockPosition fromNBT(CompoundTag nbt) {

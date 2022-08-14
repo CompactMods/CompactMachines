@@ -1,5 +1,7 @@
 package dev.compactmods.machines.core;
 
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.graph.IGraphEdgeType;
@@ -50,6 +52,8 @@ public class Registries {
 
     // LootFunctions
     public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCS = DeferredRegister.create(Registry.LOOT_FUNCTION_REGISTRY, MOD_ID);
+
+    public static DeferredRegister<RoomTemplate> ROOM_TEMPLATES = DeferredRegister.create(dev.compactmods.machines.api.room.Rooms.TEMPLATE_REG_KEY, Constants.MOD_ID);
 
     public static void setup() {
 

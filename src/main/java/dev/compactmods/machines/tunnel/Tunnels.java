@@ -7,6 +7,7 @@ import dev.compactmods.machines.tunnel.definitions.FluidTunnel;
 import dev.compactmods.machines.tunnel.definitions.ForgeEnergyTunnel;
 import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
+import dev.compactmods.machines.tunnel.definitions.redstone.RedstoneInTunnelDefinition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -53,6 +54,9 @@ public class Tunnels {
     public static final RegistryObject<TunnelDefinition> FLUID_TUNNEL_DEF = Registries.TUNNEL_DEFINITIONS.register("fluid", FluidTunnel::new);
 
     public static final RegistryObject<TunnelDefinition> FORGE_ENERGY = Registries.TUNNEL_DEFINITIONS.register("energy", ForgeEnergyTunnel::new);
+
+    public static final RegistryObject<TunnelDefinition> REDSTONE_IN = Registries.TUNNEL_DEFINITIONS
+            .register("redstone_in", RedstoneInTunnelDefinition::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES

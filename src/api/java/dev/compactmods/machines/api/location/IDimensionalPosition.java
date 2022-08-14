@@ -16,4 +16,6 @@ public interface IDimensionalPosition {
     ServerLevel level(MinecraftServer server);
 
     Optional<Vec3> getRotation();
+
+    boolean isLoaded(MinecraftServer serv);
 }

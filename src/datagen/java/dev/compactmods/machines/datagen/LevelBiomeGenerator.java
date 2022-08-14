@@ -8,6 +8,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.dimension.Dimension;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -36,8 +38,7 @@ public class LevelBiomeGenerator implements DataProvider {
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
     private final DataGenerator generator;
 
-    private final ResourceLocation COMPACT_BIOME = new ResourceLocation(CompactMachines.MOD_ID, "machine");
-    private final ResourceLocation COMPACT_LEVEL = new ResourceLocation(CompactMachines.MOD_ID, "compact_world");
+    private final ResourceLocation COMPACT_BIOME = new ResourceLocation(Constants.MOD_ID, "machine");
 
     LevelBiomeGenerator(DataGenerator generator) {
         this.generator = generator;
@@ -65,7 +66,7 @@ public class LevelBiomeGenerator implements DataProvider {
     private JsonElement writeFlatDimension(LevelStem dimension) {
         JsonObject d = new JsonObject();
 
-        d.addProperty("type", COMPACT_LEVEL.toString());
+        d.addProperty("type", CompactDimension.LEVEL_KEY.toString());
 
         var gen = ChunkGenerator.CODEC.encodeStart(JsonOps.INSTANCE, dimension.generator())
                 .getOrThrow(false, CompactMachines.LOGGER::error)
@@ -93,11 +94,11 @@ public class LevelBiomeGenerator implements DataProvider {
         var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), BuiltinRegistries.BIOME);
 
         flatSettings.setBiome(Holder.direct(biomes.get(COMPACT_BIOME)));
-        flatSettings.getLayersInfo().add(new FlatLayerInfo(dimTypes.get(COMPACT_LEVEL).height(), Dimension.BLOCK_MACHINE_VOID_AIR.get()));
+        flatSettings.getLayersInfo().add(new FlatLayerInfo(dimTypes.get(CompactDimension.LEVEL_KEY.location()).height(), Dimension.BLOCK_MACHINE_VOID_AIR.get()));
         flatSettings.updateLayers();
 
-        var stem = new LevelStem(Holder.direct(dimTypes.get(COMPACT_LEVEL)), new FlatLevelSource(ssreg, flatSettings));
-        consumer.accept(stem, COMPACT_LEVEL);
+        var stem = new LevelStem(Holder.direct(dimTypes.get(CompactDimension.LEVEL_KEY.location())), new FlatLevelSource(ssreg, flatSettings));
+        consumer.accept(stem, CompactDimension.LEVEL_KEY.location());
     }
 
     private void writeDimensionTypes(BiConsumer<DimensionType, ResourceLocation> consumer) {
@@ -110,7 +111,7 @@ public class LevelBiomeGenerator implements DataProvider {
                 .heightBounds(0, 256)
                 .build();
 
-        consumer.accept(dim, COMPACT_LEVEL);
+        consumer.accept(dim, CompactDimension.LEVEL_KEY.location());
     }
 
     private void writeBiomes(BiConsumer<Biome, ResourceLocation> biomeWriter) {
@@ -140,6 +141,6 @@ public class LevelBiomeGenerator implements DataProvider {
 
     @Override
     public String getName() {
-        return CompactMachines.MOD_ID + ":levelgen";
+        return Constants.MOD_ID + ":levelgen";
     }
 }

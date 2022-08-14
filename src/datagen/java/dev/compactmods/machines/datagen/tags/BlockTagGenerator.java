@@ -1,7 +1,6 @@
 package dev.compactmods.machines.datagen.tags;
 
-import java.util.Set;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
@@ -9,10 +8,12 @@ import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
+import java.util.Set;
+
 public class BlockTagGenerator extends BlockTagsProvider {
 
     public BlockTagGenerator(DataGenerator generator, ExistingFileHelper files) {
-        super(generator, CompactMachines.MOD_ID, files);
+        super(generator, Constants.MOD_ID, files);
     }
 
     @Override

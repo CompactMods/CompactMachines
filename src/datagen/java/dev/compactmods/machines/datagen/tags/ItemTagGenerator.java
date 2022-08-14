@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen.tags;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemTagGenerator extends ItemTagsProvider {
     public ItemTagGenerator(DataGenerator gen, BlockTagsProvider blockTags, @Nullable ExistingFileHelper files) {
-        super(gen, blockTags, CompactMachines.MOD_ID, files);
+        super(gen, blockTags, Constants.MOD_ID, files);
     }
 
     @Override

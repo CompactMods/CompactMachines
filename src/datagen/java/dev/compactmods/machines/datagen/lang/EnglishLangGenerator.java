@@ -1,14 +1,14 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.dimension.VoidAirBlock;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
@@ -59,8 +59,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
 
-        add(CompactMachines.MOD_ID + ".direction.side", "Side: %s");
-        add(CompactMachines.MOD_ID + ".connected_block", "Connected: %s");
+        add(Constants.MOD_ID + ".direction.side", "Side: %s");
+        add(Constants.MOD_ID + ".connected_block", "Connected: %s");
 
         add(RoomUpgrade.UNNAMED_TRANS_KEY, "Unnamed Room Upgrade");
 
@@ -107,9 +107,9 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addMessage(Messages.UNKNOWN_ROOM_CHUNK, "Unknown room at %s; please verify it exists.");
 
-        add("itemGroup." + CompactMachines.MOD_ID, "Compact Machines");
+        add("itemGroup." + Constants.MOD_ID, "Compact Machines");
 
-        add("biome." + CompactMachines.MOD_ID + ".machine", "Compact Machine");
+        add("biome." + Constants.MOD_ID + ".machine", "Compact Machine");
 
         add("compactmachines.psd.pages.machines.title", "Compact Machines");
         add("compactmachines.psd.pages.machines", "Compact Machines are the core mechanic of this mod. They allow you to build large " +

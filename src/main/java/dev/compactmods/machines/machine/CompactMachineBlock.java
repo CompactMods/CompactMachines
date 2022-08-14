@@ -18,6 +18,7 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.upgrade.RoomUpgradeItem;
@@ -116,20 +117,27 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @SuppressWarnings("deprecation")
     @ParametersAreNonnullByDefault
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block changedBlock, BlockPos changedPos, boolean isMoving) {
-        super.neighborChanged(state, world, pos, changedBlock, changedPos, isMoving);
-
         if (world.isClientSide)
             return;
 
         ServerLevel serverWorld = (ServerLevel) world;
-
         if (serverWorld.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {
             ServerLevel compactWorld = serverWorld.getServer().getLevel(CompactDimension.LEVEL_KEY);
             if (compactWorld == null) {
                 CompactMachines.LOGGER.warn("Warning: Compact Dimension was null! Cannot fetch internal state for machine neighbor change listener.");
-            }
+            } else {
+                for (final var dir : Direction.Plane.HORIZONTAL) {
+                    if (!pos.relative(dir).equals(changedPos)) continue;
 
-            // TODO - Send notification to dimension tunnel listeners (API)
+                    // Horizontal neighbor changed
+                    machine.getTunnelGraph().ifPresent(graph -> {
+                        // Update redstone tunnel signals
+                        graph.getRedstoneTunnels(machine.getLevelPosition(), dir).forEach(tunnelPos -> {
+                            compactWorld.updateNeighbourForOutputSignal(tunnelPos, Tunnels.BLOCK_TUNNEL_WALL.get());
+                        });
+                    });
+                }
+            }
         }
     }
 
@@ -255,7 +263,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         // Upgrade Item
         if (mainItem.is(CMTags.ROOM_UPGRADE_ITEM)) {
             final var reg = MachineRoomUpgrades.REGISTRY.get();
-            if(mainItem.getItem() instanceof RoomUpgradeItem upItem) {
+            if (mainItem.getItem() instanceof RoomUpgradeItem upItem) {
                 if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
                     tile.getConnectedRoom().ifPresent(room -> {
                         Rooms.getOwner(server, room).ifPresent(prof -> {

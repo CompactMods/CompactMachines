@@ -1,15 +1,16 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
+import dev.compactmods.machines.datagen.room.RoomTemplates;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CompactMachines.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGeneration {
 
     @SubscribeEvent
@@ -26,6 +27,8 @@ public class DataGeneration {
         final var blocks = new BlockTagGenerator(generator, helper);
         generator.addProvider(event.includeServer(), blocks);
         generator.addProvider(event.includeServer(), new ItemTagGenerator(generator, blocks, helper));
+
+        RoomTemplates.make(event);
 
         // Client
         generator.addProvider(event.includeClient(), new StateGenerator(generator, helper));

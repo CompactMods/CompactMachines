@@ -10,6 +10,7 @@ import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.data.LootFunctions;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
@@ -40,7 +41,7 @@ public class CompactMachines {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Marker CONN_MARKER = MarkerManager.getMarker("cm_connections");
 
-    public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(MOD_ID) {
+    public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(Constants.MOD_ID) {
         @Override
         public @Nonnull
         ItemStack makeIcon() {
@@ -72,6 +73,7 @@ public class CompactMachines {
         Registries.BLOCK_ENTITIES.register(bus);
         Registries.TUNNEL_DEFINITIONS.register(bus);
         Registries.CONTAINERS.register(bus);
+        Registries.ROOM_TEMPLATES.register(bus);
         Registries.UPGRADES.register(bus);
         Registries.NODE_TYPES.register(bus);
         Registries.EDGE_TYPES.register(bus);
@@ -88,6 +90,7 @@ public class CompactMachines {
 
         UIRegistration.prepare();
         Dimension.prepare();
+        Rooms.prepare();
         MachineRoomUpgrades.prepare();
         Graph.prepare();
         Commands.prepare();

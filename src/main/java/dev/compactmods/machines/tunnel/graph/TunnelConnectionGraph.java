@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
+import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.graph.*;
@@ -36,7 +37,7 @@ import java.util.stream.Stream;
  * Represents a room's tunnel connections in a graph-style format.
  * This should be accessed through the saved data for specific machine room chunks.
  */
-public class TunnelConnectionGraph extends SavedData implements INBTSerializable<CompoundTag> {
+public class TunnelConnectionGraph extends SavedData implements INBTSerializable<CompoundTag>, RoomTunnelConnections {
 
     /**
      * The full data graph. Contains tunnel nodes, machine ids, and tunnel type information.
@@ -416,14 +417,14 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     /**
      * Fetches the locations of all redstone-enabled tunnels for a specific wallSide.
      * @param machine
-     * @param side
+     * @param facing
      * @return
      */
-    public Stream<BlockPos> getRedstoneTunnels(IDimensionalBlockPosition machine, Direction side) {
+    public Stream<BlockPos> getRedstoneTunnels(IDimensionalBlockPosition machine, Direction facing) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
-        return getTunnelsForSide(machine, side)
+        return getTunnelsForSide(machine, facing)
                 .filter(sided -> graph.successors(sided).stream()
                         .filter(TunnelTypeNode.class::isInstance)
                         .map(TunnelTypeNode.class::cast)

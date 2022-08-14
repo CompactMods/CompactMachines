@@ -145,10 +145,10 @@ public abstract class PlayerUtil {
 
     public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @Nonnull ServerPlayer player) {
         ServerLevel level = Optional.ofNullable(serv.getLevel(player.getRespawnDimension())).orElse(serv.overworld());
-        Vec3 worldPos = LocationUtil.blockPosToVector(level.getSharedSpawnPos());
+        Vec3 worldPos = Vec3.atCenterOf(level.getSharedSpawnPos());
 
         if (player.getRespawnPosition() != null)
-            worldPos = LocationUtil.blockPosToVector(player.getRespawnPosition());
+            worldPos = Vec3.atCenterOf(player.getRespawnPosition());
 
         player.changeDimension(level, SimpleTeleporter.to(worldPos));
     }
