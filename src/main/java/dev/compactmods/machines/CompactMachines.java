@@ -58,7 +58,7 @@ public class CompactMachines {
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
 
-        ArgumentTypes.register("room_pos", RoomPositionArgument.class, new EmptyArgumentSerializer<>(RoomPositionArgument::room));
-        ArgumentTypes.register("upgrade_type", RoomUpgradeArgument.class, new EmptyArgumentSerializer<>(RoomUpgradeArgument::upgrade));
+        ArgumentTypes.register(MOD_ID + ":room_pos", RoomPositionArgument.class, new EmptyArgumentSerializer<>(RoomPositionArgument::room));
+        ArgumentTypes.register(MOD_ID + ":upgrade_type", RoomUpgradeArgument.class, new EmptyArgumentSerializer<>(RoomUpgradeArgument::upgrade));
     }
 }
