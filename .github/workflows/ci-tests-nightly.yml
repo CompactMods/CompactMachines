@@ -23,8 +23,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
-        
+        uses: actions/checkout@v3
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
@@ -50,7 +53,7 @@ jobs:
     needs: [ vars ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
 
       - name: Unshallow and Get Tags
         run: git fetch --prune --unshallow --tags
@@ -80,7 +83,7 @@ jobs:
           CM_RELEASE: false
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
           CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
-          
+
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         env:
@@ -103,7 +106,7 @@ jobs:
     needs: [ vars, tests ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow and Get Tags
         run: git fetch --prune --unshallow --tags

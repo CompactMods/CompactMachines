@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
@@ -126,7 +126,7 @@ jobs:
           path: changelog
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -266,7 +266,7 @@ jobs:
     needs: [changelog, vars, jar]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2
