@@ -1,5 +1,6 @@
 package dev.compactmods.machines.core;
 
+import dev.compactmods.machines.api.core.CMRegistries;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.ApiStatus;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
@@ -28,24 +30,24 @@ public class Registries {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
 
     // Tunnels
-    public static final ResourceLocation TYPES_REG_KEY = new ResourceLocation(MOD_ID, "tunnel_types");
-    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(TYPES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(CMRegistries.TYPES_REG_KEY, MOD_ID);
 
     // UIRegistration
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
 
     // MachineRoomUpgrades
-    public static final ResourceKey<Registry<RoomUpgrade>> ROOM_UPGRADES_REG_KEY = ResourceKey
-            .createRegistryKey(new ResourceLocation(MOD_ID, "room_upgrades"));
-    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(ROOM_UPGRADES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(CMRegistries.ROOM_UPGRADES_REG_KEY, MOD_ID);
 
     // Graph
-    public static final ResourceKey<Registry<IGraphNodeType>> NODES_REG_KEY = ResourceKey
+    @ApiStatus.Internal
+    public static final ResourceKey<Registry<IGraphNodeType<?>>> NODES_REG_KEY = ResourceKey
             .createRegistryKey(new ResourceLocation(MOD_ID, "graph_nodes"));
-    public static final ResourceKey<Registry<IGraphEdgeType>> EDGES_REG_KEY = ResourceKey
+
+    @ApiStatus.Internal
+    public static final ResourceKey<Registry<IGraphEdgeType<?>>> EDGES_REG_KEY = ResourceKey
             .createRegistryKey(new ResourceLocation(MOD_ID, "graph_edges"));
-    public static final DeferredRegister<IGraphNodeType> NODE_TYPES = DeferredRegister.create(NODES_REG_KEY, MOD_ID);
-    public static final DeferredRegister<IGraphEdgeType> EDGE_TYPES = DeferredRegister.create(EDGES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<IGraphNodeType<?>> NODE_TYPES = DeferredRegister.create(NODES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<IGraphEdgeType<?>> EDGE_TYPES = DeferredRegister.create(EDGES_REG_KEY, MOD_ID);
 
     // Commands
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(Registry.COMMAND_ARGUMENT_TYPE_REGISTRY, MOD_ID);
@@ -53,7 +55,8 @@ public class Registries {
     // LootFunctions
     public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCS = DeferredRegister.create(Registry.LOOT_FUNCTION_REGISTRY, MOD_ID);
 
-    public static DeferredRegister<RoomTemplate> ROOM_TEMPLATES = DeferredRegister.create(dev.compactmods.machines.api.room.Rooms.TEMPLATE_REG_KEY, Constants.MOD_ID);
+    public static DeferredRegister<RoomTemplate> ROOM_TEMPLATES = DeferredRegister
+            .create(CMRegistries.TEMPLATE_REG_KEY, Constants.MOD_ID);
 
     public static void setup() {
 

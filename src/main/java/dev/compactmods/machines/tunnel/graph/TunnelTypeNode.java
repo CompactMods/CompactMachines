@@ -3,14 +3,14 @@ package dev.compactmods.machines.tunnel.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.graph.Graph;
-import dev.compactmods.machines.graph.GraphNodeBase;
+import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
+import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 
-public final class TunnelTypeNode extends GraphNodeBase implements IGraphNodeType {
+public final class TunnelTypeNode implements IGraphNodeType, IGraphNode {
     private static final ResourceLocation TYPE = new ResourceLocation(Constants.MOD_ID, "tunnel_type");
 
     public static final Codec<TunnelTypeNode> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -57,6 +57,6 @@ public final class TunnelTypeNode extends GraphNodeBase implements IGraphNodeTyp
 
     @Override
     public IGraphNodeType getType() {
-        return Graph.TUNNEL_TYPE_NODE.get();
+        return Tunnels.TUNNEL_TYPE_NODE.get();
     }
 }

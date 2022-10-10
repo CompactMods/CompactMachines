@@ -2,7 +2,7 @@ package dev.compactmods.machines.room.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.api.codec.CodecExtensions;
+import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.api.room.RoomSize;
 import net.minecraft.world.level.ChunkPos;
 

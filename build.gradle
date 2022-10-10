@@ -25,7 +25,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 def semver = System.getenv("CM_SEMVER_VERSION")
 def buildNumber = System.getenv("CM_BUILD_NUM")
 
-def nightlyVersion = "${semver}.${buildNumber}"
+def nightlyVersion = "nightly-${semver}.${buildNumber}"
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")
 
 task getBuildInfo() {
@@ -44,14 +44,6 @@ sourceSets {
     api {
         resources.srcDirs = []
         compileClasspath += configurations.getByName("minecraft")
-    }
-
-    datagen {
-        compileClasspath += configurations.getByName("minecraft")
-        compileClasspath += sourceSets.api.output
-        runtimeClasspath += sourceSets.api.output
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
     }
 
     tunnels {
@@ -82,6 +74,16 @@ sourceSets {
 
         compileClasspath += sourceSets.api.output
         runtimeClasspath += sourceSets.api.output
+    }
+
+    datagen {
+        compileClasspath += configurations.getByName("minecraft")
+        compileClasspath += sourceSets.tunnels.output
+        runtimeClasspath += sourceSets.tunnels.output
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
     }
 }
 
@@ -176,8 +178,6 @@ minecraft {
                 jvmArg '-XX:HotswapAgent=fatjar'
             }
 
-            forceExit false
-
             mods {
                 compactmachines {
                     source sourceSets.tunnels
@@ -207,6 +207,8 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             forceExit false
+
+            environment("CM5_TEST_RESOURCES", file('src/test/resources'))
 
             // JetBrains Runtime Hotswap
             jvmArg '-XX:+AllowEnhancedClassRedefinition'
@@ -249,8 +251,15 @@ repositories {
         name "tterrag maven"
         url "https://maven.tterrag.com/"
     }
+
+    maven {
+        url = "https://maven.theillusivec4.top/"
+    }
+
+    mavenCentral()
 }
 
+jarJar.enable();
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
@@ -258,12 +267,23 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     // JEI
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
+    if(jei_version != null) {
+        compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-common-api:${jei_version}")
+        compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
+        runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
+    }
 
     // The One Probe
     implementation(fg.deobf("curse.maven:theoneprobe-245211:3927520"))
+
+    // Curios
+    if(curios_version != null) {
+        runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+        compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    }
+
+    minecraftLibrary(group: 'com.aventrix.jnanoid', name: 'jnanoid', version: '2.0.0')
+    jarJar (group: 'com.aventrix.jnanoid', name: 'jnanoid', version: '[2.0.0]')
 
     if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
         // Nicephore - Screenshots and Stuff
@@ -320,13 +340,26 @@ compileDatagenJava {
     options.encoding = 'UTF-8'
 }
 
+// FIXME: Remove once https://github.com/MinecraftForge/ForgeGradle/issues/883 is closed
+reobf {
+    jarJar { }
+}
+
+tasks.withType(Jar) {
+    destinationDirectory = file("$rootDir/build-out")
+}
+
+tasks.jarJar.configure {
+    classifier ''
+}
+
 jar {
     from sourceSets.tunnels.output
     from sourceSets.main.output
     from sourceSets.api.output
-    destinationDirectory = file("$rootDir/build-out")
 
     finalizedBy('reobfJar')
+    classifier 'slim'
 
     manifest {
         attributes([
@@ -344,8 +377,7 @@ jar {
 task apiJar(type: Jar) {
     from sourceSets.api.output
     // Sources included because of MinecraftForge/ForgeGradle#369
-    archiveClassifier = 'api'
-    destinationDirectory = file("$rootDir/build-out")
+    classifier 'api'
 }
 
 artifacts {
@@ -360,21 +392,7 @@ publishing {
 
             artifacts {
                 artifact jar
-                artifact(apiJar) {
-                    classifier = "api"
-                }
-            }
-        }
-
-        nightly(MavenPublication) {
-            artifactId = mod_id
-            groupId = "dev.compactmods.nightly"
-
-            artifacts {
-                artifact(jar)
-                artifact(apiJar) {
-                    classifier = "api"
-                }
+                artifact(apiJar)
             }
         }
     }

@@ -19,23 +19,25 @@ public class DataGeneration {
         final var generator = event.getGenerator();
 
         // Server
-        generator.addProvider(event.includeServer(), new LevelBiomeGenerator(generator));
-        generator.addProvider(event.includeServer(), new BlockLootGenerator(generator));
-        generator.addProvider(event.includeServer(), new RecipeGenerator(generator));
-        generator.addProvider(event.includeServer(), new AdvancementGenerator(generator));
+        boolean server = event.includeServer();
+        generator.addProvider(server, new LevelBiomeGenerator(generator));
+        generator.addProvider(server, new BlockLootGenerator(generator));
+        generator.addProvider(server, new RecipeGenerator(generator));
+        generator.addProvider(server, new AdvancementGenerator(generator));
 
         final var blocks = new BlockTagGenerator(generator, helper);
-        generator.addProvider(event.includeServer(), blocks);
-        generator.addProvider(event.includeServer(), new ItemTagGenerator(generator, blocks, helper));
+        generator.addProvider(server, blocks);
+        generator.addProvider(server, new ItemTagGenerator(generator, blocks, helper));
 
         RoomTemplates.make(event);
 
         // Client
-        generator.addProvider(event.includeClient(), new StateGenerator(generator, helper));
-        generator.addProvider(event.includeClient(), new TunnelWallStateGenerator(generator, helper));
-        generator.addProvider(event.includeClient(), new ItemModelGenerator(generator, helper));
+        boolean client = event.includeClient();
+        generator.addProvider(client, new StateGenerator(generator, helper));
+        generator.addProvider(client, new TunnelWallStateGenerator(generator, helper));
+        generator.addProvider(client, new ItemModelGenerator(generator, helper));
 
-        generator.addProvider(event.includeClient(), new EnglishLangGenerator(generator));
-        generator.addProvider(event.includeClient(), new RussianLangGenerator(generator));
+        generator.addProvider(client, new EnglishLangGenerator(generator));
+        generator.addProvider(client, new RussianLangGenerator(generator));
     }
 }

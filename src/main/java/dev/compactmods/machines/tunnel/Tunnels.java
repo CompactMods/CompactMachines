@@ -3,11 +3,11 @@ package dev.compactmods.machines.tunnel;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.core.Registries;
-import dev.compactmods.machines.tunnel.definitions.FluidTunnel;
-import dev.compactmods.machines.tunnel.definitions.ForgeEnergyTunnel;
-import dev.compactmods.machines.tunnel.definitions.ItemTunnel;
+import dev.compactmods.machines.graph.IGraphNodeType;
+import dev.compactmods.machines.graph.SimpleGraphNodeType;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
-import dev.compactmods.machines.tunnel.definitions.redstone.RedstoneInTunnelDefinition;
+import dev.compactmods.machines.tunnel.graph.TunnelNode;
+import dev.compactmods.machines.tunnel.graph.TunnelTypeNode;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +26,12 @@ import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 public class Tunnels {
 
-    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = Registries.TUNNEL_DEFINITIONS.makeRegistry(RegistryBuilder::new);
+    public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = Registries.TUNNEL_DEFINITIONS
+            .makeRegistry(RegistryBuilder::new);
+    public static final RegistryObject<IGraphNodeType<TunnelNode>> TUNNEL_NODE = Registries.NODE_TYPES
+            .register("tunnel", SimpleGraphNodeType.instance(TunnelNode.CODEC));
+    public static final RegistryObject<IGraphNodeType<TunnelTypeNode>> TUNNEL_TYPE_NODE = Registries.NODE_TYPES
+            .register("tunnel_type", SimpleGraphNodeType.instance(TunnelTypeNode.CODEC));
 
     public static boolean isRegistered(ResourceLocation id) {
         return TUNNEL_DEF_REGISTRY.get().containsKey(id);
@@ -41,22 +46,11 @@ public class Tunnels {
     // ================================================================================================================
     //   TUNNELS
     // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> UNKNOWN = Registries.TUNNEL_DEFINITIONS.register("unknown", UnknownTunnel::new);
+    public static final RegistryObject<TunnelDefinition> UNKNOWN = Registries.TUNNEL_DEFINITIONS
+            .register("unknown", UnknownTunnel::new);
 
     public static final RegistryObject<Item> ITEM_TUNNEL = Registries.ITEMS.register("tunnel", () ->
             new TunnelItem(new Item.Properties().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
-
-    // ================================================================================================================
-    //   TUNNEL TYPE DEFINITIONS
-    // ================================================================================================================
-    public static final RegistryObject<TunnelDefinition> ITEM_TUNNEL_DEF = Registries.TUNNEL_DEFINITIONS.register("item", ItemTunnel::new);
-
-    public static final RegistryObject<TunnelDefinition> FLUID_TUNNEL_DEF = Registries.TUNNEL_DEFINITIONS.register("fluid", FluidTunnel::new);
-
-    public static final RegistryObject<TunnelDefinition> FORGE_ENERGY = Registries.TUNNEL_DEFINITIONS.register("energy", ForgeEnergyTunnel::new);
-
-    public static final RegistryObject<TunnelDefinition> REDSTONE_IN = Registries.TUNNEL_DEFINITIONS
-            .register("redstone_in", RedstoneInTunnelDefinition::new);
 
     // ================================================================================================================
     //   TUNNEL BLOCKS / TILES
@@ -68,7 +62,8 @@ public class Tunnels {
                     .lightLevel((state) -> 15)));
 
     public static final RegistryObject<BlockEntityType<TunnelWallEntity>> TUNNEL_BLOCK_ENTITY = Registries.BLOCK_ENTITIES
-            .register("tunnel_wall", () -> BlockEntityType.Builder.of(TunnelWallEntity::new, BLOCK_TUNNEL_WALL.get()).build(null));
+            .register("tunnel_wall", () -> BlockEntityType.Builder.of(TunnelWallEntity::new, BLOCK_TUNNEL_WALL.get())
+                    .build(null));
 
     public static ResourceLocation getRegistryId(TunnelDefinition definition) {
         final var reg = TUNNEL_DEF_REGISTRY.get();

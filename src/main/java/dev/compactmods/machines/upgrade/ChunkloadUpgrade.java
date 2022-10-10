@@ -3,6 +3,9 @@ package dev.compactmods.machines.upgrade;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.room.IRoomLookup;
+import dev.compactmods.machines.api.room.registration.IMutableRoomRegistration;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.resources.ResourceLocation;
@@ -27,36 +30,42 @@ public class ChunkloadUpgrade implements RoomUpgrade, ILevelLoadedUpgradeListene
     }
 
     @Override
-    public void onAdded(ServerLevel level, ChunkPos room) {
+    public void onAdded(ServerLevel level, IRoomRegistration room) {
         forceLoad(level, room);
     }
 
     @Override
-    public void onRemoved(ServerLevel level, ChunkPos room) {
+    public void onRemoved(ServerLevel level, IRoomRegistration room) {
         normalLoad(level, room);
     }
 
     @Override
-    public void onLevelLoaded(ServerLevel level, ChunkPos room) {
+    public void onLevelLoaded(ServerLevel level, IRoomRegistration room) {
         forceLoad(level, room);
     }
 
     @Override
-    public void onLevelUnloaded(ServerLevel level, ChunkPos room) {
+    public void onLevelUnloaded(ServerLevel level, IRoomRegistration room) {
         normalLoad(level, room);
     }
 
-    private void forceLoad(ServerLevel level, ChunkPos room) {
+    private void forceLoad(ServerLevel level, IRoomRegistration room) {
         final var chunks = level.getChunkSource();
-        level.setChunkForced(room.x, room.z, true);
-        chunks.addRegionTicket(CM4_LOAD_TYPE, room, 2, room);
+        room.chunks().forEach(chunk -> {
+            level.setChunkForced(chunk.x, chunk.z, true);
+            chunks.addRegionTicket(CM4_LOAD_TYPE, chunk, 2, chunk);
+        });
+
         chunks.save(false);
     }
 
-    private void normalLoad(ServerLevel level, ChunkPos room) {
+    private void normalLoad(ServerLevel level, IRoomRegistration room) {
         final var chunks = level.getChunkSource();
-        level.setChunkForced(room.x, room.z, false);
-        chunks.removeRegionTicket(CM4_LOAD_TYPE, room, 2, room);
+        room.chunks().forEach(chunk -> {
+            level.setChunkForced(chunk.x, chunk.z, false);
+            chunks.removeRegionTicket(CM4_LOAD_TYPE, chunk, 2, chunk);
+        });
+
         chunks.save(false);
     }
 }

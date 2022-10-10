@@ -5,9 +5,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import org.jetbrains.annotations.NotNull;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
@@ -20,8 +24,29 @@ public abstract class CompactDimension {
 
     private CompactDimension() {}
 
-    @Nullable
-    public static ServerLevel forServer(MinecraftServer server) {
-        return server.getLevel(LEVEL_KEY);
+    @NotNull
+    public static ServerLevel forCurrentServer() throws MissingDimensionException {
+        final var server = ServerLifecycleHooks.getCurrentServer();
+        final var level = server.getLevel(LEVEL_KEY);
+        if(level == null)
+            throw new MissingDimensionException();
+
+        return level;
+    }
+
+    @NotNull
+    public static ServerLevel forServer(MinecraftServer server) throws MissingDimensionException {
+        final var level = server.getLevel(LEVEL_KEY);
+        if(level == null)
+            throw new MissingDimensionException();
+
+        return level;
+    }
+
+    @NotNull
+    public static DimensionDataStorage getDataStorage(@NotNull LevelStorageSource.LevelDirectory levelDir) {
+        final var dimPath = DimensionType.getStorageFolder(CompactDimension.LEVEL_KEY, levelDir.path());
+        final var fixer = DataFixers.getDataFixer();
+        return new DimensionDataStorage(dimPath.resolve("data").toFile(), fixer);
     }
 }

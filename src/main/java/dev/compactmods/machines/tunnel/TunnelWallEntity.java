@@ -8,8 +8,11 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
+import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 public class TunnelWallEntity extends BlockEntity {
 
@@ -38,6 +42,8 @@ public class TunnelWallEntity extends BlockEntity {
 
     @Nullable
     private TunnelInstance tunnel;
+
+    private WeakReference<TunnelNode> node;
 
     public TunnelWallEntity(BlockPos pos, BlockState state) {
         super(Tunnels.TUNNEL_BLOCK_ENTITY.get(), pos, state);
@@ -77,14 +83,18 @@ public class TunnelWallEntity extends BlockEntity {
             if (this.tunnelType != null && tunnelType.equals(Tunnels.UNKNOWN.get())) {
                 CompactMachines.LOGGER.warn("Removing unknown tunnel type at {}", worldPosition.toShortString());
                 sl.setBlock(worldPosition, Walls.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
+            } else {
+                // todo Load tunnel data
+                node = new WeakReference<>(null);
             }
         }
     }
 
     @Override
     public void saveAdditional(@Nonnull CompoundTag compound) {
-        compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.getRegistryId(tunnelType).toString());
-        compound.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
+        CodecExtensions.writeIntoTag(BaseTunnelWallData.CODEC,
+                new BaseTunnelWallData(connectedMachine, Tunnels.getRegistryId(tunnelType)),
+                compound);
 
         if (tunnel instanceof INBTSerializable persist) {
             var data = persist.serializeNBT();
@@ -96,9 +106,9 @@ public class TunnelWallEntity extends BlockEntity {
     @Nonnull
     public CompoundTag getUpdateTag() {
         CompoundTag nbt = super.getUpdateTag();
-        nbt.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.getRegistryId(tunnelType).toString());
-        nbt.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
-        return nbt;
+        return CodecExtensions.writeIntoTag(BaseTunnelWallData.CODEC,
+                new BaseTunnelWallData(connectedMachine, Tunnels.getRegistryId(tunnelType)),
+                nbt);
     }
 
     @Override
@@ -201,10 +211,14 @@ public class TunnelWallEntity extends BlockEntity {
     public void setConnectedTo(IDimensionalBlockPosition machine, Direction side) {
         if (level == null || level.isClientSide) return;
         this.connectedMachine = new LevelBlockPosition(machine);
-
         if (level instanceof ServerLevel sl) {
-            final var graph = TunnelConnectionGraph.forRoom(sl, new ChunkPos(worldPosition));
-            graph.rebind(worldPosition, machine, side);
+
+            // TODO - Weak references to room data so we don't have to do this
+            final var roomProvider = CompactRoomProvider.instance(sl);
+            roomProvider.findByChunk(new ChunkPos(this.worldPosition)).ifPresent(room -> {
+                final var graph = TunnelConnectionGraph.forRoom(sl, room.code());
+                graph.rebind(worldPosition, machine, side);
+            });
         }
     }
 

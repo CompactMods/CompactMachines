@@ -3,19 +3,27 @@ package dev.compactmods.machines.util;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.RegistryResourceAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -125,4 +133,28 @@ public class DimensionUtil {
         return true;
     }
 
+    @NotNull
+    public static Path getDataFolder(@NotNull Path rootDir, ResourceKey<Level> key) {
+        final var dimPath = DimensionType.getStorageFolder(key, rootDir);
+        return dimPath.resolve("data");
+    }
+
+    @NotNull
+    public static Path getDataFolder(@NotNull LevelStorageSource.LevelDirectory levelDir, ResourceKey<Level> key) {
+        final var dimPath = DimensionType.getStorageFolder(key, levelDir.path());
+        return dimPath.resolve("data");
+    }
+
+    @NotNull
+    public static DimensionDataStorage getDataStorage(@NotNull LevelStorageSource.LevelDirectory levelDir, ResourceKey<Level> key) {
+        final var folder = getDataFolder(levelDir, key).toFile();
+        final var fixer = DataFixers.getDataFixer();
+        return new DimensionDataStorage(folder, fixer);
+    }
+
+    public static CompoundTag readSavedFile(@NotNull DimensionDataStorage storage, String dataKey) throws IOException {
+        final var currVersion = SharedConstants.getCurrentVersion().getWorldVersion();
+        final var nbt = storage.readTagFromDisk(dataKey, currVersion);
+        return nbt.getCompound("data");
+    }
 }

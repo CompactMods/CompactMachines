@@ -11,7 +11,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 public class RoomNetworkHandler {
 
-    private static final ArtifactVersion ROOM_TRACK_VERSION = new DefaultArtifactVersion("1.0.0");
+    private static final ArtifactVersion ROOM_TRACK_VERSION = new DefaultArtifactVersion("2.0.0");
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Constants.MOD_ID, "room_tracking"),

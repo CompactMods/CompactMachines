@@ -9,7 +9,6 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -56,21 +55,24 @@ public class BlockLootGenerator extends LootTableProvider {
                     .add(LootItem.lootTableItem(Walls.ITEM_BREAKABLE_WALL.get()))));
 
             // Compact Machines
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_TINY, Machines.MACHINE_BLOCK_ITEM_TINY);
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_SMALL, Machines.MACHINE_BLOCK_ITEM_SMALL);
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_NORMAL, Machines.MACHINE_BLOCK_ITEM_NORMAL);
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_LARGE, Machines.MACHINE_BLOCK_ITEM_LARGE);
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_GIANT, Machines.MACHINE_BLOCK_ITEM_GIANT);
-            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_MAXIMUM, Machines.MACHINE_BLOCK_ITEM_MAXIMUM);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK);
+
+            // Legacy Machines
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_TINY);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_SMALL);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_NORMAL);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_LARGE);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_GIANT);
+            registerCompactMachineBlockDrops(Machines.MACHINE_BLOCK_MAXIMUM);
         }
 
-        private void registerCompactMachineBlockDrops(RegistryObject<Block> block, RegistryObject<Item> item) {
+        private void registerCompactMachineBlockDrops(RegistryObject<Block> block) {
             LootPool.Builder builder = LootPool.lootPool()
                     .name(block.getId().toString())
                     .setRolls(ConstantValue.exactly(1))
                     .when(ExplosionCondition.survivesExplosion())
                     .apply(CopyRoomBindingFunction.binding())
-                    .add(LootItem.lootTableItem(item.get()));
+                    .add(LootItem.lootTableItem(Machines.BOUND_MACHINE_BLOCK_ITEM.get()));
 
             this.add(block.get(), LootTable.lootTable().withPool(builder));
         }
@@ -82,6 +84,7 @@ public class BlockLootGenerator extends LootTableProvider {
                     Walls.BLOCK_BREAKABLE_WALL.get(),
 
                     // Compact Machines
+                    Machines.MACHINE_BLOCK.get(),
                     Machines.MACHINE_BLOCK_TINY.get(),
                     Machines.MACHINE_BLOCK_SMALL.get(),
                     Machines.MACHINE_BLOCK_NORMAL.get(),

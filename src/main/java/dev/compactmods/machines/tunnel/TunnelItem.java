@@ -9,9 +9,10 @@ import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
 import dev.compactmods.machines.core.CompactMachinesNet;
-import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.util.PlayerUtil;
@@ -166,7 +167,13 @@ public class TunnelItem extends Item {
         boolean redstone = def instanceof RedstoneTunnel;
         final var tunnelId = Tunnels.getRegistryId(def);
 
-        final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, player.chunkPosition());
+        final var provider = CompactRoomProvider.instance(compactDim);
+        final var roomInfo = provider.findByChunk(player.chunkPosition());
+        if(roomInfo.isEmpty())
+            return false;
+
+        final var roomInstance = roomInfo.get();
+        final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, roomInstance.code());
 
         var lastEnteredMachine = getMachineBindingInfo(player);
         if (lastEnteredMachine.isEmpty()) {

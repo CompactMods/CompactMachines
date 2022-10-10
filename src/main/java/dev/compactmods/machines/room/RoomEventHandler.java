@@ -3,9 +3,9 @@ package dev.compactmods.machines.room;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.data.CompactRoomData;
-import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -75,14 +75,15 @@ public class RoomEventHandler {
         if (!level.dimension().equals(CompactDimension.LEVEL_KEY)) return false;
 
         if (level instanceof ServerLevel compactDim) {
-            ChunkPos machineChunk = new ChunkPos(entity.chunkPosition().x, entity.chunkPosition().z);
+            ChunkPos playerChunk = entity.chunkPosition();
 
-            try {
-                final CompactRoomData intern = CompactRoomData.get(compactDim);
-                return intern.getBounds(machineChunk).contains(target);
-            } catch (NonexistentRoomException e) {
-                return false;
-            }
+            final var roomInfo = CompactRoomProvider.instance(compactDim);
+            return roomInfo.isRoomChunk(playerChunk)
+                ? roomInfo.findByChunk(playerChunk)
+                        .map(IRoomRegistration::innerBounds)
+                        .map(ib -> ib.contains(target))
+                        .orElse(false)
+                : false;
         }
 
         return false;

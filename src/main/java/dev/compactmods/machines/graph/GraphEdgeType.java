@@ -6,7 +6,7 @@ import dev.compactmods.machines.tunnel.graph.TunnelMachineEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelTypeEdge;
 import dev.compactmods.machines.upgrade.graph.RoomUpgradeConnection;
 
-public enum GraphEdgeType implements IGraphEdgeType {
+public enum GraphEdgeType implements IGraphEdgeType<IGraphEdge> {
     TUNNEL_TYPE(TunnelTypeEdge.CODEC),
     MACHINE_LINK(MachineRoomEdge.CODEC),
     TUNNEL_MACHINE(TunnelMachineEdge.CODEC),

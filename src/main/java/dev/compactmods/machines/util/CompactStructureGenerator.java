@@ -1,6 +1,5 @@
 package dev.compactmods.machines.util;
 
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +15,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class CompactStructureGenerator {
 
-    public static AABB getWallBounds(Vec3i size, BlockPos cubeFloor, Direction wall) {
+    public static AABB getWallBounds(Vec3i size, Vec3 roomCenter, Direction wall) {
+        BlockPos cubeFloor = new BlockPos(roomCenter).below(Math.floorDiv(size.getY(), 2));
         BlockPos start;
 
         switch (wall) {
@@ -62,7 +62,7 @@ public class CompactStructureGenerator {
      * @param cubeCenter
      * @param wallDirection
      */
-    public static void generateCompactWall(LevelAccessor world, Vec3i dimensions, BlockPos cubeCenter, Direction wallDirection) {
+    public static void generateCompactWall(LevelAccessor world, Vec3i dimensions, Vec3 cubeCenter, Direction wallDirection) {
         final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
         final var wallBounds = getWallBounds(dimensions, cubeCenter, wallDirection);
 
@@ -73,33 +73,14 @@ public class CompactStructureGenerator {
     }
 
     /**
-     * Generates a wall or platform in a given direction.
-     *
-     * @param world
-     * @param size
-     * @param cubeFloor
-     * @param wallDirection
-     */
-    @Deprecated(forRemoval = true)
-    public static void generateCompactWall(LevelAccessor world, RoomSize size, BlockPos cubeFloor, Direction wallDirection) {
-        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
-        final var wallBounds = getWallBounds(size.toVec3(), cubeFloor, wallDirection);
-
-        BlockPos.betweenClosedStream(wallBounds)
-                .filter(world::isEmptyBlock)
-                .map(BlockPos::immutable)
-                .forEach(p -> world.setBlock(p, unbreakableWall, 7));
-    }
-
-    /**
      * Generates a machine "internal" structure in a world via a machine size and a central point.
      *
      * @param world
      * @param dimensions Internal dimensions of the room.
-     * @param cubeFloorCenter
+     * @param roomCenter
      */
-    public static void generateCompactStructure(LevelAccessor world, Vec3i dimensions, BlockPos cubeFloorCenter) {
-        AABB floorBlocks = getWallBounds(dimensions, cubeFloorCenter, Direction.DOWN);
+    public static void generateRoom(LevelAccessor world, Vec3i dimensions, Vec3 roomCenter) {
+        AABB floorBlocks = getWallBounds(dimensions, roomCenter, Direction.DOWN);
         AABB machineInternal = floorBlocks
                 .move(1, 1, 1)
                 .contract(2, 0, 2)
@@ -111,7 +92,7 @@ public class CompactStructureGenerator {
         if (anyAir) {
             // Generate the walls
             for(final var dir : Direction.values())
-                generateCompactWall(world, dimensions, cubeFloorCenter, dir);
+                generateCompactWall(world, dimensions, roomCenter, dir);
 
             // Clear out the inside of the room
             BlockPos.betweenClosedStream(machineInternal)
@@ -120,32 +101,19 @@ public class CompactStructureGenerator {
         }
     }
 
-    public static BlockPos cornerFromSize(Vec3i dimensions, BlockPos cubeFloorCenter) {
-        Vec3i offset = new Vec3i(
-                -Math.floor(dimensions.getX() / 2f),
-                1,
-                -Math.floor(dimensions.getZ() / 2f)
+    public static BlockPos cornerFromSize(Vec3i dimensions, Vec3 center) {
+        Vec3 offset = new Vec3(
+                Math.floor(dimensions.getX() / 2f),
+                Math.floor(dimensions.getY() / 2f),
+                Math.floor(dimensions.getZ() / 2f)
         );
 
-        return cubeFloorCenter.offset(offset);
+        return new BlockPos(center.subtract(offset));
     }
 
-    /**
-     * Generates a machine "internal" structure in a world via a machine size and a central point.
-     *
-     * @param world
-     * @param size
-     * @param cubeFloorCenter
-     */
-    @Deprecated(forRemoval = true)
-    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos cubeFloorCenter) {
-        int s = size.getInternalSize();
-        generateCompactStructure(world, new Vec3i(s, s, s), cubeFloorCenter);
-    }
-
-    public static void fillRoomTemplate(ServerLevel level, ResourceLocation template, Vec3i dimensions, BlockPos cubeFloorCenter) {
+    public static void fillWithTemplate(ServerLevel level, ResourceLocation template, Vec3i dimensions, Vec3 center) {
         level.getStructureManager().get(template).ifPresent(tem -> {
-            BlockPos placeAt = cornerFromSize(dimensions, cubeFloorCenter);
+            BlockPos placeAt = cornerFromSize(dimensions, center);
             tem.placeInWorld(level, placeAt, placeAt, new StructurePlaceSettings(), level.random, Block.UPDATE_ALL);
         });
     }

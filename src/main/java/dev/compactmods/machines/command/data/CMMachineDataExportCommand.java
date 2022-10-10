@@ -11,14 +11,12 @@ import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.util.CsvOutput;
-import net.minecraft.world.level.ChunkPos;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
-// TODO
 public class CMMachineDataExportCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> makeMachineCsv() {
@@ -68,22 +66,20 @@ public class CMMachineDataExportCommand {
                 .addColumn("machine_x")
                 .addColumn("machine_y")
                 .addColumn("machine_z")
-                .addColumn("room_x")
-                .addColumn("room_z")
+                .addColumn("room")
                 .build(writer);
     }
 
-    private static void writeMachine(IDimensionalBlockPosition machine, ChunkPos room, CsvOutput builder) {
+    private static void writeMachine(IDimensionalBlockPosition machine, String room, CsvOutput builder) {
         try {
             var placedAt = machine.getBlockPosition();
 
             builder.writeRow(
-                    machine.dimensionKey().location().toString(),
+                    machine.dimension().location().toString(),
                     placedAt.getX(),
                     placedAt.getY(),
                     placedAt.getZ(),
-                    room.x,
-                    room.z
+                    room
             );
         } catch (IOException e) {
             CompactMachines.LOGGER.error(e);

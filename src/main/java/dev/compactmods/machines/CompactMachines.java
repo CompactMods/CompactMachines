@@ -1,5 +1,7 @@
 package dev.compactmods.machines;
 
+import dev.compactmods.machines.api.CompactMachinesAddon;
+import dev.compactmods.machines.api.ICompactMachinesAddon;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.config.CommonConfig;
@@ -19,16 +21,22 @@ import dev.compactmods.machines.wall.Walls;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.objectweb.asm.Type;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mod(Constants.MOD_ID)
 public class CompactMachines {
@@ -40,6 +48,7 @@ public class CompactMachines {
 
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Marker CONN_MARKER = MarkerManager.getMarker("cm_connections");
+    public static final Marker ADDON_LIFECYCLE = MarkerManager.getMarker("addons");
 
     public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(Constants.MOD_ID) {
         @Override
@@ -48,6 +57,8 @@ public class CompactMachines {
             return new ItemStack(Machines.MACHINE_BLOCK_ITEM_NORMAL.get());
         }
     };
+
+    private static Set<ICompactMachinesAddon> loadedAddons;
 
     public CompactMachines() {
         Registries.setup();
@@ -79,6 +90,31 @@ public class CompactMachines {
         Registries.EDGE_TYPES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
+
+
+        CompactMachines.loadedAddons = ModList.get()
+                .getAllScanData()
+                .stream()
+                .flatMap(scans -> scans.getAnnotations()
+                        .stream()
+                        .filter(ad -> ad.annotationType().equals(Type.getType(CompactMachinesAddon.class)))
+                        .map(ModFileScanData.AnnotationData::memberName)
+                        .map(cmAddonClass -> {
+                            try {
+                                final var cl = Class.forName(cmAddonClass);
+                                final var cla = cl.asSubclass(ICompactMachinesAddon.class);
+                                return cla.getDeclaredConstructor().newInstance();
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull))
+                .collect(Collectors.toSet());
+
+        CompactMachines.loadedAddons.forEach(addon -> {
+            LOGGER.debug(ADDON_LIFECYCLE, "Sending registration hook to addon: {}", addon.getClass().getName());
+            addon.afterRegistration(bus);
+        });
     }
 
     private static void preparePackages() {
@@ -95,5 +131,9 @@ public class CompactMachines {
         Graph.prepare();
         Commands.prepare();
         LootFunctions.prepare();
+    }
+
+    public static Set<ICompactMachinesAddon> getAddons() {
+        return loadedAddons;
     }
 }

@@ -10,6 +10,7 @@ import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
 import dev.compactmods.machines.client.render.SuperRenderTypeBuffer;
 import dev.compactmods.machines.client.util.TransformingVertexBuilder;
+import dev.compactmods.machines.compat.curios.CuriosCompat;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.fml.ModList;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
@@ -64,7 +66,11 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     }
 
     private boolean hasPsdItem() {
-        return inv.contains(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()));
+        final var inInv = inv.contains(new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()));
+        if (ModList.get().isLoaded("curios") && CuriosCompat.hasPsdCurio(inv.player))
+            return true;
+
+        return inInv;
     }
 
     @Override
@@ -95,9 +101,9 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         Screen.drawCenteredString(pose, font, p, 0, this.titleLabelY, 0xFFFFFFFF);
 
         var room = menu.getRoom();
-        var rt =  Component.literal("(%s, %s)".formatted(room.x, room.z));
-        pose.scale(0.8f, 0.8f, 0.8f);
-        Screen.drawCenteredString(pose, font, rt, 0,this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
+        var rt = Component.literal(room);
+        pose.scale(0.7f, 0.7f, 0.7f);
+        Screen.drawCenteredString(pose, font, rt, 0, this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
         pose.popPose();
     }
 
@@ -121,93 +127,98 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
         var cam = minecraft.cameraEntity;
 
-
-        try {
+        if (this.menu.loadingBlocks) {
             pose.pushPose();
-            pose.translate(0, 0, -800);
+            Screen.drawCenteredString(pose, font, "Loading preview...", 0, this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
+            pose.popPose();
+        } else {
+            try {
+                pose.pushPose();
+                pose.translate(0, 0, -800);
 
-            final var blockRenderer = Minecraft.getInstance().getBlockRenderer();
-            final var beRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher();
+                final var blockRenderer = Minecraft.getInstance().getBlockRenderer();
+                final var beRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher();
 
-            var struct = menu.getBlocks();
+                var struct = menu.getBlocks();
 
-            pose.pushPose();
-            {
-                // pose.translate(s, s, s);
+                pose.pushPose();
+                {
+                    // pose.translate(s, s, s);
 
-                pose.translate(getGuiLeft() + (getXSize() / 2d), getGuiTop() + 135, 150);
+                    pose.translate(getGuiLeft() + (getXSize() / 2d), getGuiTop() + 135, 150);
 
-                float zoom = switch (struct.getSize().getX()) {
-                    case 3 -> 23.5f;
-                    case 5 -> 19.5f;
-                    case 7 -> 15.5f;
-                    case 9 -> 14.5f;
-                    case 11 -> 11.5f;
-                    case 13 -> 10.5f;
-                    default -> 10.5f;
-                };
+                    float zoom = switch (struct.getSize().getX()) {
+                        case 3 -> 23.5f;
+                        case 5 -> 19.5f;
+                        case 7 -> 15.5f;
+                        case 9 -> 14.5f;
+                        case 11 -> 11.5f;
+                        case 13 -> 10.5f;
+                        default -> 10.5f;
+                    };
 
-                pose.scale(zoom, -zoom, zoom);
+                    pose.scale(zoom, -zoom, zoom);
 
-                pose.mulPose(Vector3f.XP.rotationDegrees((float) rotateY));
-                pose.mulPose(Vector3f.YP.rotationDegrees((float) rotateX));
+                    pose.mulPose(Vector3f.XP.rotationDegrees((float) rotateY));
+                    pose.mulPose(Vector3f.YP.rotationDegrees((float) rotateX));
 
-                final var tSize = struct.getSize();
-                final float s = tSize.getX() / 2f;
-                pose.translate(-s, -s + 1, -s);
+                    final var tSize = struct.getSize();
+                    final float s = tSize.getX() / 2f;
+                    pose.translate(-s, -s + 1, -s);
 
-                final var transformer = new TransformingVertexBuilder(buffer, RenderTypes.WALLS);
+                    final var transformer = new TransformingVertexBuilder(buffer, RenderTypes.WALLS);
 
-                var bb = struct.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO);
+                    var bb = struct.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO);
 
-                var as = new ArmorStand(renderer, 0, 0, 0);
-                minecraft.cameraEntity = as;
+                    var as = new ArmorStand(renderer, 0, 0, 0);
+                    minecraft.cameraEntity = as;
 
-                BlockPos.betweenClosedStream(bb).forEach(pos -> {
-                    pose.pushPose();
-                    {
-                        pose.translate(pos.getX(), pos.getY(), pos.getZ());
+                    BlockPos.betweenClosedStream(bb).forEach(pos -> {
+                        pose.pushPose();
+                        {
+                            pose.translate(pos.getX(), pos.getY(), pos.getZ());
 
-                        final var state = renderer.getBlockState(pos);
-                        transformer.setOverlay(OverlayTexture.RED_OVERLAY_V);
+                            final var state = renderer.getBlockState(pos);
+                            transformer.setOverlay(OverlayTexture.RED_OVERLAY_V);
 
-                        ModelData modelData = ModelData.EMPTY;
-                        if (state.hasBlockEntity()) {
-                            final var be = renderer.getBlockEntity(pos);
-                            if (be != null) {
-                                modelData = be.getModelData();
-                                final var ber = beRenderer.getRenderer(be);
-                                if (ber != null) {
-                                    ber.render(be, 1f, pose, buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                            ModelData modelData = ModelData.EMPTY;
+                            if (state.hasBlockEntity()) {
+                                final var be = renderer.getBlockEntity(pos);
+                                if (be != null) {
+                                    modelData = be.getModelData();
+                                    final var ber = beRenderer.getRenderer(be);
+                                    if (ber != null) {
+                                        ber.render(be, 1f, pose, buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                                    }
                                 }
                             }
-                        }
 
-                        try {
-                            pose.pushPose();
+                            try {
+                                pose.pushPose();
 
-                            for(var type : blockRenderer.getBlockModel(state).getRenderTypes(state, minecraft.level.random, modelData)) {
-                                blockRenderer.renderBatched(state, pos, renderer, pose, buffer.getBuffer(type), true, renderer.random, modelData, type);
+                                for (var type : blockRenderer.getBlockModel(state).getRenderTypes(state, minecraft.level.random, modelData)) {
+                                    blockRenderer.renderBatched(state, pos, renderer, pose, buffer.getBuffer(type), true, renderer.random, modelData, type);
+                                }
+
+                                pose.popPose();
+                            } catch (Exception e) {
                             }
-
-                            pose.popPose();
-                        } catch (Exception e) {
                         }
-                    }
-                    pose.popPose();
-                });
-            }
-            pose.popPose();
-            pose.popPose();
-        } catch (Exception e) {
-            while (lastEntryBeforeTry != pose.last())
+                        pose.popPose();
+                    });
+                }
                 pose.popPose();
+                pose.popPose();
+            } catch (Exception e) {
+                while (lastEntryBeforeTry != pose.last())
+                    pose.popPose();
+            }
+
+            minecraft.cameraEntity = cam;
+
+            buffer.draw();
+            RenderSystem.restoreProjectionMatrix();
         }
-
-        minecraft.cameraEntity = cam;
-
-        buffer.draw();
-        RenderSystem.restoreProjectionMatrix();
     }
 
     @Override

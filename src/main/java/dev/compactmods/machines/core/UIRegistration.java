@@ -12,7 +12,7 @@ public class UIRegistration {
             ((windowId, inv, data) -> {
                 data.readBlockPos();
                 final var mach = data.readWithCodec(LevelBlockPosition.CODEC);
-                final var room = data.readChunkPos();
+                final var room = data.readUtf();
                 final boolean hasName = data.readBoolean();
                 final var roomName = hasName ? data.readUtf() : "Room Preview";
 

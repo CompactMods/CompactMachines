@@ -1,8 +1,10 @@
 package dev.compactmods.machines.core;
 
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
@@ -12,6 +14,7 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
@@ -22,18 +25,20 @@ import java.util.stream.Collectors;
 public class ServerEventHandler {
 
     @SubscribeEvent
-    public static void onWorldLoaded(final LevelEvent.Load evt) {
-        if(evt.getLevel() instanceof ServerLevel sl && sl.dimension().equals(CompactDimension.LEVEL_KEY))
-        {
-            final var serv = sl.getServer();
-            final var owBorder = serv.overworld().getWorldBorder();
-            final var cwBorder = sl.getWorldBorder();
+    public static void onServerStarted(final ServerStartedEvent started) {
+        CompactMachines.getAddons().forEach(addon -> {
+            addon.acceptRoomSpawnLookup(CompactRoomProvider::instance);
+            addon.acceptRoomOwnerLookup(CompactRoomProvider::instance);
+        });
+    }
 
-            final var levelUpgrades = RoomUpgradeManager.get(sl);
-            levelUpgrades.implementing(ILevelLoadedUpgradeListener.class).forEach(inst -> {
-                final var upg = inst.upgrade();
-                upg.onLevelLoaded(sl, inst.room());
-            });
+    @SubscribeEvent
+    public static void onWorldLoaded(final LevelEvent.Load evt) {
+        if(evt.getLevel() instanceof ServerLevel compactDim && compactDim.dimension().equals(CompactDimension.LEVEL_KEY))
+        {
+            final var serv = compactDim.getServer();
+            final var owBorder = serv.overworld().getWorldBorder();
+            final var cwBorder = compactDim.getWorldBorder();
 
             // Filter border listeners down to the compact world, then remove them from the OW listener list
             final var listeners = owBorder.listeners.stream()
@@ -50,6 +55,16 @@ public class ServerEventHandler {
             cwBorder.setSize(WorldBorder.MAX_SIZE);
             PacketDistributor.DIMENSION.with(() -> CompactDimension.LEVEL_KEY)
                     .send(new ClientboundSetBorderSizePacket(cwBorder));
+
+
+            // Room upgrade initialization
+            final var levelUpgrades = RoomUpgradeManager.get(compactDim);
+            final var roomInfo = CompactRoomProvider.instance(compactDim);
+
+            levelUpgrades.implementing(ILevelLoadedUpgradeListener.class).forEach(inst -> {
+                final var upg = inst.upgrade();
+                roomInfo.forRoom(inst.room()).ifPresent(ri -> upg.onLevelLoaded(compactDim, ri));
+            });
 
         }
     }

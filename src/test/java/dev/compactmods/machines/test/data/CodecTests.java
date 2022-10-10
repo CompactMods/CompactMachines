@@ -1,7 +1,7 @@
 package dev.compactmods.machines.test.data;
 
 import com.mojang.serialization.DataResult;
-import dev.compactmods.machines.api.codec.CodecExtensions;
+import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.test.TestBatches;

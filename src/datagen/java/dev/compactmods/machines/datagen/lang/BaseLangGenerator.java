@@ -7,7 +7,7 @@ import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.datagen.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.CompactMachineBlock;
+import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
@@ -41,8 +41,9 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     @Override
     protected void addTranslations() {
         // Machine Block names
+        final var machineTranslation = getMachineTranslation();
         for(var size : RoomSize.values()) {
-            add(CompactMachineBlock.getBySize(size), String.format("%s (%s)", getMachineTranslation(), getSizeTranslation(size)));
+            add(LegacySizedCompactMachineBlock.getBySize(size), "%s (%s)".formatted(machineTranslation, getSizeTranslation(size)));
         }
 
         // Direction Names

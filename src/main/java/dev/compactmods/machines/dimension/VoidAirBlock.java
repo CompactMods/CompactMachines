@@ -32,6 +32,7 @@ public class VoidAirBlock extends AirBlock {
         if (ServerConfig.isAllowedOutsideOfMachine()) return;
         if (pLevel.isClientSide) return;
 
+        // TODO: Configurable behavior
         if (pEntity instanceof ServerPlayer player) {
             if (player.isCreative()) return;
 

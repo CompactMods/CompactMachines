@@ -25,7 +25,7 @@ public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge 
     }
 
     @Override
-    public @NotNull IGraphEdgeType getEdgeType() {
+    public @NotNull IGraphEdgeType<IGraphEdge> getEdgeType() {
         return GraphEdgeType.ROOM_UPGRADE;
     }
 }

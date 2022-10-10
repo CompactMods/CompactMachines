@@ -12,4 +12,5 @@ public final class TestBatches {
     public static final String MATH = "math";
     public static final String MACHINE_DATA = "machine_data";
     public static final String DIMENSION = "dimension";
+    public static final String MIGRATION = "migration";
 }

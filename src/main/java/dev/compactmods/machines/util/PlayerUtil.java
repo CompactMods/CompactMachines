@@ -5,25 +5,25 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
-import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.location.SimpleTeleporter;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.room.RoomCapabilities;
-import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -32,8 +32,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 public abstract class PlayerUtil {
+    public static Optional<GameProfile> getProfileByUUID(MinecraftServer server, UUID uuid) {
+        final var player = server.getPlayerList().getPlayer(uuid);
+        if (player == null) {
+            var profile = new GameProfile(uuid, "Unknown");
+            var p2 = server.getSessionService().fillProfileProperties(profile, false);
+            return Optional.ofNullable(p2);
+        }
+
+        GameProfile profile = player.getGameProfile();
+        return Optional.of(profile);
+    }
+
     public static Optional<GameProfile> getProfileByUUID(LevelAccessor world, UUID uuid) {
-        Player player = world.getPlayerByUUID(uuid);
+        final var player = world.getPlayerByUUID(uuid);
         if (player == null)
             return Optional.empty();
 
@@ -41,69 +53,53 @@ public abstract class PlayerUtil {
         return Optional.of(profile);
     }
 
-    public static void teleportPlayerIntoMachine(Level machineLevel, Player player, BlockPos machinePos) throws MissingDimensionException {
+    public static void teleportPlayerIntoMachine(Level machineLevel, Player player, LevelBlockPosition machinePos, IRoomRegistration room) throws MissingDimensionException {
         MinecraftServer serv = machineLevel.getServer();
 
-        ServerLevel compactWorld = serv.getLevel(CompactDimension.LEVEL_KEY);
-        if (compactWorld == null) {
-            throw new MissingDimensionException("Compact dimension not found; player attempted to enter machine.");
+        // Recursion check. Player tried to enter the room they're already in.
+        if (player.level.dimension().equals(CompactDimension.LEVEL_KEY)) {
+            final boolean recursion = player.getCapability(RoomCapabilities.ROOM_HISTORY).map(hist -> {
+                if (player instanceof ServerPlayer sp && room.chunks().anyMatch(chunk -> sp.chunkPosition().equals(chunk))) {
+                    AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
+                    return true;
+                }
+
+                return false;
+            }).orElse(false);
+
+            if (recursion) return;
         }
 
-        if (machineLevel.getBlockEntity(machinePos) instanceof CompactMachineBlockEntity tile) {
-            final var targetRoom = tile.getConnectedRoom();
-            boolean grantAdvancement = targetRoom.isEmpty();
+        try {
+            final var entry = PreciseDimensionalPosition.fromPlayer(player);
 
-            targetRoom.ifPresent(room -> {
-                if (player.level.dimension().equals(CompactDimension.LEVEL_KEY) && player.chunkPosition().equals(room)) {
-                    if (player instanceof ServerPlayer sp) {
-                        AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
-                    }
+            teleportPlayerIntoRoom(serv, player, room);
 
-                    return;
-                }
-
-                try {
-                    final var entry = PreciseDimensionalPosition.fromPlayer(player);
-
-                    teleportPlayerIntoRoom(serv, player, room, grantAdvancement);
-
-                    // Mark the player as inside the machine, set external spawn, and yeet
-                    player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
-                        hist.addHistory(new PlayerRoomHistoryItem(entry, tile.getLevelPosition()));
-                    });
-                } catch (MissingDimensionException | NonexistentRoomException e) {
-                    CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
-                }
+            // Mark the player as inside the machine, set external spawn, and yeet
+            player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
+                hist.addHistory(new PlayerRoomHistoryItem(entry, machinePos));
             });
+        } catch (MissingDimensionException | NonexistentRoomException e) {
+            CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
         }
     }
 
-    public static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, ChunkPos room, boolean grantAdvancement) throws MissingDimensionException, NonexistentRoomException {
-        final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
-        final var spawn = Rooms.getSpawn(serv, room);
-        final var roomSize = Rooms.sizeOf(serv, room);
-
-        if (spawn == null) {
-            CompactMachines.LOGGER.error("Room %s could not load spawn info.".formatted(room));
-            return;
-        }
+    public static void teleportPlayerIntoRoom(MinecraftServer serv, Player player, IRoomRegistration room)
+            throws MissingDimensionException, NonexistentRoomException {
+        final var compactDim = CompactDimension.forServer(serv);
+        final var spawnLookup = CompactRoomProvider.instance(compactDim);
 
         serv.submitAsync(() -> {
-            Vec3 sp = spawn.getExactPosition();
-            Vec3 sr = spawn.getRotation().orElse(new Vec3(player.xRotO, player.yRotO, 0));
 
             if (player instanceof ServerPlayer servPlayer) {
-                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(sp));
-
-                if (grantAdvancement)
-                    AdvancementTriggers.getTriggerForMachineClaim(roomSize).trigger(servPlayer);
+                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(room.spawnPosition(spawnLookup), room.spawnRotation(spawnLookup)));
             }
         });
     }
 
-    public static void teleportPlayerOutOfMachine(ServerLevel world, @Nonnull ServerPlayer serverPlayer) {
+    public static void teleportPlayerOutOfMachine(ServerLevel compactDim, @Nonnull ServerPlayer serverPlayer) {
 
-        MinecraftServer serv = world.getServer();
+        MinecraftServer serv = compactDim.getServer();
 
         final LazyOptional<IRoomHistory> history = serverPlayer.getCapability(RoomCapabilities.ROOM_HISTORY);
 
@@ -117,14 +113,10 @@ public abstract class PlayerUtil {
                 final IRoomHistoryItem prevArea = hist.pop();
 
                 var spawnPoint = prevArea.getEntryLocation();
+                final var enteredMachine = prevArea.getMachine().getBlockPosition();
 
                 final var level = spawnPoint.level(serv);
-
-                Vec3 worldPos, entryRot;
-                worldPos = spawnPoint.getExactPosition();
-                entryRot = spawnPoint.getRotation().orElse(Vec3.ZERO);
-
-                serverPlayer.changeDimension(level, SimpleTeleporter.to(worldPos));
+                serverPlayer.changeDimension(level, SimpleTeleporter.lookingAt(spawnPoint.position(), enteredMachine));
             } else {
                 howDidYouGetThere(serverPlayer);
 
@@ -151,5 +143,9 @@ public abstract class PlayerUtil {
             worldPos = Vec3.atCenterOf(player.getRespawnPosition());
 
         player.changeDimension(level, SimpleTeleporter.to(worldPos));
+    }
+
+    public static Vec2 getLookDirection(Player player) {
+        return new Vec2(player.xRotO, player.yRotO);
     }
 }

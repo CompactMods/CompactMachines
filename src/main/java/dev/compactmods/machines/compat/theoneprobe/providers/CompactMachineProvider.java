@@ -1,21 +1,28 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
-import com.mojang.authlib.GameProfile;
+import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
+import dev.compactmods.machines.compat.theoneprobe.elements.PlayerFaceElement;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.CompactMachineBlock;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
-import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.TunnelItem;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
-import mcjty.theoneprobe.api.*;
+import dev.compactmods.machines.util.PlayerUtil;
+import mcjty.theoneprobe.api.ElementAlignment;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.IProbeInfoProvider;
+import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.apiimpl.styles.ItemStyle;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -32,7 +39,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo info, Player player, Level level, BlockState blockState, IProbeHitData hitData) {
-        if (!(blockState.getBlock() instanceof CompactMachineBlock mach))
+        if (!blockState.is(CMTags.MACHINE_BLOCK))
             return;
 
         final var server = level.getServer();
@@ -40,13 +47,31 @@ public class CompactMachineProvider implements IProbeInfoProvider {
             return;
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
+        if (compactDim == null)
+            return;
 
-        final var te = level.getBlockEntity(hitData.getPos());
-
-        if (te instanceof CompactMachineBlockEntity machine) {
-            machine.getConnectedRoom().ifPresentOrElse(room -> {
-                final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, room);
+        if (level.getBlockEntity(hitData.getPos()) instanceof CompactMachineBlockEntity machine) {
+            machine.roomInfo().ifPresentOrElse(room -> {
+                final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, room.code());
                 info.text(boundTo);
+
+                final var roomGraph = CompactRoomProvider.instance(compactDim);
+                final var owner = room.owner(roomGraph);
+                if (owner != null) {
+                    PlayerUtil.getProfileByUUID(server, owner).ifPresent(p -> {
+                        MutableComponent ownerText = TranslationUtil
+                                .tooltip(Tooltips.Machines.OWNER, p.getName())
+                                .withStyle(ChatFormatting.GRAY);
+
+                        info.horizontal(new LayoutStyle()
+                                        .alignment(ElementAlignment.ALIGN_CENTER)
+                                        .padding(0).spacing(0))
+                                .element(new PlayerFaceElement(p))
+                                .text(ownerText);
+                    });
+                }
+
+                addTunnelInfo(probeMode, info, hitData, compactDim, machine, room);
             }, () -> {
                 MutableComponent newMachine = TranslationUtil
                         .message(new ResourceLocation(Constants.MOD_ID, "new_machine"))
@@ -54,65 +79,44 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
                 info.text(newMachine);
             });
+        }
+    }
 
-            machine.getOwnerUUID().ifPresent(ownerID -> {
-                // Owner Name
-                Player owner = level.getPlayerByUUID(ownerID);
-                if (owner != null) {
-                    GameProfile ownerProfile = owner.getGameProfile();
-                    MutableComponent ownerText = TranslationUtil
-                            .tooltip(Tooltips.Machines.OWNER, ownerProfile.getName())
-                            .withStyle(ChatFormatting.GRAY);
+    private static void addTunnelInfo(ProbeMode probeMode, IProbeInfo info, IProbeHitData hitData, ServerLevel compactDim, CompactMachineBlockEntity machine, IRoomRegistration room) {
+        if (compactDim == null)
+            return;
 
-                    info.text(ownerText);
-                }
-            });
+        final var graph = TunnelConnectionGraph.forRoom(compactDim, room.code());
 
-            machine.getConnectedRoom().ifPresent(room -> {
-                if (compactDim == null)
-                    return;
+        final var applied = graph.getTypesForSide(machine.getLevelPosition(), hitData.getSideHit())
+                .collect(Collectors.toSet());
 
-                final var roomData = CompactRoomData.get(compactDim);
-                final var graph = TunnelConnectionGraph.forRoom(compactDim, room);
+        switch (probeMode) {
+            case NORMAL:
+                final var group = info.horizontal(new LayoutStyle()
+                        .alignment(ElementAlignment.ALIGN_TOPLEFT)
+                        .padding(0)
+                        .spacing(0));
 
-                final var applied = graph.getTypesForSide(machine.getLevelPosition(), hitData.getSideHit())
-                        .collect(Collectors.toSet());
-
-                switch (probeMode) {
-                    case NORMAL:
-                        final var group = info.horizontal(new LayoutStyle()
-                                .alignment(ElementAlignment.ALIGN_TOPLEFT)
-                                .padding(0)
-                                .spacing(0));
-
-                        applied.forEach(tn -> {
-                            ItemStack item = TunnelItem.createStack(tn);
-                            group.item(item, new ItemStyle().bounds(8, 8));
-                        });
-                        break;
-
-                    case EXTENDED:
-                        final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
-                        applied.forEach(tn -> {
-                            final var tg = tgg.horizontal(new LayoutStyle()
-                                    .alignment(ElementAlignment.ALIGN_CENTER)
-                                    .hPadding(2).vPadding(2)
-                                    .spacing(0));
-
-                            ItemStack item = TunnelItem.createStack(tn);
-                            tg.item(item, new ItemStyle().bounds(8, 8));
-                            tg.itemLabel(item);
-                        });
-                        break;
-                }
-
-                final var rd = roomData.forRoom(room);
-                rd.ifPresent(r -> {
-//                        final var el = new RoomPreviewElement(new RoomPreview(room, r.getSize()));
-//                        el.loadBlocks(server, r);
-//                        info.element(el);
+                applied.forEach(tn -> {
+                    ItemStack item = TunnelItem.createStack(tn);
+                    group.item(item, new ItemStyle().bounds(8, 8));
                 });
-            });
+                break;
+
+            case EXTENDED:
+                final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
+                applied.forEach(tn -> {
+                    final var tg = tgg.horizontal(new LayoutStyle()
+                            .alignment(ElementAlignment.ALIGN_CENTER)
+                            .hPadding(2).vPadding(2)
+                            .spacing(0));
+
+                    ItemStack item = TunnelItem.createStack(tn);
+                    tg.item(item, new ItemStyle().bounds(8, 8));
+                    tg.itemLabel(item);
+                });
+                break;
         }
     }
 }

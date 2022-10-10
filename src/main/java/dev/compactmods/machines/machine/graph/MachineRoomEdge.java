@@ -26,7 +26,7 @@ public record MachineRoomEdge() implements IGraphEdge {
     }
 
     @Override
-    public @NotNull IGraphEdgeType getEdgeType() {
+    public @NotNull IGraphEdgeType<IGraphEdge> getEdgeType() {
         return GraphEdgeType.MACHINE_LINK;
     }
 }

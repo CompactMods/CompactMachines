@@ -35,7 +35,7 @@ public final class TunnelTypeEdge implements IGraphEdge {
     }
 
     @Override
-    public @NotNull IGraphEdgeType getEdgeType() {
+    public @NotNull IGraphEdgeType<IGraphEdge> getEdgeType() {
         return GraphEdgeType.TUNNEL_TYPE;
     }
 }

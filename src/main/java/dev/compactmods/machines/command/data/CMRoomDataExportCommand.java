@@ -5,13 +5,15 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.IRoomOwnerLookup;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
+import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.CsvOutput;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nonnull;
@@ -29,23 +31,19 @@ public class CMRoomDataExportCommand {
 
     private static int execAll(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
-        var serv = src.getServer();
-        var compact = serv.getLevel(CompactDimension.LEVEL_KEY);
-
-        final CompactRoomData rooms = CompactRoomData.get(compact);
-
-        var outdir = src.getServer().getFile(Constants.MOD_ID);
-        var out = outdir.toPath()
-                .resolve("rooms.csv")
-                .toAbsolutePath();
-
         try {
+            var roomProvider = CompactRoomProvider.instance(src.getServer());
+
+            var outdir = src.getServer().getFile(Constants.MOD_ID);
+            var out = outdir.toPath()
+                    .resolve("rooms.csv")
+                    .toAbsolutePath();
             Files.createDirectories(outdir.toPath());
 
             var writer = Files.newBufferedWriter(out);
             CsvOutput builder = makeCsv(writer);
 
-            rooms.streamRooms().forEach(room -> writeRoom(room, builder));
+            roomProvider.allRooms().forEach(room -> writeRoom(builder, room, roomProvider, roomProvider));
 
             writer.close();
         } catch (IOException e) {
@@ -60,25 +58,26 @@ public class CMRoomDataExportCommand {
     @Nonnull
     private static CsvOutput makeCsv(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
-                .addColumn("room_x")
-                .addColumn("room_z")
-                .addColumn("size")
+                .addColumn("room")
                 .addColumn("owner_uuid")
+                .addColumn("size_x")
+                .addColumn("size_y")
+                .addColumn("size_z")
                 .addColumn("spawn_x")
                 .addColumn("spawn_y")
                 .addColumn("spawn_z")
                 .build(writer);
     }
 
-    private static void writeRoom(CompactRoomData.RoomData room, CsvOutput builder) {
+    private static void writeRoom(CsvOutput builder, IRoomRegistration room, IRoomOwnerLookup owners, IRoomSpawnLookup spawns) {
         try {
-            ChunkPos chunk = new ChunkPos(room.getCenter());
-            final Vec3 spawn = room.getSpawn();
+            final Vec3i roomDims = room.dimensions();
+            final Vec3 spawn = room.spawnPosition(spawns);
 
             builder.writeRow(
-                    chunk.x, chunk.z,
-                    room.getSize().getSerializedName(),
-                    room.getOwner().toString(),
+                    room.code(),
+                    room.owner(owners),
+                    roomDims.getX(), roomDims.getY(), roomDims.getZ(),
                     spawn.x, spawn.y, spawn.z
             );
         } catch (IOException e) {

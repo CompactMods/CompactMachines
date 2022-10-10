@@ -3,18 +3,23 @@ package dev.compactmods.machines.tunnel.graph;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
+import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
-import dev.compactmods.machines.tunnel.Tunnels;
-import dev.compactmods.machines.graph.*;
+import dev.compactmods.machines.codec.NbtListCollector;
+import dev.compactmods.machines.graph.Graph;
+import dev.compactmods.machines.graph.IGraphEdge;
+import dev.compactmods.machines.graph.IGraphEdgeType;
+import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.graph.IGraphNodeType;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.MachineRoomEdge;
+import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,7 +34,13 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +53,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     /**
      * The full data graph. Contains tunnel nodes, machine ids, and tunnel type information.
      */
-    private final MutableValueGraph<IGraphNode, IGraphEdge> graph;
+    private final MutableValueGraph<IGraphNode<?>, IGraphEdge> graph;
 
     /**
      * Quick access to tunnel information for specific locations.
@@ -74,7 +85,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         this.deserializeNBT(nbt);
     }
 
-    public static TunnelConnectionGraph forRoom(ServerLevel compactDim, ChunkPos room) {
+    public static TunnelConnectionGraph forRoom(ServerLevel compactDim, String room) {
         final var key = getDataFilename(room);
         return compactDim.getDataStorage().computeIfAbsent(
                 TunnelConnectionGraph::new,
@@ -91,8 +102,13 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         return tag;
     }
 
-    public static String getDataFilename(ChunkPos room) {
-        return "tunnels_" + room.x + "_" + room.z;
+    @Deprecated(forRemoval = true, since = "5.2.0")
+    public static String getOldTunnelFilename(ChunkPos oldRoom) {
+        return "tunnels_%s_%s".formatted(oldRoom.x, oldRoom.z);
+    }
+
+    public static String getDataFilename(String room) {
+        return "tunnels_" + room;
     }
 
     /**
@@ -168,7 +184,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         var machineRegistered = machines.containsKey(machine);
         CompactMachineNode node;
         if (!machineRegistered) {
-            node = new CompactMachineNode(machine.dimensionKey(), machine.getBlockPosition());
+            node = new CompactMachineNode(machine.dimension(), machine.getBlockPosition());
             machines.put(machine, node);
             graph.addNode(node);
             setDirty();
@@ -224,17 +240,6 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Direction> getTunnelSide(TunnelNode node) {
-        return graph.adjacentNodes(node).stream()
-                .filter(CompactMachineNode.class::isInstance)
-                .map(mn -> graph.edgeValue(node, mn))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(TunnelMachineEdge.class::cast)
-                .map(TunnelMachineEdge::side)
-                .findFirst();
-    }
-
     public Optional<Direction> getTunnelSide(BlockPos pos) {
         if (!tunnels.containsKey(pos))
             return Optional.empty();
@@ -265,7 +270,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         var side = getTunnelSide(tunnel).orElseThrow();
         var type = typeNode.id();
 
-        return Optional.of(new TunnelMachineInfo(tunnel, type, new LevelBlockPosition(mach), side));
+        return Optional.of(new TunnelMachineInfo(tunnel, type, mach, side));
     }
 
     public Stream<TunnelMachineInfo> tunnels() {
@@ -275,7 +280,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                 .map(Optional::get);
     }
 
-    public Stream<IGraphNode> nodes() {
+    public Stream<IGraphNode<?>> nodes() {
         return graph.nodes().stream();
     }
 
@@ -288,10 +293,14 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         HashMap<IGraphNode, UUID> nodeIds = new HashMap<>();
 
         final var nodeReg = Graph.NODE_TYPE_REG.get();
-        final var nodeRegCodec = nodeReg.getCodec()
+        final Codec<IGraphNode> nodeRegCodec = nodeReg.getCodec()
                 .dispatchStable(IGraphNode::getType, IGraphNodeType::codec);
 
-        var nodeList = nodes().map(node -> {
+        final Codec<IGraphEdge> edgeRegCodec = Graph.EDGE_TYPE_REG.get()
+                .getCodec()
+                .dispatchStable(IGraphEdge::getEdgeType, IGraphEdgeType::codec);
+
+        final var nodeList = nodes().map(node -> {
             CompoundTag nodeInfo = new CompoundTag();
 
             var encoded = nodeRegCodec.encodeStart(NbtOps.INSTANCE, node);
@@ -312,9 +321,8 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
             //noinspection OptionalGetWithoutIsPresent
             var realEdge = graph.edgeValue(edge).get();
-            var codec = realEdge.getEdgeType().codec();
 
-            var encoded = codec.encodeStart(NbtOps.INSTANCE, realEdge);
+            var encoded = edgeRegCodec.encodeStart(NbtOps.INSTANCE, realEdge);
             var edgeEnc = encoded.getOrThrow(false, CompactMachines.LOGGER::error);
 
             edgeInfo.putUUID("from", nodeIds.get(edge.nodeU()));
@@ -416,6 +424,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
     /**
      * Fetches the locations of all redstone-enabled tunnels for a specific wallSide.
+     *
      * @param machine
      * @param facing
      * @return
@@ -488,7 +497,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             return Stream.empty();
 
         return getTunnelNodesByType(type)
-                .map(this::getTunnelSide)
+                .map(node -> node.getTunnelSide(this))
                 .filter(Optional::isPresent)
                 .map(Optional::get);
     }
@@ -639,5 +648,9 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         final var newMachineNode = getOrCreateMachineNode(newMachine);
         graph.putEdgeValue(tunnelNode, newMachineNode, new TunnelMachineEdge(side));
         setDirty();
+    }
+
+    public MutableValueGraph<IGraphNode<?>, IGraphEdge> getGraph() {
+        return graph;
     }
 }

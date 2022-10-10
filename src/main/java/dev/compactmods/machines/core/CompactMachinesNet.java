@@ -16,7 +16,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 public class CompactMachinesNet {
     private static final ArtifactVersion PROTOCOL_VERSION;
 
-
     static {
         if(FMLEnvironment.production) {
             PROTOCOL_VERSION = new DefaultArtifactVersion(ModList.get().getModFileById(Constants.MOD_ID).versionString());

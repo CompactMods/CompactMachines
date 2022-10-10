@@ -4,16 +4,16 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
-import java.util.HashMap;
+import java.util.stream.LongStream;
 
 public class CMSummarySubcommand {
     public static ArgumentBuilder<CommandSourceStack, ?> make() {
@@ -25,31 +25,30 @@ public class CMSummarySubcommand {
         var src = ctx.getSource();
         var serv = src.getServer();
 
-        var compactLevel = serv.getLevel(CompactDimension.LEVEL_KEY);
-        if (compactLevel != null) {
+        try {
+            ServerLevel compactLevel = CompactDimension.forServer(serv);
             src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
-        } else {
+
+            final var ls = LongStream.builder();
+            serv.getAllLevels().forEach(sl -> {
+                final var machineData = DimensionMachineGraph.forDimension(sl);
+                long numRegistered = machineData.getMachines().count();
+
+                if(numRegistered > 0) {
+                    src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().location().toString(), numRegistered), false);
+                    ls.add(numRegistered);
+                }
+            });
+
+            long grandTotal = ls.build().sum();
+            src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);
+
+            final var roomInfo = CompactRoomProvider.instance(compactLevel);
+            src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, roomInfo.count()), false);
+        } catch (MissingDimensionException e) {
             src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
         }
 
-        HashMap<ResourceKey<Level>, Long> levelCounts = new HashMap<>();
-        serv.getAllLevels().forEach(sl -> {
-            final var machineData = DimensionMachineGraph.forDimension(sl);
-            long numRegistered = machineData.getMachines().count();
-
-            if(numRegistered > 0) {
-                src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().toString(), numRegistered), false);
-                levelCounts.put(sl.dimension(), numRegistered);
-            }
-        });
-
-        long grandTotal = levelCounts.values().stream().reduce(0L, Long::sum);
-        src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);
-
-        final var roomData = CompactRoomData.get(compactLevel);
-
-        long numRegistered = roomData.stream().count();
-        src.sendSuccess(TranslationUtil.command(CMCommands.ROOM_REG_COUNT, numRegistered), false);
 
         return 0;
     }

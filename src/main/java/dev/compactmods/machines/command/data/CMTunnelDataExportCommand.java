@@ -1,5 +1,6 @@
 package dev.compactmods.machines.command.data;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -7,17 +8,15 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.command.argument.RoomPositionArgument;
-import dev.compactmods.machines.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.CsvOutput;
-import net.minecraft.world.level.ChunkPos;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
@@ -28,7 +27,7 @@ public class CMTunnelDataExportCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> makeTunnelCsv() {
         var chunk = Commands
-                .argument("room", RoomPositionArgument.room())
+                .argument("room", StringArgumentType.string())
                 .executes(CMTunnelDataExportCommand::exec);
 
         return Commands.literal("tunnels")
@@ -40,34 +39,36 @@ public class CMTunnelDataExportCommand {
     private static int execAll(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
         var serv = src.getServer();
-        var compact = serv.getLevel(CompactDimension.LEVEL_KEY);
+        try (var compactDim = CompactDimension.forServer(serv)) {
+            final var roomProvider = CompactRoomProvider.instance(compactDim);
 
-        final CompactRoomData rooms = CompactRoomData.get(compact);
+            var outdir = src.getServer().getFile(Constants.MOD_ID);
+            var out = outdir.toPath()
+                    .resolve("tunnels.csv")
+                    .toAbsolutePath();
 
-        var outdir = src.getServer().getFile(Constants.MOD_ID);
-        var out = outdir.toPath()
-                .resolve("tunnels.csv")
-                .toAbsolutePath();
+            try {
+                Files.createDirectories(outdir.toPath());
 
-        try {
-            Files.createDirectories(outdir.toPath());
+                var writer = Files.newBufferedWriter(out);
+                CsvOutput builder = makeTunnelCsvOut(writer);
 
-            var writer = Files.newBufferedWriter(out);
-            CsvOutput builder = makeTunnelCsvOut(writer);
+                roomProvider.allRooms().forEach(room -> {
+                    try {
+                        writeRoomTunnels(compactDim, room.code(), builder);
+                    } catch (MissingDimensionException e) {
+                        CompactMachines.LOGGER.error(e);
+                    }
+                });
 
-            rooms.stream().forEach(roomChunk -> {
-                try {
-                    writeRoomTunnels(compact, roomChunk, builder);
-                } catch (MissingDimensionException e) {
-                    CompactMachines.LOGGER.error(e);
-                }
-            });
-
-            writer.close();
-        } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
-            src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
-            return -1;
+                writer.close();
+            } catch (IOException e) {
+                CompactMachines.LOGGER.error(e);
+                src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
+                return -1;
+            }
+        } catch (IOException | MissingDimensionException e) {
+            throw new RuntimeException(e);
         }
 
         return 0;
@@ -77,12 +78,12 @@ public class CMTunnelDataExportCommand {
         var src = ctx.getSource();
         ServerPlayer player = src.getPlayerOrException();
 
-        final var room = RoomPositionArgument.get(ctx, "room");
+        final var room = StringArgumentType.getString(ctx, "room");
         final var compactDim = src.getServer().getLevel(CompactDimension.LEVEL_KEY);
 
         var outdir = src.getServer().getFile(Constants.MOD_ID);
         var out = outdir.toPath()
-                .resolve(String.format("tunnels_%s_%s.csv", room.x, room.z))
+                .resolve(String.format("tunnels_%s.csv", room))
                 .toAbsolutePath();
 
         try {
@@ -114,8 +115,8 @@ public class CMTunnelDataExportCommand {
                 .build(writer);
     }
 
-    private static void writeRoomTunnels(ServerLevel compactDim, ChunkPos room, CsvOutput builder) throws MissingDimensionException {
-        final var graph = TunnelConnectionGraph.forRoom(compactDim, room);
+    private static void writeRoomTunnels(ServerLevel compactDim, String roomCode, CsvOutput builder) throws MissingDimensionException {
+        final var graph = TunnelConnectionGraph.forRoom(compactDim, roomCode);
         graph.tunnels().forEach(info -> {
             var pos = info.location();
             try {

@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.dimension.VoidAirBlock;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.BuiltinTunnels;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.wall.Walls;
@@ -23,6 +24,14 @@ public class EnglishLangGenerator extends BaseLangGenerator {
     @Override
     protected void addTranslations() {
         super.addTranslations();
+
+        final var machineTranslation = getMachineTranslation();
+        add("machine.compactmachines.tiny", "%s (%s)".formatted(machineTranslation, "Tiny"));
+        add("machine.compactmachines.small", "%s (%s)".formatted(machineTranslation, "Small"));
+        add("machine.compactmachines.normal", "%s (%s)".formatted(machineTranslation, "Normal"));
+        add("machine.compactmachines.large", "%s (%s)".formatted(machineTranslation, "Large"));
+        add("machine.compactmachines.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
+        add("machine.compactmachines.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
 
         addMessage(Messages.CANNOT_ENTER_MACHINE, "You fumble with the shrinking device, to no avail. It refuses to work.");
         addMessage(Messages.NO_MACHINE_DATA, "No machine data loaded; report this.");
@@ -49,7 +58,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addCommand(CMCommands.LEVEL_REGISTERED, "Compact Machine dimension found.");
         addCommand(CMCommands.LEVEL_NOT_FOUND, "Compact Machine dimension could not be found.");
         addCommand(CMCommands.ROOM_NOT_FOUND, "Room [%s] could not be found.");
-        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawnpoint for room [%s] was changed successfully.");
+        addCommand(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "Spawn point for room [%s] was changed successfully.");
 
         addAdvancementTranslations();
 
@@ -64,9 +73,9 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         add(RoomUpgrade.UNNAMED_TRANS_KEY, "Unnamed Room Upgrade");
 
-        addTunnel(Tunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
-        addTunnel(Tunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
-        addTunnel(Tunnels.FORGE_ENERGY, "Energy Tunnel");
+        addTunnel(BuiltinTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
+        addTunnel(BuiltinTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
+        addTunnel(BuiltinTunnels.FORGE_ENERGY, "Energy Tunnel");
         // addTunnel(Tunnels.REDSTONE_IN_DEF.get(), "Redstone Tunnel (In)");
         // addTunnel(Tunnels.REDSTONE_OUT_DEF.get(), "Redstone Tunnel (Out)");
 
@@ -121,6 +130,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
         add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
+
+        add("curios.identifier.psd", "Personal Shrinking Device");
     }
 
     @Override

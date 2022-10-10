@@ -6,22 +6,25 @@ import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
-import dev.compactmods.machines.graph.IGraphNodeType;
-import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
+import dev.compactmods.machines.room.graph.RoomReferenceNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +37,7 @@ public class DimensionMachineGraph extends SavedData {
     private final ResourceKey<Level> level;
     private final MutableValueGraph<IGraphNode, IGraphEdge> graph;
     private final Map<BlockPos, CompactMachineNode> machines;
-    private final Map<ChunkPos, CompactMachineRoomNode> rooms;
+    private final Map<String, RoomReferenceNode> rooms;
 
     public static final String DATA_KEY = "machine_connections";
     private final Codec<List<CompactMachineConnectionInfo>> CONN_CODEC = CompactMachineConnectionInfo.CODEC
@@ -52,7 +55,7 @@ public class DimensionMachineGraph extends SavedData {
         rooms = new HashMap<>();
     }
 
-    private DimensionMachineGraph(ResourceKey<Level> level, @Nonnull CompoundTag nbt) {
+    public DimensionMachineGraph(ResourceKey<Level> level, @Nonnull CompoundTag nbt) {
         this(level);
 
         if (nbt.contains("graph")) {
@@ -68,10 +71,10 @@ public class DimensionMachineGraph extends SavedData {
 
     private void loadConnections(List<CompactMachineConnectionInfo> connectionInfo) {
         for (CompactMachineConnectionInfo i : connectionInfo) {
-            addRoom(i.roomChunk);
+            addRoom(i.roomCode);
             for (var connectedMachine : i.machines()) {
                 addMachine(connectedMachine);
-                connectMachineToRoom(connectedMachine, i.roomChunk);
+                connectMachineToRoom(connectedMachine, i.roomCode);
             }
         }
     }
@@ -84,9 +87,9 @@ public class DimensionMachineGraph extends SavedData {
 
     private List<CompactMachineConnectionInfo> buildConnections() {
         List<CompactMachineConnectionInfo> result = new ArrayList<>();
-        this.rooms.forEach((chunk, node) -> {
-            Collection<BlockPos> machines = this.getMachinesFor(chunk);
-            CompactMachineConnectionInfo roomInfo = new CompactMachineConnectionInfo(chunk, machines);
+        this.rooms.forEach((roomCode, node) -> {
+            final var machines = this.getMachinesFor(roomCode);
+            CompactMachineConnectionInfo roomInfo = new CompactMachineConnectionInfo(roomCode, ImmutableList.copyOf(machines));
             result.add(roomInfo);
         });
 
@@ -101,36 +104,37 @@ public class DimensionMachineGraph extends SavedData {
         graph.addNode(node);
         machines.put(machine, node);
 
+
         this.setDirty();
     }
 
-    public void addRoom(ChunkPos roomChunk) {
-        if (this.rooms.containsKey(roomChunk))
+    public void addRoom(String roomCode) {
+        if (this.rooms.containsKey(roomCode))
             return;
 
-        CompactMachineRoomNode node = new CompactMachineRoomNode(roomChunk);
+        var node = new RoomReferenceNode(roomCode);
         graph.addNode(node);
-        rooms.put(roomChunk, node);
+        rooms.put(roomCode, node);
 
         this.setDirty();
     }
 
-    public void connectMachineToRoom(BlockPos machine, ChunkPos room) {
+    public void connectMachineToRoom(BlockPos machine, String room) {
         if (!machines.containsKey(machine))
             addMachine(machine);
 
         if (!rooms.containsKey(room))
             addRoom(room);
 
-        CompactMachineNode machineNode = machines.get(machine);
-        CompactMachineRoomNode roomNode = rooms.get(room);
+        var machineNode = machines.get(machine);
+        var roomNode = rooms.get(room);
 
         graph.putEdgeValue(machineNode, roomNode, new MachineRoomEdge());
 
         this.setDirty();
     }
 
-    public Collection<BlockPos> getMachinesFor(ChunkPos room) {
+    public Set<BlockPos> getMachinesFor(String room) {
         if(!rooms.containsKey(room))
             return Collections.emptySet();
 
@@ -144,16 +148,16 @@ public class DimensionMachineGraph extends SavedData {
                 .collect(Collectors.toSet());
     }
 
-    public Optional<ChunkPos> getConnectedRoom(BlockPos machinePos) {
+    public Optional<String> getConnectedRoom(BlockPos machinePos) {
         if (!this.machines.containsKey(machinePos))
             return Optional.empty();
 
         var node = this.machines.get(machinePos);
         var connected = this.graph.successors(node);
         return connected.stream()
-                .filter(n -> n instanceof CompactMachineRoomNode)
-                .map(n -> (CompactMachineRoomNode) n)
-                .map(CompactMachineRoomNode::pos)
+                .filter(n -> n instanceof RoomReferenceNode)
+                .map(n -> (RoomReferenceNode) n)
+                .map(RoomReferenceNode::code)
                 .findFirst();
     }
 
@@ -170,7 +174,7 @@ public class DimensionMachineGraph extends SavedData {
         machines.remove(machine);
     }
 
-    public void removeRoom(ChunkPos room) {
+    public void removeRoom(String room) {
         if (!this.rooms.containsKey(room))
             return;
 
@@ -184,7 +188,7 @@ public class DimensionMachineGraph extends SavedData {
 
         final var node = machines.get(machine);
         graph.successors(node).stream()
-                .filter(cn -> cn instanceof CompactMachineRoomNode)
+                .filter(cn -> cn instanceof RoomReferenceNode)
                 .forEach(room -> graph.removeEdge(node, room));
 
         setDirty();
@@ -192,10 +196,6 @@ public class DimensionMachineGraph extends SavedData {
 
     public Optional<CompactMachineNode> getMachineNode(BlockPos worldPosition) {
         return Optional.ofNullable(machines.get(worldPosition));
-    }
-
-    public Optional<CompactMachineRoomNode> getRoomNode(ChunkPos room) {
-        return Optional.ofNullable(rooms.get(room));
     }
 
     @Nonnull
@@ -213,31 +213,16 @@ public class DimensionMachineGraph extends SavedData {
     /**
      * Data structure for serialization. Do not use directly.
      */
-    private static class CompactMachineConnectionInfo {
-        private final ChunkPos roomChunk;
-        private final List<BlockPos> connectedMachines;
-
+    private record CompactMachineConnectionInfo(String roomCode, List<BlockPos> machines) {
         public static final Codec<CompactMachineConnectionInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
-                CodecExtensions.CHUNKPOS
+                Codec.STRING
                         .fieldOf("room")
-                        .forGetter(CompactMachineConnectionInfo::room),
+                        .forGetter(CompactMachineConnectionInfo::roomCode),
 
                 BlockPos.CODEC.listOf()
                         .fieldOf("machines")
                         .forGetter(CompactMachineConnectionInfo::machines)
         ).apply(i, CompactMachineConnectionInfo::new));
 
-        public CompactMachineConnectionInfo(ChunkPos roomChunk, Collection<BlockPos> connections) {
-            this.roomChunk = roomChunk;
-            this.connectedMachines = ImmutableList.copyOf(connections);
-        }
-
-        public ChunkPos room() {
-            return this.roomChunk;
-        }
-
-        public List<BlockPos> machines() {
-            return this.connectedMachines;
-        }
     }
 }

@@ -2,9 +2,15 @@ package dev.compactmods.machines.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
-import dev.compactmods.machines.command.subcommand.*;
+import dev.compactmods.machines.command.subcommand.CMEjectSubcommand;
+import dev.compactmods.machines.command.subcommand.CMGiveMachineSubcommand;
+import dev.compactmods.machines.command.subcommand.CMReaddDimensionSubcommand;
+import dev.compactmods.machines.command.subcommand.CMRebindSubcommand;
+import dev.compactmods.machines.command.subcommand.CMRoomsSubcommand;
+import dev.compactmods.machines.command.subcommand.CMSummarySubcommand;
+import dev.compactmods.machines.command.subcommand.CMUnbindSubcommand;
+import dev.compactmods.machines.command.subcommand.SpawnSubcommand;
 import dev.compactmods.machines.core.Registries;
 import dev.compactmods.machines.upgrade.command.CMUpgradeRoomCommand;
 import dev.compactmods.machines.upgrade.command.RoomUpgradeArgument;
@@ -22,9 +28,6 @@ public class Commands {
     // TODO: /cm spawn set <room> <pos>
 
     static {
-        Registries.COMMAND_ARGUMENT_TYPES.register("room_pos",
-                () -> ArgumentTypeInfos.registerByClass(RoomPositionArgument.class, SingletonArgumentInfo.contextFree(RoomPositionArgument::room)));
-
         Registries.COMMAND_ARGUMENT_TYPES.register("room_upgrade",
                 () -> ArgumentTypeInfos.registerByClass(RoomUpgradeArgument.class, SingletonArgumentInfo.contextFree(RoomUpgradeArgument::upgrade)));
     }

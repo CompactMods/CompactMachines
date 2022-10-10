@@ -6,16 +6,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Optional;
-
 public interface IDimensionalPosition {
 
-    Vec3 getExactPosition();
+    Vec3 position();
 
-    ResourceKey<Level> dimensionKey();
+    ResourceKey<Level> dimension();
     ServerLevel level(MinecraftServer server);
-
-    Optional<Vec3> getRotation();
 
     boolean isLoaded(MinecraftServer serv);
 }

@@ -1,11 +1,13 @@
 package dev.compactmods.machines.tunnel;
 
+import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneReaderTunnel;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.wall.ProtectedWallBlock;
 import dev.compactmods.machines.wall.Walls;
@@ -74,7 +76,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
             final var machPos = tunnelWall.getConnectedPosition();
             final var tunnPos = tunnelWall.getTunnelPosition();
 
-            if(!machPos.isLoaded(serv)) return 0;
+            if (!machPos.isLoaded(serv)) return 0;
 
             if (def instanceof RedstoneReaderTunnel rrt) {
                 return rrt.powerLevel(serv, machPos, tunnPos);
@@ -113,57 +115,63 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
             final var tunnelId = Tunnels.getRegistryId(def);
 
-            if (player.isShiftKeyDown()) {
-                BlockState solidWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+            final var roomProvider = CompactRoomProvider.instance(compactDim);
+            return roomProvider.findByChunk(new ChunkPos(pos)).map(roomInfo -> {
+                final var tunnels = TunnelConnectionGraph.forRoom(compactDim, roomInfo.code());
+                if (player.isShiftKeyDown()) {
+                    BlockState solidWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
 
-                level.setBlockAndUpdate(pos, solidWall);
+                    level.setBlockAndUpdate(pos, solidWall);
 
-                ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-                CompoundTag defTag = stack.getOrCreateTagElement("definition");
-                defTag.putString("id", tunnelId.toString());
+                    ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+                    CompoundTag defTag = stack.getOrCreateTagElement("definition");
+                    defTag.putString("id", tunnelId.toString());
 
-                ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
-                level.addFreshEntity(ie);
-
-                if (def instanceof TunnelTeardownHandler<?> teardown) {
-                    teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
-                }
-
-                final var tunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
-                tunnels.unregister(pos);
-            } else {
-                // Rotate tunnel
-                Direction dir = state.getValue(CONNECTED_SIDE);
-
-                final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
-                final var existingDirs = tunnelGraph
-                        .getTunnelSides(tunnelId)
-                        .collect(Collectors.toSet());
-
-                if (existingDirs.size() == 6) {
-                    // WARN PLAYER - NO OTHER SIDES REMAIN
-                    player.displayClientMessage(
-                            TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
-
-                    return InteractionResult.FAIL;
-                }
-
-                final var next = TunnelHelper.getNextDirection(dir, existingDirs);
-                next.ifPresent(newSide -> {
-                    level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
+                    ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
+                    level.addFreshEntity(ie);
 
                     if (def instanceof TunnelTeardownHandler<?> teardown) {
-                        teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
+                        teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
                     }
 
-                    tunnelGraph.rotateTunnel(pos, newSide);
-                    tunnelGraph.setDirty();
-                });
-            }
+                    tunnels.unregister(pos);
+                } else {
+                    // Rotate tunnel
+                    Direction dir = state.getValue(CONNECTED_SIDE);
+
+                    final var existingDirs = tunnels
+                            .getTunnelSides(tunnelId)
+                            .collect(Collectors.toSet());
+
+                    if (existingDirs.size() == 6) {
+                        // WARN PLAYER - NO OTHER SIDES REMAIN
+                        player.displayClientMessage(
+                                TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
+
+                        return InteractionResult.FAIL;
+                    }
+
+                    final var next = TunnelHelper.getNextDirection(dir, existingDirs);
+                    next.ifPresent(newSide -> {
+                        level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
+
+                        if (def instanceof TunnelTeardownHandler<?> teardown) {
+                            teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
+                        }
+
+                        tunnels.rotateTunnel(pos, newSide);
+                        tunnels.setDirty();
+                    });
+                }
+
+                return InteractionResult.SUCCESS;
+            }).orElseGet(() -> {
+                CompactMachines.LOGGER.fatal("Failed to interact with tunnel: not assigned to a room");
+                return InteractionResult.FAIL;
+            });
         }
 
         return InteractionResult.SUCCESS;
     }
-
     // todo - breaking block unregisters tunnel info
 }

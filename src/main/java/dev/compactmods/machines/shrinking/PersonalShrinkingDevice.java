@@ -3,9 +3,10 @@ package dev.compactmods.machines.shrinking;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.room.registration.IMutableRoomRegistration;
 import dev.compactmods.machines.client.gui.PersonalShrinkingDeviceScreen;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.data.CompactRoomData;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -19,7 +20,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -64,12 +64,14 @@ public class PersonalShrinkingDevice extends Item {
             ServerLevel playerDim = serverPlayer.getLevel();
             if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
                 if (player.isShiftKeyDown()) {
-                    ChunkPos machineChunk = new ChunkPos(player.blockPosition());
 
-                    final CompactRoomData intern = CompactRoomData.get(playerDim);
-
-                    // Use internal data to set new spawn point
-                    intern.setSpawn(machineChunk, player.position());
+                    final var roomInfo = CompactRoomProvider.instance(playerDim);
+                    roomInfo.findByChunk(player.chunkPosition()).ifPresent(room -> {
+                        if(room instanceof IMutableRoomRegistration mutableRoom) {
+                            mutableRoom.setSpawnPosition(player.position());
+                            mutableRoom.setSpawnRotation(PlayerUtil.getLookDirection(player));
+                        }
+                    });
 
                     MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
                             .withStyle(ChatFormatting.GREEN);

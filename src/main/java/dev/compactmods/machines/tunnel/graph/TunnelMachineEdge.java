@@ -27,7 +27,7 @@ public record TunnelMachineEdge(Direction side) implements IGraphEdge {
     }
 
     @Override
-    public IGraphEdgeType getEdgeType() {
+    public IGraphEdgeType<IGraphEdge> getEdgeType() {
         return GraphEdgeType.TUNNEL_MACHINE;
     }
 }

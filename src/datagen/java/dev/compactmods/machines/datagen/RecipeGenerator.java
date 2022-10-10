@@ -1,26 +1,27 @@
 package dev.compactmods.machines.datagen;
 
+import com.google.gson.JsonObject;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.machine.ShapedWithNbtRecipeBuilder;
 import dev.compactmods.machines.api.tunnels.recipe.TunnelRecipeBuilder;
-import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
+import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.tunnel.BuiltinTunnels;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.crafting.ConditionalRecipe;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class RecipeGenerator extends RecipeProvider {
@@ -49,7 +50,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.ITEM_TUNNEL_DEF, 2)
+        TunnelRecipeBuilder.tunnel(BuiltinTunnels.ITEM_TUNNEL_DEF, 2)
                 .requires(Ingredient.of(Tags.Items.CHESTS))
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -57,7 +58,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.FLUID_TUNNEL_DEF, 2)
+        TunnelRecipeBuilder.tunnel(BuiltinTunnels.FLUID_TUNNEL_DEF, 2)
                 .requires(Items.BUCKET)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -65,7 +66,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(Tunnels.FORGE_ENERGY, 2)
+        TunnelRecipeBuilder.tunnel(BuiltinTunnels.FORGE_ENERGY, 2)
                 .requires(Items.GLOWSTONE_DUST)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -77,17 +78,17 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addMachineRecipes(Consumer<FinishedRecipe> consumer) {
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_TINY.get(), Tags.Items.STORAGE_BLOCKS_COPPER);
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_SMALL.get(), Tags.Items.STORAGE_BLOCKS_IRON);
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_NORMAL.get(), Tags.Items.STORAGE_BLOCKS_GOLD);
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_GIANT.get(), Tags.Items.STORAGE_BLOCKS_DIAMOND);
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_LARGE.get(), Tags.Items.OBSIDIAN);
-        registerMachineRecipe(consumer, Machines.MACHINE_BLOCK_ITEM_MAXIMUM.get(), Tags.Items.STORAGE_BLOCKS_NETHERITE);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_TINY, Tags.Items.STORAGE_BLOCKS_COPPER);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_SMALL, Tags.Items.STORAGE_BLOCKS_IRON);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_NORMAL, Tags.Items.STORAGE_BLOCKS_GOLD);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_LARGE, Tags.Items.STORAGE_BLOCKS_DIAMOND);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_GIANT, Tags.Items.OBSIDIAN);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_COLOSSAL, Tags.Items.STORAGE_BLOCKS_NETHERITE);
     }
 
-    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ItemLike out, TagKey<Item> center) {
+    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, LegacySizedTemplates template, TagKey<Item> center) {
         Item wall = Walls.ITEM_BREAKABLE_WALL.get();
-        ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(out)
+        ShapedWithNbtRecipeBuilder recipe = ShapedWithNbtRecipeBuilder.shaped(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get())
                 .pattern("WWW");
 
         if (center != null)
@@ -100,10 +101,15 @@ public class RecipeGenerator extends RecipeProvider {
             recipe.define('C', center);
 
         recipe.unlockedBy("has_recipe", RecipeProvider.has(wall));
+        recipe.addWriter(r -> {
+            final var nbt = new JsonObject();
+            MachineDataTagBuilder.forTemplate(template.id(), template.template())
+                    .writeToItemJson(nbt)
+                    .writeToBlockDataJson(nbt);
+            r.add("nbt", nbt);
+        });
 
-        ConditionalRecipe.builder()
-                .addCondition(new EnableVanillaRecipesConfigCondition())
-                .addRecipe(recipe::save)
-                .build(consumer, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(out.asItem())));
+        final var recipeId = new ResourceLocation(Constants.MOD_ID, "new_machine_" + template.id().getPath());
+        recipe.save(consumer, recipeId);
     }
 }

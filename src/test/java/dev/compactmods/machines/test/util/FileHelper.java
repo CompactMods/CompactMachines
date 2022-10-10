@@ -1,21 +1,27 @@
 package dev.compactmods.machines.test.util;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
 
 public final class FileHelper {
     public static final FileHelper INSTANCE = new FileHelper();
-    public static Path RESOURCES_DIR = Paths.get("src","test","resources");
 
     private FileHelper() {
+    }
+
+    @Nullable
+    public static Path resourcesDir() {
+        final var rd = System.getenv("CM5_TEST_RESOURCES");
+        return rd == null ? null : Path.of(rd);
     }
 
     public InputStream getFileStream(String filename) {
@@ -43,5 +49,11 @@ public final class FileHelper {
     public static CompoundTag getNbtFromFile(String filename) throws IOException {
         InputStream isr = INSTANCE.getFileStream(filename);
         return NbtIo.readCompressed(isr);
+    }
+
+    public static CompoundTag getNbtFromSavedDataFile(String filename) throws IOException {
+        InputStream isr = INSTANCE.getFileStream(filename);
+        final var nbtRoot = NbtIo.readCompressed(isr);
+        return nbtRoot.getCompound("data");
     }
 }

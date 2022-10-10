@@ -3,11 +3,12 @@ package dev.compactmods.machines.upgrade.command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.upgrade.RoomUpgradeManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -44,10 +45,10 @@ public class CMUpgradeRoomCommand {
 
     private static int addToCurrentRoom(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var src = ctx.getSource();
-        final var level = ctx.getSource().getLevel();
+        final var compactDim = ctx.getSource().getLevel();
         final var serv = ctx.getSource().getServer();
 
-        if (!level.dimension().equals(CompactDimension.LEVEL_KEY))
+        if (!compactDim.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
         final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");
@@ -60,22 +61,29 @@ public class CMUpgradeRoomCommand {
         final var execdAt = src.getPosition();
         final var currChunk = new ChunkPos(new BlockPos((int) execdAt.x, (int) execdAt.y, (int) execdAt.z));
 
-        if (!Rooms.exists(serv, currChunk))
+        final var roomProvider = CompactRoomProvider.instance(compactDim);
+        final var manager = RoomUpgradeManager.get(compactDim);
+
+        if (!roomProvider.isRoomChunk(currChunk)) {
+            src.sendFailure(TranslationUtil.command(CMCommands.NOT_IN_COMPACT_DIMENSION));
             return -1;
-
-        final var manager = RoomUpgradeManager.get(level);
-        if(manager.hasUpgrade(currChunk, upgrade)) {
-            src.sendFailure(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE));
-        } else {
-            final var added = manager.addUpgrade(upgrade, currChunk);
-
-            if (added) {
-                upgrade.onAdded(level, currChunk);
-                src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_APPLIED), true);
-            } else {
-                src.sendFailure(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED));
-            }
         }
+
+        roomProvider.findByChunk(currChunk).ifPresentOrElse(room -> {
+            if (manager.hasUpgrade(room.code(), upgrade)) {
+                src.sendFailure(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE));
+            } else {
+                final var added = manager.addUpgrade(upgrade, room.code());
+
+                if (added) {
+                    upgrade.onAdded(compactDim, room);
+                    src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_APPLIED), true);
+                } else {
+                    src.sendFailure(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED));
+                }
+            }
+        }, () -> src.sendFailure(TranslationUtil.command(CMCommands.NOT_IN_COMPACT_DIMENSION)));
+
 
         return 0;
     }
@@ -86,10 +94,9 @@ public class CMUpgradeRoomCommand {
 
     private static int removeFromCurrentRoom(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var src = ctx.getSource();
-        final var level = ctx.getSource().getLevel();
-        final var serv = ctx.getSource().getServer();
+        final var compactDim = ctx.getSource().getLevel();
 
-        if (!level.dimension().equals(CompactDimension.LEVEL_KEY))
+        if (!compactDim.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
         final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");
@@ -102,22 +109,28 @@ public class CMUpgradeRoomCommand {
         final var execdAt = src.getPosition();
         final var currChunk = new ChunkPos(new BlockPos((int) execdAt.x, (int) execdAt.y, (int) execdAt.z));
 
-        if (!Rooms.exists(serv, currChunk))
+        final var roomProvider = CompactRoomProvider.instance(compactDim);
+        final var manager = RoomUpgradeManager.get(compactDim);
+
+        if (!roomProvider.isRoomChunk(currChunk)) {
+            src.sendFailure(TranslationUtil.command(CMCommands.NOT_IN_COMPACT_DIMENSION));
             return -1;
-
-        final var manager = RoomUpgradeManager.get(level);
-        if(!manager.hasUpgrade(currChunk, upgrade)) {
-            src.sendFailure(TranslationUtil.message(Messages.UPGRADE_NOT_PRESENT));
-        } else {
-            final var removed = manager.removeUpgrade(upgrade, currChunk);
-
-            if (removed) {
-                upgrade.onRemoved(level, currChunk);
-                src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_REMOVED), true);
-            } else {
-                src.sendFailure(TranslationUtil.message(Messages.UPGRADE_REM_FAILED));
-            }
         }
+
+        roomProvider.findByChunk(currChunk).ifPresentOrElse(room -> {
+            if (!manager.hasUpgrade(room.code(), upgrade)) {
+                src.sendFailure(TranslationUtil.message(Messages.UPGRADE_NOT_PRESENT));
+            } else {
+                final var removed = manager.removeUpgrade(upgrade, room.code());
+
+                if (removed) {
+                    upgrade.onRemoved(compactDim, room);
+                    src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_REMOVED), true);
+                } else {
+                    src.sendFailure(TranslationUtil.message(Messages.UPGRADE_REM_FAILED));
+                }
+            }
+        }, () -> src.sendFailure(TranslationUtil.command(CMCommands.NOT_IN_COMPACT_DIMENSION)));
 
         return 0;
     }
@@ -125,6 +138,4 @@ public class CMUpgradeRoomCommand {
     private static int removeFromSpecificRoom(CommandContext<CommandSourceStack> ctx) {
         return 0;
     }
-
-
 }

@@ -1,11 +1,11 @@
 package dev.compactmods.machines.api.room.upgrade;
 
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
@@ -26,10 +26,10 @@ public interface RoomUpgrade {
     /**
      * Called when an upgrade is first applied to a room.
      */
-    default void onAdded(ServerLevel level, ChunkPos room) {}
+    default void onAdded(ServerLevel level, IRoomRegistration room) {}
 
     /**
      * Called when an update is removed from a room.
      */
-    default void onRemoved(ServerLevel level, ChunkPos room) {}
+    default void onRemoved(ServerLevel level, IRoomRegistration room) {}
 }

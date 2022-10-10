@@ -9,7 +9,7 @@ import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
-import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
+import dev.compactmods.machines.room.graph.RoomReferenceNode;
 import dev.compactmods.machines.upgrade.graph.RoomUpgradeConnection;
 import dev.compactmods.machines.upgrade.graph.RoomUpgradeGraphNode;
 import dev.compactmods.machines.upgrade.graph.UpgradeConnectionEntry;
@@ -19,12 +19,14 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,8 +35,7 @@ public class RoomUpgradeManager extends SavedData {
     public static final String DATA_NAME = Constants.MOD_ID + "_upgrades";
 
     private final HashMap<ResourceLocation, RoomUpgradeGraphNode> upgradeNodes;
-    private final HashMap<ChunkPos, CompactMachineRoomNode> roomNodes;
-
+    private final HashMap<String, RoomReferenceNode> roomNodes;
     private final MutableValueGraph<IGraphNode, IGraphEdge> graph;
 
     private static final Codec<List<UpgradeConnectionEntry>> UPGRADE_CONNECTIONS_CODEC = UpgradeConnectionEntry.CODEC.listOf();
@@ -102,7 +103,7 @@ public class RoomUpgradeManager extends SavedData {
         return tag;
     }
 
-    public <T extends RoomUpgrade> boolean addUpgrade(T upgrade, ChunkPos room) {
+    public <T extends RoomUpgrade> boolean addUpgrade(T upgrade, String room) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
 
         final var upgradeNode = upgradeNodes.computeIfAbsent(upgRegistry.getKey(upgrade), rl -> {
@@ -111,7 +112,7 @@ public class RoomUpgradeManager extends SavedData {
         });
 
         final var roomNode = roomNodes.computeIfAbsent(room, p -> {
-            final var nn = new CompactMachineRoomNode(p);
+            final var nn = new RoomReferenceNode(p);
             return graph.addNode(nn) ? nn : null;
         });
 
@@ -124,7 +125,7 @@ public class RoomUpgradeManager extends SavedData {
         return true;
     }
 
-    public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, ChunkPos room) {
+    public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, String room) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
         if(!upgRegistry.containsValue(upgrade)) return false;
 
@@ -142,16 +143,16 @@ public class RoomUpgradeManager extends SavedData {
         return true;
     }
 
-    public Stream<ChunkPos> roomsWith(ResourceKey<RoomUpgrade> upgradeKey) {
+    public Stream<String> roomsWith(ResourceKey<RoomUpgrade> upgradeKey) {
         if (!upgradeNodes.containsKey(upgradeKey.location()))
             return Stream.empty();
 
         return upgradeNodes.values().stream()
                 .filter(upg -> upg.key().equals(upgradeKey.location()))
                 .flatMap(upg -> graph.adjacentNodes(upg).stream())
-                .filter(CompactMachineRoomNode.class::isInstance)
-                .map(CompactMachineRoomNode.class::cast)
-                .map(CompactMachineRoomNode::pos);
+                .filter(RoomReferenceNode.class::isInstance)
+                .map(RoomReferenceNode.class::cast)
+                .map(RoomReferenceNode::code);
     }
 
     public <T extends RoomUpgrade> Stream<RoomUpgradeInstance<T>> implementing(Class<T> inter) {
@@ -174,10 +175,10 @@ public class RoomUpgradeManager extends SavedData {
         final var roomNodes = new HashSet<>();
         for (RoomUpgradeGraphNode upgNode : matchedUpgradeNodes) {
             for (IGraphNode adjNode : graph.adjacentNodes(upgNode)) {
-                if (adjNode instanceof CompactMachineRoomNode roomNode) {
+                if (adjNode instanceof RoomReferenceNode roomNode) {
                     graph.edgeValue(roomNode, upgNode).ifPresent(edv -> {
                         if (edv instanceof RoomUpgradeConnection conn && inter.isInstance(conn.instance()))
-                            instances.add(new RoomUpgradeInstance<>(inter.cast(conn.instance()), roomNode.pos()));
+                            instances.add(new RoomUpgradeInstance<>(inter.cast(conn.instance()), roomNode.code()));
                     });
                 }
             }
@@ -187,7 +188,7 @@ public class RoomUpgradeManager extends SavedData {
         return instances.stream();
     }
 
-    public boolean hasUpgrade(ChunkPos room, RoomUpgrade upgrade) {
+    public boolean hasUpgrade(String room, RoomUpgrade upgrade) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
         if(!upgRegistry.containsValue(upgrade))
             return false;

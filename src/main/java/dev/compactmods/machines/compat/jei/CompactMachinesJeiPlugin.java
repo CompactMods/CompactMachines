@@ -2,9 +2,10 @@ package dev.compactmods.machines.compat.jei;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.JeiInfo;
-import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.CompactMachineItem;
+import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import mezz.jei.api.IModPlugin;
@@ -14,8 +15,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Arrays;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 @JeiPlugin
 public class CompactMachinesJeiPlugin implements IModPlugin {
@@ -26,13 +26,17 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        Arrays.stream(RoomSize.values())
-                .map(CompactMachineItem::getItemBySize)
-                .forEach(i -> registration.addIngredientInfo(
-                        new ItemStack(i),
-                        VanillaTypes.ITEM_STACK,
-                        TranslationUtil.jeiInfo(JeiInfo.MACHINE)));
+        registration.addIngredientInfo(
+                UnboundCompactMachineItem.unbound(),
+                VanillaTypes.ITEM_STACK,
+                TranslationUtil.jeiInfo(JeiInfo.MACHINE));
 
+        // Add all known template JEI infos
+        Rooms.getTemplates(ServerLifecycleHooks.getCurrentServer())
+                .entrySet()
+                .stream()
+                .map(t -> UnboundCompactMachineItem.forTemplate(t.getKey().location(), t.getValue()))
+                .forEach(t -> registration.addIngredientInfo(t, VanillaTypes.ITEM_STACK, TranslationUtil.jeiInfo(JeiInfo.MACHINE)));
 
         registration.addIngredientInfo(
                 new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
@@ -43,5 +47,7 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
         registration.useNbtForSubtypes(Tunnels.ITEM_TUNNEL.get());
+        registration.registerSubtypeInterpreter(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(),
+                (ingredient, context) -> UnboundCompactMachineItem.getTemplateId(ingredient).toString());
     }
 }

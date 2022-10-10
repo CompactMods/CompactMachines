@@ -8,7 +8,7 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.CompactMachineBlockEntity;
+import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
@@ -42,7 +42,7 @@ public class CMUnbindSubcommand {
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
         }
 
-        machine.getConnectedRoom().ifPresentOrElse(currentRoom -> {
+        machine.connectedRoom().ifPresentOrElse(currentRoom -> {
             final var currentRoomTunnels = TunnelConnectionGraph.forRoom(compactDim, currentRoom);
             final var firstTunnel = currentRoomTunnels.getConnections(machine.getLevelPosition()).findFirst();
             firstTunnel.ifPresent(ft -> {

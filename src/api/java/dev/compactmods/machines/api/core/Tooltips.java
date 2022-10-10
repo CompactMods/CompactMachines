@@ -10,6 +10,7 @@ public abstract class Tooltips {
     public static final ResourceLocation ROOM_NAME = new ResourceLocation(Constants.MOD_ID, "room_name");
     public static final ResourceLocation ROOM_UPGRADE_TYPE = new ResourceLocation(Constants.MOD_ID, "room_upgrade_type");
     public static final ResourceLocation TUTORIAL_APPLY_ROOM_UPGRADE = new ResourceLocation(Constants.MOD_ID, "tutorial_apply_room_upgrade");
+    public static final ResourceLocation CRAFT_TO_UPGRADE = new ResourceLocation(Constants.MOD_ID, "craft_machine_to_upgrade");
 
     public static abstract class Machines {
         public static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "machine.id");
