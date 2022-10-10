@@ -25,7 +25,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 def semver = System.getenv("CM_SEMVER_VERSION")
 def buildNumber = System.getenv("CM_BUILD_NUM")
 
-def nightlyVersion = "nightly-${semver}.${buildNumber}"
+def nightlyVersion = "${semver}+nightly-b${buildNumber}"
 def isRelease = (System.getenv("CM_RELEASE") ?: "false").equalsIgnoreCase("true")
 
 task getBuildInfo() {
@@ -353,8 +353,9 @@ tasks.withType(Jar) {
     destinationDirectory = file("$rootDir/build-out")
 }
 
-tasks.jarJar.configure {
+tasks.jarJar {
     classifier ''
+    destinationDirectory = file("$rootDir/build-out")
 }
 
 jar {
@@ -396,7 +397,8 @@ publishing {
 
             artifacts {
                 artifact jar
-                artifact(apiJar)
+                artifact apiJar
+                artifact tasks.jarJar
             }
         }
     }
