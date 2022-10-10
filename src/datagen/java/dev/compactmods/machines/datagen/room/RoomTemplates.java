@@ -27,7 +27,7 @@ public class RoomTemplates {
         templates.put(new ResourceLocation(Constants.MOD_ID, "giant"), LegacySizedTemplates.EMPTY_GIANT.template());
         templates.put(new ResourceLocation(Constants.MOD_ID, "colossal"), LegacySizedTemplates.EMPTY_COLOSSAL.template());
 
-        templates.put(new ResourceLocation(Constants.MOD_ID, "weird"), new RoomTemplate(new Vec3i(42, 69, 12),
+        templates.put(new ResourceLocation(Constants.MOD_ID, "absurd"), new RoomTemplate(new Vec3i(25, 25, 25),
                 FastColor.ARGB32.color(255, 0, 166, 88),
                 RoomTemplate.NO_TEMPLATE));
 

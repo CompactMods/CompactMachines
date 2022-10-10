@@ -3,6 +3,7 @@ package dev.compactmods.machines.datagen;
 import com.google.gson.JsonObject;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.machine.ShapedWithNbtRecipeBuilder;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.tunnels.recipe.TunnelRecipeBuilder;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.machine.Machines;
@@ -16,6 +17,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -83,10 +85,18 @@ public class RecipeGenerator extends RecipeProvider {
         registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_NORMAL, Tags.Items.STORAGE_BLOCKS_GOLD);
         registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_LARGE, Tags.Items.STORAGE_BLOCKS_DIAMOND);
         registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_GIANT, Tags.Items.OBSIDIAN);
-        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_COLOSSAL, Tags.Items.STORAGE_BLOCKS_NETHERITE);
+        registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_COLOSSAL, Tags.Items.INGOTS_NETHERITE);
+
+        registerMachineRecipe(consumer, new ResourceLocation(Constants.MOD_ID, "absurd"),
+                new RoomTemplate(25, FastColor.ARGB32.color(255, 0, 166, 88)),
+                Tags.Items.NETHER_STARS);
     }
 
     protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, LegacySizedTemplates template, TagKey<Item> center) {
+        registerMachineRecipe(consumer, template.id(), template.template(), center);
+    }
+
+    protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ResourceLocation temId, RoomTemplate tem, TagKey<Item> center) {
         Item wall = Walls.ITEM_BREAKABLE_WALL.get();
         ShapedWithNbtRecipeBuilder recipe = ShapedWithNbtRecipeBuilder.shaped(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get())
                 .pattern("WWW");
@@ -103,13 +113,13 @@ public class RecipeGenerator extends RecipeProvider {
         recipe.unlockedBy("has_recipe", RecipeProvider.has(wall));
         recipe.addWriter(r -> {
             final var nbt = new JsonObject();
-            MachineDataTagBuilder.forTemplate(template.id(), template.template())
+            MachineDataTagBuilder.forTemplate(temId, tem)
                     .writeToItemJson(nbt)
                     .writeToBlockDataJson(nbt);
             r.add("nbt", nbt);
         });
 
-        final var recipeId = new ResourceLocation(Constants.MOD_ID, "new_machine_" + template.id().getPath());
+        final var recipeId = new ResourceLocation(Constants.MOD_ID, "new_machine_" + temId.getPath());
         recipe.save(consumer, recipeId);
     }
 }

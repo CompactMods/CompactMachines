@@ -36,7 +36,7 @@ jobs:
           exclude: '*-rc*'
           commit-ish: '@'
           skip-unshallow: 'true'
-          
+
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1

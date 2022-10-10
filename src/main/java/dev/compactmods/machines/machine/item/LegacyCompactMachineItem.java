@@ -37,7 +37,7 @@ public class LegacyCompactMachineItem extends CompactMachineItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(TranslationUtil.tooltip(Tooltips.CRAFT_TO_UPGRADE).withStyle(ChatFormatting.YELLOW));
+        // tooltip.add(TranslationUtil.tooltip(Tooltips.CRAFT_TO_UPGRADE).withStyle(ChatFormatting.YELLOW));
 
         boolean sneaking = Screen.hasShiftDown();
 

@@ -32,6 +32,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("machine.compactmachines.large", "%s (%s)".formatted(machineTranslation, "Large"));
         add("machine.compactmachines.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
         add("machine.compactmachines.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
+        add("machine.compactmachines.absurd", "%s (%s)".formatted(machineTranslation, "Absurd"));
 
         addMessage(Messages.CANNOT_ENTER_MACHINE, "You fumble with the shrinking device, to no avail. It refuses to work.");
         addMessage(Messages.NO_MACHINE_DATA, "No machine data loaded; report this.");
