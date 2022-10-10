@@ -28,6 +28,15 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --unshallow
 
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+          
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
