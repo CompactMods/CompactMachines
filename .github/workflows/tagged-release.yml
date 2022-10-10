@@ -13,6 +13,7 @@ jobs:
       cf_project: ${{steps.cf_project.outputs.value }}
       mod_id: ${{steps.mod_id.outputs.value }}
       version: ${{steps.version.outputs.version }}
+      build: ${{steps.build.outputs.buildver}}
 
     steps:
       - name: Checkout
@@ -56,6 +57,13 @@ jobs:
         run: |
           version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
           echo "::set-output name=version::$version"
+
+      - name: Build Version
+        id: build
+        run: |
+          buildver=$(git describe --tags --match v* | cut -d- -f2)
+          echo "build = $buildver"
+          echo "::set-output name=buildver::$buildver"
 
   changelog:
     name: Generate Changelog (tags)
@@ -135,14 +143,15 @@ jobs:
         env:
           CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
 
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         timeout-minutes: 20
         env:
+          CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -159,7 +168,7 @@ jobs:
         env:
           CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
