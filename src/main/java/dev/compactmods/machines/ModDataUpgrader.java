@@ -60,6 +60,7 @@ public class ModDataUpgrader {
                 // do upgrade
                 try {
                     ModDataUpgrader.doUpgrade(mismatch.getLevelDirectory());
+                    mismatch.markResolved(Constants.MOD_ID);
                 } catch (IOException e) {
                     CompactMachines.LOGGER.fatal("Exception occurred while trying to upgrade world data.", e);
                 }

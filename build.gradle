@@ -210,9 +210,11 @@ minecraft {
 
             environment("CM5_TEST_RESOURCES", file('src/test/resources'))
 
-            // JetBrains Runtime Hotswap
-            jvmArg '-XX:+AllowEnhancedClassRedefinition'
-            jvmArg '-XX:HotswapAgent=fatjar'
+            if(!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg '-XX:+AllowEnhancedClassRedefinition'
+                jvmArg '-XX:HotswapAgent=fatjar'
+            }
 
             mods {
                 compactmachines {
