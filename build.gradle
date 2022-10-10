@@ -349,13 +349,11 @@ reobf {
     jarJar { }
 }
 
-tasks.withType(Jar) {
-    destinationDirectory = file("$rootDir/build-out")
-}
-
 tasks.jarJar {
     classifier ''
-    destinationDirectory = file("$rootDir/build-out")
+    from sourceSets.tunnels.output
+    from sourceSets.main.output
+    from sourceSets.api.output
 }
 
 jar {

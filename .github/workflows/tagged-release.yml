@@ -177,8 +177,8 @@ jobs:
         with:
           name: libs
           path: |
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
+            build/libs/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
+            build/libs/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
 
   view:
     name: View Changelog Output
@@ -221,8 +221,8 @@ jobs:
           prerelease: false
           files: |
             changelog/CHANGELOG.md
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
-            build-out/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
+            build/libs/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}.jar
+            build/libs/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.version }}-api.jar
 
   release-cf:
     name: Make Curseforge Release
