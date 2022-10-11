@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "compactmachines:wall"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "picked_up_deepslate": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:cobblestone/deepslate"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "picked_up_deepslate",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "compactmachines:wall"
+    ]
+  }
+}

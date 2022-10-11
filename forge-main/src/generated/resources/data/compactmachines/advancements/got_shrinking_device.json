@@ -1,0 +1,37 @@
+{
+  "parent": "compactmachines:root",
+  "criteria": {
+    "obtained_psd": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "compactmachines:personal_shrinking_device"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancement.compactmachines.got_shrinking_device.desc"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "compactmachines:personal_shrinking_device"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.compactmachines.got_shrinking_device"
+    }
+  },
+  "requirements": [
+    [
+      "obtained_psd"
+    ]
+  ]
+}

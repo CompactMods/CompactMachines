@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "compactmachines:machine"
+        }
+      ],
+      "functions": [
+        {
+          "function": "compactmachines:copy_room_binding"
+        }
+      ],
+      "name": "compactmachines:machine_normal",
+      "rolls": 1.0
+    }
+  ]
+}

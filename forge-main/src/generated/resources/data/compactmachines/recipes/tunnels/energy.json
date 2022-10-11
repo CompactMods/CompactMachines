@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:glowstone_dust"
+    },
+    {
+      "item": "minecraft:ender_pearl"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "minecraft:observer"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "compactmachines:tunnel",
+    "nbt": {
+      "definition": {
+        "id": "compactmachines:energy"
+      }
+    }
+  }
+}

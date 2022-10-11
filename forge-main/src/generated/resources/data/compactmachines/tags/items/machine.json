@@ -1,0 +1,12 @@
+{
+  "values": [
+    "compactmachines:machine_small",
+    "compactmachines:machine_tiny",
+    "compactmachines:machine_maximum",
+    "compactmachines:machine_normal",
+    "compactmachines:machine_giant",
+    "compactmachines:machine_large",
+    "compactmachines:machine",
+    "compactmachines:new_machine"
+  ]
+}

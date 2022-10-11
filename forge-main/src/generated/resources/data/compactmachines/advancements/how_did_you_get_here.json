@@ -1,0 +1,29 @@
+{
+  "parent": "compactmachines:root",
+  "criteria": {
+    "got_stuck": {
+      "conditions": {},
+      "trigger": "compactmachines:how_did_you_get_here"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancement.compactmachines.how_did_you_get_here.desc"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "compactmachines:personal_shrinking_device"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancement.compactmachines.how_did_you_get_here"
+    }
+  },
+  "requirements": [
+    [
+      "got_stuck"
+    ]
+  ]
+}

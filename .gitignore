@@ -33,6 +33,6 @@ logs/
 
 *.dot
 
-src/generated/
+forge-main/src-old/generated/
 
 raw-assets/

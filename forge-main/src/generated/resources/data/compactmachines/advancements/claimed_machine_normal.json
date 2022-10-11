@@ -1,0 +1,29 @@
+{
+  "parent": "compactmachines:got_shrinking_device",
+  "criteria": {
+    "claimed_machine": {
+      "conditions": {},
+      "trigger": "compactmachines:claimed_machine_normal"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancement.compactmachines.claimed_machine_normal.desc"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "compactmachines:machine_normal"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.compactmachines.claimed_machine_normal"
+    }
+  },
+  "requirements": [
+    [
+      "claimed_machine"
+    ]
+  ]
+}

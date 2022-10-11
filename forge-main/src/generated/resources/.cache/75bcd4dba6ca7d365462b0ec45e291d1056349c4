@@ -1,0 +1,5 @@
+// 1.19.2	2022-10-10T13:15:36.6866127	Tags for minecraft:block
+60e219a280627ad3250ee8899d65356050a6916b data/compactmachines/tags/blocks/legacy_machines.json
+79362b5b837973baf1a191564ce11c351ab26ad6 data/compactmachines/tags/blocks/machine.json
+7cb0079d5c84af250a5219a21083a8b6151be1dc data/minecraft/tags/blocks/mineable/pickaxe.json
+7cb0079d5c84af250a5219a21083a8b6151be1dc data/minecraft/tags/blocks/needs_iron_tool.json
