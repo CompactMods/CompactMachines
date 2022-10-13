@@ -146,7 +146,7 @@ jobs:
           CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
 
       - name: Publish gradle nightly jar
-        run: ./gradlew publishReleasePublicationToGitHubPackagesRepository
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
           CM_RELEASE: false
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}

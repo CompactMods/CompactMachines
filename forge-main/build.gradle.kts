@@ -1,10 +1,23 @@
 import java.text.SimpleDateFormat
 import java.util.*
 
+val semver: String = System.getenv("CM_SEMVER_VERSION") ?: "9.9.9"
+val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
+
+val nightlyVersion: String = "${semver}+nightly-b${buildNumber}"
+val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
+
 var mod_id: String by extra
 var minecraft_version: String by extra
 var forge_version: String by extra
 var parchment_version: String by extra
+
+tasks.create("getBuildInfo") {
+    println("Mod ID: ${mod_id}")
+    println("Version: ${version}")
+    println("Semver Version: ${semver}")
+    println("Nightly Build: ${nightlyVersion}")
+}
 
 plugins {
     id("idea")
@@ -16,7 +29,8 @@ plugins {
 
 base {
     archivesName.set(mod_id)
-    version = "5.0.0"
+    group = "dev.compactmods"
+    version = if(isRelease) semver else nightlyVersion
 }
 
 java {
@@ -202,6 +216,19 @@ minecraft {
             args("--all")
             args("--output", file("src/generated/resources/"))
         }
+
+        create("gameTestServer") {
+            taskName("runGameTestServer")
+            workingDirectory(file("run/gametests"))
+            ideaModule("Compact_Machines.forge-main.test")
+
+            forceExit(false)
+            environment("CM5_TEST_RESOURCES", file("src/test/resources"))
+
+            mods.named(mod_id) {
+                source(sourceSets.test.get())
+            }
+        }
     }
 }
 
@@ -217,32 +244,10 @@ tasks.withType<ProcessResources> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-tasks.jar {
-    from(sourceSets.main.get().output)
-    from(project(":forge-tunnels").sourceSets.main.get().output)
-
-    finalizedBy("reobfJar")
-    archiveClassifier.set("slim")
-
+tasks.withType<Jar> {
+    // Remove datagen source and cache info
     this.exclude("dev/compactmods/machines/datagen/**")
-
-    manifest {
-        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
-        attributes(mapOf(
-                "Specification-Title" to "Compact Machines",
-                "Specification-Vendor" to "",
-                "Specification-Version" to "1", // We are version 1 of ourselves
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to archiveVersion,
-                "Implementation-Vendor" to "",
-                "Implementation-Timestamp" to now
-        ))
-    }
-}
-
-tasks.jarJar {
-    archiveClassifier.set("")
-    this.exclude("dev/compactmods/machines/datagen/**")
+    this.exclude(".cache/**")
 
     // TODO - Switch to API jar when JarInJar supports it better
     val api = project(":forge-api").tasks.jar.get().archiveFile;
@@ -250,6 +255,28 @@ tasks.jarJar {
 
     val tunnels = project(":forge-tunnels").tasks.jar.get().archiveFile;
     from(tunnels.map { zipTree(it) })
+
+    manifest {
+        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
+        attributes(mapOf(
+                "Specification-Title" to "Compact Machines",
+                "Specification-Vendor" to "",
+                "Specification-Version" to "1", // We are version 1 of ourselves
+                "Implementation-Title" to "Compact Machines",
+                "Implementation-Version" to archiveVersion,
+                "Implementation-Vendor" to "",
+                "Implementation-Timestamp" to now
+        ))
+    }
+}
+
+tasks.jar {
+    finalizedBy("reobfJar")
+    archiveClassifier.set("slim")
+}
+
+tasks.jarJar {
+    archiveClassifier.set("")
 }
 
 artifacts {
@@ -258,14 +285,13 @@ artifacts {
 }
 
 publishing {
-    publications.register<MavenPublication>("release") {
+    publications.register<MavenPublication>("releaseMain") {
         artifactId = mod_id
         groupId = "dev.compactmods"
 
         artifacts {
             artifact(tasks.jar.get())
-            // artifact apiJar
-            artifact(tasks.jarJar)
+            artifact(tasks.jarJar.get())
         }
     }
 
