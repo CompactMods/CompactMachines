@@ -1,7 +1,0 @@
-{
-  "parent": "compactmachines:tunnels/base",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "wall": "compactmachines:block/tunnels/up"
-  }
-}

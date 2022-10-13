@@ -38,7 +38,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("D D")
                 .pattern("DDD")
                 .define('D', Items.POLISHED_DEEPSLATE)
-                .unlockedBy("picked_up_deepslate", RecipeProvider.has(Tags.Items.COBBLESTONE_DEEPSLATE))
+                .unlockedBy("picked_up_deepslate", has(Tags.Items.COBBLESTONE_DEEPSLATE))
                 .save(consumer);
 
         ShapedRecipeBuilder.shaped(Shrinking.PERSONAL_SHRINKING_DEVICE.get())
@@ -49,7 +49,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .define('E', Items.ENDER_EYE)
                 .define('B', Items.BOOK)
                 .define('I', Tags.Items.INGOTS_IRON)
-                .unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
+                .unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
                 .save(consumer);
 
         TunnelRecipeBuilder.tunnel(BuiltinTunnels.ITEM_TUNNEL_DEF, 2)
@@ -57,7 +57,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
                 .requires(Items.OBSERVER)
-                .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
+                .unlockedBy("observer", has(Items.OBSERVER))
                 .save(consumer);
 
         TunnelRecipeBuilder.tunnel(BuiltinTunnels.FLUID_TUNNEL_DEF, 2)
@@ -65,7 +65,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
                 .requires(Items.OBSERVER)
-                .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
+                .unlockedBy("observer", has(Items.OBSERVER))
                 .save(consumer);
 
         TunnelRecipeBuilder.tunnel(BuiltinTunnels.FORGE_ENERGY, 2)
@@ -73,7 +73,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
                 .requires(Items.OBSERVER)
-                .unlockedBy("observer", RecipeProvider.has(Items.OBSERVER))
+                .unlockedBy("observer", has(Items.OBSERVER))
                 .save(consumer);
 
         addMachineRecipes(consumer);
@@ -110,7 +110,7 @@ public class RecipeGenerator extends RecipeProvider {
         if (center != null)
             recipe.define('C', center);
 
-        recipe.unlockedBy("has_recipe", RecipeProvider.has(wall));
+        recipe.unlockedBy("has_recipe", has(wall));
         recipe.addWriter(r -> {
             final var nbt = new JsonObject();
             MachineDataTagBuilder.forTemplate(temId, tem)

@@ -65,32 +65,6 @@ tasks.create("getBuildInfo") {
 //    }
 //}
 
-
-//
-//jarJar.enable();
-//dependencies {
-//    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-//    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-//    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-//    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-//
-//
-//}
-//
-
-//
-//compileDatagenJava {
-//    options.encoding = 'UTF-8'
-//}
-//
-//// FIXME: Remove once https://github.com/MinecraftForge/ForgeGradle/issues/883 is closed
-
-//
-//tasks.jarJar.configure {
-//    classifier ''
-//}
-//
-
 ////
 ////task apiJar(type: Jar) {
 ////    from sourceSets.api.output
@@ -102,18 +76,3 @@ tasks.create("getBuildInfo") {
 //    archives jar // , apiJar
 //}
 //
-
-tasks.withType<Jar> {
-    manifest {
-        val now = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(java.util.Date())
-        attributes(mapOf(
-                "Specification-Title" to "Compact Machines",
-                "Specification-Vendor" to "",
-                "Specification-Version" to "1", // We are version 1 of ourselves
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to archiveVersion,
-                "Implementation-Vendor" to "",
-                "Implementation-Timestamp" to now
-        ))
-    }
-}

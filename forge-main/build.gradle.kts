@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.*
+
 var mod_id: String by extra
 var minecraft_version: String by extra
 var forge_version: String by extra
@@ -13,6 +16,7 @@ plugins {
 
 base {
     archivesName.set(mod_id)
+    version = "5.0.0"
 }
 
 java {
@@ -20,7 +24,7 @@ java {
 }
 
 sourceSets.main {
-    java {
+    resources {
         srcDir("src/main/resources")
         srcDir("src/generated/resources")
     }
@@ -29,10 +33,6 @@ sourceSets.main {
 sourceSets.test {
     java.srcDir("src/test/java")
     resources.srcDir("src/test/resources")
-}
-
-val datagen = sourceSets.create("datagen") {
-    compileClasspath += sourceSets.main.get().output
 }
 
 project.evaluationDependsOn(project(":forge-api").path)
@@ -72,11 +72,13 @@ val curios_version: String? by extra
 jarJar.enable()
 
 dependencies {
-    minecraft ("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
+    minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
     implementation(project(":forge-api"))
-    implementation(project(":forge-tunnels"))
     testImplementation(project(":forge-api"))
+
+    implementation(project(":forge-tunnels"))
+    testImplementation(project(":forge-tunnels"))
 
     // JEI
     if (project.extra.has("jei_version") && project.extra.has("jei_mc_version")) {
@@ -165,13 +167,18 @@ minecraft {
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
 
-            // JetBrains Runtime Hotswap
-            jvmArg("-XX:+AllowEnhancedClassRedefinition")
-            jvmArg("-XX:HotswapAgent=fatjar")
+            ideaModule("Compact_Machines.forge-main.main")
 
+            if (!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg("-XX:+AllowEnhancedClassRedefinition")
+                jvmArg("-XX:HotswapAgent=fatjar")
+            }
+
+            source(sourceSets.main.get())
             mods.create(mod_id) {
                 source(sourceSets.main.get())
-                for(p in runDepends)
+                for (p in runDepends)
                     source(p.sourceSets.main.get())
             }
         }
@@ -185,20 +192,25 @@ minecraft {
             args("--height", 1080)
         }
 
-        create("datagen") {
+        create("data") {
+            taskName("runData")
             workingDirectory(file("run/data"))
+            forceExit(false)
 
-            mods.named(mod_id) {
-                source(datagen)
-            }
+            args("--mod", mod_id)
+            args("--existing", file("src/main/resources"))
+            args("--all")
+            args("--output", file("src/generated/resources/"))
         }
     }
 }
 
 reobf {
-    jarJar {
+    jarJar { }
+}
 
-    }
+tasks.compileJava {
+    options.encoding = "UTF-8";
 }
 
 tasks.withType<ProcessResources> {
@@ -207,16 +219,42 @@ tasks.withType<ProcessResources> {
 
 tasks.jar {
     from(sourceSets.main.get().output)
+    from(project(":forge-tunnels").sourceSets.main.get().output)
 
     finalizedBy("reobfJar")
     archiveClassifier.set("slim")
+
+    this.exclude("dev/compactmods/machines/datagen/**")
+
+    manifest {
+        val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
+        attributes(mapOf(
+                "Specification-Title" to "Compact Machines",
+                "Specification-Vendor" to "",
+                "Specification-Version" to "1", // We are version 1 of ourselves
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to archiveVersion,
+                "Implementation-Vendor" to "",
+                "Implementation-Timestamp" to now
+        ))
+    }
 }
 
 tasks.jarJar {
     archiveClassifier.set("")
-    project(":forge-api").tasks.jar.get().archiveFile.map {
-        zipTree(it)
-    }
+    this.exclude("dev/compactmods/machines/datagen/**")
+
+    // TODO - Switch to API jar when JarInJar supports it better
+    val api = project(":forge-api").tasks.jar.get().archiveFile;
+    from(api.map { zipTree(it) })
+
+    val tunnels = project(":forge-tunnels").tasks.jar.get().archiveFile;
+    from(tunnels.map { zipTree(it) })
+}
+
+artifacts {
+    archives(tasks.jar.get())
+    archives(tasks.jarJar.get())
 }
 
 publishing {

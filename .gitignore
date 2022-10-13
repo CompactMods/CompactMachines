@@ -36,3 +36,7 @@ logs/
 forge-main/src-old/generated/
 
 raw-assets/
+
+forge-main/src/generated/resources/.cache/
+
+forge-main/src/generated/

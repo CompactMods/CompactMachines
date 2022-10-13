@@ -1,9 +1,0 @@
-// 1.19.2	2022-10-09T06:25:22.5370764	LootTables
-77081d7de6275421c55be81619b1c42db5e2d220 data/compactmachines/loot_tables/blocks/machine.json
-87b56e6b6d0b65b8da9104b8ca2e9605abf5e30b data/compactmachines/loot_tables/blocks/machine_giant.json
-0f5eb4176f0aef8c68e20a20956554d2c899c37d data/compactmachines/loot_tables/blocks/machine_large.json
-a0f3182a08a5d0bc541ddc27ff8919cef981241c data/compactmachines/loot_tables/blocks/machine_maximum.json
-551c29282dfc490d897de745e819811dadb51f85 data/compactmachines/loot_tables/blocks/machine_normal.json
-cdcf45e2259ce617823999c0e020298cf2e6db7a data/compactmachines/loot_tables/blocks/machine_small.json
-e3541b1a2f1f829db53545d62a602700745bf9c4 data/compactmachines/loot_tables/blocks/machine_tiny.json
-e44d02b0e62a2762eccac056a342373e172b89c3 data/compactmachines/loot_tables/blocks/wall.json

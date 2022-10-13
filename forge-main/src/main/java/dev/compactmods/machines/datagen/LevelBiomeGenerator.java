@@ -66,7 +66,11 @@ public class LevelBiomeGenerator implements DataProvider {
     private JsonElement writeFlatDimension(LevelStem dimension) {
         JsonObject d = new JsonObject();
 
-        d.addProperty("type", CompactDimension.LEVEL_KEY.toString());
+        final var regAccess = RegistryAccess.builtinCopy();
+        final var dimTypes = regAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+
+        d.add("type", ResourceLocation.CODEC.encodeStart(JsonOps.INSTANCE, CompactDimension.LEVEL_KEY.location())
+                .getOrThrow(false, CompactMachines.LOGGER::fatal));
 
         var gen = ChunkGenerator.CODEC.encodeStart(JsonOps.INSTANCE, dimension.generator())
                 .getOrThrow(false, CompactMachines.LOGGER::error)
