@@ -75,6 +75,7 @@ tasks.withType<Jar> {
 
 tasks.jar {
     archiveClassifier.set("api")
+    finalizedBy("reobfJar")
 }
 
 tasks.named<Jar>("sourcesJar") {

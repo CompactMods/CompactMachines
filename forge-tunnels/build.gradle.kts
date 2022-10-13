@@ -25,3 +25,7 @@ minecraft {
     mappings("parchment", parchment_version)
     accessTransformer(file("../forge-main/src/main/resources/META-INF/accesstransformer.cfg"))
 }
+
+tasks.jar {
+    finalizedBy("reobfJar")
+}

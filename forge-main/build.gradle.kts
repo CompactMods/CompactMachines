@@ -233,7 +233,7 @@ minecraft {
 }
 
 reobf {
-    jarJar { }
+    this.create("jarJar")
 }
 
 tasks.compileJava {
@@ -271,12 +271,13 @@ tasks.withType<Jar> {
 }
 
 tasks.jar {
-    finalizedBy("reobfJar")
     archiveClassifier.set("slim")
+    finalizedBy("reobfJar")
 }
 
 tasks.jarJar {
     archiveClassifier.set("")
+    finalizedBy("reobfJarJar")
 }
 
 artifacts {
