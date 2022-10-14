@@ -7,7 +7,7 @@ plugins {
 val mod_id: String by extra
 val semver: String = System.getenv("CM_SEMVER_VERSION") ?: "9.9.9"
 val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
-val nightlyVersion: String = "${semver}+nightly-b${buildNumber}"
+val nightlyVersion: String = "${semver}.${buildNumber}-nightly"
 val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
 val aVersion = if(isRelease) semver else nightlyVersion
 
@@ -23,6 +23,7 @@ publishing {
         this.artifact(project(":forge-api").tasks.jar.get())
         this.artifact(project(":forge-api").tasks.named("sourcesJar").get())
         this.artifact(project(":forge-main").tasks.jar.get())
+        this.artifact(project(":forge-main").tasks.named("jarJar").get())
     }
 
     repositories {

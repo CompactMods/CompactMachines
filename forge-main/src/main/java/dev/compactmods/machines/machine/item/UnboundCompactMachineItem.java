@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
-import dev.compactmods.machines.room.client.RoomClientHelper;
+import dev.compactmods.machines.room.RoomHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
@@ -108,7 +108,7 @@ public class UnboundCompactMachineItem extends CompactMachineItem {
     public static Optional<RoomTemplate> getTemplate(ItemStack stack) {
         var template = getTemplateId(stack);
         if (!template.equals(RoomTemplate.NO_TEMPLATE)) {
-            final var actualTemplate = RoomClientHelper.getTemplates().get(template);
+            final var actualTemplate = RoomHelper.getTemplates().get(template);
             return Optional.ofNullable(actualTemplate);
         }
 

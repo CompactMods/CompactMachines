@@ -6,9 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 
 public class RoomClientHelper {
-
     public static Registry<RoomTemplate> getTemplates() {
-        return Minecraft.getInstance().level.registryAccess()
-                .registryOrThrow(CMRegistries.TEMPLATE_REG_KEY);
+        return Minecraft.getInstance().level.registryAccess().registryOrThrow(CMRegistries.TEMPLATE_REG_KEY);
     }
 }

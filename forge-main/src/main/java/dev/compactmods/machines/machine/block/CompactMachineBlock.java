@@ -3,7 +3,7 @@ package dev.compactmods.machines.machine.block;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.machine.item.UnboundCompactMachineItem;
-import dev.compactmods.machines.room.client.RoomClientHelper;
+import dev.compactmods.machines.room.RoomHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
@@ -65,7 +65,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
     @Override
     public void fillItemCategory(@Nonnull CreativeModeTab tab, @Nonnull NonNullList<ItemStack> tabItems) {
-        var reg = RoomClientHelper.getTemplates();
+        var reg = RoomHelper.getTemplates();
         tabItems.addAll(reg.entrySet()
                 .stream()
                 .map((template) -> UnboundCompactMachineItem.forTemplate(template.getKey().location(), template.getValue()))

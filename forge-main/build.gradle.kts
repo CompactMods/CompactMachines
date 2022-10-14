@@ -4,7 +4,7 @@ import java.util.*
 val semver: String = System.getenv("CM_SEMVER_VERSION") ?: "9.9.9"
 val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
 
-val nightlyVersion: String = "${semver}+nightly-b${buildNumber}"
+val nightlyVersion: String = "${semver}.${buildNumber}-nightly"
 val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
 
 var mod_id: String by extra
