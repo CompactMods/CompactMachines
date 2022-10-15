@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Block;
 import javax.annotation.Nullable;
 import java.util.List;
 
+@SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "5.2.0")
 public class LegacyCompactMachineItem extends CompactMachineItem {
     public LegacyCompactMachineItem(Block blockIn, Properties builder) {

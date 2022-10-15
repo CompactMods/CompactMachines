@@ -4,8 +4,8 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.room.RoomHelper;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -30,7 +30,7 @@ public record PlayerRequestedTeleportPacket(LevelBlockPosition machine, String r
                     final var provider = CompactRoomProvider.instance(CompactDimension.forServer(player.server));
                     provider.forRoom(room).ifPresent(info -> {
                         try {
-                            PlayerUtil.teleportPlayerIntoMachine(player.level, player, machine, info);
+                            RoomHelper.teleportPlayerIntoMachine(player.level, player, machine, info);
                         } catch (MissingDimensionException ignored) {
                         }
                     });

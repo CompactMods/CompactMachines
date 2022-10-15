@@ -54,6 +54,7 @@ import net.minecraftforge.network.NetworkHooks;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "5.2.0")
 public class LegacySizedCompactMachineBlock extends Block implements EntityBlock {
 
@@ -163,7 +164,7 @@ public class LegacySizedCompactMachineBlock extends Block implements EntityBlock
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, player, server, sp);
+            return MachineBlockUtil.tryRoomTeleport(level, pos, player, server);
         }
 
         // Try and pull the name off the nametag and apply it to the room

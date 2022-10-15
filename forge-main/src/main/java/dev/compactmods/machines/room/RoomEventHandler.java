@@ -3,15 +3,12 @@ package dev.compactmods.machines.room;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -75,15 +72,17 @@ public class RoomEventHandler {
         if (!level.dimension().equals(CompactDimension.LEVEL_KEY)) return false;
 
         if (level instanceof ServerLevel compactDim) {
-            ChunkPos playerChunk = entity.chunkPosition();
+            // TODO - Add chunk map check here
+            return true;
 
-            final var roomInfo = CompactRoomProvider.instance(compactDim);
-            return roomInfo.isRoomChunk(playerChunk)
-                ? roomInfo.findByChunk(playerChunk)
-                        .map(IRoomRegistration::innerBounds)
-                        .map(ib -> ib.contains(target))
-                        .orElse(false)
-                : false;
+//            ChunkPos playerChunk = entity.chunkPosition();
+//            final var roomInfo = CompactRoomProvider.instance(compactDim);
+//            return roomInfo.isRoomChunk(playerChunk)
+//                ? roomInfo.findByChunk(playerChunk)
+//                        .map(IRoomRegistration::innerBounds)
+//                        .map(ib -> ib.contains(target))
+//                        .orElse(false)
+//                : false;
         }
 
         return false;

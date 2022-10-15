@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,6 +56,11 @@ public record LevelBlockPosition(ResourceKey<Level> dimension, BlockPos blockPos
     public boolean isLoaded(MinecraftServer server) {
         final var level = level(server);
         return level.isLoaded(blockPos);
+    }
+
+    @Override
+    public ChunkPos chunkPos() {
+        return new ChunkPos(blockPos);
     }
 
     public static LevelBlockPosition fromNBT(CompoundTag nbt) {

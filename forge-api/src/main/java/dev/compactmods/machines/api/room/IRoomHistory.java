@@ -2,8 +2,10 @@ package dev.compactmods.machines.api.room;
 
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import net.minecraft.nbt.ListTag;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.util.INBTSerializable;
 
+@AutoRegisterCapability
 public interface IRoomHistory<T extends IRoomHistoryItem> extends INBTSerializable<ListTag> {
 
     void clear();

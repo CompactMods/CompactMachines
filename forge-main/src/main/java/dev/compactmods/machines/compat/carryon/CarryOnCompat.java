@@ -10,6 +10,7 @@ public class CarryOnCompat {
 
     private static final String MOD_ID = "carryon";
 
+    @SuppressWarnings("removal")
     public static void sendIMC() {
         // Denies the machine blocks from being picked up by CarryOn users.
         // Prevents duplication of data on block movement.

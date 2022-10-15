@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 public class RoomTemplates {
 
+    @SuppressWarnings("removal")
     public static void make(GatherDataEvent event) {
 
         final var templates = new HashMap<ResourceLocation, RoomTemplate>();

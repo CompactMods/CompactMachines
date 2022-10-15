@@ -17,6 +17,7 @@ public class StateGenerator extends BlockStateProvider {
     }
 
     @Override
+    @SuppressWarnings("removal")
     protected void registerStatesAndModels() {
         // Wall block model
         BlockModelProvider models = models();

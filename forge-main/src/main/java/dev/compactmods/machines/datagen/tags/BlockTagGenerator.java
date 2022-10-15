@@ -20,6 +20,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
     }
 
     @Override
+    @SuppressWarnings("removal")
     public void addTags() {
         var legacySizedMachines = Set.of(Machines.MACHINE_BLOCK_TINY.get(),
                 Machines.MACHINE_BLOCK_SMALL.get(),

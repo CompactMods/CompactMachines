@@ -6,6 +6,7 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.registration.IMutableRoomRegistration;
 import dev.compactmods.machines.client.gui.PersonalShrinkingDeviceScreen;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.room.RoomHelper;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
@@ -79,7 +80,7 @@ public class PersonalShrinkingDevice extends Item {
                     player.displayClientMessage(tc, true);
 
                 } else {
-                    PlayerUtil.teleportPlayerOutOfMachine(playerDim, serverPlayer);
+                    RoomHelper.teleportPlayerOutOfMachine(playerDim, serverPlayer);
                 }
             }
         }

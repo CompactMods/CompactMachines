@@ -39,6 +39,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     }
 
     @Override
+    @SuppressWarnings("removal")
     protected void addTranslations() {
         // Machine Block names
         final var machineTranslation = getMachineTranslation();

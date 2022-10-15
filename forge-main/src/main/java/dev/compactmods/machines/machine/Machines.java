@@ -18,6 +18,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("removal")
 public class Machines {
     static final BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
             .of(Material.METAL)

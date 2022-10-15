@@ -18,6 +18,9 @@ public class RoomCapEventHandler {
 
         event.addCapability(
                 new ResourceLocation(Constants.MOD_ID, "room_history"),
-                new PlayerRoomHistoryCapProvider(player));
+                new PlayerRoomHistoryProvider());
+
+        final var meta = new PlayerRoomMetadataProviderProvider();
+        event.addCapability(new ResourceLocation(Constants.MOD_ID, "room_metadata"), meta);
     }
 }

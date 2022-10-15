@@ -1,10 +1,22 @@
 package dev.compactmods.machines.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec3;
 
 public class MathUtil {
+    public static ChunkPos getChunkPos(Vec3 precise) {
+        final var x = SectionPos.blockToSectionCoord(precise.x);
+        final var z = SectionPos.blockToSectionCoord(precise.z);
+        return new ChunkPos(x, z);
+    }
+
+    public static int volumeOf(Vec3i dimensions) {
+        return dimensions.getX() * dimensions.getY() * dimensions.getZ();
+    }
+
     /**
      *
      * @param i

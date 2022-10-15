@@ -3,9 +3,12 @@ package dev.compactmods.machines.client;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 
 public class PlayerFaceRenderer {
+    public static final GameProfile EMPTY_PROFILE = new GameProfile(Util.NIL_UUID, "Empty Player");
+
     public static void render(GameProfile profile, PoseStack poseStack, int x, int y) {
         final var skins = Minecraft.getInstance().getSkinManager();
         final var playerSkin = skins.getInsecureSkinLocation(profile);

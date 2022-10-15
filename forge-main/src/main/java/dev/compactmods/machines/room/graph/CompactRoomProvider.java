@@ -270,6 +270,13 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
         final var ownerNode = owners.get(builder.owner);
 
         graph.putEdgeValue(roomNode, ownerNode, new RoomOwnerEdge());
+
+        // calculate chunks
+        roomNode.chunks().forEach(c -> {
+            final var roomChunkNode = new RoomChunkNode(c);
+            chunks.put(c, roomChunkNode);
+            graph.putEdgeValue(roomNode, roomChunkNode, new RoomChunkEdge());
+        });
         setDirty();
 
         return roomNode;

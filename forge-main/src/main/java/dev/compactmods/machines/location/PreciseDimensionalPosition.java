@@ -4,12 +4,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -37,6 +39,11 @@ public record PreciseDimensionalPosition(ResourceKey<Level> dimension, Vec3 posi
     @Override
     public boolean isLoaded(MinecraftServer serv) {
         return level(serv).isLoaded(new BlockPos(position));
+    }
+
+    @Override
+    public ChunkPos chunkPos() {
+        return MathUtil.getChunkPos(this.position);
     }
 
     @Override

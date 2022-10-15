@@ -79,6 +79,7 @@ public class RecipeGenerator extends RecipeProvider {
         addMachineRecipes(consumer);
     }
 
+    @SuppressWarnings("removal")
     private void addMachineRecipes(Consumer<FinishedRecipe> consumer) {
         registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_TINY, Tags.Items.STORAGE_BLOCKS_COPPER);
         registerMachineRecipe(consumer, LegacySizedTemplates.EMPTY_SMALL, Tags.Items.STORAGE_BLOCKS_IRON);
@@ -92,6 +93,7 @@ public class RecipeGenerator extends RecipeProvider {
                 Tags.Items.NETHER_STARS);
     }
 
+    @Deprecated(forRemoval = true, since = "5.2.0")
     protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, LegacySizedTemplates template, TagKey<Item> center) {
         registerMachineRecipe(consumer, template.id(), template.template(), center);
     }

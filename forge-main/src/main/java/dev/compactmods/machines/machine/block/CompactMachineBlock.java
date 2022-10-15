@@ -66,6 +66,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @Override
     public void fillItemCategory(@Nonnull CreativeModeTab tab, @Nonnull NonNullList<ItemStack> tabItems) {
         var reg = RoomHelper.getTemplates();
+        // todo - fix ordering
         tabItems.addAll(reg.entrySet()
                 .stream()
                 .map((template) -> UnboundCompactMachineItem.forTemplate(template.getKey().location(), template.getValue()))
@@ -91,7 +92,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, player, server, sp);
+            return MachineBlockUtil.tryRoomTeleport(level, pos, player, server);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);

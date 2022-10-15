@@ -1,25 +1,24 @@
 package dev.compactmods.machines.room.capability;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.room.RoomCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class PlayerRoomHistoryCapProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class PlayerRoomHistoryProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
     private final CMRoomHistory history;
-    private LazyOptional<IRoomHistory> opt = LazyOptional.empty();
+    private final LazyOptional<IRoomHistory> opt;
 
-    public PlayerRoomHistoryCapProvider(Player player) {
+    public PlayerRoomHistoryProvider() {
         this.history = new CMRoomHistory();
         this.opt = LazyOptional.of(() -> this.history);
     }

@@ -41,6 +41,7 @@ public class CodecTests {
         test.succeed();
     }
 
+    @Deprecated(forRemoval = true, since = "5.2.0")
     @GameTest(template = "empty_1x1", batch = TestBatches.CODEC_TESTS)
     public static void canSerializeMachineSize(final GameTestHelper test) {
         DataResult<Tag> result = RoomSize.CODEC.encodeStart(NbtOps.INSTANCE, RoomSize.LARGE);
