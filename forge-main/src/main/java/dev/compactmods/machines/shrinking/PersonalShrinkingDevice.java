@@ -80,7 +80,7 @@ public class PersonalShrinkingDevice extends Item {
                     player.displayClientMessage(tc, true);
 
                 } else {
-                    RoomHelper.teleportPlayerOutOfMachine(playerDim, serverPlayer);
+                    RoomHelper.teleportPlayerOutOfRoom(playerDim, serverPlayer);
                 }
             }
         }

@@ -92,7 +92,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, player, server);
+            return MachineBlockUtil.tryRoomTeleport(level, pos, sp, server);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);

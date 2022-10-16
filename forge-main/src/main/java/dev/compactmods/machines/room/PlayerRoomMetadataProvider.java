@@ -61,5 +61,5 @@ public class PlayerRoomMetadataProvider implements IPlayerRoomMetadataProvider {
         this.lazy.invalidate();
     }
 
-    record CurrentRoomData(String roomCode, UUID owner) implements IPlayerRoomMetadata {}
+    public record CurrentRoomData(String roomCode, UUID owner) implements IPlayerRoomMetadata {}
 }

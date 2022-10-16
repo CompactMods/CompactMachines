@@ -41,11 +41,18 @@ public class PlayerRoomMetadataProviderProvider implements ICapabilityProvider, 
 
     @Override
     public CompoundTag serializeNBT() {
-        return new CompoundTag();
+        final var tag = new CompoundTag();
+        provider.currentRoom().ifPresent(meta -> {
+            tag.putString("room", meta.roomCode());
+            tag.putUUID("owner", meta.owner());
+        });
+
+        return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-
+        if(nbt.isEmpty()) return;
+        provider.setCurrent(new PlayerRoomMetadataProvider.CurrentRoomData(nbt.getString("room"), nbt.getUUID("owner")));
     }
 }

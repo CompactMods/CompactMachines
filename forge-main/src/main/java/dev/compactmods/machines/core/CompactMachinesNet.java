@@ -2,6 +2,7 @@ package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.room.network.PlayerRequestedTeleportPacket;
+import dev.compactmods.machines.room.network.SyncRoomMetadataPacket;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.util.VersionUtil;
 import net.minecraft.resources.ResourceLocation;
@@ -43,6 +44,12 @@ public class CompactMachinesNet {
                 .encoder(PlayerRequestedTeleportPacket::encode)
                 .decoder(PlayerRequestedTeleportPacket::new)
                 .consumerMainThread(PlayerRequestedTeleportPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(SyncRoomMetadataPacket.class, 3, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncRoomMetadataPacket::encode)
+                .decoder(SyncRoomMetadataPacket::new)
+                .consumerMainThread(SyncRoomMetadataPacket::handle)
                 .add();
     }
 }

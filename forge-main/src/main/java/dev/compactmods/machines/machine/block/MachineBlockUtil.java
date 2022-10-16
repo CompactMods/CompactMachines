@@ -16,6 +16,7 @@ import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +32,7 @@ import java.util.UUID;
 public class MachineBlockUtil {
 
     @Nonnull
-    static InteractionResult tryRoomTeleport(Level level, BlockPos pos, Player player, MinecraftServer server) {
+    static InteractionResult tryRoomTeleport(Level level, BlockPos pos, ServerPlayer player, MinecraftServer server) {
         // Try teleport to compact machine dimension
         if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
             tile.roomInfo().ifPresentOrElse(room -> {
@@ -60,7 +61,7 @@ public class MachineBlockUtil {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    static void createAndEnterRoom(Player owner, MinecraftServer server, RoomTemplate template, CompactMachineBlockEntity machine) {
+    static void createAndEnterRoom(ServerPlayer owner, MinecraftServer server, RoomTemplate template, CompactMachineBlockEntity machine) {
         try {
             final var compactDim = CompactDimension.forServer(server);
             if(template.equals(RoomTemplate.INVALID_TEMPLATE)) {

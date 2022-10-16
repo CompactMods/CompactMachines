@@ -1,7 +1,9 @@
 package dev.compactmods.machines.room.network;
 
+import dev.compactmods.machines.room.RoomHelper;
+import dev.compactmods.machines.room.client.ClientRoomMetadata;
 import dev.compactmods.machines.room.client.MachineRoomScreen;
-import dev.compactmods.machines.room.menu.MachineRoomMenu;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 
 public class ClientRoomNetworkHandler {
@@ -11,5 +13,15 @@ public class ClientRoomNetworkHandler {
             mrs.getMenu().setBlocks(blockData.blocks());
             mrs.updateBlockRender();
         }
+    }
+
+    public static void handleRoomSync(SyncRoomMetadataPacket sync) {
+        final var mc = Minecraft.getInstance();
+        mc.player.getCapability(RoomHelper.CURRENT_ROOM_META).ifPresent(meta -> {
+            if(sync.owner().equals(Util.NIL_UUID))
+                meta.clearCurrent();
+            else
+                meta.setCurrent(new ClientRoomMetadata(sync.roomCode(), sync.owner()));
+        });
     }
 }

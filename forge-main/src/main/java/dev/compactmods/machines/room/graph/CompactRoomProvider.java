@@ -113,6 +113,12 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
 
                         metaNodeIdMap.put(id, node);
                         graph.metadata.put(node.code(), node);
+
+                        node.chunks().forEach(chunk -> {
+                            RoomChunkNode chunkNode = new RoomChunkNode(chunk);
+                            graph.graph.putEdgeValue(node, chunkNode, new RoomChunkEdge());
+                            graph.chunks.put(chunk, chunkNode);
+                        });
                     });
         }
 
@@ -145,8 +151,6 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
         CompactMachines.LOGGER.debug("Number of rooms loaded from disk: {}", metaNodeIdMap.size());
         return graph;
     }
-
-
 
     @Nonnull
     @Override
@@ -238,8 +242,11 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
         if (!isRoomChunk(chunk)) return Optional.empty();
         final var chunkNode = chunks.get(chunk);
 
-        // TODO - Implement with graph
-        return Optional.ofNullable(chunkNode.room(this));
+        return graph.predecessors(chunkNode).stream()
+                .filter(RoomMetadataNode.class::isInstance)
+                .map(RoomMetadataNode.class::cast)
+                .map(IRoomRegistration.class::cast)
+                .findFirst();
     }
 
     @Override
@@ -250,6 +257,25 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
     @Override
     public long count() {
         return metadata.size();
+    }
+
+    private IRoomRegistration finalizeNew(String code, RoomMetadataNode roomNode, UUID owner) {
+        this.metadata.put(code, roomNode);
+        this.owners.computeIfAbsent(owner, RoomOwnerNode::new);
+        final var ownerNode = owners.get(owner);
+
+        graph.putEdgeValue(roomNode, ownerNode, new RoomOwnerEdge());
+
+        // calculate chunks
+        roomNode.chunks().forEach(c -> {
+            final var roomChunkNode = new RoomChunkNode(c);
+            chunks.put(c, roomChunkNode);
+            graph.putEdgeValue(roomNode, roomChunkNode, new RoomChunkEdge());
+        });
+
+        setDirty();
+
+        return roomNode;
     }
 
     /**
@@ -265,21 +291,7 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
         final var builder = newRoom.apply(new NewRoomBuilder(code));
 
         final var roomNode = builder.build();
-        this.metadata.put(code, roomNode);
-        this.owners.computeIfAbsent(builder.owner, RoomOwnerNode::new);
-        final var ownerNode = owners.get(builder.owner);
-
-        graph.putEdgeValue(roomNode, ownerNode, new RoomOwnerEdge());
-
-        // calculate chunks
-        roomNode.chunks().forEach(c -> {
-            final var roomChunkNode = new RoomChunkNode(c);
-            chunks.put(c, roomChunkNode);
-            graph.putEdgeValue(roomNode, roomChunkNode, new RoomChunkEdge());
-        });
-        setDirty();
-
-        return roomNode;
+        return finalizeNew(code, roomNode, builder.owner);
     }
 
     public IRoomRegistration registerNew(Function<NewRoomBuilder, NewRoomBuilder> newRoom) {
@@ -294,14 +306,7 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
         builder.setCenter(newCenter);
 
         final var roomNode = builder.build();
-        this.metadata.put(newRoomCode, roomNode);
-        this.owners.computeIfAbsent(builder.owner, RoomOwnerNode::new);
-        final var ownerNode = owners.get(builder.owner);
-
-        graph.putEdgeValue(roomNode, ownerNode, new RoomOwnerEdge());
-        setDirty();
-
-        return roomNode;
+        return finalizeNew(newRoomCode, roomNode, builder.owner);
     }
 
     public IMutableRoomRegistration edit(String room) {

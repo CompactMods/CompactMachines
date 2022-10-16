@@ -3,8 +3,9 @@ package dev.compactmods.machines.room.client.overlay;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
+import dev.compactmods.machines.client.PlayerFaceRenderer;
+import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.FastColor;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.common.capabilities.Capability;
@@ -21,32 +22,47 @@ public class RoomMetadataDebugOverlay implements IGuiOverlay {
         if (player == null || !player.level.dimension().equals(CompactDimension.LEVEL_KEY))
             return;
 
-        if(!gui.getMinecraft().options.renderDebug)
+        if (!gui.getMinecraft().options.renderDebug)
             return;
 
         final var font = gui.getFont();
         final var center = screenWidth / 2f;
 
-        poseStack.pushPose();
-        poseStack.translate(center, screenHeight - 75, 0);
-        int w = font.width("(room meta WIP)");
-        font.drawShadow(poseStack, "(room meta WIP)", -(w / 2f), 0, FastColor.ARGB32.color(200, 200, 200, 255));
-        poseStack.popPose();
 
-//        player.getCapability(CURRENT_ROOM_META)
-//                .resolve()
-//                .flatMap(IPlayerRoomMetadataProvider::currentRoom)
-//                .ifPresent(room -> {
+        player.getCapability(CURRENT_ROOM_META)
+                .resolve()
+                .flatMap(IPlayerRoomMetadataProvider::currentRoom)
+                .ifPresent(room -> {
+                    poseStack.pushPose();
+                    poseStack.translate(center, screenHeight - 75, 0);
 
+                    PlayerUtil.getProfileByUUID(player.level, room.owner()).ifPresent(ownerInfo -> {
+                        final int ownerWidth = font.width(ownerInfo.getName());
+
+//                        final var shader = GameRenderer.getPositionTexShader();
+//                        final var floatBackup = shader.COLOR_MODULATOR.getFloatBuffer()
+//                                .duplicate();
 //
-//                    final int ownerWidth = font.width(room.owner().toString());
-//                    final int codeWidth = font.width(room.roomCode());
 //
-//                    PlayerFaceRenderer.render(PlayerFaceRenderer.EMPTY_PROFILE, poseStack, -8, -8);
-//
-//                    poseStack.translate(0, 20, 0);
-//                    font.drawShadow(poseStack, room.owner().toString(), -(ownerWidth / 2f), 0, 0xFFFFFFFF, false);
-//                    font.drawShadow(poseStack, room.roomCode(), -(codeWidth / 2f), font.lineHeight + 3, 0xFFFFFFFF, false);
-//                });
+//                        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+//                        shader.COLOR_MODULATOR.set(1, 1, 1, 0.2f);
+//                        shader.COLOR_MODULATOR.upload();
+
+                        PlayerFaceRenderer.render(ownerInfo, poseStack, -6, -14);
+
+//                        shader.COLOR_MODULATOR.getFloatBuffer().rewind();
+//                        shader.COLOR_MODULATOR.getFloatBuffer().put(floatBackup);
+//                        shader.COLOR_MODULATOR.upload();
+
+                        font.drawShadow(poseStack, ownerInfo.getName(), -(ownerWidth / 2f), 0, 0xFFFFFFFF, false);
+                        poseStack.translate(0, 12, 0);
+                    });
+
+                    final int codeWidth = font.width(room.roomCode());
+                    font.drawShadow(poseStack, room.roomCode(), -(codeWidth / 2f), 0, 0xFFFFFFFF, false);
+
+                    poseStack.popPose();
+
+                });
     }
 }

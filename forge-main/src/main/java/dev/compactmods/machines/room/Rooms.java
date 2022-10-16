@@ -10,6 +10,8 @@ import dev.compactmods.machines.graph.SimpleGraphEdgeType;
 import dev.compactmods.machines.graph.SimpleGraphNodeType;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.room.graph.RoomChunkEdge;
+import dev.compactmods.machines.room.graph.RoomChunkNode;
 import dev.compactmods.machines.room.graph.RoomMetadataNode;
 import dev.compactmods.machines.room.graph.RoomOwnerEdge;
 import dev.compactmods.machines.room.graph.RoomOwnerNode;
@@ -39,10 +41,15 @@ public class Rooms {
     public static final RegistryObject<IGraphNodeType<RoomOwnerNode>> ROOM_OWNER_NODE = Registries.NODE_TYPES
             .register("room_owner", SimpleGraphNodeType.instance(RoomOwnerNode.CODEC));
 
+    public static final RegistryObject<IGraphNodeType<RoomChunkNode>> ROOM_CHUNK_NODE = Registries.NODE_TYPES
+            .register("room_chunk", SimpleGraphNodeType.instance(RoomChunkNode.CODEC));
+
     public static final RegistryObject<IGraphNodeType<RoomMetadataNode>> ROOM_META_NODE = Registries.NODE_TYPES
             .register("room_meta", SimpleGraphNodeType.instance(RoomMetadataNode.CODEC));
     public static final RegistryObject<IGraphEdgeType<RoomOwnerEdge>> ROOM_OWNER_EDGE = Registries.EDGE_TYPES
             .register("room_owner", SimpleGraphEdgeType.instance(RoomOwnerEdge.CODEC));
+    public static final RegistryObject<IGraphEdgeType<RoomChunkEdge>> ROOM_CHUNK_EDGE = Registries.EDGE_TYPES
+            .register("room_chunk", SimpleGraphEdgeType.instance(RoomChunkEdge.CODEC));
 
     public static void prepare() {
     }

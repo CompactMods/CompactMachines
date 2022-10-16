@@ -49,4 +49,9 @@ public abstract class CompactDimension {
         final var fixer = DataFixers.getDataFixer();
         return new DimensionDataStorage(dimPath.resolve("data").toFile(), fixer);
     }
+
+    @NotNull
+    public static boolean isLevelCompact(Level level) {
+        return level.dimension().equals(LEVEL_KEY);
+    }
 }
