@@ -12,7 +12,7 @@ import dev.compactmods.machines.command.subcommand.CMSummarySubcommand;
 import dev.compactmods.machines.command.subcommand.CMUnbindSubcommand;
 import dev.compactmods.machines.command.subcommand.SpawnSubcommand;
 import dev.compactmods.machines.core.Registries;
-import dev.compactmods.machines.upgrade.command.CMUpgradeRoomCommand;
+import dev.compactmods.machines.upgrade.command.CMRoomUpgradeCommand;
 import dev.compactmods.machines.upgrade.command.RoomUpgradeArgument;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
@@ -44,7 +44,7 @@ public class Commands {
         root.then(CMDataSubcommand.make());
         root.then(CMGiveMachineSubcommand.make());
         root.then(SpawnSubcommand.make());
-        root.then(CMUpgradeRoomCommand.make());
+        root.then(CMRoomUpgradeCommand.make());
 
         event.getDispatcher().register(root);
     }

@@ -15,7 +15,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 
-public class CMUpgradeRoomCommand {
+public class CMRoomUpgradeCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> make() {
         final var root = Commands.literal("upgrades")
                 .requires(cs -> cs.hasPermission(ServerConfig.changeUpgrades()));
@@ -23,9 +23,9 @@ public class CMUpgradeRoomCommand {
         final var addRoot = Commands.literal("add");
         final var addUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
                 .suggests(RoomUpgradeArgument.SUGGESTOR)
-                .executes(CMUpgradeRoomCommand::addToCurrentRoom);
+                .executes(CMRoomUpgradeCommand::addToCurrentRoom);
 
-        addUpgRoot.then(Commands.literal("current").executes(CMUpgradeRoomCommand::addToCurrentRoom));
+        addUpgRoot.then(Commands.literal("current").executes(CMRoomUpgradeCommand::addToCurrentRoom));
         // addUpgRoot.then(Commands.argument("room", RoomPositionArgument.room()).executes(CMUpgradeRoomCommand::addToSpecificRoom));
         addRoot.then(addUpgRoot);
         root.then(addRoot);
@@ -33,9 +33,9 @@ public class CMUpgradeRoomCommand {
         final var remRoot = Commands.literal("remove");
         final var remUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
                 .suggests(RoomUpgradeArgument.SUGGESTOR)
-                .executes(CMUpgradeRoomCommand::removeFromCurrentRoom);
+                .executes(CMRoomUpgradeCommand::removeFromCurrentRoom);
 
-        remUpgRoot.then(Commands.literal("current").executes(CMUpgradeRoomCommand::removeFromCurrentRoom));
+        remUpgRoot.then(Commands.literal("current").executes(CMRoomUpgradeCommand::removeFromCurrentRoom));
         // remUpgRoot.then(Commands.argument("room", RoomPositionArgument.room()).executes(CMUpgradeRoomCommand::removeFromSpecificRoom));
         remRoot.then(remUpgRoot);
         root.then(remRoot);
