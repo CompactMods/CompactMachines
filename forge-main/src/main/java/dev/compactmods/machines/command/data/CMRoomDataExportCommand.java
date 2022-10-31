@@ -3,8 +3,8 @@ package dev.compactmods.machines.command.data;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
@@ -58,7 +58,7 @@ public class CMRoomDataExportCommand {
     @Nonnull
     private static CsvOutput makeCsv(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
-                .addColumn("room")
+                .addColumn("dev/compactmods/machines/api/room")
                 .addColumn("owner_uuid")
                 .addColumn("size_x")
                 .addColumn("size_y")

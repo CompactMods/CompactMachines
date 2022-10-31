@@ -2,8 +2,8 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
-import dev.compactmods.machines.api.core.CMRegistries;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.CMRegistries;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
@@ -11,7 +11,7 @@ import dev.compactmods.machines.tunnel.definitions.BufferedItemTunnel;
 import dev.compactmods.machines.tunnel.definitions.FluidTunnel;
 import dev.compactmods.machines.tunnel.definitions.ForgeEnergyTunnel;
 import dev.compactmods.machines.tunnel.definitions.redstone.RedstoneInTunnelDefinition;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -36,7 +36,8 @@ public class BuiltinTunnels implements ICompactMachinesAddon {
     public static final RegistryObject<TunnelDefinition> REDSTONE_IN = DR.register("redstone_in", RedstoneInTunnelDefinition::new);
 
     @Override
-    public void afterRegistration(IEventBus bus) {
+    public void afterRegistration() {
+        var bus = FMLJavaModLoadingContext.get().getModEventBus();
         DR.register(bus);
     }
 

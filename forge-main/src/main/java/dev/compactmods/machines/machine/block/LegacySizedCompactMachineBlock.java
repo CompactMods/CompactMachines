@@ -1,9 +1,9 @@
 package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMTags;
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.CMTags;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomSize;

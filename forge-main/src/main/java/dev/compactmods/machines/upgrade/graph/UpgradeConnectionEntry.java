@@ -10,11 +10,11 @@ public record UpgradeConnectionEntry<T extends RoomUpgrade>(String room, Resourc
 
     public static final Codec<UpgradeConnectionEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING
-                    .fieldOf("room")
+                    .fieldOf("dev/compactmods/machines/api/room")
                     .forGetter(UpgradeConnectionEntry::room),
 
             ResourceKey.codec(RoomUpgrade.REG_KEY)
-                    .fieldOf("upgrade")
+                    .fieldOf("dev/compactmods/machines/api/upgrade")
                     .forGetter(UpgradeConnectionEntry::upgradeKey),
 
             MachineRoomUpgrades.REGISTRY.get().getCodec()

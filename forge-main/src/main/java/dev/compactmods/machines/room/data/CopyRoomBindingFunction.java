@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.data;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.CMTags;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import net.minecraft.world.item.ItemStack;

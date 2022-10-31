@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.graph;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
@@ -30,6 +30,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -72,7 +73,7 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
     @Nullable
     public static CompactRoomProvider instance() {
         try {
-            final ServerLevel level = CompactDimension.forCurrentServer();
+            final ServerLevel level = CompactDimension.forServer(ServerLifecycleHooks.getCurrentServer());
             return level.getDataStorage()
                     .computeIfAbsent(CompactRoomProvider::fromDisk, CompactRoomProvider::empty, DATA_NAME);
         } catch (MissingDimensionException e) {
@@ -142,7 +143,7 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
                     .stream()
                     .map(CompoundTag.class::cast)
                     .forEach(roomOwnerConn -> {
-                        RoomMetadataNode meta = metaNodeIdMap.get(roomOwnerConn.getUUID("room"));
+                        RoomMetadataNode meta = metaNodeIdMap.get(roomOwnerConn.getUUID("dev/compactmods/machines/api/room"));
                         RoomOwnerNode owner = roomOwnerNodeMap.get(roomOwnerConn.getUUID("owner"));
                         graph.graph.putEdgeValue(meta, owner, new RoomOwnerEdge());
                     });
@@ -196,7 +197,7 @@ public class CompactRoomProvider extends SavedData implements IRoomLookup, IRoom
                                 UUID roomId = metaNodeIdMap.get(roomNode.code());
                                 UUID ownerId = ownerByUuidMap.get(roomOwner.owner());
                                 CompoundTag connection = new CompoundTag();
-                                connection.putUUID("room", roomId);
+                                connection.putUUID("dev/compactmods/machines/api/room", roomId);
                                 connection.putUUID("owner", ownerId);
                                 return connection;
                             }))

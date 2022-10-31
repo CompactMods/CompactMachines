@@ -1,7 +1,7 @@
 package dev.compactmods.machines.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.command.data.CMDataSubcommand;
 import dev.compactmods.machines.command.subcommand.CMEjectSubcommand;
 import dev.compactmods.machines.command.subcommand.CMGiveMachineSubcommand;

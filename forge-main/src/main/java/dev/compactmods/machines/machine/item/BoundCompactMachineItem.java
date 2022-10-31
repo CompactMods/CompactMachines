@@ -1,6 +1,6 @@
 package dev.compactmods.machines.machine.item;
 
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.i18n.TranslationUtil;

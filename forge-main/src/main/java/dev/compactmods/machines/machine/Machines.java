@@ -45,7 +45,7 @@ public class Machines {
     public static final RegistryObject<Block> MACHINE_BLOCK_MAXIMUM = Registries.BLOCKS.register("machine_maximum", () ->
             new LegacySizedCompactMachineBlock(RoomSize.MAXIMUM, MACHINE_BLOCK_PROPS));
 
-    public static final RegistryObject<Block> MACHINE_BLOCK = Registries.BLOCKS.register("machine", () ->
+    public static final RegistryObject<Block> MACHINE_BLOCK = Registries.BLOCKS.register("dev/compactmods/machines/api/machine", () ->
             new CompactMachineBlock(MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = Registries.ITEMS.register("machine_tiny",
@@ -66,7 +66,7 @@ public class Machines {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = Registries.ITEMS.register("machine_maximum",
             () -> new LegacyCompactMachineItem(MACHINE_BLOCK_MAXIMUM.get(), MACHINE_ITEM_PROPS.get()));
 
-    public static final RegistryObject<Item> BOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("machine",
+    public static final RegistryObject<Item> BOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("dev/compactmods/machines/api/machine",
             () -> new BoundCompactMachineItem(MACHINE_BLOCK.get(), MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
 
 

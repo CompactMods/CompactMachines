@@ -2,7 +2,7 @@ package dev.compactmods.machines.command.subcommand;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;

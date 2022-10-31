@@ -8,7 +8,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class UIRegistration {
 
-    public static final RegistryObject<MenuType<MachineRoomMenu>> MACHINE_MENU = Registries.CONTAINERS.register("machine", () -> IForgeMenuType.create(
+    public static final RegistryObject<MenuType<MachineRoomMenu>> MACHINE_MENU = Registries.CONTAINERS.register("dev/compactmods/machines/api/machine", () -> IForgeMenuType.create(
             ((windowId, inv, data) -> {
                 data.readBlockPos();
                 final var mach = data.readWithCodec(LevelBlockPosition.CODEC);

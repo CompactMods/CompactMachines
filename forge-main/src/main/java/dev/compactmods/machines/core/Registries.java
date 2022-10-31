@@ -1,8 +1,9 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.api.core.CMRegistries;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.CMRegistries;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.graph.IGraphEdgeType;
@@ -11,6 +12,8 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +23,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
 
-import static dev.compactmods.machines.api.core.Constants.MOD_ID;
+import static dev.compactmods.machines.api.Constants.MOD_ID;
 
 public class Registries {
 
@@ -36,7 +39,7 @@ public class Registries {
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
 
     // MachineRoomUpgrades
-    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(CMRegistries.ROOM_UPGRADES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(Rooms.ROOM_UPGRADES_REG_KEY, MOD_ID);
 
     // Graph
     @ApiStatus.Internal
@@ -56,7 +59,12 @@ public class Registries {
     public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCS = DeferredRegister.create(Registry.LOOT_FUNCTION_REGISTRY, MOD_ID);
 
     public static DeferredRegister<RoomTemplate> ROOM_TEMPLATES = DeferredRegister
-            .create(CMRegistries.TEMPLATE_REG_KEY, Constants.MOD_ID);
+            .create(Rooms.TEMPLATE_REG_KEY, Constants.MOD_ID);
+
+    // Villagers
+    public static final DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister.create(ForgeRegistries.VILLAGER_PROFESSIONS, Constants.MOD_ID);
+
+    public static final DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(ForgeRegistries.POI_TYPES, Constants.MOD_ID);
 
     public static void setup() {
 

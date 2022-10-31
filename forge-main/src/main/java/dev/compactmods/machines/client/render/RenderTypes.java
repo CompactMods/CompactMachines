@@ -3,7 +3,7 @@ package dev.compactmods.machines.client.render;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.client.shader.CM4Shaders;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;

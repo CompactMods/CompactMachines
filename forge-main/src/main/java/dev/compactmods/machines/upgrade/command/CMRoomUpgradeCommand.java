@@ -3,8 +3,8 @@ package dev.compactmods.machines.upgrade.command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -21,7 +21,7 @@ public class CMRoomUpgradeCommand {
                 .requires(cs -> cs.hasPermission(ServerConfig.changeUpgrades()));
 
         final var addRoot = Commands.literal("add");
-        final var addUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
+        final var addUpgRoot = Commands.argument("dev/compactmods/machines/api/upgrade", RoomUpgradeArgument.upgrade())
                 .suggests(RoomUpgradeArgument.SUGGESTOR)
                 .executes(CMRoomUpgradeCommand::addToCurrentRoom);
 
@@ -31,7 +31,7 @@ public class CMRoomUpgradeCommand {
         root.then(addRoot);
 
         final var remRoot = Commands.literal("remove");
-        final var remUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
+        final var remUpgRoot = Commands.argument("dev/compactmods/machines/api/upgrade", RoomUpgradeArgument.upgrade())
                 .suggests(RoomUpgradeArgument.SUGGESTOR)
                 .executes(CMRoomUpgradeCommand::removeFromCurrentRoom);
 
@@ -51,7 +51,7 @@ public class CMRoomUpgradeCommand {
         if (!compactDim.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
-        final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");
+        final var upg = RoomUpgradeArgument.getUpgrade(ctx, "dev/compactmods/machines/api/upgrade");
 
         if (upg.isEmpty())
             return -1;
@@ -99,7 +99,7 @@ public class CMRoomUpgradeCommand {
         if (!compactDim.dimension().equals(CompactDimension.LEVEL_KEY))
             return -1;
 
-        final var upg = RoomUpgradeArgument.getUpgrade(ctx, "upgrade");
+        final var upg = RoomUpgradeArgument.getUpgrade(ctx, "dev/compactmods/machines/api/upgrade");
 
         if (upg.isEmpty())
             return -1;

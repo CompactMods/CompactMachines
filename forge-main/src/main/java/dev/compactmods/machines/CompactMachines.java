@@ -2,7 +2,9 @@ package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
+import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
@@ -17,9 +19,11 @@ import dev.compactmods.machines.room.data.LootFunctions;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.villager.Villagers;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -71,6 +75,14 @@ public class CompactMachines {
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
         CraftingHelper.register(EnableVanillaRecipesConfigCondition.Serializer.INSTANCE);
+
+        final var bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(this::registerCapabilities);
+    }
+
+    private void registerCapabilities(final RegisterCapabilitiesEvent caps) {
+        caps.register(IPlayerRoomMetadataProvider.class);
+        caps.register(IRoomHistory.class);
     }
 
     /**
@@ -90,7 +102,9 @@ public class CompactMachines {
         Registries.EDGE_TYPES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
-
+        Registries.VILLAGERS.register(bus);
+        Villagers.TRADES.register(bus);
+        Registries.POINTS_OF_INTEREST.register(bus);
 
         CompactMachines.loadedAddons = ModList.get()
                 .getAllScanData()
@@ -113,7 +127,7 @@ public class CompactMachines {
 
         CompactMachines.loadedAddons.forEach(addon -> {
             LOGGER.debug(ADDON_LIFECYCLE, "Sending registration hook to addon: {}", addon.getClass().getName());
-            addon.afterRegistration(bus);
+            addon.afterRegistration();
         });
     }
 
@@ -131,6 +145,8 @@ public class CompactMachines {
         Graph.prepare();
         Commands.prepare();
         LootFunctions.prepare();
+
+        Villagers.prepare();
     }
 
     public static Set<ICompactMachinesAddon> getAddons() {

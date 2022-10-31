@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.client.gui.widget.PSDIconButton;
 import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;

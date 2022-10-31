@@ -17,11 +17,11 @@ public class Graph {
 
 
     public static final RegistryObject<IGraphNodeType<CompactMachineNode>> MACH_NODE = Registries.NODE_TYPES
-            .register("machine", SimpleGraphNodeType.instance(CompactMachineNode.CODEC));
+            .register("dev/compactmods/machines/api/machine", SimpleGraphNodeType.instance(CompactMachineNode.CODEC));
     public static final RegistryObject<IGraphNodeType<DimensionGraphNode>> DIM_NODE = Registries.NODE_TYPES
-            .register("dimension", SimpleGraphNodeType.instance(DimensionGraphNode.CODEC));
+            .register("dev/compactmods/machines/api/dimension", SimpleGraphNodeType.instance(DimensionGraphNode.CODEC));
     public static final RegistryObject<IGraphNodeType<RoomReferenceNode>> ROOM_REFERENCE_NODE = Registries.NODE_TYPES
-            .register("room", SimpleGraphNodeType.instance(RoomReferenceNode.CODEC));
+            .register("dev/compactmods/machines/api/room", SimpleGraphNodeType.instance(RoomReferenceNode.CODEC));
 
     public static final RegistryObject<IGraphNodeType<RoomUpgradeGraphNode>> ROOM_UPGRADE_NODE = Registries.NODE_TYPES
             .register("room_upgrade", SimpleGraphNodeType.instance(RoomUpgradeGraphNode.CODEC));

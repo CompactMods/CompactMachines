@@ -35,7 +35,7 @@ import java.lang.ref.WeakReference;
 
 public class TunnelWallEntity extends BlockEntity {
 
-    private static final String NBT_LEGACY_MACHINE_KEY = "machine";
+    private static final String NBT_LEGACY_MACHINE_KEY = "dev/compactmods/machines/api/machine";
 
     private LevelBlockPosition connectedMachine;
     private TunnelDefinition tunnelType;

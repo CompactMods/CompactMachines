@@ -1,6 +1,6 @@
 package dev.compactmods.machines.compat;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.compat.carryon.CarryOnCompat;
 import dev.compactmods.machines.compat.curios.CuriosCompat;
 import dev.compactmods.machines.compat.theoneprobe.TheOneProbeCompat;

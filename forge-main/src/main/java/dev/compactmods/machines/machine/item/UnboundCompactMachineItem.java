@@ -1,6 +1,6 @@
 package dev.compactmods.machines.machine.item;
 
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.Machines;
@@ -38,7 +38,7 @@ public class UnboundCompactMachineItem extends CompactMachineItem {
     @Nonnull
     @Override
     public String getDescriptionId(ItemStack stack) {
-        return Util.makeDescriptionId("machine", getTemplateId(stack));
+        return Util.makeDescriptionId("dev/compactmods/machines/api/machine", getTemplateId(stack));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.room.menu;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.core.UIRegistration;

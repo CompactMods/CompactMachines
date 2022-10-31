@@ -1,6 +1,6 @@
 package dev.compactmods.machines;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.data.migration.EarlyLevelDataFileReader;
 import dev.compactmods.machines.data.migration.Pre520RoomDataMigrator;

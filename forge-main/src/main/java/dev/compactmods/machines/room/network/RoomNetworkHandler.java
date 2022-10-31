@@ -1,6 +1,6 @@
 package dev.compactmods.machines.room.network;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.util.VersionUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;

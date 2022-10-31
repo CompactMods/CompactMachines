@@ -1,17 +1,12 @@
 package dev.compactmods.machines.api.tunnels.capability;
 
 import com.google.common.collect.ImmutableSet;
-import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
+import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
-/**
- *
- * @param <Tunnel>
- * @deprecated Prefer new capability lookup tunnel instead
- */
 public interface CapabilityTunnel<Tunnel extends TunnelInstance> extends InstancedTunnel<Tunnel> {
 
     ImmutableSet<Capability<?>> getSupportedCapabilities();

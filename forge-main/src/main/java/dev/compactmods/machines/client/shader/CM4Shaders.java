@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.io.IOException;
 
-import static dev.compactmods.machines.api.core.Constants.MOD_ID;
+import static dev.compactmods.machines.api.Constants.MOD_ID;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CM4Shaders

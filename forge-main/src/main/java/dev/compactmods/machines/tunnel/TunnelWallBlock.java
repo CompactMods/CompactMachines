@@ -1,7 +1,7 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;

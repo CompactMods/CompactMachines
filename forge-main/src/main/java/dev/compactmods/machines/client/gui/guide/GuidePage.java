@@ -1,7 +1,7 @@
 package dev.compactmods.machines.client.gui.guide;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.client.gui.widget.AbstractCMGuiWidget;
 import dev.compactmods.machines.client.gui.widget.ScrollableWrappedTextWidget;
 import net.minecraft.ChatFormatting;

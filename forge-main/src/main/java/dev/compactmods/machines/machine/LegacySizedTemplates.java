@@ -1,6 +1,6 @@
 package dev.compactmods.machines.machine;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;

@@ -5,8 +5,8 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -27,10 +27,10 @@ public class CMTunnelDataExportCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> makeTunnelCsv() {
         var chunk = Commands
-                .argument("room", StringArgumentType.string())
+                .argument("dev/compactmods/machines/api/room", StringArgumentType.string())
                 .executes(CMTunnelDataExportCommand::exec);
 
-        return Commands.literal("tunnels")
+        return Commands.literal("dev/compactmods/machines/api/tunnels")
                 .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(CMTunnelDataExportCommand::execAll)
                 .then(chunk);
@@ -78,7 +78,7 @@ public class CMTunnelDataExportCommand {
         var src = ctx.getSource();
         ServerPlayer player = src.getPlayerOrException();
 
-        final var room = StringArgumentType.getString(ctx, "room");
+        final var room = StringArgumentType.getString(ctx, "dev/compactmods/machines/api/room");
         final var compactDim = src.getServer().getLevel(CompactDimension.LEVEL_KEY);
 
         var outdir = src.getServer().getFile(Constants.MOD_ID);

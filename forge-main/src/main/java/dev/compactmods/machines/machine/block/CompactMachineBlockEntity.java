@@ -1,11 +1,11 @@
 package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMRegistries;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
+import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
@@ -362,7 +362,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
     public Optional<RoomTemplate> getRoomTemplate() {
         if (level != null) {
             return level.registryAccess()
-                    .registry(CMRegistries.TEMPLATE_REG_KEY)
+                    .registry(Rooms.TEMPLATE_REG_KEY)
                     .map(reg -> reg.get(roomTemplateId));
         }
 

@@ -2,7 +2,7 @@ package dev.compactmods.machines.compat.theoneprobe.elements;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.client.PlayerFaceRenderer;
 import mcjty.theoneprobe.api.IElement;
 import net.minecraft.network.FriendlyByteBuf;

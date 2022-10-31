@@ -12,7 +12,7 @@ public record PlayerRoomHistoryItem(PreciseDimensionalPosition entry, LevelBlock
 
     public static final Codec<PlayerRoomHistoryItem> CODEC = RecordCodecBuilder.create(i -> i.group(
             PreciseDimensionalPosition.CODEC.fieldOf("position").forGetter(PlayerRoomHistoryItem::entry),
-            LevelBlockPosition.CODEC.fieldOf("machine").forGetter(PlayerRoomHistoryItem::machine)
+            LevelBlockPosition.CODEC.fieldOf("dev/compactmods/machines/api/machine").forGetter(PlayerRoomHistoryItem::machine)
     ).apply(i, PlayerRoomHistoryItem::new));
 
     @Override

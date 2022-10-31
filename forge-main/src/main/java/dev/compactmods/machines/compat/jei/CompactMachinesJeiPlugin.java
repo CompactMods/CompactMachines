@@ -1,7 +1,7 @@
 package dev.compactmods.machines.compat.jei;
 
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.JeiInfo;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.JeiInfo;
 import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.Machines;

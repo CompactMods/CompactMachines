@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 public record RoomUpgradeGraphNode(ResourceLocation key) implements IGraphNode {
 
     public static final Codec<RoomUpgradeGraphNode> CODEC = RecordCodecBuilder.create(i -> i.group(
-            ResourceLocation.CODEC.fieldOf("upgrade").forGetter(RoomUpgradeGraphNode::key)
+            ResourceLocation.CODEC.fieldOf("dev/compactmods/machines/api/upgrade").forGetter(RoomUpgradeGraphNode::key)
     ).apply(i, RoomUpgradeGraphNode::new));
 
     @Override

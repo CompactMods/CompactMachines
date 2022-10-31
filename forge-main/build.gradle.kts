@@ -12,16 +12,7 @@ var minecraft_version: String by extra
 var forge_version: String by extra
 var parchment_version: String by extra
 
-tasks.create("getBuildInfo") {
-    println("Mod ID: ${mod_id}")
-    println("Version: ${version}")
-    println("Semver Version: ${semver}")
-    println("Nightly Build: ${nightlyVersion}")
-}
-
 plugins {
-    id("idea")
-    id("eclipse")
     id("maven-publish")
     id("net.minecraftforge.gradle") version ("5.1.+")
     id("org.parchmentmc.librarian.forgegradle") version ("1.+")
@@ -49,6 +40,7 @@ sourceSets.test {
     resources.srcDir("src/test/resources")
 }
 
+project.evaluationDependsOn(project(":common-api").path)
 project.evaluationDependsOn(project(":forge-api").path)
 
 repositories {
@@ -113,7 +105,7 @@ dependencies {
     minecraftLibrary("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
-    val include_test_mods: String? by extra
+    val include_test_mods: String? by project.extra
     if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
         // Nicephore - Screenshots and Stuff
         runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3879841"))
@@ -158,6 +150,7 @@ dependencies {
 }
 
 val runDepends: List<Project> = listOf(
+        project(":common-api"),
         project(":forge-api"),
         project(":forge-tunnels")
 )
@@ -167,7 +160,7 @@ runDepends.forEach {
 }
 
 minecraft {
-    mappings("parchment", parchment_version)
+    mappings("parchment", "${parchment_version}-${minecraft_version}")
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -183,11 +176,11 @@ minecraft {
 
             ideaModule("Compact_Machines.forge-main.main")
 
-            if (!System.getenv().containsKey("CI")) {
-                // JetBrains Runtime Hotswap
-                jvmArg("-XX:+AllowEnhancedClassRedefinition")
-                jvmArg("-XX:HotswapAgent=fatjar")
-            }
+//            if (!System.getenv().containsKey("CI")) {
+//                // JetBrains Runtime Hotswap
+//                jvmArg("-XX:+AllowEnhancedClassRedefinition")
+//                jvmArg("-XX:HotswapAgent=fatjar")
+//            }
 
             source(sourceSets.main.get())
             mods.create(mod_id) {

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.core;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;

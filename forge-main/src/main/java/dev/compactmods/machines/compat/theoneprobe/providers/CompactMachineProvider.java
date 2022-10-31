@@ -1,8 +1,8 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
-import dev.compactmods.machines.api.core.CMTags;
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.CMTags;
+import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.compat.theoneprobe.elements.PlayerFaceElement;
@@ -34,7 +34,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
     @Override
     public ResourceLocation getID() {
-        return new ResourceLocation(Constants.MOD_ID, "machine");
+        return new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine");
     }
 
     @Override

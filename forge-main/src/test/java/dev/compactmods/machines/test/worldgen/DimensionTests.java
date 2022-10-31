@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.worldgen;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.gametest.framework.GameTest;

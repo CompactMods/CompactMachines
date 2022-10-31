@@ -50,15 +50,23 @@ sourceSets {
 }
 
 configure<UserDevExtension> {
-    mappings("parchment", parchment_version)
+    mappings("parchment", "${parchment_version}-${minecraft_version}")
     accessTransformer(file("../forge-main/src/main/resources/META-INF/accesstransformer.cfg"))
 }
 
+project.evaluationDependsOn(project(":common-api").path)
+
 dependencies {
     minecraft ("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
+    // implementation(project(":common-api"))
+    implementation(fg.deobf(project(":common-api")))
 }
 
 tasks.withType<Jar> {
+    // include common classes
+    val commonApi = project(":common-api").tasks.jar.get().archiveFile;
+    from(commonApi.map { zipTree(it) })
+
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(mapOf(

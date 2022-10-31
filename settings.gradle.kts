@@ -2,9 +2,15 @@ pluginManagement {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven("https://repo.spongepowered.org/repository/maven-public")
         maven("https://maven.minecraftforge.net")
-        maven("https://maven.parchmentmc.org")
+
+        maven("https://maven.parchmentmc.org") {
+            name = "ParchmentMC"
+        }
+
+        maven("https://maven.fabricmc.net") {
+            name = "Fabric"
+        }
     }
 
     resolutionStrategy {
@@ -14,7 +20,12 @@ pluginManagement {
             }
         }
     }
+
+    plugins {
+        id("fabric-loom").version(settings.extra["loom_version"] as String)
+    }
 }
 
 rootProject.name = "Compact Machines"
+include("common-api")
 include("forge-api", "forge-main", "forge-tunnels")

@@ -216,7 +216,7 @@ public class DimensionMachineGraph extends SavedData {
     private record CompactMachineConnectionInfo(String roomCode, List<BlockPos> machines) {
         public static final Codec<CompactMachineConnectionInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.STRING
-                        .fieldOf("room")
+                        .fieldOf("dev/compactmods/machines/api/room")
                         .forGetter(CompactMachineConnectionInfo::roomCode),
 
                 BlockPos.CODEC.listOf()

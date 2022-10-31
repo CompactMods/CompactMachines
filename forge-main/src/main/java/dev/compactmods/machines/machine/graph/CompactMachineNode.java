@@ -2,7 +2,7 @@ package dev.compactmods.machines.machine.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
@@ -18,10 +18,10 @@ import net.minecraft.world.level.Level;
 public record CompactMachineNode(ResourceKey<Level> dimension, BlockPos position)
         implements IGraphNode {
 
-    public static final ResourceLocation TYPE = new ResourceLocation(Constants.MOD_ID, "machine");
+    public static final ResourceLocation TYPE = new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine");
 
     public static final Codec<CompactMachineNode> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(CompactMachineNode::dimension),
+            Level.RESOURCE_KEY_CODEC.fieldOf("dev/compactmods/machines/api/dimension").forGetter(CompactMachineNode::dimension),
             BlockPos.CODEC.fieldOf("position").forGetter(CompactMachineNode::position),
             ResourceLocation.CODEC.fieldOf("type").forGetter(x -> TYPE)
     ).apply(i, (dim, pos, type) -> new CompactMachineNode(dim, pos)));

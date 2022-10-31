@@ -1,7 +1,7 @@
 package dev.compactmods.machines.advancement.trigger;
 
 import com.google.gson.JsonObject;
-import dev.compactmods.machines.api.core.Advancements;
+import dev.compactmods.machines.api.Advancements;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.DeserializationContext;

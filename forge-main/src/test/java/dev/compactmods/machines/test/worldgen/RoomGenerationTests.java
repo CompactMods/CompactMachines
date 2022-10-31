@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.worldgen;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.util.CompactStructureGenerator;

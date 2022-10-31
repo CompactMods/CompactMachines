@@ -1,16 +1,18 @@
 package dev.compactmods.machines.room.capability;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
 import com.mojang.serialization.DataResult;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem> {
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+
+public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem>, INBTSerializable<ListTag> {
 
     private final Deque<PlayerRoomHistoryItem> history;
 

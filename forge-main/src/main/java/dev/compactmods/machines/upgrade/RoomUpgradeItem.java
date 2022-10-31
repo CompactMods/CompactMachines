@@ -1,6 +1,6 @@
 package dev.compactmods.machines.upgrade;
 
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.upgrade.RoomUpgradeHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;

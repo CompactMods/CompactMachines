@@ -3,8 +3,8 @@ package dev.compactmods.machines.command.data;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -66,7 +66,7 @@ public class CMMachineDataExportCommand {
                 .addColumn("machine_x")
                 .addColumn("machine_y")
                 .addColumn("machine_z")
-                .addColumn("room")
+                .addColumn("dev/compactmods/machines/api/room")
                 .build(writer);
     }
 

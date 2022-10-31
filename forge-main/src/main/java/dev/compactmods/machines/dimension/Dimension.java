@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.registries.RegistryObject;
 
-import static dev.compactmods.machines.api.core.Constants.MOD_ID;
+import static dev.compactmods.machines.api.Constants.MOD_ID;
 
 public class Dimension {
 

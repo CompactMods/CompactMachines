@@ -3,8 +3,8 @@ package dev.compactmods.machines.command.subcommand;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.machines.api.core.CMCommands;
-import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.config.ServerConfig;
@@ -21,7 +21,7 @@ public class SpawnSubcommand {
 
         final var resetSpawn = Commands.literal("reset")
                 .requires(cs -> cs.hasPermission(ServerConfig.changeRoomSpawn()))
-                .then(Commands.argument("room", StringArgumentType.string())
+                .then(Commands.argument("dev/compactmods/machines/api/room", StringArgumentType.string())
                         .executes(SpawnSubcommand::resetRoomSpawn));
 
         spawnRoot.then(resetSpawn);
@@ -32,7 +32,7 @@ public class SpawnSubcommand {
     private static int resetRoomSpawn(CommandContext<CommandSourceStack> ctx) {
         final var src = ctx.getSource();
         final var serv = src.getServer();
-        final var roomCode = StringArgumentType.getString(ctx, "room");
+        final var roomCode = StringArgumentType.getString(ctx, "dev/compactmods/machines/api/room");
 
         try {
             final var compactDim = CompactDimension.forServer(serv);

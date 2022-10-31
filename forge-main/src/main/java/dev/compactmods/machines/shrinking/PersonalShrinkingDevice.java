@@ -1,7 +1,7 @@
 package dev.compactmods.machines.shrinking;
 
-import dev.compactmods.machines.api.core.Messages;
-import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.registration.IMutableRoomRegistration;
 import dev.compactmods.machines.client.gui.PersonalShrinkingDeviceScreen;

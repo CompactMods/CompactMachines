@@ -4,7 +4,7 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;

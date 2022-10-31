@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test;
 
-import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
