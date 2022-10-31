@@ -30,9 +30,7 @@ jobs:
 
       - name: Find Current Tag
         id: version
-        run: |
-          gv=$(git describe --tags --abbrev=0 --match 'v*' --exclude '*-rc*' '@')
-          echo "version=$gv" >> $GITHUB_OUTPUT
+        run: echo "version=$(git describe --tags --abbrev=0 --match 'v*' --exclude '*-rc*' '@')" >> $GITHUB_OUTPUT
 
       - name: Release Type
         id: cf_release_type

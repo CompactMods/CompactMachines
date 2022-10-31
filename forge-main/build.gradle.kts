@@ -208,7 +208,7 @@ minecraft {
             forceExit(false)
 
             args("--mod", mod_id)
-            args("--existing", file("src/main/resources"))
+            args("--existing", project.file("src/main/resources"))
             args("--all")
             args("--output", file("src/generated/resources/"))
         }

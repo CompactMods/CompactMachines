@@ -27,9 +27,9 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
 
         for (Direction dir : Direction.values()) {
 
-            String typedTunnelDirectional = "dev/compactmods/machines/api/tunnels/" + dir.getSerializedName();
+            String typedTunnelDirectional = "tunnels/" + dir.getSerializedName();
             models()
-                    .withExistingParent(typedTunnelDirectional, modLoc("dev/compactmods/machines/api/tunnels/base"))
+                    .withExistingParent(typedTunnelDirectional, modLoc("tunnels/base"))
                     .texture("wall", modLoc("block/" + typedTunnelDirectional))
                     .renderType(mcLoc("cutout")); // NamedRenderTypeManager
 
@@ -54,7 +54,7 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
 
     private void generateTunnelBaseModel() {
         BlockModelBuilder base = models()
-                .withExistingParent("dev/compactmods/machines/api/tunnels/base", new ResourceLocation("minecraft", "block/block"))
+                .withExistingParent("tunnels/base", new ResourceLocation("minecraft", "block/block"))
                 .texture("tunnel", modLoc("block/tunnels/tunnel"))
                 .texture("indicator", modLoc("block/tunnels/indicator"));
 

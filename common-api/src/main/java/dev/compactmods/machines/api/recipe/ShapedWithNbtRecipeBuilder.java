@@ -139,7 +139,7 @@ public class ShapedWithNbtRecipeBuilder implements RecipeBuilder {
 
         @Override
         public void serializeRecipeData(JsonObject json) {
-            if (!this.group.isEmpty()) {
+            if (this.group != null && !this.group.isEmpty()) {
                 json.addProperty("group", this.group);
             }
 
