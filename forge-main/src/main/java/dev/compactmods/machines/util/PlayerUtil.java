@@ -2,7 +2,7 @@ package dev.compactmods.machines.util;
 
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
-import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.core.CompactMachinesNet;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.SimpleTeleporter;

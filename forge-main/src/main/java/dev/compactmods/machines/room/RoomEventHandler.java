@@ -1,7 +1,7 @@
 package dev.compactmods.machines.room;
 
-import dev.compactmods.machines.api.Constants;
-import dev.compactmods.machines.api.Messages;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.core.CompactMachinesNet;

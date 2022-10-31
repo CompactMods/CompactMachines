@@ -1,6 +1,6 @@
 package dev.compactmods.machines.villager;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

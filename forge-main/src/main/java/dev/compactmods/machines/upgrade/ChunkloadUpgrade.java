@@ -2,7 +2,7 @@ package dev.compactmods.machines.upgrade;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;

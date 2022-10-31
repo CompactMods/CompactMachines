@@ -1,7 +1,7 @@
 package dev.compactmods.machines.data.generated.tags;
 
-import dev.compactmods.machines.api.CMTags;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.wall.Walls;

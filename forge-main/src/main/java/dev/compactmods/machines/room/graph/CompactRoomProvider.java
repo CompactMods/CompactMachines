@@ -3,7 +3,7 @@ package dev.compactmods.machines.room.graph;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.machine.client;
 
-import dev.compactmods.machines.api.CMTags;
+import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.machine.item.CompactMachineItem;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import net.minecraft.client.color.block.BlockColor;

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.data.generated;
 
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.core.Direction;

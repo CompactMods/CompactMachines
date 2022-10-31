@@ -1,6 +1,6 @@
 package dev.compactmods.machines.client;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.resources.ResourceLocation;
 
 public class Resources {

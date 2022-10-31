@@ -1,6 +1,6 @@
 package dev.compactmods.machines.client;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.compat.curios.CuriosCompat;
 import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.machine.Machines;

@@ -2,8 +2,8 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
-import dev.compactmods.machines.api.CMRegistries;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.CMRegistries;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;

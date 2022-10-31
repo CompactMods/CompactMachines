@@ -1,7 +1,7 @@
 package dev.compactmods.machines.config;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

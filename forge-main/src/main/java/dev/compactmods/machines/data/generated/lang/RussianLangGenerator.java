@@ -1,8 +1,8 @@
 package dev.compactmods.machines.data.generated.lang;
 
-import dev.compactmods.machines.api.Constants;
-import dev.compactmods.machines.api.Messages;
-import dev.compactmods.machines.api.Tooltips;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.core.Messages;
+import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;

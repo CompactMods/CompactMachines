@@ -1,6 +1,6 @@
 package dev.compactmods.machines.data.generated.tags;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.PoiTypeTagsProvider;

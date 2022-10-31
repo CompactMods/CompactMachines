@@ -1,7 +1,7 @@
 package dev.compactmods.machines.data.generated;
 
 import com.google.gson.JsonObject;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.recipe.ShapedWithNbtRecipeBuilder;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.tunnels.recipe.TunnelRecipeBuilder;

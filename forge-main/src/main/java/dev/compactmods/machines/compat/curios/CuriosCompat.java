@@ -1,6 +1,6 @@
 package dev.compactmods.machines.compat.curios;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;

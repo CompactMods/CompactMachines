@@ -1,7 +1,7 @@
 package dev.compactmods.machines.villager;
 
 import com.google.common.collect.ImmutableSet;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.core.Registries;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;

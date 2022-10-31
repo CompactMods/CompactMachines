@@ -1,7 +1,7 @@
 package dev.compactmods.machines.data.generated.lang;
 
-import dev.compactmods.machines.api.Advancements;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Advancements;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;

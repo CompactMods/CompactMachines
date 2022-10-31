@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
-import static dev.compactmods.machines.api.Constants.MOD_ID;
+import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 
 public class VoidAirBlock extends AirBlock {

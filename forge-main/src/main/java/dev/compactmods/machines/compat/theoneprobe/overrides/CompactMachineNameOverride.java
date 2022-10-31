@@ -1,6 +1,6 @@
 package dev.compactmods.machines.compat.theoneprobe.overrides;
 
-import dev.compactmods.machines.api.CMTags;
+import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;

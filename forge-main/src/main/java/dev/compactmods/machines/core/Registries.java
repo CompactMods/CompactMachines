@@ -1,7 +1,7 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.api.CMRegistries;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.CMRegistries;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
@@ -23,7 +23,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
 
-import static dev.compactmods.machines.api.Constants.MOD_ID;
+import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 public class Registries {
 

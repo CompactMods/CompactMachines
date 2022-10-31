@@ -80,6 +80,9 @@ jarJar.enable()
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
+    implementation(project(":common-api"))
+    testImplementation(project(":common-api"))
+
     implementation(project(":forge-api"))
     testImplementation(project(":forge-api"))
 

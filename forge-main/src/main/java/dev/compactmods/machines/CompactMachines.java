@@ -2,7 +2,7 @@ package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;

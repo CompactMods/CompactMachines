@@ -2,7 +2,7 @@ package dev.compactmods.machines.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.guide.GuideSection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;

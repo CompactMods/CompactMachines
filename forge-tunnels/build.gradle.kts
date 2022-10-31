@@ -13,6 +13,7 @@ var forge_version: String by extra
 var parchment_version: String by extra
 
 val runDepends: List<Project> = listOf(
+        project(":common-api"),
         project(":forge-api")
 )
 

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.core;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.room.network.PlayerRequestedTeleportPacket;
 import dev.compactmods.machines.room.network.SyncRoomMetadataPacket;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;

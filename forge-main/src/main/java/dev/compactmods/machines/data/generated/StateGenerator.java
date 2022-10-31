@@ -1,6 +1,6 @@
 package dev.compactmods.machines.data.generated;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;

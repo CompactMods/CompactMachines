@@ -1,7 +1,7 @@
 package dev.compactmods.machines.data.generated.room;
 
 import com.mojang.serialization.JsonOps;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.machine.LegacySizedTemplates;

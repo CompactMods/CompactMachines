@@ -29,13 +29,10 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: Find Current Tag
-        id: current
-        uses: jimschubert/query-tag-action@v1
-        with:
-          include: 'v*'
-          exclude: '*-rc*'
-          commit-ish: '@'
-          skip-unshallow: 'true'
+        id: version
+        run: |
+          gv=$(git describe --tags --abbrev=0 --match 'v*' --exclude '*-rc*' '@')
+          echo "version=$gv" >> $GITHUB_OUTPUT
 
       - name: Release Type
         id: cf_release_type
@@ -43,12 +40,6 @@ jobs:
         with:
           path: './gradle.properties'
           property: 'cf_release_type'
-
-      - name: Semver Version
-        id: version
-        run: |
-          version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
-          echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Build Version
         id: build

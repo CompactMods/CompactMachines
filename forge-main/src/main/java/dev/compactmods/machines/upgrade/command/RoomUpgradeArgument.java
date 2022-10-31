@@ -4,7 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import dev.compactmods.machines.api.CMCommands;
+import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.i18n.TranslationUtil;

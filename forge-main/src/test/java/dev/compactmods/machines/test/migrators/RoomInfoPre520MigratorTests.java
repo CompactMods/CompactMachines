@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.migrators;
 
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.data.migration.Pre520RoomDataMigrator;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.FileHelper;

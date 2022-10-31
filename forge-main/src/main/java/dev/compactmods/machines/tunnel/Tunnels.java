@@ -22,7 +22,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-import static dev.compactmods.machines.api.Constants.MOD_ID;
+import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 public class Tunnels {
 
