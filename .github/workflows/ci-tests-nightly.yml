@@ -34,7 +34,7 @@ jobs:
 
       - name: Release Type
         id: cf_release_type
-        uses: christian-draeger/read-properties@1.0.1
+        uses: christian-draeger/read-properties@1.1.1
         with:
           path: './gradle.properties'
           property: 'cf_release_type'

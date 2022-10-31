@@ -38,7 +38,7 @@ public class LevelBiomeGenerator implements DataProvider {
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
     private final DataGenerator generator;
 
-    private final ResourceLocation COMPACT_BIOME = new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine");
+    private final ResourceLocation COMPACT_BIOME = new ResourceLocation(Constants.MOD_ID, "machine");
 
     LevelBiomeGenerator(DataGenerator generator) {
         this.generator = generator;
@@ -56,7 +56,7 @@ public class LevelBiomeGenerator implements DataProvider {
 
         var dimTypeWriter = DataGenUtil.makeWriter(GSON, cache, data, ImmutableSet.of("dimension_type"), DimensionType.DIRECT_CODEC, dimTypes);
 
-        var dimWriter = DataGenUtil.makeCustomWriter(GSON, cache, data, ImmutableSet.of("dev/compactmods/machines/api/dimension"), this::writeFlatDimension, dims);
+        var dimWriter = DataGenUtil.makeCustomWriter(GSON, cache, data, ImmutableSet.of("dimension"), this::writeFlatDimension, dims);
 
         writeBiomes(biomeWriter);
         writeDimensionTypes(dimTypeWriter);
