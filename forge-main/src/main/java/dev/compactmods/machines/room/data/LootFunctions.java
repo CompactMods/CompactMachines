@@ -1,6 +1,6 @@
 package dev.compactmods.machines.room.data;
 
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraftforge.registries.RegistryObject;
 

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.dimension;
 
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

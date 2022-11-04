@@ -5,6 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class TunnelRecipeHelper {
     public static ResourceLocation getRecipeId(@NotNull ResourceLocation tunnelType) {
-        return new ResourceLocation(tunnelType.getNamespace(), "dev/compactmods/machines/api/tunnels/" + tunnelType.getPath());
+        return new ResourceLocation(tunnelType.getNamespace(), "tunnels/" + tunnelType.getPath());
     }
 }

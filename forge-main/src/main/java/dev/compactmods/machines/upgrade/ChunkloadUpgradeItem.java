@@ -2,6 +2,7 @@ package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.upgrade.RoomUpgradeHelper;
+import dev.compactmods.machines.room.upgrade.ChunkloadUpgrade;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;

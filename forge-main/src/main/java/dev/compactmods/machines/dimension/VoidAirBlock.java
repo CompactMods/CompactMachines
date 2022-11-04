@@ -1,8 +1,9 @@
 package dev.compactmods.machines.dimension;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.ServerConfig;
+import dev.compactmods.machines.room.capability.RoomCapabilities;
+import dev.compactmods.machines.util.ForgePlayerUtil;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,7 +43,7 @@ public class VoidAirBlock extends AirBlock {
 
             PlayerUtil.howDidYouGetThere(player);
             player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
-            PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
+            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
         }
     }
 }

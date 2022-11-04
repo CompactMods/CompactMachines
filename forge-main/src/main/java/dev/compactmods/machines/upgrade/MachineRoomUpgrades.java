@@ -2,9 +2,10 @@ package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.core.Registries;
-import dev.compactmods.machines.upgrade.workbench.RoomUpgradeWorkbench;
-import dev.compactmods.machines.upgrade.workbench.RoomUpgradeWorkbenchEntity;
+import dev.compactmods.machines.Registries;
+import dev.compactmods.machines.room.upgrade.ChunkloadUpgrade;
+import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbench;
+import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbenchEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;

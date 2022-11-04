@@ -2,12 +2,12 @@ package dev.compactmods.machines.command.data;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
+import dev.compactmods.machines.core.LoggingUtil;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,13 +15,16 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.CsvOutput;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class CMRoomDataExportCommand {
+
+    private static final Logger LOGGER = LoggingUtil.modLog();
 
     public static ArgumentBuilder<CommandSourceStack, ?> makeRoomCsv() {
         return Commands.literal("rooms")
@@ -47,7 +50,7 @@ public class CMRoomDataExportCommand {
 
             writer.close();
         } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
+            LOGGER.error(e);
             src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
             return -1;
         }
@@ -55,10 +58,10 @@ public class CMRoomDataExportCommand {
         return 0;
     }
 
-    @Nonnull
+    @NotNull
     private static CsvOutput makeCsv(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
-                .addColumn("dev/compactmods/machines/api/room")
+                .addColumn("room")
                 .addColumn("owner_uuid")
                 .addColumn("size_x")
                 .addColumn("size_y")
@@ -81,7 +84,7 @@ public class CMRoomDataExportCommand {
                     spawn.x, spawn.y, spawn.z
             );
         } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
+            LOGGER.error(e);
         }
     }
 }

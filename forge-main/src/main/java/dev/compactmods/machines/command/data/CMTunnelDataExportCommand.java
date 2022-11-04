@@ -4,11 +4,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.core.LoggingUtil;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -17,20 +17,23 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.CsvOutput;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class CMTunnelDataExportCommand {
 
+    private static final Logger LOGGER = LoggingUtil.modLog();
+
     public static ArgumentBuilder<CommandSourceStack, ?> makeTunnelCsv() {
         var chunk = Commands
-                .argument("dev/compactmods/machines/api/room", StringArgumentType.string())
+                .argument("room", StringArgumentType.string())
                 .executes(CMTunnelDataExportCommand::exec);
 
-        return Commands.literal("dev/compactmods/machines/api/tunnels")
+        return Commands.literal("tunnels")
                 .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(CMTunnelDataExportCommand::execAll)
                 .then(chunk);
@@ -57,13 +60,13 @@ public class CMTunnelDataExportCommand {
                     try {
                         writeRoomTunnels(compactDim, room.code(), builder);
                     } catch (MissingDimensionException e) {
-                        CompactMachines.LOGGER.error(e);
+                        LOGGER.error(e);
                     }
                 });
 
                 writer.close();
             } catch (IOException e) {
-                CompactMachines.LOGGER.error(e);
+                LOGGER.error(e);
                 src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
                 return -1;
             }
@@ -78,7 +81,7 @@ public class CMTunnelDataExportCommand {
         var src = ctx.getSource();
         ServerPlayer player = src.getPlayerOrException();
 
-        final var room = StringArgumentType.getString(ctx, "dev/compactmods/machines/api/room");
+        final var room = StringArgumentType.getString(ctx, "room");
         final var compactDim = src.getServer().getLevel(CompactDimension.LEVEL_KEY);
 
         var outdir = src.getServer().getFile(Constants.MOD_ID);
@@ -95,17 +98,17 @@ public class CMTunnelDataExportCommand {
 
             writer.close();
         } catch (IOException e) {
-            CompactMachines.LOGGER.error(e);
+            LOGGER.error(e);
             src.sendFailure(TranslationUtil.command(CMCommands.FAILED_CMD_FILE_ERROR));
             return -1;
         } catch (MissingDimensionException e) {
-            CompactMachines.LOGGER.error(e);
+            LOGGER.error(e);
         }
 
         return 0;
     }
 
-    @Nonnull
+    @NotNull
     private static CsvOutput makeTunnelCsvOut(BufferedWriter writer) throws IOException {
         return CsvOutput.builder()
                 .addColumn("type")
@@ -127,7 +130,7 @@ public class CMTunnelDataExportCommand {
                         info.machine()
                 );
             } catch (IOException e) {
-                CompactMachines.LOGGER.warn("Error writing tunnel record.", e);
+                LOGGER.warn("Error writing tunnel record.", e);
             }
         });
     }

@@ -8,6 +8,7 @@ import dev.compactmods.machines.advancement.trigger.BasicPlayerAdvTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.core.LoggingUtil;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -23,6 +24,8 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -33,6 +36,8 @@ import java.util.function.Supplier;
 
 public class AdvancementGenerator implements DataProvider {
 
+    private static final Logger LOGGER = LoggingUtil.modLog();
+
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
     private final DataGenerator generator;
 
@@ -41,7 +46,7 @@ public class AdvancementGenerator implements DataProvider {
     }
 
     @Override
-    public void run(@Nonnull CachedOutput cache) {
+    public void run(@NotNull CachedOutput cache) {
         Path path = this.generator.getOutputFolder();
         Set<ResourceLocation> set = Sets.newHashSet();
         Consumer<Advancement> consumer = (adv) -> {
@@ -53,7 +58,7 @@ public class AdvancementGenerator implements DataProvider {
                 try {
                     DataProvider.saveStable(cache, adv.deconstruct().serializeToJson(), path1);
                 } catch (IOException ioexception) {
-                    CompactMachines.LOGGER.error("Couldn't save advancement {}", path1, ioexception);
+                    LOGGER.error("Couldn't save advancement {}", path1, ioexception);
                 }
 
             }

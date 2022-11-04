@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;

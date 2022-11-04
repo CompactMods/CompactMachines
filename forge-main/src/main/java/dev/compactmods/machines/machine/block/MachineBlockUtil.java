@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.ServerConfig;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.machine.item.LegacyCompactMachineItem;
@@ -14,6 +14,7 @@ import dev.compactmods.machines.room.RoomHelper;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.CompactStructureGenerator;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -76,7 +77,8 @@ public class MachineBlockUtil {
                     .setOwner(owner.getUUID()));
 
             // Generate a new machine room
-            CompactStructureGenerator.generateRoom(compactDim, template.dimensions(), newRoom.center());
+            final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+            CompactStructureGenerator.generateRoom(compactDim, template.dimensions(), newRoom.center(), unbreakableWall);
 
             // If template specified, prefill new room
             if (!template.prefillTemplate().equals(RoomTemplate.NO_TEMPLATE)) {

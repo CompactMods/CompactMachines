@@ -4,9 +4,9 @@ import java.util.Collection;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.util.PlayerUtil;
+import dev.compactmods.machines.util.ForgePlayerUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -25,7 +25,7 @@ public class CMEjectSubcommand {
         Collection<ServerPlayer> ent = EntityArgument.getPlayers(ctx, "player");
         ent.forEach(player -> {
             player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
-            PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
+            ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
         });
 
         return 0;
@@ -35,7 +35,7 @@ public class CMEjectSubcommand {
         final ServerPlayer player = ctx.getSource().getPlayerOrException();
 
         player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);
-        PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
+        ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
 
         return 0;
     }

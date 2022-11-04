@@ -1,7 +1,7 @@
 package dev.compactmods.machines.wall;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;

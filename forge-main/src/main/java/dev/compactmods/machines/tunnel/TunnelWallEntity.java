@@ -2,6 +2,7 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
+import dev.compactmods.machines.api.tunnels.ITunnelHolder;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
@@ -33,9 +34,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 
-public class TunnelWallEntity extends BlockEntity {
+public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
 
-    private static final String NBT_LEGACY_MACHINE_KEY = "dev/compactmods/machines/api/machine";
+    private static final String NBT_LEGACY_MACHINE_KEY = "machine";
 
     private LevelBlockPosition connectedMachine;
     private TunnelDefinition tunnelType;

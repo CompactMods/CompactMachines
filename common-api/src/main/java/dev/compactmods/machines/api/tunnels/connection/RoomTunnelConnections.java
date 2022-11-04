@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface RoomTunnelConnections {
@@ -15,4 +16,6 @@ public interface RoomTunnelConnections {
      * @return
      */
     Stream<BlockPos> getRedstoneTunnels(IDimensionalBlockPosition machine, Direction facing);
+
+    Optional<Direction> getConnectedSide(BlockPos position);
 }

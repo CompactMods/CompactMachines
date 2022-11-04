@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
 
 public interface MachineTags {
 
-    TagKey<Block> BLOCK = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine"));
-    TagKey<Item> ITEM = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine"));
+    TagKey<Block> BLOCK = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(Constants.MOD_ID, "machine"));
+    TagKey<Item> ITEM = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Constants.MOD_ID, "machine"));
 
 }

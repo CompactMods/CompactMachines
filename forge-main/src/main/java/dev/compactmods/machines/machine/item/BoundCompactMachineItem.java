@@ -1,25 +1,34 @@
 package dev.compactmods.machines.machine.item;
 
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.Machines;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class BoundCompactMachineItem extends CompactMachineItem {
+public class BoundCompactMachineItem extends BlockItem implements ICompactMachineItem {
     public static final String ROOM_NBT = "room_pos";
     public static final String ROOM_DIMENSIONS_NBT = "room_dimensions";
+
+    public static Holder<Item> REFERENCE_HOLDER = Holder.Reference.createStandAlone(Registry.ITEM,
+            ResourceKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Constants.MOD_ID, "machine")));
 
     public BoundCompactMachineItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
@@ -56,9 +65,9 @@ public class BoundCompactMachineItem extends CompactMachineItem {
     }
 
     public static ItemStack createForRoom(IBasicRoomInfo room) {
-        ItemStack item = new ItemStack(Machines.BOUND_MACHINE_BLOCK_ITEM.get());
+        ItemStack item = new ItemStack(REFERENCE_HOLDER);
         setRoom(item, room.code());
-        setColor(item, room.color());
+        ICompactMachineItem.setColor(item, room.color());
         return item;
     }
 

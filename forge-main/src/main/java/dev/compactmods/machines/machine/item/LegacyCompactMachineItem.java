@@ -3,24 +3,25 @@ package dev.compactmods.machines.machine.item;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;
+import dev.compactmods.machines.machine.Machines;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 @SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "5.2.0")
-public class LegacyCompactMachineItem extends CompactMachineItem {
+public class LegacyCompactMachineItem extends BlockItem implements ICompactMachineItem {
     public LegacyCompactMachineItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
     }

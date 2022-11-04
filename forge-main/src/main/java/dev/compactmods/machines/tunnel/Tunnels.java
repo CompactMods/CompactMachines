@@ -2,11 +2,13 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.graph.IGraphNodeType;
 import dev.compactmods.machines.graph.SimpleGraphNodeType;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
+import dev.compactmods.machines.tunnel.graph.TunnelMachineEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
+import dev.compactmods.machines.tunnel.graph.TunnelTypeEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelTypeNode;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -29,9 +31,9 @@ public class Tunnels {
     public static final Supplier<IForgeRegistry<TunnelDefinition>> TUNNEL_DEF_REGISTRY = Registries.TUNNEL_DEFINITIONS
             .makeRegistry(RegistryBuilder::new);
     public static final RegistryObject<IGraphNodeType<TunnelNode>> TUNNEL_NODE = Registries.NODE_TYPES
-            .register("tunnel", SimpleGraphNodeType.instance(TunnelNode.CODEC));
+            .register("tunnel", SimpleGraphNodeType.supplier(TunnelNode.CODEC));
     public static final RegistryObject<IGraphNodeType<TunnelTypeNode>> TUNNEL_TYPE_NODE = Registries.NODE_TYPES
-            .register("tunnel_type", SimpleGraphNodeType.instance(TunnelTypeNode.CODEC));
+            .register("tunnel_type", SimpleGraphNodeType.supplier(TunnelTypeNode.CODEC));
 
     public static boolean isRegistered(ResourceLocation id) {
         return TUNNEL_DEF_REGISTRY.get().containsKey(id);
@@ -41,6 +43,13 @@ public class Tunnels {
         if (isRegistered(id)) return TUNNEL_DEF_REGISTRY.get().getValue(id);
         CompactMachines.LOGGER.warn("Unknown tunnel requested: {}", id);
         return Tunnels.UNKNOWN.get();
+    }
+
+    // Graph Objects
+    static {
+        // Tunnel edges
+        Registries.EDGE_TYPES.register("tunnel_type", () -> TunnelTypeEdge.EDGE_TYPE);
+        Registries.EDGE_TYPES.register("tunnel_machine", () -> TunnelMachineEdge.EDGE_TYPE);
     }
 
     // ================================================================================================================

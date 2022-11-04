@@ -40,11 +40,10 @@ sourceSets.test {
     resources.srcDir("src/test/resources")
 }
 
-project.evaluationDependsOn(project(":common-api").path)
-project.evaluationDependsOn(project(":forge-api").path)
 
 repositories {
     mavenLocal()
+
     mavenCentral() {
         content {
             includeGroup("com.aventrix.jnanoid")
@@ -76,18 +75,34 @@ val jei_mc_version: String by extra
 val curios_version: String? by extra
 
 jarJar.enable()
+val runDepends: List<Project> = listOf(
+        project(":common-api"),
+        project(":common-main"),
+        project(":forge-api"),
+        project(":forge-tunnels")
+)
+
+runDepends.forEach {
+    project.evaluationDependsOn(it.path)
+}
 
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
-    implementation(project(":common-api"))
-    testImplementation(project(":common-api"))
+    implementation(fg.deobf(project(":common-api")))
+    testImplementation(fg.deobf(project(":common-api")))
 
     implementation(project(":forge-api"))
     testImplementation(project(":forge-api"))
 
+    implementation(fg.deobf(project(":common-main")))
+    testImplementation(fg.deobf(project(":common-main")))
+
     implementation(project(":forge-tunnels"))
     testImplementation(project(":forge-tunnels"))
+
+    minecraftLibrary("com.aventrix.jnanoid", "jnanoid", "2.0.0")
+    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
     // JEI
     if (project.extra.has("jei_version") && project.extra.has("jei_mc_version")) {
@@ -104,9 +119,6 @@ dependencies {
         runtimeOnly(fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}"))
         compileOnly(fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api"))
     }
-
-    minecraftLibrary("com.aventrix.jnanoid", "jnanoid", "2.0.0")
-    jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
 
     val include_test_mods: String? by project.extra
     if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
@@ -150,16 +162,6 @@ dependencies {
         // runtimeOnly(fg.deobf("curse.maven:cyclopscore-232758:3809427"))
         // runtimeOnly(fg.deobf("curse.maven:everlastabilities-248353:3768481"))
     }
-}
-
-val runDepends: List<Project> = listOf(
-        project(":common-api"),
-        project(":forge-api"),
-        project(":forge-tunnels")
-)
-
-runDepends.forEach {
-    project.evaluationDependsOn(it.path)
 }
 
 minecraft {

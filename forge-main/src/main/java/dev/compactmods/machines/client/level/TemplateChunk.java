@@ -1,28 +1,19 @@
 package dev.compactmods.machines.client.level;
 
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.advancement.GenericAdvancementTriggerListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.ticks.TickContainerAccess;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -75,9 +66,9 @@ public class TemplateChunk extends EmptyLevelChunk {
         this.tickers.forEach((pos, ticker) -> ticker.tick(this.getLevel(), pos, getBlockState(pos), tiles.get(pos)));
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public BlockState getBlockState(@Nonnull BlockPos pos) {
+    public BlockState getBlockState(@NotNull BlockPos pos) {
         if (shouldShow.test(pos)) {
             var state = blocksInChunk.get(pos);
             if (state != null)
@@ -87,16 +78,16 @@ public class TemplateChunk extends EmptyLevelChunk {
         return Blocks.VOID_AIR.defaultBlockState();
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public FluidState getFluidState(@Nonnull BlockPos pos) {
+    public FluidState getFluidState(@NotNull BlockPos pos) {
         return getBlockState(pos).getFluidState();
     }
 
 
     @Nullable
     @Override
-    public BlockEntity getBlockEntity(@Nonnull BlockPos pos, @Nonnull EntityCreationType creationMode) {
+    public BlockEntity getBlockEntity(@NotNull BlockPos pos, @NotNull EntityCreationType creationMode) {
         if (!shouldShow.test(pos))
             return null;
         return tiles.get(pos);

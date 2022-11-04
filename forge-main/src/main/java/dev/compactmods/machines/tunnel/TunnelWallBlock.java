@@ -27,6 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -43,7 +44,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
     public static final BooleanProperty REDSTONE = BooleanProperty.create("redstone");
 
-    public TunnelWallBlock(Properties props) {
+    public TunnelWallBlock(BlockBehaviour.Properties props) {
         super(props);
         registerDefaultState(getStateDefinition().any()
                 .setValue(CONNECTED_SIDE, Direction.UP)

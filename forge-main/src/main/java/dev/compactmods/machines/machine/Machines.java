@@ -1,8 +1,9 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.machine.MachineIds;
 import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.machine.block.CompactMachineBlock;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;
@@ -45,7 +46,7 @@ public class Machines {
     public static final RegistryObject<Block> MACHINE_BLOCK_MAXIMUM = Registries.BLOCKS.register("machine_maximum", () ->
             new LegacySizedCompactMachineBlock(RoomSize.MAXIMUM, MACHINE_BLOCK_PROPS));
 
-    public static final RegistryObject<Block> MACHINE_BLOCK = Registries.BLOCKS.register("dev/compactmods/machines/api/machine", () ->
+    public static final RegistryObject<Block> MACHINE_BLOCK = Registries.BLOCKS.register("machine", () ->
             new CompactMachineBlock(MACHINE_BLOCK_PROPS));
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_TINY = Registries.ITEMS.register("machine_tiny",
@@ -66,14 +67,14 @@ public class Machines {
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = Registries.ITEMS.register("machine_maximum",
             () -> new LegacyCompactMachineItem(MACHINE_BLOCK_MAXIMUM.get(), MACHINE_ITEM_PROPS.get()));
 
-    public static final RegistryObject<Item> BOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("dev/compactmods/machines/api/machine",
+    public static final RegistryObject<Item> BOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("machine",
             () -> new BoundCompactMachineItem(MACHINE_BLOCK.get(), MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
 
 
     public static final RegistryObject<Item> UNBOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("new_machine",
             () -> new UnboundCompactMachineItem(MACHINE_BLOCK.get(), MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
 
-    public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = Registries.BLOCK_ENTITIES.register("compact_machine", () ->
+    public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineIds.BLOCK_ENTITY.getPath(), () ->
             BlockEntityType.Builder.of(CompactMachineBlockEntity::new,
                             MACHINE_BLOCK.get(),
                             MACHINE_BLOCK_TINY.get(), MACHINE_BLOCK_SMALL.get(), MACHINE_BLOCK_NORMAL.get(),

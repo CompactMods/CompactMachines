@@ -125,12 +125,12 @@ public class Pre520RoomDataMigrator {
                         .forEach(machConnTag -> {
                             // Loop machine-room connection info, replace room pos with room code
                             if (machConnTag instanceof CompoundTag ct) {
-                                final var oldChunk = ct.getIntArray("dev/compactmods/machines/api/room");
+                                final var oldChunk = ct.getIntArray("room");
                                 final var oldRoomPos = new ChunkPos(oldChunk[0], oldChunk[1]);
                                 if (roomChunkLookup.containsKey(oldRoomPos)) {
                                     final var newCode = roomChunkLookup.get(oldRoomPos);
-                                    ct.remove("dev/compactmods/machines/api/room");
-                                    ct.putString("dev/compactmods/machines/api/room", newCode);
+                                    ct.remove("room");
+                                    ct.putString("room", newCode);
                                     UPDATER_LOGGER.debug(UPDATER, "Assigning new code to room {}; code: {}", oldRoomPos.toString(), newCode);
                                 }
                             }
@@ -144,7 +144,7 @@ public class Pre520RoomDataMigrator {
 
     public static void migrateTunnelFiles(LevelStorageSource.LevelDirectory levelDirectory, HashMap<ChunkPos, String> roomChunkLookup, Path backupDir)
             throws IOException {
-        Files.createDirectories(backupDir.resolve("dev/compactmods/machines/api/tunnels"));
+        Files.createDirectories(backupDir.resolve("tunnels"));
 
         final var dataStore = CompactDimension.getDataStorage(levelDirectory);
         for(final var room : roomChunkLookup.entrySet()) {
@@ -153,7 +153,7 @@ public class Pre520RoomDataMigrator {
             final var newFile = dataStore.getDataFile(TunnelConnectionGraph.getDataFilename(room.getValue()));
             if(oldFile.exists()) {
                 final var oldFilePath = oldFile.toPath();
-                Files.copy(oldFilePath, backupDir.resolve("dev/compactmods/machines/api/tunnels").resolve(prevFilename + ".dat.backup"));
+                Files.copy(oldFilePath, backupDir.resolve("tunnels").resolve(prevFilename + ".dat.backup"));
                 Files.copy(oldFilePath, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(oldFilePath);
             }

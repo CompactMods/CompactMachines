@@ -8,16 +8,18 @@ import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
-import dev.compactmods.machines.core.CompactMachinesNet;
+import dev.compactmods.machines.network.CompactMachinesNet;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
-import dev.compactmods.machines.location.SimpleTeleporter;
+import dev.compactmods.machines.dimension.SimpleTeleporter;
+import dev.compactmods.machines.network.SyncRoomMetadataPacket;
+import dev.compactmods.machines.room.capability.RoomCapabilities;
 import dev.compactmods.machines.room.client.RoomClientHelper;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
-import dev.compactmods.machines.room.network.SyncRoomMetadataPacket;
 import dev.compactmods.machines.room.server.RoomServerHelper;
+import dev.compactmods.machines.util.ForgePlayerUtil;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.server.MinecraftServer;
@@ -29,6 +31,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -39,7 +42,10 @@ public class RoomHelper {
     });
 
     public static Registry<RoomTemplate> getTemplates() {
-        return DistExecutor.safeRunForDist(() -> RoomClientHelper::getTemplates, () -> RoomServerHelper::getTemplates);
+        return DistExecutor.safeRunForDist(() -> RoomClientHelper::getTemplates, () -> {
+            final var serv = ServerLifecycleHooks.getCurrentServer();
+            return () -> RoomServerHelper.getTemplates(serv);
+        });
     }
 
     public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, LevelBlockPosition machinePos, IRoomRegistration room) throws MissingDimensionException {
@@ -147,11 +153,11 @@ public class RoomHelper {
                         PlayerUtil.howDidYouGetThere(serverPlayer);
 
                         hist.clear();
-                        PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                        ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
                     }
                 }, () -> {
                     PlayerUtil.howDidYouGetThere(serverPlayer);
-                    PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                    ForgePlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
                 });
     }
 }

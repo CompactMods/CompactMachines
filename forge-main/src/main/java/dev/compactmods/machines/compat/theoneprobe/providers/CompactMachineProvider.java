@@ -34,7 +34,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
     @Override
     public ResourceLocation getID() {
-        return new ResourceLocation(Constants.MOD_ID, "dev/compactmods/machines/api/machine");
+        return new ResourceLocation(Constants.MOD_ID, "machine");
     }
 
     @Override

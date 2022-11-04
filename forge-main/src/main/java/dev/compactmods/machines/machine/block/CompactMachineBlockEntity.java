@@ -3,6 +3,8 @@ package dev.compactmods.machines.machine.block;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.machine.IMachineBlockEntity;
+import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
@@ -38,17 +40,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class CompactMachineBlockEntity extends BlockEntity {
+public class CompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
 
     /**
      * @deprecated Store a room code instead or use room lookup utils
      */
     @Deprecated(forRemoval = true, since = "5.2.0")
     public static final String NBT_ROOM_POS = "room_pos";
-    public static final String NBT_ROOM_CODE = "room_code";
-    public static final String NBT_CUSTOM_COLOR = "machine_color";
-    public static final String NBT_TEMPLATE_ID = "template_id";
-    private static final String NBT_ROOM_COLOR = "room_color";
+    private static final String NBT_ROOM_CODE = MachineEntityNbt.NBT_ROOM_CODE;
+    private static final String NBT_CUSTOM_COLOR = MachineEntityNbt.NBT_CUSTOM_COLOR;
+    private static final String NBT_TEMPLATE_ID = MachineEntityNbt.NBT_TEMPLATE_ID;
+    private static final String NBT_ROOM_COLOR = MachineEntityNbt.NBT_ROOM_COLOR;
 
     @Nullable
     private ResourceLocation roomTemplateId = null;

@@ -27,5 +27,5 @@ pluginManagement {
 }
 
 rootProject.name = "Compact Machines"
-include("common-api")
+include("common-api", "common-main")
 include("forge-api", "forge-main", "forge-tunnels")

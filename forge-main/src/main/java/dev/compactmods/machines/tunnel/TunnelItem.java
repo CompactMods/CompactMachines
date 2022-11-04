@@ -5,13 +5,13 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
-import dev.compactmods.machines.core.CompactMachinesNet;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.network.CompactMachinesNet;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.room.RoomCapabilities;
+import dev.compactmods.machines.room.capability.RoomCapabilities;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class TunnelItem extends Item {
+public class TunnelItem extends Item implements ITunnelItem {
     public TunnelItem(Properties properties) {
         super(properties);
     }
@@ -66,7 +66,7 @@ public class TunnelItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        String key = getDefinition(stack)
+        String key = ITunnelItem.getDefinition(stack)
                 .map(def -> {
                     ResourceLocation id = Tunnels.getRegistryId(def);
                     return TranslationUtil.tunnelId(id);
@@ -78,7 +78,7 @@ public class TunnelItem extends Item {
 
     @Override
     public void appendHoverText(@Nonnull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        getDefinition(stack).ifPresent(tunnelDef -> {
+        ITunnelItem.getDefinition(stack).ifPresent(tunnelDef -> {
             if (Screen.hasShiftDown()) {
                 MutableComponent type = Component.translatable("tooltip." + Constants.MOD_ID + ".tunnel_type", Tunnels.getRegistryId(tunnelDef))
                         .withStyle(ChatFormatting.GRAY)
@@ -107,18 +107,7 @@ public class TunnelItem extends Item {
         }
     }
 
-    public static Optional<TunnelDefinition> getDefinition(ItemStack stack) {
-        CompoundTag defTag = stack.getOrCreateTagElement("definition");
-        if (defTag.isEmpty() || !defTag.contains("id"))
-            return Optional.empty();
 
-        ResourceLocation defId = new ResourceLocation(defTag.getString("id"));
-        if (!Tunnels.isRegistered(defId))
-            return Optional.empty();
-
-        TunnelDefinition tunnelReg = Tunnels.getDefinition(defId);
-        return Optional.ofNullable(tunnelReg);
-    }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -131,7 +120,7 @@ public class TunnelItem extends Item {
 
         if(level instanceof ServerLevel sl && sl.dimension().equals(CompactDimension.LEVEL_KEY)) {
             if (state.getBlock() instanceof SolidWallBlock && player != null) {
-                getDefinition(context.getItemInHand()).ifPresent(def -> {
+                ITunnelItem.getDefinition(context.getItemInHand()).ifPresent(def -> {
                     try {
                         boolean success = setupTunnelWall(sl, position, context.getClickedFace(), player, def);
                         if (success && !player.isCreative())

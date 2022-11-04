@@ -23,10 +23,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +46,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
     // client-side
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity be) {
             return be.basicRoomInfo()
                     .map(BoundCompactMachineItem::createForRoom)
@@ -64,7 +63,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void fillItemCategory(@Nonnull CreativeModeTab tab, @Nonnull NonNullList<ItemStack> tabItems) {
+    public void fillItemCategory(@NotNull CreativeModeTab tab, @NotNull NonNullList<ItemStack> tabItems) {
         var reg = RoomHelper.getTemplates();
         // todo - fix ordering
         tabItems.addAll(reg.entrySet()
@@ -81,14 +80,14 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new CompactMachineBlockEntity(pos, state);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @SuppressWarnings("deprecation")
-    public InteractionResult use(@Nonnull BlockState state, Level level, @Nonnull BlockPos pos, Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hitResult) {
+    public InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {

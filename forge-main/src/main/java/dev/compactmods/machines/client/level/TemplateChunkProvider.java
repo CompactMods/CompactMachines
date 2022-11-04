@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -12,9 +11,8 @@ import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +63,7 @@ public class TemplateChunkProvider extends ChunkSource {
 
     @Nullable
     @Override
-    public ChunkAccess getChunk(int chunkX, int chunkZ, @Nonnull ChunkStatus requiredStatus, boolean load)
+    public ChunkAccess getChunk(int chunkX, int chunkZ, @NotNull ChunkStatus requiredStatus, boolean load)
     {
         return chunks.computeIfAbsent(new ChunkPos(chunkX, chunkZ), p -> {
             return new EmptyLevelChunk(world, p, world.getUncachedNoiseBiome(0, 0, 0));
@@ -77,7 +75,7 @@ public class TemplateChunkProvider extends ChunkSource {
 
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String gatherStats()
     {
@@ -90,14 +88,14 @@ public class TemplateChunkProvider extends ChunkSource {
         return 0;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public LevelLightEngine getLightEngine()
     {
         return lightManager;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public BlockGetter getLevel()
     {

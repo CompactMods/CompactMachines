@@ -6,13 +6,12 @@ import dev.compactmods.machines.codec.NbtListCollector;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
 
-public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem>, INBTSerializable<ListTag> {
+public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem> {
 
     private final Deque<PlayerRoomHistoryItem> history;
 
@@ -45,7 +44,6 @@ public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem>, INBTS
         history.add(item);
     }
 
-    @Override
     public ListTag serializeNBT() {
         return history.stream()
                 .map(hi -> PlayerRoomHistoryItem.CODEC.encodeStart(NbtOps.INSTANCE, hi))
@@ -56,7 +54,6 @@ public class CMRoomHistory implements IRoomHistory<PlayerRoomHistoryItem>, INBTS
                 .collect(NbtListCollector.toNbtList());
     }
 
-    @Override
     public void deserializeNBT(ListTag nbt) {
         nbt.stream()
                 .map(it -> PlayerRoomHistoryItem.CODEC.parse(NbtOps.INSTANCE, it))

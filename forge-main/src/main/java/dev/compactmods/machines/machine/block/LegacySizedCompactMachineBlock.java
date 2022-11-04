@@ -9,7 +9,7 @@ import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.shrinking.PSDTags;
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
@@ -19,12 +19,12 @@ import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.room.menu.MachineRoomMenu;
+import dev.compactmods.machines.room.ui.MachineRoomMenu;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.upgrade.RoomUpgradeItem;
-import dev.compactmods.machines.upgrade.RoomUpgradeManager;
+import dev.compactmods.machines.room.upgrade.RoomUpgradeManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,10 +48,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("removal")
@@ -127,8 +126,8 @@ public class LegacySizedCompactMachineBlock extends Block implements EntityBlock
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
-        return MachineBlockUtil.getCloneItemStack(world, state, pos);
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        return MachineBlockUtil.getCloneItemStack(level, state, pos);
     }
 
     @Override

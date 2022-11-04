@@ -3,16 +3,18 @@ package dev.compactmods.machines.upgrade.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.graph.GraphEdgeType;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
+import dev.compactmods.machines.graph.SimpleGraphEdgeType;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import org.jetbrains.annotations.NotNull;
 
-public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge {
+public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge<RoomUpgradeConnection<?>> {
     public static final Codec<RoomUpgradeConnection<?>> CODEC = RecordCodecBuilder.create(i -> i.group(
             MachineRoomUpgrades.REGISTRY.get().getCodec().fieldOf("data").forGetter(RoomUpgradeConnection::instance)
     ).apply(i, RoomUpgradeConnection::new));
+
+    public static final IGraphEdgeType<RoomUpgradeConnection<?>> EDGE_TYPE = SimpleGraphEdgeType.instance(CODEC);
 
     private final T upgradeData;
 
@@ -25,7 +27,7 @@ public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge 
     }
 
     @Override
-    public @NotNull IGraphEdgeType<IGraphEdge> getEdgeType() {
-        return GraphEdgeType.ROOM_UPGRADE;
+    public @NotNull IGraphEdgeType<RoomUpgradeConnection<?>> getEdgeType() {
+        return EDGE_TYPE;
     }
 }

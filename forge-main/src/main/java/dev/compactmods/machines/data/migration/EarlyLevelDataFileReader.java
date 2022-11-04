@@ -2,7 +2,6 @@ package dev.compactmods.machines.data.migration;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Dynamic;
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -16,6 +15,8 @@ import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Set;
 
 public class EarlyLevelDataFileReader {
-
+    private final Logger LOG = LogManager.getLogger();
     private final LevelStorageSource.LevelDirectory directory;
     private static final ImmutableSet<ResourceKey<Level>> DEFAULT_LEVELS = ImmutableSet.of(Level.OVERWORLD, Level.NETHER, Level.END, CompactDimension.LEVEL_KEY);
     public EarlyLevelDataFileReader(LevelStorageSource.LevelDirectory directory) {
@@ -52,7 +53,7 @@ public class EarlyLevelDataFileReader {
     }
 
     public Set<ResourceKey<Level>> dimensions() {
-        CompactMachines.LOGGER.info("Starting dimension read from level files.");
+        LOG.info("Starting dimension read from level files.");
         try {
             final var tempFile = makeSafeFile("cm5_early_dimensions.dat");
             final var dataFixer = DataFixers.getDataFixer();
@@ -64,15 +65,15 @@ public class EarlyLevelDataFileReader {
 
             final var updatedData = dataFixer.update(References.WORLD_GEN_SETTINGS, dynamic, savedLevelVersion, SharedConstants.getCurrentVersion().getWorldVersion());
             final var levels = WorldGenSettings.CODEC.parse(updatedData)
-                    .resultOrPartial(Util.prefix("CM5-EarlyLevelReader: ", CompactMachines.LOGGER::error))
+                    .resultOrPartial(Util.prefix("CM5-EarlyLevelReader: ", LOG::error))
                     .map(WorldGenSettings::levels)
                     .orElse(DEFAULT_LEVELS);
 
             Files.deleteIfExists(tempFile);
-            CompactMachines.LOGGER.info("Completed dimension read from level files.");
+            LOG.info("Completed dimension read from level files.");
             return levels;
         } catch (IOException e) {
-            CompactMachines.LOGGER.fatal("Failed to make a safe level file backup to read dimension info!");
+            LOG.fatal("Failed to make a safe level file backup to read dimension info!");
             return DEFAULT_LEVELS;
         }
     }

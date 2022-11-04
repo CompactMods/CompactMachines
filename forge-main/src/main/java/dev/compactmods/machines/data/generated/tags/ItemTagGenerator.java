@@ -3,7 +3,7 @@ package dev.compactmods.machines.data.generated.tags;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.shrinking.PSDTags;
-import dev.compactmods.machines.core.Registries;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;

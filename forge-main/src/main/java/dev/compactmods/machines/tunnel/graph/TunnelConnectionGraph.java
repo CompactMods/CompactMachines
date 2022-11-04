@@ -5,13 +5,13 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
 import dev.compactmods.machines.codec.NbtListCollector;
-import dev.compactmods.machines.graph.Graph;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import dev.compactmods.machines.graph.IGraphNode;
@@ -292,11 +292,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
         HashMap<IGraphNode, UUID> nodeIds = new HashMap<>();
 
-        final var nodeReg = Graph.NODE_TYPE_REG.get();
+        final var nodeReg = Registries.NODE_TYPE_REG.get();
         final Codec<IGraphNode> nodeRegCodec = nodeReg.getCodec()
                 .dispatchStable(IGraphNode::getType, IGraphNodeType::codec);
 
-        final Codec<IGraphEdge> edgeRegCodec = Graph.EDGE_TYPE_REG.get()
+        final Codec<IGraphEdge> edgeRegCodec = Registries.EDGE_TYPE_REG.get()
                 .getCodec()
                 .dispatchStable(IGraphEdge::getEdgeType, IGraphEdgeType::codec);
 
@@ -343,11 +343,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
         final var graphRoot = tag.getCompound("graph");
 
-        final var nodeReg = Graph.NODE_TYPE_REG.get();
+        final var nodeReg = Registries.NODE_TYPE_REG.get();
         final var nodeRegCodec = nodeReg.getCodec()
                 .dispatchStable(IGraphNode::getType, IGraphNodeType::codec);
 
-        final var edgeRegCodec = Graph.EDGE_TYPE_REG.get().getCodec()
+        final var edgeRegCodec = Registries.EDGE_TYPE_REG.get().getCodec()
                 .dispatchStable(IGraphEdge::getEdgeType, IGraphEdgeType::codec);
 
         final var nodes = graphRoot.getList("nodes", Tag.TAG_COMPOUND);
@@ -441,6 +441,19 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                             var def = Tunnels.getDefinition(ttn.id());
                             return def instanceof RedstoneTunnel;
                         })).map(TunnelNode::position);
+    }
+
+    @Override
+    public Optional<Direction> getConnectedSide(BlockPos position) {
+        var node = tunnels.get(position);
+        return graph.adjacentNodes(node).stream()
+                .filter(CompactMachineNode.class::isInstance)
+                .map(mn -> graph.edgeValue(node, mn))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(TunnelMachineEdge.class::cast)
+                .map(TunnelMachineEdge::side)
+                .findFirst();
     }
 
     public <T> Stream<BlockPos> getTunnelsSupporting(LevelBlockPosition machine, Direction side, Capability<T> capability) {

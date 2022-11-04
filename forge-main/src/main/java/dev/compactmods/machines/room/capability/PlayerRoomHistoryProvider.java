@@ -1,7 +1,6 @@
 package dev.compactmods.machines.room.capability;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.room.RoomCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;

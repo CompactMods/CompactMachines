@@ -1,25 +1,29 @@
 package dev.compactmods.machines.machine.item;
 
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.machine.MachineIds;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.room.RoomHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +31,20 @@ import java.util.Optional;
  * Represents a machine item that has not been bound to a room yet,
  * but has an assigned template to use.
  */
-public class UnboundCompactMachineItem extends CompactMachineItem {
+public class UnboundCompactMachineItem extends BlockItem implements ICompactMachineItem {
 
-    public static final String NBT_TEMPLATE_ID = "template_id";
+    public static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
+
+    public static Holder<Item> REFERENCE_HOLDER = Holder.Reference.createStandAlone(Registry.ITEM, MachineIds.UNBOUND_MACHINE_ITEM_KEY);
 
     public UnboundCompactMachineItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String getDescriptionId(ItemStack stack) {
-        return Util.makeDescriptionId("dev/compactmods/machines/api/machine", getTemplateId(stack));
+        return Util.makeDescriptionId("machine", getTemplateId(stack));
     }
 
     @Override
@@ -68,16 +74,16 @@ public class UnboundCompactMachineItem extends CompactMachineItem {
     }
 
     public static ItemStack unbound() {
-        final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
+        final var stack = new ItemStack(REFERENCE_HOLDER, 1);
         setTemplate(stack, RoomTemplate.NO_TEMPLATE);
-        setColor(stack, 0xFFFFFFFF);
+        ICompactMachineItem.setColor(stack, 0xFFFFFFFF);
         return stack;
     }
 
     public static ItemStack forTemplate(ResourceLocation templateId, RoomTemplate template) {
-        final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
+        final var stack = new ItemStack(REFERENCE_HOLDER, 1);
         setTemplate(stack, templateId);
-        setColor(stack, template.color());
+        ICompactMachineItem.setColor(stack, template.color());
 
         MachineDataTagBuilder.empty()
                 .template(templateId)
