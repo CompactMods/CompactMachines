@@ -2,7 +2,7 @@ package dev.compactmods.machines.util;
 
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.core.LoggingUtil;
+import dev.compactmods.machines.LoggingUtil;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;

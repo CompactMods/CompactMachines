@@ -2,7 +2,7 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.CompactMachinesAddon;
 import dev.compactmods.machines.api.ICompactMachinesAddon;
-import dev.compactmods.machines.api.core.CMRegistries;
+import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
@@ -22,7 +22,7 @@ public class BuiltinTunnels implements ICompactMachinesAddon {
     public static Supplier<IRoomOwnerLookup> roomOwnerLookup;
     public static Supplier<IRoomSpawnLookup> roomSpawnLookup;
 
-    public static DeferredRegister<TunnelDefinition> DR = DeferredRegister.create(CMRegistries.TYPES_REG_KEY, Constants.MOD_ID);
+    public static DeferredRegister<TunnelDefinition> DR = DeferredRegister.create(CMRegistryKeys.TYPES_REG_KEY, Constants.MOD_ID);
 
     // ================================================================================================================
     //   TUNNEL TYPE DEFINITIONS

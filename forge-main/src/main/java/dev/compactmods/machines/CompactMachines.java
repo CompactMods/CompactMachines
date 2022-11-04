@@ -6,6 +6,8 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
+import dev.compactmods.machines.config.CommonConfig;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.room.ui.RoomUserInterfaceRegistration;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;

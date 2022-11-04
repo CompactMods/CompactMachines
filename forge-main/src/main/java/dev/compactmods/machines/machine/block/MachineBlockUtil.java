@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.ServerConfig;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.machine.item.LegacyCompactMachineItem;

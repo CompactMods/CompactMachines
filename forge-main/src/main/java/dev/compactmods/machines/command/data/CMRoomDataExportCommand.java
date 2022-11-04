@@ -7,7 +7,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
-import dev.compactmods.machines.core.LoggingUtil;
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;

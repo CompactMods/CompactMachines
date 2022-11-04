@@ -2,7 +2,6 @@ package dev.compactmods.machines;
 
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.core.LoggingUtil;
 import dev.compactmods.machines.network.CompactMachinesNet;
 import dev.compactmods.machines.network.RoomNetworkHandler;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

@@ -1,7 +1,7 @@
 package dev.compactmods.machines.dimension;
 
 import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.ServerConfig;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.room.capability.RoomCapabilities;
 import dev.compactmods.machines.util.ForgePlayerUtil;
 import dev.compactmods.machines.util.PlayerUtil;

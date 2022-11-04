@@ -1,6 +1,6 @@
 package dev.compactmods.machines.tunnel;
 
-import dev.compactmods.machines.api.core.CMRegistries;
+import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class TunnelHelper {
 
     public static Registry<TunnelDefinition> definitionRegistry() {
-        return RegistryAccess.builtinCopy().registryOrThrow(CMRegistries.TYPES_REG_KEY);
+        return RegistryAccess.builtinCopy().registryOrThrow(CMRegistryKeys.TYPES_REG_KEY);
     }
 
     public static TunnelDefinition getDefinition(ResourceLocation tunnelType) {

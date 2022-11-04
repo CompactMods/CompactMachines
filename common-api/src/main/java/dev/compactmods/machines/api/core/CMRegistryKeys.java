@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
-public interface CMRegistries {
+public interface CMRegistryKeys {
 
     ResourceKey<Registry<TunnelDefinition>> TYPES_REG_KEY = ResourceKey.createRegistryKey(new ResourceLocation(MOD_ID, "tunnel_types"));
 

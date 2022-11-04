@@ -5,7 +5,7 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.core.LoggingUtil;
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.room.graph.RoomReferenceNode;

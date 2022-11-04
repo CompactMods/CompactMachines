@@ -7,7 +7,7 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.ServerConfig;
+import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;

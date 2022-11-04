@@ -1,4 +1,4 @@
-package dev.compactmods.machines;
+package dev.compactmods.machines.config;
 
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;

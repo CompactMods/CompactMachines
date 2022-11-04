@@ -1,6 +1,6 @@
 package dev.compactmods.machines;
 
-import dev.compactmods.machines.api.core.CMRegistries;
+import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
@@ -37,7 +37,7 @@ public class Registries {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
 
     // Tunnels
-    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(CMRegistries.TYPES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<TunnelDefinition> TUNNEL_DEFINITIONS = DeferredRegister.create(CMRegistryKeys.TYPES_REG_KEY, MOD_ID);
 
     // UIRegistration
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);

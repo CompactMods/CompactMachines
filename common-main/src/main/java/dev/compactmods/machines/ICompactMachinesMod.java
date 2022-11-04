@@ -1,6 +1,5 @@
 package dev.compactmods.machines;
 
-import dev.compactmods.machines.core.LoggingUtil;
 import org.apache.logging.log4j.Logger;
 
 public interface ICompactMachinesMod {

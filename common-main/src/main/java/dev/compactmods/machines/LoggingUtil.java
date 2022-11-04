@@ -1,4 +1,4 @@
-package dev.compactmods.machines.core;
+package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.core.Constants;
 import org.apache.logging.log4j.LogManager;
