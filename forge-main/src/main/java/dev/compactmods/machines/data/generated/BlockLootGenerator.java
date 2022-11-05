@@ -3,7 +3,7 @@ package dev.compactmods.machines.data.generated;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import dev.compactmods.machines.machine.Machines;
-import dev.compactmods.machines.room.data.CopyRoomBindingFunction;
+import dev.compactmods.machines.data.generated.functions.CopyRoomBindingFunction;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.room.data;
+package dev.compactmods.machines.data.generated.functions;
 
 import dev.compactmods.machines.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;

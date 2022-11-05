@@ -12,7 +12,7 @@ import dev.compactmods.machines.room.ui.RoomUserInterfaceRegistration;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.data.LootFunctions;
+import dev.compactmods.machines.data.generated.functions.LootFunctions;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
