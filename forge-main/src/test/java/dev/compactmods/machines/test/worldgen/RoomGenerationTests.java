@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.util.CompactStructureGenerator;
+import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
@@ -23,7 +24,8 @@ public class RoomGenerationTests {
         final var roomDims = new Vec3i(13, 13, 13);
         final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 1, 7)));
 
-        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter, unbreakableWall);
 
         test.setBlock(new BlockPos(7, 8, 7), Blocks.GOLD_BLOCK.defaultBlockState());
         CompactStructureGenerator.fillWithTemplate(test.getLevel(),
@@ -38,7 +40,8 @@ public class RoomGenerationTests {
         final var roomDims = new Vec3i(9, 9, 9);
         final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 1, 7)));
 
-        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter, unbreakableWall);
 
         test.setBlock(new BlockPos(7, 5, 7), Blocks.GOLD_BLOCK.defaultBlockState());
         CompactStructureGenerator.fillWithTemplate(test.getLevel(),
@@ -53,7 +56,8 @@ public class RoomGenerationTests {
         final var roomDims = new Vec3i(5, 5, 5);
         final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 1, 7)));
 
-        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter, unbreakableWall);
 
         test.setBlock(new BlockPos(7, 4, 7), Blocks.GOLD_BLOCK.defaultBlockState());
         CompactStructureGenerator.fillWithTemplate(test.getLevel(),
@@ -68,7 +72,8 @@ public class RoomGenerationTests {
         final var roomDims = new Vec3i(11, 2, 7);
         final var roomCenter = Vec3.atCenterOf(test.absolutePos(new BlockPos(7, 1, 7)));
 
-        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter);
+        final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
+        CompactStructureGenerator.generateRoom(test.getLevel(), roomDims, roomCenter, unbreakableWall);
 
         // test.setBlock(new BlockPos(7, 3, 7), Blocks.GOLD_BLOCK.defaultBlockState());
 
