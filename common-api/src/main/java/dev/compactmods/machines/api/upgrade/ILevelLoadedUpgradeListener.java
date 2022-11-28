@@ -1,9 +1,9 @@
-package dev.compactmods.machines.api.room.upgrade;
+package dev.compactmods.machines.api.upgrade;
 
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import net.minecraft.server.level.ServerLevel;
 
-public interface ILevelLoadedUpgradeListener extends RoomUpgrade {
+public interface ILevelLoadedUpgradeListener extends RoomUpgradeAction {
 
     /**
      * Called when a level is loaded, typically when the server first boots up.

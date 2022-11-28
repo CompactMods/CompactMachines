@@ -5,8 +5,8 @@ import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.room.graph.RoomReferenceNode;
@@ -85,7 +85,7 @@ public class RoomUpgradeManager extends SavedData {
                 final var id = upg.key();
                 final var upgradeInst = upgReg.getValue(id);
 
-                final var uKey = ResourceKey.create(RoomUpgrade.REG_KEY, id);
+                final var uKey = ResourceKey.create(RoomUpgradeAction.REG_KEY, id);
 
                 this.roomsWith(uKey).forEach(room -> {
                     upgradeList.add(new UpgradeConnectionEntry(room, uKey, upgradeInst));
@@ -104,7 +104,7 @@ public class RoomUpgradeManager extends SavedData {
         return tag;
     }
 
-    public <T extends RoomUpgrade> boolean addUpgrade(T upgrade, String room) {
+    public <T extends RoomUpgradeAction> boolean addUpgrade(T upgrade, String room) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
 
         final var upgradeNode = upgradeNodes.computeIfAbsent(upgRegistry.getKey(upgrade), rl -> {
@@ -126,7 +126,7 @@ public class RoomUpgradeManager extends SavedData {
         return true;
     }
 
-    public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, String room) {
+    public <T extends RoomUpgradeAction> boolean removeUpgrade(T upgrade, String room) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
         if(!upgRegistry.containsValue(upgrade)) return false;
 
@@ -144,7 +144,7 @@ public class RoomUpgradeManager extends SavedData {
         return true;
     }
 
-    public Stream<String> roomsWith(ResourceKey<RoomUpgrade> upgradeKey) {
+    public Stream<String> roomsWith(ResourceKey<RoomUpgradeAction> upgradeKey) {
         if (!upgradeNodes.containsKey(upgradeKey.location()))
             return Stream.empty();
 
@@ -156,7 +156,7 @@ public class RoomUpgradeManager extends SavedData {
                 .map(RoomReferenceNode::code);
     }
 
-    public <T extends RoomUpgrade> Stream<RoomUpgradeInstance<T>> implementing(Class<T> inter) {
+    public <T extends RoomUpgradeAction> Stream<RoomUpgradeInstance<T>> implementing(Class<T> inter) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
 
         // Find all applicable upgrades in registry
@@ -189,7 +189,7 @@ public class RoomUpgradeManager extends SavedData {
         return instances.stream();
     }
 
-    public boolean hasUpgrade(String room, RoomUpgrade upgrade) {
+    public boolean hasUpgrade(String room, RoomUpgradeAction upgrade) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
         if(!upgRegistry.containsValue(upgrade))
             return false;

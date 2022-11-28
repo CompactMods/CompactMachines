@@ -8,20 +8,20 @@ import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.room.ui.RoomUserInterfaceRegistration;
+import dev.compactmods.machines.data.generated.functions.LootFunctions;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.data.generated.functions.LootFunctions;
+import dev.compactmods.machines.room.ui.RoomUserInterfaceRegistration;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.util.AnnotationScanner;
 import dev.compactmods.machines.villager.Villagers;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -29,7 +29,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.objectweb.asm.Type;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -92,16 +91,11 @@ public class CompactMachines implements ICompactMachinesMod {
         Registries.EDGE_TYPES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
-        Registries.VILLAGERS.register(bus);
-        Villagers.TRADES.register(bus);
+        // Registries.VILLAGERS.register(bus);
+        // Villagers.TRADES.register(bus);
         Registries.POINTS_OF_INTEREST.register(bus);
 
-        CompactMachines.loadedAddons = ModList.get()
-                .getAllScanData()
-                .stream()
-                .flatMap(scans -> scans.getAnnotations()
-                        .stream()
-                        .filter(ad -> ad.annotationType().equals(Type.getType(CompactMachinesAddon.class)))
+        CompactMachines.loadedAddons = AnnotationScanner.scanModList(CompactMachinesAddon.class)
                         .map(ModFileScanData.AnnotationData::memberName)
                         .map(cmAddonClass -> {
                             try {
@@ -112,7 +106,7 @@ public class CompactMachines implements ICompactMachinesMod {
                                 return null;
                             }
                         })
-                        .filter(Objects::nonNull))
+                        .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         CompactMachines.loadedAddons.forEach(addon -> {

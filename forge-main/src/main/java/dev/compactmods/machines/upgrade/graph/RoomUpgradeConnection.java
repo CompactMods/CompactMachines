@@ -2,14 +2,14 @@ package dev.compactmods.machines.upgrade.graph;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import dev.compactmods.machines.graph.SimpleGraphEdgeType;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import org.jetbrains.annotations.NotNull;
 
-public class RoomUpgradeConnection<T extends RoomUpgrade> implements IGraphEdge<RoomUpgradeConnection<?>> {
+public class RoomUpgradeConnection<T extends RoomUpgradeAction> implements IGraphEdge<RoomUpgradeConnection<?>> {
     public static final Codec<RoomUpgradeConnection<?>> CODEC = RecordCodecBuilder.create(i -> i.group(
             MachineRoomUpgrades.REGISTRY.get().getCodec().fieldOf("data").forGetter(RoomUpgradeConnection::instance)
     ).apply(i, RoomUpgradeConnection::new));

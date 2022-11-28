@@ -11,7 +11,7 @@ public abstract class RoomUpgradeHelper {
     public static final String NBT_UPGRADE_NODE = "upgrade_info";
     public static final String NBT_UPGRADE_ID = "key";
 
-    public static Optional<ResourceLocation> getTypeFrom(@NotNull ItemStack stack) {
+    public static Optional<ResourceLocation> getUpgradeId(@NotNull ItemStack stack) {
         if(!stack.hasTag()) return Optional.empty();
         final var tag = stack.getTag();
         if(!tag.contains(NBT_UPGRADE_NODE)) return Optional.empty();

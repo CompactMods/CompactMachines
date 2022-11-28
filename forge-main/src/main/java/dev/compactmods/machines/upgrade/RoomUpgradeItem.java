@@ -1,7 +1,6 @@
 package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.upgrade.RoomUpgradeHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.ChatFormatting;
@@ -15,22 +14,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class RoomUpgradeItem extends Item {
+public class RoomUpgradeItem extends Item {
 
     public RoomUpgradeItem(Properties props) {
         super(props);
-    }
-
-    public abstract RoomUpgrade getUpgradeType();
-
-    @Override
-    public Component getName(ItemStack stack) {
-        String key = RoomUpgradeHelper.getTypeFrom(stack)
-                .map(rl -> MachineRoomUpgrades.REGISTRY.get().getValue(rl))
-                .map(def -> def.getTranslationKey(stack))
-                .orElse(RoomUpgrade.UNNAMED_TRANS_KEY);
-
-        return Component.translatable(key);
     }
 
     @Override
@@ -43,7 +30,7 @@ public abstract class RoomUpgradeItem extends Item {
 
         // Show upgrade type while sneaking, or if advanced tooltips are on
         if (Screen.hasShiftDown() || flag.isAdvanced()) {
-            RoomUpgradeHelper.getTypeFrom(stack).ifPresent(upgType -> {
+            RoomUpgradeHelper.getUpgradeId(stack).ifPresent(upgType -> {
                 info.add(TranslationUtil.tooltip(Tooltips.ROOM_UPGRADE_TYPE, upgType).withStyle(ChatFormatting.DARK_GRAY));
             });
         }

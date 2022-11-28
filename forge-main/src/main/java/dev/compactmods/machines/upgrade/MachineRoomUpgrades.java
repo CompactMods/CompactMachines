@@ -1,9 +1,8 @@
 package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
 import dev.compactmods.machines.Registries;
-import dev.compactmods.machines.room.upgrade.ChunkloadUpgrade;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbench;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbenchEntity;
 import net.minecraft.world.item.BlockItem;
@@ -20,12 +19,11 @@ import java.util.function.Supplier;
 
 public class MachineRoomUpgrades {
 
-    public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::new);
+    public static final Supplier<IForgeRegistry<RoomUpgradeAction>> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::new);
 
     // ================================================================================================================
-    public static final RegistryObject<RoomUpgrade> CHUNKLOAD = Registries.UPGRADES.register(ChunkloadUpgrade.REG_ID.getPath(), ChunkloadUpgrade::new);
 
-    public static final RegistryObject<Item> CHUNKLOADER = Registries.ITEMS.register("chunkloader_upgrade", () -> new ChunkloadUpgradeItem(new Item.Properties()
+    public static final RegistryObject<Item> ROOM_UPGRADE = Registries.ITEMS.register("room_upgrade", () -> new RoomUpgradeItem(new Item.Properties()
             .tab(CompactMachines.COMPACT_MACHINES_ITEMS)
             .stacksTo(1)));
 

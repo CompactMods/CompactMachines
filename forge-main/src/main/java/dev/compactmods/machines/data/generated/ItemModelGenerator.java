@@ -31,7 +31,7 @@ public class ItemModelGenerator extends ItemModelProvider {
         withExistingParent("tunnel", mcLoc("item/generated"))
                 .texture("layer0", modLoc("item/tunnel"));
 
-        withExistingParent(MachineRoomUpgrades.CHUNKLOADER.getId().toString(), mcLoc("item/generated"))
+        withExistingParent(MachineRoomUpgrades.ROOM_UPGRADE.getId().toString(), mcLoc("item/generated"))
                 .texture("layer0", modLoc("upgrades/chunkloader"));
 
         withExistingParent(MachineRoomUpgrades.WORKBENCH_ITEM.getId().getPath(), modLoc("block/workbench"));

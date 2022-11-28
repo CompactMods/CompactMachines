@@ -1,8 +1,8 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.Registries;
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.graph.IGraphNodeType;
 import dev.compactmods.machines.graph.SimpleGraphNodeType;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;

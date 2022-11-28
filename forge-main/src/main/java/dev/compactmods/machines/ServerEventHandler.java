@@ -1,12 +1,15 @@
 package dev.compactmods.machines;
 
-import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
+import dev.compactmods.machines.api.inject.InjectField;
+import dev.compactmods.machines.api.room.IRoomOwnerLookup;
+import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
+import dev.compactmods.machines.api.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.room.ForgeCompactRoomProvider;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeManager;
+import dev.compactmods.machines.util.AnnotationScanner;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -15,21 +18,35 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEventHandler {
 
     @SubscribeEvent
-    public static void onServerStarted(final ServerStartedEvent started) {
+    public static void onServerAboutToStart(final ServerAboutToStartEvent server) {
+        final var modLog = LoggingUtil.modLog();
+
+        modLog.debug("Starting addon scan and injection for server startup.");
         CompactMachines.getAddons().forEach(addon -> {
-            addon.acceptRoomSpawnLookup(ForgeCompactRoomProvider::instance);
-            addon.acceptRoomOwnerLookup(ForgeCompactRoomProvider::instance);
+            final Supplier<IRoomOwnerLookup> ownerLookup = ForgeCompactRoomProvider::instance;
+            final Supplier<IRoomSpawnLookup> spawnLookup = ForgeCompactRoomProvider::instance;
+
+            final var injectableFields = AnnotationScanner.scanFields(addon, InjectField.class)
+                    .filter(field -> field.canAccess(addon))
+                    .collect(Collectors.toSet());
+
+            if(injectableFields.isEmpty()) return;
+
+            modLog.debug("Injecting lookup data into addon {} ...", addon.getClass());
+            AnnotationScanner.injectFields(addon, ownerLookup, injectableFields);
+            AnnotationScanner.injectFields(addon, spawnLookup, injectableFields);
         });
     }
 

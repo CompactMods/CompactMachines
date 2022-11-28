@@ -5,11 +5,11 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import dev.compactmods.machines.dimension.VoidAirBlock;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.tunnel.BuiltinTunnels;
+import dev.compactmods.machines.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.upgrade.BuiltInUpgradeActions;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
@@ -72,11 +72,9 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add(Constants.MOD_ID + ".direction.side", "Side: %s");
         add(Constants.MOD_ID + ".connected_block", "Connected: %s");
 
-        add(RoomUpgrade.UNNAMED_TRANS_KEY, "Unnamed Room Upgrade");
-
-        addTunnel(BuiltinTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
-        addTunnel(BuiltinTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
-        addTunnel(BuiltinTunnels.FORGE_ENERGY, "Energy Tunnel");
+        addTunnel(BuiltInTunnels.ITEM_TUNNEL_DEF, "Item Tunnel");
+        addTunnel(BuiltInTunnels.FLUID_TUNNEL_DEF, "Fluid Tunnel");
+        addTunnel(BuiltInTunnels.FORGE_ENERGY, "Energy Tunnel");
         // addTunnel(Tunnels.REDSTONE_IN_DEF.get(), "Redstone Tunnel (In)");
         // addTunnel(Tunnels.REDSTONE_OUT_DEF.get(), "Redstone Tunnel (Out)");
 
@@ -97,7 +95,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
 
         //region Upgrades
-        addUpgradeItem(MachineRoomUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
+        add(BuiltInUpgradeActions.CHUNKLOAD, "Chunkloader Upgrade");
 
         addMessage(Messages.ALREADY_HAS_UPGRADE, "Upgrade has already been applied to room.");
         addMessage(Messages.UPGRADE_NOT_PRESENT, "Upgrade is not applied to the room.");

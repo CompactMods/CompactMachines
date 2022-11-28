@@ -1,6 +1,7 @@
 package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
@@ -9,7 +10,6 @@ import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.shrinking.PSDTags;
-import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
@@ -24,8 +24,6 @@ import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.upgrade.RoomUpgradeItem;
-import dev.compactmods.machines.room.upgrade.RoomUpgradeManager;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -197,34 +195,37 @@ public class LegacySizedCompactMachineBlock extends Block implements EntityBlock
                 final var reg = MachineRoomUpgrades.REGISTRY.get();
                 if (mainItem.getItem() instanceof RoomUpgradeItem upItem) {
                     if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
-                        tile.roomInfo().ifPresent(room -> {
-                            final var ownerId = room.owner(roomData);
-                            if (!player.getUUID().equals(ownerId)) {
-                                final var ownerName = server.getPlayerList().getPlayer(ownerId).getName();
-                                player.displayClientMessage(TranslationUtil.message(Messages.NOT_ROOM_OWNER, ownerName), true);
-                                return;
-                            }
-
-                            final var upg = upItem.getUpgradeType();
-                            final var manager = RoomUpgradeManager.get(compactDim);
-
-                            if (manager.hasUpgrade(room.code(), upg)) {
-                                player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
-                            } else {
-                                final var added = manager.addUpgrade(upg, room.code());
-
-                                if (added) {
-                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_APPLIED)
-                                            .withStyle(ChatFormatting.DARK_GREEN), true);
-                                } else {
-                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED)
-                                            .withStyle(ChatFormatting.DARK_RED), true);
-                                }
-                            }
-                        });
+                        // TODO
+//                        tile.roomInfo().ifPresent(room -> {
+//                            final var ownerId = room.owner(roomData);
+//                            if (!player.getUUID().equals(ownerId)) {
+//                                final var ownerName = server.getPlayerList().getPlayer(ownerId).getName();
+//                                player.displayClientMessage(TranslationUtil.message(Messages.NOT_ROOM_OWNER, ownerName), true);
+//                                return;
+//                            }
+//
+//                            final var upg = RoomUpgradeHelper.getUpgradeId(mainItem);
+//                            final var manager = RoomUpgradeManager.get(compactDim);
+//
+//                            if (manager.hasUpgrade(room.code(), upg)) {
+//                                player.displayClientMessage(TranslationUtil.message(Messages.ALREADY_HAS_UPGRADE), true);
+//                            } else {
+//                                final var added = manager.addUpgrade(upg, room.code());
+//
+//                                if (added) {
+//                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_APPLIED)
+//                                            .withStyle(ChatFormatting.DARK_GREEN), true);
+//                                } else {
+//                                    player.displayClientMessage(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED)
+//                                            .withStyle(ChatFormatting.DARK_RED), true);
+//                                }
+//                            }
+//                        });
                     }
                 }
             }
+
+
 
             // All other items, open preview screen
             if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity machine) {

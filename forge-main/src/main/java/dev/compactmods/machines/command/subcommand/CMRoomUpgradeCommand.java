@@ -6,6 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.upgrade.IUpgradeAppliedListener;
+import dev.compactmods.machines.api.upgrade.IUpgradeRemovedListener;
 import dev.compactmods.machines.command.RoomUpgradeArgument;
 import dev.compactmods.machines.config.ServerConfig;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -78,7 +80,9 @@ public class CMRoomUpgradeCommand {
                 final var added = manager.addUpgrade(upgrade, room.code());
 
                 if (added) {
-                    upgrade.onAdded(compactDim, room);
+                    if(upgrade instanceof IUpgradeAppliedListener applied)
+                        applied.onAdded(compactDim, room);
+
                     src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_APPLIED), true);
                 } else {
                     src.sendFailure(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED));
@@ -126,7 +130,9 @@ public class CMRoomUpgradeCommand {
                 final var removed = manager.removeUpgrade(upgrade, room.code());
 
                 if (removed) {
-                    upgrade.onRemoved(compactDim, room);
+                    if(upgrade instanceof IUpgradeRemovedListener rem)
+                        rem.onRemoved(compactDim, room);
+
                     src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_REMOVED), true);
                 } else {
                     src.sendFailure(TranslationUtil.message(Messages.UPGRADE_REM_FAILED));

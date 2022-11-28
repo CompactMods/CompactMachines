@@ -41,7 +41,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
         machinesTag.add(boundMachineItem);
         machinesTag.add(unboundMachineItem);
 
-        upgradeTag.add(MachineRoomUpgrades.CHUNKLOADER.get());
+        upgradeTag.add(MachineRoomUpgrades.ROOM_UPGRADE.get());
 
         final var psd = Shrinking.PERSONAL_SHRINKING_DEVICE.get();
         final var curiosPsdTag = tag(TagKey.create(Registries.ITEMS.getRegistryKey(), new ResourceLocation("curios", "psd")));

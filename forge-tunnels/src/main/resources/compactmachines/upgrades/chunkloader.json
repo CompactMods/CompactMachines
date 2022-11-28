@@ -1,0 +1,25 @@
+{
+  "max_allowed": 1,
+  "apply_conditions": [
+    { "type": "compactmachines:room_owner" }
+  ],
+  "actions": [
+    { "type": "compactmachines:chunkload" },
+    {
+      "type": "compactmachines:generate_item_fixed",
+      "cooldown": 20,
+      "count": 16,
+      "item": {
+        "item": "minecraft:cobblestone"
+      }
+    },
+    {
+      "type": "compactmachines:generate_item_scaled",
+      "cooldown": 20,
+      "scale_factor": 4,
+      "item": {
+        "item": "minecraft:iron_ore"
+      }
+    }
+  ]
+}

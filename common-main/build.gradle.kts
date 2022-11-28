@@ -67,7 +67,7 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
     })
 
-    compileOnly(project(":common-api"))
+    implementation(project(":common-api"))
     compileOnly("com.aventrix.jnanoid", "jnanoid", "2.0.0")
 }
 

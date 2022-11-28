@@ -3,16 +3,19 @@ package dev.compactmods.machines.data.generated.lang;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.data.generated.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.tunnel.Tunnels;
+import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
+import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.function.Supplier;
 
@@ -22,9 +25,12 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     private final String locale;
 
+    private final IForgeRegistry<RoomUpgradeAction> ACTIONS_REG;
+
     public BaseLangGenerator(DataGenerator gen, String locale) {
         super(gen, Constants.MOD_ID, locale);
         this.locale = locale;
+        ACTIONS_REG = MachineRoomUpgrades.REGISTRY.get();
     }
 
     protected abstract String getSizeTranslation(RoomSize size);
@@ -61,10 +67,11 @@ public abstract class BaseLangGenerator extends LanguageProvider {
         add(TranslationUtil.tunnelId(Tunnels.getRegistryId(tunnel.get())), name);
     }
 
-    void addUpgradeItem(Supplier<RoomUpgrade> upgrade, String translation) {
+    void add(Supplier<RoomUpgradeAction> upgrade, String translation) {
         final var u = upgrade.get();
+        final var id = ACTIONS_REG.getKey(u);
         if(u != null)
-            add(u.getTranslationKey(), translation);
+            add(Util.makeDescriptionId("upgrade.action", id), translation);
     }
 
     protected void addAdvancementTranslations() {

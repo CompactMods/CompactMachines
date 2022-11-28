@@ -9,7 +9,7 @@ import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.shrinking.Shrinking;
-import dev.compactmods.machines.tunnel.BuiltinTunnels;
+import dev.compactmods.machines.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -52,7 +52,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(BuiltinTunnels.ITEM_TUNNEL_DEF.getId(), 2)
+        TunnelRecipeBuilder.tunnel(BuiltInTunnels.ITEM_TUNNEL_DEF.getId(), 2)
                 .requires(Ingredient.of(Tags.Items.CHESTS))
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -60,7 +60,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(BuiltinTunnels.FLUID_TUNNEL_DEF.getId(), 2)
+        TunnelRecipeBuilder.tunnel(BuiltInTunnels.FLUID_TUNNEL_DEF.getId(), 2)
                 .requires(Items.BUCKET)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)
@@ -68,7 +68,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("observer", has(Items.OBSERVER))
                 .save(consumer);
 
-        TunnelRecipeBuilder.tunnel(BuiltinTunnels.FORGE_ENERGY.getId(), 2)
+        TunnelRecipeBuilder.tunnel(BuiltInTunnels.FORGE_ENERGY.getId(), 2)
                 .requires(Items.GLOWSTONE_DUST)
                 .requires(Items.ENDER_PEARL)
                 .requires(Items.REDSTONE)

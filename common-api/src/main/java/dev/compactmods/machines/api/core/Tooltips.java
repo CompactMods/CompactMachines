@@ -11,6 +11,7 @@ public interface Tooltips {
     ResourceLocation ROOM_UPGRADE_TYPE = new ResourceLocation(Constants.MOD_ID, "room_upgrade_type");
     ResourceLocation TUTORIAL_APPLY_ROOM_UPGRADE = new ResourceLocation(Constants.MOD_ID, "tutorial_apply_room_upgrade");
     ResourceLocation CRAFT_TO_UPGRADE = new ResourceLocation(Constants.MOD_ID, "craft_machine_to_upgrade");
+    ResourceLocation NOT_YET_IMPLEMENTED = new ResourceLocation(Constants.MOD_ID, "not_yet_implemented");
 
     interface Machines {
         ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "machine.id");
