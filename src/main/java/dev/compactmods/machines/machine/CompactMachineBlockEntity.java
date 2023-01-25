@@ -7,7 +7,6 @@ import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.machine.graph.legacy.LegacyMachineConnections;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -48,7 +47,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
     protected String schema;
     protected boolean locked = false;
     private ChunkPos roomChunk;
-    private int legacyMachineId = -1;
 
     private WeakReference<CompactMachineNode> graphNode;
     private WeakReference<CompactMachineRoomNode> roomNode;
@@ -97,9 +95,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        if (this.legacyMachineId != -1)
-            this.updateLegacyData();
-
         this.syncConnectedRoom();
     }
 
@@ -114,10 +109,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
             owner = null;
         }
 
-        if (nbt.contains(LEGACY_MACH_ID)) {
-            this.legacyMachineId = nbt.getInt(LEGACY_MACH_ID);
-        }
-
         nextSpawnTick = nbt.getLong("spawntick");
         if (nbt.contains("schema")) {
             schema = nbt.getString("schema");
@@ -129,25 +120,6 @@ public class CompactMachineBlockEntity extends BlockEntity {
             locked = nbt.getBoolean("locked");
         } else {
             locked = false;
-        }
-    }
-
-    private void updateLegacyData() {
-        if (level instanceof ServerLevel sl) {
-            try {
-                final var legacy = LegacyMachineConnections.get(sl.getServer());
-
-                DimensionMachineGraph graph = DimensionMachineGraph.forDimension(sl);
-                graph.addMachine(worldPosition);
-
-                final ChunkPos oldRoom = legacy.getConnectedRoom(this.legacyMachineId);
-                CompactMachines.LOGGER.info(CompactMachines.CONN_MARKER, "Rebinding machine {} ({}/{}) to room {}", legacyMachineId, worldPosition, level.dimension(), roomChunk);
-
-                this.roomChunk = oldRoom;
-                graph.connectMachineToRoom(worldPosition, roomChunk);
-            } catch (MissingDimensionException e) {
-                CompactMachines.LOGGER.fatal(CompactMachines.CONN_MARKER, "Could not load connection info from legacy data; machine at {} in dimension {} will be unmapped.", worldPosition, level.dimension());
-            }
         }
     }
 
