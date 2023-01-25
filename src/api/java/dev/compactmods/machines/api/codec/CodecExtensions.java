@@ -3,6 +3,7 @@ package dev.compactmods.machines.api.codec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.Util;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 
@@ -11,6 +12,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 public abstract class CodecExtensions {
+    public static final Codec<GlobalPos> DIMPOS_GLOBALPOS_CODEC = new DimensionalPosCompat();
+
     public static final Codec<UUID> UUID_CODEC = Codec.STRING
             .comapFlatMap((s) -> {
                 try {
@@ -27,5 +30,4 @@ public abstract class CodecExtensions {
     public static final Codec<ChunkPos> CHUNKPOS = Codec.INT_STREAM
             .comapFlatMap(i -> Util.fixedSize(i, 2)
                     .map(arr -> new ChunkPos(arr[0], arr[1])), pos -> IntStream.of(pos.x, pos.z));
-
 }

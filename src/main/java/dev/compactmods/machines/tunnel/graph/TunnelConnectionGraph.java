@@ -5,16 +5,15 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.NbtListCollector;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.graph.*;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.MachineRoomEdge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -50,7 +49,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     /**
      * Quick access to machine information nodes.
      */
-    private final Map<IDimensionalBlockPosition, CompactMachineNode> machines;
+    private final Map<GlobalPos, CompactMachineNode> machines;
 
     /**
      * Quick access to tunnel definition nodes.
@@ -99,7 +98,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
      * @param tunnel The tunnel to find a connection for.
      * @return The id of the connected machine.
      */
-    public Optional<IDimensionalBlockPosition> connectedMachine(BlockPos tunnel) {
+    public Optional<GlobalPos> connectedMachine(BlockPos tunnel) {
         if (!tunnels.containsKey(tunnel))
             return Optional.empty();
 
@@ -122,7 +121,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
      * @param side      The side of the machine the tunnel is connecting to.
      * @return True if the connection could be established; false if the tunnel type is already registered for the given side.
      */
-    public boolean registerTunnel(BlockPos tunnelPos, TunnelDefinition type, IDimensionalBlockPosition machine, Direction side) {
+    public boolean registerTunnel(BlockPos tunnelPos, TunnelDefinition type, GlobalPos machine, Direction side) {
         // First we need to get the machine the tunnel is trying to connect to
         var machineNode = getOrCreateMachineNode(machine);
         var tunnelNode = getOrCreateTunnelNode(tunnelPos);
@@ -162,11 +161,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         return newTunnel;
     }
 
-    public CompactMachineNode getOrCreateMachineNode(IDimensionalBlockPosition machine) {
+    public CompactMachineNode getOrCreateMachineNode(GlobalPos machine) {
         var machineRegistered = machines.containsKey(machine);
         CompactMachineNode node;
         if (!machineRegistered) {
-            node = new CompactMachineNode(machine.dimensionKey(), machine.getBlockPosition());
+            node = new CompactMachineNode(machine.dimension(), machine.pos());
             machines.put(machine, node);
             graph.addNode(node);
             setDirty();
@@ -256,7 +255,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         var side = getTunnelSide(tunnel).orElseThrow();
         var type = typeNode.id();
 
-        return Optional.of(new TunnelMachineInfo(tunnel, type, new LevelBlockPosition(mach), side));
+        return Optional.of(new TunnelMachineInfo(tunnel, type, mach, side));
     }
 
     public Stream<TunnelMachineInfo> tunnels() {
@@ -405,7 +404,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         return tunnels.containsKey(location);
     }
 
-    public <T> Stream<BlockPos> getTunnelsSupporting(LevelBlockPosition machine, Direction side, Capability<T> capability) {
+    public <T> Stream<BlockPos> getTunnelsSupporting(GlobalPos machine, Direction side, Capability<T> capability) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
@@ -422,7 +421,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                         })).map(TunnelNode::position);
     }
 
-    public Stream<TunnelDefinition> getTypesForSide(LevelBlockPosition machine, Direction side) {
+    public Stream<TunnelDefinition> getTypesForSide(GlobalPos machine, Direction side) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
@@ -434,7 +433,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                 .distinct();
     }
 
-    public Stream<TunnelNode> getTunnelsForSide(IDimensionalBlockPosition machine, Direction side) {
+    public Stream<TunnelNode> getTunnelsForSide(GlobalPos machine, Direction side) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
@@ -472,7 +471,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         tunnels.clear();
     }
 
-    public Stream<BlockPos> getMachineTunnels(IDimensionalBlockPosition machine, TunnelDefinition type) {
+    public Stream<BlockPos> getMachineTunnels(GlobalPos machine, TunnelDefinition type) {
         return getTunnelNodesByType(type)
                 .map(TunnelNode::position)
                 .filter(position -> connectedMachine(position).map(machine::equals).orElse(false))
@@ -540,7 +539,7 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
     }
 
     private void cleanupOrphanedMachines() {
-        HashSet<IDimensionalBlockPosition> removed = new HashSet<>();
+        HashSet<GlobalPos> removed = new HashSet<>();
         machines.forEach((machine, node) -> {
             if (graph.degree(node) == 0) {
                 graph.removeNode(node);
@@ -573,11 +572,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         });
     }
 
-    public Stream<IDimensionalBlockPosition> getMachines() {
+    public Stream<GlobalPos> getMachines() {
         return this.machines.keySet().stream();
     }
 
-    public Stream<BlockPos> getConnections(IDimensionalBlockPosition machine) {
+    public Stream<BlockPos> getConnections(GlobalPos machine) {
         if (!machines.containsKey(machine))
             return Stream.empty();
 
@@ -592,11 +591,11 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
 
     }
 
-    public boolean hasAnyConnectedTo(IDimensionalBlockPosition machine) {
+    public boolean hasAnyConnectedTo(GlobalPos machine) {
         return getConnections(machine).findAny().isPresent();
     }
 
-    public void rebind(BlockPos tunnel, IDimensionalBlockPosition newMachine, Direction side) {
+    public void rebind(BlockPos tunnel, GlobalPos newMachine, Direction side) {
         CompactMachines.LOGGER.debug("Rebinding tunnel at {} to machine {}", tunnel, newMachine);
 
         final var tunnelNode = getOrCreateTunnelNode(tunnel);

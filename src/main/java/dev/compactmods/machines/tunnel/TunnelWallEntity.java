@@ -1,7 +1,6 @@
 package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.room.IRoomInformation;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
@@ -9,12 +8,15 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
-import dev.compactmods.machines.core.*;
-import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.machine.graph.legacy.LegacyMachineLocationsGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +39,7 @@ public class TunnelWallEntity extends BlockEntity {
     @Deprecated(forRemoval = true)
     private int legacyMachineId = -1;
 
-    private LevelBlockPosition connectedMachine;
+    private GlobalPos connectedMachine;
     private TunnelDefinition tunnelType;
 
     private LazyOptional<IRoomInformation> ROOM = LazyOptional.empty();
@@ -130,13 +131,11 @@ public class TunnelWallEntity extends BlockEntity {
 
     @Override
     public void saveAdditional(@Nonnull CompoundTag compound) {
-        if (tunnelType != null)
-            compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, tunnelType.getRegistryName().toString());
-        else
-            compound.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, Tunnels.UNKNOWN.getId().toString());
+        final var baseData = new BaseTunnelWallData(connectedMachine, tunnelType.getRegistryName());
+        final var baseNbt = (CompoundTag) BaseTunnelWallData.CODEC.encodeStart(NbtOps.INSTANCE, baseData)
+                .getOrThrow(false, CompactMachines.LOGGER::error);
 
-        if(connectedMachine != null)
-            compound.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
+        compound.merge(baseNbt);
 
         if (tunnel instanceof INBTSerializable persist) {
             var data = persist.serializeNBT();
@@ -147,24 +146,19 @@ public class TunnelWallEntity extends BlockEntity {
     @Override
     @Nonnull
     public CompoundTag getUpdateTag() {
-        CompoundTag nbt = super.getUpdateTag();
-        nbt.putString(BaseTunnelWallData.KEY_TUNNEL_TYPE, tunnelType.getRegistryName().toString());
-        nbt.put(BaseTunnelWallData.KEY_CONNECTION, connectedMachine.serializeNBT());
-        return nbt;
+        final var baseData = new BaseTunnelWallData(connectedMachine, tunnelType.getRegistryName());
+        return (CompoundTag) BaseTunnelWallData.CODEC.encodeStart(NbtOps.INSTANCE, baseData)
+                .getOrThrow(false, CompactMachines.LOGGER::error);
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
-        if (tag.contains(BaseTunnelWallData.KEY_TUNNEL_TYPE)) {
-            var id = new ResourceLocation(tag.getString(BaseTunnelWallData.KEY_TUNNEL_TYPE));
-            this.tunnelType = Tunnels.getDefinition(id);
-        }
+        final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, tag)
+                .getOrThrow(true, CompactMachines.LOGGER::fatal);
 
-        if (tag.contains(BaseTunnelWallData.KEY_CONNECTION)) {
-            this.connectedMachine = LevelBlockPosition.fromNBT(tag.getCompound(BaseTunnelWallData.KEY_CONNECTION));
-        }
-
+        this.connectedMachine = baseData.connection();
+        this.tunnelType = baseData.tunnel();
         setChanged();
     }
 
@@ -199,11 +193,11 @@ public class TunnelWallEntity extends BlockEntity {
         return super.getCapability(cap, side);
     }
 
-    public IDimensionalBlockPosition getConnectedPosition() {
+    public GlobalPos getConnectedPosition() {
         if(this.connectedMachine == null)
             return null;
 
-        return this.connectedMachine.relative(getConnectedSide());
+        return GlobalPos.of(connectedMachine.dimension(), connectedMachine.pos().relative(getConnectedSide()));
     }
 
     /**
@@ -252,9 +246,9 @@ public class TunnelWallEntity extends BlockEntity {
      *
      * @param machine Machine to connect tunnel to.
      */
-    public void setConnectedTo(IDimensionalBlockPosition machine, Direction side) {
+    public void setConnectedTo(GlobalPos machine, Direction side) {
         if (level == null || level.isClientSide) return;
-        this.connectedMachine = new LevelBlockPosition(machine);
+        this.connectedMachine = machine;
 
         if(level instanceof ServerLevel sl) {
             final var graph = TunnelConnectionGraph.forRoom(sl, new ChunkPos(worldPosition));

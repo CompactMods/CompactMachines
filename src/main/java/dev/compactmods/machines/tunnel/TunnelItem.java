@@ -3,16 +3,17 @@ package dev.compactmods.machines.tunnel;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
-import dev.compactmods.machines.api.location.IDimensionalPosition;
+import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.IRedstoneTunnel;
-import dev.compactmods.machines.core.*;
+import dev.compactmods.machines.core.Capabilities;
+import dev.compactmods.machines.core.MissingDimensionException;
+import dev.compactmods.machines.core.Registration;
+import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.location.LevelBlockPosition;
+import dev.compactmods.machines.core.CompactMachinesNet;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
-import dev.compactmods.machines.api.room.IRoomHistory;
-import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
 import net.minecraft.ChatFormatting;
@@ -34,15 +35,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -169,6 +166,7 @@ public class TunnelItem extends Item {
     private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction innerFace, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
         boolean redstone = def instanceof IRedstoneTunnel;
 
+        final var server = compactDim.getServer();
         final var roomTunnels = TunnelConnectionGraph.forRoom(compactDim, player.chunkPosition());
 
         var lastEnteredMachine = getMachineBindingInfo(player);
@@ -213,12 +211,14 @@ public class TunnelItem extends Item {
         compactDim.setBlock(position, tunnelState, Block.UPDATE_NEIGHBORS);
 
         if (compactDim.getBlockEntity(position) instanceof TunnelWallEntity twe) {
+            final var connectedMachine = hist.getMachine();
+
             twe.setTunnelType(def);
             twe.setConnectedTo(hist.getMachine(), first);
 
             CompactMachinesNet.CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
-                    new TunnelAddedPacket(position, def));
+                    new TunnelAddedPacket(position, def.getRegistryName(), hist.getMachine()));
         }
 
         compactDim.sendBlockUpdated(position, oldState, tunnelState, Block.UPDATE_ALL);

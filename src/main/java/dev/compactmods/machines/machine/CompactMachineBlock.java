@@ -8,7 +8,6 @@ import dev.compactmods.machines.core.*;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -22,6 +21,7 @@ import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -196,7 +196,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                         final var roomName = Rooms.getRoomName(server, room);
                         NetworkHooks.openGui((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
                             buf.writeBlockPos(pos);
-                            buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
+                            buf.writeWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
                             buf.writeChunkPos(room);
                             roomName.ifPresentOrElse(name -> {
                                 buf.writeBoolean(true);

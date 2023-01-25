@@ -7,8 +7,6 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.util.MathUtil;
@@ -118,15 +116,12 @@ public class CompactRoomData extends SavedData {
     }
 
     @Nullable
-    public LevelBlockPosition getSpawn(ChunkPos roomChunk) {
+    public Vec3 getSpawn(ChunkPos roomChunk) {
         RoomData roomData = this.roomData.get(roomChunk);
         if (roomData == null)
             return null;
 
-        return new LevelBlockPosition(
-                Registration.COMPACT_DIMENSION,
-                roomData.getSpawn()
-        );
+        return roomData.getSpawn();
     }
 
     public int getNextSpiralPosition() {

@@ -2,10 +2,7 @@ package dev.compactmods.machines.room;
 
 import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
-import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -14,6 +11,7 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
@@ -128,7 +126,7 @@ public class Rooms {
 //        return true;
 //    }
 
-    public static Stream<IDimensionalBlockPosition> getConnectedMachines(MinecraftServer server, ChunkPos room) {
+    public static Stream<GlobalPos> getConnectedMachines(MinecraftServer server, ChunkPos room) {
         return server.levelKeys().stream()
                 .map(server::getLevel)
                 .filter(Objects::nonNull)
@@ -136,7 +134,7 @@ public class Rooms {
                 .flatMap(sl -> {
                     final var graph = DimensionMachineGraph.forDimension(sl);
                     return graph.getMachinesFor(room).stream()
-                        .map(bp -> new LevelBlockPosition(sl.dimension(), bp));
+                        .map(bp -> GlobalPos.of(sl.dimension(), bp));
                 });
     }
 
@@ -147,7 +145,7 @@ public class Rooms {
                 .getSize();
     }
 
-    public static IDimensionalPosition getSpawn(MinecraftServer server, ChunkPos room) {
+    public static Vec3 getSpawn(MinecraftServer server, ChunkPos room) {
         final var compactDim = server.getLevel(Registration.COMPACT_DIMENSION);
         return CompactRoomData.get(compactDim).getSpawn(room);
     }

@@ -10,7 +10,6 @@ import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
 import dev.compactmods.machines.client.render.SuperRenderTypeBuffer;
 import dev.compactmods.machines.client.util.TransformingVertexBuilder;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
@@ -21,6 +20,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -224,7 +224,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         // this.blit(pose, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 
-    public LevelBlockPosition getMachine() {
+    public GlobalPos getMachine() {
         return menu.getMachine();
     }
 }

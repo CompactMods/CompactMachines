@@ -6,8 +6,8 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.graph.CMGraphRegistration;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.graph.IGraphNodeType;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -32,8 +32,8 @@ public record CompactMachineNode(ResourceKey<Level> dimension, BlockPos position
         return "Compact Machine {%s}".formatted(position);
     }
 
-    public LevelBlockPosition dimpos() {
-        return new LevelBlockPosition(dimension, position);
+    public GlobalPos dimpos() {
+        return GlobalPos.of(dimension, position);
     }
 
     @Override

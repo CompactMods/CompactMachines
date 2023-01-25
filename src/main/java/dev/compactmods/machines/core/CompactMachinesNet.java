@@ -35,8 +35,8 @@ public class CompactMachinesNet {
 
     public static void setupMessages() {
         CHANNEL.messageBuilder(TunnelAddedPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(TunnelAddedPacket::encode)
-                .decoder(TunnelAddedPacket::new)
+                .encoder((p, b) -> b.writeWithCodec(TunnelAddedPacket.CODEC, p))
+                .decoder(b -> b.readWithCodec(TunnelAddedPacket.CODEC))
                 .consumer(TunnelAddedPacket::handle)
                 .add();
 

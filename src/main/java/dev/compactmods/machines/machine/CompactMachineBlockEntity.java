@@ -1,36 +1,46 @@
 package dev.compactmods.machines.machine;
 
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.Registration;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
+import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.machine.graph.legacy.LegacyMachineConnections;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CompactMachineBlockEntity extends BlockEntity {
     private static final String ROOM_NBT = "room_pos";
     private static final String LEGACY_MACH_ID = "machine_id";
+
+    private static final String PLAYERS_NBT = "players_inside";
+    private static final String TUNNEL_POSITIONS_NBT = "has_tunnels";
 
     public long nextSpawnTick = 0;
 
@@ -42,6 +52,8 @@ public class CompactMachineBlockEntity extends BlockEntity {
 
     private WeakReference<CompactMachineNode> graphNode;
     private WeakReference<CompactMachineRoomNode> roomNode;
+    private final HashSet<UUID> playersInside = new HashSet<>();
+    private final HashSet<GlobalPos> connectedTunnels = new HashSet<>();
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
@@ -159,42 +171,69 @@ public class CompactMachineBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag() {
         CompoundTag data = super.getUpdateTag();
 
-        getConnectedRoom().ifPresent(room -> {
-            data.putIntArray(ROOM_NBT, new int[]{room.x, room.z});
-        });
+        if (level instanceof ServerLevel serverLevel) {
+            final var compactDim = serverLevel.getServer().getLevel(Registration.COMPACT_DIMENSION);
+            Objects.requireNonNull(compactDim);
 
-        if (level instanceof ServerLevel) {
-            // TODO - Internal player list
             if (this.owner != null)
                 data.putUUID("owner", this.owner);
+
+            final var graph = DimensionMachineGraph.forDimension(serverLevel);
+            var chunk = graph.getConnectedRoom(worldPosition);
+            chunk.ifPresent(room -> {
+                // write room position
+                data.putIntArray(ROOM_NBT, new int[]{room.x, room.z});
+
+                // players and tunnels
+                final var playersInRoom = compactDim.getPlayers(player -> player.chunkPosition().equals(room));
+                if (!playersInRoom.isEmpty()) {
+                    final var playersNbt = playersInRoom.stream()
+                            .map(ServerPlayer::getStringUUID)
+                            .map(StringTag::valueOf)
+                            .collect(NbtListCollector.toNbtList());
+
+                    data.put(PLAYERS_NBT, playersNbt);
+                }
+
+                final var machineLoc = GlobalPos.of(serverLevel.dimension(), worldPosition);
+                final var tunnels = TunnelConnectionGraph.forRoom(compactDim, room)
+                        .getConnections(machineLoc)
+                        .map(bp -> GlobalPos.of(compactDim.dimension(), bp))
+                        .toList();
+
+                final var tunnelPositions = GlobalPos.CODEC.listOf()
+                        .encodeStart(NbtOps.INSTANCE, tunnels)
+                        .getOrThrow(false, CompactMachines.LOGGER::error);
+
+                data.put(TUNNEL_POSITIONS_NBT, tunnelPositions);
+            });
         }
 
         return data;
-    }
-
-    public Optional<ChunkPos> getConnectedRoom() {
-        if (level instanceof ServerLevel sl) {
-            if (roomChunk != null)
-                return Optional.of(roomChunk);
-
-            final var graph = DimensionMachineGraph.forDimension(sl);
-
-            var chunk = graph.getConnectedRoom(worldPosition);
-            chunk.ifPresent(c -> this.roomChunk = c);
-            return chunk;
-        }
-
-        return Optional.ofNullable(roomChunk);
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
 
-        if (tag.contains("players")) {
-            CompoundTag players = tag.getCompound("players");
-            // playerData = CompactMachinePlayerData.fromNBT(players);
+        playersInside.clear();
+        if (tag.contains(PLAYERS_NBT)) {
+            final var pi = tag.getList(PLAYERS_NBT, Tag.TAG_INT_ARRAY)
+                    .stream()
+                    .map(Tag::getAsString)
+                    .map(UUID::fromString)
+                    .collect(Collectors.toUnmodifiableSet());
 
+            playersInside.addAll(pi);
+        }
+
+        connectedTunnels.clear();
+        if (tag.contains(TUNNEL_POSITIONS_NBT)) {
+            final var positions = GlobalPos.CODEC.listOf()
+                    .parse(NbtOps.INSTANCE, tag.get(TUNNEL_POSITIONS_NBT))
+                    .getOrThrow(false, CompactMachines.LOGGER::error);
+
+            this.connectedTunnels.addAll(positions);
         }
 
         if (tag.contains(ROOM_NBT)) {
@@ -206,6 +245,20 @@ public class CompactMachineBlockEntity extends BlockEntity {
             owner = tag.getUUID("owner");
     }
 
+    public Optional<ChunkPos> getConnectedRoom() {
+        if (roomChunk != null)
+            return Optional.of(roomChunk);
+
+        if (level instanceof ServerLevel sl) {
+            final var graph = DimensionMachineGraph.forDimension(sl);
+            var chunk = graph.getConnectedRoom(worldPosition);
+            chunk.ifPresent(c -> this.roomChunk = c);
+            return chunk;
+        }
+
+        return Optional.empty();
+    }
+
     public Optional<UUID> getOwnerUUID() {
         return Optional.ofNullable(this.owner);
     }
@@ -215,12 +268,15 @@ public class CompactMachineBlockEntity extends BlockEntity {
     }
 
     public boolean hasPlayersInside() {
-        // TODO
-        return false;
+        return !playersInside.isEmpty();
     }
 
-    public LevelBlockPosition getLevelPosition() {
-        return new LevelBlockPosition(level.dimension(), worldPosition);
+    public boolean hasTunnels() {
+        return !connectedTunnels.isEmpty();
+    }
+
+    public GlobalPos getLevelPosition() {
+        return GlobalPos.of(level.dimension(), worldPosition);
     }
 
     public void syncConnectedRoom() {

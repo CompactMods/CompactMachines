@@ -1,7 +1,6 @@
 package dev.compactmods.machines.compat.theoneprobe.providers;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
@@ -70,10 +69,10 @@ public class TunnelProvider implements IProbeInfoProvider {
             final var connectedTo = tile.getConnectedPosition();
             if(connectedTo != null) {
                 ServerLevel connectedWorld = (ServerLevel) level;
-                BlockPos outPosBlock = connectedTo.getBlockPosition();
+                BlockPos outPosBlock = connectedTo.pos();
 
                 try {
-                    final var state = connectedTo.state(level.getServer());
+                    final var state = level.getBlockState(connectedTo.pos());
 
                     // If connected block isn't air, show a connected block line
                     if (!state.isAir()) {

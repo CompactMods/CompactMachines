@@ -1,11 +1,11 @@
 package dev.compactmods.machines.room.menu;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.core.MissingDimensionException;
 import dev.compactmods.machines.core.UIRegistration;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
@@ -23,10 +23,10 @@ import javax.annotation.Nullable;
 public class MachineRoomMenu extends AbstractContainerMenu {
     private final ChunkPos room;
     private String roomName;
-    private final LevelBlockPosition machine;
+    private final GlobalPos machine;
     private StructureTemplate roomBlocks;
 
-    public MachineRoomMenu(int win, ChunkPos room, LevelBlockPosition machine, String roomName) {
+    public MachineRoomMenu(int win, ChunkPos room, GlobalPos machine, String roomName) {
         super(UIRegistration.MACHINE_MENU.get(), win);
         this.room = room;
         this.roomName = roomName;
@@ -38,11 +38,11 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         return room;
     }
 
-    public LevelBlockPosition getMachine() {
+    public GlobalPos getMachine() {
         return machine;
     }
 
-    public static MenuProvider makeProvider(MinecraftServer server, ChunkPos roomId, LevelBlockPosition machinePos) {
+    public static MenuProvider makeProvider(MinecraftServer server, ChunkPos roomId, GlobalPos machinePos) {
         return new MenuProvider() {
             @Override
             public Component getDisplayName() {

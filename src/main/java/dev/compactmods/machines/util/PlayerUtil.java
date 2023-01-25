@@ -89,12 +89,8 @@ public abstract class PlayerUtil {
         }
 
         serv.submitAsync(() -> {
-            Vec3 sp = spawn.getExactPosition();
-            Vec3 sr = spawn.getRotation().orElse(new Vec3(player.xRotO, player.yRotO, 0));
-
             if (player instanceof ServerPlayer servPlayer) {
-                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(sp));
-
+                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(spawn));
                 if (grantAdvancement)
                     AdvancementTriggers.getTriggerForMachineClaim(roomSize).trigger(servPlayer);
             }
