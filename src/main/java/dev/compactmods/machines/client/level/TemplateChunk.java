@@ -44,6 +44,7 @@ public class TemplateChunk extends EmptyLevelChunk {
                 BlockEntity tile = BlockEntity.loadStatic(blockInfo.pos, blockInfo.state, blockInfo.nbt);
                 if (tile != null) {
                     tile.setLevel(worldIn);
+                    tile.clearRemoved();
                     tile.setBlockState(blockInfo.state);
                     tiles.put(blockInfo.pos, tile);
                     tile.onLoad();

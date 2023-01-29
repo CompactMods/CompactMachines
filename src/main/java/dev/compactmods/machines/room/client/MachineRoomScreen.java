@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.client.ClientConfig;
 import dev.compactmods.machines.client.gui.widget.PSDIconButton;
 import dev.compactmods.machines.client.level.RenderingLevel;
 import dev.compactmods.machines.client.render.RenderTypes;
@@ -30,6 +31,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
@@ -38,6 +43,9 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     protected double rotateY = 20.0f;
     private PSDIconButton psdButton;
     private RenderingLevel renderer;
+
+    public static final Logger SCREEN_LOGGER = LogManager.getLogger("room_preview");
+    public static final Marker RENDER_ERROR = MarkerManager.getMarker("room_preview");
 
     public MachineRoomScreen(MachineRoomMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -188,7 +196,11 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                         }
 
                         catch(Exception e) {
-                            CompactMachines.LOGGER.error(e);
+                            if(ClientConfig.roomPreviewLoggingEnabled())
+                                SCREEN_LOGGER.atError()
+                                        .withMarker(RENDER_ERROR)
+                                        .withThrowable(e)
+                                        .log();
                         }
 
                         try {
@@ -203,7 +215,11 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
                             pose.popPose();
                         } catch (Exception e) {
-                            CompactMachines.LOGGER.error(e);
+                            if(ClientConfig.roomPreviewLoggingEnabled())
+                                SCREEN_LOGGER.atError()
+                                        .withMarker(RENDER_ERROR)
+                                        .withThrowable(e)
+                                        .log();
                         }
                     }
                     pose.popPose();

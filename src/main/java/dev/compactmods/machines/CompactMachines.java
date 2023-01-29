@@ -1,5 +1,6 @@
 package dev.compactmods.machines;
 
+import dev.compactmods.machines.client.ClientConfig;
 import dev.compactmods.machines.command.argument.RoomPositionArgument;
 import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
@@ -53,6 +54,7 @@ public class CompactMachines {
         MachineRoomUpgrades.init(eb);
 
         ModLoadingContext mlCtx = ModLoadingContext.get();
+        mlCtx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 
