@@ -1,28 +1,20 @@
 package dev.compactmods.machines.client.level;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.advancement.GenericAdvancementTriggerListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.ticks.TickContainerAccess;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -72,7 +64,18 @@ public class TemplateChunk extends EmptyLevelChunk {
     }
 
     public void tick() {
-        this.tickers.forEach((pos, ticker) -> ticker.tick(this.getLevel(), pos, getBlockState(pos), tiles.get(pos)));
+        for (var entry : this.tickers.entrySet()) {
+            BlockPos pos = entry.getKey();
+            BlockEntityTicker<BlockEntity> ticker = entry.getValue();
+
+            try {
+                ticker.tick(this.getLevel(), pos, getBlockState(pos), tiles.get(pos));
+            }
+
+            catch(Exception ex) {
+                CompactMachines.LOGGER.error("Error ticking block entity in preview level.", ex);
+            }
+        }
     }
 
     @Nonnull

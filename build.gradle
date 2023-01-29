@@ -266,9 +266,16 @@ dependencies {
             runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
 
         //    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-        //    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-            // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
-        //
+
+        // Pretty Pipes
+        runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:4049657"))
+
+        // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+
+        // ChickenChunks Chunkloader
+        runtimeOnly(fg.deobf("curse.maven:codechickenlib-242818:4009409"))
+        runtimeOnly(fg.deobf("curse.maven:chickenchunks-243883:3865388"))
+
         //    // Scalable Cat's Force, BdLib, Advanced Generators
         //    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
         //    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))

@@ -174,15 +174,21 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
                         transformer.setOverlay(OverlayTexture.RED_OVERLAY_V);
 
                         IModelData modelData = EmptyModelData.INSTANCE;
-                        if (state.hasBlockEntity()) {
-                            final var be = renderer.getBlockEntity(pos);
-                            if (be != null) {
-                                modelData = be.getModelData();
-                                final var ber = beRenderer.getRenderer(be);
-                                if (ber != null) {
-                                    ber.render(be, 1f, pose, buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                        try {
+                            if (state.hasBlockEntity()) {
+                                final var be = renderer.getBlockEntity(pos);
+                                if (be != null) {
+                                    modelData = be.getModelData();
+                                    final var ber = beRenderer.getRenderer(be);
+                                    if (ber != null) {
+                                        ber.render(be, 1f, pose, buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                                    }
                                 }
                             }
+                        }
+
+                        catch(Exception e) {
+                            CompactMachines.LOGGER.error(e);
                         }
 
                         try {
@@ -197,6 +203,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
                             pose.popPose();
                         } catch (Exception e) {
+                            CompactMachines.LOGGER.error(e);
                         }
                     }
                     pose.popPose();

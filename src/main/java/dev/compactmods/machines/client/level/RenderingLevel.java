@@ -1,7 +1,11 @@
 package dev.compactmods.machines.client.level;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.profiling.InactiveProfiler;
@@ -13,8 +17,6 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -29,7 +31,8 @@ import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class RenderingLevel extends Level {
 
@@ -38,6 +41,9 @@ public class RenderingLevel extends Level {
     public RenderingLevel(StructureTemplate blocks) {
         super(new FakeSpawnInfo(), Level.OVERWORLD, Holder.direct(DimensionType.DEFAULT_OVERWORLD),
                 () -> InactiveProfiler.INSTANCE, true, false, 0);
+
+        // Gathers level capabilities, for mods that set up level-bound information like pipe networks
+        this.gatherCapabilities();
 
         if(!blocks.palettes.isEmpty()) {
             StructurePlaceSettings s = new StructurePlaceSettings();
