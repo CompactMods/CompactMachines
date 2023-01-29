@@ -12,7 +12,9 @@ import dev.compactmods.machines.core.Registration;
 import dev.compactmods.machines.core.Tunnels;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.core.CompactMachinesNet;
+import dev.compactmods.machines.machine.CompactMachineBlockEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.network.MachineTunnelsUpdatePacket;
 import dev.compactmods.machines.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.util.PlayerUtil;
 import dev.compactmods.machines.wall.SolidWallBlock;
@@ -20,6 +22,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -216,9 +219,24 @@ public class TunnelItem extends Item {
             twe.setTunnelType(def);
             twe.setConnectedTo(hist.getMachine(), first);
 
-            CompactMachinesNet.CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
-                    new TunnelAddedPacket(position, def.getRegistryName(), hist.getMachine()));
+            final var inRoomPlayers = PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position));
+            CompactMachinesNet.CHANNEL.send(inRoomPlayers, new TunnelAddedPacket(position, def.getRegistryName(), hist.getMachine()));
+
+            final var watchingMachineChunk = PacketDistributor.TRACKING_CHUNK.with(() -> {
+                final var machLevel = server.getLevel(connectedMachine.dimension());
+                return machLevel.getChunkAt(connectedMachine.pos());
+            });
+
+            final var newTunnelList = roomTunnels.getConnections(connectedMachine)
+                    .map(bp -> GlobalPos.of(compactDim.dimension(), bp.immutable()))
+                    .toList();
+
+            final var machLevel = server.getLevel(connectedMachine.dimension());
+            if(machLevel.getBlockEntity(connectedMachine.pos()) instanceof CompactMachineBlockEntity machine) {
+                machine.updateTunnelList(newTunnelList);
+            }
+
+            CompactMachinesNet.CHANNEL.send(watchingMachineChunk, new MachineTunnelsUpdatePacket(connectedMachine.pos(), newTunnelList));
         }
 
         compactDim.sendBlockUpdated(position, oldState, tunnelState, Block.UPDATE_ALL);

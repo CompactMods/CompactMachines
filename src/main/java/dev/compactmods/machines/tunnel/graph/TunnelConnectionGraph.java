@@ -8,9 +8,12 @@ import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.core.Tunnels;
-import dev.compactmods.machines.graph.*;
+import dev.compactmods.machines.graph.CMGraphRegistration;
+import dev.compactmods.machines.graph.IGraphEdge;
+import dev.compactmods.machines.graph.IGraphEdgeType;
+import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.graph.IGraphNodeType;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
-import dev.compactmods.machines.machine.graph.MachineRoomEdge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -26,7 +29,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,10 +152,6 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
         return true;
     }
 
-    private void createTunnelAndLink(TunnelNode newTunnel, Direction side, CompactMachineNode machNode, TunnelTypeNode typeNode) {
-
-    }
-
     @Nonnull
     public TunnelNode getOrCreateTunnelNode(BlockPos tunnelPos) {
         if (tunnels.containsKey(tunnelPos))
@@ -263,6 +267,14 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
                 .map(this::getTunnelInfo)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
+    }
+
+    public Stream<TunnelMachineInfo> tunnels(GlobalPos machinePos) {
+        return tunnels.keySet().stream()
+                .map(this::getTunnelInfo)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(tmi -> tmi.machine().equals(machinePos));
     }
 
     public Stream<IGraphNode> nodes() {
@@ -581,14 +593,10 @@ public class TunnelConnectionGraph extends SavedData implements INBTSerializable
             return Stream.empty();
 
         final var mNode = machines.get(machine);
-        return graph.incidentEdges(mNode).stream()
-                .filter(e -> graph.edgeValue(e).orElseThrow() instanceof MachineRoomEdge)
-                .map(edge -> {
-                    if (edge.nodeU() instanceof TunnelNode cmn) return cmn;
-                    if (edge.nodeV() instanceof TunnelNode cmn2) return cmn2;
-                    return null;
-                }).filter(Objects::nonNull).map(TunnelNode::position);
-
+        return graph.predecessors(mNode).stream()
+                .filter(TunnelNode.class::isInstance)
+                .map(TunnelNode.class::cast)
+                .map(TunnelNode::position);
     }
 
     public boolean hasAnyConnectedTo(GlobalPos machine) {

@@ -71,10 +71,11 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         if (tile == null)
             return normalHardness;
 
-        boolean hasPlayers = tile.hasPlayersInside();
-
+        if(tile.hasTunnels())
+            return 0;
 
         // If there are players inside, check config for break handling
+        boolean hasPlayers = tile.hasPlayersInside();
         if (hasPlayers) {
             EnumMachinePlayersBreakHandling hand = ServerConfig.MACHINE_PLAYER_BREAK_HANDLING.get();
             switch (hand) {

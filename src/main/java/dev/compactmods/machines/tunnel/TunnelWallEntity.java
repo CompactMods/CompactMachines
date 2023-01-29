@@ -154,6 +154,10 @@ public class TunnelWallEntity extends BlockEntity {
         return super.getCapability(cap, side);
     }
 
+    public GlobalPos getConnectedMachine() {
+        return this.connectedMachine;
+    }
+
     public GlobalPos getConnectedPosition() {
         if(this.connectedMachine == null)
             return null;

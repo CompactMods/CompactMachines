@@ -14,11 +14,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +39,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
     private static final String LEGACY_MACH_ID = "machine_id";
 
     private static final String PLAYERS_NBT = "players_inside";
-    private static final String TUNNEL_POSITIONS_NBT = "has_tunnels";
+    private static final String HAS_TUNNELS_NBT = "has_tunnels";
 
     public long nextSpawnTick = 0;
 
@@ -51,7 +51,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
     private WeakReference<CompactMachineNode> graphNode;
     private WeakReference<CompactMachineRoomNode> roomNode;
     private final HashSet<UUID> playersInside = new HashSet<>();
-    private final HashSet<GlobalPos> connectedTunnels = new HashSet<>();
+    private boolean hasConnectedTunnels = false;
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.MACHINE_TILE_ENTITY.get(), pos, state);
@@ -96,6 +96,37 @@ public class CompactMachineBlockEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         this.syncConnectedRoom();
+        this.loadPlayersAndTunnels();
+    }
+
+    private void loadPlayersAndTunnels() {
+        if (level instanceof ServerLevel serverLevel) {
+            final var compactDim = serverLevel.getServer().getLevel(Registration.COMPACT_DIMENSION);
+            Objects.requireNonNull(compactDim);
+
+            final var graph = DimensionMachineGraph.forDimension(serverLevel);
+            var chunk = graph.getConnectedRoom(worldPosition);
+            chunk.ifPresent(room -> {
+                // players and tunnels
+                final var playersInRoom = compactDim.getPlayers(player -> player.chunkPosition().equals(room))
+                        .stream()
+                        .map(Player::getUUID)
+                        .collect(Collectors.toSet());
+
+                this.playersInside.clear();
+                this.playersInside.addAll(playersInRoom);
+
+                final var machineLoc = GlobalPos.of(serverLevel.dimension(), worldPosition);
+                final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, room);
+
+                final var tunnels = tunnelGraph
+                        .getConnections(machineLoc)
+                        .map(bp -> GlobalPos.of(compactDim.dimension(), bp))
+                        .toList();
+
+                this.hasConnectedTunnels = !tunnels.isEmpty();
+            });
+        }
     }
 
     @Override
@@ -157,27 +188,17 @@ public class CompactMachineBlockEntity extends BlockEntity {
                 data.putIntArray(ROOM_NBT, new int[]{room.x, room.z});
 
                 // players and tunnels
-                final var playersInRoom = compactDim.getPlayers(player -> player.chunkPosition().equals(room));
-                if (!playersInRoom.isEmpty()) {
-                    final var playersNbt = playersInRoom.stream()
-                            .map(ServerPlayer::getStringUUID)
+                this.loadPlayersAndTunnels();
+                if (!this.playersInside.isEmpty()) {
+                    final var playersNbt = this.playersInside.stream()
+                            .map(UUID::toString)
                             .map(StringTag::valueOf)
                             .collect(NbtListCollector.toNbtList());
 
                     data.put(PLAYERS_NBT, playersNbt);
                 }
 
-                final var machineLoc = GlobalPos.of(serverLevel.dimension(), worldPosition);
-                final var tunnels = TunnelConnectionGraph.forRoom(compactDim, room)
-                        .getConnections(machineLoc)
-                        .map(bp -> GlobalPos.of(compactDim.dimension(), bp))
-                        .toList();
-
-                final var tunnelPositions = GlobalPos.CODEC.listOf()
-                        .encodeStart(NbtOps.INSTANCE, tunnels)
-                        .getOrThrow(false, CompactMachines.LOGGER::error);
-
-                data.put(TUNNEL_POSITIONS_NBT, tunnelPositions);
+                data.putBoolean(HAS_TUNNELS_NBT, this.hasConnectedTunnels);
             });
         }
 
@@ -199,13 +220,10 @@ public class CompactMachineBlockEntity extends BlockEntity {
             playersInside.addAll(pi);
         }
 
-        connectedTunnels.clear();
-        if (tag.contains(TUNNEL_POSITIONS_NBT)) {
-            final var positions = GlobalPos.CODEC.listOf()
-                    .parse(NbtOps.INSTANCE, tag.get(TUNNEL_POSITIONS_NBT))
-                    .getOrThrow(false, CompactMachines.LOGGER::error);
-
-            this.connectedTunnels.addAll(positions);
+        if (tag.contains(HAS_TUNNELS_NBT)) {
+            this.hasConnectedTunnels = tag.getBoolean(HAS_TUNNELS_NBT);
+        } else {
+            this.hasConnectedTunnels = false;
         }
 
         if (tag.contains(ROOM_NBT)) {
@@ -244,7 +262,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
     }
 
     public boolean hasTunnels() {
-        return !connectedTunnels.isEmpty();
+        return this.hasConnectedTunnels;
     }
 
     public GlobalPos getLevelPosition() {
@@ -285,5 +303,9 @@ public class CompactMachineBlockEntity extends BlockEntity {
             this.graphNode.clear();
             setChanged();
         }
+    }
+
+    public void updateTunnelList(List<GlobalPos> tunnels) {
+        this.hasConnectedTunnels = !tunnels.isEmpty();
     }
 }
