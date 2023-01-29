@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class TunnelProvider implements IProbeInfoProvider {
+public class TunnelOneProbeProvider implements IProbeInfoProvider {
 
     @Override
     public ResourceLocation getID() {

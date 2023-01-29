@@ -11,6 +11,10 @@ public abstract class Tooltips {
     public static final ResourceLocation ROOM_UPGRADE_TYPE = new ResourceLocation(Constants.MOD_ID, "room_upgrade_type");
     public static final ResourceLocation TUTORIAL_APPLY_ROOM_UPGRADE = new ResourceLocation(Constants.MOD_ID, "tutorial_apply_room_upgrade");
 
+    public static final ResourceLocation UNBREAKABLE_PLAYERS = new ResourceLocation(Constants.MOD_ID, "unbreakable_due_to_players");
+    public static final ResourceLocation UNBREAKABLE_TUNNELS = new ResourceLocation(Constants.MOD_ID, "unbreakable_due_to_tunnels");
+    public static final ResourceLocation UNBREAKABLE_PLAYERS_AND_TUNNELS = new ResourceLocation(Constants.MOD_ID, "unbreakable_due_to_players_and_tunnels");
+
     public static abstract class Machines {
         public static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "machine.id");
         public static final ResourceLocation OWNER = new ResourceLocation(Constants.MOD_ID, "machine.owner");

@@ -248,7 +248,10 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}:${jei_version}")
 
     // The One Probe
-    implementation(fg.deobf("curse.maven:theoneprobe-245211:3671753"))
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:${top_version}"))
+
+    // Jade
+    implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 
     if (!System.getenv().containsKey("CI") && Boolean.valueOf(include_test_mods)) {
         // Nicephore - Screenshots and Stuff

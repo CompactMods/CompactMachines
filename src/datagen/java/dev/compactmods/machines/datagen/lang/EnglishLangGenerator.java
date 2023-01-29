@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.lang;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.CMCommands;
+import dev.compactmods.machines.api.core.JeiInfo;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
@@ -11,8 +12,6 @@ import dev.compactmods.machines.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.wall.MachineVoidAir;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.RegistryObject;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -118,9 +117,14 @@ public class EnglishLangGenerator extends BaseLangGenerator {
                 "You can use Tunnels to connect the outside block faces with any of the inside walls to transport items, fluids etc.\n\n" +
                 "You can enter a Compact Machine by right-clicking it with a Personal Shrinking Device. Please use JEI to look up crafting recipes.");
 
-        add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
-        add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
+        addJeiInfo(JeiInfo.MACHINE, "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
+        addJeiInfo(JeiInfo.SHRINKING_DEVICE, "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
+
+        addTooltip(Tooltips.UNBREAKABLE_PLAYERS, "Unbreakable");
+        addTooltip(Tooltips.UNBREAKABLE_TUNNELS, "Unbreakable");
+        addTooltip(Tooltips.UNBREAKABLE_PLAYERS_AND_TUNNELS, "Unbreakable");
+
         add("death.attack." + MachineVoidAir.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
     }
 
