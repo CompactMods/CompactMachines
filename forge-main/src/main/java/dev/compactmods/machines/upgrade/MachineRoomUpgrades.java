@@ -1,7 +1,7 @@
 package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.Registries;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbench;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeWorkbenchEntity;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public class MachineRoomUpgrades {
 
-    public static final Supplier<IForgeRegistry<RoomUpgradeAction>> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::new);
+    public static final Supplier<IForgeRegistry<RoomUpgrade>> REGISTRY = Registries.UPGRADES.makeRegistry(RegistryBuilder::new);
 
     // ================================================================================================================
 

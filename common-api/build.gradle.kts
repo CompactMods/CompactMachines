@@ -59,6 +59,8 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-proc:none")
 }
 
+tasks.create("prepareWorkspace") {}
+
 publishing {
     publications.register<MavenPublication>("commonApi") {
         artifactId = "compactmachines"

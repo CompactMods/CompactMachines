@@ -3,7 +3,7 @@ package dev.compactmods.machines.api.upgrade;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import net.minecraft.server.level.ServerLevel;
 
-public interface IUpgradeRemovedListener extends RoomUpgradeAction {
+public interface IUpgradeRemovedListener extends RoomUpgrade {
 
     /**
      * Called when an update is removed from a room.

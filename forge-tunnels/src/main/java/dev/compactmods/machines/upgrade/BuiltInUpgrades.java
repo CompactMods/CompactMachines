@@ -2,16 +2,16 @@ package dev.compactmods.machines.upgrade;
 
 import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
-public class BuiltInUpgradeActions {
+public class BuiltInUpgrades {
 
-    public static DeferredRegister<RoomUpgradeAction> REGISTRATION =
-            DeferredRegister.create(CMRegistryKeys.UPGRADE_ACTIONS, Constants.MOD_ID);
+    public static DeferredRegister<RoomUpgrade> REGISTRATION =
+            DeferredRegister.create(CMRegistryKeys.UPGRADES, Constants.MOD_ID);
 
-    public static final RegistryObject<RoomUpgradeAction> CHUNKLOAD =
+    public static final RegistryObject<RoomUpgrade> CHUNKLOAD =
             REGISTRATION.register("chunkload", ChunkloadAction::new);
 
     public static void prepare() {}

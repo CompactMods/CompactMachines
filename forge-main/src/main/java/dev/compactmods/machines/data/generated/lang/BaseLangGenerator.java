@@ -3,7 +3,7 @@ package dev.compactmods.machines.data.generated.lang;
 import dev.compactmods.machines.api.core.Advancements;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.data.generated.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -25,7 +25,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     private final String locale;
 
-    private final IForgeRegistry<RoomUpgradeAction> ACTIONS_REG;
+    private final IForgeRegistry<RoomUpgrade> ACTIONS_REG;
 
     public BaseLangGenerator(DataGenerator gen, String locale) {
         super(gen, Constants.MOD_ID, locale);
@@ -67,7 +67,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
         add(TranslationUtil.tunnelId(Tunnels.getRegistryId(tunnel.get())), name);
     }
 
-    void add(Supplier<RoomUpgradeAction> upgrade, String translation) {
+    void add(Supplier<RoomUpgrade> upgrade, String translation) {
         final var u = upgrade.get();
         final var id = ACTIONS_REG.getKey(u);
         if(u != null)

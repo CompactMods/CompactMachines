@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.graph.IGraphEdgeType;
 import dev.compactmods.machines.graph.IGraphNodeType;
@@ -43,7 +43,7 @@ public class Registries {
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
 
     // MachineRoomUpgrades
-    public static final DeferredRegister<RoomUpgradeAction> UPGRADES = DeferredRegister.create(Rooms.ROOM_UPGRADES_REG_KEY, MOD_ID);
+    public static final DeferredRegister<RoomUpgrade> UPGRADES = DeferredRegister.create(CMRegistryKeys.UPGRADES, MOD_ID);
 
     // Graph
     @ApiStatus.Internal

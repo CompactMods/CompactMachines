@@ -6,14 +6,14 @@ import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.api.upgrade.IUpgradeAppliedListener;
 import dev.compactmods.machines.api.upgrade.IUpgradeRemovedListener;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 
 import java.util.Comparator;
 
-public class ChunkloadAction implements RoomUpgradeAction,
+public class ChunkloadAction implements RoomUpgrade,
         IUpgradeAppliedListener, IUpgradeRemovedListener,
         ILevelLoadedUpgradeListener {
 
@@ -22,7 +22,7 @@ public class ChunkloadAction implements RoomUpgradeAction,
     private static final Codec<ChunkloadAction> CODEC = Codec.unit(new ChunkloadAction());
 
     @Override
-    public Codec<? extends RoomUpgradeAction> codec() {
+    public Codec<? extends RoomUpgrade> codec() {
         return CODEC;
     }
 

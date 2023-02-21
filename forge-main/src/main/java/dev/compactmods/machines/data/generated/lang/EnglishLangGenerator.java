@@ -9,7 +9,7 @@ import dev.compactmods.machines.dimension.VoidAirBlock;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.tunnel.Tunnels;
-import dev.compactmods.machines.upgrade.BuiltInUpgradeActions;
+import dev.compactmods.machines.upgrade.BuiltInUpgrades;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
@@ -95,7 +95,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
 
         //region Upgrades
-        add(BuiltInUpgradeActions.CHUNKLOAD, "Chunkloader Upgrade");
+        add(BuiltInUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
 
         addMessage(Messages.ALREADY_HAS_UPGRADE, "Upgrade has already been applied to room.");
         addMessage(Messages.UPGRADE_NOT_PRESENT, "Upgrade is not applied to the room.");

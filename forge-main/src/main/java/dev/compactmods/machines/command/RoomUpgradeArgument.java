@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.room.Rooms;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeAction;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import net.minecraft.commands.CommandSourceStack;
@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceKey;
 
 import java.util.Optional;
 
-public class RoomUpgradeArgument extends ResourceKeyArgument<RoomUpgradeAction> {
+public class RoomUpgradeArgument extends ResourceKeyArgument<RoomUpgrade> {
 
     public static final SuggestionProvider<CommandSourceStack> SUGGESTOR = (ctx, builder) ->
             SharedSuggestionProvider.suggestResource(MachineRoomUpgrades.REGISTRY.get().getKeys(), builder);
@@ -28,9 +28,9 @@ public class RoomUpgradeArgument extends ResourceKeyArgument<RoomUpgradeAction> 
         super(Rooms.ROOM_UPGRADES_REG_KEY);
     }
 
-    public static Optional<RoomUpgradeAction> getUpgrade(CommandContext<CommandSourceStack> stack, String argName) throws CommandSyntaxException {
+    public static Optional<RoomUpgrade> getUpgrade(CommandContext<CommandSourceStack> stack, String argName) throws CommandSyntaxException {
         final var UPGRADES = MachineRoomUpgrades.REGISTRY.get();
-        ResourceKey<RoomUpgradeAction> resourcekey = getRegistryType(stack, argName, Rooms.ROOM_UPGRADES_REG_KEY, ERROR_INVALID_UPGRADE);
+        ResourceKey<RoomUpgrade> resourcekey = getRegistryType(stack, argName, Rooms.ROOM_UPGRADES_REG_KEY, ERROR_INVALID_UPGRADE);
         return Optional.ofNullable(UPGRADES.getValue(resourcekey.location()));
     }
 

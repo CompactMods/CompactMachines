@@ -6,7 +6,7 @@ import dev.compactmods.machines.api.inject.InjectField;
 import dev.compactmods.machines.api.room.IRoomOwnerLookup;
 import dev.compactmods.machines.api.room.registration.IRoomSpawnLookup;
 import dev.compactmods.machines.tunnel.BuiltInTunnels;
-import dev.compactmods.machines.upgrade.BuiltInUpgradeActions;
+import dev.compactmods.machines.upgrade.BuiltInUpgrades;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.function.Supplier;
@@ -25,13 +25,13 @@ public class CMBuiltInAddon implements ICompactMachinesAddon {
     public CMBuiltInAddon() {
         INSTANCE = this;
         BuiltInTunnels.prepare();
-        BuiltInUpgradeActions.prepare();
+        BuiltInUpgrades.prepare();
     }
 
     @Override
     public void afterRegistration() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         BuiltInTunnels.REGISTRATION.register(bus);
-        BuiltInUpgradeActions.REGISTRATION.register(bus);
+        BuiltInUpgrades.REGISTRATION.register(bus);
     }
 }
