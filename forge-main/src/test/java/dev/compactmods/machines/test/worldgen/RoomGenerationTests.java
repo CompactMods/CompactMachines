@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.util.CompactStructureGenerator;
-import dev.compactmods.machines.wall.Walls;
+import dev.compactmods.machines.forge.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;

@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.crossmod;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.forge.CompactMachines;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;

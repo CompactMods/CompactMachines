@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.core;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.gametest.framework.GameTest;

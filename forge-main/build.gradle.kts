@@ -7,6 +7,9 @@ val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
 val nightlyVersion: String = "${semver}.${buildNumber}-nightly"
 val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
 
+val coreVersion: String = property("core_version") as String
+val tunnelsApiVersion: String = property("tunnels_version") as String
+
 var mod_id: String by extra
 var minecraft_version: String by extra
 var forge_version: String by extra
@@ -45,27 +48,38 @@ repositories {
     mavenLocal()
 
     mavenCentral() {
+        name = "Central"
         content {
             includeGroup("com.aventrix.jnanoid")
         }
     }
 
     maven("https://www.cursemaven.com") {
+        name = "Curse Maven"
         content {
             includeGroup("curse.maven")
         }
     }
 
     // location of the maven that hosts JEI files
-    maven("https://dvs1.progwml6.com/files/maven") {
+    maven("https://maven.blamejared.com") {
         content {
             includeGroup("mezz.jei")
         }
     }
 
     maven("https://maven.theillusivec4.top/") {
+        name = "Illusive"
         content {
             includeGroup("top.theillusivec4.curios")
+        }
+    }
+
+    maven("https://maven.pkg.github.com/compactmods/compactmachines-core") {
+        name = "Github PKG Core"
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GH_PKG_USER")
+            password = project.findProperty("gpr.token") as String? ?: System.getenv("GH_PKG_TOKEN")
         }
     }
 }
@@ -76,10 +90,8 @@ val curios_version: String? by extra
 
 jarJar.enable()
 val runDepends: List<Project> = listOf(
-        project(":common-api"),
-        project(":common-main"),
-        project(":forge-api"),
-        project(":forge-tunnels")
+        project(":forge-tunnels-api"),
+        project(":forge-builtin")
 )
 
 runDepends.forEach {
@@ -89,17 +101,19 @@ runDepends.forEach {
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
-    implementation(fg.deobf(project(":common-api")))
-    testImplementation(fg.deobf(project(":common-api")))
+    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:core-api:$coreVersion"))
+    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:core:$coreVersion"))
+    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion"))
 
-    implementation(project(":forge-api"))
-    testImplementation(project(":forge-api"))
+    jarJar("dev.compactmods.compactmachines", "core-api", coreVersion)
+    jarJar("dev.compactmods.compactmachines", "core", coreVersion)
+    jarJar("dev.compactmods.compactmachines", "tunnels-api", tunnelsApiVersion)
 
-    implementation(fg.deobf(project(":common-main")))
-    testImplementation(fg.deobf(project(":common-main")))
+    implementation(project(":forge-tunnels-api"))
+    testImplementation(project(":forge-tunnels-api"))
 
-    implementation(project(":forge-tunnels"))
-    testImplementation(project(":forge-tunnels"))
+    implementation(project(":forge-builtin"))
+    testImplementation(project(":forge-builtin"))
 
     minecraftLibrary("com.aventrix.jnanoid", "jnanoid", "2.0.0")
     jarJar("com.aventrix.jnanoid", "jnanoid", "[2.0.0]")
@@ -247,12 +261,12 @@ tasks.withType<Jar> {
     this.exclude("dev/compactmods/machines/datagen/**")
     this.exclude(".cache/**")
 
-    // TODO - Switch to API jar when JarInJar supports it better
-    val api = project(":forge-api").tasks.jar.get().archiveFile;
-    from(api.map { zipTree(it) })
-
-    val tunnels = project(":forge-tunnels").tasks.jar.get().archiveFile;
-    from(tunnels.map { zipTree(it) })
+//    // TODO - Switch to API jar when JarInJar supports it better
+//    val api = project(":forge-api").tasks.jar.get().archiveFile;
+//    from(api.map { zipTree(it) })
+//
+//    val tunnels = project(":forge-tunnels").tasks.jar.get().archiveFile;
+//    from(tunnels.map { zipTree(it) })
 
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
