@@ -28,7 +28,7 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
         for (Direction dir : Direction.values()) {
 
             String typedTunnelDirectional = "tunnels/" + dir.getSerializedName();
-            models()
+            final var dirModel = models()
                     .withExistingParent(typedTunnelDirectional, modLoc("tunnels/base"))
                     .texture("wall", modLoc("block/" + typedTunnelDirectional))
                     .renderType(mcLoc("cutout")); // NamedRenderTypeManager
@@ -40,14 +40,14 @@ public class TunnelWallStateGenerator extends BlockStateProvider {
              int y = dir.getAxis().isVertical() ? 0 : (((int) dir.getHorizontalAngle()) + 180) % 360;
             */
 
+            var dirModelConfigured = ConfiguredModel.builder()
+                    .modelFile(dirModel)
+                    .build();
+
             getVariantBuilder(block)
                     .partialState()
-                    .with(TunnelWallBlock.CONNECTED_SIDE, dir)
-                    .setModels(
-                            ConfiguredModel.builder()
-                                    .modelFile(models().getExistingFile(modLoc(typedTunnelDirectional)))
-                                    .build()
-                    );
+                        .with(TunnelWallBlock.CONNECTED_SIDE, dir)
+                            .setModels(dirModelConfigured);
 
         }
     }

@@ -101,9 +101,9 @@ runDepends.forEach {
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
-    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:core-api:$coreVersion"))
-    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:core:$coreVersion"))
-    minecraftLibrary(fg.deobf("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion"))
+    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
+    implementation("dev.compactmods.compactmachines:core:$coreVersion")
+    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 
     jarJar("dev.compactmods.compactmachines", "core-api", coreVersion)
     jarJar("dev.compactmods.compactmachines", "core", coreVersion)
@@ -221,7 +221,7 @@ minecraft {
         create("data") {
             taskName("runData")
             workingDirectory(file("run/data"))
-            forceExit(false)
+            forceExit(true)
 
             args("--mod", mod_id)
             args("--existing", project.file("src/main/resources"))

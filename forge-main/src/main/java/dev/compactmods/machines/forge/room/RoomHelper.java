@@ -1,8 +1,5 @@
 package dev.compactmods.machines.forge.room;
 
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.dimension.SimpleTeleporter;
-import dev.compactmods.machines.forge.util.ForgePlayerUtil;
 import dev.compactmods.machines.advancement.AdvancementTriggers;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
@@ -10,15 +7,17 @@ import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
-import dev.compactmods.machines.location.PreciseDimensionalPosition;
+import dev.compactmods.machines.forge.CompactMachines;
+import dev.compactmods.machines.forge.dimension.SimpleTeleporter;
 import dev.compactmods.machines.forge.network.CompactMachinesNet;
 import dev.compactmods.machines.forge.network.SyncRoomMetadataPacket;
 import dev.compactmods.machines.forge.room.capability.RoomCapabilities;
+import dev.compactmods.machines.forge.util.ForgePlayerUtil;
+import dev.compactmods.machines.location.PreciseDimensionalPosition;
 import dev.compactmods.machines.room.client.RoomClientHelper;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
-import dev.compactmods.machines.room.server.RoomServerHelper;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
@@ -31,7 +30,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -42,10 +40,7 @@ public class RoomHelper {
     });
 
     public static Registry<RoomTemplate> getTemplates() {
-        return DistExecutor.safeRunForDist(() -> RoomClientHelper::getTemplates, () -> {
-            final var serv = ServerLifecycleHooks.getCurrentServer();
-            return () -> RoomServerHelper.getTemplates(serv);
-        });
+        return DistExecutor.safeRunForDist(() -> RoomClientHelper::getTemplates, () -> ForgeRoomServerHelper::getTemplates);
     }
 
     public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, IRoomRegistration room) throws MissingDimensionException {

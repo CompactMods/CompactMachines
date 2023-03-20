@@ -4,24 +4,23 @@ import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineIds;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
+import dev.compactmods.machines.forge.room.RoomHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
-import dev.compactmods.machines.forge.room.RoomHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +34,6 @@ import java.util.Optional;
 public class UnboundCompactMachineItem extends BlockItem implements ICompactMachineItem {
 
     public static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
-
-    public static Holder<Item> REFERENCE_HOLDER = Holder.Reference.createStandAlone(Registry.ITEM, MachineIds.UNBOUND_MACHINE_ITEM_KEY);
 
     public UnboundCompactMachineItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
@@ -74,15 +71,19 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         }
     }
 
+    private static ItemLike fromRegistry() {
+        return ForgeRegistries.ITEMS.getValue(MachineIds.UNBOUND_MACHINE_ITEM_ID);
+    }
+
     public static ItemStack unbound() {
-        final var stack = new ItemStack(REFERENCE_HOLDER, 1);
+        final var stack = new ItemStack(fromRegistry(), 1);
         setTemplate(stack, RoomTemplate.NO_TEMPLATE);
         ICompactMachineItem.setColor(stack, 0xFFFFFFFF);
         return stack;
     }
 
     public static ItemStack forTemplate(ResourceLocation templateId, RoomTemplate template) {
-        final var stack = new ItemStack(REFERENCE_HOLDER, 1);
+        final var stack = new ItemStack(fromRegistry(), 1);
         setTemplate(stack, templateId);
         ICompactMachineItem.setColor(stack, template.color());
 
