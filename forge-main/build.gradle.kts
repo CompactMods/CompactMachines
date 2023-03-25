@@ -101,13 +101,17 @@ runDepends.forEach {
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
-    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
-    implementation("dev.compactmods.compactmachines:core:$coreVersion")
-    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
+    implementation("dev.compactmods.compactmachines:core-api:$coreVersion") {
+        jarJar.pin(this, coreVersion)
+    }
 
-    jarJar("dev.compactmods.compactmachines", "core-api", coreVersion)
-    jarJar("dev.compactmods.compactmachines", "core", coreVersion)
-    jarJar("dev.compactmods.compactmachines", "tunnels-api", tunnelsApiVersion)
+    implementation("dev.compactmods.compactmachines:core:$coreVersion") {
+        jarJar.pin(this, coreVersion)
+    }
+
+    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion") {
+        jarJar.pin(this, tunnelsApiVersion)
+    }
 
     implementation(project(":forge-tunnels-api"))
     testImplementation(project(":forge-tunnels-api"))
