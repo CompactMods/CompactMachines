@@ -6,7 +6,7 @@ val modVersion: String = System.getenv("CM_VERSION") ?: "9.9.9"
 val coreVersion: String = property("core_version") as String
 val tunnelsApiVersion: String = property("tunnels_version") as String
 
-var modId = property("mod_version") as String
+var modId = property("mod_id") as String
 var minecraft_version: String by extra
 var forge_version: String by extra
 var parchment_version: String by extra
