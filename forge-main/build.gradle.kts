@@ -83,7 +83,6 @@ val jei_version: String? by extra
 val jei_mc_version: String by extra
 val curios_version: String? by extra
 
-jarJar.enable()
 val runDepends: List<Project> = listOf(
         project(":forge-tunnels-api"),
         project(":forge-builtin")
@@ -96,17 +95,13 @@ runDepends.forEach {
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "${minecraft_version}-${forge_version}")
 
-    implementation("dev.compactmods.compactmachines:core-api:$coreVersion") {
-        jarJar.pin(this, coreVersion)
-    }
+    implementation("dev.compactmods.compactmachines:core-api:$coreVersion")
+    implementation("dev.compactmods.compactmachines:core:$coreVersion")
+    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 
-    implementation("dev.compactmods.compactmachines:core:$coreVersion") {
-        jarJar.pin(this, coreVersion)
-    }
-
-    implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion") {
-        jarJar.pin(this, tunnelsApiVersion)
-    }
+    jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]")
+    jarJar("dev.compactmods.compactmachines", "core-api", "[$coreVersion]")
+    jarJar("dev.compactmods.compactmachines", "tunnels-api", "[$tunnelsApiVersion]")
 
     implementation(project(":forge-tunnels-api"))
     testImplementation(project(":forge-tunnels-api"))
@@ -260,6 +255,13 @@ tasks.withType<Jar> {
     this.exclude("dev/compactmods/machines/datagen/**")
     this.exclude(".cache/**")
 
+    val forgeBuiltin = project(":forge-builtin").tasks.jar.get().archiveFile;
+    val forgeTunnelsApi = project(":forge-builtin").tasks.jar.get().archiveFile;
+    from(forgeBuiltin.map { zipTree(it) })
+    from(forgeTunnelsApi.map { zipTree(it) })
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(mapOf(
@@ -279,6 +281,7 @@ tasks.jar {
     finalizedBy("reobfJar")
 }
 
+jarJar.enable()
 tasks.jarJar {
     archiveClassifier.set("")
     finalizedBy("reobfJarJar")
