@@ -292,6 +292,7 @@ artifacts {
 val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactcrafting"
 publishing {
     publications.register<MavenPublication>("forge") {
+        artifactId = modId
         from(components.findByName("java"))
     }
 

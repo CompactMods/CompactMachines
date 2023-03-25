@@ -140,6 +140,13 @@ jobs:
           filter: "^compactmachines-(?:[\\d\\.]+)-nightly.jar$"
           outputFile: compactmachines-nightly.json
 
+      - name: Store Package Info
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: package-info
+          path: compactmachines-nightly.json
+
       - name: Read info into variable [latest]
         id: info
         run: echo "latestJson=$(cat compactmachines-nightly.json)" >> $GITHUB_OUTPUT
