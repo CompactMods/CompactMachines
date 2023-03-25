@@ -15,7 +15,7 @@ on:
 jobs:
   vars:
     name: Get Variables
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       version: ${{steps.version.outputs.version}}
       mcVersion: ${{steps.gradle_props.outputs.minecraft_version}}
@@ -38,14 +38,14 @@ jobs:
 
       - name: Read MC and Forge versions
         id: gradle_props
-        uses: christian-draeger/read-properties@1.1.0
+        uses: christian-draeger/read-properties@1.1.1
         with:
           path: "gradle.properties"
           properties: "minecraft_version forge_version"
 
   tests:
     name: Gradle Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [ vars ]
     steps:
       - name: Checkout
@@ -94,7 +94,8 @@ jobs:
 
   nightly:
     name: Publish Nightly
-    runs-on: ubuntu-20.04
+    id: publish-gh-package
+    runs-on: ubuntu-22.04
     needs: [ vars, tests ]
     steps:
       - name: Checkout
