@@ -3,15 +3,12 @@ import net.minecraftforge.gradle.userdev.UserDevExtension
 import java.text.SimpleDateFormat
 import java.util.*
 
+val modVersion: String = System.getenv("CM_VERSION") ?: "9.9.9"
+
 val coreVersion: String = property("core_version") as String
 val tunnelsApiVersion: String = property("tunnels_version") as String
 
-val semver: String = System.getenv("CM_SEMVER_VERSION") ?: "9.9.9"
-val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
-val nightlyVersion: String = "${semver}.${buildNumber}-nightly"
-val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
-
-var mod_id: String by extra
+var modId: String by extra
 
 plugins {
     id("idea")
@@ -22,9 +19,8 @@ plugins {
 }
 
 base {
-    archivesName.set(mod_id)
-    group = "dev.compactmods"
-    version = if(isRelease) semver else nightlyVersion
+    group = "dev.compactmods.compactmachines"
+    version = modVersion
 }
 
 java {
@@ -107,20 +103,15 @@ artifacts {
     archives(tasks.named("sourcesJar").get())
 }
 
+val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactmachines"
 publishing {
-    publications.register<MavenPublication>("releaseApi") {
-        artifactId = "compactmachines"
-        groupId = "dev.compactmods"
-
-        artifacts {
-            artifact(tasks.jar.get())
-            artifact(tasks.named("sourcesJar").get())
-        }
+    publications.register<MavenPublication>("forge-tunnels-api") {
+        from(components.findByName("java"))
     }
 
     repositories {
         // GitHub Packages
-        maven("https://maven.pkg.github.com/CompactMods/CompactMachines") {
+        maven(PACKAGES_URL) {
             name = "GitHubPackages"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")

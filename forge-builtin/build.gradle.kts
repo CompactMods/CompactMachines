@@ -26,7 +26,6 @@ repositories {
     }
 }
 
-
 dependencies {
     minecraft (group = "net.minecraftforge", name = "forge", version = "${minecraft_version}-${forge_version}")
 

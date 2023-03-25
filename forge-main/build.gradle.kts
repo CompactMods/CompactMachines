@@ -1,16 +1,12 @@
 import java.text.SimpleDateFormat
 import java.util.*
 
-val semver: String = System.getenv("CM_SEMVER_VERSION") ?: "9.9.9"
-val buildNumber: String = System.getenv("CM_BUILD_NUM") ?: "0"
-
-val nightlyVersion: String = "${semver}.${buildNumber}-nightly"
-val isRelease: Boolean = (System.getenv("CM_RELEASE") ?: "false").equals("true", true)
+val modVersion: String = System.getenv("CM_VERSION") ?: "9.9.9"
 
 val coreVersion: String = property("core_version") as String
 val tunnelsApiVersion: String = property("tunnels_version") as String
 
-var mod_id: String by extra
+var modId: String by extra
 var minecraft_version: String by extra
 var forge_version: String by extra
 var parchment_version: String by extra
@@ -22,9 +18,8 @@ plugins {
 }
 
 base {
-    archivesName.set(mod_id)
-    group = "dev.compactmods"
-    version = if(isRelease) semver else nightlyVersion
+    group = "dev.compactmods.compactmachines"
+    version = modVersion
 }
 
 java {
@@ -206,7 +201,7 @@ minecraft {
 //            }
 
             source(sourceSets.main.get())
-            mods.create(mod_id) {
+            mods.create(modId) {
                 source(sourceSets.main.get())
                 for (p in runDepends)
                     source(p.sourceSets.main.get())
@@ -227,7 +222,7 @@ minecraft {
             workingDirectory(file("run/data"))
             forceExit(false)
 
-            args("--mod", mod_id)
+            args("--mod", modId)
             args("--existing", project.file("src/main/resources"))
             args("--all")
             args("--output", file("src/generated/resources/"))
@@ -241,7 +236,7 @@ minecraft {
             forceExit(false)
             environment("CM5_TEST_RESOURCES", file("src/test/resources"))
 
-            mods.named(mod_id) {
+            mods.named(modId) {
                 source(sourceSets.test.get())
             }
         }
@@ -264,13 +259,6 @@ tasks.withType<Jar> {
     // Remove datagen source and cache info
     this.exclude("dev/compactmods/machines/datagen/**")
     this.exclude(".cache/**")
-
-//    // TODO - Switch to API jar when JarInJar supports it better
-//    val api = project(":forge-api").tasks.jar.get().archiveFile;
-//    from(api.map { zipTree(it) })
-//
-//    val tunnels = project(":forge-tunnels").tasks.jar.get().archiveFile;
-//    from(tunnels.map { zipTree(it) })
 
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
@@ -301,20 +289,15 @@ artifacts {
     archives(tasks.jarJar.get())
 }
 
+val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactcrafting"
 publishing {
-    publications.register<MavenPublication>("releaseMain") {
-        artifactId = mod_id
-        groupId = "dev.compactmods"
-
-        artifacts {
-            artifact(tasks.jar.get())
-            artifact(tasks.jarJar.get())
-        }
+    publications.register<MavenPublication>("forge") {
+        from(components.findByName("java"))
     }
 
     repositories {
         // GitHub Packages
-        maven("https://maven.pkg.github.com/CompactMods/CompactMachines") {
+        maven(PACKAGES_URL) {
             name = "GitHubPackages"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
