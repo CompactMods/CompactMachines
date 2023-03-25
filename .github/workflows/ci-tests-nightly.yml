@@ -92,9 +92,8 @@ jobs:
           name: test-data
           path: run/gametest
 
-  nightly:
-    name: Publish Nightly
-    id: publish-gh-package
+  publish-gh-package:
+    name: Publish Github Package - Nightly
     runs-on: ubuntu-22.04
     needs: [ vars, tests ]
     steps:
