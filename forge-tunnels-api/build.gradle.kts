@@ -8,8 +8,6 @@ val modVersion: String = System.getenv("CM_VERSION") ?: "9.9.9"
 val coreVersion: String = property("core_version") as String
 val tunnelsApiVersion: String = property("tunnels_version") as String
 
-var modId: String by extra
-
 plugins {
     id("idea")
     id("eclipse")
