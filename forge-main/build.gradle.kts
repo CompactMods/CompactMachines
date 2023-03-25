@@ -221,10 +221,7 @@ minecraft {
         create("data") {
             taskName("runData")
             workingDirectory(file("run/data"))
-
-            if(environment.containsKey("CI")) {
-                forceExit(false)
-            }
+            forceExit(false)
 
             args("--mod", mod_id)
             args("--existing", project.file("src/main/resources"))
