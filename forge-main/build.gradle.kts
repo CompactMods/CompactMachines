@@ -78,8 +78,8 @@ repositories {
     maven("https://maven.pkg.github.com/compactmods/compactmachines-core") {
         name = "Github PKG Core"
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GH_PKG_USER")
-            password = project.findProperty("gpr.token") as String? ?: System.getenv("GH_PKG_TOKEN")
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
 }
