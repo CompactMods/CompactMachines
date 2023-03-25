@@ -1,12 +1,12 @@
 name: Gradle Tests and Nightly (CI)
 
+env:
+  GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
+  CM_RELEASE: false
+
 on:
   workflow_dispatch:
   push:
-    branches:
-      - '**'
-    tags-ignore:
-      - v*
     paths-ignore:
       - "README.md"
       - "LICENSE"
@@ -17,34 +17,32 @@ jobs:
     name: Get Variables
     runs-on: ubuntu-20.04
     outputs:
-      release_type: ${{steps.cf_release_type.outputs.value }}
-      version: ${{steps.version.outputs.version }}
-      build: ${{steps.build.outputs.buildver}}
+      version: ${{steps.version.outputs.version}}
+      mcVersion: ${{steps.gradle_props.outputs.minecraft_version}}
+      forgeVersion: ${{steps.gradle_props.outputs.forge_version}}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-
-      - name: Find Current Tag
-        id: version
-        run: echo "version=$(git describe --tags --abbrev=0 --match 'v*' --exclude '*-rc*' '@')" >> $GITHUB_OUTPUT
-
-      - name: Release Type
-        id: cf_release_type
-        uses: christian-draeger/read-properties@1.1.1
         with:
-          path: './gradle.properties'
-          property: 'cf_release_type'
+          fetch-depth: 0
 
-      - name: Build Version
-        id: build
-        run: |
-          buildver=$(git describe --tags --match v* | cut -d- -f2)
-          echo "build = $buildver"
-          echo "buildver=$buildver" >> $GITHUB_OUTPUT
+      - name: Version
+        id: version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          change_path: "forge-main"
+          version_format: "${major}.${minor}.${patch}.${increment}-nightly"
+          search_commit_body: true
+          bump_each_commit: true
+
+      - name: Read MC and Forge versions
+        id: gradle_props
+        uses: christian-draeger/read-properties@1.1.0
+        with:
+          path: "gradle.properties"
+          properties: "minecraft_version forge_version"
+
   tests:
     name: Gradle Tests
     runs-on: ubuntu-20.04
@@ -53,41 +51,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Unshallow and Get Tags
-        run: git fetch --prune --unshallow --tags
-        
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: "17"
+          distribution: temurin
+          java-version: 17
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
+      - name: Prepare Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Datagen
+        uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Create datagen assets
-        continue-on-error: true
-        run: ./gradlew runData
+          arguments: runData
         env:
-          CM_RELEASE: false
-          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+          CM_VERSION: ${{ needs.vars.outputs.version }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test JAR with GameTest Server
-        run: ./gradlew runGameTestServer
+      - name: Store Built Assets
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-data
+          path: forge-main/src/generated/resources
+
+      - name: Game Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runGameTestServer
         env:
-          CM_RELEASE: false
-          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+          CM_VERSION: ${{ needs.vars.outputs.version }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -106,39 +100,87 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Unshallow and Get Tags
-        run: git fetch --prune --unshallow --tags
-        
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: "17"
+          distribution: temurin
+          java-version: 17
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
+      - name: Pull Built Generated Data
+        uses: actions/download-artifact@v3
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
+          name: generated-data
+          path: forge-main/src/generated/resources
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Generate Resources
-        run: ./gradlew runData
+      - name: Publish
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publish
         env:
-          CM_RELEASE: false
-          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
-
-      - name: Publish gradle nightly jar
-        run: ./gradlew publishAllLibsPublicationToGitHubPackagesRepository
-        env:
-          CM_RELEASE: false
-          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+          CM_VERSION: ${{ needs.vars.outputs.version }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  get-package-info:
+    name: Get Latest Package Info
+    runs-on: ubuntu-22.04
+    needs: [ publish-gh-package ]
+    outputs:
+      version: ${{ steps.download-info.outputs.version }}
+    steps:
+      - name: Download Package Info
+        id: download-info
+        uses: compactmods/dl-package-info@1.0.2
+        env:
+          GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          owner: compactmods
+          repo: compactmachines
+          group: dev.compactmods.compactmachines
+          filter: "^compactmachines-(?:[\\d\\.]+)-nightly.jar$"
+          outputFile: compactmachines-nightly.json
+
+      - name: Read info into variable [latest]
+        id: info
+        run: echo "latestJson=$(cat compactmachines-nightly.json)" >> $GITHUB_OUTPUT
+
+      - name: Download JAR and prepare artifacts
+        run: |
+          mkdir release
+          curl -L "${{ fromJson(steps.info.outputs.latestJson)[0].url }}" -o "release/${{ fromJson(steps.info.outputs.latestJson)[0].name}}"
+          mv compactmachines-nightly.json release/compactmachines-nightly.json
+
+      - name: Add Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: release
+
+  announce:
+    name: Discord Announcement
+    needs: [ vars, get-package-info ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Grab JAR and Info
+        uses: actions/download-artifact@v3
+        with:
+          name: release
+          path: .
+
+      - name: Read info into variable [latest]
+        id: info
+        run: echo "latestJson=$(cat compactmachines-nightly.json)" >> $GITHUB_OUTPUT
+
+      - name: Announce Release
+        uses: compactmods/discord-releaser@0.1.5
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        with:
+          filename: ${{ fromJson(steps.info.outputs.latestJson)[0].name}}
+          channel: ${{ secrets.NIGHTLY_CHANNEL_ID }}
+          modName: Compact Machines
+          modVersion: ${{ needs.get-package-info.outputs.version }}
+          thumbnail: https://media.forgecdn.net/avatars/10/602/635460270800375500.png
+
+          forgeVersion: ${{ needs.vars.outputs.forgeVersion }}
+          mcVersion: ${{ needs.vars.outputs.mcVersion }}
