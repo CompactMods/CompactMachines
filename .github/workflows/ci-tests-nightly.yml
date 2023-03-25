@@ -2,7 +2,6 @@ name: Gradle Tests and Nightly (CI)
 
 env:
   GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
-  CM_RELEASE: false
 
 on:
   workflow_dispatch:
@@ -137,7 +136,7 @@ jobs:
           owner: compactmods
           repo: compactmachines
           group: dev.compactmods.compactmachines
-          filter: "^compactmachines-(?:[\\d\\.]+)-nightly.jar$"
+          filter: "^compactmachines-forge-(?:[\\d\\.]+)-nightly.jar$"
           outputFile: compactmachines-nightly.json
 
       - name: Store Package Info

@@ -88,7 +88,7 @@ tasks.withType<Jar> {
 }
 
 tasks.jar {
-    archiveClassifier.set("api")
+    archiveClassifier.set("")
     finalizedBy("reobfJar")
 }
 
