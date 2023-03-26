@@ -1,4 +1,4 @@
-# Compact Machines 4
+# Compact Machines 5
 
 Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
 
