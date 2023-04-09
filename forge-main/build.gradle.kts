@@ -99,9 +99,17 @@ dependencies {
     implementation("dev.compactmods.compactmachines:core:$coreVersion")
     implementation("dev.compactmods.compactmachines:tunnels-api:$tunnelsApiVersion")
 
-    jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]")
-    jarJar("dev.compactmods.compactmachines", "core-api", "[$coreVersion]")
-    jarJar("dev.compactmods.compactmachines", "tunnels-api", "[$tunnelsApiVersion]")
+    jarJar("dev.compactmods.compactmachines", "core", "[$coreVersion]", classifier = "srg") {
+        isTransitive = false
+    }
+
+    jarJar("dev.compactmods.compactmachines", "core-api", "[$coreVersion]", classifier = "srg") {
+        isTransitive = false
+    }
+
+    jarJar("dev.compactmods.compactmachines", "tunnels-api", "[$tunnelsApiVersion]", classifier = "srg") {
+        isTransitive = false
+    }
 
     implementation(project(":forge-tunnels-api"))
     testImplementation(project(":forge-tunnels-api"))
@@ -285,6 +293,15 @@ jarJar.enable()
 tasks.jarJar {
     archiveClassifier.set("")
     finalizedBy("reobfJarJar")
+}
+
+tasks.reobfJarJar {
+//    doFirst {
+//        println("Reobfuscating JarJar")
+//        this.inputs.files.forEach {
+//            println(it.path)
+//        }
+//    }
 }
 
 artifacts {
