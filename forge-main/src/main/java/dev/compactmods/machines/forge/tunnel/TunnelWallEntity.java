@@ -1,7 +1,5 @@
 package dev.compactmods.machines.forge.tunnel;
 
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.api.tunnels.ITunnelHolder;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
@@ -9,10 +7,13 @@ import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
+import dev.compactmods.machines.api.tunnels.lifecycle.removal.ITunnelRemoveEventListener;
 import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.forge.CompactMachines;
+import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.BaseTunnelWallData;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -185,14 +186,26 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
             return;
         }
 
+        // TODO Clean all this up properly with a real removal reason
         final var p = new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
         if (tunnelType instanceof TunnelTeardownHandler teardown) {
-            teardown.onRemoved(sl.getServer(), p, tunnel);
+            //noinspection removal,unchecked
+            teardown.onRemoved(p, tunnel);
+        }
+
+        if(tunnelType instanceof ITunnelRemoveEventListener removeListener) {
+            removeListener.createBeforeRemoveHandler(tunnel)
+                    .beforeRemove(level.getServer(), p, null);
         }
 
         this.tunnelType = type;
         if (type instanceof InstancedTunnel it)
             this.tunnel = it.newInstance(p.pos(), p.wallSide());
+
+        if(tunnelType instanceof ITunnelRemoveEventListener removeListener) {
+            removeListener.createAfterRemoveHandler(tunnel)
+                    .afterRemove(level.getServer(), p, null);
+        }
 
         setChanged();
     }

@@ -1,14 +1,18 @@
 package dev.compactmods.machines.forge.tunnel;
 
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.forge.wall.ProtectedWallBlock;
-import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
+import dev.compactmods.machines.api.tunnels.lifecycle.removal.ITunnelRemoveEventListener;
+import dev.compactmods.machines.api.tunnels.lifecycle.rotation.ITunnelRotationEventListener;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneReaderTunnel;
+import dev.compactmods.machines.forge.CompactMachines;
+import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.forge.tunnel.removal.ServerPlayerRemovedReason;
+import dev.compactmods.machines.forge.tunnel.rotation.ServerPlayerRotatedReason;
+import dev.compactmods.machines.forge.wall.ProtectedWallBlock;
+import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.TunnelHelper;
@@ -18,6 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -109,17 +114,32 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
 
+        final var server = level.getServer();
+        if (!(player instanceof ServerPlayer serverPlayer))
+            return InteractionResult.FAIL;
+
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
         if (level.dimension().equals(CompactDimension.LEVEL_KEY) && level instanceof ServerLevel compactDim) {
-            var def = tunnel.getTunnelType();
-            final Direction tunnelWallSide = hitResult.getDirection();
-            var tunnelConnectedSide = tunnel.getConnectedSide();
-
+            final var def = tunnel.getTunnelType();
+            final var tunnelWallSide = hitResult.getDirection();
+            final var tunnelConnectedSide = tunnel.getConnectedSide();
             final var tunnelId = Tunnels.getRegistryId(def);
-
             final var roomProvider = CompactRoomProvider.instance(compactDim);
+            final var tunnelOriginalPosition = new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide);
+
+            if (player.isShiftKeyDown()) {
+                final var removalReason = new ServerPlayerRemovedReason(serverPlayer);
+                if (def instanceof ITunnelRemoveEventListener<?> removeListener) {
+                    var handler = removeListener.createBeforeRemoveHandler(tunnel.getTunnel());
+                    if (handler != null && handler.beforeRemove(server, tunnelOriginalPosition, removalReason)) {
+                        // Cancel removal
+                        return InteractionResult.FAIL;
+                    }
+                }
+            }
+
             return roomProvider.findByChunk(new ChunkPos(pos)).map(roomInfo -> {
                 final var tunnels = TunnelConnectionGraph.forRoom(compactDim, roomInfo.code());
                 if (player.isShiftKeyDown()) {
@@ -135,7 +155,8 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     level.addFreshEntity(ie);
 
                     if (def instanceof TunnelTeardownHandler<?> teardown) {
-                        teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
+                        //noinspection removal
+                        teardown.onRemoved(tunnelOriginalPosition, tunnel.getTunnel());
                     }
 
                     tunnels.unregister(pos);
@@ -157,14 +178,31 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                     final var next = TunnelHelper.getNextDirection(dir, existingDirs);
                     next.ifPresent(newSide -> {
+                        final var rotationReason = new ServerPlayerRotatedReason(serverPlayer);
+                        final var newRotation = new TunnelPosition(pos, tunnelWallSide, newSide);
+
+                        if(def instanceof ITunnelRotationEventListener<?> rotationListener) {
+                            var handler = rotationListener.createBeforeRotateHandler(tunnel.getTunnel());
+                            if(handler != null && handler.beforeRotate(server, tunnelOriginalPosition, newRotation, rotationReason)) {
+                                return;
+                            }
+                        }
+
                         level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
                         if (def instanceof TunnelTeardownHandler<?> teardown) {
-                            teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
+                            //noinspection removal
+                            teardown.onRotated(new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
                         }
 
                         tunnels.rotateTunnel(pos, newSide);
                         tunnels.setDirty();
+
+                        if(def instanceof ITunnelRotationEventListener<?> rotationListener) {
+                            var handler = rotationListener.createAfterRotateHandler(tunnel.getTunnel());
+                            if(handler != null)
+                                handler.afterRotate(server, tunnelOriginalPosition, newRotation, rotationReason);
+                        }
                     });
                 }
 
