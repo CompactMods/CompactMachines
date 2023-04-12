@@ -63,6 +63,10 @@ public class Pre520RoomDataMigrator {
     public record RoomDataLoadResult(HashMap<String, RoomDataPre520> oldRoomData, HashMap<ChunkPos, String> roomChunkLookup) {
     }
 
+    public static String getOldTunnelFilename(ChunkPos oldRoom) {
+        return "tunnels_%s_%s".formatted(oldRoom.x, oldRoom.z);
+    }
+
     public static RoomDataLoadResult loadOldRoomData(DimensionDataStorage dataStore) throws IOException {
         AtomicReference<RoomDataLoadResult> result = new AtomicReference<>();
         SavedDataHelper.processFile(dataStore, ROOM_DATA_NAME, nbt -> result.set(loadOldRoomData(nbt)));
@@ -148,7 +152,7 @@ public class Pre520RoomDataMigrator {
 
         final var dataStore = CompactDimension.getDataStorage(levelDirectory);
         for(final var room : roomChunkLookup.entrySet()) {
-            final var prevFilename = TunnelConnectionGraph.getOldTunnelFilename(room.getKey());
+            final var prevFilename = getOldTunnelFilename(room.getKey());
             final var oldFile = dataStore.getDataFile(prevFilename);
             final var newFile = dataStore.getDataFile(TunnelConnectionGraph.getDataFilename(room.getValue()));
             if(oldFile.exists()) {

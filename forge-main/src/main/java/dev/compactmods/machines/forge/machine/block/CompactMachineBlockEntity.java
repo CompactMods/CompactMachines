@@ -1,6 +1,5 @@
 package dev.compactmods.machines.forge.machine.block;
 
-import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
@@ -11,14 +10,14 @@ import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
-import dev.compactmods.machines.machine.BasicRoomInfo;
+import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
+import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.machine.BasicRoomInfo;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.tunnel.graph.TunnelNode;
 import dev.compactmods.machines.util.NbtUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public class CompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
 
@@ -311,22 +309,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
             this.graphNode.clear();
             setChanged();
         }
-    }
-
-    public Stream<BlockPos> getTunnels(Direction dir) {
-        if (level == null || roomCode == null) return Stream.empty();
-
-        if (level instanceof ServerLevel sl) {
-            try {
-                final ServerLevel compactDim = CompactDimension.forServer(sl.getServer());
-                final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, roomCode);
-                return tunnelGraph.getTunnelsForSide(getLevelPosition(), dir).map(TunnelNode::position);
-            } catch (MissingDimensionException e) {
-                return Stream.empty();
-            }
-        }
-
-        return Stream.empty();
     }
 
     public Optional<RoomTunnelConnections> getTunnelGraph() {

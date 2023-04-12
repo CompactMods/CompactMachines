@@ -1,19 +1,11 @@
 package dev.compactmods.machines.forge.room;
 
-import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.graph.SimpleGraphEdgeType;
-import dev.compactmods.machines.graph.SimpleGraphNodeType;
+import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
-import dev.compactmods.machines.room.graph.RoomChunkEdge;
-import dev.compactmods.machines.room.graph.RoomChunkNode;
-import dev.compactmods.machines.room.graph.RoomMetadataNode;
-import dev.compactmods.machines.room.graph.RoomOwnerEdge;
-import dev.compactmods.machines.room.graph.RoomOwnerNode;
-import dev.compactmods.machines.room.graph.RoomSpawnNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
@@ -32,16 +24,6 @@ public class Rooms {
     public static Supplier<IForgeRegistry<RoomTemplate>> TEMPLATES = Registries.ROOM_TEMPLATES
             .makeRegistry(() -> new RegistryBuilder<RoomTemplate>()
                     .dataPackRegistry(RoomTemplate.CODEC, RoomTemplate.CODEC));
-
-    static {
-        Registries.NODE_TYPES.register("room_spawn", SimpleGraphNodeType.supplier(RoomSpawnNode.CODEC));
-        Registries.NODE_TYPES.register("room_owner", SimpleGraphNodeType.supplier(RoomOwnerNode.CODEC));
-        Registries.NODE_TYPES.register("room_chunk", SimpleGraphNodeType.supplier(RoomChunkNode.CODEC));
-        Registries.NODE_TYPES.register("room_meta", SimpleGraphNodeType.supplier(RoomMetadataNode.CODEC));
-
-        Registries.EDGE_TYPES.register("room_owner", SimpleGraphEdgeType.supplier(RoomOwnerEdge.CODEC));
-        Registries.EDGE_TYPES.register("room_chunk", SimpleGraphEdgeType.supplier(RoomChunkEdge.CODEC));
-    }
 
     public static void prepare() {
     }

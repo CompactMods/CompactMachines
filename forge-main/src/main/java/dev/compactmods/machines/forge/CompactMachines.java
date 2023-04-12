@@ -88,8 +88,6 @@ public class CompactMachines implements ICompactMachinesMod {
         Registries.CONTAINERS.register(bus);
         Registries.ROOM_TEMPLATES.register(bus);
         Registries.UPGRADES.register(bus);
-        Registries.NODE_TYPES.register(bus);
-        Registries.EDGE_TYPES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
         // Registries.VILLAGERS.register(bus);
@@ -127,7 +125,6 @@ public class CompactMachines implements ICompactMachinesMod {
         Dimension.prepare();
         Rooms.prepare();
         MachineRoomUpgrades.prepare();
-        GraphCommon.prepare();
         Commands.prepare();
         LootFunctions.prepare();
 
