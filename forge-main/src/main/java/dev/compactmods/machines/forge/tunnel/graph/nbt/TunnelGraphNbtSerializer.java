@@ -75,7 +75,7 @@ public class TunnelGraphNbtSerializer {
     public static TunnelConnectionGraph fromNbt(CompoundTag tag) {
         final var graph = new TunnelConnectionGraph();
         deserialize(graph, tag);
-        return TunnelGraphNbtSerializer.fromNbt(tag);
+        return graph;
     }
 
     public static void deserialize(TunnelConnectionGraph graph, CompoundTag tag) {
