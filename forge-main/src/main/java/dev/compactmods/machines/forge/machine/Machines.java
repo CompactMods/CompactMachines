@@ -68,11 +68,11 @@ public class Machines {
             () -> new LegacyCompactMachineItem(MACHINE_BLOCK_MAXIMUM.get(), MACHINE_ITEM_PROPS.get()));
 
     public static final RegistryObject<Item> BOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("machine",
-            () -> new BoundCompactMachineItem(MACHINE_BLOCK.get(), MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
+            () -> new BoundCompactMachineItem(MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
 
 
     public static final RegistryObject<Item> UNBOUND_MACHINE_BLOCK_ITEM = Registries.ITEMS.register("new_machine",
-            () -> new UnboundCompactMachineItem(MACHINE_BLOCK.get(), MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
+            () -> new UnboundCompactMachineItem(MACHINE_ITEM_PROPS.get().tab(CompactMachines.COMPACT_MACHINES_ITEMS)));
 
     public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = Registries.BLOCK_ENTITIES.register(MachineIds.BLOCK_ENTITY.getPath(), () ->
             BlockEntityType.Builder.of(CompactMachineBlockEntity::new,

@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineIds;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
+import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.room.RoomHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
@@ -19,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,8 +35,8 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
 
     public static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
 
-    public UnboundCompactMachineItem(Block blockIn, Properties builder) {
-        super(blockIn, builder);
+    public UnboundCompactMachineItem(Properties builder) {
+        super(Machines.MACHINE_BLOCK.get(), builder);
     }
 
     @NotNull
