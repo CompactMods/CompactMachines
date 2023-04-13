@@ -94,6 +94,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addTooltip(Tooltips.ROOM_NAME, "Bound to room: %s");
 
+        addTooltip(Tooltips.NOT_YET_IMPLEMENTED, "Not Yet Implemented");
+
         //region Upgrades
         add(BuiltInUpgrades.CHUNKLOAD, "Chunkloader Upgrade");
 
