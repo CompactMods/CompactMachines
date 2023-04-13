@@ -12,7 +12,6 @@ import dev.compactmods.machines.forge.tunnel.graph.nbt.TunnelGraphNbtSerializer;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
-import dev.compactmods.machines.machine.graph.MachineRoomEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelMachineEdge;
 import dev.compactmods.machines.tunnel.graph.TunnelMachineInfo;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
@@ -22,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -115,7 +115,7 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
      * @param tunnel The tunnel to find a connection for.
      * @return The id of the connected machine.
      */
-    public Optional<GlobalPos> connectedMachine(BlockPos tunnel) {
+    public Optional<GlobalPos> machine(BlockPos tunnel) {
         if (!tunnels.containsKey(tunnel))
             return Optional.empty();
 
@@ -138,7 +138,7 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
      * @param side      The side of the machine the tunnel is connecting to.
      * @return True if the connection could be established; false if the tunnel type is already registered for the given side.
      */
-    public boolean registerTunnel(BlockPos tunnelPos, TunnelDefinition type, GlobalPos machine, Direction side) {
+    public boolean register(BlockPos tunnelPos, ResourceKey<TunnelDefinition> type, GlobalPos machine, Direction side) {
         // First we need to get the machine the tunnel is trying to connect to
         var machineNode = getOrCreateMachineNode(machine);
         var tunnelNode = getOrCreateTunnelNode(tunnelPos);
@@ -189,8 +189,8 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
         return node;
     }
 
-    protected TunnelTypeNode getOrCreateTunnelTypeNode(TunnelDefinition definition) {
-        final ResourceLocation id = Tunnels.getRegistryId(definition);
+    protected TunnelTypeNode getOrCreateTunnelTypeNode(ResourceKey<TunnelDefinition> definition) {
+        final ResourceLocation id = definition.location();
 
         if (tunnelTypes.containsKey(id))
             return tunnelTypes.get(id);
@@ -209,8 +209,8 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
         return graph.nodes().size();
     }
 
-    protected Stream<TunnelNode> getTunnelNodesByType(ResourceLocation type) {
-        var defNode = tunnelTypes.get(type);
+    protected Stream<TunnelNode> _type(ResourceKey<TunnelDefinition> type) {
+        var defNode = tunnelTypes.get(type.location());
         if (defNode == null)
             return Stream.empty();
 
@@ -220,7 +220,18 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                 .map(TunnelNode.class::cast);
     }
 
-    public Optional<Direction> getTunnelSide(BlockPos pos) {
+    /**
+     * @deprecated Use {@link #side(BlockPos)}
+     * @param position
+     * @return
+     */
+    @Override
+    @Deprecated(forRemoval = true, since = "5.2.0")
+    public Optional<Direction> getConnectedSide(BlockPos position) {
+        return side(position);
+    }
+
+    public Optional<Direction> side(BlockPos pos) {
         if (!tunnels.containsKey(pos))
             return Optional.empty();
 
@@ -235,7 +246,7 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                 .findFirst();
     }
 
-    public Optional<TunnelMachineInfo> getTunnelInfo(BlockPos tunnel) {
+    public Optional<TunnelMachineInfo> info(BlockPos tunnel) {
         if (!tunnels.containsKey(tunnel))
             return Optional.empty();
 
@@ -246,8 +257,8 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                 .findFirst()
                 .orElseThrow();
 
-        var mach = connectedMachine(tunnel).orElseThrow();
-        var side = getTunnelSide(tunnel).orElseThrow();
+        var mach = machine(tunnel).orElseThrow();
+        var side = side(tunnel).orElseThrow();
         var type = typeNode.id();
 
         return Optional.of(new TunnelMachineInfo(tunnel, type, mach, side));
@@ -255,12 +266,19 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
 
     public Stream<TunnelMachineInfo> tunnels() {
         return tunnels.keySet().stream()
-                .map(this::getTunnelInfo)
+                .map(this::info)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
     }
 
-    public boolean hasTunnel(BlockPos location) {
+    public Stream<TunnelMachineInfo> tunnels(GlobalPos machine) {
+        return positions(machine)
+                .map(this::info)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
+
+    public boolean has(BlockPos location) {
         return tunnels.containsKey(location);
     }
 
@@ -275,7 +293,7 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
-        return getTunnelsForSide(machine, facing)
+        return _side(machine, facing)
                 .filter(sided -> graph.successors(sided).stream()
                         .filter(TunnelTypeNode.class::isInstance)
                         .map(TunnelTypeNode.class::cast)
@@ -285,24 +303,11 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                         })).map(TunnelNode::position);
     }
 
-    @Override
-    public Optional<Direction> getConnectedSide(BlockPos position) {
-        var node = tunnels.get(position);
-        return graph.adjacentNodes(node).stream()
-                .filter(CompactMachineNode.class::isInstance)
-                .map(mn -> graph.edgeValue(node, mn))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(TunnelMachineEdge.class::cast)
-                .map(TunnelMachineEdge::side)
-                .findFirst();
-    }
-
     public <T> Stream<BlockPos> getTunnelsSupporting(GlobalPos machine, Direction side, Capability<T> capability) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
-        return getTunnelsForSide(machine, side)
+        return _side(machine, side)
                 .filter(sided -> graph.successors(sided).stream()
                         .filter(TunnelTypeNode.class::isInstance)
                         .map(TunnelTypeNode.class::cast)
@@ -315,19 +320,19 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                         })).map(TunnelNode::position);
     }
 
-    public Stream<TunnelDefinition> getTypesForSide(GlobalPos machine, Direction side) {
+    public Stream<ResourceKey<TunnelDefinition>> types(GlobalPos machine, Direction side) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
-        return getTunnelsForSide(machine, side)
+        return _side(machine, side)
                 .flatMap(tn -> graph.successors(tn).stream())
                 .filter(TunnelTypeNode.class::isInstance)
                 .map(TunnelTypeNode.class::cast)
-                .map(type -> Tunnels.getDefinition(type.id()))
+                .map(type -> ResourceKey.create(TunnelDefinition.REGISTRY_KEY, type.id()))
                 .distinct();
     }
 
-    protected Stream<TunnelNode> getTunnelsForSide(GlobalPos machine, Direction side) {
+    protected Stream<TunnelNode> _side(GlobalPos machine, Direction side) {
         final var node = machines.get(machine);
         if (node == null) return Stream.empty();
 
@@ -341,11 +346,12 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
                 .map(TunnelNode.class::cast);
     }
 
-    public Stream<Direction> getTunnelSides(ResourceLocation type) {
-        if (!tunnelTypes.containsKey(type))
+    public Stream<Direction> sides(GlobalPos machine, ResourceKey<TunnelDefinition> type) {
+        if (!tunnelTypes.containsKey(type.location()))
             return Stream.empty();
 
-        return getTunnelNodesByType(type)
+        return _type(type)
+                .filter(node -> machine(node.position()).map(machine::equals).orElse(false))
                 .map(node -> node.getTunnelSide(this))
                 .filter(Optional::isPresent)
                 .map(Optional::get);
@@ -357,7 +363,7 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
      * @param pos Tunnel position inside the room.
      */
     public void unregister(BlockPos pos) {
-        if (!hasTunnel(pos))
+        if (!has(pos))
             return;
 
         LOGS.debug("Unregistering tunnel at {}", pos);
@@ -427,11 +433,11 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
         }
     }
 
-    public void rotateTunnel(BlockPos tunnel, Direction newSide) {
+    public void rotate(BlockPos tunnel, Direction newSide) {
         if (!tunnels.containsKey(tunnel))
             return;
 
-        final var connected = connectedMachine(tunnel);
+        final var connected = machine(tunnel);
         connected.ifPresent(machine -> {
             if (!machines.containsKey(machine))
                 return;
@@ -445,27 +451,21 @@ public class TunnelConnectionGraph extends SavedData implements RoomTunnelConnec
         });
     }
 
-    public Stream<GlobalPos> getMachines() {
+    public Stream<GlobalPos> machines() {
         return this.machines.keySet().stream();
     }
 
-    public Stream<BlockPos> getConnections(GlobalPos machine) {
+    public Stream<BlockPos> positions(GlobalPos machine) {
         if (!machines.containsKey(machine))
             return Stream.empty();
 
         final var mNode = machines.get(machine);
-        return graph.incidentEdges(mNode).stream()
-                .filter(e -> graph.edgeValue(e).orElseThrow() instanceof MachineRoomEdge)
-                .map(edge -> {
-                    if (edge.nodeU() instanceof TunnelNode cmn) return cmn;
-                    if (edge.nodeV() instanceof TunnelNode cmn2) return cmn2;
-                    return null;
-                }).filter(Objects::nonNull).map(TunnelNode::position);
 
-    }
-
-    public boolean hasAnyConnectedTo(GlobalPos machine) {
-        return getConnections(machine).findAny().isPresent();
+        // [CompactMachineNode] <--- [TunnelNode]
+        return graph.predecessors(mNode).stream()
+                .filter(TunnelNode.class::isInstance)
+                .map(TunnelNode.class::cast)
+                .map(TunnelNode::position);
     }
 
     public void rebind(BlockPos tunnel, GlobalPos newMachine, Direction side) {

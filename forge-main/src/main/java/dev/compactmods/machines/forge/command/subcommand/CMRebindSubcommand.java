@@ -55,7 +55,7 @@ public class CMRebindSubcommand {
 
             machine.connectedRoom().ifPresentOrElse(currentRoom -> {
                 final var currentRoomTunnels = TunnelConnectionGraph.forRoom(compactDim, currentRoom);
-                final var firstTunnel = currentRoomTunnels.getConnections(machine.getLevelPosition()).findFirst();
+                final var firstTunnel = currentRoomTunnels.positions(machine.getLevelPosition()).findFirst();
                 firstTunnel.ifPresent(ft -> {
                     throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, ft));
                 });

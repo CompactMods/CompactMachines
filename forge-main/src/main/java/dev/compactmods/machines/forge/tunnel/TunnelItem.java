@@ -27,6 +27,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -53,12 +54,26 @@ public class TunnelItem extends Item implements ITunnelItem {
         super(properties);
     }
 
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static void setTunnelType(ItemStack stack, TunnelDefinition definition) {
         CompoundTag defTag = stack.getOrCreateTagElement("definition");
         defTag.putString("id", Tunnels.getRegistryId(definition).toString());
     }
 
+    private static void setTunnelType(ItemStack stack, ResourceKey<TunnelDefinition> definition) {
+        CompoundTag defTag = stack.getOrCreateTagElement("definition");
+        defTag.putString("id", definition.location().toString());
+    }
+
     @Nonnull
+    public static ItemStack createStack(ResourceKey<TunnelDefinition> definition) {
+        var stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
+        setTunnelType(stack, definition);
+        return stack;
+    }
+
+    @Nonnull
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static ItemStack createStack(TunnelDefinition definition) {
         var stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
         setTunnelType(stack, definition);
@@ -95,11 +110,11 @@ public class TunnelItem extends Item implements ITunnelItem {
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         if (this.allowedIn(group)) {
             IForgeRegistry<TunnelDefinition> definitions = Tunnels.TUNNEL_DEF_REGISTRY.get();
-            definitions.getValues().forEach(def -> {
-                if (def == Tunnels.UNKNOWN.get())
+            definitions.getKeys().forEach(def -> {
+                if (def.equals(Tunnels.UNKNOWN_KEY.location()))
                     return;
 
-                ItemStack withDef = createStack(def);
+                ItemStack withDef = createStack(ResourceKey.create(TunnelDefinition.REGISTRY_KEY, def));
                 items.add(withDef);
             });
         }
@@ -152,7 +167,7 @@ public class TunnelItem extends Item implements ITunnelItem {
 
     private static boolean setupTunnelWall(ServerLevel compactDim, BlockPos position, Direction innerFace, Player player, TunnelDefinition def) throws Exception, MissingDimensionException {
         boolean redstone = def instanceof RedstoneTunnel;
-        final var tunnelId = Tunnels.getRegistryId(def);
+        final var tunnelId = Tunnels.getRegistryKey(def);
 
         final var provider = CompactRoomProvider.instance(compactDim);
         final var roomInfo = provider.findByChunk(player.chunkPosition());
@@ -171,7 +186,7 @@ public class TunnelItem extends Item implements ITunnelItem {
 
         var hist = lastEnteredMachine.get();
         var placedSides = roomTunnels
-                .getTunnelSides(tunnelId)
+                .sides(hist.getMachine(), tunnelId)
                 .collect(Collectors.toSet());
 
         // all tunnels already placed for type
@@ -194,7 +209,7 @@ public class TunnelItem extends Item implements ITunnelItem {
                 .setValue(TunnelWallBlock.CONNECTED_SIDE, first)
                 .setValue(TunnelWallBlock.REDSTONE, redstone);
 
-        boolean connected = roomTunnels.registerTunnel(position, def, hist.getMachine(), first);
+        boolean connected = roomTunnels.register(position, tunnelId, hist.getMachine(), first);
         if (!connected) {
             player.displayClientMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE), true);
             return false;

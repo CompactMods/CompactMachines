@@ -2,8 +2,8 @@ package dev.compactmods.machines.forge.tunnel.graph.nbt;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.codec.NbtListCollector;
-import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
@@ -16,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -106,8 +107,8 @@ public class TunnelGraphNbtSerializer {
             final var machine = machines.results().get(connectedMachine.to());
             final var type = tunnelTypes.results().get(connectedType.to());
 
-            final var definition = Tunnels.getDefinition(type.id());
-            graph.registerTunnel(node.position(), definition, machine.dimpos(), connectedMachine.data().side());
+            final var definition = ResourceKey.create(TunnelDefinition.REGISTRY_KEY, type.id());
+            graph.register(node.position(), definition, machine.dimpos(), connectedMachine.data().side());
         });
     }
 

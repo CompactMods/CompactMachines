@@ -81,7 +81,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (world instanceof ServerLevel sl && world.getBlockEntity(position) instanceof TunnelWallEntity tunnelWall) {
             final var serv = sl.getServer();
             final var def = tunnelWall.getTunnelType();
-            final var machPos = tunnelWall.getConnectedPosition();
+            final var machPos = tunnelWall.connectedMachine();
             final var tunnPos = tunnelWall.getTunnelPosition();
             final var connectedLevel = serv.getLevel(machPos.dimension());
 
@@ -125,7 +125,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
             final var def = tunnel.getTunnelType();
             final var tunnelWallSide = hitResult.getDirection();
             final var tunnelConnectedSide = tunnel.getConnectedSide();
-            final var tunnelId = Tunnels.getRegistryId(def);
+            final var tunnelId = Tunnels.getRegistryKey(def);
             final var roomProvider = CompactRoomProvider.instance(compactDim);
             final var tunnelOriginalPosition = new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide);
 
@@ -165,7 +165,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     Direction dir = state.getValue(CONNECTED_SIDE);
 
                     final var existingDirs = tunnels
-                            .getTunnelSides(tunnelId)
+                            .sides(tunnel.connectedMachine(), tunnelId)
                             .collect(Collectors.toSet());
 
                     if (existingDirs.size() == 6) {
@@ -195,7 +195,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                             teardown.onRotated(new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
                         }
 
-                        tunnels.rotateTunnel(pos, newSide);
+                        tunnels.rotate(pos, newSide);
                         tunnels.setDirty();
 
                         if(def instanceof ITunnelRotationEventListener<?> rotationListener) {

@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.gametest.GameTestHolder;
@@ -58,7 +59,7 @@ public class TunnelGraphSerializationTests {
         final var graph = new TunnelConnectionGraph();
 
         final var MACHINE_POS = GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO);
-        graph.registerTunnel(BlockPos.ZERO, Tunnels.UNKNOWN.get(), MACHINE_POS, Direction.UP);
+        graph.register(BlockPos.ZERO, Tunnels.UNKNOWN_KEY, MACHINE_POS, Direction.UP);
 
         final var nbt = TunnelGraphNbtSerializer.serialize(graph);
 
@@ -94,18 +95,29 @@ public class TunnelGraphSerializationTests {
     }
 
     @GameTest(template = "empty_1x1", batch = TestBatches.TUNNEL_DATA)
+    public static void deserializeEarlyExitsEmptyTag(final GameTestHelper test) {
+        final var tag = new CompoundTag();
+
+        test.succeedIf(() -> {
+            final var graph = TunnelGraphNbtSerializer.fromNbt(tag);
+            if(graph.size() != 0)
+                test.fail("Expected an empty graph.");
+        });
+    }
+
+    @GameTest(template = "empty_1x1", batch = TestBatches.TUNNEL_DATA)
     public static void canDeserializeTunnels(final GameTestHelper test) {
         final var graph = new TunnelConnectionGraph();
 
         final var MACHINE_POS = GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO);
-        graph.registerTunnel(BlockPos.ZERO.above(), Tunnels.UNKNOWN.get(), MACHINE_POS, Direction.UP);
-        graph.registerTunnel(BlockPos.ZERO, Tunnels.UNKNOWN.get(), MACHINE_POS, Direction.DOWN);
+        graph.register(BlockPos.ZERO.above(), Tunnels.UNKNOWN_KEY, MACHINE_POS, Direction.UP);
+        graph.register(BlockPos.ZERO, Tunnels.UNKNOWN_KEY, MACHINE_POS, Direction.DOWN);
 
         final var nbt = TunnelGraphNbtSerializer.serialize(graph);
 
         final var newGraph = TunnelGraphNbtSerializer.fromNbt(nbt);
 
-        long machineCount = newGraph.getMachines().count();
+        long machineCount = newGraph.machines().count();
         if(machineCount != 1) {
             test.fail("Expected one machine node; got %s.".formatted(machineCount));
         }

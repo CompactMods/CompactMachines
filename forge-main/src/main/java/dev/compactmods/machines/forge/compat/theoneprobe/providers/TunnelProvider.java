@@ -61,7 +61,7 @@ public class TunnelProvider implements IProbeInfoProvider {
                     .item(new ItemStack(Items.COMPASS))
                     .text(Component.translatable(sideTranslated));
 
-            final var connectedMachinePos = tile.getConnectedPosition();
+            final var connectedMachinePos = tile.connectedMachine();
             final var connectedPos = connectedMachinePos.pos().relative(tile.getConnectedSide());
 
             ServerLevel connectedWorld = (ServerLevel) level;

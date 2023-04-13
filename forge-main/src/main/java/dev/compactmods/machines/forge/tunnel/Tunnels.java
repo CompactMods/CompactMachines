@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.tunnel.definitions.UnknownTunnel;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -29,6 +30,12 @@ public class Tunnels {
         return TUNNEL_DEF_REGISTRY.get().containsKey(id);
     }
 
+    public static TunnelDefinition getDefinition(ResourceKey<TunnelDefinition> id) {
+        if (isRegistered(id.location())) return TUNNEL_DEF_REGISTRY.get().getValue(id.location());
+        CompactMachines.LOGGER.warn("Unknown tunnel requested: {}", id);
+        return Tunnels.UNKNOWN.get();
+    }
+
     public static TunnelDefinition getDefinition(ResourceLocation id) {
         if (isRegistered(id)) return TUNNEL_DEF_REGISTRY.get().getValue(id);
         CompactMachines.LOGGER.warn("Unknown tunnel requested: {}", id);
@@ -38,6 +45,9 @@ public class Tunnels {
     // ================================================================================================================
     //   TUNNELS
     // ================================================================================================================
+    public static final ResourceKey<TunnelDefinition> UNKNOWN_KEY = ResourceKey.create(TunnelDefinition.REGISTRY_KEY,
+            new ResourceLocation(MOD_ID, "unknown"));
+
     public static final RegistryObject<TunnelDefinition> UNKNOWN = Registries.TUNNEL_DEFINITIONS
             .register("unknown", UnknownTunnel::new);
 
@@ -56,6 +66,11 @@ public class Tunnels {
     public static final RegistryObject<BlockEntityType<TunnelWallEntity>> TUNNEL_BLOCK_ENTITY = Registries.BLOCK_ENTITIES
             .register("tunnel_wall", () -> BlockEntityType.Builder.of(TunnelWallEntity::new, BLOCK_TUNNEL_WALL.get())
                     .build(null));
+
+    public static ResourceKey<TunnelDefinition> getRegistryKey(TunnelDefinition definition) {
+        final var reg = TUNNEL_DEF_REGISTRY.get();
+        return reg.getResourceKey(definition).orElse(UNKNOWN_KEY);
+    }
 
     public static ResourceLocation getRegistryId(TunnelDefinition definition) {
         final var reg = TUNNEL_DEF_REGISTRY.get();

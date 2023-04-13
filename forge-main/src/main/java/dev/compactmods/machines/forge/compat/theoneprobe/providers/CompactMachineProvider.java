@@ -1,14 +1,14 @@
 package dev.compactmods.machines.forge.compat.theoneprobe.providers;
 
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
-import dev.compactmods.machines.forge.tunnel.TunnelItem;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.forge.compat.theoneprobe.elements.PlayerFaceElement;
+import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.tunnel.TunnelItem;
+import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.PlayerUtil;
@@ -88,7 +88,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
 
         final var graph = TunnelConnectionGraph.forRoom(compactDim, room.code());
 
-        final var applied = graph.getTypesForSide(machine.getLevelPosition(), hitData.getSideHit())
+        final var applied = graph.types(machine.getLevelPosition(), hitData.getSideHit())
                 .collect(Collectors.toSet());
 
         switch (probeMode) {

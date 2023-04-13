@@ -157,7 +157,7 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
     }
 
     @NotNull
-    public GlobalPos getConnectedPosition() {
+    public GlobalPos connectedMachine() {
         return this.connectedMachine;
     }
 
