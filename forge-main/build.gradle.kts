@@ -220,17 +220,6 @@ minecraft {
             args("--height", 1080)
         }
 
-        create("data") {
-            taskName("runData")
-            workingDirectory(file("run/data"))
-            forceExit(false)
-
-            args("--mod", modId)
-            args("--existing", project.file("src/main/resources"))
-            args("--all")
-            args("--output", file("src/generated/resources/"))
-        }
-
         create("gameTestServer") {
             taskName("runGameTestServer")
             workingDirectory(file("run/gametests"))
@@ -259,10 +248,6 @@ tasks.withType<ProcessResources> {
 }
 
 tasks.withType<Jar> {
-    // Remove datagen source and cache info
-    this.exclude("dev/compactmods/machines/datagen/**")
-    this.exclude(".cache/**")
-
     val forgeBuiltin = project(":forge-builtin").tasks.jar.get().archiveFile;
     val forgeTunnelsApi = project(":forge-builtin").tasks.jar.get().archiveFile;
     from(forgeBuiltin.map { zipTree(it) })

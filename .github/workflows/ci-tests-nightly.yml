@@ -61,7 +61,7 @@ jobs:
       - name: Datagen
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: runData
+          arguments: :forge-datagen:runData
         env:
           CM_VERSION: ${{ needs.vars.outputs.version }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}

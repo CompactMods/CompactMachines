@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated;
+package dev.compactmods.machines.datagen;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;

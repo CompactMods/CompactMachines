@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated.functions;
+package dev.compactmods.machines.forge.data.functions;
 
 import dev.compactmods.machines.forge.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;

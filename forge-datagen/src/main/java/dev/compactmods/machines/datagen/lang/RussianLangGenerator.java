@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated.lang;
+package dev.compactmods.machines.datagen.lang;
 
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.wall.Walls;

@@ -1,6 +1,6 @@
-package dev.compactmods.machines.forge.data.generated;
+package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.forge.data.generated.lang.BaseLangGenerator;
+import dev.compactmods.machines.datagen.lang.BaseLangGenerator;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.resources.ResourceLocation;
 

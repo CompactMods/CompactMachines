@@ -1,9 +1,9 @@
-package dev.compactmods.machines.forge.data.generated;
+package dev.compactmods.machines.datagen;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import dev.compactmods.machines.forge.machine.Machines;
-import dev.compactmods.machines.forge.data.generated.functions.CopyRoomBindingFunction;
+import dev.compactmods.machines.forge.data.functions.CopyRoomBindingFunction;
 import dev.compactmods.machines.forge.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;

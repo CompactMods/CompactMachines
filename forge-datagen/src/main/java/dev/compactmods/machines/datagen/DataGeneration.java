@@ -1,12 +1,12 @@
-package dev.compactmods.machines.forge.data.generated;
+package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.forge.data.generated.lang.EnglishLangGenerator;
-import dev.compactmods.machines.forge.data.generated.lang.RussianLangGenerator;
-import dev.compactmods.machines.forge.data.generated.room.RoomTemplates;
-import dev.compactmods.machines.forge.data.generated.tags.BlockTagGenerator;
-import dev.compactmods.machines.forge.data.generated.tags.ItemTagGenerator;
-import dev.compactmods.machines.forge.data.generated.tags.PointOfInterestTagGenerator;
+import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
+import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
+import dev.compactmods.machines.datagen.room.RoomTemplates;
+import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
+import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
+import dev.compactmods.machines.datagen.tags.PointOfInterestTagGenerator;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

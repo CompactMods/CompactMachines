@@ -9,7 +9,7 @@ import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.forge.config.CommonConfig;
 import dev.compactmods.machines.forge.config.ServerConfig;
-import dev.compactmods.machines.forge.data.generated.functions.LootFunctions;
+import dev.compactmods.machines.forge.data.functions.LootFunctions;
 import dev.compactmods.machines.forge.dimension.Dimension;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.room.Rooms;

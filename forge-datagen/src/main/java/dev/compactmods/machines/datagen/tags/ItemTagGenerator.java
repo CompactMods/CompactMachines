@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated.tags;
+package dev.compactmods.machines.datagen.tags;
 
 import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.forge.machine.Machines;

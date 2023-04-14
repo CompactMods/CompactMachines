@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated;
+package dev.compactmods.machines.datagen;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;

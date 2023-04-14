@@ -1,6 +1,6 @@
-package dev.compactmods.machines.forge.data.generated.lang;
+package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.forge.data.generated.AdvancementLangBuilder;
+import dev.compactmods.machines.datagen.AdvancementLangBuilder;
 import dev.compactmods.machines.forge.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;

@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated.room;
+package dev.compactmods.machines.datagen.room;
 
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.api.core.Constants;

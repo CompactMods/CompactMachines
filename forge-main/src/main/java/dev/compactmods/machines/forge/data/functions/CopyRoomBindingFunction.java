@@ -1,4 +1,4 @@
-package dev.compactmods.machines.forge.data.generated.functions;
+package dev.compactmods.machines.forge.data.functions;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;

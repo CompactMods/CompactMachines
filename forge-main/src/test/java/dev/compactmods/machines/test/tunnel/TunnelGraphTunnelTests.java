@@ -1,8 +1,8 @@
 package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.test.TestBatches;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -20,7 +20,7 @@ public class TunnelGraphTunnelTests {
         final var graph = new TunnelConnectionGraph();
 
         final var connectedTo = graph.machine(BlockPos.ZERO);
-        if(connectedTo.isPresent()) {
+        if (connectedTo.isPresent()) {
             test.fail("There should not be a connection.");
         }
 
@@ -45,20 +45,20 @@ public class TunnelGraphTunnelTests {
 
         graph.register(BlockPos.ZERO, FakeTunnelDefinition.ID, MACHINE_POS, Direction.UP);
 
-        if(!graph.has(BlockPos.ZERO))
+        if (!graph.has(BlockPos.ZERO))
             test.fail("Graph is reporting tunnel is not registered.");
 
         graph.info(BlockPos.ZERO).ifPresentOrElse(info -> {
-            if(!info.location().equals(BlockPos.ZERO))
+            if (!info.location().equals(BlockPos.ZERO))
                 test.fail("Tunnel location is not correct.");
 
-            if(!info.machine().equals(MACHINE_POS))
+            if (!info.machine().equals(MACHINE_POS))
                 test.fail("Tunnel machine is not correct.");
 
-            if(!info.side().equals(Direction.UP))
+            if (!info.side().equals(Direction.UP))
                 test.fail("Tunnel side is not correct.");
 
-            if(!info.type().equals(FakeTunnelDefinition.ID))
+            if (!info.type().equals(FakeTunnelDefinition.ID))
                 test.fail("Tunnel type is not correct.");
         }, () -> {
             test.fail("Tunnel was not registered correctly.");

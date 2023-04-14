@@ -24,3 +24,4 @@ rootProject.name = "Compact Machines"
 include("forge-tunnels-api")
 include("forge-main")
 include("forge-builtin")
+include("forge-datagen")
