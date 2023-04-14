@@ -6,9 +6,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.config.ServerConfig;
 import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,17 +38,18 @@ public class CMUnbindSubcommand {
 
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
 
-        if(!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machine)) {
+        if (!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machine)) {
             CompactMachines.LOGGER.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
         }
 
         machine.connectedRoom().ifPresentOrElse(currentRoom -> {
             final var currentRoomTunnels = TunnelConnectionGraph.forRoom(compactDim, currentRoom);
-            final var firstTunnel = currentRoomTunnels.positions(machine.getLevelPosition()).findFirst();
-            firstTunnel.ifPresent(ft -> {
-                throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, ft));
-            });
+            currentRoomTunnels.positions(TunnelMachineFilters.all(machine.getLevelPosition()))
+                    .findFirst()
+                    .ifPresent(ft -> {
+                        throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, ft));
+                    });
 
             machine.disconnect();
         }, () -> {

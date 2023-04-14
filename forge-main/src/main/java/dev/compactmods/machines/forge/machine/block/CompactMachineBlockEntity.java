@@ -9,15 +9,16 @@ import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.room.Rooms;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.api.room.registration.IRoomRegistration;
-import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.forge.tunnel.graph.traversal.ForgeTunnelTypeFilters;
 import dev.compactmods.machines.machine.BasicRoomInfo;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.util.NbtUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,7 +83,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
                     final var graph = TunnelConnectionGraph.forRoom(compactDim, roomId);
 
-                    final var supportingTunnels = graph.getTunnelsSupporting(getLevelPosition(), side, cap);
+                    final var supportingTunnels = graph.positions(TunnelMachineFilters.sided(getLevelPosition(), side), ForgeTunnelTypeFilters.capability(cap));
                     final var firstSupported = supportingTunnels.findFirst();
                     if (firstSupported.isEmpty())
                         return super.getCapability(cap, side);
@@ -311,7 +312,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
         }
     }
 
-    public Optional<RoomTunnelConnections> getTunnelGraph() {
+    public Optional<TunnelConnectionGraph> getTunnelGraph() {
         if (level == null || roomCode == null) return Optional.empty();
 
         if (level instanceof ServerLevel sl) {

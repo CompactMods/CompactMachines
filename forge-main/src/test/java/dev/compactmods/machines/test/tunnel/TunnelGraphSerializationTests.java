@@ -2,13 +2,14 @@ package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.forge.tunnel.graph.nbt.TunnelGraphNbtKeys;
-import dev.compactmods.machines.forge.tunnel.graph.nbt.TunnelGraphNbtSerializer;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.nbt.TunnelGraphNbtKeys;
+import dev.compactmods.machines.tunnel.graph.nbt.TunnelGraphNbtSerializer;
+import dev.compactmods.machines.tunnel.graph.traversal.GraphTraversalHelper;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.NbtTestUtils;
-import dev.compactmods.machines.tunnel.graph.TunnelNode;
-import dev.compactmods.machines.tunnel.graph.TunnelTypeNode;
+import dev.compactmods.machines.tunnel.graph.node.TunnelNode;
+import dev.compactmods.machines.tunnel.graph.node.TunnelTypeNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -122,12 +123,12 @@ public class TunnelGraphSerializationTests {
             test.fail("Expected one machine node; got %s.".formatted(machineCount));
         }
 
-        long tunnelCount = newGraph.nodes(TunnelNode.class).count();
+        long tunnelCount = GraphTraversalHelper.nodes(graph, TunnelNode.class).count();
         if(tunnelCount != 2) {
             test.fail("Expected 2 tunnel nodes; got %s.".formatted(tunnelCount));
         }
 
-        long tunnelTypeCount = newGraph.nodes(TunnelTypeNode.class).count();
+        long tunnelTypeCount = GraphTraversalHelper.nodes(graph, TunnelTypeNode.class).count();
         if(tunnelTypeCount != 1) {
             test.fail("Expected 1 tunnel type node; got %s.".formatted(tunnelTypeCount));
         }

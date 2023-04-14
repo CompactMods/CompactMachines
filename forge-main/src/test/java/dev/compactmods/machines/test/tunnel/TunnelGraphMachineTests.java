@@ -1,7 +1,8 @@
 package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +23,8 @@ public class TunnelGraphMachineTests {
         final var graph = new TunnelConnectionGraph();
         final var MACHINE_POS = GlobalPos.of(test.getLevel().dimension(), BlockPos.ZERO);
 
-        final var connections = graph.positions(MACHINE_POS).collect(Collectors.toUnmodifiableSet());
+        final var connections = graph.positions(TunnelMachineFilters.all(MACHINE_POS))
+                .collect(Collectors.toUnmodifiableSet());
 
         if(!connections.isEmpty()) {
             test.fail("There should be no connections registered.");
@@ -56,7 +58,7 @@ public class TunnelGraphMachineTests {
 
         graph.register(BlockPos.ZERO, FakeTunnelDefinition.ID, MACHINE_POS, Direction.UP);
 
-        final var connectedToMachine = graph.positions(MACHINE_POS)
+        final var connectedToMachine = graph.positions(TunnelMachineFilters.sided(MACHINE_POS, Direction.UP))
                 .collect(Collectors.toUnmodifiableSet());
 
         if(connectedToMachine.size() != 1) {

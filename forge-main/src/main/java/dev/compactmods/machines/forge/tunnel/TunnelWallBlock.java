@@ -8,7 +8,6 @@ import dev.compactmods.machines.api.tunnels.lifecycle.removal.ITunnelRemoveEvent
 import dev.compactmods.machines.api.tunnels.lifecycle.rotation.ITunnelRotationEventListener;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneReaderTunnel;
 import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.forge.tunnel.removal.ServerPlayerRemovedReason;
 import dev.compactmods.machines.forge.tunnel.rotation.ServerPlayerRotatedReason;
 import dev.compactmods.machines.forge.wall.ProtectedWallBlock;
@@ -16,6 +15,9 @@ import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.TunnelHelper;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -165,7 +167,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     Direction dir = state.getValue(CONNECTED_SIDE);
 
                     final var existingDirs = tunnels
-                            .sides(tunnel.connectedMachine(), tunnelId)
+                            .sides(TunnelMachineFilters.all(tunnel.connectedMachine()), TunnelTypeFilters.key(tunnelId))
                             .collect(Collectors.toSet());
 
                     if (existingDirs.size() == 6) {

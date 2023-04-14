@@ -12,7 +12,7 @@ import dev.compactmods.machines.api.upgrade.RoomUpgrade;
 import dev.compactmods.machines.api.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.graph.IGraphNode;
-import dev.compactmods.machines.room.graph.RoomReferenceNode;
+import dev.compactmods.machines.room.graph.node.RoomReferenceNode;
 import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeGraphNode;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;

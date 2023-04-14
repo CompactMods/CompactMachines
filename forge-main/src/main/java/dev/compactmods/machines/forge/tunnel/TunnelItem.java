@@ -1,7 +1,9 @@
 package dev.compactmods.machines.forge.tunnel;
 
 import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import dev.compactmods.machines.forge.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.forge.wall.SolidWallBlock;
 import dev.compactmods.machines.api.core.Constants;
@@ -83,7 +85,7 @@ public class TunnelItem extends Item implements ITunnelItem {
     @Override
     public Component getName(ItemStack stack) {
         String key = ITunnelItem.getDefinition(stack)
-                .map(TranslationUtil::tunnelId)
+                .map(id -> TranslationUtil.tunnelId(id.location()))
                 .orElse("item." + Constants.MOD_ID + ".tunnels.unnamed");
 
         return Component.translatable(key);
@@ -186,7 +188,7 @@ public class TunnelItem extends Item implements ITunnelItem {
 
         var hist = lastEnteredMachine.get();
         var placedSides = roomTunnels
-                .sides(hist.getMachine(), tunnelId)
+                .sides(TunnelMachineFilters.all(hist.getMachine()), TunnelTypeFilters.key(tunnelId))
                 .collect(Collectors.toSet());
 
         // all tunnels already placed for type

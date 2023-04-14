@@ -1,8 +1,10 @@
 package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.test.TestBatches;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 public class TunnelGraphSideTests {
 
     @GameTest(template = "empty_1x1", batch = TestBatches.TUNNEL_DATA)
-    public static void unregisteredMachineConnectionCheck(final GameTestHelper test) {
+    public static void directionalTypeLookup(final GameTestHelper test) {
         final var graph = new TunnelConnectionGraph();
         final var MACHINE_POS = GlobalPos.of(test.getLevel().dimension(), BlockPos.ZERO);
 
@@ -53,7 +55,8 @@ public class TunnelGraphSideTests {
 
         graph.register(BlockPos.ZERO, FakeTunnelDefinition.ID, MACHINE_POS, Direction.UP);
 
-        final var sides = graph.sides(MACHINE_POS, FakeTunnelDefinition.ID)
+        final var sides = graph
+                .sides(TunnelMachineFilters.all(MACHINE_POS), TunnelTypeFilters.key(FakeTunnelDefinition.ID))
                 .collect(Collectors.toSet());
 
         if(sides.size() != 1) {

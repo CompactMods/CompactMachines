@@ -2,6 +2,8 @@ package dev.compactmods.machines.forge.machine.block;
 
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.Registries;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.forge.upgrade.RoomUpgradeItem;
 import dev.compactmods.machines.api.core.CMTags;
@@ -22,7 +24,7 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.forge.room.ui.MachineRoomMenu;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -102,7 +104,7 @@ public class LegacySizedCompactMachineBlock extends Block implements EntityBlock
                     // Horizontal neighbor changed
                     machine.getTunnelGraph().ifPresent(graph -> {
                         // Update redstone tunnel signals
-                        graph.getRedstoneTunnels(machine.getLevelPosition(), dir).forEach(tunnelPos -> {
+                        graph.positions(TunnelMachineFilters.sided(machine.getLevelPosition(), dir), TunnelTypeFilters.redstone(Tunnels::getDefinition)).forEach(tunnelPos -> {
                             compactWorld.updateNeighbourForOutputSignal(tunnelPos, Tunnels.BLOCK_TUNNEL_WALL.get());
                         });
                     });

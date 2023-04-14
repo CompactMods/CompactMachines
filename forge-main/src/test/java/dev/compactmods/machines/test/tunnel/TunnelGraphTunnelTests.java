@@ -1,7 +1,7 @@
 package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,7 +58,7 @@ public class TunnelGraphTunnelTests {
             if(!info.side().equals(Direction.UP))
                 test.fail("Tunnel side is not correct.");
 
-            if(!info.type().equals(FakeTunnelDefinition.ID.location()))
+            if(!info.type().equals(FakeTunnelDefinition.ID))
                 test.fail("Tunnel type is not correct.");
         }, () -> {
             test.fail("Tunnel was not registered correctly.");

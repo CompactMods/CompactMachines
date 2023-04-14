@@ -4,15 +4,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.config.ServerConfig;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.forge.CompactMachines;
+import dev.compactmods.machines.forge.config.ServerConfig;
+import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -27,7 +28,7 @@ public class CMRebindSubcommand {
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .then(Commands.argument("bindTo", StringArgumentType.string())
-                .executes(CMRebindSubcommand::doRebind)));
+                        .executes(CMRebindSubcommand::doRebind)));
 
         return subRoot;
     }
@@ -48,17 +49,18 @@ public class CMRebindSubcommand {
         roomProvider.forRoom(roomCode).ifPresentOrElse(targetRoom -> {
             CompactMachines.LOGGER.debug("Binding machine at {} to room {}", rebindingMachine, targetRoom.code());
 
-            if(!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machine)) {
+            if (!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machine)) {
                 CompactMachines.LOGGER.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
                 throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
             }
 
             machine.connectedRoom().ifPresentOrElse(currentRoom -> {
                 final var currentRoomTunnels = TunnelConnectionGraph.forRoom(compactDim, currentRoom);
-                final var firstTunnel = currentRoomTunnels.positions(machine.getLevelPosition()).findFirst();
-                firstTunnel.ifPresent(ft -> {
-                    throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, ft));
-                });
+                currentRoomTunnels.positions(TunnelMachineFilters.all(machine.getLevelPosition()))
+                        .findFirst()
+                        .ifPresent(match -> {
+                            throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NO_REBIND_TUNNEL_PRESENT, match));
+                        });
 
                 // No tunnels - clear to rebind
                 machine.setConnectedRoom(targetRoom);

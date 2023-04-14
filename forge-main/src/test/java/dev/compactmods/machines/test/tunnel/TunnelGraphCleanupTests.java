@@ -1,7 +1,7 @@
 package dev.compactmods.machines.test.tunnel;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,5 +29,7 @@ public class TunnelGraphCleanupTests {
         final var machines = graph.machines().collect(Collectors.toSet());
         if(!machines.isEmpty())
             test.fail("Expected no machines to remain registered; got %s".formatted(machines.size()));
+
+        test.succeed();
     }
 }

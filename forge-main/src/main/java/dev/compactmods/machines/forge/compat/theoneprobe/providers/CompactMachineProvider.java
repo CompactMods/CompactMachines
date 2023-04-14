@@ -8,7 +8,7 @@ import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.forge.compat.theoneprobe.elements.PlayerFaceElement;
 import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.forge.tunnel.TunnelItem;
-import dev.compactmods.machines.forge.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.util.PlayerUtil;
