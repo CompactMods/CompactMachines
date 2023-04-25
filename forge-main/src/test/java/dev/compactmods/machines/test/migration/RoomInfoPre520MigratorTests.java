@@ -52,7 +52,7 @@ public class RoomInfoPre520MigratorTests {
     public static void canReadSingleRoom(final GameTestHelper test) {
 
         try {
-            final var nbtData = FileHelper.getNbtFromSavedDataFile("migrate/pre520/single_room.dat");
+            final var nbtData = FileHelper.getNbtFromFile("migrate/pre520/single_room.dat");
             final var oldData = Pre520RoomDataMigrator.RoomDataPre520.of(nbtData);
 
             if(!oldData.center().equals(new BlockPos(8, 45, -1016)))

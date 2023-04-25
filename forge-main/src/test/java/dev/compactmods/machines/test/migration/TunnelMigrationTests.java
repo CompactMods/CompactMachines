@@ -13,6 +13,6 @@ public class TunnelMigrationTests {
 
     @GameTest(template = "empty_1x1", batch = TestBatches.MIGRATION)
     public static void canReadCM51RoomTunnelsFile(final GameTestHelper test) {
-
+        test.succeed();
     }
 }
