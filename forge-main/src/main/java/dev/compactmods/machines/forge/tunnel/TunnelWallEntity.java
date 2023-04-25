@@ -8,18 +8,20 @@ import dev.compactmods.machines.api.tunnels.lifecycle.InstancedTunnel;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelInstance;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import dev.compactmods.machines.api.tunnels.lifecycle.removal.ITunnelRemoveEventListener;
+import dev.compactmods.machines.api.tunnels.lifecycle.removal.ITunnelRemoveReason;
 import dev.compactmods.machines.codec.CodecExtensions;
 import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.forge.wall.Walls;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.BaseTunnelWallData;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.node.TunnelNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -29,9 +31,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 
 public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
@@ -39,6 +40,8 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
     private static final String NBT_LEGACY_MACHINE_KEY = "machine";
 
     private GlobalPos connectedMachine;
+
+    private ResourceKey<TunnelDefinition> tunnelTypeKey;
     private TunnelDefinition tunnelType;
 
     @Nullable
@@ -52,14 +55,15 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void load(@Nonnull CompoundTag nbt) {
+    public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
         final var baseData = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, nbt)
                 .getOrThrow(true, CompactMachines.LOGGER::fatal);
 
         this.connectedMachine = baseData.connection();
-        this.tunnelType = Tunnels.getDefinition(baseData.tunnelType());
+        this.tunnelTypeKey = ResourceKey.create(TunnelDefinition.REGISTRY_KEY, baseData.tunnelType());
+        this.tunnelType = Tunnels.getDefinition(this.tunnelTypeKey);
 
         try {
             if (tunnelType instanceof InstancedTunnel it)
@@ -92,9 +96,9 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
     }
 
     @Override
-    public void saveAdditional(@Nonnull CompoundTag compound) {
+    public void saveAdditional(@NotNull CompoundTag compound) {
         CodecExtensions.writeIntoTag(BaseTunnelWallData.CODEC,
-                new BaseTunnelWallData(connectedMachine, Tunnels.getRegistryId(tunnelType)),
+                new BaseTunnelWallData(connectedMachine, tunnelTypeKey.location()),
                 compound);
 
         if (tunnel instanceof INBTSerializable persist) {
@@ -104,11 +108,11 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public CompoundTag getUpdateTag() {
         CompoundTag nbt = super.getUpdateTag();
         return CodecExtensions.writeIntoTag(BaseTunnelWallData.CODEC,
-                new BaseTunnelWallData(connectedMachine, Tunnels.getRegistryId(tunnelType)),
+                new BaseTunnelWallData(connectedMachine, tunnelTypeKey.location()),
                 nbt);
     }
 
@@ -118,15 +122,15 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
         final var data = BaseTunnelWallData.CODEC.parse(NbtOps.INSTANCE, tag)
                 .getOrThrow(false, CompactMachines.LOGGER::error);
 
-        var id = data.tunnelType();
-        this.tunnelType = Tunnels.getDefinition(id);
+        this.tunnelTypeKey = ResourceKey.create(TunnelDefinition.REGISTRY_KEY, data.tunnelType());
+        this.tunnelType = Tunnels.getDefinition(tunnelTypeKey);
         this.connectedMachine = data.connection();
 
         setChanged();
     }
 
-    @Nonnull
-    public <T> LazyOptional<T> getTunnelCapability(@Nonnull Capability<T> cap, @Nullable Direction outerSide) {
+    @NotNull
+    public <T> LazyOptional<T> getTunnelCapability(@NotNull Capability<T> cap, @Nullable Direction outerSide) {
         if (level == null || level.isClientSide)
             return LazyOptional.empty();
 
@@ -140,9 +144,9 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
         return LazyOptional.empty();
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (level == null || level.isClientSide)
             return super.getCapability(cap, side);
 
@@ -177,37 +181,75 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
         return blockState.getValue(TunnelWallBlock.CONNECTED_SIDE);
     }
 
-    public void setTunnelType(TunnelDefinition type) {
-        if (type == tunnelType)
-            return;
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void serverPreRemoval(@Nullable ITunnelRemoveReason reason) {
+        final var p = new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
+        if (tunnelType instanceof TunnelTeardownHandler teardown) {
+            //noinspection removal
+            teardown.onRemoved(p, tunnel);
+        }
 
-        if (level == null || level.isClientSide || !(level instanceof ServerLevel sl)) {
-            tunnelType = type;
+        if (tunnelType instanceof ITunnelRemoveEventListener removeListener) {
+            final var handler = removeListener.createBeforeRemoveHandler(tunnel);
+            if (handler != null)
+                handler.beforeRemove(level.getServer(), p, reason);
+        }
+    }
+
+    private void serverPostRemoval(@Nullable ITunnelRemoveReason reason) {
+        final var p = new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
+        if (this.tunnelType instanceof InstancedTunnel it)
+            this.tunnel = it.newInstance(p.pos(), p.wallSide());
+
+        if (this.tunnelType instanceof ITunnelRemoveEventListener removeListener) {
+            removeListener.createAfterRemoveHandler(tunnel)
+                    .afterRemove(level.getServer(), p, reason);
+        }
+    }
+
+    // TODO : Fix tunnel removal and placement coloration
+
+    private void setTunnelTypeInternal(ResourceKey<TunnelDefinition> key, TunnelDefinition definition) {
+        if (level == null || level.isClientSide || !(level instanceof ServerLevel)) {
+            this.tunnelTypeKey = key;
+            this.tunnelType = definition;
             return;
         }
 
         // TODO Clean all this up properly with a real removal reason
-        final var p = new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
-        if (tunnelType instanceof TunnelTeardownHandler teardown) {
-            //noinspection removal,unchecked
-            teardown.onRemoved(p, tunnel);
-        }
+        serverPreRemoval(null);
 
-        if(tunnelType instanceof ITunnelRemoveEventListener removeListener) {
-            removeListener.createBeforeRemoveHandler(tunnel)
-                    .beforeRemove(level.getServer(), p, null);
-        }
+        this.tunnelTypeKey = key;
+        this.tunnelType = definition;
 
-        this.tunnelType = type;
-        if (type instanceof InstancedTunnel it)
-            this.tunnel = it.newInstance(p.pos(), p.wallSide());
-
-        if(tunnelType instanceof ITunnelRemoveEventListener removeListener) {
-            removeListener.createAfterRemoveHandler(tunnel)
-                    .afterRemove(level.getServer(), p, null);
-        }
-
+        serverPostRemoval(null);
         setChanged();
+    }
+
+    @Override
+    public void setTunnelType(ResourceKey<TunnelDefinition> type) {
+        if(type == null) {
+            CompactMachines.LOGGER.warn("Removing tunnel at {} due to it being set null", worldPosition.toShortString());
+            level.setBlock(worldPosition, Walls.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
+            return;
+        }
+
+        if (type.equals(this.tunnelTypeKey))
+            return;
+
+        final var def = Tunnels.getDefinition(type);
+        setTunnelTypeInternal(type, def);
+    }
+
+    @Override
+    @Deprecated(forRemoval = true, since = "5.2.0")
+    @SuppressWarnings("removal")
+    public void setTunnelType(TunnelDefinition definition) {
+        final var key = Tunnels.getRegistryKey(definition);
+        if (this.tunnelTypeKey.equals(key))
+            return;
+
+        setTunnelTypeInternal(key, definition);
     }
 
     public TunnelDefinition getTunnelType() {

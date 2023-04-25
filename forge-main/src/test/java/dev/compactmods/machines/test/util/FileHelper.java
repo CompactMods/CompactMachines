@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -55,5 +56,15 @@ public final class FileHelper {
         InputStream isr = INSTANCE.getFileStream(filename);
         final var nbtRoot = NbtIo.readCompressed(isr);
         return nbtRoot.getCompound("data");
+    }
+
+    public static <T extends Tag> T getNbtFromSavedDataFile(String filename, Class<T> tagClass) throws IOException {
+        InputStream isr = INSTANCE.getFileStream(filename);
+        final var nbtRoot = NbtIo.readCompressed(isr);
+        final var tag = nbtRoot.get("data");
+        if(tagClass.isInstance(tag))
+            return tagClass.cast(tag);
+
+        return null;
     }
 }

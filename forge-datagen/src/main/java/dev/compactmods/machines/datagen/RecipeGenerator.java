@@ -93,6 +93,7 @@ public class RecipeGenerator extends RecipeProvider {
                 Tags.Items.NETHER_STARS);
     }
 
+    @SuppressWarnings("removal")
     @Deprecated(forRemoval = true, since = "5.2.0")
     protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, LegacySizedTemplates template, TagKey<Item> center) {
         registerMachineRecipe(consumer, template.id(), template.template(), center);

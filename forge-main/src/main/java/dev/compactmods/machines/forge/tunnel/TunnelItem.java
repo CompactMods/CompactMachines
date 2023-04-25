@@ -30,6 +30,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -84,28 +85,41 @@ public class TunnelItem extends Item implements ITunnelItem {
 
     @Override
     public Component getName(ItemStack stack) {
-        String key = ITunnelItem.getDefinition(stack)
-                .map(id -> TranslationUtil.tunnelId(id.location()))
-                .orElse("item." + Constants.MOD_ID + ".tunnels.unnamed");
+        try {
+            String key = ITunnelItem.getDefinition(stack)
+                    .map(id -> TranslationUtil.tunnelId(id.location()))
+                    .orElse(TranslationUtil.tunnelId(Tunnels.UNKNOWN_KEY.location()));
 
-        return Component.translatable(key);
+            return Component.translatable(key);
+        }
+
+        catch(Exception e) {
+            return Component.translatable(TranslationUtil.tunnelId(Tunnels.UNKNOWN_KEY.location()));
+        }
     }
 
     @Override
     public void appendHoverText(@Nonnull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        ITunnelItem.getDefinition(stack).ifPresent(tunnelDef -> {
-            if (Screen.hasShiftDown()) {
-                MutableComponent type = Component.translatable("tooltip." + Constants.MOD_ID + ".tunnel_type", tunnelDef)
-                        .withStyle(ChatFormatting.GRAY)
-                        .withStyle(ChatFormatting.ITALIC);
+        try {
+            ITunnelItem.getDefinition(stack).ifPresent(tunnelDef -> {
+                if (Screen.hasShiftDown()) {
+                    MutableComponent type = Component.translatable("tooltip." + Constants.MOD_ID + ".tunnel_type", tunnelDef.location())
+                            .withStyle(ChatFormatting.GRAY)
+                            .withStyle(ChatFormatting.ITALIC);
 
-                tooltip.add(type);
-            } else {
-                tooltip.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
-                        .withStyle(ChatFormatting.DARK_GRAY)
-                        .withStyle(ChatFormatting.ITALIC));
-            }
-        });
+                    tooltip.add(type);
+                } else {
+                    tooltip.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT)
+                            .withStyle(ChatFormatting.DARK_GRAY)
+                            .withStyle(ChatFormatting.ITALIC));
+                }
+            });
+        }
+
+        catch(Exception e) {
+            tooltip.add(TranslationUtil.tooltip(new ResourceLocation(Constants.MOD_ID, "error_tunnel_tooltip"))
+                    .withStyle(ChatFormatting.DARK_RED));
+        }
     }
 
     @Override
@@ -221,12 +235,12 @@ public class TunnelItem extends Item implements ITunnelItem {
         compactDim.setBlock(position, tunnelState, Block.UPDATE_NEIGHBORS);
 
         if (compactDim.getBlockEntity(position) instanceof TunnelWallEntity twe) {
-            twe.setTunnelType(def);
+            twe.setTunnelType(tunnelId);
             twe.setConnectedTo(hist.getMachine(), first);
 
             CompactMachinesNet.CHANNEL.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
-                    new TunnelAddedPacket(position, def));
+                    new TunnelAddedPacket(position, tunnelId));
         }
 
         compactDim.sendBlockUpdated(position, oldState, tunnelState, Block.UPDATE_ALL);

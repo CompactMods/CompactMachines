@@ -1,5 +1,6 @@
 package dev.compactmods.machines.forge.network;
 
+import dev.compactmods.machines.forge.room.client.ClientRoomPacketHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -23,7 +24,7 @@ public record InitialRoomBlockDataPacket(StructureTemplate blocks) {
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> ClientRoomNetworkHandler.handleBlockData(this));
+        ctx.get().enqueueWork(() -> ClientRoomPacketHandler.handleBlockData(this.blocks));
         return true;
     }
 }

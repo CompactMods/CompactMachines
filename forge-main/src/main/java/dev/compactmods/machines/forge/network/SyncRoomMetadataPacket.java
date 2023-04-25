@@ -1,5 +1,6 @@
 package dev.compactmods.machines.forge.network;
 
+import dev.compactmods.machines.forge.room.client.ClientRoomPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -17,7 +18,7 @@ public record SyncRoomMetadataPacket(String roomCode, UUID owner) {
     }
 
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-        ClientRoomNetworkHandler.handleRoomSync(this);
+        ClientRoomPacketHandler.handleRoomSync(this.roomCode, this.owner);
         contextSupplier.get().setPacketHandled(true);
     }
 }

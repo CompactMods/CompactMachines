@@ -1,11 +1,9 @@
 package dev.compactmods.machines.forge.network;
 
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.forge.tunnel.network.TunnelAddedPacket;
 import dev.compactmods.machines.forge.util.VersionUtil;
-import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -13,15 +11,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 public class CompactMachinesNet {
-    private static final ArtifactVersion PROTOCOL_VERSION;
-
-    static {
-        if(FMLEnvironment.production) {
-            PROTOCOL_VERSION = new DefaultArtifactVersion(ModList.get().getModFileById(Constants.MOD_ID).versionString());
-        } else {
-            PROTOCOL_VERSION = new DefaultArtifactVersion("9.99.999");
-        }
-    }
+    private static final ArtifactVersion PROTOCOL_VERSION = new DefaultArtifactVersion("5.2.0");
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Constants.MOD_ID, "main"),

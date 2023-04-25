@@ -10,7 +10,6 @@ public class ForgeTunnelTypeFilters {
 
     public static ITunnelFilter capability(Capability<?> capability) {
         return TunnelTypeFilters.definition(def -> {
-
             if (!(def instanceof CapabilityTunnel<?> tcp))
                 return false;
 

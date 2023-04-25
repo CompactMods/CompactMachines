@@ -83,8 +83,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
                     final var graph = TunnelConnectionGraph.forRoom(compactDim, roomId);
 
-                    final var supportingTunnels = graph.positions(TunnelMachineFilters.sided(getLevelPosition(), side), ForgeTunnelTypeFilters.capability(cap));
-                    final var firstSupported = supportingTunnels.findFirst();
+                    final var firstSupported = graph.positions(
+                            TunnelMachineFilters.sided(getLevelPosition(), side),
+                            ForgeTunnelTypeFilters.capability(cap)
+                    ).findFirst();
+
                     if (firstSupported.isEmpty())
                         return super.getCapability(cap, side);
 

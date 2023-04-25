@@ -1,4 +1,4 @@
-package dev.compactmods.machines.test.migrators;
+package dev.compactmods.machines.test.migration;
 
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.forge.data.migration.EarlyLevelDataFileReader;

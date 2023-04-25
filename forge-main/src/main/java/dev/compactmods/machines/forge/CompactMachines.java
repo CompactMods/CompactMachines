@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 @Mod(Constants.MOD_ID)
 public class CompactMachines implements ICompactMachinesMod {
     /**
-     * @deprecated Switch usages to use api Constants in 1.20, eliminate it here
+     * @deprecated Switch usages to use api {@link Constants#MOD_ID} in 1.20, eliminate it here
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static final String MOD_ID = Constants.MOD_ID;
 
     public static final Marker ADDON_LIFECYCLE = MarkerManager.getMarker("addons");

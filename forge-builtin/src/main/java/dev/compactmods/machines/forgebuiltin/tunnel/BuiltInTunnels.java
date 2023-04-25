@@ -5,7 +5,6 @@ import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.forgebuiltin.tunnel.definitions.BufferedItemTunnel;
 import dev.compactmods.machines.forgebuiltin.tunnel.definitions.FluidTunnel;
 import dev.compactmods.machines.forgebuiltin.tunnel.definitions.ForgeEnergyTunnel;
-import dev.compactmods.machines.forgebuiltin.tunnel.definitions.redstone.RedstoneInTunnelDefinition;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -22,7 +21,7 @@ public class BuiltInTunnels {
 
     public static final RegistryObject<TunnelDefinition> FORGE_ENERGY = REGISTRATION.register("energy", ForgeEnergyTunnel::new);
 
-    public static final RegistryObject<TunnelDefinition> REDSTONE_IN = REGISTRATION.register("redstone_in", RedstoneInTunnelDefinition::new);
+    // public static final RegistryObject<TunnelDefinition> REDSTONE_IN = REGISTRATION.register("redstone_in", RedstoneInTunnelDefinition::new);
 
     public static void prepare() {
 

@@ -36,15 +36,21 @@ public class TunnelColors {
     };
 
     public static final ItemColor ITEM = (stack, tintIndex) -> {
-        var definition = ITunnelItem.getDefinition(stack);
-        if(definition.isEmpty())
-            return 0;
+        try {
+            var definition = ITunnelItem.getDefinition(stack);
+            if (definition.isEmpty())
+                return 0;
 
-        TunnelDefinition actualDef = Tunnels.getDefinition(definition.get());
-        if (tintIndex == 0) {
-            return actualDef.ringColor();
+            TunnelDefinition actualDef = Tunnels.getDefinition(definition.get());
+            if (tintIndex == 0) {
+                return actualDef.ringColor();
+            }
+
+            return actualDef.indicatorColor();
         }
 
-        return actualDef.indicatorColor();
+        catch(Exception e) {
+            return 0;
+        }
     };
 }

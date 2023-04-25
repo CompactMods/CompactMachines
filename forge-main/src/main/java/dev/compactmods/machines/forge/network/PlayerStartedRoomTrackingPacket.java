@@ -26,18 +26,10 @@ public record PlayerStartedRoomTrackingPacket(String room) {
     public boolean handle(Supplier<NetworkEvent.Context> ctx) {
         var sender = ctx.get().getSender();
         ctx.get().enqueueWork(() -> {
-            StructureTemplate blocks = null;
+            StructureTemplate blocks;
             try {
                 blocks = Rooms.getInternalBlocks(sender.server, room).get(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                throw new RuntimeException(e);
-            } catch (MissingDimensionException e) {
-                throw new RuntimeException(e);
-            } catch (NonexistentRoomException e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException | MissingDimensionException | NonexistentRoomException e) {
                 throw new RuntimeException(e);
             }
             RoomNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender), new InitialRoomBlockDataPacket(blocks));

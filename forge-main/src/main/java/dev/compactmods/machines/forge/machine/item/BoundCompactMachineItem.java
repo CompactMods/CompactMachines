@@ -26,7 +26,7 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
         super(Machines.MACHINE_BLOCK.get(), builder);
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static Optional<Integer> getMachineId(ItemStack stack) {
         if (!stack.hasTag())
             return Optional.empty();

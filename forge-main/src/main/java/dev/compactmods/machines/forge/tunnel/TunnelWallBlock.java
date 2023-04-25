@@ -22,7 +22,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -149,9 +148,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                     level.setBlockAndUpdate(pos, solidWall);
 
-                    ItemStack stack = new ItemStack(Tunnels.ITEM_TUNNEL.get(), 1);
-                    CompoundTag defTag = stack.getOrCreateTagElement("definition");
-                    defTag.putString("id", tunnelId.toString());
+                    ItemStack stack = TunnelItem.createStack(tunnelId);
 
                     ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
                     level.addFreshEntity(ie);
@@ -185,13 +182,14 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                         if(def instanceof ITunnelRotationEventListener<?> rotationListener) {
                             var handler = rotationListener.createBeforeRotateHandler(tunnel.getTunnel());
-                            if(handler != null && handler.beforeRotate(server, tunnelOriginalPosition, newRotation, rotationReason)) {
+                            if(handler != null && !handler.beforeRotate(server, tunnelOriginalPosition, newRotation, rotationReason)) {
                                 return;
                             }
                         }
 
                         level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
+                        // TODO Remove in 5.3/next
                         if (def instanceof TunnelTeardownHandler<?> teardown) {
                             //noinspection removal
                             teardown.onRotated(new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);

@@ -18,11 +18,11 @@ public class Dimension {
     // ================================================================================================================
     //   DIMENSION
     // ================================================================================================================
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey
             .create(Registry.DIMENSION_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "5.2.0")
     public static final ResourceKey<DimensionType> COMPACT_DIMENSION_DIM_TYPE = ResourceKey
             .create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
 

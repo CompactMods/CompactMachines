@@ -58,6 +58,10 @@ public class Pre520RoomDataMigrator {
                 RoomSize.CODEC.fieldOf("size").forGetter(RoomDataPre520::size),
                 Codec.STRING.optionalFieldOf("name").forGetter(RoomDataPre520::name)
         ).apply(i, RoomDataPre520::new));
+
+        public static RoomDataPre520 of(CompoundTag data) {
+            return CODEC.parse(NbtOps.INSTANCE, data).getOrThrow(false, UPDATER_LOGGER::error);
+        }
     }
 
     public record RoomDataLoadResult(HashMap<String, RoomDataPre520> oldRoomData, HashMap<ChunkPos, String> roomChunkLookup) {
