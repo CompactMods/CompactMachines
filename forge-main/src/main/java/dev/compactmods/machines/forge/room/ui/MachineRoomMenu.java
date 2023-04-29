@@ -1,9 +1,8 @@
 package dev.compactmods.machines.forge.room.ui;
 
-import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.api.room.registration.IRoomRegistration;
+import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import net.minecraft.core.GlobalPos;
@@ -46,7 +45,7 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         return machine;
     }
 
-    public static MenuProvider makeProvider(MinecraftServer server, IRoomRegistration roomInfo, GlobalPos machinePos) {
+    public static MenuProvider makeProvider(MinecraftServer server, String roomCode, GlobalPos machinePos) {
         return new MenuProvider() {
             @Override
             public Component getDisplayName() {
@@ -57,10 +56,10 @@ public class MachineRoomMenu extends AbstractContainerMenu {
             @Override
             public AbstractContainerMenu createMenu(int winId, Inventory inv, Player player2) {
                 try {
-                    final var title = Rooms.getRoomName(server, roomInfo.code());
+                    final var title = Rooms.getRoomName(server, roomCode);
 
-                    var menu = new MachineRoomMenu(winId, roomInfo.code(), machinePos, title.orElse("Room Preview"));
-                    menu.roomBlocks = Rooms.getInternalBlocks(server, roomInfo.code()).get(5, TimeUnit.SECONDS);
+                    var menu = new MachineRoomMenu(winId, roomCode, machinePos, title.orElse("Room Preview"));
+                    menu.roomBlocks = Rooms.getInternalBlocks(server, roomCode).get(5, TimeUnit.SECONDS);
                     return menu;
 
                 } catch (NonexistentRoomException | MissingDimensionException e) {

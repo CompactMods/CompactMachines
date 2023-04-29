@@ -63,8 +63,8 @@ public class CMRebindSubcommand {
                         });
 
                 // No tunnels - clear to rebind
-                machine.setConnectedRoom(targetRoom);
-            }, () -> machine.setConnectedRoom(targetRoom));
+                machine.setConnectedRoom(roomCode);
+            }, () -> machine.setConnectedRoom(roomCode));
         }, () -> {
             CompactMachines.LOGGER.error("Cannot rebind to room {}; not registered.", roomCode);
         });

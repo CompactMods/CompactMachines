@@ -30,9 +30,9 @@ public class CopyRoomBindingFunction extends LootItemConditionalFunction {
         if(state.is(CMTags.MACHINE_BLOCK)) {
             var data = ctx.getParam(LootContextParams.BLOCK_ENTITY);
             if (data instanceof CompactMachineBlockEntity machine) {
-                machine.basicRoomInfo().ifPresent(room -> {
-                    ICompactMachineItem.setColor(stack, room.color());
-                    BoundCompactMachineItem.setRoom(stack, room.code());
+                machine.connectedRoom().ifPresent(roomCode -> {
+                    ICompactMachineItem.setColor(stack, machine.getColor());
+                    BoundCompactMachineItem.setRoom(stack, roomCode);
                 });
             }
         }

@@ -1,10 +1,8 @@
 package dev.compactmods.machines.forge.network;
 
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.room.RoomHelper;
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -27,13 +25,7 @@ public record PlayerRequestedTeleportPacket(GlobalPos machine, String room) {
             final var player = ctx.get().getSender();
             if (player != null) {
                 try {
-                    final var provider = CompactRoomProvider.instance(CompactDimension.forServer(player.server));
-                    provider.forRoom(room).ifPresent(info -> {
-                        try {
-                            RoomHelper.teleportPlayerIntoMachine(player.level, player, machine, info);
-                        } catch (MissingDimensionException ignored) {
-                        }
-                    });
+                    RoomHelper.teleportPlayerIntoMachine(player.level, player, machine, room);
                 } catch (MissingDimensionException e) {
                     CompactMachines.LOGGER.error("Failed to teleport player into machine.", e);
                 }

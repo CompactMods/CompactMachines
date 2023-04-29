@@ -1,7 +1,8 @@
 package dev.compactmods.machines.forge.command;
 
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.forge.Registries;
-import dev.compactmods.machines.forge.command.data.CMDataSubcommand;
 import dev.compactmods.machines.forge.command.subcommand.CMEjectSubcommand;
 import dev.compactmods.machines.forge.command.subcommand.CMGiveMachineSubcommand;
 import dev.compactmods.machines.forge.command.subcommand.CMReaddDimensionSubcommand;
@@ -11,8 +12,6 @@ import dev.compactmods.machines.forge.command.subcommand.CMRoomsSubcommand;
 import dev.compactmods.machines.forge.command.subcommand.CMSummarySubcommand;
 import dev.compactmods.machines.forge.command.subcommand.CMUnbindSubcommand;
 import dev.compactmods.machines.forge.command.subcommand.SpawnSubcommand;
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.command.Commands;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -34,7 +33,6 @@ public class ForgeCommands {
         cm.then(CMUnbindSubcommand.make());
         cm.then(CMReaddDimensionSubcommand.make());
         cm.then(CMRoomsSubcommand.make());
-        cm.then(CMDataSubcommand.make());
         cm.then(CMGiveMachineSubcommand.make());
         cm.then(SpawnSubcommand.make());
         cm.then(CMRoomUpgradeCommand.make());

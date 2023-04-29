@@ -43,38 +43,41 @@ public class RoomHelper {
         return DistExecutor.safeRunForDist(() -> RoomClientHelper::getTemplates, () -> ForgeRoomServerHelper::getTemplates);
     }
 
-    public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, IRoomRegistration room) throws MissingDimensionException {
+    public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) throws MissingDimensionException {
         MinecraftServer serv = machineLevel.getServer();
 
-        // Recursion check. Player tried to enter the room they're already in.
-        if (player.level.dimension().equals(CompactDimension.LEVEL_KEY)) {
-            final boolean recursion = player.getCapability(RoomCapabilities.ROOM_HISTORY).map(hist -> {
-                if (room.chunks().anyMatch(chunk -> player.chunkPosition().equals(chunk))) {
-                    AdvancementTriggers.RECURSIVE_ROOMS.trigger(player);
-                    return true;
-                }
+        CompactRoomProvider.instance(serv)
+                .forRoom(roomCode)
+                .ifPresent(roomInfo -> {
+                    // Recursion check. Player tried to enter the room they're already in.
+                    if (player.level.dimension().equals(CompactDimension.LEVEL_KEY)) {
+                        final boolean recursion = player.getCapability(RoomCapabilities.ROOM_HISTORY).map(hist -> {
+                            if (roomInfo.chunks().anyMatch(chunk -> player.chunkPosition().equals(chunk))) {
+                                AdvancementTriggers.RECURSIVE_ROOMS.trigger(player);
+                                return true;
+                            }
 
-                return false;
-            }).orElse(false);
+                            return false;
+                        }).orElse(false);
 
-            if (recursion) return;
-        }
+                        if (recursion) return;
+                    }
 
-        try {
-            final var entry = PreciseDimensionalPosition.fromPlayer(player);
+                    try {
+                        final var entry = PreciseDimensionalPosition.fromPlayer(player);
 
+                        teleportPlayerIntoRoom(serv, player, roomInfo);
 
-            teleportPlayerIntoRoom(serv, player, room);
+                        // Mark the player as inside the machine, set external spawn, and yeet
+                        player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
+                            hist.addHistory(new PlayerRoomHistoryItem(entry, machinePos));
 
-            // Mark the player as inside the machine, set external spawn, and yeet
-            player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
-                hist.addHistory(new PlayerRoomHistoryItem(entry, machinePos));
-
-                setCurrentRoom(serv, player, room);
-            });
-        } catch (MissingDimensionException | NonexistentRoomException e) {
-            CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
-        }
+                            setCurrentRoom(serv, player, roomInfo);
+                        });
+                    } catch (MissingDimensionException | NonexistentRoomException e) {
+                        CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);
+                    }
+                });
     }
 
     public static void setCurrentRoom(MinecraftServer server, ServerPlayer player, IRoomRegistration room) {
@@ -102,12 +105,11 @@ public class RoomHelper {
             player.changeDimension(compactDim, SimpleTeleporter.to(room.spawnPosition(roomProvider), room.spawnRotation(roomProvider)));
         });
 
-        if(from != null) {
+        if (from != null) {
             // Mark the player as inside the machine, set external spawn
             player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
                 var entry = PreciseDimensionalPosition.fromPlayer(player);
                 hist.addHistory(new PlayerRoomHistoryItem(entry, from));
-
             });
         }
 
@@ -118,7 +120,7 @@ public class RoomHelper {
     public static void teleportPlayerOutOfRoom(ServerLevel compactDim, @Nonnull ServerPlayer serverPlayer) {
 
         MinecraftServer serv = compactDim.getServer();
-        if(!serverPlayer.level.dimension().equals(CompactDimension.LEVEL_KEY))
+        if (!serverPlayer.level.dimension().equals(CompactDimension.LEVEL_KEY))
             return;
 
         serverPlayer.getCapability(RoomCapabilities.ROOM_HISTORY)
@@ -130,7 +132,7 @@ public class RoomHelper {
                         // Mark current room, invalidates any listeners + debug screen
                         serverPlayer.getCapability(CURRENT_ROOM_META).ifPresent(provider -> {
                             // Check entry dimension - if it isn't a machine room, clear room info
-                            if(!prevArea.getEntryLocation().dimension().equals(CompactDimension.LEVEL_KEY))
+                            if (!prevArea.getEntryLocation().dimension().equals(CompactDimension.LEVEL_KEY))
                                 provider.clearCurrent();
                             else {
                                 roomProvider.findByChunk(prevArea.getEntryLocation().chunkPos()).ifPresent(roomMeta -> {

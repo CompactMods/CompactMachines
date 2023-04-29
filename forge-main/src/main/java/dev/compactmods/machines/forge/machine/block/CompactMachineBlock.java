@@ -1,9 +1,13 @@
 package dev.compactmods.machines.forge.machine.block;
 
 import dev.compactmods.machines.api.shrinking.PSDTags;
+import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
+import dev.compactmods.machines.forge.machine.item.MachineItemUtil;
 import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.forge.room.RoomHelper;
+import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.room.BasicRoomInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
@@ -48,9 +52,10 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity be) {
-            return be.basicRoomInfo()
-                    .map(BoundCompactMachineItem::createForRoom)
-                    .orElse(UnboundCompactMachineItem.unbound());
+            return be.connectedRoom().map(roomCode -> {
+                final var roomInfo = new BasicRoomInfo(roomCode, be.getColor());
+                return BoundCompactMachineItem.createForRoom(roomInfo);
+            }).orElse(UnboundCompactMachineItem.unbound());
         }
 
         return UnboundCompactMachineItem.unbound();
@@ -75,7 +80,21 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         // force client redraw
-        super.setPlacedBy(level, pos, state, placer, stack);
+        final int color = ICompactMachineItem.getMachineColor(stack);
+        level.getBlockEntity(pos, Machines.MACHINE_TILE_ENTITY.get()).ifPresent(tile -> {
+            tile.setColor(color);
+
+            if(stack.getItem() instanceof BoundCompactMachineItem boundItem) {
+                BoundCompactMachineItem.getRoom(stack).ifPresent(roomCode -> {
+                    tile.setConnectedRoom(roomCode);
+                });
+            }
+
+            if(stack.getItem() instanceof UnboundCompactMachineItem unboundItem) {
+                final var template = MachineItemUtil.getTemplateId(stack);
+                tile.tem
+            }
+        });
     }
 
     @Nullable
@@ -95,5 +114,18 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @SuppressWarnings("deprecation")
+    public void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean a) {
+        MinecraftServer server = level.getServer();
+        if (level.isClientSide || server == null) {
+            super.onRemove(oldState, level, pos, newState, a);
+            return;
+        }
+
+        MachineBlockUtil.cleanupTunnelsPostMachineRemove(level, pos);
+
+        super.onRemove(oldState, level, pos, newState, a);
     }
 }

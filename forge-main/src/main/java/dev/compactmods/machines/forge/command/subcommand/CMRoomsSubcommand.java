@@ -50,9 +50,13 @@ public class CMRoomsSubcommand {
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
 
         if (level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
-            be.roomInfo().ifPresent(room -> {
-                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, room.dimensions(), room.code());
-                ctx.getSource().sendSuccess(m, false);
+            be.connectedRoom().ifPresent(roomCode -> {
+                CompactRoomProvider.instance(ctx.getSource().getServer())
+                        .forRoom(roomCode)
+                        .ifPresent(roomInfo -> {
+                            final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, roomInfo.dimensions(), roomCode);
+                            ctx.getSource().sendSuccess(m, false);
+                        });
             });
         }
 
@@ -61,7 +65,6 @@ public class CMRoomsSubcommand {
 
     private static int findByContainingPlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var player = EntityArgument.getPlayer(ctx, "player");
-        final var server = ctx.getSource().getServer();
 
         final var playerChunk = player.chunkPosition();
         final var playerLevel = player.getLevel();
@@ -83,7 +86,7 @@ public class CMRoomsSubcommand {
 
         // TODO Localization
         final var owned = graph.findByOwner(owner.getUUID()).collect(Collectors.toSet());
-        if(owned.isEmpty()) {
+        if (owned.isEmpty()) {
             source.sendSuccess(Component.literal("No rooms found."), false);
         } else {
             owned.forEach(roomInfo -> source.sendSuccess(Component.literal("Room: " + roomInfo.code()), false));

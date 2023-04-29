@@ -3,15 +3,16 @@ package dev.compactmods.machines.forge.room.upgrade;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.mojang.serialization.Codec;
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.forge.upgrade.graph.RoomUpgradeConnection;
 import dev.compactmods.machines.forge.upgrade.graph.UpgradeConnectionEntry;
-import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.upgrade.RoomUpgrade;
-import dev.compactmods.machines.api.upgrade.RoomUpgradeInstance;
-import dev.compactmods.machines.graph.IGraphEdge;
-import dev.compactmods.machines.graph.IGraphNode;
+import dev.compactmods.machines.graph.GraphTraversalHelper;
+import dev.compactmods.machines.graph.edge.IGraphEdge;
+import dev.compactmods.machines.graph.node.IGraphNode;
 import dev.compactmods.machines.room.graph.node.RoomReferenceNode;
 import dev.compactmods.machines.room.upgrade.graph.RoomUpgradeGraphNode;
 import net.minecraft.nbt.CompoundTag;
@@ -31,13 +32,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage")
 public class RoomUpgradeManager extends SavedData {
 
     public static final String DATA_NAME = Constants.MOD_ID + "_upgrades";
 
     private final HashMap<ResourceLocation, RoomUpgradeGraphNode> upgradeNodes;
     private final HashMap<String, RoomReferenceNode> roomNodes;
-    private final MutableValueGraph<IGraphNode, IGraphEdge> graph;
+    private final MutableValueGraph<IGraphNode<?>, IGraphEdge<?>> graph;
 
     private static final Codec<List<UpgradeConnectionEntry>> UPGRADE_CONNECTIONS_CODEC = UpgradeConnectionEntry.CODEC.listOf();
 
@@ -128,18 +130,18 @@ public class RoomUpgradeManager extends SavedData {
 
     public <T extends RoomUpgrade> boolean removeUpgrade(T upgrade, String room) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
-        if(!upgRegistry.containsValue(upgrade)) return false;
+        if (!upgRegistry.containsValue(upgrade)) return false;
 
         final var upgId = upgRegistry.getKey(upgrade);
-        if(!upgradeNodes.containsKey(upgId))
+        if (!upgradeNodes.containsKey(upgId))
             return true;
 
-        if(!roomNodes.containsKey(room))
+        if (!roomNodes.containsKey(room))
             return true;
 
         final var uNode = upgradeNodes.get(upgId);
         final var rNode = roomNodes.get(room);
-        graph.removeEdge(rNode,  uNode);
+        graph.removeEdge(rNode, uNode);
         setDirty();
         return true;
     }
@@ -173,16 +175,14 @@ public class RoomUpgradeManager extends SavedData {
 
         // Build a set of matched upgrade instance nodes
         HashSet<RoomUpgradeInstance<T>> instances = new HashSet<>();
-        final var roomNodes = new HashSet<>();
         for (RoomUpgradeGraphNode upgNode : matchedUpgradeNodes) {
-            for (IGraphNode adjNode : graph.adjacentNodes(upgNode)) {
-                if (adjNode instanceof RoomReferenceNode roomNode) {
-                    graph.edgeValue(roomNode, upgNode).ifPresent(edv -> {
-                        if (edv instanceof RoomUpgradeConnection conn && inter.isInstance(conn.instance()))
-                            instances.add(new RoomUpgradeInstance<>(inter.cast(conn.instance()), roomNode.code()));
+            GraphTraversalHelper.predecessors(graph, upgNode, RoomReferenceNode.class)
+                    .forEach(roomNode -> {
+                        var edge = graph.edgeValue(roomNode, upgNode).orElseThrow();
+                        if (edge instanceof RoomUpgradeConnection<?> upgEdge) {
+                            instances.add(new RoomUpgradeInstance<>(inter.cast(upgEdge.instance()), roomNode.code()));
+                        }
                     });
-                }
-            }
         }
 
         // Stream the instances off the set built above
@@ -191,14 +191,14 @@ public class RoomUpgradeManager extends SavedData {
 
     public boolean hasUpgrade(String room, RoomUpgrade upgrade) {
         final var upgRegistry = MachineRoomUpgrades.REGISTRY.get();
-        if(!upgRegistry.containsValue(upgrade))
+        if (!upgRegistry.containsValue(upgrade))
             return false;
 
         final var upgId = upgRegistry.getKey(upgrade);
-        if(!upgradeNodes.containsKey(upgId))
+        if (!upgradeNodes.containsKey(upgId))
             return false;
 
-        if(!roomNodes.containsKey(room))
+        if (!roomNodes.containsKey(room))
             return false;
 
         final var upgNode = upgradeNodes.get(upgId);

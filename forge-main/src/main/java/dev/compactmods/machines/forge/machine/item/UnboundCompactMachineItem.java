@@ -2,10 +2,8 @@ package dev.compactmods.machines.forge.machine.item;
 
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineIds;
-import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.forge.machine.Machines;
-import dev.compactmods.machines.forge.room.RoomHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
@@ -25,15 +23,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Represents a machine item that has not been bound to a room yet,
  * but has an assigned template to use.
  */
 public class UnboundCompactMachineItem extends BlockItem implements ICompactMachineItem {
-
-    public static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
 
     public UnboundCompactMachineItem(Properties builder) {
         super(Machines.MACHINE_BLOCK.get(), builder);
@@ -42,7 +37,7 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
     @NotNull
     @Override
     public String getDescriptionId(ItemStack stack) {
-        return Util.makeDescriptionId("machine", getTemplateId(stack));
+        return Util.makeDescriptionId("machine", MachineItemUtil.getTemplateId(stack));
     }
 
     @Override
@@ -51,11 +46,11 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         boolean sneaking = Screen.hasShiftDown();
 
         if (sneaking) {
-            UnboundCompactMachineItem.getTemplate(stack).ifPresent(actualTemplate -> {
+            MachineItemUtil.getTemplate(stack).ifPresent(actualTemplate -> {
                 final var roomDimensions = actualTemplate.dimensions();
                 tooltip.add(Component.literal("Size: " + roomDimensions.toShortString()).withStyle(ChatFormatting.YELLOW));
 
-                final var templateId = getTemplateId(stack);
+                final var templateId = MachineItemUtil.getTemplateId(stack);
                 tooltip.add(Component.literal("Template: " + templateId).withStyle(ChatFormatting.DARK_GRAY));
 
                 if (!actualTemplate.prefillTemplate().equals(RoomTemplate.NO_TEMPLATE)) {
@@ -77,14 +72,14 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
 
     public static ItemStack unbound() {
         final var stack = new ItemStack(fromRegistry(), 1);
-        setTemplate(stack, RoomTemplate.NO_TEMPLATE);
+        MachineItemUtil.setTemplate(stack, RoomTemplate.NO_TEMPLATE);
         ICompactMachineItem.setColor(stack, 0xFFFFFFFF);
         return stack;
     }
 
     public static ItemStack forTemplate(ResourceLocation templateId, RoomTemplate template) {
         final var stack = new ItemStack(fromRegistry(), 1);
-        setTemplate(stack, templateId);
+        MachineItemUtil.setTemplate(stack, templateId);
         ICompactMachineItem.setColor(stack, template.color());
 
         MachineDataTagBuilder.empty()
@@ -93,33 +88,5 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
                 .writeToBlockData(stack);
 
         return stack;
-    }
-
-    private static ItemStack setTemplate(ItemStack stack, ResourceLocation templateId) {
-        var tag = stack.getOrCreateTag();
-        tag.putString(NBT_TEMPLATE_ID, templateId.toString());
-        return stack;
-    }
-
-    @NotNull
-    public static ResourceLocation getTemplateId(ItemStack stack) {
-        if (!stack.hasTag()) return RoomTemplate.NO_TEMPLATE;
-
-        final var tag = stack.getTag();
-        if (tag == null || tag.isEmpty() || !tag.contains(NBT_TEMPLATE_ID))
-            return RoomTemplate.NO_TEMPLATE;
-
-        return new ResourceLocation(tag.getString(NBT_TEMPLATE_ID));
-    }
-
-    @NotNull
-    public static Optional<RoomTemplate> getTemplate(ItemStack stack) {
-        var template = getTemplateId(stack);
-        if (!template.equals(RoomTemplate.NO_TEMPLATE)) {
-            final var actualTemplate = RoomHelper.getTemplates().get(template);
-            return Optional.ofNullable(actualTemplate);
-        }
-
-        return Optional.empty();
     }
 }

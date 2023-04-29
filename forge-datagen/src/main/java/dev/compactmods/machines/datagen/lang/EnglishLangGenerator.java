@@ -13,6 +13,7 @@ import dev.compactmods.machines.forge.shrinking.Shrinking;
 import dev.compactmods.machines.forgebuiltin.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.forgebuiltin.upgrade.BuiltInUpgrades;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -88,6 +89,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.Machines.OWNER, "Owner: %s");
         addTooltip(Tooltips.Machines.SIZE, "Internal Size: %1$sx%1$sx%1$s");
         addTooltip(Tooltips.Machines.BOUND_TO, "Bound to: %1$s");
+        addTooltip(new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"), "Bound Compact Machine");
 
         addTooltip(Tooltips.TUNNEL_TYPE, "Type ID: %1$s");
         addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");

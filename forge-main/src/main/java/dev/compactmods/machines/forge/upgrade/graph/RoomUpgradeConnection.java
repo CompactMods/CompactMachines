@@ -3,8 +3,8 @@ package dev.compactmods.machines.forge.upgrade.graph;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.upgrade.RoomUpgrade;
-import dev.compactmods.machines.graph.IGraphEdge;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
+import dev.compactmods.machines.graph.edge.IGraphEdge;
 import org.jetbrains.annotations.NotNull;
 
 public record RoomUpgradeConnection<T extends RoomUpgrade>(T instance) implements IGraphEdge<RoomUpgradeConnection<?>> {

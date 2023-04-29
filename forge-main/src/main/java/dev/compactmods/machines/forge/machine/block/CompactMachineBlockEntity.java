@@ -1,20 +1,17 @@
 package dev.compactmods.machines.forge.machine.block;
 
+import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.api.room.Rooms;
-import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
-import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.forge.tunnel.graph.traversal.ForgeTunnelTypeFilters;
-import dev.compactmods.machines.machine.BasicRoomInfo;
-import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
@@ -24,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -35,7 +33,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,12 +57,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
     private boolean hasCustomColor = false;
     private int customColor;
     private int roomColor;
-
-    private WeakReference<CompactMachineNode> graphNode;
-    private WeakReference<IRoomRegistration> fullRoomInfo;
-
-    @Nullable
-    private IBasicRoomInfo basicInfo;
 
     public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Machines.MACHINE_TILE_ENTITY.get(), pos, state);
@@ -142,7 +133,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
             roomTemplateId = new ResourceLocation(nbt.getString(NBT_TEMPLATE_ID));
         }
 
-        if(level != null && !level.isClientSide )
+        if (level != null && !level.isClientSide)
             this.level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
@@ -167,10 +158,10 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
     public CompoundTag getUpdateTag() {
         CompoundTag data = super.getUpdateTag();
 
-        roomInfo().ifPresent(room -> {
+        if(this.roomCode != null) {
             // data.putString(ROOM_POS_NBT, room);
             data.putString(NBT_ROOM_CODE, roomCode);
-        });
+        }
 
         if (level instanceof ServerLevel) {
             // TODO - Internal player list
@@ -196,7 +187,7 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
             final var graph = DimensionMachineGraph.forDimension(sl);
 
-            var chunk = graph.getConnectedRoom(worldPosition);
+            var chunk = graph.connectedRoom(worldPosition);
             chunk.ifPresent(c -> this.roomCode = c);
             return chunk;
         }
@@ -231,8 +222,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
         if (tag.contains(NBT_TEMPLATE_ID))
             roomTemplateId = new ResourceLocation(tag.getString(NBT_TEMPLATE_ID));
-
-        this.basicInfo = new BasicRoomInfo(this.roomCode, this.getColor());
     }
 
     public Optional<UUID> getOwnerUUID() {
@@ -260,31 +249,21 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
             try {
                 final var compactDim = CompactDimension.forServer(sl.getServer());
 
-                graph.getMachineNode(worldPosition).ifPresent(node -> {
-                    this.graphNode = new WeakReference<>(node);
-                });
-
                 if (this.roomCode != null) {
                     final var lookup = CompactRoomProvider.instance(compactDim);
                     lookup.forRoom(roomCode).ifPresent(roomInfo -> {
-                        this.basicInfo = new BasicRoomInfo(this.roomCode, this.getColor());
-                        this.fullRoomInfo = new WeakReference<>(roomInfo);
                         this.roomColor = roomInfo.color();
                     });
                 } else {
-                    graph.getConnectedRoom(worldPosition).ifPresentOrElse(room -> {
-                        CompactMachines.LOGGER.debug("No room code found for {}/{}, but machine connection graph has value {}; connecting to that room...",
-                                level.dimension().location(), worldPosition.toShortString(), room);
+                    graph.connectedRoom(worldPosition).ifPresent(roomCode -> {
+                        LoggingUtil.modLog().debug("No room code found for {}/{}, but machine connection graph has value {}; connecting to that room...",
+                                level.dimension().location(), worldPosition.toShortString(), roomCode);
 
-                        this.roomCode = room;
+                        this.roomCode = roomCode;
                         final var lookup = CompactRoomProvider.instance(compactDim);
-                        lookup.forRoom(roomCode).ifPresent(roomInfo -> {
-                            this.basicInfo = new BasicRoomInfo(this.roomCode, this.getColor());
-                            this.fullRoomInfo = new WeakReference<>(roomInfo);
+                        lookup.forRoom(this.roomCode).ifPresent(roomInfo -> {
                             this.roomColor = roomInfo.color();
                         });
-                    }, () -> {
-                        this.basicInfo = null;
                     });
                 }
 
@@ -295,11 +274,15 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
         }
     }
 
-    public void setConnectedRoom(IRoomRegistration room) {
+    public void setConnectedRoom(String roomCode) {
         if (level instanceof ServerLevel sl) {
             final var dimMachines = DimensionMachineGraph.forDimension(sl);
-            dimMachines.connectMachineToRoom(worldPosition, room.code());
-            this.roomCode = room.code();
+            if (this.roomCode != null) {
+                dimMachines.unregisterMachine(worldPosition);
+            }
+
+            dimMachines.register(worldPosition, roomCode);
+            this.roomCode = roomCode;
             syncConnectedRoom();
         }
     }
@@ -307,10 +290,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
     public void disconnect() {
         if (level instanceof ServerLevel sl) {
             final var dimMachines = DimensionMachineGraph.forDimension(sl);
-            dimMachines.disconnect(worldPosition);
+            dimMachines.unregisterMachine(worldPosition);
 
             this.roomCode = null;
-            this.graphNode.clear();
             setChanged();
         }
     }
@@ -331,26 +313,23 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
         return Optional.empty();
     }
 
-    public Optional<IRoomRegistration> roomInfo() {
-        if (level != null && level.isClientSide) {
-            if (roomCode == null) return Optional.empty();
-            return Optional.empty();
-        } else {
-            if (fullRoomInfo == null)
-                return Optional.empty();
-
-            return Optional.ofNullable(fullRoomInfo.get());
-        }
-    }
-
     public int getColor() {
         return hasCustomColor ? customColor : roomColor;
     }
 
+    public void setColor(int color) {
+        this.customColor = color;
+        this.hasCustomColor = true;
+    }
+
+    public ResourceKey<RoomTemplate> templateId() {
+        return ResourceKey.create(CMRegistryKeys.ROOM_TEMPLATES, roomTemplateId);
+    }
+    
     public Optional<RoomTemplate> getRoomTemplate() {
         if (level != null) {
             return level.registryAccess()
-                    .registry(Rooms.TEMPLATE_REG_KEY)
+                    .registry(CMRegistryKeys.ROOM_TEMPLATES)
                     .map(reg -> reg.get(roomTemplateId));
         }
 
@@ -359,12 +338,5 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
     public Optional<String> connectedRoom() {
         return Optional.ofNullable(roomCode);
-    }
-
-    public Optional<IBasicRoomInfo> basicRoomInfo() {
-        if (this.roomCode != null)
-            return Optional.of(this.basicInfo);
-
-        return Optional.empty();
     }
 }

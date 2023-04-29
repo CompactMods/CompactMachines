@@ -1,6 +1,7 @@
 package dev.compactmods.machines.forge.compat.jei;
 
 import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.machine.item.MachineItemUtil;
 import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.api.core.Constants;
@@ -48,6 +49,6 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
     public void registerItemSubtypes(ISubtypeRegistration registration) {
         registration.useNbtForSubtypes(Tunnels.ITEM_TUNNEL.get());
         registration.registerSubtypeInterpreter(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(),
-                (ingredient, context) -> UnboundCompactMachineItem.getTemplateId(ingredient).toString());
+                (ingredient, context) -> MachineItemUtil.getTemplateId(ingredient).toString());
     }
 }

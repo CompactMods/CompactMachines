@@ -12,17 +12,23 @@ import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.forge.room.RoomHelper;
+import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
+import dev.compactmods.machines.room.BasicRoomInfo;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
@@ -32,13 +38,37 @@ import java.util.UUID;
 @SuppressWarnings("removal")
 public class MachineBlockUtil {
 
+    static void cleanupTunnelsPostMachineRemove(Level level, BlockPos pos) {
+        if (level instanceof ServerLevel sl) {
+            final var serv = sl.getServer();
+            final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
+
+            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
+                entity.connectedRoom().ifPresent(roomCode -> {
+                    final var dimGraph = DimensionMachineGraph.forDimension(sl);
+                    dimGraph.unregisterMachine(pos);
+
+                    if (compactDim == null)
+                        return;
+
+                    final var tunnels = TunnelConnectionGraph.forRoom(compactDim, roomCode);
+                    tunnels.positions(TunnelMachineFilters.all(entity.getLevelPosition()))
+                            .forEach(pos1 -> {
+                                tunnels.unregister(pos1);
+                                compactDim.setBlock(pos1, Walls.BLOCK_SOLID_WALL.get().defaultBlockState(), Block.UPDATE_ALL);
+                            });
+                });
+            }
+        }
+    }
+
     @Nonnull
     static InteractionResult tryRoomTeleport(Level level, BlockPos pos, ServerPlayer player, MinecraftServer server) {
         // Try teleport to compact machine dimension
         if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
-            tile.roomInfo().ifPresentOrElse(room -> {
+            tile.connectedRoom().ifPresentOrElse(roomCode -> {
                 try {
-                    RoomHelper.teleportPlayerIntoMachine(level, player, tile.getLevelPosition(), room);
+                    RoomHelper.teleportPlayerIntoMachine(level, player, tile.getLevelPosition(), roomCode);
                 } catch (MissingDimensionException e) {
                     e.printStackTrace();
                 }
@@ -85,7 +115,7 @@ public class MachineBlockUtil {
                 CompactStructureGenerator.fillWithTemplate(compactDim, template.prefillTemplate(), template.dimensions(), newRoom.center());
             }
 
-            machine.setConnectedRoom(newRoom);
+            machine.setConnectedRoom(newRoom.code());
 
             RoomHelper.teleportPlayerIntoRoom(server, owner, newRoom, machine.getLevelPosition());
         } catch (MissingDimensionException | NonexistentRoomException e) {
@@ -136,9 +166,10 @@ public class MachineBlockUtil {
         if(!state.is(CMTags.MACHINE_BLOCK) || !(world.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile))
             return UnboundCompactMachineItem.unbound();
 
-        return tile.basicRoomInfo()
-                .map(BoundCompactMachineItem::createForRoom)
-                .orElse(UnboundCompactMachineItem.unbound());
+        return tile.connectedRoom().map(roomCode -> {
+            final var roomInfo = new BasicRoomInfo(roomCode, tile.getColor());
+            return BoundCompactMachineItem.createForRoom(roomInfo);
+        }).orElse(UnboundCompactMachineItem.unbound());
     }
 
 }

@@ -6,7 +6,6 @@ import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,13 +30,14 @@ public class CMSummarySubcommand {
 
             final var ls = LongStream.builder();
             serv.getAllLevels().forEach(sl -> {
-                final var machineData = DimensionMachineGraph.forDimension(sl);
-                long numRegistered = machineData.getMachines().count();
-
-                if(numRegistered > 0) {
-                    src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().location().toString(), numRegistered), false);
-                    ls.add(numRegistered);
-                }
+                // TODO - Reimplement
+//                final var machineData = DimensionMachineGraph.forDimension(sl);
+//                long numRegistered = machineData.machineCount();
+//
+//                if(numRegistered > 0) {
+//                    src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_REG_DIM, sl.dimension().location().toString(), numRegistered), false);
+//                    ls.add(numRegistered);
+//                }
             });
 
             long grandTotal = ls.build().sum();

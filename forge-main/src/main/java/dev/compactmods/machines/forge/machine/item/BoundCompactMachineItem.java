@@ -1,18 +1,22 @@
 package dev.compactmods.machines.forge.machine.item;
 
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.registration.IBasicRoomInfo;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import net.minecraft.Util;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -22,8 +26,26 @@ public class BoundCompactMachineItem extends BlockItem implements ICompactMachin
     public static final String ROOM_NBT = "room_pos";
     public static final String ROOM_DIMENSIONS_NBT = "room_dimensions";
 
+    private static final String FALLBACK_ID = Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"));
+
     public BoundCompactMachineItem(Properties builder) {
         super(Machines.MACHINE_BLOCK.get(), builder);
+    }
+
+    public static Component name(ItemStack stack) {
+        return MachineItemUtil.getMachineName(stack)
+                .map(Component::literal)
+                .orElse(Component.translatable(FALLBACK_ID));
+    }
+    @Override
+    public Component getName(ItemStack stack) {
+        return name(stack);
+    }
+
+    @NotNull
+    @Override
+    public String getDescriptionId(ItemStack stack) {
+        return FALLBACK_ID;
     }
 
     @Deprecated(forRemoval = true, since = "5.2.0")

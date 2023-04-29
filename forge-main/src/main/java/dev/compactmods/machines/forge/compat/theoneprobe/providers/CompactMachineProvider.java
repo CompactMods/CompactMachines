@@ -4,13 +4,12 @@ import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.forge.compat.theoneprobe.elements.PlayerFaceElement;
 import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.forge.tunnel.TunnelItem;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.util.PlayerUtil;
 import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -51,27 +50,26 @@ public class CompactMachineProvider implements IProbeInfoProvider {
             return;
 
         if (level.getBlockEntity(hitData.getPos()) instanceof CompactMachineBlockEntity machine) {
-            machine.roomInfo().ifPresentOrElse(room -> {
-                final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, room.code());
+            machine.connectedRoom().ifPresentOrElse(roomCode -> {
+                final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, roomCode);
                 info.text(boundTo);
 
                 final var roomGraph = CompactRoomProvider.instance(compactDim);
-                final var owner = room.owner(roomGraph);
-                if (owner != null) {
-                    PlayerUtil.getProfileByUUID(server, owner).ifPresent(p -> {
-                        MutableComponent ownerText = TranslationUtil
-                                .tooltip(Tooltips.Machines.OWNER, p.getName())
-                                .withStyle(ChatFormatting.GRAY);
+                roomGraph.getRoomOwner(roomCode)
+                        .flatMap(owner -> PlayerUtil.getProfileByUUID(server, owner))
+                        .ifPresent(p -> {
+                            MutableComponent ownerText = TranslationUtil
+                                    .tooltip(Tooltips.Machines.OWNER, p.getName())
+                                    .withStyle(ChatFormatting.GRAY);
 
-                        info.horizontal(new LayoutStyle()
-                                        .alignment(ElementAlignment.ALIGN_CENTER)
-                                        .padding(0).spacing(0))
-                                .element(new PlayerFaceElement(p))
-                                .text(ownerText);
-                    });
-                }
+                            info.horizontal(new LayoutStyle()
+                                            .alignment(ElementAlignment.ALIGN_CENTER)
+                                            .padding(0).spacing(0))
+                                    .element(new PlayerFaceElement(p))
+                                    .text(ownerText);
+                        });
 
-                addTunnelInfo(probeMode, info, hitData, compactDim, machine, room);
+                addTunnelInfo(probeMode, info, hitData, compactDim, machine, roomCode);
             }, () -> {
                 MutableComponent newMachine = TranslationUtil
                         .message(new ResourceLocation(Constants.MOD_ID, "new_machine"))
@@ -82,29 +80,27 @@ public class CompactMachineProvider implements IProbeInfoProvider {
         }
     }
 
-    private static void addTunnelInfo(ProbeMode probeMode, IProbeInfo info, IProbeHitData hitData, ServerLevel compactDim, CompactMachineBlockEntity machine, IRoomRegistration room) {
+    private static void addTunnelInfo(ProbeMode probeMode, IProbeInfo info, IProbeHitData hitData, ServerLevel compactDim, CompactMachineBlockEntity machine, String roomCode) {
         if (compactDim == null)
             return;
 
-        final var graph = TunnelConnectionGraph.forRoom(compactDim, room.code());
+        final var graph = TunnelConnectionGraph.forRoom(compactDim, roomCode);
 
         final var applied = graph.types(machine.getLevelPosition(), hitData.getSideHit())
                 .collect(Collectors.toSet());
 
         switch (probeMode) {
-            case NORMAL:
+            case NORMAL -> {
                 final var group = info.horizontal(new LayoutStyle()
                         .alignment(ElementAlignment.ALIGN_TOPLEFT)
                         .padding(0)
                         .spacing(0));
-
                 applied.forEach(tn -> {
                     ItemStack item = TunnelItem.createStack(tn);
                     group.item(item, new ItemStyle().bounds(8, 8));
                 });
-                break;
-
-            case EXTENDED:
+            }
+            case EXTENDED -> {
                 final var tgg = info.vertical(new LayoutStyle().alignment(ElementAlignment.ALIGN_TOPLEFT));
                 applied.forEach(tn -> {
                     final var tg = tgg.horizontal(new LayoutStyle()
@@ -116,7 +112,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
                     tg.item(item, new ItemStyle().bounds(8, 8));
                     tg.itemLabel(item);
                 });
-                break;
+            }
         }
     }
 }
