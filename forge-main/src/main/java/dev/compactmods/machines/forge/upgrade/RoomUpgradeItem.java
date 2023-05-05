@@ -21,17 +21,17 @@ public class RoomUpgradeItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> info, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltips, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            info.add(TranslationUtil.tooltip(Tooltips.TUTORIAL_APPLY_ROOM_UPGRADE).withStyle(ChatFormatting.ITALIC));
+            tooltips.add(TranslationUtil.tooltip(Tooltips.TUTORIAL_APPLY_ROOM_UPGRADE).withStyle(ChatFormatting.ITALIC));
         } else {
-            info.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT).withStyle(ChatFormatting.DARK_GRAY));
+            tooltips.add(TranslationUtil.tooltip(Tooltips.HINT_HOLD_SHIFT).withStyle(ChatFormatting.DARK_GRAY));
         }
 
         // Show upgrade type while sneaking, or if advanced tooltips are on
         if (Screen.hasShiftDown() || flag.isAdvanced()) {
             RoomUpgradeHelper.getUpgradeId(stack).ifPresent(upgType -> {
-                info.add(TranslationUtil.tooltip(Tooltips.ROOM_UPGRADE_TYPE, upgType).withStyle(ChatFormatting.DARK_GRAY));
+                tooltips.add(TranslationUtil.tooltip(Tooltips.ROOM_UPGRADE_TYPE, upgType).withStyle(ChatFormatting.DARK_GRAY));
             });
         }
     }

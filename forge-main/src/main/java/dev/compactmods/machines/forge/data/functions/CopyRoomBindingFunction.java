@@ -3,7 +3,7 @@ package dev.compactmods.machines.forge.data.functions;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
@@ -29,7 +29,7 @@ public class CopyRoomBindingFunction extends LootItemConditionalFunction {
         var state = ctx.getParam(LootContextParams.BLOCK_STATE);
         if(state.is(CMTags.MACHINE_BLOCK)) {
             var data = ctx.getParam(LootContextParams.BLOCK_ENTITY);
-            if (data instanceof CompactMachineBlockEntity machine) {
+            if (data instanceof BoundCompactMachineBlockEntity machine) {
                 machine.connectedRoom().ifPresent(roomCode -> {
                     ICompactMachineItem.setColor(stack, machine.getColor());
                     BoundCompactMachineItem.setRoom(stack, roomCode);

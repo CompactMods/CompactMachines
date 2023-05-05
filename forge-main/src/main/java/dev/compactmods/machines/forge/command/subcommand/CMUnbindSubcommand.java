@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.config.ServerConfig;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.dimension.CompactDimension;
@@ -38,7 +38,7 @@ public class CMUnbindSubcommand {
 
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
 
-        if (!(level.getBlockEntity(rebindingMachine) instanceof CompactMachineBlockEntity machine)) {
+        if (!(level.getBlockEntity(rebindingMachine) instanceof BoundCompactMachineBlockEntity machine)) {
             CompactMachines.LOGGER.error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
         }

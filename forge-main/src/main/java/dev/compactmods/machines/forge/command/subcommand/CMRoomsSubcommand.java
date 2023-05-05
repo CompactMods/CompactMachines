@@ -3,7 +3,7 @@ package dev.compactmods.machines.forge.command.subcommand;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.api.core.CMCommands;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
@@ -49,7 +49,7 @@ public class CMRoomsSubcommand {
         if (!level.getBlockState(block).is(MachineTags.BLOCK))
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.NOT_A_MACHINE_BLOCK));
 
-        if (level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
+        if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
             be.connectedRoom().ifPresent(roomCode -> {
                 CompactRoomProvider.instance(ctx.getSource().getServer())
                         .forRoom(roomCode)

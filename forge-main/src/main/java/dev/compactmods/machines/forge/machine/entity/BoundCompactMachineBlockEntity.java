@@ -1,13 +1,10 @@
-package dev.compactmods.machines.forge.machine.block;
+package dev.compactmods.machines.forge.machine.entity;
 
-import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.api.core.CMRegistryKeys;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
-import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
@@ -16,15 +13,12 @@ import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
-import dev.compactmods.machines.util.NbtUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,31 +30,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
-
-    /**
-     * @deprecated Store a room code instead or use room lookup utils
-     */
-    @Deprecated(forRemoval = true, since = "5.2.0")
-    public static final String NBT_ROOM_POS = "room_pos";
-    private static final String NBT_ROOM_CODE = MachineEntityNbt.NBT_ROOM_CODE;
-    private static final String NBT_CUSTOM_COLOR = MachineEntityNbt.NBT_CUSTOM_COLOR;
-    private static final String NBT_TEMPLATE_ID = MachineEntityNbt.NBT_TEMPLATE_ID;
-    private static final String NBT_ROOM_COLOR = MachineEntityNbt.NBT_ROOM_COLOR;
-
-    @Nullable
-    private ResourceLocation roomTemplateId = null;
+@SuppressWarnings("removal")
+public class BoundCompactMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
 
     protected UUID owner;
     private String roomCode;
 
-    private boolean hasCustomColor = false;
-    private int customColor;
+    private boolean hasMachineColorOverride = false;
+    private int machineColor;
     private int roomColor;
 
-    public CompactMachineBlockEntity(BlockPos pos, BlockState state) {
-        super(Machines.MACHINE_TILE_ENTITY.get(), pos, state);
-        this.roomTemplateId = RoomTemplate.NO_TEMPLATE;
+    @Nullable
+    private Component customName;
+
+    public BoundCompactMachineBlockEntity(BlockPos pos, BlockState state) {
+        super(Machines.MACHINE_ENTITY.get(), pos, state);
     }
 
     @NotNull
@@ -98,24 +82,11 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-        this.syncConnectedRoom();
-    }
-
-    @Override
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
 
-        if (nbt.contains(NBT_ROOM_POS)) {
-            final var originalRoomPos = NbtUtil.readChunkPos(nbt.get(NBT_ROOM_POS));
-            CompactMachines.LOGGER.debug("Machine block has a chunk position specified, it will be rewritten to the new room code system." +
-                    "The block at {} was originally connected to position {}", worldPosition, originalRoomPos);
-        }
-
-        if (nbt.contains(NBT_ROOM_CODE)) {
-            this.hasCustomColor = true;
-            this.roomCode = nbt.getString(NBT_ROOM_CODE);
+        if (nbt.contains(MachineEntityNbt.NBT_ROOM_CODE)) {
+            this.roomCode = nbt.getString(MachineEntityNbt.NBT_ROOM_CODE);
         }
 
         if (nbt.contains(MachineNbt.OWNER)) {
@@ -124,13 +95,9 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
             owner = null;
         }
 
-        if (nbt.contains(NBT_CUSTOM_COLOR)) {
-            customColor = nbt.getInt(NBT_CUSTOM_COLOR);
-            hasCustomColor = true;
-        }
-
-        if (nbt.contains(NBT_TEMPLATE_ID)) {
-            roomTemplateId = new ResourceLocation(nbt.getString(NBT_TEMPLATE_ID));
+        if (nbt.contains(MachineEntityNbt.NBT_CUSTOM_COLOR)) {
+            machineColor = nbt.getInt(MachineNbt.NBT_COLOR);
+            hasMachineColorOverride = true;
         }
 
         if (level != null && !level.isClientSide)
@@ -143,24 +110,21 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
             nbt.putUUID(MachineNbt.OWNER, this.owner);
         }
 
-        if (hasCustomColor) {
-            nbt.putInt(NBT_CUSTOM_COLOR, customColor);
+        if (hasMachineColorOverride) {
+            nbt.putInt(MachineEntityNbt.NBT_CUSTOM_COLOR, machineColor);
         }
 
         if (roomCode != null)
-            nbt.putString(NBT_ROOM_CODE, roomCode);
-
-        if (roomTemplateId != null)
-            nbt.putString(NBT_TEMPLATE_ID, roomTemplateId.toString());
+            nbt.putString(MachineEntityNbt.NBT_ROOM_CODE, roomCode);
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag data = super.getUpdateTag();
 
-        if(this.roomCode != null) {
+        if (this.roomCode != null) {
             // data.putString(ROOM_POS_NBT, room);
-            data.putString(NBT_ROOM_CODE, roomCode);
+            data.putString(MachineEntityNbt.NBT_ROOM_CODE, roomCode);
         }
 
         if (level instanceof ServerLevel) {
@@ -169,13 +133,10 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
                 data.putUUID("owner", this.owner);
         }
 
-        if (hasCustomColor)
-            data.putInt(NBT_CUSTOM_COLOR, customColor);
+        if (hasMachineColorOverride)
+            data.putInt(MachineEntityNbt.NBT_CUSTOM_COLOR, machineColor);
         else
-            data.putInt(NBT_ROOM_COLOR, getColor());
-
-        if (!this.roomTemplateId.equals(RoomTemplate.NO_TEMPLATE))
-            data.putString(NBT_TEMPLATE_ID, this.roomTemplateId.toString());
+            data.putInt(MachineEntityNbt.NBT_ROOM_COLOR, getColor());
 
         return data;
     }
@@ -205,23 +166,21 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
         }
 
-        if (tag.contains(NBT_ROOM_POS)) {
-            int[] room = tag.getIntArray(NBT_ROOM_POS);
-            final var oldChunk = new ChunkPos(room[0], room[1]);
+        if (tag.contains(MachineEntityNbt.NBT_ROOM_CODE)) {
+            this.roomCode = tag.getString(MachineEntityNbt.NBT_ROOM_CODE);
         }
 
-        if (tag.contains(NBT_CUSTOM_COLOR)) {
-            hasCustomColor = true;
-            customColor = tag.getInt(NBT_CUSTOM_COLOR);
-        } else {
-            roomColor = tag.getInt(NBT_ROOM_COLOR);
+        if (tag.contains(MachineEntityNbt.NBT_CUSTOM_COLOR)) {
+            hasMachineColorOverride = true;
+            machineColor = tag.getInt(MachineNbt.NBT_COLOR);
+        }
+
+        if (tag.contains(MachineEntityNbt.NBT_ROOM_COLOR)) {
+            roomColor = tag.getInt(MachineEntityNbt.NBT_ROOM_COLOR);
         }
 
         if (tag.contains("owner"))
             owner = tag.getUUID("owner");
-
-        if (tag.contains(NBT_TEMPLATE_ID))
-            roomTemplateId = new ResourceLocation(tag.getString(NBT_TEMPLATE_ID));
     }
 
     public Optional<UUID> getOwnerUUID() {
@@ -241,39 +200,6 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
         return GlobalPos.of(level.dimension(), worldPosition);
     }
 
-    public void syncConnectedRoom() {
-        if (this.level == null || this.level.isClientSide) return;
-
-        if (level instanceof ServerLevel sl) {
-            final var graph = DimensionMachineGraph.forDimension(sl);
-            try {
-                final var compactDim = CompactDimension.forServer(sl.getServer());
-
-                if (this.roomCode != null) {
-                    final var lookup = CompactRoomProvider.instance(compactDim);
-                    lookup.forRoom(roomCode).ifPresent(roomInfo -> {
-                        this.roomColor = roomInfo.color();
-                    });
-                } else {
-                    graph.connectedRoom(worldPosition).ifPresent(roomCode -> {
-                        LoggingUtil.modLog().debug("No room code found for {}/{}, but machine connection graph has value {}; connecting to that room...",
-                                level.dimension().location(), worldPosition.toShortString(), roomCode);
-
-                        this.roomCode = roomCode;
-                        final var lookup = CompactRoomProvider.instance(compactDim);
-                        lookup.forRoom(this.roomCode).ifPresent(roomInfo -> {
-                            this.roomColor = roomInfo.color();
-                        });
-                    });
-                }
-
-                this.setChanged();
-            } catch (MissingDimensionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     public void setConnectedRoom(String roomCode) {
         if (level instanceof ServerLevel sl) {
             final var dimMachines = DimensionMachineGraph.forDimension(sl);
@@ -283,7 +209,12 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
 
             dimMachines.register(worldPosition, roomCode);
             this.roomCode = roomCode;
-            syncConnectedRoom();
+
+            CompactRoomProvider.instance(sl.getServer()).forRoom(roomCode).ifPresent(roomInfo -> {
+                this.roomColor = roomInfo.color();
+            });
+
+            this.setChanged();
         }
     }
 
@@ -314,29 +245,24 @@ public class CompactMachineBlockEntity extends BlockEntity implements IMachineBl
     }
 
     public int getColor() {
-        return hasCustomColor ? customColor : roomColor;
+        return hasMachineColorOverride ? machineColor : roomColor;
     }
 
     public void setColor(int color) {
-        this.customColor = color;
-        this.hasCustomColor = true;
-    }
-
-    public ResourceKey<RoomTemplate> templateId() {
-        return ResourceKey.create(CMRegistryKeys.ROOM_TEMPLATES, roomTemplateId);
-    }
-    
-    public Optional<RoomTemplate> getRoomTemplate() {
-        if (level != null) {
-            return level.registryAccess()
-                    .registry(CMRegistryKeys.ROOM_TEMPLATES)
-                    .map(reg -> reg.get(roomTemplateId));
-        }
-
-        return Optional.empty();
+        this.machineColor = color;
+        this.hasMachineColorOverride = true;
     }
 
     public Optional<String> connectedRoom() {
         return Optional.ofNullable(roomCode);
+    }
+
+    public Optional<Component> getCustomName() {
+        return Optional.ofNullable(customName);
+    }
+
+    public void setCustomName(Component customName) {
+        this.customName = customName;
+        this.setChanged();
     }
 }

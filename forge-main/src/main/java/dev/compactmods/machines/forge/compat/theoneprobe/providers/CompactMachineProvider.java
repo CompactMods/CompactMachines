@@ -5,7 +5,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.forge.compat.theoneprobe.elements.PlayerFaceElement;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.tunnel.TunnelItem;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
@@ -49,7 +49,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
         if (compactDim == null)
             return;
 
-        if (level.getBlockEntity(hitData.getPos()) instanceof CompactMachineBlockEntity machine) {
+        if (level.getBlockEntity(hitData.getPos()) instanceof BoundCompactMachineBlockEntity machine) {
             machine.connectedRoom().ifPresentOrElse(roomCode -> {
                 final var boundTo = TranslationUtil.tooltip(Tooltips.Machines.BOUND_TO, roomCode);
                 info.text(boundTo);
@@ -80,7 +80,7 @@ public class CompactMachineProvider implements IProbeInfoProvider {
         }
     }
 
-    private static void addTunnelInfo(ProbeMode probeMode, IProbeInfo info, IProbeHitData hitData, ServerLevel compactDim, CompactMachineBlockEntity machine, String roomCode) {
+    private static void addTunnelInfo(ProbeMode probeMode, IProbeInfo info, IProbeHitData hitData, ServerLevel compactDim, BoundCompactMachineBlockEntity machine, String roomCode) {
         if (compactDim == null)
             return;
 

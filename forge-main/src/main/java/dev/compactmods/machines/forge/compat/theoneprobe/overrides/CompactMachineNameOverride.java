@@ -1,7 +1,7 @@
 package dev.compactmods.machines.forge.compat.theoneprobe.overrides;
 
 import dev.compactmods.machines.api.core.CMTags;
-import dev.compactmods.machines.forge.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.forge.room.Rooms;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
@@ -23,7 +23,7 @@ public class CompactMachineNameOverride implements IBlockDisplayOverride {
     @Override
     public boolean overrideStandardInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level level, BlockState blockState, IProbeHitData hitData) {
         if(blockState.is(CMTags.MACHINE_BLOCK)) {
-            if (level.getBlockEntity(hitData.getPos()) instanceof CompactMachineBlockEntity mach) {
+            if (level.getBlockEntity(hitData.getPos()) instanceof BoundCompactMachineBlockEntity mach) {
                 final var cr = mach.connectedRoom();
                 if(cr.isEmpty())
                     return false;

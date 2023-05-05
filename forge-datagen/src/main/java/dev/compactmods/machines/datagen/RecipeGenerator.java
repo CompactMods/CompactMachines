@@ -2,12 +2,14 @@ package dev.compactmods.machines.datagen;
 
 import com.google.gson.JsonObject;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.api.machine.MachineEntityNbt;
+import dev.compactmods.machines.api.machine.MachineIds;
+import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.recipe.ShapedWithNbtRecipeBuilder;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.tunnels.recipe.TunnelRecipeBuilder;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.forge.machine.Machines;
-import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.forge.shrinking.Shrinking;
 import dev.compactmods.machines.forgebuiltin.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.forge.wall.Walls;
@@ -116,9 +118,13 @@ public class RecipeGenerator extends RecipeProvider {
         recipe.unlockedBy("has_recipe", has(wall));
         recipe.addWriter(r -> {
             final var nbt = new JsonObject();
-            MachineDataTagBuilder.forTemplate(temId, tem)
-                    .writeToItemJson(nbt)
-                    .writeToBlockDataJson(nbt);
+            nbt.addProperty(MachineNbt.NBT_TEMPLATE_ID, temId.toString());
+
+            final var blockTag = new JsonObject();
+            blockTag.addProperty("id", MachineIds.UNBOUND_MACHINE_ITEM_ID.toString());
+            blockTag.addProperty(MachineEntityNbt.NBT_TEMPLATE_ID, temId.toString());
+
+            nbt.add("BlockEntityTag", blockTag);
             r.add("nbt", nbt);
         });
 

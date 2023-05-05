@@ -7,6 +7,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.IPlayerRoomMetadataProvider;
 import dev.compactmods.machines.api.room.IRoomHistory;
 import dev.compactmods.machines.command.Commands;
+import dev.compactmods.machines.forge.client.ClientConfig;
 import dev.compactmods.machines.forge.config.CommonConfig;
 import dev.compactmods.machines.forge.config.ServerConfig;
 import dev.compactmods.machines.forge.data.functions.LootFunctions;
@@ -63,6 +64,7 @@ public class CompactMachines implements ICompactMachinesMod {
 
         // Configuration
         ModLoadingContext mlCtx = ModLoadingContext.get();
+        mlCtx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
         mlCtx.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
 

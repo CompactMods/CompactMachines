@@ -1,11 +1,11 @@
 package dev.compactmods.machines.forge.machine.item;
 
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineIds;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.machine.data.MachineDataTagBuilder;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -31,7 +31,7 @@ import java.util.List;
 public class UnboundCompactMachineItem extends BlockItem implements ICompactMachineItem {
 
     public UnboundCompactMachineItem(Properties builder) {
-        super(Machines.MACHINE_BLOCK.get(), builder);
+        super(Machines.UNBOUND_MACHINE_BLOCK.get(), builder);
     }
 
     @NotNull
@@ -82,11 +82,8 @@ public class UnboundCompactMachineItem extends BlockItem implements ICompactMach
         MachineItemUtil.setTemplate(stack, templateId);
         ICompactMachineItem.setColor(stack, template.color());
 
-        MachineDataTagBuilder.empty()
-                .template(templateId)
-                .color(template.color())
-                .writeToBlockData(stack);
-
+        final var tag = stack.getOrCreateTag();
+        tag.putString(MachineEntityNbt.NBT_TEMPLATE_ID, templateId.toString());
         return stack;
     }
 }

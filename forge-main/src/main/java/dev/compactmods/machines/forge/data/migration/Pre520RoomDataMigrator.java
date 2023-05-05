@@ -2,15 +2,15 @@ package dev.compactmods.machines.forge.data.migration;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.compactmods.machines.forge.machine.block.LegacySizedCompactMachineBlock;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.codec.CodecExtensions;
+import dev.compactmods.machines.forge.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.room.RoomCodeGenerator;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.util.DimensionUtil;
 import dev.compactmods.machines.util.SavedDataHelper;
 import net.minecraft.core.BlockPos;
@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -62,6 +63,16 @@ public class Pre520RoomDataMigrator {
         public static RoomDataPre520 of(CompoundTag data) {
             return CODEC.parse(NbtOps.INSTANCE, data).getOrThrow(false, UPDATER_LOGGER::error);
         }
+    }
+
+    public record MachineRoomConnection(ChunkPos room, List<BlockPos> machines) {
+        public static final Codec<MachineRoomConnection> CODEC = RecordCodecBuilder.create(i -> i.group(
+                CodecExtensions.CHUNKPOS.fieldOf("room")
+                        .forGetter(MachineRoomConnection::room),
+
+                BlockPos.CODEC.listOf().fieldOf("machines")
+                        .forGetter(MachineRoomConnection::machines)
+        ).apply(i, MachineRoomConnection::new));
     }
 
     public record RoomDataLoadResult(HashMap<String, RoomDataPre520> oldRoomData, HashMap<ChunkPos, String> roomChunkLookup) {
@@ -127,20 +138,33 @@ public class Pre520RoomDataMigrator {
                 UPDATER_LOGGER.debug(UPDATER, "Updating connection info for dimension: {}", level.location());
                 Files.copy(connFile.toPath(),  thisDimDir.resolve(connFile.getName() + ".backup"));
 
-                final var machineGraphNbt = DimensionUtil.readSavedFile(dimDataStore, DimensionMachineGraph.DATA_KEY);
+                /**
+                 * data/ CompoundTag
+                 *   graph: CompoundTag
+                 *     connections: ListTag (CompoundTag/MachineRoomConnectionRecord)
+                 *
+                 * MachineRoomConnectionRecord:
+                 *   machines: ListTag (integer) - BlockPos
+                 *   room: array<int> [x, z]
+                 */
+                final var machineGraphNbt = DimensionUtil.readSavedFile(dimDataStore, "machine_connections");
                 machineGraphNbt.getCompound("graph")
                         .getList("connections", Tag.TAG_COMPOUND)
                         .forEach(machConnTag -> {
                             // Loop machine-room connection info, replace room pos with room code
                             if (machConnTag instanceof CompoundTag ct) {
-                                final var oldChunk = ct.getIntArray("room");
-                                final var oldRoomPos = new ChunkPos(oldChunk[0], oldChunk[1]);
-                                if (roomChunkLookup.containsKey(oldRoomPos)) {
-                                    final var newCode = roomChunkLookup.get(oldRoomPos);
+                                var record = MachineRoomConnection.CODEC.parse(NbtOps.INSTANCE, ct)
+                                        .getOrThrow(false, UPDATER_LOGGER::error);
+
+                                // Change the room reference from a chunkpos to a room code
+                                if (roomChunkLookup.containsKey(record.room)) {
+                                    final var newCode = roomChunkLookup.get(record.room);
                                     ct.remove("room");
                                     ct.putString("room", newCode);
-                                    UPDATER_LOGGER.debug(UPDATER, "Assigning new code to room {}; code: {}", oldRoomPos.toString(), newCode);
+                                    UPDATER_LOGGER.debug(UPDATER, "Assigning new code to room {}; code: {}", record.room.toString(), newCode);
                                 }
+
+                                // note: machines are read here but not needed; the dim graph still reads those fine
                             }
                         });
 

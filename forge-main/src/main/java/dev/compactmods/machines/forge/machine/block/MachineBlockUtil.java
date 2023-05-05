@@ -1,35 +1,38 @@
 package dev.compactmods.machines.forge.machine.block;
 
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.forge.config.ServerConfig;
-import dev.compactmods.machines.forge.wall.Walls;
-import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.api.room.RoomTemplate;
-import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
-import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
-import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
-import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
+import dev.compactmods.machines.forge.config.ServerConfig;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.room.RoomHelper;
+import dev.compactmods.machines.forge.room.Rooms;
+import dev.compactmods.machines.forge.room.ui.MachineRoomMenu;
+import dev.compactmods.machines.forge.wall.Walls;
+import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
-import dev.compactmods.machines.room.BasicRoomInfo;
 import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
-import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
-import dev.compactmods.machines.util.CompactStructureGenerator;
+import dev.compactmods.machines.util.PlayerUtil;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.NameTagItem;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -43,7 +46,7 @@ public class MachineBlockUtil {
             final var serv = sl.getServer();
             final var compactDim = serv.getLevel(CompactDimension.LEVEL_KEY);
 
-            if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity entity) {
+            if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity entity) {
                 entity.connectedRoom().ifPresent(roomCode -> {
                     final var dimGraph = DimensionMachineGraph.forDimension(sl);
                     dimGraph.unregisterMachine(pos);
@@ -65,7 +68,7 @@ public class MachineBlockUtil {
     @Nonnull
     static InteractionResult tryRoomTeleport(Level level, BlockPos pos, ServerPlayer player, MinecraftServer server) {
         // Try teleport to compact machine dimension
-        if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
+        if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
             tile.connectedRoom().ifPresentOrElse(roomCode -> {
                 try {
                     RoomHelper.teleportPlayerIntoMachine(level, player, tile.getLevelPosition(), roomCode);
@@ -73,16 +76,7 @@ public class MachineBlockUtil {
                     e.printStackTrace();
                 }
             }, () -> {
-                final var state = level.getBlockState(pos);
-                RoomTemplate template = RoomTemplate.INVALID_TEMPLATE;
-                if(state.is(LegacySizedCompactMachineBlock.LEGACY_MACHINES_TAG)) {
-                    if(state.getBlock() instanceof LegacySizedCompactMachineBlock b)
-                        template = LegacySizedCompactMachineBlock.getLegacyTemplate(b.getSize());
-                } else {
-                    template = tile.getRoomTemplate().orElse(RoomTemplate.INVALID_TEMPLATE);
-                }
 
-                createAndEnterRoom(player, server, template, tile);
                 // AdvancementTriggers.getTriggerForMachineClaim(size).trigger(sp);
             });
 
@@ -92,46 +86,28 @@ public class MachineBlockUtil {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    static void createAndEnterRoom(ServerPlayer owner, MinecraftServer server, RoomTemplate template, CompactMachineBlockEntity machine) {
-        try {
-            final var compactDim = CompactDimension.forServer(server);
-            if(template.equals(RoomTemplate.INVALID_TEMPLATE)) {
-                CompactMachines.LOGGER.fatal("Tried to create and enter an invalidly-registered room. Something went very wrong!");
-                return;
-            }
-
-            final var roomInfo = CompactRoomProvider.instance(compactDim);
-            final var newRoom = roomInfo.registerNew(builder -> builder
-                    .setColor(template.color())
-                    .setDimensions(template.dimensions())
-                    .setOwner(owner.getUUID()));
-
-            // Generate a new machine room
-            final var unbreakableWall = Walls.BLOCK_SOLID_WALL.get().defaultBlockState();
-            CompactStructureGenerator.generateRoom(compactDim, template.dimensions(), newRoom.center(), unbreakableWall);
-
-            // If template specified, prefill new room
-            if (!template.prefillTemplate().equals(RoomTemplate.NO_TEMPLATE)) {
-                CompactStructureGenerator.fillWithTemplate(compactDim, template.prefillTemplate(), template.dimensions(), newRoom.center());
-            }
-
-            machine.setConnectedRoom(newRoom.code());
-
-            RoomHelper.teleportPlayerIntoRoom(server, owner, newRoom, machine.getLevelPosition());
-        } catch (MissingDimensionException | NonexistentRoomException e) {
-            CompactMachines.LOGGER.error("Error occurred while generating new room and machine info for first player entry.", e);
-        }
+    /**
+     * Gets destroy progress, without any lookups on owner, internal players, etcetera.
+     *
+     * @param state
+     * @param player
+     * @param worldIn
+     * @param pos
+     * @return
+     */
+    public static float destroyProgressUnchecked(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+        int baseSpeedForge = ForgeHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
+        return player.getDigSpeed(state, pos) / (float) baseSpeedForge;
     }
 
     public static float destroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
-        CompactMachineBlockEntity tile = (CompactMachineBlockEntity) worldIn.getBlockEntity(pos);
-        float normalHardness = state.getDestroyProgress(player, worldIn, pos);
+        float normalHardness = destroyProgressUnchecked(state, player, worldIn, pos);
 
+        BoundCompactMachineBlockEntity tile = (BoundCompactMachineBlockEntity) worldIn.getBlockEntity(pos);
         if (tile == null)
             return normalHardness;
 
         boolean hasPlayers = tile.hasPlayersInside();
-
 
         // If there are players inside, check config for break handling
         if (hasPlayers) {
@@ -155,21 +131,60 @@ public class MachineBlockUtil {
         return normalHardness;
     }
 
-    public static ItemStack getCloneItemStack(BlockGetter world, BlockState state, BlockPos pos) {
-        if(state.is(LegacySizedCompactMachineBlock.LEGACY_MACHINES_TAG) && state.getBlock() instanceof LegacySizedCompactMachineBlock l)
-        {
-            final var item = LegacyCompactMachineItem.getItemBySize(l.getSize());
-            return new ItemStack(item);
-        }
-
-        // If not a machine or the block data is invalid...
-        if(!state.is(CMTags.MACHINE_BLOCK) || !(world.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile))
-            return UnboundCompactMachineItem.unbound();
-
-        return tile.connectedRoom().map(roomCode -> {
-            final var roomInfo = new BasicRoomInfo(roomCode, tile.getColor());
-            return BoundCompactMachineItem.createForRoom(roomInfo);
-        }).orElse(UnboundCompactMachineItem.unbound());
+    public static void roomPreviewScreen(BlockPos pos, ServerPlayer player, MinecraftServer server, BoundCompactMachineBlockEntity machine) {
+        machine.connectedRoom().ifPresent(roomCode -> {
+            try {
+                final var roomName = Rooms.getRoomName(server, roomCode);
+                NetworkHooks.openScreen(player, MachineRoomMenu.makeProvider(server, roomCode, machine.getLevelPosition()), (buf) -> {
+                    buf.writeBlockPos(pos);
+                    buf.writeWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
+                    buf.writeUtf(roomCode);
+                    roomName.ifPresentOrElse(name -> {
+                        buf.writeBoolean(true);
+                        buf.writeUtf(name);
+                    }, () -> {
+                        buf.writeBoolean(false);
+                        buf.writeUtf("");
+                    });
+                });
+            } catch (NonexistentRoomException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
+    @Nullable
+    public static InteractionResult tryApplyNametag(Level level, BlockPos pos, Player player) {
+        ItemStack mainItem = player.getMainHandItem();
+        if (mainItem.getItem() instanceof NameTagItem && mainItem.hasCustomHoverName()) {
+            if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
+                final var ownerProfile = tile.getOwnerUUID().flatMap(id -> PlayerUtil.getProfileByUUID(level, id));
+                boolean isOwner = ownerProfile.map(p -> p.getId().equals(player.getUUID())).orElse(false);
+                boolean isOp = player.hasPermissions(Commands.LEVEL_MODERATORS);
+
+                if (ownerProfile.isEmpty()) {
+                    return InteractionResult.FAIL;
+                }
+
+                if (!isOp || !isOwner)
+                    return InteractionResult.FAIL;
+                else {
+                    ownerProfile.ifPresent(owner -> {
+                        player.displayClientMessage(TranslationUtil.message(Messages.CANNOT_RENAME_NOT_OWNER,
+                                owner.getName()), true);
+                    });
+                }
+
+                tile.connectedRoom().ifPresent(roomCode -> {
+                    try {
+                        final var newName = mainItem.getHoverName().getString(120);
+                        Rooms.updateName(level.getServer(), roomCode, newName);
+                    } catch (NonexistentRoomException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+        return null;
+    }
 }

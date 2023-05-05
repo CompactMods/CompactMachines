@@ -12,6 +12,7 @@ import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.forge.shrinking.Shrinking;
 import dev.compactmods.machines.forgebuiltin.tunnel.BuiltInTunnels;
 import dev.compactmods.machines.forgebuiltin.upgrade.BuiltInUpgrades;
+import net.minecraft.Util;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 
@@ -67,6 +68,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addBlock(Walls.BLOCK_BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Walls.BLOCK_SOLID_WALL, "Solid Compact Machine Wall");
         addBlock(Tunnels.BLOCK_TUNNEL_WALL, "Solid Compact Machine Wall (with Tunnel)");
+        add(Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback")), "Bound Compact Machine");
 
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Personal Shrinking Device");
 
@@ -82,6 +84,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.Details.PERSONAL_SHRINKING_DEVICE, "Used as in-game documentation and to enter Compact Machines.");
         addTooltip(Tooltips.Details.SOLID_WALL, "Warning! Unbreakable for non-creative players!");
 
+        addTooltip(Tooltips.CRAFT_TO_UPGRADE, "Craft to upgrade to a new machine.");
         addTooltip(Tooltips.HINT_HOLD_SHIFT, "Hold shift for details.");
         addTooltip(Tooltips.UNKNOWN_PLAYER_NAME, "Unknown Player");
 
@@ -89,7 +92,6 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addTooltip(Tooltips.Machines.OWNER, "Owner: %s");
         addTooltip(Tooltips.Machines.SIZE, "Internal Size: %1$sx%1$sx%1$s");
         addTooltip(Tooltips.Machines.BOUND_TO, "Bound to: %1$s");
-        addTooltip(new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"), "Bound Compact Machine");
 
         addTooltip(Tooltips.TUNNEL_TYPE, "Type ID: %1$s");
         addTooltip(Tooltips.UNKNOWN_TUNNEL_TYPE, "Unknown Tunnel Type (%s)");
