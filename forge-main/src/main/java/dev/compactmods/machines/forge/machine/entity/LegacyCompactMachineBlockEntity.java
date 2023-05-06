@@ -1,4 +1,4 @@
-package dev.compactmods.machines.machine;
+package dev.compactmods.machines.forge.machine.entity;
 
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;

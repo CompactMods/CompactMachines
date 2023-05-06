@@ -12,7 +12,7 @@ import dev.compactmods.machines.forge.machine.entity.UnboundCompactMachineEntity
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
-import dev.compactmods.machines.machine.LegacyCompactMachineBlockEntity;
+import dev.compactmods.machines.forge.machine.entity.LegacyCompactMachineBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;

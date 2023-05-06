@@ -1,38 +1,50 @@
-# Compact Machines 4
+<a href="https://discord.gg/abca3pDPvu" rel="nofollow"><img src="https://img.shields.io/discord/765363477186740234?label=Discord&amp;logo=discord&amp;logoColor=white&amp;style=for-the-badge" alt="Discord"></a>
 
-Minecraft Mod. Adds one simple game mechanic: Small rooms inside of blocks.
+A Minecraft mod that adds one simple game mechanic: small rooms inside of blocks. You can grab the latest build off [Curseforge] or on [Github Releases].
 
-You can grab the latest build (tagged) in the releases tab.
+| Version         | Minecraft Version |      Released | Support | Support Ends   |
+| :-------------- | :---------------: | ------------: | :-----: | -------------- |
+| 5.2             |      1.19.2       |             - |    ✅    | -              |
+| **5.1**         |      1.19.2       |     July 2022 |    ✅    | -              |
+| 5.0             |      1.19.2       |     July 2022 |    ❌    | July 2022      |
+| **4.5**         |      1.18.2       |     July 2022 |    ❌    | September 2022 |
+| 4.4             |      1.18.2       |     July 2022 |    ❌    | -              |
+| 4.3             |      1.18.2       |      May 2022 |    ❌    | -              |
+| 4.2             |      1.18.2       |    April 2022 |    ❌    | -              |
+| **4.0-beta2**   |      1.16.5       |    March 2021 |    ❌    | July 2022      |
+| **3.0.19-b278** |      1.12.2       |      May 2019 |    ❌    | 2021           |
+| **2.0.1-b141**  |      1.10.2       |  October 2017 |    ❌    | 2019           |
+| **1.21**        |      1.7.10       | November 2015 |    ❌    | 2017           |
 
-## Compact Machines
+\* *Note - only the most recent versions are shown here for brevity.* 
 
-These are the main component of this mod and allow you to build complicated machine contraptions and hide them within a single Compact Machine block.
+Standard support policy is after a new version is released for the current Minecraft version, support for the previous version is dropped. If a new major Minecraft version is released and CM is updated, support for the previous major version is currently ***45*** days.
 
-#### Sizes
-There are 6 different sizes of machines:
+​
 
-| Name                        | Description  |
-| ----------------------------| -------------|
-| Tiny                        | 3x3x3        |
-| Small                       | 5x5x5        |
-| Normal                      | 7x7x7        |
-| Large                       | 9x9x9        |
-| Giant                       | 11x11x11     |
-| Maximum                     | 13x13x13     |
+# Contributing
 
-#### Personal Shrinking Device
+## Prerequisite: Github Packages
+First of all, thank you for wanting to help! To get started, you will need to set up authentication for Github Packages. Github has a guide for how to set up authentication here:
 
-This little tool allows you to enter your Compact Machines. Right clicking a Compact Machine world will teleport you inside.
+https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages
 
-#### Spawn location
+It is recommended to create a `gradle.properties` file in your user-level gradle folder to simplify working across multiple repositories.
 
-By default, you spawn in the center of the room. You can change this by shift-right-clicking a Personal Shrinking Device at the location you want to set the spawn to.
+## Modules
+Compact Machines is split into multiple modules to make updating and version maintenance easier. The following is a quick summary of each module's purpose:
 
-Make sure not to obstruct the spawn location, there is currently no mechanic to automatically search for a better spawn location. You don't want to have to break the blocks you spawn in.
+| Module | Description
+| --- | ---
+| core-api | Contains classes used across all other modules; modloader-independent.
+| core | Contains data classes and core functionality not tied to a mod loader.
+| tunnels-api | Shipped to end users as a baseline for working with tunnel integration.
+| forge-tunnels-api | Contains Forge-specific API code for tunnels. (Mainly capability support)
 
-## Miniaturization Crafting
-See the [Compact Crafting] mod instead. The crafting mechanic was split in 1.16 due to the dimension and worldgen changes.
+If you are interested in working with `core-api`, `core`, or `tunnels-api`, you can find them in the [core repository](https://github.com/CompactMods/compactmachines-core).
 
 
+---
 
-[Compact Crafting]: https://github.com/robotgryphon/CompactCrafting
+[Curseforge]: https://www.curseforge.com/minecraft/mc-mods/compact-machines
+[Github Releases]: https://github.com/CompactMods/CompactMachines/releases
