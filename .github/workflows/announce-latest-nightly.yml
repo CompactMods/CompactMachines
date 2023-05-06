@@ -44,8 +44,8 @@ jobs:
         with:
           owner: compactmods
           repo: compactmachines
-          group: dev.compactmods
-          filter: "^compactmachines-(?:[\\d\\.]+)-nightly.jar$"
+          group: dev.compactmods.compactmachines
+          filter: "^compactmachines-forge-(?:[\\d\\.]+)-nightly.jar$"
           outputFile: compactmachines-nightly.json
 
       - name: Debug output
