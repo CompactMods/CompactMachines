@@ -206,8 +206,10 @@ public class TunnelItem extends Item implements ITunnelItem {
                 .collect(Collectors.toSet());
 
         // all tunnels already placed for type
-        if (placedSides.size() == 6)
+        if (placedSides.size() == 6) {
+            player.displayClientMessage(TranslationUtil.message(Messages.NO_TUNNEL_SIDE).withStyle(ChatFormatting.DARK_RED), true);
             return false;
+        }
 
         var newlyPlacedSide = TunnelHelper.getOrderedSides()
                 .filter(s -> !placedSides.contains(s))
