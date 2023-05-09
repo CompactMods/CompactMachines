@@ -3,6 +3,7 @@ package dev.compactmods.machines.forge.command.subcommand;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.machines.forge.command.argument.Suggestors;
 import dev.compactmods.machines.forge.config.ServerConfig;
 import dev.compactmods.machines.forge.room.upgrade.RoomUpgradeManager;
 import dev.compactmods.machines.api.core.CMCommands;
@@ -10,7 +11,7 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.upgrade.IUpgradeAppliedListener;
 import dev.compactmods.machines.api.upgrade.IUpgradeRemovedListener;
-import dev.compactmods.machines.forge.command.RoomUpgradeArgument;
+import dev.compactmods.machines.forge.command.argument.RoomUpgradeArgument;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import net.minecraft.commands.CommandSourceStack;
@@ -26,7 +27,7 @@ public class CMRoomUpgradeCommand {
 
         final var addRoot = Commands.literal("add");
         final var addUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
-                .suggests(RoomUpgradeArgument.SUGGESTOR)
+                .suggests(Suggestors.ROOM_UPGRADES)
                 .executes(CMRoomUpgradeCommand::addToCurrentRoom);
 
         addUpgRoot.then(Commands.literal("current").executes(CMRoomUpgradeCommand::addToCurrentRoom));
@@ -36,7 +37,7 @@ public class CMRoomUpgradeCommand {
 
         final var remRoot = Commands.literal("remove");
         final var remUpgRoot = Commands.argument("upgrade", RoomUpgradeArgument.upgrade())
-                .suggests(RoomUpgradeArgument.SUGGESTOR)
+                .suggests(Suggestors.ROOM_UPGRADES)
                 .executes(CMRoomUpgradeCommand::removeFromCurrentRoom);
 
         remUpgRoot.then(Commands.literal("current").executes(CMRoomUpgradeCommand::removeFromCurrentRoom));

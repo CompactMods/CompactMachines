@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.compactmods.machines.forge.command.argument.Suggestors;
 import dev.compactmods.machines.forge.config.ServerConfig;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.api.core.CMCommands;
@@ -27,6 +28,7 @@ public class CMGiveMachineSubcommand {
 
         subRoot.then(Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("room", StringArgumentType.string())
+                        .suggests(Suggestors.ROOM_CODES)
                         .executes(CMGiveMachineSubcommand::giveMachine)));
 
         return subRoot;
