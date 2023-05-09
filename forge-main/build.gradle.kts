@@ -145,30 +145,37 @@ dependencies {
         runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3910759"))
         runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3871885"))
 
-        // runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3871082"))
-        // runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
+        // Flywheel/Create - v0.6.8.a / v0.5.0i - Jan 29, 2023
+        runtimeOnly(fg.deobf("curse.maven:flywheel-486392:4341471"))
+        runtimeOnly(fg.deobf("curse.maven:create-328085:4371809"))
 
-        // runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-        // runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-        // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+        // 1.18 runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
+
+        // Pretty Pipes - 1.13.6 - Oct 25, 2022
+        runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:4049655"))
+
+        // Refined Storage - 1.11.6 - Mar 30, 2023
+        runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:4465872"))
 
         // Scalable Cat's Force, BdLib, Advanced Generators
-        // runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
-        // runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
-        // runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
+        // 2.13.10-b10 - Oct 13, 2022 / 1.25.0.5 - Nov 20, 2022 / 1.4.0.5 - Nov 22, 2022
+        runtimeOnly(fg.deobf("curse.maven:scalable-320926:4028119"))
+        runtimeOnly(fg.deobf("curse.maven:bdlib-70496:4100704"))
+        runtimeOnly(fg.deobf("curse.maven:advgen-223622:4104739"))
 
         // Immersive Eng - 7.1.0-145 (Dec 31)
         // runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
 
         // FTB Chunks
-        // runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
-        // runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
-        // runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
-        // runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
+//        runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
+//        runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
+//        runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
+//        runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
 
         // Mekanism + Mek Generators - Tunnel testing
-        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3922056"))
-        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3922058"))
+        // 10.3.8.477 - Feb 7, 2023 / 10.3.8.477 - Feb 7, 2023
+        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:4385637"))
+        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:4385639"))
 
         // Soul Shards (FTB)
         // runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))
@@ -197,11 +204,10 @@ minecraft {
 
             ideaModule("Compact_Machines.forge-main.main")
 
-//            if (!System.getenv().containsKey("CI")) {
-//                // JetBrains Runtime Hotswap
-//                jvmArg("-XX:+AllowEnhancedClassRedefinition")
-//                jvmArg("-XX:HotswapAgent=fatjar")
-//            }
+            if (!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg("-XX:+AllowEnhancedClassRedefinition")
+            }
 
             source(sourceSets.main.get())
             mods.create(modId) {
