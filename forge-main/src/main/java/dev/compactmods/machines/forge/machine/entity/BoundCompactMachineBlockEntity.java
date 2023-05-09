@@ -210,6 +210,7 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IMach
             dimMachines.register(worldPosition, roomCode);
             this.roomCode = roomCode;
 
+            // FIXME - Rooms do not have colors on first creation; this should be pulled from the template!
             CompactRoomProvider.instance(sl.getServer()).forRoom(roomCode).ifPresent(roomInfo -> {
                 this.roomColor = roomInfo.color();
             });

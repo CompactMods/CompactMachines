@@ -1,9 +1,12 @@
 package dev.compactmods.machines.forge.machine.block;
 
+import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
+import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.room.BasicRoomInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,6 +23,19 @@ import org.jetbrains.annotations.Nullable;
 public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
     public BoundCompactMachineBlock(Properties props) {
         super(props);
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
+            return be.connectedRoom().map(roomCode -> {
+                final var roomInfo = new BasicRoomInfo(roomCode, be.getColor());
+                return BoundCompactMachineItem.createForRoom(roomInfo);
+            }).orElse(UnboundCompactMachineItem.unbound());
+        }
+
+        LoggingUtil.modLog().warn("Warning: tried to pick block on a machine that does not have an associated block entity.");
+        return null;
     }
 
     @Override
