@@ -42,6 +42,15 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
     }
 
     @Override
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        if (level.getBlockEntity(pos) instanceof UnboundCompactMachineEntity be) {
+            return UnboundCompactMachineItem.forTemplate(be.templateId().location(), be.template().get());
+        }
+
+        return UnboundCompactMachineItem.unbound();
+    }
+
+    @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new UnboundCompactMachineEntity(pos, state);
     }
@@ -54,10 +63,8 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         level.getBlockEntity(pos, Machines.UNBOUND_MACHINE_ENTITY.get()).ifPresent(tile -> {
-            if(!level.isClientSide) {
-                final var template = MachineItemUtil.getTemplateId(stack);
-                tile.setTemplate(template);
-            }
+            final var template = MachineItemUtil.getTemplateId(stack);
+            tile.setTemplate(template);
         });
     }
 

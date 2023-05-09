@@ -1,6 +1,7 @@
 package dev.compactmods.machines.forge.machine.entity;
 
 import dev.compactmods.machines.api.core.CMRegistryKeys;
+import dev.compactmods.machines.api.machine.IMachineBlockEntity;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.forge.machine.Machines;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class UnboundCompactMachineEntity extends BlockEntity {
+public class UnboundCompactMachineEntity extends BlockEntity implements IMachineBlockEntity {
 
     private static final String NBT_TEMPLATE_ID = MachineNbt.NBT_TEMPLATE_ID;
 
@@ -64,6 +65,7 @@ public class UnboundCompactMachineEntity extends BlockEntity {
 
     public void setTemplate(ResourceLocation template) {
         this.roomTemplateId = template;
+        this.setChanged();
     }
 
     public Optional<RoomTemplate> template() {
@@ -74,5 +76,10 @@ public class UnboundCompactMachineEntity extends BlockEntity {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public int getColor() {
+        return this.template().map(RoomTemplate::color).orElse(0xFFFFFFFF);
     }
 }

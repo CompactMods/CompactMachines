@@ -1,10 +1,6 @@
 package dev.compactmods.machines.forge.machine.block;
 
 import dev.compactmods.machines.api.shrinking.PSDTags;
-import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
-import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
-import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
-import dev.compactmods.machines.room.BasicRoomInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +8,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,19 +23,6 @@ public class CompactMachineBlock extends Block {
 
     CompactMachineBlock(Properties props) {
         super(props);
-    }
-
-    // client-side
-    @Override
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
-            return be.connectedRoom().map(roomCode -> {
-                final var roomInfo = new BasicRoomInfo(roomCode, be.getColor());
-                return BoundCompactMachineItem.createForRoom(roomInfo);
-            }).orElse(UnboundCompactMachineItem.unbound());
-        }
-
-        return UnboundCompactMachineItem.unbound();
     }
 
     @NotNull

@@ -3,12 +3,16 @@ package dev.compactmods.machines.forge.client;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.forge.compat.curios.CuriosCompat;
 import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.machine.entity.UnboundCompactMachineEntity;
 import dev.compactmods.machines.forge.room.ui.MachineRoomScreen;
 import dev.compactmods.machines.forge.room.ui.RoomUserInterfaceRegistration;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.tunnel.client.TunnelColors;
 import dev.compactmods.machines.machine.client.MachineColors;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -31,6 +35,14 @@ public class ClientEventHandler {
     public static void onBlockColors(final RegisterColorHandlersEvent.Block colors) {
         colors.register(TunnelColors.BLOCK, Tunnels.BLOCK_TUNNEL_WALL.get());
         colors.register(MachineColors.BLOCK, Machines.MACHINE_BLOCK.get());
+        colors.register(ClientEventHandler::unboundMachineColor, Machines.UNBOUND_MACHINE_BLOCK.get());
+    }
+
+    private static int unboundMachineColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
+        return switch (tintIndex) {
+            case 0 -> level.getBlockEntity(pos) instanceof UnboundCompactMachineEntity unbound ? unbound.getColor() : 0xFFFFFFFF;
+            default -> 0xFFFFFFFF;
+        };
     }
 
     @SubscribeEvent
