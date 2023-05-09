@@ -33,7 +33,7 @@ public class StateGenerator extends BlockStateProvider {
                 .texture("border", modLoc("block/machine/border"))
                 .texture("tint", modLoc("block/machine/tint"))
                 .texture("overlay", modLoc("block/machine/overlay"))
-                .renderType(mcLoc("cutout_mipped_all"))
+                .renderType(mcLoc("cutout"))
                 .element()
                 .allFaces((dir, face) -> face.texture("#border")
                         .uvs(0, 0, 16, 16)
@@ -55,6 +55,10 @@ public class StateGenerator extends BlockStateProvider {
                         .tintindex(1)
                         .end())
                 .end();
+
+        simpleBlock(Machines.UNBOUND_MACHINE_BLOCK.get(), ConfiguredModel.builder()
+                .modelFile(m)
+                .build());
 
         simpleBlock(Machines.MACHINE_BLOCK.get(), ConfiguredModel.builder()
                 .modelFile(m)

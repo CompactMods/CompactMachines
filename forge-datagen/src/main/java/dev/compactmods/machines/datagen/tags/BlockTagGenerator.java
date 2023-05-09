@@ -1,14 +1,13 @@
 package dev.compactmods.machines.datagen.tags;
 
+import dev.compactmods.machines.api.core.CMTags;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.forge.wall.Walls;
-import dev.compactmods.machines.api.core.CMTags;
-import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.Set;
@@ -45,9 +44,16 @@ public class BlockTagGenerator extends BlockTagsProvider {
             ironTool.add(mach);
         });
 
-        Block machine = Machines.MACHINE_BLOCK.get();
-        allMachines.add(machine);
-        pickaxe.add(machine);
-        ironTool.add(machine);
+        var boundMachine = Machines.MACHINE_BLOCK.get();
+        allMachines.add(boundMachine);
+        pickaxe.add(boundMachine);
+        ironTool.add(boundMachine);
+
+        var unboundTag = tag(CMTags.UNBOUND_MACHINE_BLOCK);
+        var unboundMachine = Machines.UNBOUND_MACHINE_BLOCK.get();
+        allMachines.add(unboundMachine);
+        unboundTag.add(unboundMachine);
+        pickaxe.add(unboundMachine);
+        ironTool.add(unboundMachine);
     }
 }
