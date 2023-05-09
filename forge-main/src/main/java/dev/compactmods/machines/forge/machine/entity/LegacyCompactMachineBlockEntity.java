@@ -4,11 +4,13 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.MachineEntityNbt;
 import dev.compactmods.machines.api.machine.MachineNbt;
+import dev.compactmods.machines.api.room.registration.IRoomRegistration;
 import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.forge.tunnel.graph.traversal.ForgeTunnelTypeFilters;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
+import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.util.NbtUtil;
@@ -25,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,11 +40,8 @@ public class LegacyCompactMachineBlockEntity extends BlockEntity {
 
     protected UUID owner;
     private String roomCode;
-
-    public long nextSpawnTick = 0;
-    protected String schema;
-    protected boolean locked = false;
     private int legacyMachineId = -1;
+    private WeakReference<IRoomRegistration> roomInfo;
 
     public LegacyCompactMachineBlockEntity(BlockPos pos, BlockState state) {
         super(Machines.LEGACY_MACHINE_ENTITY.get(), pos, state);
@@ -82,6 +82,8 @@ public class LegacyCompactMachineBlockEntity extends BlockEntity {
         super.onLoad();
         if (this.roomCode == null || this.legacyMachineId == -1)
             this.updateLegacyData();
+
+        roomInfo().ifPresent(r -> this.roomInfo = new WeakReference<>(r));
     }
 
     @Override
@@ -214,5 +216,11 @@ public class LegacyCompactMachineBlockEntity extends BlockEntity {
             this.roomCode = null;
             setChanged();
         }
+    }
+
+    public Optional<IRoomRegistration> roomInfo() {
+        if(level == null || level.isClientSide) return Optional.empty();
+        return getConnectedRoom()
+                .flatMap(code -> CompactRoomProvider.instance(level.getServer()).forRoom(code));
     }
 }

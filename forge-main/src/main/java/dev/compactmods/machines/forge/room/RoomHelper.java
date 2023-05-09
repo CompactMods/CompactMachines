@@ -71,8 +71,6 @@ public class RoomHelper {
                         // Mark the player as inside the machine, set external spawn, and yeet
                         player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(hist -> {
                             hist.addHistory(new PlayerRoomHistoryItem(entry, machinePos));
-
-                            setCurrentRoom(serv, player, roomInfo);
                         });
                     } catch (MissingDimensionException | NonexistentRoomException e) {
                         CompactMachines.LOGGER.fatal("Critical error; could not enter a freshly-created room instance.", e);

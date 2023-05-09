@@ -3,6 +3,7 @@ package dev.compactmods.machines.forge.machine.block;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.shrinking.PSDTags;
@@ -15,16 +16,19 @@ import dev.compactmods.machines.forge.machine.entity.LegacyCompactMachineBlockEn
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
 import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
+import dev.compactmods.machines.forge.room.RoomHelper;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.forge.upgrade.RoomUpgradeItem;
 import dev.compactmods.machines.machine.LegacySizedTemplates;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
+import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
 import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -64,7 +68,7 @@ public class LegacySizedCompactMachineBlock extends CompactMachineBlock implemen
 
     @Override
     public void fillItemCategory(CreativeModeTab pTab, NonNullList<ItemStack> pItems) {
-        if(ClientConfig.showLegacyItems()) {
+        if (ClientConfig.showLegacyItems()) {
             pItems.add(new ItemStack(LegacyCompactMachineItem.getItemBySize(this.size)));
         }
     }
@@ -172,7 +176,20 @@ public class LegacySizedCompactMachineBlock extends CompactMachineBlock implemen
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
         if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
-            return MachineBlockUtil.tryRoomTeleport(level, pos, sp, server);
+            level.getBlockEntity(pos, Machines.LEGACY_MACHINE_ENTITY.get()).ifPresentOrElse(machine -> {
+                machine.roomInfo().ifPresentOrElse(room -> {
+                    try {
+
+                        RoomHelper.teleportPlayerIntoRoom(server, sp, room, machine.getLevelPosition());
+                    } catch (MissingDimensionException | NonexistentRoomException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, () -> {
+                    player.displayClientMessage(Component.literal("Please break and replace this block to create a new room."), true);
+                });
+            }, () -> {
+                player.displayClientMessage(Component.literal("Error in block entry: not a legacy machine block entity"), true);
+            });
         }
 
         // Try and pull the name off the nametag and apply it to the room

@@ -1,6 +1,7 @@
 package dev.compactmods.machines.forge.machine.block;
 
 import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
 import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import net.minecraft.core.BlockPos;
@@ -11,10 +12,12 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class BoundCompactMachineBlock extends CompactMachineBlock {
+public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
     public BoundCompactMachineBlock(Properties props) {
         super(props);
     }
@@ -52,5 +55,11 @@ public class BoundCompactMachineBlock extends CompactMachineBlock {
         MachineBlockUtil.cleanupTunnelsPostMachineRemove(level, pos);
 
         super.onRemove(oldState, level, pos, newState, a);
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new BoundCompactMachineBlockEntity(pos, state);
     }
 }

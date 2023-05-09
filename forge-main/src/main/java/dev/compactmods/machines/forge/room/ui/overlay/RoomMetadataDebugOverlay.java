@@ -39,20 +39,7 @@ public class RoomMetadataDebugOverlay implements IGuiOverlay {
                     PlayerUtil.getProfileByUUID(player.level, room.owner()).ifPresent(ownerInfo -> {
                         final int ownerWidth = font.width(ownerInfo.getName());
 
-//                        final var shader = GameRenderer.getPositionTexShader();
-//                        final var floatBackup = shader.COLOR_MODULATOR.getFloatBuffer()
-//                                .duplicate();
-//
-//
-//                        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-//                        shader.COLOR_MODULATOR.set(1, 1, 1, 0.2f);
-//                        shader.COLOR_MODULATOR.upload();
-
                         PlayerFaceRenderer.render(ownerInfo, poseStack, -6, -14);
-
-//                        shader.COLOR_MODULATOR.getFloatBuffer().rewind();
-//                        shader.COLOR_MODULATOR.getFloatBuffer().put(floatBackup);
-//                        shader.COLOR_MODULATOR.upload();
 
                         font.drawShadow(poseStack, ownerInfo.getName(), -(ownerWidth / 2f), 0, 0xFFFFFFFF, false);
                         poseStack.translate(0, 12, 0);
