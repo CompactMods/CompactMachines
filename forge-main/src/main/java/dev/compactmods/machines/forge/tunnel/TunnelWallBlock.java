@@ -134,7 +134,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 final var removalReason = new ServerPlayerRemovedReason(serverPlayer);
                 if (def instanceof ITunnelRemoveEventListener<?> removeListener) {
                     var handler = removeListener.createBeforeRemoveHandler(tunnel.getTunnel());
-                    if (handler != null && handler.beforeRemove(server, tunnelOriginalPosition, removalReason)) {
+                    if (handler != null && !handler.beforeRemove(server, tunnelOriginalPosition, removalReason)) {
                         // Cancel removal
                         return InteractionResult.FAIL;
                     }

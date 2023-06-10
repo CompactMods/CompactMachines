@@ -15,6 +15,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ClientEventHandler {
+public class ClientModBusEventHandler {
 
     @SubscribeEvent
     public static void onItemColors(final RegisterColorHandlersEvent.Item colors) {
@@ -35,7 +36,7 @@ public class ClientEventHandler {
     public static void onBlockColors(final RegisterColorHandlersEvent.Block colors) {
         colors.register(TunnelColors.BLOCK, Tunnels.BLOCK_TUNNEL_WALL.get());
         colors.register(MachineColors.BLOCK, Machines.MACHINE_BLOCK.get());
-        colors.register(ClientEventHandler::unboundMachineColor, Machines.UNBOUND_MACHINE_BLOCK.get());
+        colors.register(ClientModBusEventHandler::unboundMachineColor, Machines.UNBOUND_MACHINE_BLOCK.get());
     }
 
     private static int unboundMachineColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
@@ -46,13 +47,18 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public static void onKeybindRegistration(final RegisterKeyMappingsEvent evt) {
+        evt.register(RoomExitKeyMapping.MAPPING);
+    }
+
+    @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent client) {
         MenuScreens.register(RoomUserInterfaceRegistration.MACHINE_MENU.get(), MachineRoomScreen::new);
     }
 
     @SubscribeEvent
     public static void onTextureStitch(final TextureStitchEvent.Pre stitch) {
-        if(ModList.get().isLoaded("curios"))
+        if (ModList.get().isLoaded("curios"))
             CuriosCompat.addTextures(stitch);
     }
 }

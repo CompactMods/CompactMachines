@@ -22,7 +22,6 @@ import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
@@ -115,9 +114,9 @@ public class RoomHelper {
         RoomHelper.setCurrentRoom(serv, player, room);
     }
 
-    public static void teleportPlayerOutOfRoom(ServerLevel compactDim, @Nonnull ServerPlayer serverPlayer) {
+    public static void teleportPlayerOutOfRoom(@Nonnull ServerPlayer serverPlayer) {
 
-        MinecraftServer serv = compactDim.getServer();
+        MinecraftServer serv = serverPlayer.getServer();
         if (!serverPlayer.level.dimension().equals(CompactDimension.LEVEL_KEY))
             return;
 
@@ -125,7 +124,7 @@ public class RoomHelper {
                 .resolve()
                 .ifPresentOrElse(hist -> {
                     if (hist.hasHistory()) {
-                        final var roomProvider = CompactRoomProvider.instance(compactDim);
+                        final var roomProvider = CompactRoomProvider.instance(serv);
                         final IRoomHistoryItem prevArea = hist.pop();
                         // Mark current room, invalidates any listeners + debug screen
                         serverPlayer.getCapability(CURRENT_ROOM_META).ifPresent(provider -> {

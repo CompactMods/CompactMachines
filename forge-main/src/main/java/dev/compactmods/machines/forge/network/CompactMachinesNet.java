@@ -39,5 +39,11 @@ public class CompactMachinesNet {
                 .decoder(SyncRoomMetadataPacket::new)
                 .consumerMainThread(SyncRoomMetadataPacket::handle)
                 .add();
+
+        CHANNEL.messageBuilder(PlayerRequestedLeavePacket.class, 4, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(PlayerRequestedLeavePacket::encode)
+                .decoder(PlayerRequestedLeavePacket::new)
+                .consumerMainThread(PlayerRequestedLeavePacket::handle)
+                .add();
     }
 }

@@ -1,5 +1,6 @@
 package dev.compactmods.machines.datagen.lang;
 
+import dev.compactmods.machines.forge.client.RoomExitKeyMapping;
 import dev.compactmods.machines.forge.dimension.VoidAirBlock;
 import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
@@ -140,6 +141,9 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         add(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), "Workbench");
         add("entity.minecraft.villager.compactmachines.tinkerer", "Tinkerer");
+
+        add(RoomExitKeyMapping.CATEGORY, "Compact Machines");
+        add(RoomExitKeyMapping.NAME, "Quick-Exit Compact Machine");
     }
 
     @Override
