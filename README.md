@@ -1,4 +1,4 @@
-<a href="https://discord.gg/abca3pDPvu" rel="nofollow"><img src="https://img.shields.io/discord/765363477186740234?label=Discord&amp;logo=discord&amp;logoColor=white&amp;style=for-the-badge" alt="Discord"></a>
+<a href="https://discord.gg/Y5QhUWxQdq" rel="nofollow"><img src="https://img.shields.io/discord/765363477186740234?label=Discord&amp;logo=discord&amp;logoColor=white&amp;style=for-the-badge" alt="Discord"></a>
 
 A Minecraft mod that adds one simple game mechanic: small rooms inside of blocks. You can grab the latest build off [Curseforge] or on [Github Releases].
 
