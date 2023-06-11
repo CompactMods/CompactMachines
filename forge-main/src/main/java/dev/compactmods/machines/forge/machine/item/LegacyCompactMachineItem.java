@@ -1,5 +1,7 @@
 package dev.compactmods.machines.forge.machine.item;
 
+import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.forge.machine.block.LegacySizedCompactMachineBlock;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.RoomSize;
@@ -10,6 +12,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +27,9 @@ import java.util.List;
 @SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "5.2.0")
 public class LegacyCompactMachineItem extends BlockItem implements ICompactMachineItem {
+    public static final TagKey<Item> TAG = TagKey.create(Registries.ITEMS.getRegistryKey(),
+            new ResourceLocation(Constants.MOD_ID, "legacy_machines"));;
+
     public LegacyCompactMachineItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
     }

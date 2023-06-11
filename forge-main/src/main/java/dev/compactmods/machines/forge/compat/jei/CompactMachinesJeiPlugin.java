@@ -1,14 +1,15 @@
 package dev.compactmods.machines.forge.compat.jei;
 
-import dev.compactmods.machines.forge.machine.Machines;
-import dev.compactmods.machines.forge.machine.item.MachineItemUtil;
-import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
-import dev.compactmods.machines.forge.tunnel.Tunnels;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.JeiInfo;
 import dev.compactmods.machines.api.room.Rooms;
-import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
+import dev.compactmods.machines.forge.machine.item.MachineItemUtil;
+import dev.compactmods.machines.forge.machine.item.UnboundCompactMachineItem;
 import dev.compactmods.machines.forge.shrinking.Shrinking;
+import dev.compactmods.machines.forge.tunnel.Tunnels;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
@@ -16,7 +17,10 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
+import java.util.stream.Collectors;
 
 @JeiPlugin
 public class CompactMachinesJeiPlugin implements IModPlugin {
@@ -27,6 +31,8 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        final var ingManager = registration.getIngredientManager();
+
         registration.addIngredientInfo(
                 UnboundCompactMachineItem.unbound(),
                 VanillaTypes.ITEM_STACK,
@@ -43,6 +49,15 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
                 new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
                 VanillaTypes.ITEM_STACK,
                 TranslationUtil.jeiInfo(JeiInfo.SHRINKING_DEVICE));
+
+        //noinspection removal Will be removing once 5.3 or 6.0 drops
+        final var allLegacyMachines = ForgeRegistries.ITEMS.tags()
+                .getTag(LegacyCompactMachineItem.TAG)
+                .stream()
+                .map(ItemStack::new)
+                .collect(Collectors.toSet());
+
+        ingManager.removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK, allLegacyMachines);
     }
 
     @Override

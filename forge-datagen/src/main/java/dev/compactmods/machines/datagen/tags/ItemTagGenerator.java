@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.tags;
 
 import dev.compactmods.machines.forge.Registries;
 import dev.compactmods.machines.forge.machine.Machines;
+import dev.compactmods.machines.forge.machine.item.LegacyCompactMachineItem;
 import dev.compactmods.machines.forge.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.api.core.CMTags;
 import dev.compactmods.machines.api.core.Constants;
@@ -26,6 +27,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     protected void addTags() {
         var upgradeTag = tag(CMTags.ROOM_UPGRADE_ITEM);
         var machinesTag = tag(CMTags.MACHINE_ITEM);
+        var legacyMachinesTag = tag(LegacyCompactMachineItem.TAG);
 
         var legacySizedMachines = Set.of(Machines.MACHINE_BLOCK_ITEM_TINY.get(),
                 Machines.MACHINE_BLOCK_ITEM_SMALL.get(),
@@ -38,6 +40,8 @@ public class ItemTagGenerator extends ItemTagsProvider {
         var unboundMachineItem = Machines.UNBOUND_MACHINE_BLOCK_ITEM.get();
 
         legacySizedMachines.forEach(machinesTag::add);
+        legacySizedMachines.forEach(legacyMachinesTag::add);
+
         machinesTag.add(boundMachineItem);
         machinesTag.add(unboundMachineItem);
 
