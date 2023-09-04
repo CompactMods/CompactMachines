@@ -29,7 +29,12 @@ First of all, thank you for wanting to help! To get started, you will need to se
 
 https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages
 
-It is recommended to create a `gradle.properties` file in your user-level gradle folder to simplify working across multiple repositories.
+It is recommended to create a `gradle.properties` file in your user-level gradle folder to simplify working across multiple repositories. On macOS or Linux, that's `~/.gradle/gradle.properties`, which should look like this:
+
+```
+gpr.user=<your github username>
+gpr.token=<github personal access token with packages:read scope>
+```
 
 ## Modules
 Compact Machines is split into multiple modules to make updating and version maintenance easier. The following is a quick summary of each module's purpose:
