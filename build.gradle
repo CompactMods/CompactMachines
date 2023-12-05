@@ -29,10 +29,13 @@ minecraft {
 }
 
 repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        // url "http://mobiusstrip.eu/maven"
-        url "http://maven.tehnut.info"
+//    maven { // The repo from which to get waila
+//        name "Mobius Repo"
+//        // url "http://mobiusstrip.eu/maven"
+//        url "http://maven.tehnut.info"
+//    }
+    maven {
+        url "https://cursemaven.com"
     }
 
     maven { // TheOneProbe
@@ -42,17 +45,12 @@ repositories {
 
     maven { // location of the maven that hosts JEI files
         name "Progwml Repo"
-        url "http://dvs1.progwml6.com/files/maven"
-    }
-
-    maven { // jei by ip, because travis couldn't resolve it?!
-        name "Progwml Repo"
-        url "http://104.168.20.187/files/maven"
+        url "https://dvs1.progwml6.com/files/maven"
     }
 
     maven {
         name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
+        url = "https://maven.covers1624.net"
     }
 
     maven {
@@ -80,6 +78,7 @@ repositories {
 dependencies {
     deobfCompile "mezz.jei:jei_${minecraft.version}:${jei_version}:api"
     //runtime "mezz.jei:jei_${minecraft.version}:${jei.version}"
+//    deobfCompile "curse.maven:jei-238222:4538010"
 
     deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}:api"
 
@@ -87,18 +86,18 @@ dependencies {
         transitive = false
     }
 
-    deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
+    compileOnly "curse.maven:refined-storage-243076:2940914"
 
     deobfCompile "li.cil.oc:OpenComputers:${oc_version}:api"
 
 
     // All of the following are needed to make Ducts connect to each other visually
     // in recipes and in the machine view. :(
-    deobfCompile("cofh:ThermalDynamics:${minecraft.version}-${cofh_thermaldynamics_version}:universal") {
+    compileOnly("cofh:ThermalDynamics:${minecraft.version}-${cofh_thermaldynamics_version}:universal") {
         transitive = false
     }
 
-    deobfCompile("cofh:CoFHCore:${minecraft.version}-${cofh_core_version}:universal") {
+    compileOnly("cofh:CoFHCore:${minecraft.version}-${cofh_core_version}:universal") {
         transitive = false
     }
 
