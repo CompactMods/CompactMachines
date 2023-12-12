@@ -1,6 +1,7 @@
 package dev.compactmods.machines.forge.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.forge.machine.Machines;
 import dev.compactmods.machines.forge.machine.entity.BoundCompactMachineBlockEntity;
 import dev.compactmods.machines.forge.machine.item.BoundCompactMachineItem;
@@ -9,6 +10,10 @@ import dev.compactmods.machines.machine.item.ICompactMachineItem;
 import dev.compactmods.machines.room.BasicRoomInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -18,6 +23,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
@@ -77,5 +84,25 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BoundCompactMachineBlockEntity(pos, state);
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("deprecation")
+    public InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
+        MinecraftServer server = level.getServer();
+        ItemStack mainItem = player.getMainHandItem();
+        if (mainItem.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
+            return MachineBlockUtil.tryRoomTeleport(level, pos, sp, server);
+        }
+
+        // All other items, open preview screen
+        if(!level.isClientSide) {
+            level.getBlockEntity(pos, Machines.MACHINE_ENTITY.get()).ifPresent(machine -> {
+                MachineBlockUtil.roomPreviewScreen(pos, (ServerPlayer) player, server, machine);
+            });
+        }
+
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

@@ -92,22 +92,31 @@ public class CompactMachines implements ICompactMachinesMod {
         Registries.UPGRADES.register(bus);
         Registries.COMMAND_ARGUMENT_TYPES.register(bus);
         Registries.LOOT_FUNCS.register(bus);
-        // Registries.VILLAGERS.register(bus);
+        Registries.VILLAGERS.register(bus);
         // Villagers.TRADES.register(bus);
         Registries.POINTS_OF_INTEREST.register(bus);
 
+//        CompactMachines.loadedAddons = ServiceLoader.load(ICompactMachinesAddon.class)
+//                .stream()
+//                .filter(p -> Arrays.stream(p.type().getAnnotationsByType(CompactMachinesAddon.class))
+//                        .anyMatch(cma -> cma.major() == 2))
+//                .map(allowedThisMajor -> {
+//                    allowedThisMajor.get();
+//                })
+//                .collect(Collectors.toSet());
+
         CompactMachines.loadedAddons = AnnotationScanner.scanModList(CompactMachinesAddon.class)
-                        .map(ModFileScanData.AnnotationData::memberName)
-                        .map(cmAddonClass -> {
-                            try {
-                                final var cl = Class.forName(cmAddonClass);
-                                final var cla = cl.asSubclass(ICompactMachinesAddon.class);
-                                return cla.getDeclaredConstructor().newInstance();
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        })
-                        .filter(Objects::nonNull)
+                .map(ModFileScanData.AnnotationData::memberName)
+                .map(cmAddonClass -> {
+                    try {
+                        final var cl = Class.forName(cmAddonClass);
+                        final var cla = cl.asSubclass(ICompactMachinesAddon.class);
+                        return cla.getDeclaredConstructor().newInstance();
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         CompactMachines.loadedAddons.forEach(addon -> {

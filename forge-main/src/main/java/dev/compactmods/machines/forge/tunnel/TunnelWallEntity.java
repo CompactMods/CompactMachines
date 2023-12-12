@@ -21,6 +21,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -105,6 +107,12 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
             var data = persist.serializeNBT();
             compound.put("tunnel_data", data);
         }
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return super.getUpdatePacket();
     }
 
     @Override
@@ -223,6 +231,10 @@ public class TunnelWallEntity extends BlockEntity implements ITunnelHolder {
         this.tunnelType = definition;
 
         serverPostRemoval(null);
+
+        final var state = getBlockState();
+        level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_ALL);
+
         setChanged();
     }
 

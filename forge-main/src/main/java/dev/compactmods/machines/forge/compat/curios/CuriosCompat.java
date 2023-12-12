@@ -22,8 +22,6 @@ public class CuriosCompat {
                 .size(1)
                 .icon(CURIO_TEXTURE)
                 .build());
-
-
     }
 
     private static boolean isPsd(ItemStack stack) {
@@ -34,7 +32,7 @@ public class CuriosCompat {
         stitch.addSprite(CURIO_TEXTURE);
     }
 
-    public static boolean hasPsdCurio(@Nonnull  LivingEntity ent) {
+    public static boolean hasPsdCurio(@Nonnull LivingEntity ent) {
         return CuriosApi.getCuriosHelper()
                 .findFirstCurio(ent, CuriosCompat::isPsd)
                 .isPresent();

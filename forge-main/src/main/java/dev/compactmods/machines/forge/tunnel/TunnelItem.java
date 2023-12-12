@@ -1,11 +1,5 @@
 package dev.compactmods.machines.forge.tunnel;
 
-import dev.compactmods.machines.forge.CompactMachines;
-import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
-import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
-import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
-import dev.compactmods.machines.forge.tunnel.network.TunnelAddedPacket;
-import dev.compactmods.machines.forge.wall.SolidWallBlock;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
@@ -14,12 +8,16 @@ import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.history.IRoomHistoryItem;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
-import dev.compactmods.machines.i18n.TranslationUtil;
-import dev.compactmods.machines.forge.network.CompactMachinesNet;
+import dev.compactmods.machines.forge.CompactMachines;
 import dev.compactmods.machines.forge.room.capability.RoomCapabilities;
+import dev.compactmods.machines.forge.wall.SolidWallBlock;
+import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.room.graph.CompactRoomProvider;
 import dev.compactmods.machines.tunnel.ITunnelItem;
 import dev.compactmods.machines.tunnel.TunnelHelper;
+import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelMachineFilters;
+import dev.compactmods.machines.tunnel.graph.traversal.TunnelTypeFilters;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -43,7 +41,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
@@ -233,19 +230,16 @@ public class TunnelItem extends Item implements ITunnelItem {
             return false;
         }
 
-        final var oldState = compactDim.getBlockState(position);
-        compactDim.setBlock(position, tunnelState, Block.UPDATE_NEIGHBORS);
-
-        if (compactDim.getBlockEntity(position) instanceof TunnelWallEntity twe) {
+        compactDim.setBlock(position, tunnelState, Block.UPDATE_ALL);
+        compactDim.getBlockEntity(position, Tunnels.TUNNEL_BLOCK_ENTITY.get()).ifPresent(twe -> {
             twe.setTunnelType(tunnelId);
             twe.setConnectedTo(hist.getMachine(), first);
 
-            CompactMachinesNet.CHANNEL.send(
-                    PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
-                    new TunnelAddedPacket(position, tunnelId));
-        }
+//            CompactMachinesNet.CHANNEL.send(
+//                    PacketDistributor.TRACKING_CHUNK.with(() -> compactDim.getChunkAt(position)),
+//                    new TunnelAddedPacket(position, tunnelId));
+        });
 
-        compactDim.sendBlockUpdated(position, oldState, tunnelState, Block.UPDATE_ALL);
         return true;
     }
 }

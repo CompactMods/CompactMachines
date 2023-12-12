@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
+// thanks to JEI's ForgePluginFinder for a baseline
 public class AnnotationScanner {
 
     private static final Logger SCANNER_LOG = LogManager.getLogger();
