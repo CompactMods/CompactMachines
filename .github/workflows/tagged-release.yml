@@ -13,10 +13,11 @@ jobs:
       cf_project: ${{steps.cf_project.outputs.value }}
       mod_id: ${{steps.mod_id.outputs.value }}
       version: ${{steps.version.outputs.version }}
+      build: ${{steps.build.outputs.buildver}}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
@@ -57,12 +58,19 @@ jobs:
           version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
           echo "::set-output name=version::$version"
 
+      - name: Build Version
+        id: build
+        run: |
+          buildver=$(git describe --tags --match v* | cut -d- -f2)
+          echo "build = $buildver"
+          echo "::set-output name=buildver::$buildver"
+
   changelog:
     name: Generate Changelog (tags)
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
@@ -118,7 +126,7 @@ jobs:
           path: changelog
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -135,14 +143,15 @@ jobs:
         env:
           CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
 
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         timeout-minutes: 20
         env:
+          CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -159,7 +168,7 @@ jobs:
         env:
           CM_RELEASE: true
           CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
-          CM_BUILD_NUM: "0"
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -257,7 +266,7 @@ jobs:
     needs: [changelog, vars, jar]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2

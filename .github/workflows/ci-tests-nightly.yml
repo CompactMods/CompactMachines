@@ -18,10 +18,25 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       release_type: ${{steps.cf_release_type.outputs.value }}
+      version: ${{steps.version.outputs.version }}
+      build: ${{steps.build.outputs.buildver}}
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
-        
+        uses: actions/checkout@v3
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      - name: Find Current Tag
+        id: current
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: '@'
+          skip-unshallow: 'true'
+          
       - name: Release Type
         id: cf_release_type
         uses: christian-draeger/read-properties@1.0.1
@@ -29,13 +44,25 @@ jobs:
           path: './gradle.properties'
           property: 'cf_release_type'
 
+      - name: Semver Version
+        id: version
+        run: |
+          version=$(echo "${{steps.current.outputs.tag}}" | cut -dv -f2)
+          echo "::set-output name=version::$version"
+
+      - name: Build Version
+        id: build
+        run: |
+          buildver=$(git describe --tags --match v* | cut -d- -f2)
+          echo "build = $buildver"
+          echo "::set-output name=buildver::$buildver"
   tests:
     name: Gradle Tests
     runs-on: ubuntu-20.04
     needs: [ vars ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
 
       - name: Unshallow and Get Tags
         run: git fetch --prune --unshallow --tags
@@ -61,10 +88,17 @@ jobs:
       - name: Create datagen assets
         continue-on-error: true
         run: ./gradlew runData
-
+        env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+          
       - name: Test JAR with GameTest Server
         run: ./gradlew runGameTestServer
         env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,7 +115,7 @@ jobs:
     needs: [ vars, tests ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow and Get Tags
         run: git fetch --prune --unshallow --tags
@@ -106,10 +140,16 @@ jobs:
 
       - name: Generate Resources
         run: ./gradlew runData
-
-      - name: Publish gradle nightly jar
-        run: ./gradlew publishNightlyPublicationToGitHubPackagesRepository
         env:
           CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
+
+      - name: Publish gradle nightly jar
+        run: ./gradlew publishReleasePublicationToGitHubPackagesRepository
+        env:
+          CM_RELEASE: false
+          CM_SEMVER_VERSION: ${{ needs.vars.outputs.version }}
+          CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
