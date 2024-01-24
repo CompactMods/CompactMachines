@@ -1,7 +1,6 @@
 package dev.compactmods.machines.test;
 
-import java.util.HashMap;
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -11,8 +10,10 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
+import java.util.HashMap;
+
 @PrefixGameTestTemplate(false)
-@GameTestHolder(CompactMachines.MOD_ID)
+@GameTestHolder(Constants.MOD_ID)
 public class MathTests {
 
     @GameTest(template = "empty_1x1", batch = TestBatches.MATH)

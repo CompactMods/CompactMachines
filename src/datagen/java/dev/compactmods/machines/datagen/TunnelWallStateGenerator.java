@@ -1,7 +1,7 @@
 package dev.compactmods.machines.datagen;
 
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.tunnel.TunnelWallBlock;
 import dev.compactmods.machines.tunnel.Tunnels;
 import net.minecraft.core.Direction;
@@ -16,7 +16,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class TunnelWallStateGenerator extends BlockStateProvider {
     public TunnelWallStateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, CompactMachines.MOD_ID, exFileHelper);
+        super(gen, Constants.MOD_ID, exFileHelper);
     }
 
     @Override

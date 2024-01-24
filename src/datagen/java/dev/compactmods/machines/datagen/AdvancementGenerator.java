@@ -7,6 +7,7 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.advancement.trigger.BasicPlayerAdvTrigger;
 import dev.compactmods.machines.advancement.trigger.HowDidYouGetHereTrigger;
 import dev.compactmods.machines.api.core.Advancements;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -62,7 +63,7 @@ public class AdvancementGenerator implements DataProvider {
     }
 
     private ResourceLocation modLoc(String i) {
-        return new ResourceLocation(CompactMachines.MOD_ID, i);
+        return new ResourceLocation(Constants.MOD_ID, i);
     }
 
     private void generateAdvancements(Consumer<Advancement> consumer) {

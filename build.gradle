@@ -107,9 +107,14 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
+            // JetBrains Runtime Hotswap
+            jvmArg '-XX:+AllowEnhancedClassRedefinition'
+            jvmArg '-XX:HotswapAgent=fatjar'
+
             args '--username', 'Nano'
             args '--width', 1920
             args '--height', 1080
+
 
             mods {
                 compactmachines {
@@ -133,6 +138,10 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            // JetBrains Runtime Hotswap
+            jvmArg '-XX:+AllowEnhancedClassRedefinition'
+            jvmArg '-XX:HotswapAgent=fatjar'
 
             mods {
                 compactmachines {
@@ -160,6 +169,12 @@ minecraft {
             args '--existing', file('src/main/resources')
             args '--all'
             args '--output', file('src/generated/resources/')
+
+            if(!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg '-XX:+AllowEnhancedClassRedefinition'
+                jvmArg '-XX:HotswapAgent=fatjar'
+            }
 
             forceExit false
 
@@ -192,6 +207,10 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             forceExit false
+
+            // JetBrains Runtime Hotswap
+            jvmArg '-XX:+AllowEnhancedClassRedefinition'
+            jvmArg '-XX:HotswapAgent=fatjar'
 
             mods {
                 compactmachines {
@@ -244,49 +263,48 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
 
     // The One Probe
-    implementation(fg.deobf("curse.maven:theoneprobe-245211:3871444"))
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:3927520"))
 
     if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
         // Nicephore - Screenshots and Stuff
-        runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3741832"))
+        runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3879841"))
 
-        //    // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-            runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3649270"))
-            runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3597654"))
-            runtimeOnly(fg.deobf("curse.maven:pipez-443900:3760255"))
+        // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
+        runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3910759"))
+        runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3871885"))
 
-            runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3737402"))
-            runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
+        // runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3871082"))
+        // runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
 
-        //    runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
-        //    runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
-            // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
-        //
-        //    // Scalable Cat's Force, BdLib, Advanced Generators
-        //    runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
-        //    runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
-        //    runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
-        //
-        //    // Immersive Eng - 7.1.0-145 (Dec 31)
-        //    runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
+        // runtimeOnly(fg.deobf("curse.maven:refinedpipes-370696:3570151"))
+        // runtimeOnly(fg.deobf("curse.maven:prettypipes-376737:3573145"))
+        // runtimeOnly(fg.deobf("curse.maven:refinedstorage-243076:3623324"))
+
+        // Scalable Cat's Force, BdLib, Advanced Generators
+        // runtimeOnly(fg.deobf("curse.maven:scalable-320926:3634756"))
+        // runtimeOnly(fg.deobf("curse.maven:bdlib-70496:3663149"))
+        // runtimeOnly(fg.deobf("curse.maven:advgen-223622:3665335"))
+
+        // Immersive Eng - 7.1.0-145 (Dec 31)
+        // runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
 
         // FTB Chunks
-        runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
-        runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
-        runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
-        runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
+        // runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
+        // runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
+        // runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
+        // runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
 
         // Mekanism + Mek Generators - Tunnel testing
-        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3743835"))
-        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3743837"))
+        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3922056"))
+        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3922058"))
 
         // Soul Shards (FTB)
-        runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))
-        runtimeOnly(fg.deobf("curse.maven:soulshards-551523:3757202"))
+        // runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))
+        // runtimeOnly(fg.deobf("curse.maven:soulshards-551523:3757202"))
 
         // Everlasting Abilities
-        runtimeOnly(fg.deobf("curse.maven:cyclopscore-232758:3809427"))
-        runtimeOnly(fg.deobf("curse.maven:everlastabilities-248353:3768481"))
+        // runtimeOnly(fg.deobf("curse.maven:cyclopscore-232758:3809427"))
+        // runtimeOnly(fg.deobf("curse.maven:everlastabilities-248353:3768481"))
     }
 }
 

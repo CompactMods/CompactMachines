@@ -81,6 +81,11 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
         return Optional.empty();
     }
 
+    @Override
+    public boolean isLoaded(MinecraftServer serv) {
+        return level(serv).isLoaded(new BlockPos(position));
+    }
+
     public ResourceKey<Level> dimension() {
         return dimension;
     }

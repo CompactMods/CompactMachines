@@ -1,8 +1,8 @@
 package dev.compactmods.machines.datagen;
 
-import dev.compactmods.machines.CompactMachines;
-import dev.compactmods.machines.machine.CompactMachineBlock;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -11,7 +11,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class StateGenerator extends BlockStateProvider {
     public StateGenerator(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, CompactMachines.MOD_ID, exFileHelper);
+        super(gen, Constants.MOD_ID, exFileHelper);
     }
 
     @Override

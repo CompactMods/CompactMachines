@@ -22,4 +22,6 @@ public interface IDimensionalPosition {
     IDimensionalPosition relative(Direction direction);
 
     Optional<Vec3> getRotation();
+
+    boolean isLoaded(MinecraftServer serv);
 }

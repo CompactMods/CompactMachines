@@ -18,6 +18,7 @@ import dev.compactmods.machines.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.room.history.PlayerRoomHistoryItem;
 import dev.compactmods.machines.room.menu.MachineRoomMenu;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
 import dev.compactmods.machines.upgrade.RoomUpgradeItem;
@@ -255,7 +256,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         // Upgrade Item
         if (mainItem.is(CMTags.ROOM_UPGRADE_ITEM)) {
             final var reg = MachineRoomUpgrades.REGISTRY.get();
-            if(mainItem.getItem() instanceof RoomUpgradeItem upItem) {
+            if (mainItem.getItem() instanceof RoomUpgradeItem upItem) {
                 if (level.getBlockEntity(pos) instanceof CompactMachineBlockEntity tile) {
                     tile.getConnectedRoom().ifPresent(room -> {
                         Rooms.getOwner(server, room).ifPresent(prof -> {

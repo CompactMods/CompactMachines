@@ -1,11 +1,11 @@
 package dev.compactmods.machines.datagen.lang;
 
-import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
+import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
-import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
@@ -54,8 +54,8 @@ public class RussianLangGenerator extends BaseLangGenerator {
         add(Tunnels.BLOCK_TUNNEL_WALL.get(), "Прочная стена компактного механизма (с Туннелем)");
 
         // Basics
-        add(CompactMachines.MOD_ID + ".connected_block", "Подключено: %s");
-        add(CompactMachines.MOD_ID + ".direction.side", "Сторона: %s");
+        add(Constants.MOD_ID + ".connected_block", "Подключено: %s");
+        add(Constants.MOD_ID + ".direction.side", "Сторона: %s");
 
         // PSD
         add(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), "Персональное сжимающее устройство");
@@ -64,7 +64,7 @@ public class RussianLangGenerator extends BaseLangGenerator {
         add(Tunnels.ITEM_TUNNEL.get(), "Предметный туннель");
 
         // Creative Tabs
-        add("itemGroup." + CompactMachines.MOD_ID, "Компактные механизмы");
+        add("itemGroup." + Constants.MOD_ID, "Компактные механизмы");
 
         // PSD Guide Pages
         add("compactmachines.psd.pages.machines.title", "Компактные механизмы");

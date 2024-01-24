@@ -40,10 +40,6 @@ public class TunnelProvider implements IProbeInfoProvider {
         IProbeInfo v = info.vertical(info.defaultLayoutStyle().spacing(-1));
 
         if (level.getBlockEntity(hitData.getPos()) instanceof TunnelWallEntity tile) {
-
-
-
-
             if (probeMode == ProbeMode.EXTENDED) {
                 TunnelDefinition definition = tile.getTunnelType();
                 final var tunnelReg = Tunnels.TUNNEL_DEF_REGISTRY.get();
@@ -65,32 +61,32 @@ public class TunnelProvider implements IProbeInfoProvider {
                     .item(new ItemStack(Items.COMPASS))
                     .text(Component.translatable(sideTranslated));
 
-            final var connectedTo = tile.getConnectedPosition();
-            if(connectedTo != null) {
-                ServerLevel connectedWorld = (ServerLevel) level;
-                BlockPos outPosBlock = connectedTo.getBlockPosition();
+            final var connectedMachinePos = tile.getConnectedPosition();
+            final var connectedPos = connectedMachinePos.relative(tile.getConnectedSide());
 
-                try {
-                    final var state = connectedTo.state(level.getServer());
+            ServerLevel connectedWorld = (ServerLevel) level;
+            BlockPos outPosBlock = connectedMachinePos.getBlockPosition();
 
-                    // If connected block isn't air, show a connected block line
-                    if (!state.isAir()) {
-                        String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
-                        HitResult trace = new BlockHitResult(
-                                hitData.getHitVec(), hitData.getSideHit(),
-                                outPosBlock, false);
+            try {
+                final var state = connectedPos.state(level.getServer());
 
-                        ItemStack pick = state
-                                .getBlock()
-                                .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
+                // If connected block isn't air, show a connected block line
+                if (!state.isAir()) {
+                    String blockName = IProbeInfo.STARTLOC + state.getBlock().getDescriptionId() + IProbeInfo.ENDLOC;
+                    HitResult trace = new BlockHitResult(
+                            hitData.getHitVec(), hitData.getSideHit(),
+                            outPosBlock, false);
 
-                        v.horizontal(center)
-                                .item(pick)
-                                .text(Component.translatable(Constants.MOD_ID.concat(".connected_block"), blockName));
-                    }
-                } catch (Exception ex) {
-                    // no-op: we don't want to spam the log here
+                    ItemStack pick = state
+                            .getBlock()
+                            .getCloneItemStack(state, trace, connectedWorld, outPosBlock, playerEntity);
+
+                    v.horizontal(center)
+                            .item(pick)
+                            .text(Component.translatable(Constants.MOD_ID.concat(".connected_block"), blockName));
                 }
+            } catch (Exception ex) {
+                // no-op: we don't want to spam the log here
             }
         }
     }

@@ -62,9 +62,4 @@ public class MathUtil {
         return getCenterWithY(chunk, y);
     }
 
-    public static ChunkPos getChunkForRoomIndex(int roomIndex) {
-        Vec3i region = getRegionPositionByIndex(roomIndex);
-        BlockPos roomCenter = getCenterWithY(region, 0);
-        return new ChunkPos(roomCenter);
-    }
 }

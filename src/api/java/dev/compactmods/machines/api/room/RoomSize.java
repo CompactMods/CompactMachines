@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.room;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
@@ -56,5 +57,9 @@ public enum RoomSize implements StringRepresentable {
     @Override
     public String getSerializedName() {
         return this.name;
+    }
+
+    public Vec3i toVec3() {
+        return new Vec3i(internalSize, internalSize, internalSize);
     }
 }

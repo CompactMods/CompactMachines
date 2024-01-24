@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
+import dev.compactmods.machines.api.core.Constants;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +18,8 @@ import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-class DataGenUtil {
-    static <T> BiConsumer<T, ResourceLocation> makeWriter(Gson gson, @Nonnull CachedOutput cache, Path dataDir, ImmutableSet<String> pathParts, Codec<T> codec, HashMap<ResourceLocation, T> set) {
+public class DataGenUtil {
+    public static <T> BiConsumer<T, ResourceLocation> makeWriter(Gson gson, @Nonnull CachedOutput cache, Path dataDir, ImmutableSet<String> pathParts, Codec<T> codec, HashMap<ResourceLocation, T> set) {
         return (T resource, ResourceLocation regName) -> {
             if (set.containsKey(regName)) {
                 throw new IllegalStateException("Duplicate resource " + regName);
@@ -26,7 +27,7 @@ class DataGenUtil {
                 String namespace = regName.getNamespace();
                 String path = regName.getPath();
 
-                Path fileLocation = dataDir.resolve(Path.of("data", CompactMachines.MOD_ID));
+                Path fileLocation = dataDir.resolve(Path.of("data", Constants.MOD_ID));
                 for (String p : pathParts)
                     fileLocation = fileLocation.resolve(p);
 
@@ -52,7 +53,7 @@ class DataGenUtil {
                 String namespace = regName.getNamespace();
                 String path = regName.getPath();
 
-                Path fileLocation = dataDir.resolve(Path.of("data", CompactMachines.MOD_ID));
+                Path fileLocation = dataDir.resolve(Path.of("data", Constants.MOD_ID));
                 for (String p : pathParts)
                     fileLocation = fileLocation.resolve(p);
 

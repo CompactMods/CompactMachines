@@ -6,7 +6,9 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.RoomSize;
+import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.config.ServerConfig;
+import dev.compactmods.machines.core.Registries;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -20,6 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.RegistryBuilder;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.Objects;
@@ -39,8 +42,7 @@ public class Rooms {
         int nextPosition = rooms.getNextSpiralPosition();
         Vec3i location = MathUtil.getRegionPositionByIndex(nextPosition);
 
-        int centerY = ServerConfig.MACHINE_FLOOR_Y.get() + (size.getInternalSize() / 2);
-        BlockPos newCenter = MathUtil.getCenterWithY(location, centerY);
+        BlockPos newCenter = MathUtil.getCenterWithY(location, ServerConfig.MACHINE_FLOOR_Y.get());
 
         // Generate a new machine room
         CompactStructureGenerator.generateCompactStructure(compactWorld, size, newCenter);
@@ -137,7 +139,7 @@ public class Rooms {
                 .flatMap(sl -> {
                     final var graph = DimensionMachineGraph.forDimension(sl);
                     return graph.getMachinesFor(room).stream()
-                        .map(bp -> new LevelBlockPosition(sl.dimension(), bp));
+                            .map(bp -> new LevelBlockPosition(sl.dimension(), bp));
                 });
     }
 
@@ -175,7 +177,7 @@ public class Rooms {
     }
 
     public static void resetSpawn(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
-        if(!exists(server, room))
+        if (!exists(server, room))
             throw new NonexistentRoomException(room);
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
@@ -190,7 +192,7 @@ public class Rooms {
     }
 
     public static Optional<String> getRoomName(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {
-        if(!exists(server, room))
+        if (!exists(server, room))
             throw new NonexistentRoomException(room);
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
@@ -201,7 +203,7 @@ public class Rooms {
     }
 
     public static Optional<GameProfile> getOwner(MinecraftServer server, ChunkPos room) {
-        if(!exists(server, room))
+        if (!exists(server, room))
             return Optional.empty();
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
@@ -218,7 +220,7 @@ public class Rooms {
     }
 
     public static void updateName(MinecraftServer server, ChunkPos room, String newName) throws NonexistentRoomException {
-        if(!exists(server, room))
+        if (!exists(server, room))
             throw new NonexistentRoomException(room);
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);

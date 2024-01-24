@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
@@ -49,14 +48,6 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 .setValue(TUNNEL_SIDE, Direction.UP)
                 .setValue(REDSTONE, false)
         );
-    }
-
-    public static Optional<TunnelDefinition> getTunnelInfo(BlockGetter world, BlockPos position) {
-        TunnelWallEntity tile = (TunnelWallEntity) world.getBlockEntity(position);
-        if (tile == null)
-            return Optional.empty();
-
-        return Optional.ofNullable(tile.getTunnelType());
     }
 
     @Override
@@ -101,7 +92,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
         if (!(level.getBlockEntity(pos) instanceof TunnelWallEntity tunnel))
             return InteractionResult.FAIL;
 
-        if(level.dimension().equals(CompactDimension.LEVEL_KEY) && level instanceof ServerLevel compactDim) {
+        if (level.dimension().equals(CompactDimension.LEVEL_KEY) && level instanceof ServerLevel compactDim) {
             var def = tunnel.getTunnelType();
             final Direction tunnelWallSide = hitResult.getDirection();
 
@@ -117,8 +108,8 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 ItemEntity ie = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
                 level.addFreshEntity(ie);
 
-                if (def instanceof TunnelTeardownHandler teardown) {
-                    teardown.onRemoved(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel());
+                if (def instanceof TunnelTeardownHandler<?> teardown) {
+                    teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
                 }
 
                 final var tunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
@@ -144,8 +135,8 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 next.ifPresent(newSide -> {
                     level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
-                    if (def instanceof TunnelTeardownHandler teardown) {
-                        teardown.onRotated(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel(), dir, newSide);
+                    if (def instanceof TunnelTeardownHandler<?> teardown) {
+                        teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
                     }
 
                     tunnelGraph.rotateTunnel(pos, newSide);
