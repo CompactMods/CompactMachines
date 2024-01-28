@@ -1,0 +1,99 @@
+name: Announce Latest Nightly to Discord
+
+on:
+  workflow_dispatch:
+    inputs:
+      diagnostic_mode:
+        description: Diagnostic Mode
+        type: boolean
+        default: false
+        required: true
+
+jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-22.04
+    outputs:
+      mcVersion: ${{steps.gradle_props.outputs.minecraft_version}}
+      forgeVersion: ${{steps.gradle_props.outputs.forge_version}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Read MC and Forge versions
+        id: gradle_props
+        uses: christian-draeger/read-properties@1.1.0
+        with:
+          path: "gradle.properties"
+          properties: "minecraft_version forge_version"
+
+  get-package-info:
+    name: Get Latest Package Info
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.download-info.outputs.version }}
+    steps:
+      - name: Download Package Info
+        id: download-info
+        uses: compactmods/dl-package-info@1.0.2
+        env:
+          GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          owner: compactmods
+          repo: compactmachines
+          group: dev.compactmods.compactmachines
+          filter: "^compactmachines-(?:[\\d\\.]{4})\.jar$"
+          outputFile: compactmachines-nightly.json
+
+      - name: Debug output
+        run: |
+          echo "Version: ${{ steps.download-info.outputs.version }}"
+          cat compactmachines-nightly.json
+
+      - name: Read info into variable [latest]
+        id: info
+        run: echo "latestJson=$(cat compactmachines-nightly.json)" >> $GITHUB_OUTPUT
+
+      - name: Download JAR and prepare artifacts
+        run: |
+          mkdir release
+          curl -L "${{ fromJson(steps.info.outputs.latestJson)[0].url }}" -o "release/${{ fromJson(steps.info.outputs.latestJson)[0].name}}"
+          mv compactmachines-nightly.json release/compactmachines-nightly.json
+
+      - name: Add Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: release
+
+  announce:
+    name: Discord Announcement
+    needs: [ vars, get-package-info ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Grab JAR and Info
+        uses: actions/download-artifact@v3
+        with:
+          name: release
+          path: .
+
+      - name: Read info into variable [latest]
+        id: info
+        run: echo "latestJson=$(cat compactmachines-nightly.json)" >> $GITHUB_OUTPUT
+
+      - name: Announce Release
+        uses: compactmods/discord-releaser@0.1.5
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        with:
+          filename: ${{ fromJson(steps.info.outputs.latestJson)[0].name}}
+          channel: ${{ secrets.NIGHTLY_CHANNEL_ID }}
+          modName: Compact Machines
+          modVersion: ${{ needs.get-package-info.outputs.version }}
+          thumbnail: https://media.forgecdn.net/avatars/10/602/635460270800375500.png
+
+          forgeVersion: ${{ needs.vars.outputs.forgeVersion }}
+          mcVersion: ${{ needs.vars.outputs.mcVersion }}
