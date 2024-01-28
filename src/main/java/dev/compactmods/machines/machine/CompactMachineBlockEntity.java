@@ -9,6 +9,7 @@ import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
 import dev.compactmods.machines.machine.graph.legacy.LegacyMachineConnections;
 import dev.compactmods.machines.room.graph.CompactMachineRoomNode;
+import dev.compactmods.machines.tunnel.TunnelHelper;
 import dev.compactmods.machines.tunnel.TunnelWallEntity;
 import dev.compactmods.machines.tunnel.graph.TunnelConnectionGraph;
 import dev.compactmods.machines.tunnel.graph.TunnelNode;
@@ -237,6 +238,7 @@ public class CompactMachineBlockEntity extends BlockEntity {
                     .ifPresent(roomNode -> this.roomNode = new WeakReference<>(roomNode));
 
             this.setChanged();
+            forceLoadIfHasTunnels();
         }
     }
 
@@ -258,6 +260,18 @@ public class CompactMachineBlockEntity extends BlockEntity {
             setChanged();
         }
     }
+
+    public void forceLoadIfHasTunnels() {
+        if(level == null || roomChunk == null) return;
+
+        if (level instanceof ServerLevel sl) {
+            final var compactDim = CompactDimension.forServer(sl.getServer());
+            if (compactDim == null) return;
+            final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, roomChunk);
+            TunnelHelper.setChunkMode(compactDim, roomChunk, tunnelGraph.tunnels().findAny().isPresent());
+        }
+    }
+
 
     public Stream<BlockPos> getTunnels(Direction dir) {
         if(level == null || roomChunk == null) return Stream.empty();
