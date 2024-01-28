@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Download Package Info
         id: download-info
-        uses: compactmods/dl-package-info@1.0.2
+        uses: compactmods/dl-package-info@1.0.3
         env:
           GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
