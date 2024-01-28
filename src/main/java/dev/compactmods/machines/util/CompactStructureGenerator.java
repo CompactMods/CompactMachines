@@ -125,17 +125,4 @@ public class CompactStructureGenerator {
 
         return cubeFloorCenter.offset(offset);
     }
-
-    /**
-     * Generates a machine "internal" structure in a world via a machine size and a central point.
-     *
-     * @param world
-     * @param size
-     * @param cubeFloorCenter
-     */
-    @Deprecated(forRemoval = true)
-    public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos cubeFloorCenter) {
-        int s = size.getInternalSize();
-        generateCompactStructure(world, new Vec3i(s, s, s), cubeFloorCenter);
-    }
 }
