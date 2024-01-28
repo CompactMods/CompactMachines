@@ -266,18 +266,9 @@ public class CompactMachineBlockEntity extends BlockEntity {
 
         if (level instanceof ServerLevel sl) {
             final var compactDim = CompactDimension.forServer(sl.getServer());
-            if(compactDim == null) return;
-
+            if (compactDim == null) return;
             final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, roomChunk);
-            boolean forceLoad = false;
-            for (Direction direction : Direction.values()) {
-                if (tunnelGraph.getTunnelsForSide(getLevelPosition(), direction).map(TunnelNode::position).findAny().isPresent()) {
-                    forceLoad = true;
-                    break;
-                }
-            }
-
-            TunnelHelper.setChunkMode(compactDim, roomChunk, forceLoad);
+            TunnelHelper.setChunkMode(compactDim, roomChunk, tunnelGraph.tunnels().findAny().isPresent());
         }
     }
 
