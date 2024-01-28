@@ -6,6 +6,7 @@ import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.upgrade.ILevelLoadedUpgradeListener;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.commands.ForceLoadCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
@@ -50,14 +51,14 @@ public class ChunkloadUpgrade implements RoomUpgrade, ILevelLoadedUpgradeListene
         final var chunks = level.getChunkSource();
         level.setChunkForced(room.x, room.z, true);
         chunks.addRegionTicket(CM4_LOAD_TYPE, room, 2, room);
-        chunks.save(false);
+        chunks.save(true);
     }
 
     private void normalLoad(ServerLevel level, ChunkPos room) {
         final var chunks = level.getChunkSource();
         level.setChunkForced(room.x, room.z, false);
         chunks.removeRegionTicket(CM4_LOAD_TYPE, room, 2, room);
-        chunks.save(false);
+        chunks.save(true);
     }
 }
 
