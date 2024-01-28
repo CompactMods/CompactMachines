@@ -107,14 +107,15 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            // JetBrains Runtime Hotswap
-            jvmArg '-XX:+AllowEnhancedClassRedefinition'
-            jvmArg '-XX:HotswapAgent=fatjar'
+            if(!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg '-XX:+AllowEnhancedClassRedefinition'
+                jvmArg '-XX:HotswapAgent=fatjar'
+            }
 
             args '--username', 'Nano'
             args '--width', 1920
             args '--height', 1080
-
 
             mods {
                 compactmachines {
@@ -139,9 +140,11 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-            // JetBrains Runtime Hotswap
-            jvmArg '-XX:+AllowEnhancedClassRedefinition'
-            jvmArg '-XX:HotswapAgent=fatjar'
+            if(!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg '-XX:+AllowEnhancedClassRedefinition'
+                jvmArg '-XX:HotswapAgent=fatjar'
+            }
 
             mods {
                 compactmachines {
@@ -210,10 +213,12 @@ minecraft {
 
             forceExit false
 
-            // JetBrains Runtime Hotswap
-            jvmArg '-XX:+AllowEnhancedClassRedefinition'
-            jvmArg '-XX:HotswapAgent=fatjar'
-
+            if(!System.getenv().containsKey("CI")) {
+                // JetBrains Runtime Hotswap
+                jvmArg '-XX:+AllowEnhancedClassRedefinition'
+                jvmArg '-XX:HotswapAgent=fatjar'
+            }
+            
             mods {
                 compactmachines {
                     source sourceSets.tunnels
