@@ -23,6 +23,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nonnull;
@@ -124,7 +125,8 @@ public class CompactRoomData extends SavedData {
 
         return new LevelBlockPosition(
                 CompactDimension.LEVEL_KEY,
-                roomData.getSpawn()
+                roomData.getSpawn(),
+                roomData.getSpawnRotation()
         );
     }
 
@@ -132,12 +134,17 @@ public class CompactRoomData extends SavedData {
         return this.roomData.size() + 1;
     }
 
+    @Deprecated
     public void setSpawn(ChunkPos roomChunk, Vec3 position) {
+        setSpawn(roomChunk, position, Vec2.ZERO);
+    }
+
+    public void setSpawn(ChunkPos roomChunk, Vec3 position, Vec2 rotation) {
         if (!roomData.containsKey(roomChunk))
             return;
 
         RoomData roomData = this.roomData.get(roomChunk);
-        roomData.setSpawn(position);
+        roomData.setSpawn(position, rotation);
 
         setDirty();
     }
@@ -218,7 +225,7 @@ public class CompactRoomData extends SavedData {
         }
 
         public void register() throws OperationNotSupportedException {
-            RoomData data = new RoomData(owner, center, spawn, size, Optional.empty());
+            RoomData data = new RoomData(owner, center, spawn, Vec2.ZERO, size, Optional.empty());
             storage.register(chunk, data);
         }
     }
@@ -229,6 +236,7 @@ public class CompactRoomData extends SavedData {
                 CodecExtensions.UUID_CODEC.fieldOf("owner").forGetter(RoomData::getOwner),
                 BlockPos.CODEC.fieldOf("center").forGetter(RoomData::getCenter),
                 CodecExtensions.VECTOR3D.fieldOf("spawn").forGetter(RoomData::getSpawn),
+                CodecExtensions.VECTOR2.optionalFieldOf("spawnRot", Vec2.ZERO).forGetter(RoomData::getSpawnRotation),
                 RoomSize.CODEC.fieldOf("size").forGetter(RoomData::getSize),
                 Codec.STRING.optionalFieldOf("name").forGetter(RoomData::getName)
         ).apply(i, RoomData::new));
@@ -236,14 +244,16 @@ public class CompactRoomData extends SavedData {
         private final UUID owner;
         private final BlockPos center;
         private Vec3 spawn;
+        private @org.jetbrains.annotations.Nullable Vec2 spawnRotation;
         private final RoomSize size;
         private boolean hasCustomName;
         private String name;
 
-        public RoomData(UUID owner, BlockPos center, Vec3 spawn, RoomSize size, Optional<String> name) {
+        public RoomData(UUID owner, BlockPos center, Vec3 spawn, Vec2 spawnRotation, RoomSize size, Optional<String> name) {
             this.owner = owner;
             this.center = center;
             this.spawn = spawn;
+            this.spawnRotation = spawnRotation;
             this.size = size;
 
             name.ifPresentOrElse(n -> {
@@ -278,12 +288,22 @@ public class CompactRoomData extends SavedData {
             return this.spawn;
         }
 
+        public Vec2 getSpawnRotation() {
+            return this.spawnRotation;
+        }
+
         public BlockPos getCenter() {
             return this.center;
         }
 
+        @Deprecated(forRemoval = true)
         public void setSpawn(Vec3 newSpawn) {
+            setSpawn(newSpawn, Vec2.ZERO);
+        }
+
+        public void setSpawn(Vec3 newSpawn, Vec2 rotation) {
             this.spawn = newSpawn;
+            this.spawnRotation = rotation;
         }
 
         public AABB getRoomBounds() {

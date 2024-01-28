@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -29,12 +30,12 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
 
     private ResourceKey<Level> dimension;
     private Vec3 position;
-    private Vec3 rotation;
+    private Vec2 rotation;
 
     public static final Codec<LevelBlockPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
             ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(LevelBlockPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(LevelBlockPosition::getExactPosition),
-            CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(x -> x.rotation)
+            CodecExtensions.VECTOR2.optionalFieldOf("rot", Vec2.ZERO).forGetter(x -> x.rotation)
     ).apply(i, LevelBlockPosition::new));
 
     private LevelBlockPosition() {
@@ -43,29 +44,29 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     public LevelBlockPosition(IDimensionalBlockPosition base) {
         this.dimension = base.dimensionKey();
         this.position = base.getExactPosition();
-        this.rotation = Vec3.ZERO;
+        this.rotation = Vec2.ZERO;
     }
 
     public LevelBlockPosition(ResourceKey<Level> world, BlockPos positionBlock) {
-        this(world, Vec3.ZERO, Vec3.ZERO);
+        this(world, Vec3.ZERO, Vec2.ZERO);
         this.position = new Vec3(positionBlock.getX(), positionBlock.getY(), positionBlock.getZ());
-        this.rotation = Vec3.ZERO;
+        this.rotation = Vec2.ZERO;
     }
 
     public LevelBlockPosition(ResourceKey<Level> world, Vec3 positionBlock) {
-        this(world, positionBlock, Vec3.ZERO);
+        this(world, positionBlock, Vec2.ZERO);
         this.dimension = world;
-        this.rotation = Vec3.ZERO;
+        this.rotation = Vec2.ZERO;
     }
 
-    public LevelBlockPosition(ResourceKey<Level> dim, Vec3 pos, Vec3 rotation) {
+    public LevelBlockPosition(ResourceKey<Level> dim, Vec3 pos, Vec2 rotation) {
         this.dimension = dim;
         this.position = pos;
         this.rotation = rotation;
     }
 
     public static LevelBlockPosition fromEntity(LivingEntity entity) {
-        return new LevelBlockPosition(entity.level.dimension(), entity.position());
+        return new LevelBlockPosition(entity.level.dimension(), entity.position(), entity.getRotationVector());
     }
 
     public ServerLevel level(@Nonnull MinecraftServer server) {
@@ -97,7 +98,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     @Override
     public CompoundTag serializeNBT() {
         if(this.rotation == null)
-            this.rotation = Vec3.ZERO;
+            this.rotation = Vec2.ZERO;
 
         DataResult<Tag> nbt = CODEC.encodeStart(NbtOps.INSTANCE, this);
         return (CompoundTag) nbt.result().orElse(null);
@@ -120,7 +121,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
         return this.dimension;
     }
 
-    public Optional<Vec3> getRotation() {
+    public Optional<Vec2> getRotation() {
         return Optional.of(this.rotation);
     }
 

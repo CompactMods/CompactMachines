@@ -16,6 +16,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import javax.naming.OperationNotSupportedException;
@@ -98,7 +99,7 @@ public class Rooms {
         final var centerPoint = Vec3.atCenterOf(roomInfo.getCenter());
         final var newSpawn = centerPoint.subtract(0, (roomInfo.getSize().getInternalSize() / 2f), 0);
 
-        data.setSpawn(room, newSpawn);
+        data.setSpawn(room, newSpawn, Vec2.ZERO);
     }
 
     public static Optional<String> getRoomName(MinecraftServer server, ChunkPos room) throws NonexistentRoomException {

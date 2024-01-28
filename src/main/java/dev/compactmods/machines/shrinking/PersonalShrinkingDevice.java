@@ -69,7 +69,7 @@ public class PersonalShrinkingDevice extends Item {
                     final CompactRoomData intern = CompactRoomData.get(playerDim);
 
                     // Use internal data to set new spawn point
-                    intern.setSpawn(machineChunk, player.position());
+                    intern.setSpawn(machineChunk, player.position(), player.getRotationVector());
 
                     MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
                             .withStyle(ChatFormatting.GREEN);

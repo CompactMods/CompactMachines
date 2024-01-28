@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -90,11 +91,11 @@ public abstract class PlayerUtil {
 
         serv.submitAsync(() -> {
             Vec3 sp = spawn.getExactPosition();
-            Vec3 sr = spawn.getRotation().orElse(new Vec3(player.xRotO, player.yRotO, 0));
+            Vec2 sr = spawn.getRotation().orElse(player.getRotationVector());
 
             if (player instanceof ServerPlayer servPlayer) {
-                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(sp));
-
+                servPlayer.changeDimension(compactDim, SimpleTeleporter.to(sp, sr));
+                servPlayer.setCamera(null); // force camera update
                 if (grantAdvancement)
                     AdvancementTriggers.getTriggerForMachineClaim(roomSize).trigger(servPlayer);
             }
@@ -120,11 +121,10 @@ public abstract class PlayerUtil {
 
                 final var level = spawnPoint.level(serv);
 
-                Vec3 worldPos, entryRot;
-                worldPos = spawnPoint.getExactPosition();
-                entryRot = spawnPoint.getRotation().orElse(Vec3.ZERO);
+                Vec3 worldPos = spawnPoint.getExactPosition();
+                Vec2 entryRot = spawnPoint.getRotation().orElse(Vec2.ZERO);
 
-                serverPlayer.changeDimension(level, SimpleTeleporter.to(worldPos));
+                serverPlayer.changeDimension(level, SimpleTeleporter.to(worldPos, entryRot));
             } else {
                 howDidYouGetThere(serverPlayer);
 

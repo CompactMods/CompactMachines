@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
-import dev.compactmods.machines.util.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -13,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Objects;
@@ -77,7 +77,7 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
     }
 
     @Override
-    public Optional<Vec3> getRotation() {
+    public Optional<Vec2> getRotation() {
         return Optional.empty();
     }
 

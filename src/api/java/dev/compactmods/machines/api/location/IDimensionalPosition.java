@@ -1,15 +1,15 @@
 package dev.compactmods.machines.api.location;
 
-import java.util.Optional;
-
-import com.mojang.serialization.Codec;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Optional;
 
 public interface IDimensionalPosition {
 
@@ -21,7 +21,7 @@ public interface IDimensionalPosition {
 
     IDimensionalPosition relative(Direction direction);
 
-    Optional<Vec3> getRotation();
+    Optional<Vec2> getRotation();
 
     boolean isLoaded(MinecraftServer serv);
 }
