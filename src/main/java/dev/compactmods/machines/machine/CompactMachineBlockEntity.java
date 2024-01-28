@@ -4,7 +4,6 @@ import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineNbt;
 import dev.compactmods.machines.location.LevelBlockPosition;
-import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
 import dev.compactmods.machines.machine.graph.CompactMachineNode;
@@ -273,20 +272,5 @@ public class CompactMachineBlockEntity extends BlockEntity {
         }
 
         return Stream.empty();
-    }
-
-    public Optional<RoomTunnelConnections> getTunnelGraph() {
-        if(level == null || roomChunk == null) return Optional.empty();
-
-        if(level instanceof ServerLevel sl) {
-            final var compactDim = CompactDimension.forServer(sl.getServer());
-            if (compactDim == null)
-                return Optional.empty();
-
-            final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, roomChunk);
-            return Optional.of(tunnelGraph);
-        }
-
-        return Optional.empty();
     }
 }

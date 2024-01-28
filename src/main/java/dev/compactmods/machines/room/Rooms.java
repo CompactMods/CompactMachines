@@ -6,9 +6,7 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.location.IDimensionalPosition;
 import dev.compactmods.machines.api.room.RoomSize;
-import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.config.ServerConfig;
-import dev.compactmods.machines.core.Registries;
 import dev.compactmods.machines.dimension.MissingDimensionException;
 import dev.compactmods.machines.location.LevelBlockPosition;
 import dev.compactmods.machines.machine.graph.DimensionMachineGraph;
@@ -22,7 +20,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.RegistryBuilder;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.Objects;

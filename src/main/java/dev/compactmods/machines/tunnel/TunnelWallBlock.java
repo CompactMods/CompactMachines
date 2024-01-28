@@ -2,7 +2,6 @@ package dev.compactmods.machines.tunnel;
 
 import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.TunnelPosition;
 import dev.compactmods.machines.api.tunnels.lifecycle.TunnelTeardownHandler;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -109,7 +108,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                 level.addFreshEntity(ie);
 
                 if (def instanceof TunnelTeardownHandler<?> teardown) {
-                    teardown.onRemoved(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel());
+                    teardown.onRemoved(new TunnelPosition(compactDim, pos, tunnelWallSide), tunnel.getTunnel());
                 }
 
                 final var tunnels = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
@@ -120,7 +119,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
 
                 final var tunnelGraph = TunnelConnectionGraph.forRoom(compactDim, new ChunkPos(pos));
                 final var existingDirs = tunnelGraph
-                        .getTunnelSides(def)
+                        .getTunnelSides(Tunnels.getRegistryId(def))
                         .collect(Collectors.toSet());
 
                 if (existingDirs.size() == 6) {
@@ -136,7 +135,7 @@ public class TunnelWallBlock extends ProtectedWallBlock implements EntityBlock {
                     level.setBlockAndUpdate(pos, state.setValue(CONNECTED_SIDE, newSide));
 
                     if (def instanceof TunnelTeardownHandler<?> teardown) {
-                        teardown.onRotated(compactDim.getServer(), new TunnelPosition(pos, tunnelWallSide, tunnelConnectedSide), tunnel.getTunnel(), dir, newSide);
+                        teardown.onRotated(tunnel.tunnelPosition(), tunnel.getTunnel(), dir, newSide);
                     }
 
                     tunnelGraph.rotateTunnel(pos, newSide);

@@ -68,7 +68,7 @@ public class TunnelProvider implements IProbeInfoProvider {
             BlockPos outPosBlock = connectedMachinePos.getBlockPosition();
 
             try {
-                final var state = connectedPos.state(level.getServer());
+                final var state = connectedPos.level(level.getServer()).getBlockState(connectedPos.getBlockPosition());
 
                 // If connected block isn't air, show a connected block line
                 if (!state.isAir()) {

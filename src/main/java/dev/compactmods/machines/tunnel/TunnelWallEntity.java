@@ -252,7 +252,11 @@ public class TunnelWallEntity extends BlockEntity {
         setChanged();
     }
 
-    public TunnelPosition getTunnelPosition() {
-        return new TunnelPosition(worldPosition, getTunnelSide(), getConnectedSide());
+    @org.jetbrains.annotations.Nullable
+    public TunnelPosition tunnelPosition() {
+        if(level instanceof ServerLevel sl)
+            return new TunnelPosition(sl, worldPosition, getConnectedSide());
+
+        return null;
     }
 }

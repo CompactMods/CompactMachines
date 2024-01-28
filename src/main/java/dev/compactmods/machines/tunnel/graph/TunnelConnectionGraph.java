@@ -8,8 +8,6 @@ import dev.compactmods.machines.api.codec.NbtListCollector;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import dev.compactmods.machines.api.tunnels.TunnelDefinition;
 import dev.compactmods.machines.api.tunnels.capability.CapabilityTunnel;
-import dev.compactmods.machines.api.tunnels.connection.RoomTunnelConnections;
-import dev.compactmods.machines.api.tunnels.redstone.RedstoneTunnel;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.graph.*;
 import dev.compactmods.machines.location.LevelBlockPosition;
@@ -37,7 +35,7 @@ import java.util.stream.Stream;
  * Represents a room's tunnel connections in a graph-style format.
  * This should be accessed through the saved data for specific machine room chunks.
  */
-public class TunnelConnectionGraph extends SavedData implements INBTSerializable<CompoundTag>, RoomTunnelConnections {
+public class TunnelConnectionGraph extends SavedData implements INBTSerializable<CompoundTag> {
 
     /**
      * The full data graph. Contains tunnel nodes, machine ids, and tunnel type information.

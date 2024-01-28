@@ -5,12 +5,8 @@ import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -141,12 +137,5 @@ public class CompactStructureGenerator {
     public static void generateCompactStructure(LevelAccessor world, RoomSize size, BlockPos cubeFloorCenter) {
         int s = size.getInternalSize();
         generateCompactStructure(world, new Vec3i(s, s, s), cubeFloorCenter);
-    }
-
-    public static void fillRoomTemplate(ServerLevel level, ResourceLocation template, Vec3i dimensions, BlockPos cubeFloorCenter) {
-        level.getStructureManager().get(template).ifPresent(tem -> {
-            BlockPos placeAt = cornerFromSize(dimensions, cubeFloorCenter);
-            tem.placeInWorld(level, placeAt, placeAt, new StructurePlaceSettings(), level.random, Block.UPDATE_ALL);
-        });
     }
 }

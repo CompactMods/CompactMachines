@@ -1,14 +1,12 @@
 package dev.compactmods.machines.test.worldgen;
 
 import dev.compactmods.machines.api.core.Constants;
-import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.util.CompactStructureGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -25,9 +23,6 @@ public class RoomGenerationTests {
         CompactStructureGenerator.generateCompactStructure(test.getLevel(), roomDims, roomCenter);
 
         test.setBlock(new BlockPos(7, 8, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactStructureGenerator.fillRoomTemplate(test.getLevel(),
-                new ResourceLocation(Constants.MOD_ID, "template_max"),
-                roomDims, roomCenter);
 
         test.succeed();
     }
@@ -40,9 +35,6 @@ public class RoomGenerationTests {
         CompactStructureGenerator.generateCompactStructure(test.getLevel(), roomDims, roomCenter);
 
         test.setBlock(new BlockPos(7, 5, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactStructureGenerator.fillRoomTemplate(test.getLevel(),
-                RoomTemplate.NO_TEMPLATE,
-                roomDims, roomCenter);
 
         test.succeed();
     }
@@ -55,9 +47,6 @@ public class RoomGenerationTests {
         CompactStructureGenerator.generateCompactStructure(test.getLevel(), roomDims, roomCenter);
 
         test.setBlock(new BlockPos(7, 4, 7), Blocks.GOLD_BLOCK.defaultBlockState());
-        CompactStructureGenerator.fillRoomTemplate(test.getLevel(),
-                RoomTemplate.NO_TEMPLATE,
-                roomDims, roomCenter);
 
         test.succeed();
     }
