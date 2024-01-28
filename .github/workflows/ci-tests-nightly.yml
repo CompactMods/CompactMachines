@@ -108,7 +108,6 @@ jobs:
         with:
           name: test-data
           path: run/gametest
-
   nightly:
     name: Publish Nightly
     runs-on: ubuntu-20.04
@@ -153,7 +152,7 @@ jobs:
           CM_BUILD_NUM: ${{ needs.vars.outputs.build }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   announce:
     uses: ./.github/workflows/announce-latest-nightly.yml
+    needs: [ nightly ]
     secrets: inherit
