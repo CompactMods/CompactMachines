@@ -29,8 +29,7 @@ import java.util.stream.Stream;
 
 public class Rooms {
     public static ChunkPos createNew(MinecraftServer serv, RoomSize size, UUID owner) throws MissingDimensionException {
-        final var compactWorld = serv.getLevel(CompactDimension.LEVEL_KEY);
-
+        final var compactWorld = CompactDimension.forServer(serv);
         if (compactWorld == null)
             throw new MissingDimensionException();
 

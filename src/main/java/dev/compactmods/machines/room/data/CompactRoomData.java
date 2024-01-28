@@ -186,7 +186,7 @@ public class CompactRoomData extends SavedData {
             BlockPos centerAtFloor = MathUtil.getCenterWithY(chunk, ServerConfig.MACHINE_FLOOR_Y.get());
             BlockPos centerSized = centerAtFloor.above(size.getInternalSize() / 2);
 
-            this.spawn = new Vec3(centerAtFloor.getX(), centerAtFloor.getY(), centerAtFloor.getZ());
+            this.spawn = new Vec3(centerAtFloor.getX(), centerAtFloor.getY() + 2, centerAtFloor.getZ());
             this.center = centerSized;
         }
 
