@@ -1,6 +1,8 @@
 name: Announce Latest Nightly to Discord
 
 on:
+  workflow_call:
+    
   workflow_dispatch:
     inputs:
       diagnostic_mode:
