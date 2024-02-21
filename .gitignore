@@ -40,3 +40,9 @@ raw-assets/
 forge-main/src/generated/resources/.cache/
 
 forge-main/src/generated/
+
+neoforge-main/runs/
+
+.architectury-transformer/
+
+neoforge-datagen/runs/

@@ -1,27 +1,64 @@
+dependencyResolutionManagement {
+    versionCatalogs.create("libraries") {
+        library("feather", "dev.compactmods", "feather")
+                .versionRef("feather")
+
+        library("jnanoid", "com.aventrix.jnanoid", "jnanoid")
+                .versionRef("jnanoid")
+
+        library("neoforge", "net.neoforged", "neoforge")
+                .versionRef("neoforge")
+
+        version("minecraft", "1.20.4")
+        version("feather", "[0.1.8, 2.0)")
+        version("jnanoid", "[2.0.0, 3)")
+        version("neoforge", "20.4.153-beta")
+    }
+}
+
 pluginManagement {
+    plugins {
+        id("idea")
+        id("eclipse")
+        id("maven-publish")
+        id("java-library")
+    }
+
     repositories {
-        mavenCentral()
         mavenLocal()
-        maven("https://maven.minecraftforge.net") {
-            name = "Minecraft Forge"
-        }
+        mavenCentral()
+        gradlePluginPortal()
+
+        // maven("https://maven.architectury.dev/")
 
         maven("https://maven.parchmentmc.org") {
             name = "ParchmentMC"
         }
-    }
 
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "net.minecraftforge.gradle") {
-                useModule("${requested.id}:ForgeGradle:${requested.version}")
-            }
+        maven("https://maven.neoforged.net/releases") {
+            name = "NeoForged"
+        }
+
+        maven("https://repo.spongepowered.org/repository/maven-public/") {
+            name = "Sponge Snapshots"
         }
     }
 }
 
-rootProject.name = "Compact Machines"
-include("forge-tunnels-api")
-include("forge-main")
-include("forge-builtin")
-include("forge-datagen")
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
+}
+
+include(":core:core")
+include(":core:core-api")
+include(":core:room-api")
+include(":core:room-upgrade-api")
+
+project(":core:core").projectDir = file("./core/core")
+project(":core:core-api").projectDir = file("./core/core-api")
+project(":core:room-api").projectDir = file("./core/room-api")
+project(":core:room-upgrade-api").projectDir = file("./core/room-upgrade-api")
+
+include("neoforge-main")
+include("neoforge-datagen")
+
