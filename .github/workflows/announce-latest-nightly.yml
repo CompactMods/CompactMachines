@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       mcVersion: ${{steps.gradle_props.outputs.minecraft_version}}
-      forgeVersion: ${{steps.gradle_props.outputs.forge_version}}
 
     steps:
       - name: Checkout
@@ -30,7 +29,7 @@ jobs:
         uses: christian-draeger/read-properties@1.1.0
         with:
           path: "gradle.properties"
-          properties: "minecraft_version forge_version"
+          properties: "minecraft_version"
 
   get-package-info:
     name: Get Latest Package Info
@@ -40,7 +39,7 @@ jobs:
     steps:
       - name: Download Package Info
         id: download-info
-        uses: compactmods/dl-package-info@1.0.2
+        uses: compactmods/dl-package-info@1.0.3
         env:
           GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -96,6 +95,4 @@ jobs:
           modName: Compact Machines
           modVersion: ${{ needs.get-package-info.outputs.version }}
           thumbnail: https://media.forgecdn.net/avatars/10/602/635460270800375500.png
-
-          forgeVersion: ${{ needs.vars.outputs.forgeVersion }}
           mcVersion: ${{ needs.vars.outputs.mcVersion }}
