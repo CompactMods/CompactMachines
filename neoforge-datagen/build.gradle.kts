@@ -17,6 +17,10 @@ val roomUpgradeApi = project(":core:room-upgrade-api")
 
 val coreProjects = listOf(core, coreApi, roomApi, roomUpgradeApi)
 
+coreProjects.forEach {
+    project.evaluationDependsOn(it.path)
+}
+
 base {
     group = "dev.compactmods.compactmachines"
     archivesName.set(mod_id)
