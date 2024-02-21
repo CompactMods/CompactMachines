@@ -47,10 +47,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Datagen
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: runData
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Data Generation
+        run: ./gradlew runData
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,6 +92,9 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Pull Built Generated Data
         uses: actions/download-artifact@v3
         with:
@@ -98,9 +102,7 @@ jobs:
           path: neoforge-main/src/generated/resources
 
       - name: Publish
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publish
+        run: ./gradlew publish
         env:
           VERSION: ${{ needs.vars.outputs.version }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
