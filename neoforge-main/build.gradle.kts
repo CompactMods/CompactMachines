@@ -213,6 +213,7 @@ val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/
 publishing {
     publications.register<MavenPublication>("compactmachines") {
         artifactId = "$modId-neoforge"
+        this.artifact(tasks.jarJar)
         from(components.getByName("java"))
     }
 
