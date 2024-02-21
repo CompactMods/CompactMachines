@@ -5,7 +5,6 @@ import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.util.BlockSpaceUtil;
 import dev.compactmods.machines.machine.BuiltInRoomTemplate;
-import dev.compactmods.machines.test.TestBatches;
 import dev.compactmods.machines.test.util.TestUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,6 +26,8 @@ import java.util.List;
 @PrefixGameTestTemplate(false)
 @GameTestHolder(Constants.MOD_ID)
 public class RoomGenerationTests {
+
+    public static final String BATCH = "room_generation";
 
     @GameTestGenerator
     public static Collection<TestFunction> roomTests() {
@@ -59,7 +60,7 @@ public class RoomGenerationTests {
         testHelper.succeed();
     }
 
-    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
+    @GameTest(template = "empty_15x15", batch = BATCH)
     public static void checkOffsetsNormalTest(final GameTestHelper testHelper) {
         final var logs = LogManager.getLogger();
 
@@ -80,7 +81,7 @@ public class RoomGenerationTests {
         testHelper.succeed();
     }
 
-    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
+    @GameTest(template = "empty_15x15", batch = BATCH)
     public static void checkRoomGeneratorNormal(final GameTestHelper testHelper) {
 
         AABB localBounds = TestUtil.localBounds(testHelper);
@@ -94,7 +95,7 @@ public class RoomGenerationTests {
         testHelper.succeed();
     }
 
-    @GameTest(template = "empty_15x15", batch = TestBatches.ROOM_GENERATION)
+    @GameTest(template = "empty_15x15", batch = BATCH)
     public static void checkRoomGeneratorWeirdShape(final GameTestHelper testHelper) {
 
         AABB localBounds = TestUtil.localBounds(testHelper);
