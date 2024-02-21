@@ -1,0 +1,112 @@
+name: Gradle Tests and Nightly (CI)
+
+env:
+  GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - ".github/**/*"
+
+jobs:
+  vars:
+    name: Get Variables
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{steps.version.outputs.version}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        uses: paulhatch/semantic-version@v5.0.2
+        with:
+          change_path: "neoforge-main"
+          version_format: "${major}.${minor}.${patch}.${increment}-nightly"
+          search_commit_body: true
+
+  tests:
+    name: Gradle Tests
+    runs-on: ubuntu-22.04
+    needs: [ vars ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Datagen
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runData
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Store Built Assets
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-data
+          path: neoforge-main/src/generated/resources
+
+      - name: Game Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runGameTestServer
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-data
+          path: run/gametest
+
+  publish-gh-package:
+    name: Publish Github Package - Nightly
+    runs-on: ubuntu-22.04
+    needs: [ vars, tests ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Pull Built Generated Data
+        uses: actions/download-artifact@v3
+        with:
+          name: generated-data
+          path: neoforge-main/src/generated/resources
+
+      - name: Publish
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publish
+        env:
+          VERSION: ${{ needs.vars.outputs.version }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  announce:
+    name: Discord Announcement
+    needs: [ publish-gh-package ]
+    uses: ./.github/workflows/announce-latest-nightly.yml
+    secrets: inherit

@@ -34,7 +34,7 @@ coreProjects.forEach {
 
 base {
     archivesName.set(modId)
-    group = "dev.compactmods"
+    group = "dev.compactmods.compactmachines"
     version = envVersion
 }
 
@@ -207,5 +207,24 @@ tasks.jarJar {
     from(sourceSets.main.get().output)
     coreProjects.forEach {
         from (it.sourceSets.main.get().output)
+    }
+}
+
+val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/compactmods/compactmachines"
+publishing {
+    publications.register<MavenPublication>("compactmachines") {
+        artifactId = "$modId-neoforge"
+        from(components.getByName("java"))
+    }
+
+    repositories {
+        // GitHub Packages
+        maven(PACKAGES_URL) {
+            name = "GitHubPackages"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }

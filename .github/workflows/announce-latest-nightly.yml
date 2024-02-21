@@ -1,6 +1,8 @@
 name: Announce Latest Nightly to Discord
 
 on:
+  workflow_call:
+
   workflow_dispatch:
     inputs:
       diagnostic_mode:
@@ -45,7 +47,7 @@ jobs:
           owner: compactmods
           repo: compactmachines
           group: dev.compactmods.compactmachines
-          filter: "^compactmachines-forge-(?:[\\d\\.]+)-nightly.jar$"
+          filter: "^compactmachines-neoforge-(?:[\\d\\.]+)-nightly.jar$"
           outputFile: compactmachines-nightly.json
 
       - name: Debug output
