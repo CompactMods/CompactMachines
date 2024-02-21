@@ -87,7 +87,6 @@ runs {
         if(!System.getenv().containsKey("CI")) {
             // JetBrains Runtime Hotswap
             jvmArgument("-XX:+AllowEnhancedClassRedefinition")
-            jvmArgument("-XX:HotswapAgent=fatjar")
         }
 
         modSource(sourceSets.main.get())

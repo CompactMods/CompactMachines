@@ -20,13 +20,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-tags: true
+          submodules: true
 
       - name: Version
         id: version
-        uses: paulhatch/semantic-version@v5.0.2
+        uses: paulhatch/semantic-version@v5.3.0
         with:
           change_path: "neoforge-main"
           version_format: "${major}.${minor}.${patch}.${increment}-nightly"
