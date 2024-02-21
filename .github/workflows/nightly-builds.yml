@@ -51,7 +51,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Data Generation
-        run: ./gradlew runData
+        run: ./gradlew :neoforge-data:runData
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,9 +64,7 @@ jobs:
           path: neoforge-main/src/generated/resources
 
       - name: Game Tests
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: runGameTestServer
+        run: ./gradlew :neoforge-main:runGameTestServer
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +100,7 @@ jobs:
           path: neoforge-main/src/generated/resources
 
       - name: Publish
-        run: ./gradlew publish
+        run: ./gradlew :neoforge-main:publish
         env:
           VERSION: ${{ needs.vars.outputs.version }}
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
