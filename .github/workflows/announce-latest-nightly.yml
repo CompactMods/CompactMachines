@@ -45,7 +45,7 @@ jobs:
         with:
           owner: compactmods
           repo: compactmachines
-          group: dev.compactmods.compactmachines
+          group: dev.compactmods.compactmachines.compactmachines-neoforge
           filter: "^compactmachines-neoforge-(?:[\\d\\.]+)-nightly.jar$"
           outputFile: compactmachines-nightly.json
 
