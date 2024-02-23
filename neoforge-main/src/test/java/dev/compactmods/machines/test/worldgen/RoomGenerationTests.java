@@ -12,9 +12,11 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.apache.logging.log4j.LogManager;
@@ -52,9 +54,10 @@ public class RoomGenerationTests {
 
     private static void makeTemplateTest(GameTestHelper testHelper, RoomTemplate template) {
         final AABB localBounds = TestUtil.localBounds(testHelper);
+        final AABB worldBounds = testHelper.getBounds();
         final BlockPos testCenter = BlockPos.containing(localBounds.getCenter());
 
-        CompactRoomGenerator.generateRoom(testHelper.getLevel(), localBounds);
+        CompactRoomGenerator.generateRoom(testHelper.getLevel(), template.getBoundariesCenteredAt(worldBounds.getCenter()));
 
         testHelper.setBlock(testCenter, Blocks.RED_STAINED_GLASS);
         testHelper.succeed();
