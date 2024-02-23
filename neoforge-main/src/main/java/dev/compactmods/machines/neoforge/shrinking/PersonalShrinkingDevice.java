@@ -67,6 +67,12 @@ public class PersonalShrinkingDevice extends Item {
                             .map(RoomApi::spawnManager)
                             .ifPresent(spawnManager -> {
                                 spawnManager.setPlayerSpawn(serverPlayer.getUUID(), player.position(), player.getRotationVector());
+
+                                MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
+                                        .withStyle(ChatFormatting.GREEN);
+
+                                player.displayClientMessage(tc, true);
+
                             });
 
 //                    final var roomInfo = CompactRoomProvider.instance(playerDim);
@@ -76,12 +82,6 @@ public class PersonalShrinkingDevice extends Item {
 //                            mutableRoom.setSpawnRotation(PlayerUtil.getLookDirection(player));
 //                        }
 //                    });
-
-                    MutableComponent tc = TranslationUtil.message(Messages.ROOM_SPAWNPOINT_SET)
-                            .withStyle(ChatFormatting.GREEN);
-
-                    player.displayClientMessage(tc, true);
-
                 } else {
                     RoomHelper.teleportPlayerOutOfRoom(serverPlayer);
                 }

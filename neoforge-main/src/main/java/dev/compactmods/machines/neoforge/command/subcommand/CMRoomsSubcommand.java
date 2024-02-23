@@ -8,7 +8,7 @@ import dev.compactmods.machines.api.command.CMCommands;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineConstants;
-import dev.compactmods.machines.api.util.BlockSpaceUtil;
+import dev.compactmods.machines.api.util.AABBHelper;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.machine.block.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
@@ -53,7 +53,7 @@ public class CMRoomsSubcommand {
             final var roomCode = be.connectedRoom();
             RoomApi.registrar().get(roomCode).ifPresent(roomInfo -> {
                 final var innerBounds = roomInfo.boundaries().innerBounds();
-                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, BlockSpaceUtil.aabbToString(innerBounds), roomCode);
+                final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, AABBHelper.toString(innerBounds), roomCode);
                 ctx.getSource().sendSuccess(() -> m, false);
             });
         }
