@@ -3,6 +3,7 @@ package dev.compactmods.machines.test;
 
 import com.google.common.math.DoubleMath;
 import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.api.util.AABBAligner;
 import dev.compactmods.machines.api.util.AABBHelper;
 import dev.compactmods.machines.util.RandomSourceUtil;
 import net.minecraft.core.Direction;
@@ -31,7 +32,7 @@ public class AABBHelperTests {
         AABB before = AABB.ofSize(new Vec3(0, 7.5, 0), 5, 5, 5);
 
         // Align to Y-0
-        final var after = AABBHelper.alignFloor(before, 0);
+        final var after = AABBAligner.floor(before, 0);
 
         test.assertTrue(before.minY == 5, "Before was modified in-place rather than immutably moved.");
         test.assertTrue(after.minY == 0, "After y level should be zero. (was: %s)".formatted(after.minY));
@@ -48,7 +49,7 @@ public class AABBHelperTests {
         AABB bounds = AABB.ofSize(Vec3.ZERO.relative(Direction.UP, 6), 10, 10, 10);
 
         // Align to Y-0
-        final var after = AABBHelper.alignFloor(before, bounds);
+        final var after = AABBAligner.floor(before, bounds);
 
         test.assertTrue(before.minY == 5, "Before was modified in-place rather than immutably moved.");
         test.assertTrue(after.minY == 1, "After y level should be 1. (was: %s)".formatted(after.minY));

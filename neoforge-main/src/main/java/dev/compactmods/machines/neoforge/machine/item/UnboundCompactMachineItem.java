@@ -35,7 +35,6 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
     }
 
 
-
     @NotNull
     @Override
     public String getDescriptionId(ItemStack stack) {
@@ -55,8 +54,8 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
                 final var templateId = getTemplateId(stack);
                 tooltip.add(Component.literal("Template: " + templateId).withStyle(ChatFormatting.DARK_GRAY));
 
-                if (!actualTemplate.prefillTemplate().equals(RoomTemplate.NO_TEMPLATE)) {
-                    tooltip.add(Component.literal("Prefill: " + actualTemplate.prefillTemplate()).withStyle(ChatFormatting.DARK_GRAY));
+                if (!actualTemplate.structures().isEmpty()) {
+                    tooltip.add(Component.literal("Generates " + actualTemplate.structures().size() + " structures after creation.").withStyle(ChatFormatting.DARK_GRAY));
                 }
             });
         } else {
@@ -70,12 +69,10 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
 
     @NotNull
     public static Optional<RoomTemplate> getTemplate(RegistryAccess registries, ItemStack stack) {
-        if(stack.getItem() instanceof IUnboundCompactMachineItem unbound) {
+        if (stack.getItem() instanceof IUnboundCompactMachineItem unbound) {
             var template = unbound.getTemplateId(stack);
-            if (!template.equals(RoomTemplate.NO_TEMPLATE)) {
-                final var actualTemplate = registries.registryOrThrow(RoomTemplate.REGISTRY_KEY).get(template);
-                return Optional.ofNullable(actualTemplate);
-            }
+            final var actualTemplate = registries.registryOrThrow(RoomTemplate.REGISTRY_KEY).get(template);
+            return Optional.ofNullable(actualTemplate);
         }
 
         return Optional.empty();
@@ -83,7 +80,7 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
 
     public static ItemStack forTemplate(ResourceLocation templateId, RoomTemplate template) {
         final var stack = new ItemStack(Machines.UNBOUND_MACHINE_BLOCK_ITEM.get(), 1);
-        if(stack.getItem() instanceof IUnboundCompactMachineItem unbound) {
+        if (stack.getItem() instanceof IUnboundCompactMachineItem unbound) {
             unbound.setTemplate(stack, templateId);
             unbound.setColor(stack, template.color());
         }
