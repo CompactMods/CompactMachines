@@ -7,6 +7,7 @@ import dev.compactmods.machines.datagen.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.lang.RussianLangGenerator;
 import dev.compactmods.machines.datagen.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.tags.ItemTagGenerator;
+import dev.compactmods.machines.datagen.tags.PointOfInterestTagGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -46,7 +47,7 @@ public class DataGeneration {
         generator.addProvider(server, new CurioSlotGenerator(packOut, holderLookup, fileHelper));
         generator.addProvider(server, new CurioEntityGenerator(packOut, holderLookup, fileHelper));
 
-        // generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, helper));
+        generator.addProvider(server, new PointOfInterestTagGenerator(packOut, holderLookup, fileHelper));
         // generator.addProvider(event.includeServer(), new PackMetaGenerator(packOut));
 
         // Client

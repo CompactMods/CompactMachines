@@ -9,6 +9,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.function.Supplier;
 
@@ -17,6 +25,11 @@ public class Villagers {
 
     public static final ResourceKey<PoiType> TINKERER_WORKBENCH_KEY = ResourceKey
             .create(BuiltInRegistries.POINT_OF_INTEREST_TYPE.key(), TINKERER_ID);
+
+    public static final DeferredBlock<Block> SPATIAL_WORKBENCH = Registries.BLOCKS.registerSimpleBlock("spatial_workbench", BlockBehaviour.Properties.of()
+            .mapColor(MapColor.NONE));
+
+    public static final DeferredItem<BlockItem> SPATIAL_WORKBENCH_ITEM = Registries.ITEMS.registerSimpleBlockItem(SPATIAL_WORKBENCH);
 
     public static final Supplier<VillagerProfession> TINKERER = Registries.VILLAGERS.register("tinkerer",
             () -> new VillagerProfession(
@@ -40,9 +53,9 @@ public class Villagers {
 //            () -> new BasicItemListing(1, new ItemStack(Machines.MACHINE_BLOCK_ITEM_TINY.get()), 5, 100));
 
     static {
-//        Registries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
-//                ImmutableSet.of(MachineRoomUpgrades.WORKBENCH_BLOCK.get().defaultBlockState()), 1, 1)
-//        );
+        Registries.POINTS_OF_INTEREST.register("tinkerer", () -> new PoiType(
+                ImmutableSet.of(SPATIAL_WORKBENCH.get().defaultBlockState()), 1, 1)
+        );
     }
 
     public static void prepare() {
