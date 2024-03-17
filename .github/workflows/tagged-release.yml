@@ -45,7 +45,7 @@ jobs:
 
       - name: Find Current Tag
         id: current
-        uses: jimschubert/query-tag-action@v1
+        uses: jimschubert/query-tag-action@v2
         with:
           include: 'v*'
           exclude: '*-rc*'
@@ -77,7 +77,7 @@ jobs:
 
       - name: Find Current Tag
         id: current
-        uses: jimschubert/query-tag-action@v1
+        uses: jimschubert/query-tag-action@v2
         with:
           include: 'v*'
           exclude: '*-rc*'
@@ -86,7 +86,7 @@ jobs:
 
       - name: Previous Tag
         id: last
-        uses: jimschubert/query-tag-action@v1
+        uses: jimschubert/query-tag-action@v2
         with:
           include: 'v*'
           exclude: ${{steps.current.outputs.tag}}
