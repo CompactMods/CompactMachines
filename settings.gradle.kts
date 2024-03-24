@@ -14,6 +14,18 @@ dependencyResolutionManagement {
         version("jnanoid", "[2.0.0, 3)")
         version("neoforge", "20.4.203")
     }
+
+    versionCatalogs.create("mods") {
+        this.library("jei-common", "mezz.jei", "jei-1.20.4-common-api")
+                .versionRef("jei")
+
+        this.library("jei-neo", "mezz.jei", "jei-1.20.4-neoforge-api")
+                .versionRef("jei");
+
+        this.bundle("jei",  listOf("jei-common", "jei-neo"))
+
+        this.version("jei", "17.3.0.49")
+    }
 }
 
 pluginManagement {

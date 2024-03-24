@@ -133,6 +133,16 @@ repositories {
             password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
+
+    maven("https://maven.blamejared.com/") {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+    }
+
+    maven("https://modmaven.dev") {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+    }
 }
 
 dependencies {
@@ -155,6 +165,9 @@ dependencies {
     jarJar(libraries.feather) {
         isTransitive = false
     }
+
+    // Mods
+    compileOnly(mods.bundles.jei)
 }
 
 tasks.withType<ProcessResources> {
