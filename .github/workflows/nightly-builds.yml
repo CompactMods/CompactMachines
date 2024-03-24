@@ -61,7 +61,7 @@ jobs:
 
       - name: Store Built Assets
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: generated-data
           path: neoforge-main/src/generated/resources
@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload build failure
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-data
           path: run/gametest
