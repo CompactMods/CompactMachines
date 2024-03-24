@@ -57,7 +57,7 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
         if (sneaking && worldIn != null) {
             getTemplate(worldIn.registryAccess(), stack).ifPresent(actualTemplate -> {
                 final var roomDimensions = actualTemplate.internalDimensions();
-                tooltip.add(Component.literal("Size: " + roomDimensions.toShortString()).withStyle(ChatFormatting.YELLOW));
+                tooltip.add(Component.literal("Size: " + roomDimensions.toString()).withStyle(ChatFormatting.YELLOW));
 
                 final var templateId = getTemplateId(stack);
                 tooltip.add(Component.literal("Template: " + templateId).withStyle(ChatFormatting.DARK_GRAY));
