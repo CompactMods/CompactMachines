@@ -42,7 +42,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     private void shrinkingDevices(PersonalShrinkingDevice psd) {
         final var cmShrinkTag = tag(PSDTags.ITEM);
         cmShrinkTag.add(psd);
-        cmShrinkTag.add(ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation("shrink", "shrinking_device")));
+        cmShrinkTag.addOptional(new ResourceLocation("shrink", "shrinking_device"));
     }
 
     private void curiosTags(PersonalShrinkingDevice psd) {
