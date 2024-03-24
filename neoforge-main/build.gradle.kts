@@ -139,6 +139,12 @@ repositories {
         name = "Jared's maven"
     }
 
+    maven("https://www.cursemaven.com") {
+        content {
+            includeGroup("curse.maven")
+        }
+    }
+
     maven("https://modmaven.dev") {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
@@ -146,28 +152,25 @@ repositories {
 }
 
 dependencies {
-    implementation(libraries.neoforge)
+    // Core Projects and Libraries
+    this {
+        implementation(libraries.neoforge)
 
-    implementation(libraries.jnanoid)
-    jarJar(libraries.jnanoid)
+        implementation(libraries.jnanoid)
+        jarJar(libraries.jnanoid)
 
-    compileOnly(core)
-    compileOnly(coreApi)
-    compileOnly(roomApi)
-    compileOnly(roomUpgradeApi)
+        listOf(core, coreApi, roomApi, roomUpgradeApi).forEach {
+            compileOnly(it)
+            testCompileOnly(it)
+        }
 
-    testCompileOnly(core)
-    testCompileOnly(coreApi)
-    testCompileOnly(roomApi)
-    testCompileOnly(roomUpgradeApi)
-
-    implementation(libraries.feather)
-    jarJar(libraries.feather) {
-        isTransitive = false
+        implementation(libraries.feather)
+        jarJar(libraries.feather) { isTransitive = false }
     }
 
     // Mods
     compileOnly(mods.bundles.jei)
+    compileOnly(mods.jade)
 }
 
 tasks.withType<ProcessResources> {

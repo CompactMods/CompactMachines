@@ -16,15 +16,12 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs.create("mods") {
-        this.library("jei-common", "mezz.jei", "jei-1.20.4-common-api")
-                .versionRef("jei")
-
-        this.library("jei-neo", "mezz.jei", "jei-1.20.4-neoforge-api")
-                .versionRef("jei");
-
-        this.bundle("jei",  listOf("jei-common", "jei-neo"))
-
+        this.library("jei-common", "mezz.jei", "jei-1.20.4-common-api").versionRef("jei")
+        this.library("jei-neo", "mezz.jei", "jei-1.20.4-neoforge-api").versionRef("jei");
+        this.bundle("jei", listOf("jei-common", "jei-neo"))
         this.version("jei", "17.3.0.49")
+
+        this.library("jade", "curse.maven", "jade-324717").version("5109393")
     }
 }
 
