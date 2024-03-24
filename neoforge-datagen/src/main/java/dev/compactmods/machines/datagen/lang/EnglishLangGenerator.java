@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.command.CMCommands;
+import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.client.RoomExitKeyMapping;
 import dev.compactmods.machines.neoforge.client.creative.CreativeTabs;
 import dev.compactmods.machines.neoforge.room.Rooms;
@@ -28,6 +29,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("machine.compactmachines.large", "%s (%s)".formatted(machineTranslation, "Large"));
         add("machine.compactmachines.giant", "%s (%s)".formatted(machineTranslation, "Giant"));
         add("machine.compactmachines.colossal", "%s (%s)".formatted(machineTranslation, "Colossal"));
+
+        add(Util.makeDescriptionId("block", CompactMachines.rl("bound_machine_fallback")), machineTranslation);
 
         addMessage(Messages.CANNOT_ENTER_MACHINE, "You fumble with the shrinking device, to no avail. It refuses to work.");
         addMessage(Messages.NO_MACHINE_DATA, "No machine data loaded; report this.");

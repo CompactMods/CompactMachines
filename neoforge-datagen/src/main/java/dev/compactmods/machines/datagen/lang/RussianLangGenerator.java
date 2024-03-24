@@ -3,8 +3,10 @@ package dev.compactmods.machines.datagen.lang;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.Tooltips;
+import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
+import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 
@@ -33,6 +35,8 @@ public class RussianLangGenerator extends BaseLangGenerator {
     @Override
     protected void addTranslations() {
         super.addTranslations();
+
+        add(Util.makeDescriptionId("block", CompactMachines.rl("bound_machine_fallback")), getMachineTranslation());
 
         // Walls (Solid, Breakable, Tunnel)
         add(Rooms.BLOCK_SOLID_WALL.get(), "Прочная стена компактного механизма");

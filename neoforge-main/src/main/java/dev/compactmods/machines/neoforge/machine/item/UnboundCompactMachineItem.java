@@ -1,10 +1,13 @@
 package dev.compactmods.machines.neoforge.machine.item;
 
+import dev.compactmods.machines.api.machine.item.IBoundCompactMachineItem;
+import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.room.RoomTemplate;
 import dev.compactmods.machines.api.Tooltips;
 import dev.compactmods.machines.api.machine.item.IUnboundCompactMachineItem;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.neoforge.machine.Machines;
+import dev.compactmods.machines.neoforge.room.RoomHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,6 +19,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +38,10 @@ public class UnboundCompactMachineItem extends BlockItem implements IUnboundComp
         super(Machines.UNBOUND_MACHINE_BLOCK.get(), builder);
     }
 
+    @Override
+    public Component getName(ItemStack pStack) {
+        return Component.translatableWithFallback(getDescriptionId(pStack), "Compact Machine");
+    }
 
     @NotNull
     @Override

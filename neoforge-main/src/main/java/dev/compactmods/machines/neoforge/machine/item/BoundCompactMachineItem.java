@@ -6,6 +6,7 @@ import dev.compactmods.machines.api.machine.MachineCreator;
 import dev.compactmods.machines.api.machine.item.IBoundCompactMachineItem;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.api.machine.item.ICompactMachineItem;
+import dev.compactmods.machines.neoforge.CompactMachines;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import net.minecraft.Util;
 import net.minecraft.core.Vec3i;
@@ -26,7 +27,7 @@ public class BoundCompactMachineItem extends BlockItem implements IBoundCompactM
 
     public static final String NBT_ROOM_DIMENSIONS = "room_dimensions";
 
-    private static final String FALLBACK_ID = Util.makeDescriptionId("block", new ResourceLocation(Constants.MOD_ID, "bound_machine_fallback"));
+    private static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.rl("bound_machine_fallback"));
 
     public BoundCompactMachineItem(Properties builder) {
         super(Machines.MACHINE_BLOCK.get(), builder);
@@ -36,7 +37,7 @@ public class BoundCompactMachineItem extends BlockItem implements IBoundCompactM
     public Component getName(ItemStack stack) {
         return getMachineName(stack)
                 .map(Component::literal)
-                .orElse(Component.translatable(FALLBACK_ID));
+                .orElse(Component.translatableWithFallback(FALLBACK_ID, "Compact Machine"));
     }
 
     @NotNull
