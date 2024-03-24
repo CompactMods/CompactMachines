@@ -111,7 +111,7 @@ jobs:
     needs: [vars, changelog]
     steps:
       - name: Download Changelog Results
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: out
           path: changelog
@@ -162,7 +162,7 @@ jobs:
     needs: [changelog]
     steps:
       - name: Download Build Results
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: out
           path: changelog
