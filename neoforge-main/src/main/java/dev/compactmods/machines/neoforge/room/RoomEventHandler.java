@@ -4,21 +4,31 @@ import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.TranslationUtil;
+import dev.compactmods.machines.neoforge.data.RoomAttachmentDataManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class RoomEventHandler {
+
+    @SubscribeEvent
+    public static void onWorldSaved(final LevelEvent.Save level) {
+        if(level.getLevel() instanceof Level l && CompactDimension.isLevelCompact(l)) {
+            RoomAttachmentDataManager.instance().ifPresent(RoomAttachmentDataManager::save);
+        }
+    }
 
     @SubscribeEvent
     public static void entityJoined(final EntityJoinLevelEvent evt) {

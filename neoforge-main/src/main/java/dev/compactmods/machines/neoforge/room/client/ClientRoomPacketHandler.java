@@ -1,6 +1,6 @@
 package dev.compactmods.machines.neoforge.room.client;
 
-import dev.compactmods.machines.neoforge.room.ui.MachineRoomScreen;
+import dev.compactmods.machines.neoforge.room.ui.preview.MachineRoomScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 

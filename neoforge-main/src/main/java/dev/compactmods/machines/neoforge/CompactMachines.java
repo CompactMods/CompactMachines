@@ -49,6 +49,13 @@ public class CompactMachines {
     }
 
     public static ResourceLocation rl(String id) {
-        return new ResourceLocation(Constants.MOD_ID, id);
+        return ResourceLocation.isValidPath(id) ?
+            new ResourceLocation(Constants.MOD_ID, id) :
+                new ResourceLocation(Constants.MOD_ID, "invalid");
+    }
+
+    public static String rls(String id) {
+        return ResourceLocation.isValidPath(id) ?
+                Constants.MOD_ID  + ":" + id : Constants.MOD_ID + ":invalid";
     }
 }

@@ -1,23 +1,28 @@
-package dev.compactmods.machines.neoforge.room.ui;
+package dev.compactmods.machines.neoforge.room.ui.preview;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.compactmods.machines.api.Constants;
+import dev.compactmods.machines.neoforge.CompactMachines;
+import dev.compactmods.machines.neoforge.client.render.NineSliceRenderer;
+import dev.compactmods.machines.neoforge.client.widget.ImageButtonBuilder;
+import dev.compactmods.machines.neoforge.network.PlayerRequestedTeleportPacket;
+import dev.compactmods.machines.neoforge.network.PlayerRequestedUpgradeMenuPacket;
 import dev.compactmods.machines.neoforge.shrinking.Shrinking;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
     private final Inventory inv;
     protected double rotateX = 45.0f;
     protected double rotateY = 20.0f;
-    private PSDIconButton psdButton;
-//    private RenderingLevel renderer;
+
+    private ImageButton psdButton;
 
     public MachineRoomScreen(MachineRoomMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -35,18 +40,52 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     protected void init() {
         super.init();
 
-        this.psdButton = addRenderableWidget(new PSDIconButton(this, leftPos + 220, topPos + 210));
-        if (hasPsdItem())
-            this.psdButton.setEnabled(true);
+        final var psdBtnSprites = new WidgetSprites(
+                CompactMachines.rl("personal_shrinking_device"),
+                CompactMachines.rl("personal_shrinking_device_disabled"),
+                CompactMachines.rl("personal_shrinking_device_highlighted"),
+                CompactMachines.rl("personal_shrinking_device_disabled"));
+
+        this.psdButton = ImageButtonBuilder.button(psdBtnSprites)
+                .size(12, 12)
+                .location(leftPos + imageWidth - 12, topPos + 212)
+                .onPress(btn -> {
+                    var room = menu.getRoom();
+                    PacketDistributor.SERVER.noArg().send(new PlayerRequestedTeleportPacket(menu.getMachine(), room));
+                }).build();
+
+        addRenderableWidget(psdButton);
+
+        final var upgradeBtnSprites = new WidgetSprites(
+                CompactMachines.rl("upgrade_btn"),
+                CompactMachines.rl("upgrade_btn")
+        );
+
+        var upgradeScreenBtn = ImageButtonBuilder.button(upgradeBtnSprites)
+                .size(12, 12)
+                .location(leftPos + imageWidth - 24, topPos + 212)
+                .onPress(btn -> {
+                    PacketDistributor.SERVER.noArg().send(new PlayerRequestedUpgradeMenuPacket(menu.getRoom()));
+                }).build();
+
+        addRenderableWidget(upgradeScreenBtn);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
-        RenderSystem.setShaderTexture(0, new ResourceLocation(Constants.MOD_ID, "textures/gui/room_menu.png"));
+    protected void renderBg(GuiGraphics graphics, float v, int i, int i1) {
+        var backgroundRenderer = NineSliceRenderer.builder(CompactMachines.rl("textures/gui/psd_screen_9slice.png"))
+                .area(0, 0, 248, 210)
+                .uv(32, 32)
+                .sliceSize(4, 4)
+                .textureSize(32, 32)
+                .build();
 
-        // int i = (this.width - this.imageWidth) / 2;
-        // int j = (this.height - this.imageHeight) / 2;
-        // this.blit(pose, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+        final var pose = graphics.pose();
+
+        pose.pushPose();
+        pose.translate(leftPos, topPos, 0);
+        backgroundRenderer.render(graphics);
+        pose.popPose();
     }
 
     public void updateBlockRender() {
@@ -65,8 +104,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     @Override
     protected void containerTick() {
         super.containerTick();
-        psdButton.setEnabled(this.inv.player.isCreative() || hasPsdItem());
-//        renderer.tbe();
+        psdButton.active = this.inv.player.isCreative() || hasPsdItem();
     }
 
     @Override
@@ -93,7 +131,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
         var room = menu.getRoom();
         var rt = Component.literal(room);
         pose.scale(0.7f, 0.7f, 0.7f);
-        graphics.drawCenteredString(font, rt, 0, this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
+        graphics.drawCenteredString(font, rt, 0, this.titleLabelY + font.lineHeight + 7, 0xFFDEDEDE);
         pose.popPose();
     }
 
@@ -101,7 +139,19 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
 
+        final var pose = graphics.pose();
+        pose.pushPose();
+        pose.translate(leftPos, topPos, 0);
+        pose.translate(this.imageWidth / 2f, 0, 0);
+
         graphics.drawCenteredString(font, Component.literal("Room preview broken for a bit"), 0, 100, 0xFFCCCCCC);
+
+        pose.popPose();
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
     }
 
     //    @Override

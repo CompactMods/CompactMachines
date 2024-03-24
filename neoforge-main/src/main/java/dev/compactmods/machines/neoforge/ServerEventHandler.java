@@ -8,6 +8,7 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.neoforge.data.RoomAttachmentDataManager;
 import dev.compactmods.machines.room.RoomApiInstance;
 import dev.compactmods.machines.room.RoomRegistrar;
 import dev.compactmods.machines.room.spatial.GraphChunkManager;
@@ -19,6 +20,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEventHandler {
@@ -49,14 +51,24 @@ public class ServerEventHandler {
         final var modLog = LoggingUtil.modLog();
 
         try {
-            modLog.debug("Setting up room API instances.");
+            modLog.debug("Setting up room API and data...");
             MinecraftServer server = evt.getServer();
 
+            // Set up room API
             RoomApi.INSTANCE = RoomApiInstance.forServer(server);
-            modLog.debug("Completed setting up room API instances.");
+
+            // Set up room data attachments for Neo
+            RoomAttachmentDataManager.instance(server);
+
+            modLog.debug("Completed setting up room API and data.");
         } catch (MissingDimensionException e) {
             modLog.fatal("Failed to set up room API instance; dimension error.", e);
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(final ServerStoppingEvent evt) {
+        RoomAttachmentDataManager.instance().ifPresent(RoomAttachmentDataManager::save);
     }
 
     @SubscribeEvent

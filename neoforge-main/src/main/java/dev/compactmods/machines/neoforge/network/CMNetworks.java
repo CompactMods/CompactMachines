@@ -1,6 +1,7 @@
 package dev.compactmods.machines.neoforge.network;
 
 import dev.compactmods.machines.api.Constants;
+import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
@@ -22,5 +23,11 @@ public class CMNetworks {
 
         main.play(PlayerRequestedLeavePacket.ID, (b) -> new PlayerRequestedLeavePacket(), builder ->
                 builder.server(PlayerRequestedLeavePacket.HANDLER));
+
+        main.play(PlayerRequestedRoomUIPacket.ID, (FriendlyByteBuf b) -> b.readJsonWithCodec(PlayerRequestedRoomUIPacket.CODEC),
+                builder -> builder.server(PlayerRequestedRoomUIPacket.HANDLER));
+
+        main.play(PlayerRequestedUpgradeMenuPacket.ID, (FriendlyByteBuf b) -> b.readJsonWithCodec(PlayerRequestedUpgradeMenuPacket.CODEC),
+                builder -> builder.server(PlayerRequestedUpgradeMenuPacket.HANDLER));
     }
 }

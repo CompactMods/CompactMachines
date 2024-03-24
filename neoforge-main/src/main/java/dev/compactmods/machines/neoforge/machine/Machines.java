@@ -47,6 +47,7 @@ public interface Machines {
             BlockEntityType.Builder.of(BoundCompactMachineBlockEntity::new, MACHINE_BLOCK.get())
                     .build(null));
 
+
     static void prepare() {
 
     }

@@ -17,9 +17,6 @@ public class Suggestors {
     public static final SuggestionProvider<CommandSourceStack> ROOM_TEMPLATES = (ctx, builder) ->
             SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomTemplate.REGISTRY_KEY), builder);
 
-    public static final SuggestionProvider<CommandSourceStack> ROOM_UPGRADES = (ctx, builder) ->
-            SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomUpgrade.REGISTRY_KEY), builder);
-
     public static final SuggestionProvider<CommandSourceStack> OWNED_ROOM_CODES = (ctx, builder) -> {
         final var owner = ctx.getSource().getPlayerOrException();
 

@@ -1,16 +1,20 @@
 package dev.compactmods.machines.neoforge.client.render;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.neoforge.client.CompactMachinesShaders;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.mojang.blaze3d.vertex.DefaultVertexFormat.*;
 
 public class RenderTypes extends RenderStateShard {
+
 	public static final VertexFormat BLOCK_WITH_OVERLAY = new VertexFormat(
 			ImmutableMap.<String, VertexFormatElement>builder()
 					.put("Position", ELEMENT_POSITION)
@@ -23,7 +27,7 @@ public class RenderTypes extends RenderStateShard {
 					.build()
 	);
 
-	protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
+    protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
 
 	protected static final RenderStateShard.ShaderStateShard WALL_BLOCKS = new RenderStateShard.ShaderStateShard(CompactMachinesShaders::wall);
 

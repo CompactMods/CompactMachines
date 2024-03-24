@@ -4,8 +4,9 @@ import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.machine.client.MachineColors;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.machine.block.UnboundCompactMachineEntity;
-import dev.compactmods.machines.neoforge.room.ui.MachineRoomScreen;
+import dev.compactmods.machines.neoforge.room.ui.preview.MachineRoomScreen;
 import dev.compactmods.machines.neoforge.room.Rooms;
+import dev.compactmods.machines.neoforge.room.ui.upgrades.RoomUpgradeScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -16,6 +17,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientModBusEventHandler {
@@ -45,7 +47,8 @@ public class ClientModBusEventHandler {
     }
 
     @SubscribeEvent
-    public static void onClientSetup(final FMLClientSetupEvent client) {
-        MenuScreens.register(Rooms.MACHINE_MENU.get(), MachineRoomScreen::new);
+    public static void onClientSetup(final RegisterMenuScreensEvent evt) {
+        evt.register(Rooms.MACHINE_MENU.get(), MachineRoomScreen::new);
+        evt.register(Rooms.ROOM_UPGRADE_MENU.get(), RoomUpgradeScreen::new);
     }
 }

@@ -4,17 +4,20 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Messages;
 import dev.compactmods.machines.api.machine.MachineCreator;
 import dev.compactmods.machines.api.machine.item.IBoundCompactMachineItem;
+import dev.compactmods.machines.api.room.RoomApi;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.EnumMachinePlayersBreakHandling;
 import dev.compactmods.machines.neoforge.config.ServerConfig;
 import dev.compactmods.machines.neoforge.machine.Machines;
 import dev.compactmods.machines.neoforge.room.RoomHelper;
-import dev.compactmods.machines.neoforge.room.ui.MachineRoomMenu;
+import dev.compactmods.machines.neoforge.room.Rooms;
+import dev.compactmods.machines.neoforge.room.ui.preview.MachineRoomMenu;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -32,6 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,26 +133,19 @@ public class BoundCompactMachineBlock extends Block implements EntityBlock {
         }
 
         // All other items, open preview screen
-        if (!level.isClientSide) {
+        if (!level.isClientSide && !(player instanceof FakePlayer)) {
             level.getBlockEntity(pos, Machines.MACHINE_ENTITY.get()).ifPresent(machine -> {
                 final var roomCode = machine.connectedRoom();
-                if (player instanceof ServerPlayer sp) {
-
-                    sp.openMenu(MachineRoomMenu.makeProvider(sp.server, roomCode, machine.getLevelPosition()), (buf) -> {
-                        buf.writeBlockPos(pos);
-                        buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
-                        buf.writeUtf(roomCode);
-
-                        // FIXME Renamable rooms
-//            roomName.ifPresentOrElse(name -> {
-//                buf.writeBoolean(true);
-//                buf.writeUtf(name);
-//            }, () -> {
-                        buf.writeBoolean(false);
-                        buf.writeUtf("");
-//            });
-                    });
-                }
+                RoomApi.room(roomCode).ifPresent(inst -> {
+                    if (player instanceof ServerPlayer sp) {
+                        sp.setData(Rooms.OPEN_MACHINE_POS, machine.getLevelPosition());
+                        sp.openMenu(MachineRoomMenu.provider(sp.server, inst), (buf) -> {
+                            buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
+                            buf.writeUtf(roomCode);
+                            buf.writeOptional(Optional.<String>empty(), FriendlyByteBuf::writeUtf);
+                        });
+                    }
+                });
             });
         }
 

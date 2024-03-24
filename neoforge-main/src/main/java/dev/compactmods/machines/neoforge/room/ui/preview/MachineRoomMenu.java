@@ -1,8 +1,9 @@
-package dev.compactmods.machines.neoforge.room.ui;
+package dev.compactmods.machines.neoforge.room.ui.preview;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.Constants;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.neoforge.room.RoomBlocks;
 import dev.compactmods.machines.neoforge.room.Rooms;
 import net.minecraft.core.GlobalPos;
@@ -35,7 +36,7 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         this.roomName = roomName;
         this.roomBlocks = new StructureTemplate();
         this.machine = machine;
-        this.loadingBlocks = true;
+        this.loadingBlocks = false;
     }
 
     public String getRoom() {
@@ -46,7 +47,7 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         return machine;
     }
 
-    public static MenuProvider makeProvider(MinecraftServer server, String roomCode, GlobalPos machinePos) {
+    public static MenuProvider provider(MinecraftServer server, RoomInstance roomInstance) {
         return new MenuProvider() {
             @Override
             public Component getDisplayName() {
@@ -55,18 +56,15 @@ public class MachineRoomMenu extends AbstractContainerMenu {
 
             @Nullable
             @Override
-            public AbstractContainerMenu createMenu(int winId, Inventory inv, Player player2) {
-                try {
-                    var menu = new MachineRoomMenu(winId, roomCode, machinePos, "Room Preview");
-                    menu.roomBlocks = RoomBlocks.getInternalBlocks(server, roomCode).get(5, TimeUnit.SECONDS);
-                    return menu;
+            public AbstractContainerMenu createMenu(int winId, Inventory inv, Player player) {
+                var viewing = player.getData(Rooms.OPEN_MACHINE_POS);
+                return new MachineRoomMenu(winId, roomInstance.code(), viewing, "Room Preview");
 
-                } catch (MissingDimensionException e) {
-                    LoggingUtil.modLog().fatal("Error creating machine preview for {}.", machinePos, e);
-                    return null;
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    throw new RuntimeException(e);
-                }
+            }
+
+            @Override
+            public boolean shouldTriggerClientSideContainerClosingOnOpen() {
+                return false;
             }
         };
     }
@@ -96,12 +94,10 @@ public class MachineRoomMenu extends AbstractContainerMenu {
         return roomName;
     }
 
-    public static MachineRoomMenu createRoomMenu(int windowId, Inventory inv, FriendlyByteBuf data) {
-        data.readBlockPos();
+    public static MachineRoomMenu createClientMenu(int windowId, Inventory inv, FriendlyByteBuf data) {
         final var mach = data.readJsonWithCodec(GlobalPos.CODEC);
         final var room = data.readUtf();
-        final boolean hasName = data.readBoolean();
-        final var roomName = hasName ? data.readUtf() : "Room Preview";
+        final var roomName = data.readOptional(FriendlyByteBuf::readUtf).orElse("Room Preview");
 
         return new MachineRoomMenu(windowId, room, mach, roomName);
     }

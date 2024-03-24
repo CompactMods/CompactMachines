@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
-public class TestEventHandler {
+public class ServerEventHandler {
 
     final static Logger LOG = LogManager.getLogger();
 
@@ -64,5 +64,4 @@ public class TestEventHandler {
             }
         }
     }
-
 }
