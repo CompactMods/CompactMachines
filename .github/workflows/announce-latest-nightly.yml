@@ -26,7 +26,7 @@ jobs:
 
       - name: Read MC and Forge versions
         id: gradle_props
-        uses: christian-draeger/read-properties@1.1.0
+        uses: christian-draeger/read-properties@1.1.1
         with:
           path: "gradle.properties"
           properties: "minecraft_version"
