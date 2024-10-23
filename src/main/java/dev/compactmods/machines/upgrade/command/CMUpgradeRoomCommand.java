@@ -71,7 +71,7 @@ public class CMUpgradeRoomCommand {
 
             if (added) {
                 upgrade.onAdded(level, currChunk);
-                src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_APPLIED), true);
+                src.sendSuccess(() -> TranslationUtil.message(Messages.UPGRADE_APPLIED), true);
             } else {
                 src.sendFailure(TranslationUtil.message(Messages.UPGRADE_ADD_FAILED));
             }
@@ -113,7 +113,7 @@ public class CMUpgradeRoomCommand {
 
             if (removed) {
                 upgrade.onRemoved(level, currChunk);
-                src.sendSuccess(TranslationUtil.message(Messages.UPGRADE_REMOVED), true);
+                src.sendSuccess(() -> TranslationUtil.message(Messages.UPGRADE_REMOVED), true);
             } else {
                 src.sendFailure(TranslationUtil.message(Messages.UPGRADE_REM_FAILED));
             }

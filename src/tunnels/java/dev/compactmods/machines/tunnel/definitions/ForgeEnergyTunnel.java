@@ -9,9 +9,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.FastColor;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -25,12 +25,12 @@ public class ForgeEnergyTunnel implements TunnelDefinition, CapabilityTunnel<For
 
     @Override
     public ImmutableSet<Capability<?>> getSupportedCapabilities() {
-        return ImmutableSet.of(CapabilityEnergy.ENERGY);
+        return ImmutableSet.of(ForgeCapabilities.ENERGY);
     }
 
     @Override
     public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> type, Instance instance) {
-        if (type == CapabilityEnergy.ENERGY) {
+        if (type == ForgeCapabilities.ENERGY) {
             return instance.lazy().cast();
         }
 

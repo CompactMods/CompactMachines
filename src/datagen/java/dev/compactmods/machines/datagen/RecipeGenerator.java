@@ -6,8 +6,11 @@ import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.wall.Walls;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
@@ -24,13 +27,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class RecipeGenerator extends RecipeProvider {
-    public RecipeGenerator(DataGenerator generatorIn) {
-        super(generatorIn);
+    public RecipeGenerator(PackOutput packOut) {
+        super(packOut);
     }
 
     @Override
-    protected void buildCraftingRecipes(@NotNull Consumer<FinishedRecipe> consumer) {
-        ShapedRecipeBuilder.shaped(Walls.ITEM_BREAKABLE_WALL.get(), 8)
+    protected void buildRecipes(@NotNull Consumer<FinishedRecipe> consumer) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Walls.ITEM_BREAKABLE_WALL.get(), 8)
                 .pattern("DDD")
                 .pattern("D D")
                 .pattern("DDD")
@@ -38,7 +41,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("picked_up_deepslate", RecipeProvider.has(Tags.Items.COBBLESTONE_DEEPSLATE))
                 .save(consumer);
 
-        ShapedRecipeBuilder.shaped(Shrinking.PERSONAL_SHRINKING_DEVICE.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Shrinking.PERSONAL_SHRINKING_DEVICE.get())
                 .pattern(" P ")
                 .pattern("EBE")
                 .pattern(" I ")
@@ -87,7 +90,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     protected void registerMachineRecipe(Consumer<FinishedRecipe> consumer, ItemLike out, TagKey<Item> center) {
         Item wall = Walls.ITEM_BREAKABLE_WALL.get();
-        ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(out)
+        ShapedRecipeBuilder recipe = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, out)
                 .pattern("WWW");
 
         if (center != null)

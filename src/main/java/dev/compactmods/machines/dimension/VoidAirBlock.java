@@ -14,16 +14,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import static dev.compactmods.machines.api.core.Constants.MOD_ID;
 
 
 public class VoidAirBlock extends AirBlock {
-    final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
+    //final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
     public VoidAirBlock() {
-        super(BlockBehaviour.Properties.of(Material.AIR).noCollission().air().noLootTable());
+        super(BlockBehaviour.Properties.of()
+                .noCollission()
+                .air()
+                .strength(-1.0F, 3600000.0F)
+                .noLootTable()
+                .forceSolidOn()
+        );
     }
 
 
@@ -37,7 +42,7 @@ public class VoidAirBlock extends AirBlock {
 
             player.addEffect(new MobEffectInstance(MobEffects.POISON, 5 * 20));
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 5 * 20));
-            player.hurt(DAMAGE_SOURCE, 1);
+            player.hurt(pLevel.damageSources().fellOutOfWorld(), 1);
 
             PlayerUtil.howDidYouGetThere(player);
             player.getCapability(RoomCapabilities.ROOM_HISTORY).ifPresent(IRoomHistory::clear);

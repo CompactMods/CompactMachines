@@ -3,21 +3,23 @@ package dev.compactmods.machines.datagen.tags;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.wall.Walls;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class BlockTagGenerator extends BlockTagsProvider {
 
-    public BlockTagGenerator(DataGenerator generator, ExistingFileHelper files) {
-        super(generator, Constants.MOD_ID, files);
+    public BlockTagGenerator(PackOutput packOut, ExistingFileHelper files, CompletableFuture<HolderLookup.Provider> lookup) {
+        super(packOut, lookup, Constants.MOD_ID, files);
     }
 
     @Override
-    public void addTags() {
+    protected void addTags(HolderLookup.Provider provider) {
         var machines = Set.of(Machines.MACHINE_BLOCK_TINY.get(),
                 Machines.MACHINE_BLOCK_SMALL.get(),
                 Machines.MACHINE_BLOCK_NORMAL.get(),

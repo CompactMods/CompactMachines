@@ -17,7 +17,7 @@ public abstract class CodecExtensions {
                 try {
                     return DataResult.success(UUID.fromString(s));
                 } catch (Exception ex) {
-                    return DataResult.error("Not a valid UUID: " + s + " (" + ex.getMessage() + ")");
+                    return DataResult.error(() -> "Not a valid UUID: " + s + " (" + ex.getMessage() + ")");
                 }
             }, UUID::toString).stable();
 

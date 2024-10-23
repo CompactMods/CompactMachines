@@ -14,9 +14,9 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -38,7 +38,7 @@ public class ItemTunnel implements TunnelDefinition, CapabilityTunnel<ItemTunnel
 
     @Override
     public ImmutableSet<Capability<?>> getSupportedCapabilities() {
-        return ImmutableSet.of(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        return ImmutableSet.of(ForgeCapabilities.ITEM_HANDLER);
     }
 
     /**
@@ -49,7 +49,7 @@ public class ItemTunnel implements TunnelDefinition, CapabilityTunnel<ItemTunnel
      */
     @Override
     public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> capType, Instance instance) {
-        if (capType == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (capType == ForgeCapabilities.ITEM_HANDLER) {
             return instance.lazy();
         }
 

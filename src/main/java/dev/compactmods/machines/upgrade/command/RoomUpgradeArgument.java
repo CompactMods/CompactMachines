@@ -30,7 +30,7 @@ public class RoomUpgradeArgument extends ResourceKeyArgument<RoomUpgrade> {
 
     public static Optional<RoomUpgrade> getUpgrade(CommandContext<CommandSourceStack> stack, String argName) throws CommandSyntaxException {
         final var UPGRADES = MachineRoomUpgrades.REGISTRY.get();
-        ResourceKey<RoomUpgrade> resourcekey = getRegistryType(stack, argName, Registries.ROOM_UPGRADES_REG_KEY, ERROR_INVALID_UPGRADE);
+        ResourceKey<RoomUpgrade> resourcekey = getRegistryKey(stack, argName, Registries.ROOM_UPGRADES_REG_KEY, ERROR_INVALID_UPGRADE);
         return Optional.ofNullable(UPGRADES.getValue(resourcekey.location()));
     }
 

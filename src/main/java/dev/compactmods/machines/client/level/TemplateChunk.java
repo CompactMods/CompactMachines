@@ -46,18 +46,18 @@ public class TemplateChunk extends EmptyLevelChunk {
 
         for (var pos : blocksInChunk.keySet()) {
             final var blockInfo = blocksInChunk.get(pos);
-            this.blocksInChunk.put(pos, blockInfo.state);
+            this.blocksInChunk.put(pos, blockInfo.state());
 
-            if(blockInfo.nbt != null) {
-                BlockEntity tile = BlockEntity.loadStatic(blockInfo.pos, blockInfo.state, blockInfo.nbt);
+            if(blockInfo.nbt() != null) {
+                BlockEntity tile = BlockEntity.loadStatic(blockInfo.pos(), blockInfo.state(), blockInfo.nbt());
                 if (tile != null) {
                     tile.setLevel(worldIn);
-                    tile.setBlockState(blockInfo.state);
-                    tiles.put(blockInfo.pos, tile);
+                    tile.setBlockState(blockInfo.state());
+                    tiles.put(blockInfo.pos(), tile);
                     tile.onLoad();
 
-                    if(blockInfo.state.getBlock() instanceof EntityBlock eb) {
-                        final BlockEntityTicker<?> ticker = eb.getTicker(worldIn, blockInfo.state, tile.getType());
+                    if(blockInfo.state().getBlock() instanceof EntityBlock eb) {
+                        final BlockEntityTicker<?> ticker = eb.getTicker(worldIn, blockInfo.state(), tile.getType());
                         if(ticker != null)
                             this.tickers.put(pos, (BlockEntityTicker<BlockEntity>) ticker);
                     }

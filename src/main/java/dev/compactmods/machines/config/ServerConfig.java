@@ -51,7 +51,7 @@ public class ServerConfig {
 
         MACHINE_FLOOR_Y = builder
                 .comment("The Y-dimension to spawn machine floors at.")
-                .defineInRange("floor", 40, 10, 200);
+                .defineInRange("floor", 0, 0, 20);
 
         ALLOWED_OUTSIDE_MACHINE = builder
                 .comment("Specify if we want to damage player's that managed to escape the boundries")

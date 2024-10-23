@@ -81,7 +81,7 @@ public class Rooms {
 
         final var bounds = roomInfo.getRoomBounds();
         final int inside = roomInfo.getSize().getInternalSize();
-        tem.fillFromWorld(compactDim, new BlockPos(bounds.minX, bounds.minY - 1, bounds.minZ),
+        tem.fillFromWorld(compactDim, new BlockPos((int)bounds.minX, (int)bounds.minY - 1, (int)bounds.minZ),
                 new Vec3i(inside, inside + 1, inside), false, null);
 
         return tem;

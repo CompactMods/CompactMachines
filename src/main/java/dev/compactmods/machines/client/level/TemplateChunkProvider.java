@@ -38,7 +38,7 @@ public class TemplateChunkProvider extends ChunkSource {
 
         HashMap<BlockPos, StructureTemplate.StructureBlockInfo> blockInfo = new HashMap<>();
         blocks.forEach(sbi -> {
-            blockInfo.put(sbi.pos, sbi);
+            blockInfo.put(sbi.pos(), sbi);
         });
 
         chunks = loadChunkData(blockInfo, world, shouldShow);

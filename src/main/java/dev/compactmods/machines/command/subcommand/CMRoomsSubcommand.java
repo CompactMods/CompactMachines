@@ -55,7 +55,7 @@ public class CMRoomsSubcommand {
         if(level.getBlockEntity(block) instanceof CompactMachineBlockEntity be) {
             be.getConnectedRoom().ifPresent(room -> {
                 final var m = TranslationUtil.message(Messages.MACHINE_ROOM_INFO, block, b.getSize(), room);
-                ctx.getSource().sendSuccess(m, false);
+                ctx.getSource().sendSuccess(() -> m, false);
             });
         }
 
@@ -67,7 +67,7 @@ public class CMRoomsSubcommand {
         final var server = ctx.getSource().getServer();
 
         final var playerChunk = player.chunkPosition();
-        final var playerLevel = player.getLevel();
+        final var playerLevel = player.level();
 
         if (!playerLevel.dimension().equals(CompactDimension.LEVEL_KEY)) {
             throw new CommandRuntimeException(TranslationUtil.command(CMCommands.WRONG_DIMENSION));
@@ -76,7 +76,7 @@ public class CMRoomsSubcommand {
         try {
             final var roomSize = Rooms.sizeOf(server, playerChunk);
             final var m = TranslationUtil.message(Messages.PLAYER_ROOM_INFO, player.getDisplayName(), playerChunk.toString(), roomSize);
-            ctx.getSource().sendSuccess(m, false);
+            ctx.getSource().sendSuccess(() -> m, false);
         } catch (NonexistentRoomException e) {
             CompactMachines.LOGGER.error("Player is inside an unregistered chunk ({}) in the compact world.", playerChunk, e);
             final var tc = Component.literal("%s, %s".formatted(playerChunk.x, playerChunk.z))
@@ -97,7 +97,7 @@ public class CMRoomsSubcommand {
         rooms.streamRooms()
                 .filter(r -> r.getOwner().equals(owner.getUUID()))
                 .forEach(data -> {
-                    ctx.getSource().sendSuccess(Component.literal("Room: " + new ChunkPos(data.getCenter())), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal("Room: " + new ChunkPos(data.getCenter())), false);
                 });
 
         return 0;

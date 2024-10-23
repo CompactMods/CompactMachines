@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.guide.GuideSection;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -68,8 +69,9 @@ public class PersonalShrinkingDeviceScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        PoseStack matrixStack = graphics.pose();
+        this.renderBackground(graphics);
 
         RenderSystem.clearColor(1, 1, 1, 1);
         int relX = (this.width - WIDTH) / 2;
@@ -81,19 +83,19 @@ public class PersonalShrinkingDeviceScreen extends Screen {
         matrixStack.translate(relX, relY, 0);
 
         RenderSystem.setShaderTexture(0, GUI);
-        this.blit(matrixStack, 0, 0, 0, 0, WIDTH, HEIGHT);
+        graphics.blit(GUI, 0, 0, 0, 0, WIDTH, HEIGHT);
         matrixStack.popPose();
 
         matrixStack.pushPose();
         matrixStack.translate(relX + 15, relY + 14, 10);
 
         if(currentSection != null) {
-            currentSection.render(matrixStack, mouseX - relX - 15, mouseY - relY - 14, partialTicks);
+            currentSection.render(graphics, mouseX - relX - 15, mouseY - relY - 14, partialTicks);
         }
 
         matrixStack.popPose();
 
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        super.render(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override

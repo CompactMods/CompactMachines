@@ -2,6 +2,8 @@ package dev.compactmods.machines.test.core;
 
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.client.CreativeTabs;
+import dev.compactmods.machines.core.Registries;
 import dev.compactmods.machines.test.TestBatches;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -15,7 +17,8 @@ public class CompactMachinesTests {
     @GameTest(template = "empty_1x1", batch = TestBatches.CODEC_TESTS)
     public static void canSerializeVector3d(final GameTestHelper test) {
         try {
-            var icon = CompactMachines.COMPACT_MACHINES_ITEMS.makeIcon();
+            var icon = CreativeTabs.TAB.get().getIconItem();
+            //var icon = CompactMachines.COMPACT_MACHINES_ITEMS.makeIcon();
             if(icon.isEmpty())
                 test.fail("Mod creative tab icon is wrong.");
         }

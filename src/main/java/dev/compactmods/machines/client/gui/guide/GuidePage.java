@@ -7,8 +7,8 @@ import dev.compactmods.machines.client.gui.widget.ScrollableWrappedTextWidget;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class GuidePage implements Widget, GuiEventListener {
+public class GuidePage implements Renderable, GuiEventListener {
 
     protected final List<AbstractCMGuiWidget> widgets;
 
@@ -28,15 +28,15 @@ public class GuidePage implements Widget, GuiEventListener {
     }
 
     @Override
-    public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         Font fr = Minecraft.getInstance().font;
-        GuiComponent.drawString(ms, fr,
+        graphics.drawString(fr,
                 Component.translatable(Constants.MOD_ID + ".psd.pages.machines.title")
                 .withStyle(ChatFormatting.GOLD),
                 2, 2, 0);
 
-        for(Widget comp : widgets)
-            comp.render(ms, mouseX, mouseY, partialTicks);
+        for(Renderable renderable : widgets)
+            renderable.render(graphics, mouseX, mouseY, partialTicks);
     }
 
     public Optional<AbstractCMGuiWidget> getWidgetByPosition(double mouseX, double mouseY) {
@@ -59,6 +59,16 @@ public class GuidePage implements Widget, GuiEventListener {
         return getWidgetByPosition(mouseX, mouseY)
                 .map(c -> c.mouseScrolled(mouseX, mouseY, delta))
                 .orElse(false);
+    }
+
+    @Override
+    public void setFocused(boolean b) {
+
+    }
+
+    @Override
+    public boolean isFocused() {
+        return true;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.core.Constants;
+import dev.compactmods.machines.client.CreativeTabs;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.config.CommonConfig;
 import dev.compactmods.machines.config.EnableVanillaRecipesConfigCondition;
@@ -41,14 +42,6 @@ public class CompactMachines {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Marker CONN_MARKER = MarkerManager.getMarker("cm_connections");
 
-    public static final CreativeModeTab COMPACT_MACHINES_ITEMS = new CreativeModeTab(Constants.MOD_ID) {
-        @Override
-        public @Nonnull
-        ItemStack makeIcon() {
-            return new ItemStack(Machines.MACHINE_BLOCK_ITEM_NORMAL.get());
-        }
-    };
-
     public CompactMachines() {
         Registries.setup();
         preparePackages();
@@ -68,6 +61,7 @@ public class CompactMachines {
     private static void doRegistration() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        Registries.TABS.register(bus);
         Registries.BLOCKS.register(bus);
         Registries.ITEMS.register(bus);
         Registries.BLOCK_ENTITIES.register(bus);
@@ -86,6 +80,7 @@ public class CompactMachines {
         Walls.prepare();
         Tunnels.prepare();
         Shrinking.prepare();
+        CreativeTabs.prepare();
 
         UIRegistration.prepare();
         Dimension.prepare();

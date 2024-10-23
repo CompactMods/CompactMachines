@@ -28,6 +28,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -58,7 +59,7 @@ import java.util.UUID;
 
 public class CompactMachineBlock extends Block implements EntityBlock {
 
-    public static final TagKey<Block> TAG = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(Constants.MOD_ID, "machine"));
+    public static final TagKey<Block> TAG = TagKey.create(Registries.BLOCK, new ResourceLocation(Constants.MOD_ID, "machine"));
 
     private final RoomSize size;
 
@@ -201,7 +202,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                         final var roomName = Rooms.getRoomName(server, room);
                         NetworkHooks.openScreen((ServerPlayer) player, MachineRoomMenu.makeProvider(server, room, machine.getLevelPosition()), (buf) -> {
                             buf.writeBlockPos(pos);
-                            buf.writeWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
+                            buf.writeJsonWithCodec(LevelBlockPosition.CODEC, machine.getLevelPosition());
                             buf.writeChunkPos(room);
                             roomName.ifPresentOrElse(name -> {
                                 buf.writeBoolean(true);

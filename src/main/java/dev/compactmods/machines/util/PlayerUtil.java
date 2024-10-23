@@ -55,7 +55,7 @@ public abstract class PlayerUtil {
             boolean grantAdvancement = targetRoom.isEmpty();
 
             targetRoom.ifPresent(room -> {
-                if (player.level.dimension().equals(CompactDimension.LEVEL_KEY) && player.chunkPosition().equals(room)) {
+                if (player.level().dimension().equals(CompactDimension.LEVEL_KEY) && player.chunkPosition().equals(room)) {
                     if (player instanceof ServerPlayer sp) {
                         AdvancementTriggers.RECURSIVE_ROOMS.trigger(sp);
                     }

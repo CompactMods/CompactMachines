@@ -33,7 +33,7 @@ public class SpawnSubcommand {
 
         try {
             Rooms.resetSpawn(serv, roomPos);
-            src.sendSuccess(TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s, %s".formatted(roomPos.x, roomPos.z)), true);
+            src.sendSuccess(() -> TranslationUtil.command(CMCommands.SPAWN_CHANGED_SUCCESSFULLY, "%s, %s".formatted(roomPos.x, roomPos.z)), true);
             return 0;
         } catch (NonexistentRoomException e) {
             src.sendFailure(TranslationUtil.command(CMCommands.ROOM_NOT_FOUND, "%s, %s".formatted(roomPos.x, roomPos.z)));

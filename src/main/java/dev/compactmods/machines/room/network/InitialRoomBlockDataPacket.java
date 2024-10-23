@@ -1,5 +1,6 @@
 package dev.compactmods.machines.room.network;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -12,7 +13,7 @@ public record InitialRoomBlockDataPacket(StructureTemplate blocks) {
     public static InitialRoomBlockDataPacket fromNetwork(FriendlyByteBuf buf) {
         final var nbt = buf.readNbt();
         final var struct = new StructureTemplate();
-        struct.load(nbt);
+        struct.load(BuiltInRegistries.BLOCK.asLookup(), nbt);
 
         return new InitialRoomBlockDataPacket(struct);
     }

@@ -3,6 +3,7 @@ package dev.compactmods.machines.client.gui.widget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -51,7 +52,8 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        PoseStack matrixStack = graphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(x, y, 10);
         
@@ -60,7 +62,7 @@ public class ScrollableWrappedTextWidget extends AbstractCMGuiWidget {
         try {
             for (int y = lineIndexStart; y <= lineIndexStart + maxLinesToShow; y++) {
                 FormattedCharSequence s = lines.get(y);
-                fr.drawShadow(matrixStack, s, 0, (y - lineIndexStart) * (charSize + 4), 0xFFFFFF);
+                graphics.drawString(fr, s, 0, (y - lineIndexStart) * (charSize + 4), 0xFFFFFF, true);
             }
         }
 

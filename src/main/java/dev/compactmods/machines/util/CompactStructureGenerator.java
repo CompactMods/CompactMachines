@@ -5,6 +5,7 @@ import dev.compactmods.machines.wall.Walls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -118,9 +119,9 @@ public class CompactStructureGenerator {
 
     public static BlockPos cornerFromSize(Vec3i dimensions, BlockPos cubeFloorCenter) {
         Vec3i offset = new Vec3i(
-                -Math.floor(dimensions.getX() / 2f),
+                -Mth.floor(dimensions.getX() / 2f),
                 1,
-                -Math.floor(dimensions.getZ() / 2f)
+                -Mth.floor(dimensions.getZ() / 2f)
         );
 
         return cubeFloorCenter.offset(offset);

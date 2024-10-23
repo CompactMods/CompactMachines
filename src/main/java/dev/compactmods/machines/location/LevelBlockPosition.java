@@ -8,7 +8,7 @@ import dev.compactmods.machines.api.codec.CodecExtensions;
 import dev.compactmods.machines.api.location.IDimensionalBlockPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -33,7 +33,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     private Vec2 rotation;
 
     public static final Codec<LevelBlockPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
-            ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(LevelBlockPosition::getDimension),
+            ResourceKey.codec(Registries.DIMENSION).fieldOf("dim").forGetter(LevelBlockPosition::getDimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(LevelBlockPosition::getExactPosition),
             CodecExtensions.VECTOR2.optionalFieldOf("rot", Vec2.ZERO).forGetter(x -> x.rotation)
     ).apply(i, LevelBlockPosition::new));
@@ -66,7 +66,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     }
 
     public static LevelBlockPosition fromEntity(LivingEntity entity) {
-        return new LevelBlockPosition(entity.level.dimension(), entity.position(), entity.getRotationVector());
+        return new LevelBlockPosition(entity.level().dimension(), entity.position(), entity.getRotationVector());
     }
 
     public ServerLevel level(@Nonnull MinecraftServer server) {
@@ -85,7 +85,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
 
     public boolean isLoaded(MinecraftServer server) {
         final var level = level(server);
-        return level.isLoaded(new BlockPos(position));
+        return level.isLoaded(getBlockPosition());
     }
 
     public static LevelBlockPosition fromNBT(CompoundTag nbt) {
@@ -126,7 +126,7 @@ public class LevelBlockPosition implements INBTSerializable<CompoundTag>, IDimen
     }
 
     public BlockPos getBlockPosition() {
-        return new BlockPos(position.x, position.y, position.z);
+        return new BlockPos((int)position.x, (int)position.y, (int)position.z);
     }
 
     @Override

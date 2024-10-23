@@ -24,11 +24,11 @@ public class CMReaddDimensionSubcommand {
 
         var compactLevel = serv.getLevel(CompactDimension.LEVEL_KEY);
         if (compactLevel == null) {
-            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
+            src.sendSuccess(() -> TranslationUtil.command(CMCommands.LEVEL_NOT_FOUND).withStyle(ChatFormatting.RED), false);
 
             DimensionUtil.createAndRegisterWorldAndDimension(serv);
         } else {
-            src.sendSuccess(TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
+            src.sendSuccess(() -> TranslationUtil.command(CMCommands.LEVEL_REGISTERED).withStyle(ChatFormatting.DARK_GREEN), false);
         }
 
         return 0;

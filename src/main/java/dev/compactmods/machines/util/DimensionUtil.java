@@ -4,8 +4,8 @@ import com.mojang.serialization.JsonOps;
 import dev.compactmods.machines.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.RegistryResourceAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +29,7 @@ public class DimensionUtil {
         final ServerLevel overworld = server.getLevel(Level.OVERWORLD);
 
         // dimension keys have a 1:1 relationship with dimension keys, they have the same IDs as well
-        final ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, CompactDimension.LEVEL_KEY.location());
+        final ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registries.LEVEL_STEM, CompactDimension.LEVEL_KEY.location());
 
         final var serverResources = server.getResourceManager();
 
@@ -37,13 +37,13 @@ public class DimensionUtil {
         if (FMLEnvironment.production && !doLevelFileBackup(server)) return;
 
         var reg = server.registryAccess();
-        var cmDimType = reg.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY)
+        var cmDimType = reg.registryOrThrow(Registries.DIMENSION_TYPE)
                 .get(CompactDimension.DIM_TYPE_KEY);
 
         var ops = RegistryOps.create(JsonOps.INSTANCE, reg);
 
-        var resourceAccess = RegistryResourceAccess.forResourceManager(serverResources);
-        var dims = resourceAccess.listResources(Registry.DIMENSION_REGISTRY);
+        /*var resourceAccess = RegistryResourceAccess.forResourceManager(serverResources);
+        var dims = resourceAccess.listResources(Registries.DIMENSION_TYPE);*/
 
         // TODO - Revisit
 //        resourceAccess.getResource(Registration.COMPACT_DIMENSION).ifPresent(lev -> {

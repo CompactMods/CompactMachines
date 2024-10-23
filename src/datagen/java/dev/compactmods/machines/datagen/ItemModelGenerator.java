@@ -3,14 +3,14 @@ package dev.compactmods.machines.datagen;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ItemModelGenerator extends ItemModelProvider {
 
-    public ItemModelGenerator(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-        super(generator, Constants.MOD_ID, existingFileHelper);
+    public ItemModelGenerator(PackOutput packOutput, ExistingFileHelper existingFileHelper) {
+        super(packOutput, Constants.MOD_ID, existingFileHelper);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class ServerEventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent evt) {
         final var player = evt.getEntity();
-        if(player.level.dimension().equals(CompactDimension.LEVEL_KEY) && player instanceof ServerPlayer sp) {
+        if(player.level().dimension().equals(CompactDimension.LEVEL_KEY) && player instanceof ServerPlayer sp) {
             // Send a fake world border to the player instead of the "real" one in overworld
             sp.connection.send(new ClientboundInitializeBorderPacket(new WorldBorder()));
         }

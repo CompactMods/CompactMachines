@@ -9,6 +9,7 @@ import dev.compactmods.machines.datagen.AdvancementLangBuilder;
 import dev.compactmods.machines.i18n.TranslationUtil;
 import dev.compactmods.machines.machine.CompactMachineBlock;
 import dev.compactmods.machines.tunnel.Tunnels;
+import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +24,7 @@ public abstract class BaseLangGenerator extends LanguageProvider {
     private final String locale;
 
     public BaseLangGenerator(DataGenerator gen, String locale) {
-        super(gen, Constants.MOD_ID, locale);
+        super(gen.getPackOutput(), Constants.MOD_ID, locale);
         this.locale = locale;
     }
 
@@ -63,6 +64,10 @@ public abstract class BaseLangGenerator extends LanguageProvider {
         final var u = upgrade.get();
         if(u != null)
             add(u.getTranslationKey(), translation);
+    }
+
+    protected void addCreativeTab(ResourceLocation id, String translation) {
+        add(Util.makeDescriptionId("itemGroup", id), translation);
     }
 
     protected void addAdvancementTranslations() {

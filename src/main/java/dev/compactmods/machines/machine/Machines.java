@@ -7,19 +7,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
 public class Machines {
     static final BlockBehaviour.Properties MACHINE_BLOCK_PROPS = BlockBehaviour.Properties
-            .of(Material.METAL)
+            .of()
             .strength(8.0F, 20.0F)
             .requiresCorrectToolForDrops();
 
-    static final Supplier<Item.Properties> MACHINE_ITEM_PROPS = () -> new Item.Properties()
-            .tab(CompactMachines.COMPACT_MACHINES_ITEMS);
+    static final Supplier<Item.Properties> MACHINE_ITEM_PROPS = Item.Properties::new;
 
     public static final RegistryObject<Block> MACHINE_BLOCK_TINY = Registries.BLOCKS.register("machine_tiny", () ->
             new CompactMachineBlock(RoomSize.TINY, MACHINE_BLOCK_PROPS));
@@ -59,7 +57,6 @@ public class Machines {
 
     public static final RegistryObject<Item> MACHINE_BLOCK_ITEM_MAXIMUM = Registries.ITEMS.register("machine_maximum",
             () -> new CompactMachineItem(MACHINE_BLOCK_MAXIMUM.get(), MACHINE_ITEM_PROPS.get()));
-
 
 
     public static final RegistryObject<BlockEntityType<CompactMachineBlockEntity>> MACHINE_TILE_ENTITY = Registries.BLOCK_ENTITIES.register("compact_machine", () ->

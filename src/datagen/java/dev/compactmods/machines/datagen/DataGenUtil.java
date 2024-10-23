@@ -33,14 +33,8 @@ public class DataGenUtil {
 
                 fileLocation = fileLocation.resolve(path + ".json");
 
-                try {
-                    //noinspection OptionalGetWithoutIsPresent
-                    DataProvider.saveStable(cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
-
-                    set.put(regName, resource);
-                } catch (IOException ioe) {
-                    CompactMachines.LOGGER.error("Couldn't save resource {}", fileLocation, ioe);
-                }
+                DataProvider.saveStable(cache, codec.encodeStart(JsonOps.INSTANCE, resource).result().get(), fileLocation);
+                set.put(regName, resource);
             }
         };
     }
@@ -59,13 +53,10 @@ public class DataGenUtil {
 
                 fileLocation = fileLocation.resolve(path + ".json");
 
-                try {
-                    DataProvider.saveStable(cache, writer.apply(resource), fileLocation);
 
-                    set.put(regName, resource);
-                } catch (IOException ioe) {
-                    CompactMachines.LOGGER.error("Couldn't save resource {}", fileLocation, ioe);
-                }
+                DataProvider.saveStable(cache, writer.apply(resource), fileLocation);
+                set.put(regName, resource);
+
             }
         };
     }

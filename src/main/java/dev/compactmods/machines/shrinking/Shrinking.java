@@ -9,7 +9,6 @@ public class Shrinking {
 
     public static final RegistryObject<PersonalShrinkingDevice> PERSONAL_SHRINKING_DEVICE = Registries.ITEMS.register("personal_shrinking_device",
             () -> new PersonalShrinkingDevice(new Item.Properties()
-                    .tab(CompactMachines.COMPACT_MACHINES_ITEMS)
                     .stacksTo(1)));
 
     public static void prepare() {

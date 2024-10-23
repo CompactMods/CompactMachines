@@ -7,6 +7,7 @@ import dev.compactmods.machines.api.location.IDimensionalPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public final class PreciseDimensionalPosition implements IDimensionalPosition {
 
     public static final Codec<PreciseDimensionalPosition> CODEC = RecordCodecBuilder.create(i -> i.group(
-            ResourceKey.codec(Registry.DIMENSION_REGISTRY).fieldOf("dim").forGetter(PreciseDimensionalPosition::dimension),
+            ResourceKey.codec(Registries.DIMENSION).fieldOf("dim").forGetter(PreciseDimensionalPosition::dimension),
             CodecExtensions.VECTOR3D.fieldOf("pos").forGetter(PreciseDimensionalPosition::position),
             CodecExtensions.VECTOR3D.optionalFieldOf("rot", Vec3.ZERO).forGetter(x -> x.rotation)
     ).apply(i, PreciseDimensionalPosition::new));
@@ -43,12 +44,12 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
     }
 
     public static PreciseDimensionalPosition fromPlayer(Player player) {
-        return new PreciseDimensionalPosition(player.level.dimension(), player.position(), player.getLookAngle());
+        return new PreciseDimensionalPosition(player.level().dimension(), player.position(), player.getLookAngle());
     }
 
     @Override
     public BlockPos getBlockPosition() {
-        return new BlockPos(position.x, position.y, position.z);
+        return new BlockPos((int) position.x, (int) position.y, (int) position.z);
     }
 
     @Override
@@ -83,7 +84,7 @@ public final class PreciseDimensionalPosition implements IDimensionalPosition {
 
     @Override
     public boolean isLoaded(MinecraftServer serv) {
-        return level(serv).isLoaded(new BlockPos(position));
+        return level(serv).isLoaded(getBlockPosition());
     }
 
     public ResourceKey<Level> dimension() {

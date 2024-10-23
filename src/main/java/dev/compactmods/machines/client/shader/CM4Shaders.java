@@ -22,12 +22,12 @@ public class CM4Shaders
     public static void registerShaders(final RegisterShadersEvent ev) throws IOException
     {
         ev.registerShader(
-                new ShaderInstance(ev.getResourceManager(), new ResourceLocation(MOD_ID, "block_fullbright"), DefaultVertexFormat.BLOCK),
+                new ShaderInstance(ev.getResourceProvider(), new ResourceLocation(MOD_ID, "block_fullbright"), DefaultVertexFormat.BLOCK),
                 shader -> blockFullbrightShader = shader
         );
 
         ev.registerShader(
-                new ShaderInstance(ev.getResourceManager(), new ResourceLocation(MOD_ID, "wall"), DefaultVertexFormat.BLOCK),
+                new ShaderInstance(ev.getResourceProvider(), new ResourceLocation(MOD_ID, "wall"), DefaultVertexFormat.BLOCK),
                 shader -> wallShader = shader
         );
     }

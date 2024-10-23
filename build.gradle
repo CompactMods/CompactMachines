@@ -243,8 +243,9 @@ repositories {
 
     // location of the maven that hosts JEI files
     maven {
-        name "Progwml Repo"
-        url "https://dvs1.progwml6.com/files/maven"
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
     }
 
     // TheOneProbe
@@ -270,15 +271,16 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
 
     // The One Probe
-    implementation(fg.deobf("curse.maven:theoneprobe-245211:3927520"))
+    implementation(fg.deobf("curse.maven:theoneprobe-245211:4629624"))
 
     if (!System.getenv().containsKey("CI") && include_test_mods.equals("true")) {
         // Nicephore - Screenshots and Stuff
-        runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3879841"))
+        //runtimeOnly(fg.deobf("curse.maven:nicephore-401014:3879841"))
 
         // Testing Mods - Trash Cans, Pipez, Create, Refined Pipes, Pretty Pipes, Refined Storage
-        runtimeOnly(fg.deobf("curse.maven:SuperMartijn642-454372:3910759"))
-        runtimeOnly(fg.deobf("curse.maven:trashcans-394535:3871885"))
+        runtimeOnly(fg.deobf("curse.maven:SuperMartijn642Core-454372:5668859"))
+        runtimeOnly(fg.deobf("curse.maven:SuperMartijn642Config-438332:4715408"))
+        runtimeOnly(fg.deobf("curse.maven:trashcans-394535:4665996"))
 
         // runtimeOnly(fg.deobf("curse.maven:flywheel-486392:3871082"))
         // runtimeOnly(fg.deobf("curse.maven:create-328085:3737418"))
@@ -302,8 +304,8 @@ dependencies {
         // runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
 
         // Mekanism + Mek Generators - Tunnel testing
-        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:3922056"))
-        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:3922058"))
+        runtimeOnly(fg.deobf("curse.maven:mekanism-268560:5662583"))
+        runtimeOnly(fg.deobf("curse.maven:mekanismgenerators-268566:5662587"))
 
         // Soul Shards (FTB)
         // runtimeOnly(fg.deobf("curse.maven:polylib-576589:3751528"))

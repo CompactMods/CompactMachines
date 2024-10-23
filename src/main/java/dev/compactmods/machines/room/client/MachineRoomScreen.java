@@ -2,8 +2,8 @@ package dev.compactmods.machines.room.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.blaze3d.vertex.VertexSorting;
+import com.mojang.math.Axis;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.client.gui.widget.PSDIconButton;
 import dev.compactmods.machines.client.level.RenderingLevel;
@@ -16,7 +16,7 @@ import dev.compactmods.machines.room.network.PlayerStartedRoomTrackingPacket;
 import dev.compactmods.machines.room.network.RoomNetworkHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -28,6 +28,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraftforge.client.model.data.ModelData;
+import org.joml.Matrix4f;
 
 public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> {
 
@@ -85,26 +86,27 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     }
 
     @Override
-    protected void renderLabels(PoseStack pose, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        PoseStack pose = graphics.pose();
         pose.pushPose();
         pose.translate(0, 0, 500);
 
         pose.translate(this.imageWidth / 2f, 0, 0);
 
         var p = Component.literal(menu.getRoomName());
-        Screen.drawCenteredString(pose, font, p, 0, this.titleLabelY, 0xFFFFFFFF);
+        graphics.drawCenteredString(font, p, 0, this.titleLabelY, 0xFFFFFFFF);
 
         var room = menu.getRoom();
         var rt =  Component.literal("(%s, %s)".formatted(room.x, room.z));
         pose.scale(0.8f, 0.8f, 0.8f);
-        Screen.drawCenteredString(pose, font, rt, 0,this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
+        graphics.drawCenteredString(font, rt, 0,this.titleLabelY + font.lineHeight + 2, 0xFFCCCCCC);
         pose.popPose();
     }
 
     @Override
-    public void render(PoseStack pose, int mouseX, int mouseY, float partial) {
-        this.renderBackground(pose);
-        super.render(pose, mouseX, mouseY, partial);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partial) {
+        this.renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, partial);
 
         var buffer = SuperRenderTypeBuffer.getInstance();
 
@@ -114,9 +116,11 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
         // has to be outside of MS transforms, important for vertex sorting
         Matrix4f matrix4f = new Matrix4f(RenderSystem.getProjectionMatrix());
-        matrix4f.multiplyWithTranslation(0, 0, 800);
-        RenderSystem.setProjectionMatrix(matrix4f);
+        //matrix4f.multiplyWithTranslation(0, 0, 800);
+        matrix4f.translate(0, 0, 800);
+        RenderSystem.setProjectionMatrix(matrix4f, VertexSorting.ORTHOGRAPHIC_Z);
 
+        PoseStack pose = graphics.pose();
         PoseStack.Pose lastEntryBeforeTry = pose.last();
 
         var cam = minecraft.cameraEntity;
@@ -149,8 +153,8 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
 
                 pose.scale(zoom, -zoom, zoom);
 
-                pose.mulPose(Vector3f.XP.rotationDegrees((float) rotateY));
-                pose.mulPose(Vector3f.YP.rotationDegrees((float) rotateX));
+                pose.mulPose(Axis.XP.rotationDegrees((float) rotateY));
+                pose.mulPose(Axis.YP.rotationDegrees((float) rotateX));
 
                 final var tSize = struct.getSize();
                 final float s = tSize.getX() / 2f;
@@ -211,7 +215,7 @@ public class MachineRoomScreen extends AbstractContainerScreen<MachineRoomMenu> 
     }
 
     @Override
-    protected void renderBg(PoseStack pose, float p_97788_, int p_97789_, int p_97790_) {
+    protected void renderBg(GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
         RenderSystem.setShaderTexture(0, new ResourceLocation(Constants.MOD_ID, "textures/gui/room_menu.png"));
 
         int i = (this.width - this.imageWidth) / 2;

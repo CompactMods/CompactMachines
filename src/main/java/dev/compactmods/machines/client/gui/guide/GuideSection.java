@@ -1,13 +1,14 @@
 package dev.compactmods.machines.client.gui.guide;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.components.Widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuideSection implements Widget, GuiEventListener {
+public class GuideSection implements Renderable, GuiEventListener {
     private final List<GuidePage> pages;
     private final int currentPageIndex = 0;
     private final GuidePage currentPage;
@@ -19,9 +20,9 @@ public class GuideSection implements Widget, GuiEventListener {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if(this.currentPage != null)
-            currentPage.render(matrixStack, mouseX, mouseY, partialTicks);
+            currentPage.render(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -44,5 +45,15 @@ public class GuideSection implements Widget, GuiEventListener {
             return currentPage.mouseScrolled(mouseX, mouseY, delta);
 
         return false;
+    }
+
+    @Override
+    public void setFocused(boolean b) {
+
+    }
+
+    @Override
+    public boolean isFocused() {
+        return true;
     }
 }

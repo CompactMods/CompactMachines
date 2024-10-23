@@ -20,11 +20,11 @@ public class Dimension {
     // ================================================================================================================
     @Deprecated(forRemoval = true)
     public static final ResourceKey<Level> COMPACT_DIMENSION = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
+            .create(net.minecraft.core.registries.Registries.DIMENSION, new ResourceLocation(MOD_ID, "compact_world"));
 
     @Deprecated(forRemoval = true)
     public static final ResourceKey<DimensionType> COMPACT_DIMENSION_DIM_TYPE = ResourceKey
-            .create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(MOD_ID, "compact_world"));
+            .create(net.minecraft.core.registries.Registries.DIMENSION_TYPE, new ResourceLocation(MOD_ID, "compact_world"));
 
     public static void prepare() {
 

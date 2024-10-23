@@ -2,6 +2,7 @@ package dev.compactmods.machines.advancement.trigger;
 
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.resources.ResourceLocation;
@@ -21,17 +22,17 @@ public class BasicPlayerAdvTrigger extends BaseAdvancementTrigger<BasicPlayerAdv
 
     @Override
     public Instance createInstance(JsonObject json, DeserializationContext conditions) {
-        return new Instance(this.advancementId, EntityPredicate.Composite.fromJson(json, "player", conditions));
+        return new Instance(this.advancementId, EntityPredicate.fromJson(json, "player", conditions));
     }
 
     public static class Instance extends AbstractCriterionTriggerInstance {
 
-        public Instance(ResourceLocation advId, EntityPredicate.Composite player) {
+        public Instance(ResourceLocation advId, ContextAwarePredicate player) {
             super(advId, player);
         }
 
         public static Instance create(ResourceLocation advancement) {
-            return new Instance(advancement, EntityPredicate.Composite.ANY);
+            return new Instance(advancement, EntityPredicate.wrap(EntityPredicate.ANY));
         }
     }
 }

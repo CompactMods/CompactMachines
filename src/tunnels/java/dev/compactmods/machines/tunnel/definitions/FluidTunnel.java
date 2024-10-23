@@ -9,9 +9,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.FastColor;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 
@@ -25,12 +25,12 @@ public class FluidTunnel implements TunnelDefinition, CapabilityTunnel<FluidTunn
 
     @Override
     public ImmutableSet<Capability<?>> getSupportedCapabilities() {
-        return ImmutableSet.of(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        return ImmutableSet.of(ForgeCapabilities.FLUID_HANDLER);
     }
 
     @Override
     public <CapType> LazyOptional<CapType> getCapability(Capability<CapType> type, FluidTunnel.Instance instance) {
-        if(type == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+        if(type == ForgeCapabilities.FLUID_HANDLER)
             return instance.lazy().cast();
 
         return LazyOptional.empty();

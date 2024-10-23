@@ -61,7 +61,7 @@ public class PersonalShrinkingDevice extends Item {
         }
 
         if (world instanceof ServerLevel && player instanceof ServerPlayer serverPlayer) {
-            ServerLevel playerDim = serverPlayer.getLevel();
+            ServerLevel playerDim = serverPlayer.serverLevel();
             if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
                 if (player.isShiftKeyDown()) {
                     ChunkPos machineChunk = new ChunkPos(player.blockPosition());

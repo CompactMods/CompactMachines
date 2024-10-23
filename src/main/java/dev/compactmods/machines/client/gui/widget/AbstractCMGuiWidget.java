@@ -1,12 +1,13 @@
 package dev.compactmods.machines.client.gui.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.components.Widget;
 
-public class AbstractCMGuiWidget implements Widget, GuiEventListener {
+public class AbstractCMGuiWidget implements Renderable, GuiEventListener {
 
     protected final int x, y, width, height;
+    protected boolean focused;
 
     protected AbstractCMGuiWidget(int x, int y, int width, int height) {
         this.x = x;
@@ -16,12 +17,22 @@ public class AbstractCMGuiWidget implements Widget, GuiEventListener {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+    }
+
+    @Override
+    public void setFocused(boolean b) {
+        this.focused = b;
+    }
+
+    @Override
+    public boolean isFocused() {
+        return this.focused;
     }
 }

@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -29,10 +29,10 @@ public class RoomEventHandler {
         Entity ent = evt.getEntity();
 
         // Early exit if spawning in non-CM dimensions
-        if ((ent instanceof Player) || !ent.level.dimension().equals(CompactDimension.LEVEL_KEY)) return;
+        if ((ent instanceof Player) || !ent.level().dimension().equals(CompactDimension.LEVEL_KEY)) return;
 
         // no-op clients, we only care about blocking server spawns
-        if(ent.level.isClientSide) return;
+        if(ent.level().isClientSide) return;
 
         if (!positionInsideRoom(ent, ent.position())) {
             evt.setCanceled(true);
@@ -40,13 +40,13 @@ public class RoomEventHandler {
     }
 
     @SubscribeEvent
-    public static void onCheckSpawn(final LivingSpawnEvent.CheckSpawn evt) {
+    public static void onCheckSpawn(final MobSpawnEvent evt) {
         Vec3 target = new Vec3(evt.getX(), evt.getY(), evt.getZ());
 
         Entity ent = evt.getEntity();
 
         // Early exit if spawning in non-CM dimensions
-        if (!ent.level.dimension().equals(CompactDimension.LEVEL_KEY)) return;
+        if (!ent.level().dimension().equals(CompactDimension.LEVEL_KEY)) return;
 
         if (!positionInsideRoom(ent, target)) evt.setResult(Event.Result.DENY);
     }
@@ -55,7 +55,7 @@ public class RoomEventHandler {
     public static void onEntityTeleport(final EntityTeleportEvent evt) {
         // Allow teleport commands, we don't want to trap people anywhere
         if (evt instanceof EntityTeleportEvent.TeleportCommand) return;
-        if(!evt.getEntity().level.dimension().equals(CompactDimension.LEVEL_KEY)) return;
+        if(!evt.getEntity().level().dimension().equals(CompactDimension.LEVEL_KEY)) return;
 
         Entity ent = evt.getEntity();
         doEntityTeleportHandle(evt, evt.getTarget(), ent);
@@ -71,7 +71,7 @@ public class RoomEventHandler {
      * @return True if position is inside a room; false otherwise.
      */
     private static boolean positionInsideRoom(Entity entity, Vec3 target) {
-        final var level = entity.level;
+        final var level = entity.level();
         if (!level.dimension().equals(CompactDimension.LEVEL_KEY)) return false;
 
         if (level instanceof ServerLevel compactDim) {

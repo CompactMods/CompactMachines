@@ -92,7 +92,8 @@ public class TunnelItem extends Item {
         });
     }
 
-    @Override
+
+    /*@Override
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         if (this.allowedIn(group)) {
             IForgeRegistry<TunnelDefinition> definitions = Tunnels.TUNNEL_DEF_REGISTRY.get();
@@ -104,7 +105,7 @@ public class TunnelItem extends Item {
                 items.add(withDef);
             });
         }
-    }
+    }*/
 
     public static Optional<TunnelDefinition> getDefinition(ItemStack stack) {
         CompoundTag defTag = stack.getOrCreateTagElement("definition");

@@ -6,7 +6,7 @@ import dev.compactmods.machines.api.core.Messages;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.api.room.RoomSize;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
-import dev.compactmods.machines.dimension.VoidAirBlock;
+import dev.compactmods.machines.client.CreativeTabs;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.tunnel.Tunnels;
 import dev.compactmods.machines.upgrade.MachineRoomUpgrades;
@@ -23,6 +23,8 @@ public class EnglishLangGenerator extends BaseLangGenerator {
     @Override
     protected void addTranslations() {
         super.addTranslations();
+
+        addCreativeTab(CreativeTabs.MAIN_RL, "Compact Machines");
 
         addMessage(Messages.CANNOT_ENTER_MACHINE, "You fumble with the shrinking device, to no avail. It refuses to work.");
         addMessage(Messages.NO_MACHINE_DATA, "No machine data loaded; report this.");
@@ -107,8 +109,6 @@ public class EnglishLangGenerator extends BaseLangGenerator {
 
         addMessage(Messages.UNKNOWN_ROOM_CHUNK, "Unknown room at %s; please verify it exists.");
 
-        add("itemGroup." + Constants.MOD_ID, "Compact Machines");
-
         add("biome." + Constants.MOD_ID + ".machine", "Compact Machine");
 
         add("compactmachines.psd.pages.machines.title", "Compact Machines");
@@ -120,7 +120,7 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space. " +
                 "You can also right click it in the overworld for more info.");
-        add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
+        //add("death.attack." + VoidAirBlock.DAMAGE_SOURCE.msgId, "%1$s failed to enter the void");
     }
 
     @Override

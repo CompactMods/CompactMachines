@@ -10,7 +10,7 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
     public ChunkloadUpgradeItem(Properties props) {
         super(props);
     }
-    @Override
+    /*@Override
     public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> stacks) {
         if(!allowedIn(tab)) return;
 
@@ -19,7 +19,7 @@ public class ChunkloadUpgradeItem extends RoomUpgradeItem {
         info.putString(RoomUpgradeHelper.NBT_UPGRADE_ID, ChunkloadUpgrade.REG_ID.toString());
 
         stacks.add(stack);
-    }
+    }*/
     @Override
     public RoomUpgrade getUpgradeType() {
         return MachineRoomUpgrades.CHUNKLOAD.get();

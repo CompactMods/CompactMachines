@@ -53,7 +53,7 @@ public class CMGiveMachineSubcommand {
             if(!player.addItem(newItem)) {
                 src.sendFailure(TranslationUtil.command(CMCommands.CANNOT_GIVE_MACHINE));
             } else {
-                src.sendSuccess(TranslationUtil.command(CMCommands.MACHINE_GIVEN, player.getDisplayName()), true);
+                src.sendSuccess(() -> TranslationUtil.command(CMCommands.MACHINE_GIVEN, player.getDisplayName()), true);
             }
         } catch (NonexistentRoomException e) {
             CompactMachines.LOGGER.fatal(e);
