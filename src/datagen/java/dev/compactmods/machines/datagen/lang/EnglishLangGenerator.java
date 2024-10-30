@@ -107,7 +107,10 @@ public class EnglishLangGenerator extends BaseLangGenerator {
         addMessage(Messages.UNKNOWN_ROOM_CHUNK, "Unknown room at %s; please verify it exists.");
 
         // Jade Plugin Specific Translations
-        add(JadeInfo.MACHINE.toString(), "Compact Machines");
+        add(JadeInfo.MACHINE, "Compact Machines");
+        add(JadeInfo.MACHINE_TUNNELS, "Compact Machine Tunnel Presence");
+        add(JadeInfo.TUNNEL_CONNECTION, "Tunnel Connection");
+
 
         add("biome." + Constants.MOD_ID + ".machine", "Compact Machine");
 
