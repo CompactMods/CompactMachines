@@ -1,6 +1,5 @@
 package dev.compactmods.machines.compat.jade.providers.client;
 
-import com.mojang.logging.LogUtils;
 import dev.compactmods.machines.api.core.Constants;
 import dev.compactmods.machines.api.core.Tooltips;
 import dev.compactmods.machines.i18n.TranslationUtil;
@@ -14,7 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
-import org.slf4j.Logger;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -24,8 +22,6 @@ import snownee.jade.api.ui.IElementHelper;
 
 public class CompactMachineProvider implements IBlockComponentProvider {
     public static final CompactMachineProvider INSTANCE = new CompactMachineProvider();
-
-    Logger logger = LogUtils.getLogger();
 
     @Override
     public void appendTooltip(
