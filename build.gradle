@@ -309,10 +309,10 @@ dependencies {
         // runtimeOnly(fg.deobf("curse.maven:immersiveeng-231951:3587149"))
 
         // FTB Chunks
-        // runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:3781711"))
-        // runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:3725501"))
-        // runtimeOnly(fg.deobf("curse.maven:ftblib-404465:3725485"))
-        // runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:3780113"))
+        // runtimeOnly(fg.deobf("curse.maven:architectury-forge-419699:5137938"))
+        // runtimeOnly(fg.deobf("curse.maven:ftb-teams-404468:5267190"))
+        // runtimeOnly(fg.deobf("curse.maven:ftblib-404465:5567591"))
+        // runtimeOnly(fg.deobf("curse.maven:ftbchunks-314906:5856503"))
 
         // Mekanism + Mek Generators - Tunnel testing
         runtimeOnly(fg.deobf("curse.maven:mekanism-268560:5662583"))
