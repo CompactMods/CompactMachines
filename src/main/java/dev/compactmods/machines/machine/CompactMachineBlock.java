@@ -188,7 +188,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (level.isClientSide())
-            return InteractionResult.SUCCESS;
+            return InteractionResult.PASS;
 
         MinecraftServer server = level.getServer();
         ItemStack mainItem = player.getMainHandItem();
@@ -287,7 +287,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             }
         }
 
-        return InteractionResult.SUCCESS;
+        return InteractionResult.PASS;
     }
 
     private void createAndEnterRoom(Player player, MinecraftServer server, CompactMachineBlockEntity tile) {
