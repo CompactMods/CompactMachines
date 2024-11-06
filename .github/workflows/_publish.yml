@@ -28,6 +28,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: Pull Built Generated Data
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-data
+          path: src/generated/resources
+
       - name: Publish
         run: ./gradlew :publish
         env:
