@@ -7,7 +7,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.LoggingUtil;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.machine.block.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,7 +16,7 @@ public class CMRebindSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("rebind")
-                .requires(cs -> cs.hasPermission(ServerConfig.rebindLevel()));
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .then(Commands.argument("bindTo", StringArgumentType.string())

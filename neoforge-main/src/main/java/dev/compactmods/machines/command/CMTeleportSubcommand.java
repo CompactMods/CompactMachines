@@ -10,7 +10,6 @@ import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.i18n.RoomTranslations;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.command.argument.Suggestors;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.room.RoomHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -25,7 +24,7 @@ public class CMTeleportSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("tp")
-                .requires(cs -> cs.hasPermission(ServerConfig.giveMachineLevel()));
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("room", StringArgumentType.string())
                 .suggests(Suggestors.ROOM_CODES)

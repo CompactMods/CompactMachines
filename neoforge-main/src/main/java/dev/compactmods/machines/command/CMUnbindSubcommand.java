@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.MachineTranslations;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.BoundCompactMachineBlockEntity;
 import net.minecraft.commands.CommandSourceStack;
@@ -18,7 +17,7 @@ public class CMUnbindSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("unbind")
-                .requires(cs -> cs.hasPermission(ServerConfig.rebindLevel()));
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         subRoot.then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .executes(CMUnbindSubcommand::doUnbind));

@@ -5,7 +5,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.i18n.CommandTranslations;
-import dev.compactmods.machines.server.ServerConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -16,7 +15,7 @@ public class SpawnSubcommand {
         final var spawnRoot = Commands.literal("spawn");
 
         final var resetSpawn = Commands.literal("reset")
-                .requires(cs -> cs.hasPermission(ServerConfig.changeRoomSpawn()))
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("room", StringArgumentType.string())
                         .executes(SpawnSubcommand::resetRoomSpawn));
 

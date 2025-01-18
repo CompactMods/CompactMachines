@@ -5,7 +5,6 @@ import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.compat.InterModCompat;
 import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.dimension.WorldBorderFixer;
 import dev.compactmods.machines.machine.Machines;
@@ -39,7 +38,6 @@ public class CompactMachinesCommon {
 
     private static void initConfigs(ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
-        modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.CONFIG);
     }
 
     private static void prepare() {

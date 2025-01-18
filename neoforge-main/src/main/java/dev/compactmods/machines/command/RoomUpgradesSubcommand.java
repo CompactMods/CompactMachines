@@ -10,7 +10,6 @@ import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
 import dev.compactmods.machines.command.argument.Suggestors;
 import dev.compactmods.machines.feature.CMFeatureFlags;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
-import dev.compactmods.machines.server.ServerConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -27,7 +26,8 @@ public class RoomUpgradesSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("upgrades")
-                .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures()) && cs.hasPermission(ServerConfig.giveMachineLevel()));
+                .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures())
+                        && cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
         // /cm upgrades add [id]
         subRoot.then(Commands.literal("add")

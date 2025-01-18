@@ -10,7 +10,6 @@ import dev.compactmods.machines.i18n.CommandTranslations;
 import dev.compactmods.machines.i18n.RoomTranslations;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.command.argument.Suggestors;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.machine.Machines;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -27,7 +26,7 @@ public class CMGiveMachineSubcommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("give")
-                .requires(cs -> cs.hasPermission(ServerConfig.giveMachineLevel()));
+                .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS));
 
 
         // /cm give new [template]
