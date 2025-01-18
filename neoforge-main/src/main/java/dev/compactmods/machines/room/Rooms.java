@@ -2,13 +2,10 @@ package dev.compactmods.machines.room;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
-import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
 import dev.compactmods.machines.CMRegistries;
-import dev.compactmods.machines.network.RoomNetworkHandler;
 import dev.compactmods.machines.room.block.SolidWallBlock;
-import dev.compactmods.machines.room.ui.preview.MachineRoomMenu;
 import dev.compactmods.machines.room.ui.upgrades.RoomUpgradeMenu;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeInventory;
 import dev.compactmods.machines.room.wall.BreakableWallBlock;
@@ -21,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -65,9 +61,6 @@ public interface Rooms {
   }
 
   interface Menus {
-	 DeferredHolder<MenuType<?>, MenuType<MachineRoomMenu>> MACHINE_MENU = CMRegistries.CONTAINERS.register("machine",
-		  () -> IMenuTypeExtension.create(MachineRoomMenu::createClientMenu));
-
 	 DeferredHolder<MenuType<?>, MenuType<RoomUpgradeMenu>> ROOM_UPGRADES = CMRegistries.CONTAINERS.register("room_upgrades",
 		  () -> IMenuTypeExtension.create(RoomUpgradeMenu::createClientMenu));
 
@@ -111,12 +104,6 @@ public interface Rooms {
   }
 
   static void registerEvents(IEventBus modBus) {
-	 modBus.addListener(FMLCommonSetupEvent.class, commonSetup -> {
-		var logger = LoggingUtil.modLog();
-		logger.trace("Initializing network handler.");
-		RoomNetworkHandler.setupMessages();
-	 });
-
 	 NeoForge.EVENT_BUS.addListener(RoomEventHandler::checkSpawn);
 	 NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityChangedDimensions);
 	 NeoForge.EVENT_BUS.addListener(RoomEventHandler::entityJoined);

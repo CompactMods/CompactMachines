@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.feature.CMFeatureFlags;
-import dev.compactmods.machines.network.PlayerRequestedUpgradeUIPacket;
+import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;

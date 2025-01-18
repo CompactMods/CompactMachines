@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.spatial.aabb.AABBHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class RoomBlocks {
 
-    public static CompletableFuture<StructureTemplate> getInternalBlocks(MinecraftServer server, RoomInstance room) throws MissingDimensionException {
+    public static CompletableFuture<StructureTemplate> getInternalBlocks(MinecraftServer server, RoomInstance room) {
         final var tem = new StructureTemplate();
 
         final var compactDim = server.getLevel(CompactDimension.LEVEL_KEY);
@@ -29,7 +30,7 @@ public class RoomBlocks {
         final var awaitAllChunks = CompletableFuture.allOf(chunkLoading.toArray(new CompletableFuture[chunkLoading.size()]));
 
         return awaitAllChunks.thenApply(ignored -> {
-            final var bounds = room.boundaries().outerBounds();
+            final var bounds = room.boundaries().innerBounds();
             tem.fillFromWorld(compactDim,
                     BlockPos.containing(bounds.minX, bounds.minY - 1, bounds.minZ),
                     new Vec3i((int) bounds.getXsize(), (int) bounds.getYsize() + 1, (int) bounds.getZsize()),

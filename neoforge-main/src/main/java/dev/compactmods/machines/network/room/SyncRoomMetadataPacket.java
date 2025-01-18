@@ -1,4 +1,4 @@
-package dev.compactmods.machines.network;
+package dev.compactmods.machines.network.room;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.room.ClientRoomPacketHandler;

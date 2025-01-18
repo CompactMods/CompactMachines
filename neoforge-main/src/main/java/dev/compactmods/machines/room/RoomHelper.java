@@ -8,7 +8,7 @@ import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
-import dev.compactmods.machines.network.SyncRoomMetadataPacket;
+import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;

@@ -2,13 +2,14 @@ package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.api.shrinking.PSDTags;
-import dev.compactmods.machines.machine.config.EnumMachinePlayersBreakHandling;
-import dev.compactmods.machines.server.ServerConfig;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
+import dev.compactmods.machines.room.RoomBlocks;
 import dev.compactmods.machines.room.RoomHelper;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.ui.preview.MachineRoomMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,7 +21,6 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.EntityBlock;
@@ -29,11 +29,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
     public BoundCompactMachineBlock(Properties props) {
@@ -122,11 +122,16 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                 CompactMachines.room(roomCode).ifPresent(inst -> {
                     if (player instanceof ServerPlayer sp) {
                         sp.setData(Rooms.DataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
-                        sp.openMenu(MachineRoomMenu.provider(sp.server, inst), (buf) -> {
-                            buf.writeJsonWithCodec(GlobalPos.CODEC, machine.getLevelPosition());
-                            buf.writeUtf(roomCode);
-                            buf.writeOptional(Optional.<String>empty(), FriendlyByteBuf::writeUtf);
-                        });
+
+                        try {
+                            final var roomBlocks = RoomBlocks.getInternalBlocks(sp.server, inst).get();
+
+                            PacketDistributor.sendToPlayer(sp,
+                                    new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode, roomBlocks)
+                            );
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             });

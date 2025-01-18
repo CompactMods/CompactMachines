@@ -4,7 +4,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.client.render.ConditionalGhostSlot;
 import dev.compactmods.machines.client.render.NineSliceRenderer;
 import dev.compactmods.machines.client.widget.ImageButtonBuilder;
-import dev.compactmods.machines.network.PlayerRequestedRoomUIPacket;
+import dev.compactmods.machines.network.room.PlayerRequestedRoomUIPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

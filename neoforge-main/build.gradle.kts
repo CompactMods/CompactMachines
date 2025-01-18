@@ -8,8 +8,8 @@ var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v')
 
-val modId: String = "compactmachines"
 val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
+val modId: String = "compactmachines"
 
 val coreApi = project(":core-api")
 
@@ -146,6 +146,20 @@ repositories {
 
     maven("https://maven.pkg.github.com/compactmods/feather") {
         name = "Github PKG - Feather"
+        content {
+            includeGroup("dev.compactmods")
+            includeModule("dev.compactmods", "feather")
+        }
+
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+
+    maven("https://maven.pkg.github.com/compactmods/gander") {
+        name = "Github PKG - Gander"
+        content { includeGroup("dev.compactmods.gander") }
         credentials {
             username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
@@ -175,6 +189,7 @@ dependencies {
         compileOnly(libs.jnanoid)
         testImplementation(libs.jnanoid)
         jarJar(libs.jnanoid)
+        additionalRuntimeClasspath(libs.jnanoid)
 
         compileOnly(coreApi)
         testCompileOnly(coreApi)
@@ -186,7 +201,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    additionalRuntimeClasspath(libs.jnanoid)
 
     compileOnly(compactmods.feather)
     testImplementation(compactmods.feather)
@@ -196,6 +210,11 @@ dependencies {
     implementation(compactmods.spatial)
     testImplementation(compactmods.spatial)
     jarJar(compactmods.spatial) { isTransitive = false }
+
+    // Gander
+    implementation(compactmods.bundles.gander)
+    accessTransformers(compactmods.ganderRendering)
+    jarJar(compactmods.bundles.gander)
 }
 
 tasks.withType<Test> {

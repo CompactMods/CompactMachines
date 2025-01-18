@@ -3,7 +3,7 @@ package dev.compactmods.machines.client.keybinds.room;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.network.PlayerRequestedLeavePacket;
+import dev.compactmods.machines.network.room.PlayerRequestedLeavePacket;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
