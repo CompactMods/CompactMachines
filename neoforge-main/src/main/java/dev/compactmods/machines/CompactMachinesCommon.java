@@ -19,6 +19,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(CompactMachines.MOD_ID)
@@ -33,7 +34,6 @@ public class CompactMachinesCommon {
         registerEvents(modBus);
 
         CMRegistries.setup(modBus);
-        CMGameRules.register();
     }
 
     private static void initConfigs(ModContainer modContainer) {
@@ -55,11 +55,16 @@ public class CompactMachinesCommon {
         RoomUpgrades.registerEvents(modBus);
         WorldBorderFixer.registerEvents();
 
+        modBus.addListener(CompactMachinesCommon::commonSetup);
         modBus.addListener(CMFeaturePacks::addFeaturePacks);
         modBus.addListener(CMNetworks::onPacketRegistration);
         modBus.addListener(InterModCompat::enqueueCompatMessages);
 
         NeoForge.EVENT_BUS.addListener(Commands::onCommandsRegister);
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);
+    }
+
+    private static void commonSetup(FMLCommonSetupEvent evt) {
+        CMGameRules.register();
     }
 }
