@@ -7,6 +7,8 @@ import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
+import dev.compactmods.machines.api.room.history.RoomEntryResult;
+import dev.compactmods.machines.api.room.history.RoomExitResult;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
 import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
@@ -23,112 +25,110 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class RoomHelper {
 
-   private static final Logger LOGS = LoggingUtil.modLog();
+    private static final Logger LOGS = LoggingUtil.modLog();
 
-   public static boolean entityInsideRoom(LivingEntity entity, String roomCode) {
-	  // Recursion check. Player is inside the room being queried.
-	  if (entity.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
-		 return CompactMachines.roomApi().chunks(roomCode).hasChunk(entity.chunkPosition());
-	  }
+    public static boolean entityInsideRoom(LivingEntity entity, String roomCode) {
+        // Recursion check. Player is inside the room being queried.
+        if (entity.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
+            return CompactMachines.roomApi().chunks(roomCode).hasChunk(entity.chunkPosition());
+        }
 
-	  return false;
-   }
+        return false;
+    }
 
-   public static void teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) {
-	  MinecraftServer serv = machineLevel.getServer();
+    public static CompletableFuture<RoomEntryResult> teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) {
+        MinecraftServer serv = machineLevel.getServer();
 
+        LOGS.debug("Player {} entering machine at: {}", player.getName(), machinePos);
+        return CompactMachines.room(roomCode).map(roomInfo -> {
+            try {
+                return teleportPlayerIntoRoom(serv, player, roomInfo, RoomEntryPoint.playerEnteringMachine(player));
+            } catch (MissingDimensionException e) {
+                LOGS.fatal("Critical error; could not enter a freshly-created room instance.", e);
+                return CompletableFuture.completedFuture(RoomEntryResult.FAILED_ROOM_INVALID);
+            }
+        }).orElse(CompletableFuture.completedFuture(RoomEntryResult.FAILED_ROOM_INVALID));
+    }
 
-	  LOGS.debug("Player {} entering machine at: {}", player.getName(), machinePos);
-	  CompactMachines.room(roomCode).ifPresent(roomInfo -> {
-		 try {
-			teleportPlayerIntoRoom(serv, player, roomInfo, RoomEntryPoint.playerEnteringMachine(player));
-		 } catch (MissingDimensionException e) {
-			LOGS.fatal("Critical error; could not enter a freshly-created room instance.", e);
-		 }
-	  });
-   }
+    public static CompletableFuture<RoomEntryResult> teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room, RoomEntryPoint entryPoint)
+            throws MissingDimensionException {
+        final var compactDim = CompactDimension.forServer(serv);
 
-   public static void teleportPlayerIntoRoom(MinecraftServer serv, ServerPlayer player, RoomInstance room, RoomEntryPoint entryPoint)
-	   throws MissingDimensionException {
-	  final var compactDim = CompactDimension.forServer(serv);
+        final var history = CompactMachines.playerHistoryApi().entryPoints();
+        final var result = history.enterRoom(player, room.code(), entryPoint);
 
-	  final var history = CompactMachines.playerHistoryApi().entryPoints();
-	  final var result = history.enterRoom(player, room.code(), entryPoint);
+        if(result == RoomEntryResult.FAILED_TOO_FAR_DOWN) {
+            player.displayClientMessage(Component.translatableWithFallback("compactmachines.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
+                    .withStyle(ChatFormatting.DARK_RED)
+                    .withStyle(ChatFormatting.ITALIC), true);
 
-	  LOGS.debug("Entry result: {}", result);
+            return CompletableFuture.completedFuture(result);
+        }
 
-	  switch (result) {
-		 case FAILED_TOO_FAR_DOWN -> {
-			player.displayClientMessage(Component.translatableWithFallback("compactmachines.errors.too_far_down", "An otherworldly force prevents you from shrinking more.")
-				.withStyle(ChatFormatting.DARK_RED)
-				.withStyle(ChatFormatting.ITALIC), true);
-		 }
+        if(result.successful()) {
+            // Mark current room
+            player.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, room.code());
+            player.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
 
-		 case SUCCESS -> {
+            return serv.submit(() -> {
+                player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
-			// Mark current room
-			player.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, room.code());
-			player.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
+                final var spawns = CompactMachines.roomApi().spawnManager(room.code()).spawns();
+                final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
+                player.changeDimension(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
 
-			// UUID owner;
-//			try {
-//			   owner = CompactMachines.roomApi().owners().getRoomOwner(room.code());
-//			} catch (NonexistentRoomException e) {
-//			   LoggingUtil.modLog().debug("SCREM", e);
-//			   owner = Util.NIL_UUID;
-//			}
+                PacketDistributor.sendToPlayer(player, new SyncRoomMetadataPacket(room.code(), Util.NIL_UUID));
 
-			serv.submitAsync(() -> {
-			   player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
+                return result;
+            });
+        }
 
-			   final var spawns = CompactMachines.roomApi().spawnManager(room.code()).spawns();
-			   final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
-			   player.changeDimension(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
+        return CompletableFuture.completedFuture(result);
+    }
 
-			   PacketDistributor.sendToPlayer(player, new SyncRoomMetadataPacket(room.code(), Util.NIL_UUID));
-			});
-		 }
-	  }
-   }
+    public static CompletableFuture<RoomExitResult> teleportPlayerOutOfRoom(@Nonnull ServerPlayer serverPlayer) {
+        if (!CompactDimension.isLevelCompact(serverPlayer.level()))
+            return CompletableFuture.completedFuture(RoomExitResult.FAILED_NOT_IN_COMPACT_DIM);
 
-   public static void teleportPlayerOutOfRoom(@Nonnull ServerPlayer serverPlayer) {
-	  if (!serverPlayer.level().dimension().equals(CompactDimension.LEVEL_KEY))
-		 return;
+        MinecraftServer serv = serverPlayer.getServer();
+        assert serv != null;
 
-	  MinecraftServer serv = serverPlayer.getServer();
-	  assert serv != null;
+        final IPlayerEntryPointHistoryManager history = CompactMachines.playerHistoryApi().entryPoints();
 
-	  final IPlayerEntryPointHistoryManager history = CompactMachines.playerHistoryApi().entryPoints();
+        return serv.submit(() -> {
+            final var lastHistory = history.lastHistory(serverPlayer).orElse(null);
+            if(lastHistory != null) {
+                serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
-	  serv.submit(() -> {
-		 history.lastHistory(serverPlayer).ifPresentOrElse(
-			 before -> {
-				serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
+                serverPlayer.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, lastHistory.entryPoint());
+                history.popHistory(serverPlayer, 1);
 
-				serverPlayer.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, before.entryPoint());
-				history.popHistory(serverPlayer, 1);
+                serverPlayer.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, lastHistory.roomCode());
 
-				serverPlayer.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, before.roomCode());
+                final var location = lastHistory.entryPoint().entryLocation();
+                final var level = serv.getLevel(location.dimension());
+                if (level != null) {
+                    LOGS.debug("Teleporting player {} to {} as they jump up a level...", serverPlayer.getUUID(), location);
+                    serverPlayer.changeDimension(CompactDimensionTransitions.to(level, location.position(), location.rotation()));
 
-				final var location = before.entryPoint().entryLocation();
-				final var level = serv.getLevel(location.dimension());
-				if (level != null) {
-				   LOGS.debug("Teleporting player {} to {} as they jump up a level...", serverPlayer.getUUID(), location);
-				   serverPlayer.changeDimension(CompactDimensionTransitions.to(level, location.position(), location.rotation()));
-				} else {
-				   LOGS.error("Player tracking points to an unknown dimension. Teleporting player {} to their default spawn instead.", serverPlayer.getUUID());
-				   PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-				}
-			 },
-			 () -> {
-				serverPlayer.removeData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT);
-				PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
-			 }
-		 );
+                    return RoomExitResult.SUCCESS_WENT_TO_LAST_ENTRYPOINT;
+                } else {
+                    LOGS.error("Player tracking points to an unknown dimension. Teleporting player {} to their default spawn instead.", serverPlayer.getUUID());
+                    PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
 
-	  });
-   }
+                    return RoomExitResult.SUCCESS_WENT_TO_SPAWN;
+                }
+
+            } else {
+                serverPlayer.removeData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT);
+                PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+
+                return RoomExitResult.SUCCESS_WENT_TO_SPAWN;
+            }
+        });
+    }
 }

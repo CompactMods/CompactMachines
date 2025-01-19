@@ -4,7 +4,9 @@ import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
@@ -48,7 +50,7 @@ public interface CMRegistries {
 
 	DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, CompactMachines.MOD_ID);
 
-	DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(CompactMachines.MOD_ID);
+	DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CompactMachines.MOD_ID);
 
 	static Item basicItem() {
 		return new Item(new Item.Properties());

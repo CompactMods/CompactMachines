@@ -29,7 +29,7 @@ public class RoomEventHandler {
 
         if(!CompactDimension.isLevelCompact(dimensionEvent.getDimension())) {
             if(p instanceof ServerPlayer sp) {
-                LOGS.debug("Resetting player {} room history due to dimension change.", sp.getDisplayName());
+                LOGS.debug("Resetting player {}'s room history due to dimension change.", sp.getGameProfile().getName());
                 PlayerUtil.resetPlayerHistory(sp);
             }
         }

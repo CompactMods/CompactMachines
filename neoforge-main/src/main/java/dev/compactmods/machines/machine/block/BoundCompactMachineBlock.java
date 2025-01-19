@@ -2,17 +2,18 @@ package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
-import dev.compactmods.machines.api.room.exceptions.NonexistentRoomException;
 import dev.compactmods.machines.api.shrinking.PSDTags;
+import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import dev.compactmods.machines.room.RoomBlocks;
 import dev.compactmods.machines.room.RoomHelper;
 import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
+import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -32,7 +33,6 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 public class BoundCompactMachineBlock extends CompactMachineBlock implements EntityBlock {
@@ -48,9 +48,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
             }
 
             return Machines.Items.unbound();
-        }
-
-        catch(Exception ex) {
+        } catch (Exception ex) {
             LoggingUtil.modLog().warn("Warning: tried to pick block on a bound machine that does not have a room bound.", ex);
             return Machines.Items.unbound();
         }
@@ -101,12 +99,18 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
             return tryDyingMachine(sl, pos, player, dye, mainItem);
         }
 
-        if (mainItem.is(PSDTags.ITEM)
-                && player instanceof ServerPlayer sp
+        if ((mainItem.is(PSDTags.ITEM) || mainItem.has(Shrinking.DataComponents.SHRINKING_CONFIG))
+                && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
 
             // Try to teleport player into room
-            RoomHelper.teleportPlayerIntoMachine(level, sp, tile.getLevelPosition(), tile.connectedRoom());
+            RoomHelper.teleportPlayerIntoMachine(level, serverPlayer, tile.getLevelPosition(), tile.connectedRoom()).thenAccept(result -> {
+                if (result.successful()) {
+                    var config = PersonalShrinkingDevice.config(mainItem);
+                    PersonalShrinkingDevice.handleSuccessfulAtomicShift(mainItem, serverPlayer, config);
+                }
+            });
+
             return ItemInteractionResult.SUCCESS;
         }
 

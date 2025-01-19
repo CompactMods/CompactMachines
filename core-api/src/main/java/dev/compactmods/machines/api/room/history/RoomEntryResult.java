@@ -1,7 +1,17 @@
 package dev.compactmods.machines.api.room.history;
 
 public enum RoomEntryResult {
-    SUCCESS,
-    FAILED_TOO_FAR_DOWN,
-    FAILED_ROOM_INVALID
+    SUCCESS(true),
+    FAILED_TOO_FAR_DOWN(false),
+    FAILED_ROOM_INVALID(false);
+
+    private final boolean success;
+
+    RoomEntryResult(boolean successful) {
+        this.success = successful;
+    }
+
+    public boolean successful() {
+        return success;
+    }
 }

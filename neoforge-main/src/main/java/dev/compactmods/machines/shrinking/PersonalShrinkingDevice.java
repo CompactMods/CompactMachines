@@ -1,14 +1,17 @@
 package dev.compactmods.machines.shrinking;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.shrinking.component.ShrinkingDeviceConfiguration;
+import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.i18n.Translations;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.i18n.RoomTranslations;
 import dev.compactmods.machines.room.RoomHelper;
+import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +28,10 @@ public class PersonalShrinkingDevice extends Item {
         super(props);
     }
 
+    public static ShrinkingDeviceConfiguration config(ItemStack stack) {
+        return stack.getOrDefault(Shrinking.DataComponents.SHRINKING_CONFIG, ShrinkingDeviceConfiguration.DEFAULT_CONFIG);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
         super.appendHoverText(stack, context, tooltips, flags);
@@ -38,30 +45,46 @@ public class PersonalShrinkingDevice extends Item {
             return InteractionResultHolder.fail(stack);
         }
 
-        // If we aren't in the compact dimension, allow PSD guide usage
-        // Prevents misfiring if a player is trying to leave a machine or set their spawn
-        if (world.isClientSide && !world.dimension().equals(CompactDimension.LEVEL_KEY)) {
-            // fixme PersonalShrinkingDeviceScreen.show();
-            return InteractionResultHolder.success(stack);
-        }
+        final var config = config(stack);
+        if (CompactDimension.isInServerDimension(player) && player instanceof ServerPlayer serverPlayer) {
+            // Player Sneaking - Set Room Spawn
+            if (player.isShiftKeyDown()) {
+                final var roomCode = CompactMachines.roomApi().chunkManager()
+                        .findRoomByChunk(serverPlayer.chunkPosition())
+                        .orElseThrow();
 
-        if (world instanceof ServerLevel playerDim && player instanceof ServerPlayer serverPlayer) {
-            if (playerDim.dimension().equals(CompactDimension.LEVEL_KEY)) {
-                if (player.isShiftKeyDown()) {
-                    final var roomCode = CompactMachines.roomApi().chunkManager()
-                            .findRoomByChunk(serverPlayer.chunkPosition())
-                            .orElseThrow();
+                final var spawnManager = CompactMachines.roomApi().spawnManager(roomCode);
+                spawnManager.setPlayerSpawn(serverPlayer);
 
-                    final var spawnManager = CompactMachines.roomApi().spawnManager(roomCode);
-                    spawnManager.setPlayerSpawn(serverPlayer);
+                player.displayClientMessage(RoomTranslations.ROOM_SPAWNPOINT_SET.apply(serverPlayer, roomCode), true);
+            }
 
-                    player.displayClientMessage(RoomTranslations.ROOM_SPAWNPOINT_SET.apply(serverPlayer, roomCode), true);
-                } else {
-                    RoomHelper.teleportPlayerOutOfRoom(serverPlayer);
-                }
+            // Player Not Sneaking - Teleport from Room
+            else {
+                RoomHelper.teleportPlayerOutOfRoom(serverPlayer).thenAccept(result -> {
+                    // Check Result - If successful, maybe attempt to damage the PSD item
+                    if (result.successful() && world.getGameRules().getBoolean(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT)) {
+                        handleSuccessfulAtomicShift(stack, serverPlayer, config);
+                    }
+                });
             }
         }
 
         return InteractionResultHolder.success(stack);
+    }
+
+    public static void handleSuccessfulAtomicShift(ItemStack stack, ServerPlayer serverPlayer, ShrinkingDeviceConfiguration config) {
+        switch (config.afterUseAction()) {
+            case DAMAGE:
+                stack.hurtAndBreak(1, serverPlayer.serverLevel(), serverPlayer, item -> {
+                    // RIP, hope you have spare crafting materials nearby!
+                });
+                break;
+
+            case BREAK:
+                stack.consume(1, serverPlayer);
+                PlayerUtil.breakItemEffect(serverPlayer, stack);
+                break;
+        }
     }
 }

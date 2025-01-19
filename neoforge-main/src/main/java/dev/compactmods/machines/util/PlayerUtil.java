@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -53,5 +54,23 @@ public abstract class PlayerUtil {
 
     public static Vec2 getLookDirection(Player player) {
         return new Vec2(player.xRotO, player.yRotO);
+    }
+
+    public static void breakItemEffect(Player player, ItemStack stack) {
+        if (!player.isSilent()) {
+
+            var l = player.level();
+            var pos = player.position();
+
+            l.playSeededSound(
+                    null,
+                    pos.x(), pos.y(), pos.z(),
+                    stack.getBreakingSound(),
+                    player.getSoundSource(),
+                    1.0F,
+                    0.8F + l.random.nextFloat() * 0.4F,
+                    player.getRandom().nextLong()
+            );
+        }
     }
 }
