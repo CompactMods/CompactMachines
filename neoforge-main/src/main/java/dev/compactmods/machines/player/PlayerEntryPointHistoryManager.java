@@ -7,7 +7,6 @@ import dev.compactmods.feather.edge.impl.EmptyEdge;
 import dev.compactmods.feather.node.Node;
 import dev.compactmods.feather.traversal.GraphNodeTransformationFunction;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.api.room.history.IPlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.PlayerRoomHistoryEntry;
@@ -82,7 +81,7 @@ public class PlayerEntryPointHistoryManager implements CodecHolder<PlayerEntryPo
             entry.getValue()
                     .stream()
                     .sorted(Comparator.comparing(PlayerRoomHistoryEntry::instant))
-                    .forEach(hist -> enterRoom(entry.getKey(), hist));
+                    .forEach(hist -> addRoomEntryUnsafe(entry.getKey(), hist));
         }
     }
 
@@ -141,6 +140,10 @@ public class PlayerEntryPointHistoryManager implements CodecHolder<PlayerEntryPo
         if (!CompactMachines.isValidRoomCode(history.roomCode()))
             return RoomEntryResult.FAILED_ROOM_INVALID;
 
+        return addRoomEntryUnsafe(player, history);
+    }
+
+    private @NotNull RoomEntryResult addRoomEntryUnsafe(UUID player, PlayerRoomHistoryEntry history) {
         PlayerReferenceNode playerNode = getOrCreatePlayer(player);
 
         long depth = graph.outboundEdges(playerNode, PlayerEntryPointNode.class).count();

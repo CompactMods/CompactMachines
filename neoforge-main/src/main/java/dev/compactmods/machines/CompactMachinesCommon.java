@@ -9,6 +9,7 @@ import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.dimension.WorldBorderFixer;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.CMNetworks;
+import dev.compactmods.machines.player.PlayerEventHandler;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
@@ -54,6 +55,7 @@ public class CompactMachinesCommon {
         Rooms.registerEvents(modBus);
         RoomUpgrades.registerEvents(modBus);
         WorldBorderFixer.registerEvents();
+        PlayerEventHandler.registerEvents();
 
         modBus.addListener(CompactMachinesCommon::commonSetup);
         modBus.addListener(CMFeaturePacks::addFeaturePacks);

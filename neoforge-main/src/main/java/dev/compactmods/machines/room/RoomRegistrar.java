@@ -124,12 +124,6 @@ public class RoomRegistrar implements IRoomRegistrar, CodecHolder<RoomRegistrar>
         return CMRoomDataLocations.DATA_ROOT.apply(server);
     }
 
-    public static File getFile(MinecraftServer server) {
-        return CMRoomDataLocations.DATA_ROOT.apply(server)
-            .resolve("room_registrations.dat")
-            .toFile();
-    }
-
     @Override
     public Codec<RoomRegistrar> codec() {
         return CODEC;

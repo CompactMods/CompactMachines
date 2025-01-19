@@ -1,8 +1,10 @@
 package dev.compactmods.machines.util;
 
 import com.mojang.authlib.GameProfile;
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
 import dev.compactmods.machines.room.Rooms;
+import dev.compactmods.machines.server.CompactMachinesServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +22,12 @@ public abstract class PlayerUtil {
 
     public static void resetPlayerHistory(@NotNull ServerPlayer player) {
         player.removeData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT);
+
+        CompactMachines.playerHistoryApi()
+                .entryPoints()
+                .clearHistory(player);
+
+        CompactMachinesServer.savePlayerHistory();
     }
 
     public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @NotNull ServerPlayer player) {
