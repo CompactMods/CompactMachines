@@ -9,6 +9,8 @@ import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.RoomHelper;
+import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
+import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -64,7 +66,7 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 		}
 
 		MinecraftServer server = level.getServer();
-		if (stack.is(PSDTags.ITEM) && player instanceof ServerPlayer sp) {
+		if ((stack.is(PSDTags.ITEM) || stack.has(Shrinking.DataComponents.SHRINKING_CONFIG)) && player instanceof ServerPlayer sp) {
 			level.getBlockEntity(pos, Machines.BlockEntities.UNBOUND_MACHINE.get()).ifPresent(unboundEntity -> {
 
 				RoomTemplate template = RoomTemplateHelper.getTemplate(level, unboundEntity.templateId());
@@ -84,7 +86,8 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 							ent.setData(Machines.Attachments.MACHINE_COLOR, color);
 
 							try {
-								RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, RoomEntryPoint.playerEnteringMachine(player));
+								RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, RoomEntryPoint.playerEnteringMachine(player))
+										.thenAccept(res -> PersonalShrinkingDevice.handleSuccessfulAtomicShift(stack, sp, PersonalShrinkingDevice.config(stack)));
 							} catch (MissingDimensionException e) {
 								throw new RuntimeException(e);
 							}

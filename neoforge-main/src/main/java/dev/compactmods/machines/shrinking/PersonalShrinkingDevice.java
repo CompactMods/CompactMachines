@@ -76,14 +76,18 @@ public class PersonalShrinkingDevice extends Item {
     public static void handleSuccessfulAtomicShift(ItemStack stack, ServerPlayer serverPlayer, ShrinkingDeviceConfiguration config) {
         switch (config.afterUseAction()) {
             case DAMAGE:
-                stack.hurtAndBreak(1, serverPlayer.serverLevel(), serverPlayer, item -> {
-                    // RIP, hope you have spare crafting materials nearby!
-                });
+                if(!serverPlayer.hasInfiniteMaterials()) {
+                    stack.hurtAndBreak(1, serverPlayer.serverLevel(), serverPlayer, item -> {
+                        // RIP, hope you have spare crafting materials nearby!
+                    });
+                }
                 break;
 
             case BREAK:
-                stack.consume(1, serverPlayer);
-                PlayerUtil.breakItemEffect(serverPlayer, stack);
+                if(!serverPlayer.hasInfiniteMaterials()) {
+                    stack.consume(1, serverPlayer);
+                    PlayerUtil.breakItemEffect(serverPlayer, stack);
+                }
                 break;
         }
     }
