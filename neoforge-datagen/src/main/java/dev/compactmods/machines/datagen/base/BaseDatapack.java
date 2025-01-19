@@ -1,7 +1,6 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.datagen.base.curios.CurioEntityGenerator;
-import dev.compactmods.machines.datagen.base.curios.CurioSlotGenerator;
+import dev.compactmods.machines.datagen.base.compat.PSDCuriosProvider;
 import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
@@ -46,8 +45,7 @@ public class BaseDatapack {
         generator.addProvider(server, new ItemTagGenerator(basePackOutput, blocks, holderLookup));
 
         // CURIOS Integration
-        generator.addProvider(server, new CurioSlotGenerator(basePackOutput, holderLookup, fileHelper));
-        generator.addProvider(server, new CurioEntityGenerator(basePackOutput, holderLookup, fileHelper));
+        generator.addProvider(server, new PSDCuriosProvider(basePackOutput, holderLookup, fileHelper));
 
         generator.addProvider(server, new PointOfInterestTagGenerator(basePackOutput, holderLookup, fileHelper));
 

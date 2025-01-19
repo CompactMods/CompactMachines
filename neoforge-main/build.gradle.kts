@@ -181,6 +181,13 @@ repositories {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
     }
+
+    maven("https://maven.theillusivec4.top/") {
+        name = "Illusive Soulworks maven (Curios API)"
+        content {
+            includeGroup("top.theillusivec4.curios")
+        }
+    }
 }
 
 dependencies {
@@ -215,6 +222,9 @@ dependencies {
     implementation(compactmods.bundles.gander)
     accessTransformers(compactmods.ganderRendering)
     jarJar(compactmods.bundles.gander)
+
+    // Curios API
+    compileOnly(libs.curios)
 }
 
 tasks.withType<Test> {

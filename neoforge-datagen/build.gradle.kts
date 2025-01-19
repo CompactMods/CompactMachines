@@ -55,11 +55,20 @@ repositories {
             password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
+
+    maven("https://maven.theillusivec4.top/") {
+        name = "Illusive Soulworks maven (Curios API)"
+        content {
+            includeGroup("top.theillusivec4.curios")
+        }
+    }
 }
 
 dependencies {
     compileOnly(coreApi)
     compileOnly(mainProject)
+
+    implementation(libs.curios)
 }
 
 tasks.compileJava {

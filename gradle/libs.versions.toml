@@ -6,3 +6,7 @@ parchment = "2024.07.28"
 [libraries.jnanoid]
 module = "com.aventrix.jnanoid:jnanoid"
 version.ref = "jnanoid"
+
+[libraries.curios]
+module = "top.theillusivec4.curios:curios-neoforge"
+version = "9.2.2+1.21.1"
