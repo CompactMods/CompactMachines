@@ -12,6 +12,8 @@ on:
         default: false
         required: true
   push:
+    tags-ignore:
+      - v*
     paths-ignore:
       - "README.md"
       - "LICENSE"
