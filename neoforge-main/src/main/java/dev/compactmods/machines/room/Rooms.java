@@ -35,7 +35,7 @@ public interface Rooms {
 		  new SolidWallBlock(BlockBehaviour.Properties.of()
 				.strength(-1.0F, 3600000.8F)
 				.sound(SoundType.METAL)
-				.lightLevel((state) -> 15)));
+				.lightLevel((state) -> state.getValue(SolidWallBlock.LIGHTS_ON) ? 15 : 0)));
 
 
 	 DeferredBlock<BreakableWallBlock> BREAKABLE_WALL = CMRegistries.BLOCKS.register("wall", () ->

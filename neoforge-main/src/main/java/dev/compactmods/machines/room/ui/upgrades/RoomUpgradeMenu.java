@@ -2,17 +2,25 @@ package dev.compactmods.machines.room.ui.upgrades;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.room.upgrade.events.RoomUpgradeEvent;
+import dev.compactmods.machines.api.room.upgrade.events.lifecycle.UpgradeAppliedEventListener;
+import dev.compactmods.machines.api.room.upgrade.events.lifecycle.UpgradeRemovedEventListener;
 import dev.compactmods.machines.client.render.ConditionalGhostSlot;
+import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeInventory;
+import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +44,45 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
 			public void onTake(Player pPlayer, ItemStack pStack) {
 			   // TODO: Room Upgrade removal event
 			   super.onTake(pPlayer, pStack);
+			   if (!playerInv.player.level().isClientSide()) {
+				   if (!pStack.has(RoomUpgrades.UPGRADE_LIST_COMPONENT)) return;
+				   var list = pStack.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
+				   if (list != null) {
+					   list.upgrades()
+							   .stream()
+							   .flatMap(RoomUpgrade::gatherEvents)
+							   .filter(UpgradeRemovedEventListener.class::isInstance)
+							   .map(UpgradeRemovedEventListener.class::cast)
+							   .forEach(upgrade -> upgrade.handle(
+									   (ServerLevel) playerInv.player.level(),
+									   CompactMachines.room(roomCode).get(),
+									   pStack
+							   ));
+				   }
+			   }
 			}
+
+			 @Override
+			 public void set(ItemStack pStack) {
+				 super.set(pStack);
+				// TODO: Room Upgrade Add Event
+				 if (!playerInv.player.level().isClientSide()) {
+					 if (!pStack.has(RoomUpgrades.UPGRADE_LIST_COMPONENT)) return;
+					 var list = pStack.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
+					 if (list != null) {
+						 list.upgrades()
+								 .stream()
+								 .flatMap(RoomUpgrade::gatherEvents)
+								 .filter(UpgradeAppliedEventListener.class::isInstance)
+								 .map(UpgradeAppliedEventListener.class::cast)
+								 .forEach(upgrade -> upgrade.handle(
+										 (ServerLevel) playerInv.player.level(),
+										 CompactMachines.room(roomCode).get(),
+										 pStack
+								 ));
+					 }
+				 }
+			 }
 		 });
 	  }
 
