@@ -8,4 +8,6 @@ public interface IRoomDataAttachmentAccessor {
    Optional<? extends IAttachmentHolder> get(String roomCode);
 
    IAttachmentHolder getOrCreate(String roomCode);
+
+   void save();
 }

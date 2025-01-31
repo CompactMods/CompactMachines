@@ -1,5 +1,6 @@
 package dev.compactmods.machines.client.room;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.gander.render.geometry.BakedLevel;
 import dev.compactmods.gander.ui.widget.SpatialRenderer;
 import dev.compactmods.machines.CommonConfig;
@@ -23,6 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -32,6 +34,7 @@ public class MachineRoomScreen extends Screen {
     private final String roomCode;
 
     private SpatialRenderer renderer;
+    private AABB renderSize;
 
     private ImageButton psdButton;
     private ScreenRectangle screenArea;
@@ -56,11 +59,11 @@ public class MachineRoomScreen extends Screen {
                 CompactMachines.modRL("personal_shrinking_device_disabled"));
 
         this.screenArea = new ScreenRectangle((width / 2) - 130, (height / 2) - 120,
-                260, 240);
+                260, 260);
 
         this.psdButton = ImageButtonBuilder.button(psdBtnSprites)
                 .size(12, 12)
-                .location(screenArea.right() - 12, screenArea.bottom() + 12)
+                .location(screenArea.right() - 12, screenArea.bottom() + 2)
                 .onPress(btn -> {
                     PacketDistributor.sendToServer(new PlayerRequestedTeleportPacket(machinePos, roomCode));
                 }).build();
@@ -77,20 +80,74 @@ public class MachineRoomScreen extends Screen {
         psdButton.active = checkForShrinkingDevice();
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        final float rotateSpeed = 1 / 12f;
+
+        if (keyCode == InputConstants.KEY_R) {
+            renderer.camera().resetLook();
+            renderer.recalculateTranslucency();
+            return true;
+        }
+
+        if (keyCode == InputConstants.KEY_UP) {
+            renderer.camera().lookUp(rotateSpeed);
+            renderer.recalculateTranslucency();
+            return true;
+        }
+
+        if (keyCode == InputConstants.KEY_DOWN) {
+            renderer.camera().lookDown(rotateSpeed);
+            renderer.recalculateTranslucency();
+            return true;
+        }
+
+        if (keyCode == InputConstants.KEY_LEFT) {
+            renderer.camera().lookLeft(rotateSpeed);
+            renderer.recalculateTranslucency();
+            return true;
+        }
+
+        if (keyCode == InputConstants.KEY_RIGHT) {
+            renderer.camera().lookRight(rotateSpeed);
+            renderer.recalculateTranslucency();
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (renderer != null) {
+            var camPosition = this.renderer.camera().getPosition();
+
+            // Only allow zooming up to 2 blocks from center
+            if (scrollY > 0 && camPosition.distanceTo(Vec3.ZERO) >= 2)
+                this.renderer.zoom(scrollY);
+
+            // Zoom out up to 50 blocks away from center
+            if (scrollY < 0 && camPosition.distanceTo(Vec3.ZERO) <= 100)
+                this.renderer.zoom(scrollY);
+        }
+
+        return true;
+    }
+
     private static boolean checkForShrinkingDevice() {
         final var player = Minecraft.getInstance().player;
-        if(player == null)
+        if (player == null)
             return false;
 
-        if(player.isCreative()) return true;
+        if (player.isCreative()) return true;
 
         final var hasPsdInInv = player.getInventory()
                 .contains(slotItem -> slotItem.has(Shrinking.DataComponents.SHRINKING_CONFIG) || slotItem.is(PSDTags.ITEM));
 
-        if(hasPsdInInv)
+        if (hasPsdInInv)
             return true;
 
-        if(ModList.get().isLoaded("curios")) {
+        if (ModList.get().isLoaded("curios")) {
             return CuriosCompat.hasPsdCurio(player);
         }
 
@@ -98,9 +155,8 @@ public class MachineRoomScreen extends Screen {
     }
 
     private void roomUpgradesButton() {
-        if(this.minecraft == null || this.minecraft.getConnection() == null) return;
-        if(CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(minecraft.getConnection().enabledFeatures()))
-        {
+        if (this.minecraft == null || this.minecraft.getConnection() == null) return;
+        if (CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(minecraft.getConnection().enabledFeatures())) {
             final var upgradeBtnSprites = new WidgetSprites(
                     CompactMachines.modRL("upgrade_btn"),
                     CompactMachines.modRL("upgrade_btn")
@@ -108,7 +164,7 @@ public class MachineRoomScreen extends Screen {
 
             var upgradeScreenBtn = ImageButtonBuilder.button(upgradeBtnSprites)
                     .size(12, 12)
-                    .location(screenArea.right() - 24, screenArea.bottom() + 12)
+                    .location(screenArea.right() - 24, screenArea.bottom() + 2)
                     .onPress(btn -> {
                         PacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(roomCode, false));
                     }).build();
@@ -119,15 +175,29 @@ public class MachineRoomScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
         // TODO: Re-enable once Gander scissors itself properly
-//        guiGraphics.fill(screenArea.left(), screenArea.top(), screenArea.right(), screenArea.bottom(),
-//                FastColor.ARGB32.color(180, CommonColors.WHITE));
-//
-//        guiGraphics.fill(screenArea.left() + 2, screenArea.top() + 2,
-//                screenArea.right() - 2, screenArea.bottom() - 2,
-//                FastColor.ARGB32.color(255, CommonColors.BLACK));
+
+        final var pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(0, 0, 200);
+
+        guiGraphics.fill(screenArea.left() - 1, screenArea.top() - 1,
+                screenArea.right() + 1, screenArea.bottom() + 1,
+                FastColor.ARGB32.color(180, CommonColors.WHITE));
+
+        guiGraphics.fill(screenArea.left(), screenArea.top(),
+                screenArea.right(), screenArea.bottom(),
+                FastColor.ARGB32.color(250, 8, 90, 120));
+
+//        guiGraphics.hLine(screenArea.left(), screenArea.right(), screenArea.top(), CommonColors.WHITE);
+//        guiGraphics.hLine(screenArea.left(), screenArea.right(), screenArea.bottom(), CommonColors.WHITE);
+//        guiGraphics.vLine(screenArea.left(), screenArea.top(), screenArea.bottom(), CommonColors.WHITE);
+//        guiGraphics.vLine(screenArea.right(), screenArea.top(), screenArea.bottom(), CommonColors.WHITE);
+
+        pose.popPose();
     }
 
     @Override
@@ -154,18 +224,44 @@ public class MachineRoomScreen extends Screen {
     }
 
     public void updateScene(BakedLevel bakedLevel) {
-        if(this.renderer != null) {
-            this.renderer.dispose();
+        if (this.renderer != null) {
             renderables.remove(renderer);
         }
 
-        this.renderer = addRenderableOnly(new SpatialRenderer(bakedLevel));
-        renderer.camera().zoom(calculateZoomForRoom(AABB.of(bakedLevel.blockBoundaries())));
+        this.renderer = addRenderableOnly(new SpatialRenderer(bakedLevel, screenArea.left(), screenArea.top(),
+                screenArea.width(), screenArea.height()));
+
+        this.renderSize = AABB.of(bakedLevel.blockBoundaries());
+
+        renderer.camera().zoom(calculateZoomForRoom(this.renderSize));
         renderer.camera().lookUp(3 / 12f);
     }
 
     private static float calculateZoomForRoom(AABB internalSize) {
-        double maxSize = Math.max(internalSize.getXsize(), internalSize.getZsize());
-        return (float) (-1.0f * maxSize) - 10;
+        boolean tallRoom = Math.max(internalSize.getXsize(), internalSize.getZsize()) < internalSize.getYsize();
+        boolean sidesEqual = internalSize.getXsize() == internalSize.getZsize();
+        boolean isCube = sidesEqual && internalSize.getZsize() == internalSize.getYsize();
+
+        // All sides equal, simple zoom algo
+        if (isCube) {
+            return -1.0f * (float) Math.sqrt(Math.pow(internalSize.getXsize(), 2) * 3);
+        }
+
+        if (sidesEqual) {
+            final var cSquared = Math.sqrt(
+                    (Math.pow(internalSize.getXsize(), 2) * 2) +
+                            Math.pow(internalSize.getYsize(), 2)
+            );
+
+            return (float) (-1.0f * cSquared);
+        }
+
+        final var cSquared = Math.sqrt(
+                Math.pow(internalSize.getXsize(), 2) +
+                        Math.pow(internalSize.getYsize(), 2) +
+                        Math.pow(internalSize.getZsize(), 2)
+        );
+
+        return (float) (-1.0f * cSquared);
     }
 }

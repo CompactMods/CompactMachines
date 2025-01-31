@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.machine;
 
 import dev.compactmods.gander.level.VirtualLevel;
 import dev.compactmods.gander.render.geometry.LevelBakery;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.client.room.MachineRoomScreen;
@@ -24,7 +25,7 @@ public class ClientMachinePacketHandler {
             var state = mc.level.getBlockState(position.pos());
             var blockEntity = mc.level.getBlockEntity(position.pos());
             if(state.is(MachineConstants.MACHINE_BLOCK)) {
-                blockEntity.setData(Machines.Attachments.MACHINE_COLOR, newColor);
+                blockEntity.setData(CMDataAttachments.MACHINE_COLOR, newColor);
                 mc.level.sendBlockUpdated(position.pos(), state, state, Block.UPDATE_ALL_IMMEDIATE);
             }
         }

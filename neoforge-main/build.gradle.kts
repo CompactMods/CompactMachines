@@ -61,7 +61,6 @@ neoForge {
     this.mods.create(modId) {
         modSourceSets.add(coreApi.sourceSets.main)
         modSourceSets.add(sourceSets.main)
-        modSourceSets.add(sourceSets.test)
     }
 
     unitTest {
@@ -82,9 +81,9 @@ neoForge {
             sourceSet = project.sourceSets.main
 
             // JetBrains Runtime Hotswap
-//            if (!System.getenv().containsKey("CI")) {
-//              jvmArgument("-XX:+AllowEnhancedClassRedefinition")
-//            }
+            if (!System.getenv().containsKey("CI")) {
+              jvmArgument("-XX:+AllowEnhancedClassRedefinition")
+            }
         }
 
         create("client") {
@@ -129,6 +128,7 @@ neoForge {
 
             systemProperty("forge.enabledGameTestNamespaces", modId)
             environment.put("CM_TEST_RESOURCES", file("src/test/resources").path)
+            environment.put("CM_GAMETEST_ENABLED", "true")
 
             sourceSet = project.sourceSets.test
         }
@@ -203,7 +203,6 @@ dependencies {
         jarJar(coreApi)
     }
 
-    runtimeOnly(neoforged.testframework)
     testImplementation(neoforged.testframework)
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -2,6 +2,7 @@ package dev.compactmods.machines.client.keybinds.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.feature.CMFeatureFlags;
 import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
@@ -38,7 +39,7 @@ public class RoomUpgradeUIMapping {
 	  final var player = Minecraft.getInstance().player;
 	  if (player != null && level != null && level.dimension().equals(CompactDimension.LEVEL_KEY)) {
 		  if(CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(level.enabledFeatures())) {
-			  player.getExistingData(Rooms.DataAttachments.CURRENT_ROOM_CODE).ifPresent(currentRoom -> {
+			  player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(currentRoom -> {
                   PacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(currentRoom, true));
 			  });
 		  } else {

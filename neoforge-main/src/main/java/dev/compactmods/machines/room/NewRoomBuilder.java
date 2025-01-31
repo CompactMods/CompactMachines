@@ -1,11 +1,14 @@
 package dev.compactmods.machines.room;
 
+import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.registration.IRoomBuilder;
 import dev.compactmods.machines.api.room.spatial.IRoomBoundaries;
 import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -47,7 +50,11 @@ public class NewRoomBuilder implements IRoomBuilder {
         return this;
     }
 
-    public RoomInstance build() {
-        return new RoomInstance(code, color, () -> boundaries);
+    public RoomInstance build(MinecraftServer server) {
+        try {
+            return new RoomInstance(server, CompactDimension.forServer(server), code, color, () -> boundaries);
+        } catch (MissingDimensionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

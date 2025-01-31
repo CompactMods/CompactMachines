@@ -3,6 +3,8 @@ package dev.compactmods.machines.machine.block;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.machine.block.IBoundCompactMachineBlockEntity;
 import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.machine.Machines;
@@ -38,26 +40,26 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoun
 	@Override
 	protected void applyImplicitComponents(DataComponentInput components) {
 		super.applyImplicitComponents(components);
-		this.roomCode = components.get(Machines.DataComponents.BOUND_ROOM_CODE);
+		this.roomCode = components.get(CMDataComponents.BOUND_ROOM_CODE);
 
-		final var desiredColor = components.get(Machines.DataComponents.MACHINE_COLOR);
+		final var desiredColor = components.get(CMDataComponents.MACHINE_COLOR);
 		if (desiredColor != null) {
-			this.setData(Machines.Attachments.MACHINE_COLOR, desiredColor);
+			this.setData(CMDataAttachments.MACHINE_COLOR, desiredColor);
 		}
 	}
 
 	@Override
 	protected void collectImplicitComponents(DataComponentMap.Builder builder) {
 		super.collectImplicitComponents(builder);
-		builder.set(Machines.DataComponents.BOUND_ROOM_CODE, this.roomCode);
-		builder.set(Machines.DataComponents.MACHINE_COLOR, this.getData(Machines.Attachments.MACHINE_COLOR));
+		builder.set(CMDataComponents.BOUND_ROOM_CODE, this.roomCode);
+		builder.set(CMDataComponents.MACHINE_COLOR, this.getData(CMDataAttachments.MACHINE_COLOR));
 	}
 
 	@Override
 	public void removeComponentsFromTag(CompoundTag tag) {
 		super.removeComponentsFromTag(tag);
-		tag.remove(Machines.DataComponents.KEY_ROOM_CODE);
-		tag.remove(Machines.DataComponents.KEY_MACHINE_COLOR);
+		tag.remove(CMDataComponents.KEY_ROOM_CODE);
+		tag.remove(CMDataComponents.KEY_MACHINE_COLOR);
 	}
 
    @Override
@@ -141,10 +143,10 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoun
 		 this.roomCode = roomCode;
 
 		 CompactMachines.room(roomCode).ifPresentOrElse(inst -> {
-				this.setData(Machines.Attachments.MACHINE_COLOR, inst.defaultMachineColor());
+				this.setData(CMDataAttachments.MACHINE_COLOR, inst.defaultMachineColor());
 			 },
 			 () -> {
-				this.setData(Machines.Attachments.MACHINE_COLOR, MachineColors.WHITE);
+				this.setData(CMDataAttachments.MACHINE_COLOR, MachineColors.WHITE);
 			 });
 
 		 this.setChanged();

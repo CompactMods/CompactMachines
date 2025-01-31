@@ -1,24 +1,18 @@
 package dev.compactmods.machines.test.gametest.core;
 
 import dev.compactmods.machines.api.CompactMachines;
-import net.minecraft.commands.Commands;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.testframework.conf.Feature;
-import net.neoforged.testframework.conf.FrameworkConfiguration;
 
-@Mod(CompactMachines.MOD_ID)
+@Mod(value = CompactMachines.MOD_ID)
 public class CompactMachinesTest {
 
-   public CompactMachinesTest(ModContainer container, IEventBus modBus) {
-	  final var config = FrameworkConfiguration.builder(CompactMachines.modRL("tests"))
-		  .enable(Feature.GAMETEST)
-		  .enable(Feature.MAGIC_ANNOTATIONS)
-		  .build();
+    public CompactMachinesTest(ModContainer container, IEventBus modBus) {
+        // Exit if we aren't in a dedicated gametest setup
+        if (System.getenv().containsKey("CM_GAMETEST_ENABLED") && !System.getenv("CM_GAMETEST_ENABLED").equals("true"))
+            return;
 
-	  var fw = config.create();
-	  fw.registerCommands(Commands.literal("cmtest"));
-	  fw.init(modBus, container);
-   }
+        CMTestFramework.init(container, modBus);
+    }
 }

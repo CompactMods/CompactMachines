@@ -1,6 +1,8 @@
 package dev.compactmods.machines;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.command.Commands;
 import dev.compactmods.machines.compat.InterModCompat;
 import dev.compactmods.machines.feature.CMFeaturePacks;
@@ -12,6 +14,7 @@ import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.player.PlayerEventHandler;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
+import dev.compactmods.machines.room.capability.BasicRoomCapabilities;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
@@ -49,6 +52,9 @@ public class CompactMachinesCommon {
         Dimension.prepare();
         Commands.prepare();
         Villagers.prepare();
+
+        CMDataComponents.prepare();
+        CMDataAttachments.prepare();
     }
 
     private static void registerEvents(IEventBus modBus) {
@@ -64,6 +70,8 @@ public class CompactMachinesCommon {
 
         NeoForge.EVENT_BUS.addListener(Commands::onCommandsRegister);
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);
+
+        modBus.addListener(BasicRoomCapabilities::register);
     }
 
     private static void commonSetup(FMLCommonSetupEvent evt) {

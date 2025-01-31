@@ -1,5 +1,7 @@
 package dev.compactmods.machines.machine.block;
 
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.machine.block.IUnboundCompactMachineBlockEntity;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.machine.Machines;
@@ -27,26 +29,26 @@ public class UnboundCompactMachineEntity extends BlockEntity implements IUnbound
     @Override
     protected void applyImplicitComponents(DataComponentInput components) {
         super.applyImplicitComponents(components);
-        this.templateId = components.get(Machines.DataComponents.ROOM_TEMPLATE_ID);
+        this.templateId = components.get(CMDataComponents.ROOM_TEMPLATE_ID);
 
-        final var desiredColor = components.get(Machines.DataComponents.MACHINE_COLOR);
+        final var desiredColor = components.get(CMDataComponents.MACHINE_COLOR);
         if (desiredColor != null) {
-            this.setData(Machines.Attachments.MACHINE_COLOR, desiredColor);
+            this.setData(CMDataAttachments.MACHINE_COLOR, desiredColor);
         }
     }
 
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
-        builder.set(Machines.DataComponents.ROOM_TEMPLATE_ID, this.templateId);
-        builder.set(Machines.DataComponents.MACHINE_COLOR, this.getData(Machines.Attachments.MACHINE_COLOR));
+        builder.set(CMDataComponents.ROOM_TEMPLATE_ID, this.templateId);
+        builder.set(CMDataComponents.MACHINE_COLOR, this.getData(CMDataAttachments.MACHINE_COLOR));
     }
 
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
         super.removeComponentsFromTag(tag);
-        tag.remove(Machines.DataComponents.KEY_ROOM_TEMPLATE);
-        tag.remove(Machines.DataComponents.KEY_MACHINE_COLOR);
+        tag.remove(CMDataComponents.KEY_ROOM_TEMPLATE);
+        tag.remove(CMDataComponents.KEY_MACHINE_COLOR);
     }
 
     @Override

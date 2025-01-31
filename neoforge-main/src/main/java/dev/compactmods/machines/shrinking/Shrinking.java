@@ -1,10 +1,10 @@
 package dev.compactmods.machines.shrinking;
 
 import dev.compactmods.machines.CMRegistries;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.shrinking.component.ShrinkingDeviceConfiguration;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.common.util.DataComponentUtil;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -22,7 +22,7 @@ public class Shrinking {
     public interface DataComponents {
         String KEY_SHRINKING_CONFIG = "shrinking_device";
 
-        DeferredHolder<DataComponentType<?>, DataComponentType<ShrinkingDeviceConfiguration>> SHRINKING_CONFIG = CMRegistries.DATA_COMPONENTS
+        DeferredHolder<DataComponentType<?>, DataComponentType<ShrinkingDeviceConfiguration>> SHRINKING_CONFIG = CMDataComponents.DATA_COMPONENTS
                 .registerComponentType(KEY_SHRINKING_CONFIG, (builder) -> builder
                         .persistent(ShrinkingDeviceConfiguration.CODEC)
                         .networkSynchronized(ShrinkingDeviceConfiguration.STREAM_CODEC));

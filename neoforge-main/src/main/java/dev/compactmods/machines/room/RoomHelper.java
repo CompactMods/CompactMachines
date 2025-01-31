@@ -1,7 +1,9 @@
 package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.history.IPlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.LoggingUtil;
@@ -11,6 +13,7 @@ import dev.compactmods.machines.api.room.history.RoomEntryResult;
 import dev.compactmods.machines.api.room.history.RoomExitResult;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
 import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
+import dev.compactmods.machines.room.capability.BasicRoomCapabilities;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
@@ -71,8 +74,8 @@ public abstract class RoomHelper {
 
         if(result.successful()) {
             // Mark current room
-            player.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, room.code());
-            player.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
+            player.setData(CMDataAttachments.CURRENT_ROOM_CODE, room.code());
+            player.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
 
             return serv.submit(() -> {
                 player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
@@ -104,10 +107,10 @@ public abstract class RoomHelper {
             if(lastHistory != null) {
                 serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
-                serverPlayer.setData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT, lastHistory.entryPoint());
+                serverPlayer.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, lastHistory.entryPoint());
                 history.popHistory(serverPlayer, 1);
 
-                serverPlayer.setData(Rooms.DataAttachments.CURRENT_ROOM_CODE, lastHistory.roomCode());
+                serverPlayer.setData(CMDataAttachments.CURRENT_ROOM_CODE, lastHistory.roomCode());
 
                 final var location = lastHistory.entryPoint().entryLocation();
                 final var level = serv.getLevel(location.dimension());
@@ -124,7 +127,7 @@ public abstract class RoomHelper {
                 }
 
             } else {
-                serverPlayer.removeData(Rooms.DataAttachments.LAST_ROOM_ENTRYPOINT);
+                serverPlayer.removeData(CMDataAttachments.LAST_ROOM_ENTRYPOINT);
                 PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
 
                 return RoomExitResult.SUCCESS_WENT_TO_SPAWN;

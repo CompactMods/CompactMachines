@@ -1,15 +1,17 @@
 package dev.compactmods.machines.room.upgrade.example;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import dev.compactmods.machines.api.room.RoomInstance;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgrade;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeType;
 import dev.compactmods.machines.api.room.upgrade.events.RoomUpgradeEvent;
 import dev.compactmods.machines.api.room.upgrade.events.lifecycle.UpgradeTickedEventListener;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import dev.compactmods.machines.util.item.ItemHandlerUtil;
 import dev.compactmods.spatial.aabb.AABBHelper;
-import dev.compactmods.spatial.vector.VectorUtils;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -32,12 +36,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TreeCutterUpgrade implements RoomUpgrade {
 
     public static final MapCodec<TreeCutterUpgrade> CODEC = MapCodec.unit(TreeCutterUpgrade::new);
+
+    public static final Supplier<AttachmentType<Data>> TREECUTTER_DATA = CMDataAttachments.ATTACHMENT_TYPES
+            .register("treecutter", key -> AttachmentType.builder(() -> new Data())
+                    .serialize(Data.CODEC)
+                    .build());
+
+    public static void prepare() {}
 
     @Override
     public void addToTooltip(@NotNull Item.TooltipContext ctx, Consumer<Component> tooltips, @NotNull TooltipFlag flags) {
@@ -58,31 +70,43 @@ public class TreeCutterUpgrade implements RoomUpgrade {
         return RoomUpgrades.TREECUTTER.get();
     }
 
-    public static void onTick(ServerLevel level, RoomInstance room, ItemStack upgrade) {
-        final var innerBounds = room.boundaries().innerBounds();
+    public static void onTick(RoomUpgradeInstance instance) {
+        final var data = instance.getData(TREECUTTER_DATA);
 
+        if(data.cooldown > 0) {
+            data.cooldown--;
+            return;
+        }
+
+        final var room = instance.roomInstance();
+        final var level = room.level();
         final var everythingLoaded = room.boundaries()
                 .innerChunkPositions()
                 .allMatch(cp -> level.shouldTickBlocksAt(cp.toLong()));
 
-        // TODO - Implement upgrade cooldowns (i.e. retry in 100 ticks if room isn't loaded)
-        if (!everythingLoaded) return;
+        if (!everythingLoaded) {
+            data.cooldown = 200;
+            return;
+        }
 
-        var energyHandler = upgrade.getCapability(Capabilities.EnergyStorage.ITEM);
+        final var innerBounds = room.boundaries().innerBounds();
+
+        final var upgradeItem = instance.upgradeItem();
+        var energyHandler = upgradeItem.getCapability(Capabilities.EnergyStorage.ITEM);
 
         boolean doItemDamage = false;
         boolean preferEnergy = false;
         int maxAllowed = 0;
-        if (upgrade.isDamageableItem()) {
+        if (upgradeItem.isDamageableItem()) {
             doItemDamage = true;
-            var durabilityLeft = upgrade.getMaxDamage() - upgrade.getDamageValue();
+            var durabilityLeft = upgradeItem.getMaxDamage() - upgradeItem.getDamageValue();
             maxAllowed = Math.clamp(durabilityLeft, 0, 5);
         }
 
         if (energyHandler != null && energyHandler.canExtract()) {
             doItemDamage = true;
             preferEnergy = true;
-            maxAllowed = Math.clamp(energyHandler.getEnergyStored() / 10, 0, 5);
+            maxAllowed = Math.clamp(energyHandler.getEnergyStored() / 10, 0, 10);
         }
 
         final var treeBlocks = BlockPos.betweenClosedStream(innerBounds)
@@ -92,8 +116,8 @@ public class TreeCutterUpgrade implements RoomUpgrade {
                 })
                 .filter(pair -> {
                     BlockState state = pair.right();
-                    if(state.is(BlockTags.LOGS)) return true;
-                    if(state.is(BlockTags.LEAVES)) {
+                    if (state.is(BlockTags.LOGS)) return true;
+                    if (state.is(BlockTags.LEAVES)) {
                         if (state.hasProperty(LeavesBlock.PERSISTENT)) return !state.getValue(LeavesBlock.PERSISTENT);
                         return true;
                     }
@@ -111,7 +135,6 @@ public class TreeCutterUpgrade implements RoomUpgrade {
             final var minCorner = AABBHelper.minCorner(bounds);
             final var lastDitch = BlockPos.containing(minCorner.x(), minCorner.y() + 1, minCorner.z());
 
-            // TODO: Actual persistence and cooldowns for when the inventories fill up
             final var inventories = getInventories(level, bounds).toList();
 
             // If we have no valid inventories, do nothing
@@ -120,7 +143,7 @@ public class TreeCutterUpgrade implements RoomUpgrade {
 
             for (Pair<BlockPos, BlockState> pos : treeBlocks) {
                 final var blockEntity = level.getBlockEntity(pos.left());
-                final var drops = Block.getDrops(pos.right(), level, pos.left(), blockEntity, null, upgrade);
+                final var drops = Block.getDrops(pos.right(), level, pos.left(), blockEntity, null, upgradeItem);
 
                 level.destroyBlock(pos.left(), false);
 
@@ -142,11 +165,15 @@ public class TreeCutterUpgrade implements RoomUpgrade {
             if (preferEnergy) {
                 energyHandler.extractEnergy(numLogs * 10, false);
             } else {
-                upgrade.hurtAndBreak(numLogs, level, null, (item) -> {
-                    upgrade.shrink(1);
-                });
+                if(doItemDamage) {
+                    upgradeItem.hurtAndBreak(numLogs, level, null, (item) -> {
+                        upgradeItem.shrink(1);
+                    });
+                }
             }
         }
+
+        data.cooldown = 30;
     }
 
     private record LocatedInventory(BlockPos pos, IItemHandler inventory) {
@@ -161,5 +188,21 @@ public class TreeCutterUpgrade implements RoomUpgrade {
                         )
                         .filter(Objects::nonNull)
                         .map(handler -> new LocatedInventory(pos, handler)));
+    }
+
+    public static class Data {
+        public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                ExtraCodecs.POSITIVE_INT.fieldOf("cooldown").forGetter(d -> d.cooldown)
+        ).apply(instance, Data::new));
+
+        public int cooldown;
+
+        public Data() {
+            this.cooldown = 0;
+        }
+
+        Data(int cooldown) {
+            this.cooldown = cooldown;
+        }
     }
 }

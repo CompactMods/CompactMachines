@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.LoggingUtil;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeType;
 import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
 import dev.compactmods.machines.command.argument.Suggestors;
@@ -61,7 +62,7 @@ public class RoomUpgradesSubcommand {
         if(realUpgradeType == null) return 0;
 
         var heldItem = player.getMainHandItem();
-        var currentUpgrades = heldItem.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
+        var currentUpgrades = heldItem.get(CMDataComponents.UPGRADE_LIST_COMPONENT);
 
         if(!realUpgradeType.canApplyTo(heldItem)) {
             ctx.getSource().sendFailure(Component.literal("That upgrade cannot be applied to the held item."));
@@ -75,11 +76,11 @@ public class RoomUpgradesSubcommand {
             addedList.add(realUpgradeType.constructor().get());
 
             var newList = new RoomUpgradeList(addedList);
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
+            heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         } else {
             // TODO: Room Upgrade context (level, itemstack, etc)
             var newList = new RoomUpgradeList(List.of(realUpgradeType.constructor().get()));
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
+            heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         }
 
         return 0;
@@ -90,13 +91,13 @@ public class RoomUpgradesSubcommand {
         var realUpgradeType = getTargetedUpgradeType(ctx);
 
         var heldItem = player.getMainHandItem();
-        var currentUpgrades = heldItem.get(RoomUpgrades.UPGRADE_LIST_COMPONENT);
+        var currentUpgrades = heldItem.get(CMDataComponents.UPGRADE_LIST_COMPONENT);
 
         if (currentUpgrades != null) {
             var newList = new RoomUpgradeList(currentUpgrades.upgrades());
             newList.upgrades().removeIf(ru -> ru.getType().equals(realUpgradeType));
 
-            heldItem.set(RoomUpgrades.UPGRADE_LIST_COMPONENT, newList);
+            heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         }
 
         return 0;

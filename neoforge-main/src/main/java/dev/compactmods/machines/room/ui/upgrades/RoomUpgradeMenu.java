@@ -1,10 +1,13 @@
 package dev.compactmods.machines.room.ui.upgrades;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.client.render.ConditionalGhostSlot;
 import dev.compactmods.machines.room.Rooms;
-import dev.compactmods.machines.room.upgrade.RoomUpgradeInventory;
+import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
+import dev.compactmods.machines.room.upgrade.RoomUpgradeMenuEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -15,6 +18,8 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class RoomUpgradeMenu extends AbstractContainerMenu {
    private final Inventory playerInv;
@@ -32,11 +37,31 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
 		 int slotX = 8 + slot * 18;
 
 		 this.addSlot(new SlotItemHandler(upgradeInv, slot, slotX, 18) {
-			@Override
-			public void onTake(Player pPlayer, ItemStack pStack) {
-			   // TODO: Room Upgrade removal event
-			   super.onTake(pPlayer, pStack);
-			}
+
+			 @Override
+			 public boolean mayPlace(ItemStack stack) {
+				 return stack.has(CMDataComponents.UPGRADE_LIST_COMPONENT);
+			 }
+
+			 @Override
+			 public void setByPlayer(@NotNull ItemStack newStack, @NotNull ItemStack oldStack) {
+				 super.setByPlayer(newStack, oldStack);
+
+				 if(oldStack.has(CMDataComponents.UPGRADE_INSTANCE_ID)) {
+					 var instanceID = oldStack.get(CMDataComponents.UPGRADE_INSTANCE_ID);
+					 RoomUpgradeMenuEvents.onUpgradeRemoved(roomCode, oldStack, instanceID);
+				 }
+
+				 if(newStack.isEmpty()) return;
+
+				 if(!newStack.has(CMDataComponents.UPGRADE_INSTANCE_ID)) {
+					 UUID newInstanceID = UUID.randomUUID();
+					 newStack.set(CMDataComponents.UPGRADE_INSTANCE_ID, newInstanceID);
+				 }
+
+				 var instanceID = newStack.get(CMDataComponents.UPGRADE_INSTANCE_ID);
+				 RoomUpgradeMenuEvents.onUpgradeApplied(roomCode, newStack, instanceID);
+			 }
 		 });
 	  }
 
@@ -82,10 +107,7 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
 
 		 @Override
 		 public @NotNull AbstractContainerMenu createMenu(int winId, Inventory inventory, Player player) {
-			// TODO - Expose room data via API
-			var serverUpgInv = CompactMachines.roomData(room.code())
-				.getData(Rooms.DataAttachments.UPGRADE_INV);
-
+			var serverUpgInv = room.getData(CMDataAttachments.UPGRADE_ITEMS);
 			return new RoomUpgradeMenu(winId, inventory, room.code(), serverUpgInv);
 		 }
 

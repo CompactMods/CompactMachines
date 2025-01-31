@@ -1,5 +1,7 @@
 package dev.compactmods.machines.machine.block;
 
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.block.ICompactMachineBlockEntity;
 import dev.compactmods.machines.machine.MachineColors;
@@ -31,10 +33,10 @@ public class CompactMachineBlock extends Block {
     public void setPlacedBy(Level level, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(level, pPos, pState, pPlacer, pStack);
 
-        final var color = pStack.getOrDefault(Machines.DataComponents.MACHINE_COLOR, MachineColors.WHITE);
+        final var color = pStack.getOrDefault(CMDataComponents.MACHINE_COLOR, MachineColors.WHITE);
         final var be = level.getBlockEntity(pPos);
         if(be != null)
-            be.setData(Machines.Attachments.MACHINE_COLOR, color);
+            be.setData(CMDataAttachments.MACHINE_COLOR, color);
     }
 
     @NotNull
@@ -44,7 +46,7 @@ public class CompactMachineBlock extends Block {
         final var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof ICompactMachineBlockEntity) {
             final var newColor = MachineColor.fromDyeColor(color);
-            blockEntity.setData(Machines.Attachments.MACHINE_COLOR, newColor);
+            blockEntity.setData(CMDataAttachments.MACHINE_COLOR, newColor);
 
             PacketDistributor.sendToPlayersTrackingChunk(
                     level, new ChunkPos(pos), new MachineColorSyncPacket(GlobalPos.of(level.dimension(), pos), newColor));

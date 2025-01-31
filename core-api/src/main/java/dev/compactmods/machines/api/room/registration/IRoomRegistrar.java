@@ -2,7 +2,9 @@ package dev.compactmods.machines.api.room.registration;
 
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +12,10 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface IRoomRegistrar {
+
+    default MinecraftServer server() {
+        return ServerLifecycleHooks.getCurrentServer();
+    }
 
     AABB getNextBoundaries(RoomTemplate template);
 
@@ -27,7 +33,7 @@ public interface IRoomRegistrar {
         // Make builder, set template defaults, then allow overrides
         final var b = builder();
         preOverride.andThen(override).accept(b);
-        return b.build();
+        return b.build(server());
     }
 
     boolean isRegistered(String room);

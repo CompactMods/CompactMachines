@@ -2,6 +2,8 @@ package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
@@ -44,7 +46,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         try {
             if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
-                return Machines.Items.boundToRoom(be.connectedRoom(), be.getData(Machines.Attachments.MACHINE_COLOR));
+                return Machines.Items.boundToRoom(be.connectedRoom(), be.getData(CMDataAttachments.MACHINE_COLOR));
             }
 
             return Machines.Items.unbound();
@@ -125,7 +127,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                 final var roomCode = machine.connectedRoom();
                 CompactMachines.room(roomCode).ifPresent(inst -> {
                     if (player instanceof ServerPlayer sp) {
-                        sp.setData(Rooms.DataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
+                        sp.setData(CMDataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
 
                         try {
                             final var roomBlocks = RoomBlocks.getInternalBlocks(sp.server, inst).get();

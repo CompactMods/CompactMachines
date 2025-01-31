@@ -1,8 +1,7 @@
 package dev.compactmods.machines.api.room.upgrade.events;
 
-import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 
 /**
  * Marker interface for all room upgrade events.
@@ -10,5 +9,5 @@ import net.minecraft.world.item.ItemStack;
 @FunctionalInterface
 public interface RoomUpgradeEvent {
 
-   void handle(ServerLevel level, RoomInstance room, ItemStack upgrade);
+   void handle(RoomUpgradeInstance instance);
 }

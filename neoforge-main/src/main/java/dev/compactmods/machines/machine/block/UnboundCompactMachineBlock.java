@@ -1,6 +1,8 @@
 package dev.compactmods.machines.machine.block;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
@@ -9,6 +11,7 @@ import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.RoomHelper;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.BlockPos;
@@ -43,8 +46,8 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 			if (id != null) {
 				final var template = RoomTemplateHelper.getTemplateHolder(level, id);
 				var item = Machines.Items.forNewRoom(template);
-				be.getExistingData(Machines.Attachments.MACHINE_COLOR).ifPresent(color -> {
-					item.set(Machines.DataComponents.MACHINE_COLOR, color);
+				be.getExistingData(CMDataAttachments.MACHINE_COLOR).ifPresent(color -> {
+					item.set(CMDataComponents.MACHINE_COLOR, color);
 				});
 
 				return item;
@@ -71,11 +74,12 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 
 				RoomTemplate template = RoomTemplateHelper.getTemplate(level, unboundEntity.templateId());
 				if (!template.equals(RoomTemplate.INVALID_TEMPLATE)) {
-					var color = unboundEntity.getData(Machines.Attachments.MACHINE_COLOR);
+					var color = unboundEntity.getData(CMDataAttachments.MACHINE_COLOR);
 
 					try {
 						// Generate a new machine room
 						final var newRoom = CompactMachines.newRoom(server, template, sp.getUUID());
+						newRoom.setData(CMDataAttachments.ROOM_OWNER, player.getUUID());
 
 						// Change into a bound machine block
 						level.setBlock(pos, Machines.Blocks.BOUND_MACHINE.get().defaultBlockState(), Block.UPDATE_ALL);
@@ -83,7 +87,7 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 						// Set up binding and enter
 						level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get()).ifPresent(ent -> {
 							ent.setConnectedRoom(newRoom.code());
-							ent.setData(Machines.Attachments.MACHINE_COLOR, color);
+							ent.setData(CMDataAttachments.MACHINE_COLOR, color);
 
 							try {
 								RoomHelper.teleportPlayerIntoRoom(server, sp, newRoom, RoomEntryPoint.playerEnteringMachine(player))

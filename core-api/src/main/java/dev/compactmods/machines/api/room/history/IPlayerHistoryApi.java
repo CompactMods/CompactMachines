@@ -4,4 +4,5 @@ public interface IPlayerHistoryApi {
 
    IPlayerEntryPointHistoryManager entryPoints();
 
+    void save();
 }

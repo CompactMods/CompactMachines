@@ -2,6 +2,8 @@ package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.data.CMDataFile;
 import dev.compactmods.machines.api.room.RoomInstance;
@@ -13,13 +15,15 @@ import dev.compactmods.machines.data.CodecHolder;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import dev.compactmods.machines.util.MathUtil;
 import dev.compactmods.spatial.aabb.AABBAligner;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -40,20 +44,29 @@ public class RoomRegistrar implements IRoomRegistrar, CodecHolder<RoomRegistrar>
 
     private final MemoryGraph graph;
     private final Map<String, RoomRegistrationNode> registrationNodes;
+    private final Map<String, RoomInstance> instanceCache;
+    private final MinecraftServer server;
 
-    public RoomRegistrar() {
+    public RoomRegistrar(MinecraftServer server) {
+        this.server = server;
         this.graph = new MemoryGraph();
-        this.registrationNodes = new HashMap<>();
+        this.registrationNodes = new Object2ReferenceArrayMap<>();
+        this.instanceCache = new Object2ObjectArrayMap<>();
     }
 
     private RoomRegistrar(List<RoomRegistrationNode> regNodes) {
-        this();
+        this(ServerLifecycleHooks.getCurrentServer());
         regNodes.forEach(this::registerDirty);
     }
 
     @Override
     public IRoomBuilder builder() {
         return new NewRoomBuilder();
+    }
+
+    @Override
+    public MinecraftServer server() {
+        return this.server;
     }
 
     @Override
@@ -74,6 +87,7 @@ public class RoomRegistrar implements IRoomRegistrar, CodecHolder<RoomRegistrar>
 
         CompactMachines.roomApi().chunkManager().calculateChunks(inst.code(), node);
 
+        instanceCache.put(inst.code(), inst);
         return inst;
     }
 
@@ -88,13 +102,22 @@ public class RoomRegistrar implements IRoomRegistrar, CodecHolder<RoomRegistrar>
         if (regNode == null)
             return Optional.empty();
 
-        RoomInstance inst = makeRoomInstance(regNode);
+        RoomInstance inst = getOrMakeRoomInstance(regNode);
         return Optional.of(inst);
     }
 
     @NotNull
-    private static RoomInstance makeRoomInstance(RoomRegistrationNode regNode) {
-        return new RoomInstance(regNode.code(), regNode.defaultMachineColor(), regNode);
+    private RoomInstance getOrMakeRoomInstance(RoomRegistrationNode regNode) {
+        try {
+            if(instanceCache.containsKey(regNode.code()))
+                return instanceCache.get(regNode.code());
+
+            final var inst = new RoomInstance(server, CompactDimension.forServer(server), regNode.code(), regNode.defaultMachineColor(), regNode);
+            instanceCache.put(regNode.code(), inst);
+            return inst;
+        } catch (MissingDimensionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -111,7 +134,7 @@ public class RoomRegistrar implements IRoomRegistrar, CodecHolder<RoomRegistrar>
     public Stream<RoomInstance> allRooms() {
         return registrationNodes.values()
                 .stream()
-                .map(RoomRegistrar::makeRoomInstance);
+                .map(this::getOrMakeRoomInstance);
     }
 
     private void registerDirty(RoomRegistrationNode node) {

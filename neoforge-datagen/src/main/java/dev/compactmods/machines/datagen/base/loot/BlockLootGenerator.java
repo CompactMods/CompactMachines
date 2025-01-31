@@ -1,5 +1,6 @@
 package dev.compactmods.machines.datagen.base.loot;
 
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.HolderLookup;
@@ -42,16 +43,16 @@ public class BlockLootGenerator extends BlockLootSubProvider {
             .setRolls(ConstantValue.exactly(1))
             .when(ExplosionCondition.survivesExplosion())
             .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                .include(Machines.DataComponents.MACHINE_COLOR.get())
-                .include(Machines.DataComponents.ROOM_TEMPLATE_ID.get()))
+                .include(CMDataComponents.MACHINE_COLOR.get())
+                .include(CMDataComponents.ROOM_TEMPLATE_ID.get()))
             .add(LootItem.lootTableItem(Machines.Items.UNBOUND_MACHINE.get()))));
 
         this.add(Machines.Blocks.BOUND_MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
             .setRolls(ConstantValue.exactly(1))
             .when(ExplosionCondition.survivesExplosion())
             .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                .include(Machines.DataComponents.MACHINE_COLOR.get())
-                .include(Machines.DataComponents.BOUND_ROOM_CODE.get()))
+                .include(CMDataComponents.MACHINE_COLOR.get())
+                .include(CMDataComponents.BOUND_ROOM_CODE.get()))
             .add(LootItem.lootTableItem(Machines.Items.BOUND_MACHINE.get()))));
     }
 }

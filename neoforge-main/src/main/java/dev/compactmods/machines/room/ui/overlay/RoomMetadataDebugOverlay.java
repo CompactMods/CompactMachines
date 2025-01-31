@@ -1,6 +1,7 @@
 package dev.compactmods.machines.room.ui.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.client.render.PlayerFaceRenderer;
 import dev.compactmods.machines.room.Rooms;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class RoomMetadataDebugOverlay implements LayeredDraw.Layer {
    
    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, Player player, PoseStack poseStack, int center, int screenHeight) {
-	  player.getExistingData(Rooms.DataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
+	  player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
 		 graphics.drawCenteredString(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
 	  });
    }

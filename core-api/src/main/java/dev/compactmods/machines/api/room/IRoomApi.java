@@ -18,4 +18,6 @@ public interface IRoomApi {
     IRoomChunkManager chunkManager();
 
     IRoomChunks chunks(String roomCode);
+
+    void save();
 }

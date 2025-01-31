@@ -1,5 +1,6 @@
 package dev.compactmods.machines.machine.item;
 
+import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.i18n.MachineTranslations;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.machine.MachineColors;
@@ -38,13 +39,13 @@ public class UnboundCompactMachineItem extends BlockItem {
     @Override
     public ItemStack getDefaultInstance() {
         var stack = new ItemStack(this);
-        stack.set(Machines.DataComponents.ROOM_TEMPLATE_ID, RoomTemplate.NO_TEMPLATE);
-        stack.set(Machines.DataComponents.MACHINE_COLOR, MachineColors.WHITE);
+        stack.set(CMDataComponents.ROOM_TEMPLATE_ID, RoomTemplate.NO_TEMPLATE);
+        stack.set(CMDataComponents.MACHINE_COLOR, MachineColors.WHITE);
         return stack;
     }
 
     private ResourceLocation getTemplateId(ItemStack stack) {
-        return stack.get(Machines.DataComponents.ROOM_TEMPLATE_ID);
+        return stack.get(CMDataComponents.ROOM_TEMPLATE_ID);
     }
 
     @Override
@@ -53,9 +54,9 @@ public class UnboundCompactMachineItem extends BlockItem {
 
         tooltip.add(Component.translatableWithFallback(MachineTranslations.IDs.NEW_MACHINE, "New Machine"));
 
-        if(stack.has(Machines.DataComponents.ROOM_TEMPLATE_ID)) {
+        if(stack.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
             // TODO Room Dimensions
-            Component.literal(stack.get(Machines.DataComponents.ROOM_TEMPLATE_ID).toString());
+            Component.literal(stack.get(CMDataComponents.ROOM_TEMPLATE_ID).toString());
         }
     }
 }

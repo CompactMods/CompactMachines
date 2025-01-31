@@ -50,7 +50,7 @@ public class CMKeyedDataFileManager<Key, T extends CMDataFile & CodecHolder<T>> 
 		 var inst = creator.apply(server, k);
 		 var dir = inst.getDataLocation(server);
 		 DataFileUtil.ensureDirExists(dir);
-		 final var file = dir.resolve(k.toString() + ".dat").toFile();
+		 final var file = dir.resolve(getFileKey(k) + ".dat").toFile();
 		 return !file.exists() ? inst : DataFileUtil.loadFileWithCodec(file, inst.codec());
 	  });
    }

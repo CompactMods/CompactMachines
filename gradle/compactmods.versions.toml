@@ -1,5 +1,5 @@
 [versions]
-gander = "[0.2.3]"
+gander = "[0.2.20]"
 feather = "[0.1.8]"
 
 [versions.spatial]

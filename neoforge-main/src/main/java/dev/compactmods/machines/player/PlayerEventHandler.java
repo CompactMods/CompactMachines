@@ -1,5 +1,6 @@
 package dev.compactmods.machines.player;
 
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.Util;
@@ -18,7 +19,7 @@ public class PlayerEventHandler {
         final var player = event.getEntity();
 
         if(player instanceof ServerPlayer serverPlayer) {
-            final var currentRoom = serverPlayer.getExistingData(Rooms.DataAttachments.CURRENT_ROOM_CODE);
+            final var currentRoom = serverPlayer.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE);
             currentRoom.ifPresent(roomCode -> PacketDistributor.sendToPlayer(serverPlayer, new SyncRoomMetadataPacket(roomCode, Util.NIL_UUID)));
         }
     }
