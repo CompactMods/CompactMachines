@@ -39,7 +39,7 @@ public class CMTeleportSubcommand {
     }
 
     private static void teleportToRoom(CommandSourceStack src, MinecraftServer server, ServerPlayer player, String roomCode) {
-        CompactMachines.roomApi().registrar().get(roomCode).ifPresentOrElse(room -> {
+        CompactMachines.room(roomCode).ifPresentOrElse(room -> {
             try {
                 RoomHelper.teleportPlayerIntoRoom(server, player, room, RoomEntryPoint.playerUsingCommand(player));
             } catch (MissingDimensionException e) {

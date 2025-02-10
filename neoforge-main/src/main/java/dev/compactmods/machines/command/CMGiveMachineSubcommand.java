@@ -121,7 +121,7 @@ public class CMGiveMachineSubcommand {
     }
 
     private static void createAndGiveExistingRoom(String roomCode, ServerPlayer player, CommandSourceStack src) {
-        CompactMachines.roomApi().registrar().get(roomCode).ifPresentOrElse(room -> {
+        CompactMachines.room(roomCode).ifPresentOrElse(room -> {
             ItemStack newItem = Machines.Items.boundToRoom(room.code(), room.defaultMachineColor());
             if (!player.addItem(newItem)) {
                 src.sendFailure(CommandTranslations.CANNOT_GIVE_MACHINE.get());

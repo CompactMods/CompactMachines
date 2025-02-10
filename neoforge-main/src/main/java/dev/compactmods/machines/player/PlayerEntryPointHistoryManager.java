@@ -137,7 +137,7 @@ public class PlayerEntryPointHistoryManager implements CodecHolder<PlayerEntryPo
     }
 
     public RoomEntryResult enterRoom(UUID player, PlayerRoomHistoryEntry history) {
-        if (!CompactMachines.isValidRoomCode(history.roomCode()))
+        if (!CompactMachines.roomRegistrar().isRegistered(history.roomCode()))
             return RoomEntryResult.FAILED_ROOM_INVALID;
 
         return addRoomEntryUnsafe(player, history);

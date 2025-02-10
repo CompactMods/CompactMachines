@@ -6,7 +6,6 @@ import dev.compactmods.machines.player.PlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.RoomEntryResult;
 import dev.compactmods.machines.room.RoomCodeGenerator;
 import dev.compactmods.machines.test.gametest.core.EmptyTestSizes;
-import dev.compactmods.machines.test.services.TestRoomApi;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
@@ -26,7 +25,7 @@ public class PlayerHistoryTrackerTests {
     @TestHolder
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void failsPlayerGoingTooFar(final GameTestHelper test) {
-        CompactMachines.reloadServices("dev.compactmods.machines.test");
+        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
 
         final var history = new PlayerEntryPointHistoryManager(1);
 
@@ -44,7 +43,7 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void canGetPlayerHistory(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test");
+        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
 
         final var history = new PlayerEntryPointHistoryManager(5);
 
@@ -75,7 +74,7 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void canRemovePlayerHistory(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test");
+        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
 
         final var history = new PlayerEntryPointHistoryManager(5);
         final var player = test.makeMockPlayer(GameType.SURVIVAL);
@@ -104,7 +103,7 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void testDataLogic(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test");
+        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
 
         final var history = new PlayerEntryPointHistoryManager(5);
 

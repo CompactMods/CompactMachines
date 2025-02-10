@@ -1,7 +1,6 @@
 package dev.compactmods.machines.data;
 
 import com.mojang.serialization.Codec;
-import dev.compactmods.machines.room.RoomRegistrar;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;

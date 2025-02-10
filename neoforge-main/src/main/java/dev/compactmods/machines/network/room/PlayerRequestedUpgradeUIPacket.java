@@ -1,6 +1,8 @@
 package dev.compactmods.machines.network.room;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import dev.compactmods.machines.room.ui.upgrades.RoomUpgradeMenu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,6 +20,9 @@ public record PlayerRequestedUpgradeUIPacket(String roomCode, boolean isIsolated
 		 player.openMenu(RoomUpgradeMenu.provider(inst), buf -> {
 			buf.writeBoolean(pkt.isIsolated);
 			buf.writeUtf(pkt.roomCode());
+
+			final var inv = inst.getData(CMDataAttachments.UPGRADE_ITEMS);
+			RoomUpgradeInventory.STREAM_CODEC.encode(buf, inv);
 		 });
 	  });
    };

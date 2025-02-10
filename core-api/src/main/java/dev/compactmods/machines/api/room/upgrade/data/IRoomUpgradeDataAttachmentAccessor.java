@@ -1,11 +1,12 @@
 package dev.compactmods.machines.api.room.upgrade.data;
 
+import dev.compactmods.machines.api.data.Saveable;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IRoomUpgradeDataAttachmentAccessor {
+public interface IRoomUpgradeDataAttachmentAccessor extends Saveable {
    Optional<? extends IAttachmentHolder> get(String roomCode, UUID instanceId);
 
    IAttachmentHolder getOrCreate(String roomCode, UUID instanceId);

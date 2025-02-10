@@ -15,6 +15,7 @@ import dev.compactmods.machines.player.PlayerEventHandler;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.room.capability.BasicRoomCapabilities;
+import dev.compactmods.machines.room.upgrade.RoomUpgradeEventHandlers;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
@@ -75,6 +76,7 @@ public class CompactMachinesCommon {
     }
 
     private static void commonSetup(FMLCommonSetupEvent evt) {
-        CMGameRules.register();
+        evt.enqueueWork(CMGameRules::register);
+        evt.enqueueWork(RoomUpgradeEventHandlers::collectUpgradeEvents);
     }
 }

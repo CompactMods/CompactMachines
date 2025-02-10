@@ -6,11 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.component.CMDataComponents;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeType;
-import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
+import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.command.argument.Suggestors;
 import dev.compactmods.machines.feature.CMFeatureFlags;
-import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -45,13 +44,13 @@ public class RoomUpgradesSubcommand {
         return subRoot;
     }
 
-    private static @Nullable RoomUpgradeType<?> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
+    private static @Nullable RoomUpgradeComponentType<?> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
         final var src = ctx.getSource();
 
         final var upgradeType = ResourceLocationArgument.getId(ctx, "upgrade");
         return src.getServer()
                 .registryAccess()
-                .registryOrThrow(RoomUpgradeType.REGISTRY_KEY)
+                .registryOrThrow(RoomUpgradeComponentType.REGISTRY_KEY)
                 .get(upgradeType);
     }
 
@@ -70,16 +69,16 @@ public class RoomUpgradesSubcommand {
         }
 
         if (currentUpgrades != null) {
-            var addedList = new ArrayList<>(currentUpgrades.upgrades());
+            var addedList = new ArrayList<>(currentUpgrades.components());
 
             // TODO: Room Upgrade context (level, itemstack, etc)
             addedList.add(realUpgradeType.constructor().get());
 
-            var newList = new RoomUpgradeList(addedList);
+            var newList = new RoomUpgradeComponentList(addedList);
             heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         } else {
             // TODO: Room Upgrade context (level, itemstack, etc)
-            var newList = new RoomUpgradeList(List.of(realUpgradeType.constructor().get()));
+            var newList = new RoomUpgradeComponentList(List.of(realUpgradeType.constructor().get()));
             heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         }
 
@@ -94,8 +93,8 @@ public class RoomUpgradesSubcommand {
         var currentUpgrades = heldItem.get(CMDataComponents.UPGRADE_LIST_COMPONENT);
 
         if (currentUpgrades != null) {
-            var newList = new RoomUpgradeList(currentUpgrades.upgrades());
-            newList.upgrades().removeIf(ru -> ru.getType().equals(realUpgradeType));
+            var newList = new RoomUpgradeComponentList(currentUpgrades.components());
+            newList.components().removeIf(ru -> ru.getType().equals(realUpgradeType));
 
             heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         }

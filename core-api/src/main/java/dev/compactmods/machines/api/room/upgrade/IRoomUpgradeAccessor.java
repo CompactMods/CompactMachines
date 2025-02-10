@@ -1,17 +1,18 @@
 package dev.compactmods.machines.api.room.upgrade;
 
-import dev.compactmods.machines.api.room.RoomInstance;
-
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public interface IRoomUpgradeAccessor {
 
-    Optional<RoomUpgradeInstance> getExistingInstance(RoomInstance roomInstance, UUID id);
+    Stream<RoomUpgradeInstance> all();
 
-    RoomUpgradeInstance getOrCreateInstance(RoomInstance roomInstance, UUID id);
+    Optional<RoomUpgradeInstance> getExistingInstance(UUID id);
+
+    RoomUpgradeInstance getOrCreateInstance(UUID id);
+
+    void remove(UUID uuid);
 
     void clearCache();
-
-    void removeInstance(UUID uuid);
 }

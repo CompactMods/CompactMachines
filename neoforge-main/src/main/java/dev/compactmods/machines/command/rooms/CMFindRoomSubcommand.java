@@ -53,7 +53,7 @@ public class CMFindRoomSubcommand {
     private static int fetchByChunkPos(CommandContext<CommandSourceStack> ctx) {
         final var chunkPos = ColumnPosArgument.getColumnPos(ctx, "chunk");
 
-        final var m = CompactMachines.roomApi().chunkManager()
+        final var m = CompactMachines.chunkManager()
                 .findRoomByChunk(chunkPos.toChunkPos())
 
                 // FIXME Translations
@@ -76,7 +76,7 @@ public class CMFindRoomSubcommand {
 
         if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
             final var roomCode = be.connectedRoom();
-            CompactMachines.roomApi().registrar().get(roomCode).ifPresent(roomInfo -> {
+            CompactMachines.room(roomCode).ifPresent(roomInfo -> {
                 ctx.getSource().sendSuccess(() -> RoomTranslations.MACHINE_ROOM_INFO.apply(block, roomInfo), false);
             });
         } else {
@@ -97,7 +97,7 @@ public class CMFindRoomSubcommand {
             return -1;
         }
 
-        final var m = CompactMachines.roomApi().chunkManager()
+        final var m = CompactMachines.chunkManager()
                 .findRoomByChunk(player.chunkPosition())
                 .map(code -> RoomTranslations.PLAYER_ROOM_INFO.apply(player, code))
                 .orElse(RoomTranslations.UNKNOWN_ROOM_BY_PLAYER_CHUNK.apply(player));

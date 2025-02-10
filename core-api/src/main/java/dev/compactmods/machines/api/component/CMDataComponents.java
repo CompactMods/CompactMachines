@@ -3,7 +3,7 @@ package dev.compactmods.machines.api.component;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineColor;
-import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
+import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -22,10 +22,10 @@ public interface CMDataComponents {
     String KEY_ROOM_CODE = "room_code";
     String KEY_MACHINE_COLOR = "machine_color";
 
-    DeferredHolder<DataComponentType<?>, DataComponentType<RoomUpgradeList>> UPGRADE_LIST_COMPONENT = DATA_COMPONENTS
+    DeferredHolder<DataComponentType<?>, DataComponentType<RoomUpgradeComponentList>> UPGRADE_LIST_COMPONENT = DATA_COMPONENTS
             .registerComponentType("room_upgrades", (builder) -> builder
-                    .persistent(RoomUpgradeList.CODEC)
-                    .networkSynchronized(RoomUpgradeList.STREAM_CODEC));
+                    .persistent(RoomUpgradeComponentList.CODEC)
+                    .networkSynchronized(RoomUpgradeComponentList.STREAM_CODEC));
 
     /**
      * Only on bound room items - given by a crafting process or when a bound machine block is broken

@@ -41,11 +41,6 @@ public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager
     private final Map<UUID, RoomSpawn> playerSpawns;
     private AABB roomBounds;
 
-    public SpawnManager(String roomCode) {
-        this(roomCode, Collections.emptyMap(), null);
-        this.defaultSpawn = null;
-    }
-
     public SpawnManager(String roomCode, IRoomBoundaries roomBounds) {
         this(roomCode, Collections.emptyMap(), new RoomSpawn(roomBounds.defaultSpawn(), Vec2.ZERO));
         this.roomBounds = roomBounds.innerBounds();

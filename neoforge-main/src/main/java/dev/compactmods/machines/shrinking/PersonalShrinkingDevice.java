@@ -49,11 +49,11 @@ public class PersonalShrinkingDevice extends Item {
         if (CompactDimension.isInServerDimension(player) && player instanceof ServerPlayer serverPlayer) {
             // Player Sneaking - Set Room Spawn
             if (player.isShiftKeyDown()) {
-                final var roomCode = CompactMachines.roomApi().chunkManager()
+                final var roomCode = CompactMachines.chunkManager()
                         .findRoomByChunk(serverPlayer.chunkPosition())
                         .orElseThrow();
 
-                final var spawnManager = CompactMachines.roomApi().spawnManager(roomCode);
+                final var spawnManager = CompactMachines.spawnManagers().get(roomCode);
                 spawnManager.setPlayerSpawn(serverPlayer);
 
                 player.displayClientMessage(RoomTranslations.ROOM_SPAWNPOINT_SET.apply(serverPlayer, roomCode), true);

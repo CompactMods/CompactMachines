@@ -1,7 +1,9 @@
 package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.compactmods.gander.level.VirtualLevel;
 import dev.compactmods.gander.render.geometry.BakedLevel;
+import dev.compactmods.gander.render.geometry.LevelBakery;
 import dev.compactmods.gander.ui.widget.SpatialRenderer;
 import dev.compactmods.machines.CommonConfig;
 import dev.compactmods.machines.api.CompactMachines;
@@ -16,17 +18,26 @@ import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector3f;
+
+import java.util.concurrent.CompletableFuture;
 
 public class MachineRoomScreen extends Screen {
 
@@ -39,12 +50,15 @@ public class MachineRoomScreen extends Screen {
     private ImageButton psdButton;
     private ScreenRectangle screenArea;
 
+    private boolean isLoadingRoomPreview;
+
     public MachineRoomScreen(Component title, GlobalPos machinePos, String roomCode) {
         super(title);
         this.machinePos = machinePos;
         this.roomCode = roomCode;
 
         // Send packet to server for block data
+        this.isLoadingRoomPreview = true;
         PacketDistributor.sendToServer(new PlayerStartedRoomTrackingPacket(roomCode));
     }
 
@@ -182,7 +196,7 @@ public class MachineRoomScreen extends Screen {
 
         final var pose = guiGraphics.pose();
         pose.pushPose();
-        pose.translate(0, 0, 200);
+        pose.translate(0, 0, 100);
 
         guiGraphics.fill(screenArea.left() - 1, screenArea.top() - 1,
                 screenArea.right() + 1, screenArea.bottom() + 1,
@@ -201,19 +215,34 @@ public class MachineRoomScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(graphics, mouseX, mouseY, partialTick);
 
         final var pose = graphics.pose();
         pose.pushPose();
         {
-            pose.translate(this.width / 2f, 0, 0);
-
-            // graphics.drawCenteredString(font, this.ti, 0, this.titleLabelY, 0xFFFFFFFF);
-
             var rt = Component.literal(roomCode);
-            pose.scale(0.7f, 0.7f, 0.7f);
-            graphics.drawCenteredString(font, rt, 0, font.lineHeight + 7, 0xFFDEDEDE);
+            graphics.drawCenteredString(font, rt, this.width / 2,
+                    screenArea.top() - font.lineHeight - 2, 0xFFDEDEDE);
+        }
+        pose.popPose();
+
+        // Render loading
+        if(isLoadingRoomPreview) {
+            pose.pushPose();
+            {
+                pose.translate(0, 0, 110);
+                final var loadingMsg = Component.translatableWithFallback("compactmachines.preview.loading", "Loading room preview...");
+                graphics.drawCenteredString(font, loadingMsg,
+                        this.width / 2,
+                        (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
+            }
+            pose.popPose();
+        }
+
+        pose.pushPose();
+        for (Renderable renderable : this.renderables) {
+            renderable.render(graphics, mouseX, mouseY, partialTick);
         }
         pose.popPose();
     }
@@ -221,6 +250,11 @@ public class MachineRoomScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
+    }
+
+    public void updateSceneRenderer(CompletableFuture<BakedLevel> future) {
+        this.isLoadingRoomPreview = true;
+        future.thenAcceptAsync(this::updateScene);
     }
 
     public void updateScene(BakedLevel bakedLevel) {
@@ -231,10 +265,12 @@ public class MachineRoomScreen extends Screen {
         this.renderer = addRenderableOnly(new SpatialRenderer(bakedLevel, screenArea.left(), screenArea.top(),
                 screenArea.width(), screenArea.height()));
 
-        this.renderSize = AABB.of(bakedLevel.blockBoundaries());
+        this.renderSize = bakedLevel.blockBoundaries();
 
         renderer.camera().zoom(calculateZoomForRoom(this.renderSize));
         renderer.camera().lookUp(3 / 12f);
+
+        this.isLoadingRoomPreview = false;
     }
 
     private static float calculateZoomForRoom(AABB internalSize) {

@@ -93,7 +93,7 @@ public class RoomEventHandler {
         final var level = entity.level();
         if (!CompactDimension.isLevelCompact(entity.level())) return false;
 
-        return CompactMachines.roomApi().chunkManager()
+        return CompactMachines.chunkManager()
                 .findRoomByChunk(entity.chunkPosition())
                 .flatMap(CompactMachines::room)
                 .map(ib -> ib.boundaries().innerBounds().contains(target))

@@ -1,13 +1,12 @@
 package dev.compactmods.machines.api.room.data;
 
+import dev.compactmods.machines.api.data.Saveable;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 import java.util.Optional;
 
-public interface IRoomDataAttachmentAccessor {
+public interface IRoomDataAttachmentAccessor extends Saveable {
    Optional<? extends IAttachmentHolder> get(String roomCode);
 
    IAttachmentHolder getOrCreate(String roomCode);
-
-   void save();
 }

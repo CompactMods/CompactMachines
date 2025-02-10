@@ -41,10 +41,6 @@ public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachm
         return CMRoomDataLocations.ROOM_DATA_ATTACHMENTS.apply(server);
     }
 
-    public String roomCode() {
-        return roomCode;
-    }
-
     @Override
     public Codec<RoomDataAttachments> codec() {
         return codec;
@@ -52,6 +48,6 @@ public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachm
 
     @Override
     protected RoomDataAttachments.AdditionalData dataSupplier(RoomDataAttachments instance) {
-        return new RoomDataAttachments.AdditionalData(instance.roomCode());
+        return new RoomDataAttachments.AdditionalData(instance.roomCode);
     }
 }

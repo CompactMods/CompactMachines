@@ -1,5 +1,6 @@
 package dev.compactmods.machines.api.room.registration;
 
+import dev.compactmods.machines.api.data.Saveable;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import net.minecraft.server.MinecraftServer;
@@ -11,7 +12,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface IRoomRegistrar {
+public interface IRoomRegistrar extends Saveable {
 
     default MinecraftServer server() {
         return ServerLifecycleHooks.getCurrentServer();

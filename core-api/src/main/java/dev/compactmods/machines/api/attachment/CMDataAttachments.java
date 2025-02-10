@@ -6,7 +6,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
-import dev.compactmods.machines.api.room.upgrade.components.RoomUpgradeList;
+import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -30,8 +30,8 @@ public interface CMDataAttachments {
             .serialize(RoomEntryPoint.CODEC)
             .build());
 
-    Supplier<AttachmentType<RoomUpgradeInventory>> UPGRADE_ITEMS = ATTACHMENT_TYPES.register("upgrades", () -> AttachmentType
-            .serializable(RoomUpgradeInventory::new)
+    Supplier<AttachmentType<RoomUpgradeInventory>> UPGRADE_ITEMS = ATTACHMENT_TYPES.register("components", () -> AttachmentType
+            .serializable(() -> new RoomUpgradeInventory())
             .build());
 
     Supplier<AttachmentType<GlobalPos>> OPEN_MACHINE_POS = ATTACHMENT_TYPES.register("open_machine", () -> AttachmentType
@@ -39,9 +39,9 @@ public interface CMDataAttachments {
             .serialize(GlobalPos.CODEC, Predicates.alwaysFalse())
             .build());
 
-    Supplier<AttachmentType<RoomUpgradeList>> PERMANENT_UPGRADES = ATTACHMENT_TYPES.register("permanent_upgrades", () -> AttachmentType
-            .builder(() -> new RoomUpgradeList(List.of()))
-            .serialize(RoomUpgradeList.CODEC)
+    Supplier<AttachmentType<RoomUpgradeComponentList>> PERMANENT_UPGRADES = ATTACHMENT_TYPES.register("permanent_upgrades", () -> AttachmentType
+            .builder(() -> new RoomUpgradeComponentList(List.of()))
+            .serialize(RoomUpgradeComponentList.CODEC)
             .build());
 
     Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType

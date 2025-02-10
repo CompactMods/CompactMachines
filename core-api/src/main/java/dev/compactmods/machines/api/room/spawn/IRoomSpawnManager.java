@@ -1,5 +1,6 @@
 package dev.compactmods.machines.api.room.spawn;
 
+import dev.compactmods.machines.api.data.Saveable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;

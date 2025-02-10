@@ -47,7 +47,7 @@ public class CMRoomsSubcommand {
 //        long grandTotal = ls.build().sum();
 //        src.sendSuccess(() -> Component.translatable(CommandTranslations.IDs.MACHINE_REG_TOTAL, grandTotal).withStyle(ChatFormatting.GOLD), false);
 
-        final var roomCount = CompactMachines.roomApi().registrar().count();
+        final var roomCount = CompactMachines.roomRegistrar().count();
         src.sendSuccess(() -> Component.translatable(CommandTranslations.IDs.ROOM_COUNT, roomCount), false);
 
         return 0;

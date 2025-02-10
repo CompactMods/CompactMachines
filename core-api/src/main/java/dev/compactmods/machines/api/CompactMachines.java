@@ -3,14 +3,22 @@ package dev.compactmods.machines.api;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.CompactRoomGenerator;
-import dev.compactmods.machines.api.room.IRoomApi;
 import dev.compactmods.machines.api.room.RoomInstance;
+import dev.compactmods.machines.api.room.registration.IRoomRegistrar;
+import dev.compactmods.machines.api.room.spatial.IRoomChunkManager;
+import dev.compactmods.machines.api.room.spatial.IRoomChunks;
+import dev.compactmods.machines.api.room.spawn.IRoomSpawnManagers;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.data.IRoomDataAttachmentAccessor;
 import dev.compactmods.machines.api.room.history.IPlayerHistoryApi;
 import dev.compactmods.machines.api.room.upgrade.IRoomUpgradeAccessor;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeType;
+import dev.compactmods.machines.api.room.upgrade.IRoomUpgradeManager;
+import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
 import dev.compactmods.machines.api.room.upgrade.data.IRoomUpgradeDataAttachmentAccessor;
+import dev.compactmods.machines.api.server.service.RoomChunkManagerProvider;
+import dev.compactmods.machines.api.server.service.RoomRegistrarProvider;
+import dev.compactmods.machines.api.server.ServerServiceProvider;
+import dev.compactmods.machines.api.server.service.RoomSpawnManagersProvider;
 import dev.compactmods.machines.api.util.BlockSpaceUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +31,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -36,7 +43,7 @@ public class CompactMachines {
 
 	//region API Cache - NO TOUCHY - This class gives access to these services, or you can service locate them yourself!
 	@ApiStatus.Internal
-	private static IRoomApi ROOM_API;
+	private static IRoomRegistrar ROOM_REGISTRAR;
 
 	@ApiStatus.Internal
 	private static IRoomDataAttachmentAccessor ROOM_DATA_ACCESSOR;
@@ -45,10 +52,16 @@ public class CompactMachines {
 	private static IPlayerHistoryApi PLAYER_HISTORY_API;
 
 	@ApiStatus.Internal
-	private static IRoomUpgradeAccessor UPGRADE_ACCESSOR;
+	private static IRoomSpawnManagers SPAWN_MANAGERS;
+
+	@ApiStatus.Internal
+	private static IRoomUpgradeManager UPGRADE_MANAGER;
 
 	@ApiStatus.Internal
 	private static IRoomUpgradeDataAttachmentAccessor ROOM_UPGRADE_DATA_ACCESSOR;
+
+	@ApiStatus.Internal
+	private static IRoomChunkManager CHUNK_MANAGER;
 	//endregion
 
 	/**
@@ -56,18 +69,27 @@ public class CompactMachines {
 	 * Typically called after a new server fires its starting event; API consumers SHOULD NOT need
 	 * to call this!
 	 */
-	public static void reloadServices() {
-		reloadServices("dev.compactmods.machines");
+	public static void reloadServices(MinecraftServer server) {
+		reloadServices("dev.compactmods.machines", server);
 	}
 
-	public static void reloadServices(String prefix) {
+	public static void reloadServices(String prefix, MinecraftServer server) {
 		logger.debug("Reloading Compact services...");
-		ROOM_API = cmService(IRoomApi.class, prefix);
+		ROOM_REGISTRAR = serverProvidedService(IRoomRegistrar.class, RoomRegistrarProvider.class, prefix, server);
+		CHUNK_MANAGER = serverProvidedService(IRoomChunkManager.class, RoomChunkManagerProvider.class, prefix, server);
+		SPAWN_MANAGERS = serverProvidedService(IRoomSpawnManagers.class, RoomSpawnManagersProvider.class, prefix, server);
+
 		ROOM_DATA_ACCESSOR = cmService(IRoomDataAttachmentAccessor.class, prefix);
 		PLAYER_HISTORY_API = cmService(IPlayerHistoryApi.class, prefix);
-		UPGRADE_ACCESSOR = cmService(IRoomUpgradeAccessor.class, prefix);
+		UPGRADE_MANAGER = cmService(IRoomUpgradeManager.class, prefix);
 		ROOM_UPGRADE_DATA_ACCESSOR = cmService(IRoomUpgradeDataAttachmentAccessor.class, prefix);
 		logger.debug("Compact services loaded.");
+	}
+
+	private static <T, TP extends ServerServiceProvider<T>> T serverProvidedService(Class<T> ignored, Class<TP> providerClass, String packagePrefix, MinecraftServer server) {
+		final var registrarProvider = cmService(providerClass, packagePrefix);
+		if(registrarProvider == null) return null;
+		return registrarProvider.makeServiceInstance(server);
 	}
 
 	/**
@@ -104,12 +126,8 @@ public class CompactMachines {
 		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
 
-	public static DeferredRegister<RoomUpgradeType<?>> roomUpgradeDR(String namespace) {
-		return DeferredRegister.create(RoomUpgradeType.REGISTRY_KEY, namespace);
-	}
-
-	public static IRoomApi roomApi() {
-		return ROOM_API;
+	public static DeferredRegister<RoomUpgradeComponentType<?>> roomUpgradeDR(String namespace) {
+		return DeferredRegister.create(RoomUpgradeComponentType.REGISTRY_KEY, namespace);
 	}
 
 	public static IPlayerHistoryApi playerHistoryApi() {
@@ -117,7 +135,7 @@ public class CompactMachines {
 	}
 
 	public static Optional<RoomInstance> room(String roomCode) {
-		return ROOM_API.registrar().get(roomCode);
+		return ROOM_REGISTRAR.get(roomCode);
 	}
 
 	/**
@@ -129,7 +147,7 @@ public class CompactMachines {
 	 * @return
 	 */
 	public static RoomInstance newRoom(MinecraftServer server, RoomTemplate template, UUID owner) throws MissingDimensionException {
-		final var instance = ROOM_API.registrar().createNew(template, owner);
+		final var instance = ROOM_REGISTRAR.createNew(template, owner);
 		final var compactDim = CompactDimension.forServer(server);
 		CompactRoomGenerator.generateRoom(compactDim, instance.boundaries().outerBounds());
 
@@ -139,7 +157,7 @@ public class CompactMachines {
 			}
 		}
 
-		final var spawnManager = ROOM_API.spawnManager(instance.code());
+		final var spawnManager = SPAWN_MANAGERS.get(instance.code());
 		template.optionalFloor().ifPresent(floorState -> {
 			var fixedSpawn = instance.boundaries()
 				.defaultSpawn()
@@ -156,10 +174,6 @@ public class CompactMachines {
 		return instance;
 	}
 
-	public static boolean isValidRoomCode(String roomCode) {
-		return ROOM_API.roomCodeValidator().test(roomCode);
-	}
-
 	public static Optional<? extends IAttachmentHolder> existingRoomData(String code) {
 		return ROOM_DATA_ACCESSOR.get(code);
 	}
@@ -172,8 +186,8 @@ public class CompactMachines {
 		return ROOM_DATA_ACCESSOR.getOrCreate(code);
 	}
 
-	public static IRoomUpgradeAccessor upgradeAccessor() {
-		return UPGRADE_ACCESSOR;
+	public static IRoomUpgradeAccessor upgradeAccessor(RoomInstance instance) {
+		return UPGRADE_MANAGER.upgradeAccessor(instance);
 	}
 
 	public static IRoomUpgradeDataAttachmentAccessor upgradeDataAccessor() {
@@ -182,5 +196,25 @@ public class CompactMachines {
 
 	public static IAttachmentHolder roomUpgradeData(String roomCode, UUID upgradeId) {
 		return ROOM_UPGRADE_DATA_ACCESSOR.getOrCreate(roomCode, upgradeId);
+	}
+
+	public static IRoomUpgradeManager upgradeManager() {
+		return UPGRADE_MANAGER;
+	}
+
+	public static IRoomRegistrar roomRegistrar() {
+		return ROOM_REGISTRAR;
+	}
+
+	public static IRoomSpawnManagers spawnManagers() {
+		return SPAWN_MANAGERS;
+	}
+
+	public static IRoomChunkManager chunkManager() {
+		return CHUNK_MANAGER;
+	}
+
+	public static IRoomChunks roomChunks(String code) {
+		return chunkManager().get(code);
 	}
 }

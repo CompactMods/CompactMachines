@@ -21,7 +21,7 @@ public class NewRoomBuilder implements IRoomBuilder {
     private AABB boundaries = AABB.ofSize(Vec3.ZERO, 1, 1, 1);
     UUID owner;
 
-    NewRoomBuilder() {
+    public NewRoomBuilder() {
         this.code = RoomCodeGenerator.generateRoomId();
     }
 
@@ -51,10 +51,6 @@ public class NewRoomBuilder implements IRoomBuilder {
     }
 
     public RoomInstance build(MinecraftServer server) {
-        try {
-            return new RoomInstance(server, CompactDimension.forServer(server), code, color, () -> boundaries);
-        } catch (MissingDimensionException e) {
-            throw new RuntimeException(e);
-        }
+        return new RoomInstance(server, CompactDimension.LEVEL_KEY, code, color, () -> boundaries);
     }
 }

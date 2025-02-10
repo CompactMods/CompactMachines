@@ -28,7 +28,7 @@ public class SpawnSubcommand {
         final var src = ctx.getSource();
         final var roomCode = StringArgumentType.getString(ctx, "room");
 
-        final var spawnManager = CompactMachines.roomApi().spawnManager(roomCode);
+        final var spawnManager = CompactMachines.spawnManagers().get(roomCode);
 
         // FIXME roomProvider.setDefaultSpawn();
         src.sendSuccess(() -> Component.translatable(CommandTranslations.IDs.SPAWN_CHANGED_SUCCESSFULLY, roomCode), true);

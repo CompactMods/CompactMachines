@@ -58,9 +58,13 @@ sourceSets.test {
 neoForge {
     version = neoforged.versions.neoforge
 
-    this.mods.create(modId) {
+    val cmMain = this.mods.create(modId) {
         modSourceSets.add(coreApi.sourceSets.main)
         modSourceSets.add(sourceSets.main)
+
+        if(System.getenv().containsKey("CI")) {
+            modSourceSets.add(sourceSets.test)
+        }
     }
 
     unitTest {
@@ -113,24 +117,20 @@ neoForge {
         create("server") {
             server()
             gameDirectory.set(file("runs/server"))
-
-            systemProperty("forge.enabledGameTestNamespaces", modId)
             programArgument("nogui")
-
-            environment.put("CM_TEST_RESOURCES", file("src/test/resources").path)
-
-            sourceSet = project.sourceSets.test
         }
 
         create("gameTestServer") {
             type = "gameTestServer"
             gameDirectory.set(file("runs/gametest"))
 
-            systemProperty("forge.enabledGameTestNamespaces", modId)
+            systemProperty("neoforge.enabledGameTestNamespaces", listOf(modId, modId + "_test").joinToString(","))
             environment.put("CM_TEST_RESOURCES", file("src/test/resources").path)
             environment.put("CM_GAMETEST_ENABLED", "true")
 
-            sourceSet = project.sourceSets.test
+            loadedMods.add(cmMain)
+
+            sourceSet.set(sourceSets.test)
         }
     }
 }

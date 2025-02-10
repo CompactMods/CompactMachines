@@ -31,7 +31,7 @@ public class CMRebindSubcommand {
 
         final var LOGS = LoggingUtil.modLog();
 
-        final var roomProvider = CompactMachines.roomApi().registrar();
+        final var roomProvider = CompactMachines.roomRegistrar();
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
         final var roomCode = StringArgumentType.getString(ctx, "bindTo");
 

@@ -43,7 +43,7 @@ public class RoomUpgradeUIMapping {
                   PacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(currentRoom, true));
 			  });
 		  } else {
-			  player.displayClientMessage(Component.literal("You must enable room upgrades for this keybind!"), true);
+			  player.displayClientMessage(Component.literal("You must enable room components for this keybind!"), true);
 		  }
 	  }
    }

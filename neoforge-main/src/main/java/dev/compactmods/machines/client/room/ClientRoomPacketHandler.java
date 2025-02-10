@@ -10,6 +10,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.phys.AABB;
 import org.joml.Vector3f;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class ClientRoomPacketHandler {
         final var mc = Minecraft.getInstance();
         if(mc.screen instanceof MachineRoomScreen mrs) {
 
-            var bounds = blocks.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO);
+            var bounds = AABB.of(blocks.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO));
 
             var virtualLevel = new VirtualLevel(Minecraft.getInstance().level.registryAccess(), true, level -> {
                 level.refreshBlockEntityModels();

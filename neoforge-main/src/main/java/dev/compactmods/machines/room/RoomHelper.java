@@ -37,7 +37,7 @@ public abstract class RoomHelper {
     public static boolean entityInsideRoom(LivingEntity entity, String roomCode) {
         // Recursion check. Player is inside the room being queried.
         if (entity.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
-            return CompactMachines.roomApi().chunks(roomCode).hasChunk(entity.chunkPosition());
+            return CompactMachines.roomChunks(roomCode).hasChunk(entity.chunkPosition());
         }
 
         return false;
@@ -80,7 +80,7 @@ public abstract class RoomHelper {
             return serv.submit(() -> {
                 player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
-                final var spawns = CompactMachines.roomApi().spawnManager(room.code()).spawns();
+                final var spawns = CompactMachines.spawnManagers().get(room.code()).spawns();
                 final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
                 player.changeDimension(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
 
