@@ -6,6 +6,7 @@ import dev.compactmods.gander.render.geometry.LevelBakery;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.MachineConstants;
+import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.room.MachineRoomScreen;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
@@ -38,7 +39,7 @@ public class ClientMachinePacketHandler {
     public static void openRoomPreviewScreen(OpenMachinePreviewScreenPacket pkt) {
         final var mc = Minecraft.getInstance();
         mc.setScreen(new MachineRoomScreen(Component.empty(), pkt.machinePos(), pkt.roomCode()));
-        if(mc.screen instanceof MachineRoomScreen mrs) {
+        if(mc.screen instanceof MachineRoomScreen mrs && ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
             CompletableFuture<BakedLevel> setup = CompletableFuture.supplyAsync(() -> {
                 var virtualLevel = new VirtualLevel(Minecraft.getInstance().level.registryAccess(), true);
                 var bounds = AABB.of(pkt.internalBlocks().getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO));

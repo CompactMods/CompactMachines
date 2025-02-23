@@ -8,6 +8,7 @@ import dev.compactmods.gander.ui.widget.SpatialRenderer;
 import dev.compactmods.machines.CommonConfig;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.shrinking.PSDTags;
+import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.widget.ImageButtonBuilder;
 import dev.compactmods.machines.compat.curios.CuriosCompat;
 import dev.compactmods.machines.feature.CMFeatureFlags;
@@ -51,15 +52,20 @@ public class MachineRoomScreen extends Screen {
     private ScreenRectangle screenArea;
 
     private boolean isLoadingRoomPreview;
+    private boolean roomPreviewEnabled = true;
 
     public MachineRoomScreen(Component title, GlobalPos machinePos, String roomCode) {
         super(title);
         this.machinePos = machinePos;
         this.roomCode = roomCode;
 
-        // Send packet to server for block data
-        this.isLoadingRoomPreview = true;
-        PacketDistributor.sendToServer(new PlayerStartedRoomTrackingPacket(roomCode));
+        if(ClientConfig.ENABLE_ROOM_PREVIEWS.get()) {
+            // Send packet to server for block data
+            this.isLoadingRoomPreview = true;
+            PacketDistributor.sendToServer(new PlayerStartedRoomTrackingPacket(roomCode));
+        } else {
+            this.roomPreviewEnabled = false;
+        }
     }
 
     @Override
@@ -98,34 +104,36 @@ public class MachineRoomScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         final float rotateSpeed = 1 / 12f;
 
-        if (keyCode == InputConstants.KEY_R) {
-            renderer.camera().resetLook();
-            renderer.recalculateTranslucency();
-            return true;
-        }
+        if(roomPreviewEnabled) {
+            if (keyCode == InputConstants.KEY_R) {
+                renderer.camera().resetLook();
+                renderer.recalculateTranslucency();
+                return true;
+            }
 
-        if (keyCode == InputConstants.KEY_UP) {
-            renderer.camera().lookUp(rotateSpeed);
-            renderer.recalculateTranslucency();
-            return true;
-        }
+            if (keyCode == InputConstants.KEY_UP) {
+                renderer.camera().lookUp(rotateSpeed);
+                renderer.recalculateTranslucency();
+                return true;
+            }
 
-        if (keyCode == InputConstants.KEY_DOWN) {
-            renderer.camera().lookDown(rotateSpeed);
-            renderer.recalculateTranslucency();
-            return true;
-        }
+            if (keyCode == InputConstants.KEY_DOWN) {
+                renderer.camera().lookDown(rotateSpeed);
+                renderer.recalculateTranslucency();
+                return true;
+            }
 
-        if (keyCode == InputConstants.KEY_LEFT) {
-            renderer.camera().lookLeft(rotateSpeed);
-            renderer.recalculateTranslucency();
-            return true;
-        }
+            if (keyCode == InputConstants.KEY_LEFT) {
+                renderer.camera().lookLeft(rotateSpeed);
+                renderer.recalculateTranslucency();
+                return true;
+            }
 
-        if (keyCode == InputConstants.KEY_RIGHT) {
-            renderer.camera().lookRight(rotateSpeed);
-            renderer.recalculateTranslucency();
-            return true;
+            if (keyCode == InputConstants.KEY_RIGHT) {
+                renderer.camera().lookRight(rotateSpeed);
+                renderer.recalculateTranslucency();
+                return true;
+            }
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -133,7 +141,7 @@ public class MachineRoomScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (renderer != null) {
+        if (roomPreviewEnabled && renderer != null) {
             var camPosition = this.renderer.camera().getPosition();
 
             // Only allow zooming up to 2 blocks from center
@@ -143,9 +151,11 @@ public class MachineRoomScreen extends Screen {
             // Zoom out up to 50 blocks away from center
             if (scrollY < 0 && camPosition.distanceTo(Vec3.ZERO) <= 100)
                 this.renderer.zoom(scrollY);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private static boolean checkForShrinkingDevice() {
@@ -206,11 +216,6 @@ public class MachineRoomScreen extends Screen {
                 screenArea.right(), screenArea.bottom(),
                 FastColor.ARGB32.color(250, 8, 90, 120));
 
-//        guiGraphics.hLine(screenArea.left(), screenArea.right(), screenArea.top(), CommonColors.WHITE);
-//        guiGraphics.hLine(screenArea.left(), screenArea.right(), screenArea.bottom(), CommonColors.WHITE);
-//        guiGraphics.vLine(screenArea.left(), screenArea.top(), screenArea.bottom(), CommonColors.WHITE);
-//        guiGraphics.vLine(screenArea.right(), screenArea.top(), screenArea.bottom(), CommonColors.WHITE);
-
         pose.popPose();
     }
 
@@ -228,11 +233,23 @@ public class MachineRoomScreen extends Screen {
         pose.popPose();
 
         // Render loading
-        if(isLoadingRoomPreview) {
+        if(roomPreviewEnabled && isLoadingRoomPreview) {
             pose.pushPose();
             {
                 pose.translate(0, 0, 110);
                 final var loadingMsg = Component.translatableWithFallback("compactmachines.preview.loading", "Loading room preview...");
+                graphics.drawCenteredString(font, loadingMsg,
+                        this.width / 2,
+                        (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
+            }
+            pose.popPose();
+        }
+
+        if(!roomPreviewEnabled) {
+            pose.pushPose();
+            {
+                pose.translate(0, 0, 110);
+                final var loadingMsg = Component.translatableWithFallback("compactmachines.preview.disabled", "Room Preview Disabled");
                 graphics.drawCenteredString(font, loadingMsg,
                         this.width / 2,
                         (height / 2) - (font.lineHeight / 2), 0xFFDEDEDE);
