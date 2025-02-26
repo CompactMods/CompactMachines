@@ -94,6 +94,7 @@ neoForge {
 
             var additional = this.additionalRuntimeClasspathConfiguration
             additional.dependencies.add(compactmods.feather.get())
+            additional.dependencies.add(libs.jnanoid.get())
         }
 
         create("client") {
@@ -209,7 +210,6 @@ dependencies {
         compileOnly(libs.jnanoid)
         testImplementation(libs.jnanoid)
         jarJar(libs.jnanoid)
-        // additionalRuntimeClasspath(libs.jnanoid)
 
         compileOnly(coreApi)
         testCompileOnly(coreApi)

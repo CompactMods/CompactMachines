@@ -8,21 +8,14 @@ permissions:
 
 on:
   workflow_dispatch:
-    inputs:
-      skip_tests:
-        description: Skip Tests
-        type: boolean
-        default: false
-        required: true
   push:
     tags-ignore:
       - v*
-    paths-ignore:
-      - "README.md"
-      - "LICENSE"
-      - ".github/**/*"
-      - "**/*.gradle.kts"
-      - "**/gradle.properties"
+    paths:
+      - "gradle/*.versions.toml"
+      - "core-api/**"
+      - "neoforge-datagen/**"
+      - "neoforge-main/**"
 
 jobs:
   vars:
