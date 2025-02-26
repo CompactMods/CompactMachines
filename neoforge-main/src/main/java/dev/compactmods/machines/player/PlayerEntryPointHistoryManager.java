@@ -6,7 +6,6 @@ import dev.compactmods.feather.MemoryGraph;
 import dev.compactmods.feather.edge.impl.EmptyEdge;
 import dev.compactmods.feather.node.Node;
 import dev.compactmods.feather.traversal.GraphNodeTransformationFunction;
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.api.room.history.IPlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.PlayerRoomHistoryEntry;
@@ -137,9 +136,6 @@ public class PlayerEntryPointHistoryManager implements CodecHolder<PlayerEntryPo
     }
 
     public RoomEntryResult enterRoom(UUID player, PlayerRoomHistoryEntry history) {
-        if (!CompactMachines.roomRegistrar().isRegistered(history.roomCode()))
-            return RoomEntryResult.FAILED_ROOM_INVALID;
-
         return addRoomEntryUnsafe(player, history);
     }
 

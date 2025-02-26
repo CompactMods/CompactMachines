@@ -25,8 +25,6 @@ public class PlayerHistoryTrackerTests {
     @TestHolder
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void failsPlayerGoingTooFar(final GameTestHelper test) {
-        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
-
         final var history = new PlayerEntryPointHistoryManager(1);
 
         final var player = test.makeMockPlayer(GameType.SURVIVAL);
@@ -43,8 +41,6 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void canGetPlayerHistory(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
-
         final var history = new PlayerEntryPointHistoryManager(5);
 
         final var player = test.makeMockPlayer(GameType.SURVIVAL);
@@ -74,8 +70,6 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void canRemovePlayerHistory(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
-
         final var history = new PlayerEntryPointHistoryManager(5);
         final var player = test.makeMockPlayer(GameType.SURVIVAL);
 
@@ -103,8 +97,6 @@ public class PlayerHistoryTrackerTests {
     @GameTest(timeoutTicks = 1400)
     @EmptyTemplate(EmptyTestSizes.ONE_CUBED)
     public static void testDataLogic(final GameTestHelper test) throws InterruptedException {
-        CompactMachines.reloadServices("dev.compactmods.machines.test", test.getLevel().getServer());
-
         final var history = new PlayerEntryPointHistoryManager(5);
 
         final var player = test.makeMockPlayer(GameType.SURVIVAL);
