@@ -31,7 +31,7 @@ java {
 }
 
 neoForge {
-    version = neoforged.versions.neoforge
+    version = neoforged.versions.neoforge.get()
 
     parchment {
         enabled = true

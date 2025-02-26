@@ -3,6 +3,9 @@ name: Continuous Integration + Announcement
 env:
   GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
 
+permissions:
+  contents: write # For creating and pushing the tag
+
 on:
   workflow_dispatch:
     inputs:
@@ -32,8 +35,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 150
-          fetch-tags: true
+          fetch-depth: 1
+
+      - name: Fetch Tags
+        run: git fetch --tags
 
       - name: Version
         id: version
@@ -64,6 +69,22 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.vars.outputs.version }}
+
+  create-tag:
+    name: Create tag
+    needs: [vars, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/releases/v${{ needs.vars.outputs.version }}',
+              sha: context.sha
+            })
 
   announce:
     name: Discord Announcement

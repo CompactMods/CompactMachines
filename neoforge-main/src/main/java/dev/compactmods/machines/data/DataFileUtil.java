@@ -30,8 +30,7 @@ public class DataFileUtil {
 			IOUtilities.cleanupTempFiles(Path.of(file.getParent()), file.getName());
 			try (var is = new FileInputStream(file)) {
 				final var tag = NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
-				return codec.parse(NbtOps.INSTANCE, tag.contains("data") ? tag.getCompound("data") : new CompoundTag())
-					.getOrThrow();
+				return tag.read("data", codec).orElseThrow();
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

@@ -62,12 +62,7 @@ public class CMKeyedDataFileManager<Key, T extends CMDataFile & CodecHolder<T>> 
 	  cache.forEach((key, data) -> {
 		 var fullData = new CompoundTag();
 		 fullData.putString("version", data.getDataVersion());
-
-		 var fileData = data.codec()
-			 .encodeStart(NbtOps.INSTANCE, data)
-			 .getOrThrow();
-
-		 fullData.put("data", fileData);
+		 fullData.store("data", data.codec(), data);
 
 		 try {
 			 IOUtilities.writeNbtCompressed(fullData, data.getDataLocation(server).resolve(getFileKey(key) + ".dat"));

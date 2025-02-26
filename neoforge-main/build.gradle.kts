@@ -56,7 +56,9 @@ sourceSets.test {
 }
 
 neoForge {
-    version = neoforged.versions.neoforge
+    version = neoforged.versions.neoforge.get()
+
+    interfaceInjectionData.from("src/main/resources/interfaces.json")
 
     val cmMain = this.mods.create(modId) {
         modSourceSets.add(coreApi.sourceSets.main)
@@ -88,6 +90,11 @@ neoForge {
             if (!System.getenv().containsKey("CI")) {
               jvmArgument("-XX:+AllowEnhancedClassRedefinition")
             }
+
+            systemProperties.put("terminal.ansi", "true")
+
+            var additional = this.additionalRuntimeClasspathConfiguration
+            additional.dependencies.add(compactmods.feather.get())
         }
 
         create("client") {
@@ -188,6 +195,13 @@ repositories {
             includeGroup("top.theillusivec4.curios")
         }
     }
+
+    // saps.dev Maven (KubeJS and Rhino)
+    maven("https://maven.saps.dev/minecraft") {
+        content {
+            includeGroup("dev.latvian.mods")
+        }
+    }
 }
 
 dependencies {
@@ -196,7 +210,7 @@ dependencies {
         compileOnly(libs.jnanoid)
         testImplementation(libs.jnanoid)
         jarJar(libs.jnanoid)
-        additionalRuntimeClasspath(libs.jnanoid)
+        // additionalRuntimeClasspath(libs.jnanoid)
 
         compileOnly(coreApi)
         testCompileOnly(coreApi)
@@ -211,7 +225,6 @@ dependencies {
     compileOnly(compactmods.feather)
     testImplementation(compactmods.feather)
     jarJar(compactmods.feather) { isTransitive = false }
-    additionalRuntimeClasspath(compactmods.feather)
 
     implementation(compactmods.spatial)
     testImplementation(compactmods.spatial)
@@ -224,6 +237,10 @@ dependencies {
 
     // Curios API
     compileOnly(libs.curios)
+
+    // KubeJS Support
+    compileOnly(mods.kubeJS)
+    compileOnly(mods.rhino)
 }
 
 tasks.withType<Test> {
@@ -258,7 +275,8 @@ tasks.withType<Jar> {
                 "Implementation-Timestamp" to now,
                 "Minecraft-Version" to mojang.versions.minecraft.get(),
                 "NeoForge-Version" to neoforged.versions.neoforge.get(),
-                "Main-Commit" to gitVersion
+                "Main-Commit" to gitVersion,
+                "MixinConfigs" to "compactmachines.mixins.json"
             )
         )
     }

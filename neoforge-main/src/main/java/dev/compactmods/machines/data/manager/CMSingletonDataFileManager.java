@@ -56,12 +56,7 @@ public class CMSingletonDataFileManager<T extends CMDataFile & CodecHolder<T>> i
 
             var fullData = new CompoundTag();
             fullData.putString("version", instance.getDataVersion());
-
-            var fileData = instance.codec()
-                    .encodeStart(NbtOps.INSTANCE, instance)
-                    .getOrThrow();
-
-            fullData.put("data", fileData);
+            fullData.store("data", instance.codec(), instance);
 
             try {
                 IOUtilities.writeNbtCompressed(fullData, instance.getDataLocation(server).resolve(dataKey + ".dat"));
