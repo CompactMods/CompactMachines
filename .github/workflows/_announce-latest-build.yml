@@ -87,14 +87,19 @@ jobs:
           name: release
           path: .
 
+      - name: Announce Timestamp
+        id: timestamp
+        run: echo "buildTimestamp=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
+
       - name: Announce Release
-        uses: compactmods/discord-releaser@0.1.5
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        uses: tsickert/discord-webhook@v6.0.0
         with:
-          filename: ${{ needs.get-package-info.outputs.jarFile }}
-          channel: ${{ secrets.NIGHTLY_CHANNEL_ID }}
-          modName: Compact Machines
-          modVersion: ${{ needs.get-package-info.outputs.version }}
-          thumbnail: https://media.forgecdn.net/avatars/10/602/635460270800375500.png
-          mcVersion: ${{ needs.get-package-info.outputs.mcVersion }}
+          webhook-url: ${{ secrets.DISCORD_NIGHTLY_WEBHOOK }}
+          avatar-url: "https://compactmods.dev/personal-shrinking-device.png"
+          content: "**New Version Available: Compact Machines v${{ needs.get-package-info.outputs.version }}**"
+          filename: ${{ fromJson(steps.info.outputs.latestJson)[0].name }}
+          embed-title: "**Mod File Information**"
+          embed-description: "Filename: ${{ fromJson(steps.info.outputs.latestJson)[0].name}}"
+          embed-url: "https://www.curseforge.com/minecraft/mc-mods/compact-machines"
+          embed-thumbnail-url: "https://media.forgecdn.net/avatars/thumbnails/10/602/64/64/635460270800375500.png"
+          embed-timestamp: ${{ steps.timestamp.outputs.buildTimestamp }}

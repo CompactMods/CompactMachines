@@ -8,7 +8,6 @@ var envVersion: String = System.getenv("VERSION") ?: "9.9.9"
 if (envVersion.startsWith("v"))
     envVersion = envVersion.trimStart('v')
 
-val isRelease: Boolean = (System.getenv("RELEASE") ?: "false").equals("true", true)
 val modId: String = "compactmachines"
 
 val coreApi = project(":core-api")
@@ -131,7 +130,7 @@ neoForge {
             type = "gameTestServer"
             gameDirectory.set(file("runs/gametest"))
 
-            systemProperty("neoforge.enabledGameTestNamespaces", listOf(modId, modId + "_test").joinToString(","))
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
             environment.put("CM_TEST_RESOURCES", file("src/test/resources").path)
             environment.put("CM_GAMETEST_ENABLED", "true")
 
