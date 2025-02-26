@@ -192,7 +192,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
 
     public static class Data {
         public static final Codec<Data> CODEC = RecordCodecBuilder.create(i -> i.group(
-                ExtraCodecs.POSITIVE_INT.fieldOf("cooldown").forGetter(d -> d.cooldown)
+                ExtraCodecs.NON_NEGATIVE_INT.fieldOf("cooldown").forGetter(d -> d.cooldown)
         ).apply(i, Data::new));
 
         public int cooldown;
