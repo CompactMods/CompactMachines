@@ -92,7 +92,7 @@ jobs:
         run: echo "buildTimestamp=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
       - name: Announce Release
-        uses: tsickert/discord-webhook@v6.0.0
+        uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_NIGHTLY_WEBHOOK }}
           avatar-url: "https://compactmods.dev/personal-shrinking-device.png"
