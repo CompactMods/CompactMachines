@@ -50,7 +50,6 @@ jobs:
       version: ${{ inputs.version }}
 
   build:
-    if: ${{ inputs.release_packages }}
     name: JAR
     needs: [ tests ]
     uses: ./.github/workflows/_make-release-jar.yml
