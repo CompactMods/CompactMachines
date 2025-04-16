@@ -42,25 +42,33 @@ jobs:
       version: ${{ inputs.version }}
 
   tests:
-    needs: [datagen]
     if: ${{ inputs.run_tests == 'true' }}
+    needs: [ datagen ]
     uses: ./.github/workflows/_run-gametests.yml
+    secrets: inherit
+    with:
+      version: ${{ inputs.version }}
+
+  build:
+    if: ${{ inputs.release_packages == 'false' }}
+    needs: [ tests ]
+    uses: ./.github/workflows/_manual_build.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
 
   publish:
     if: ${{ inputs.release_packages == 'true' }}
-    needs: [ tests]
+    needs: [ tests ]
     uses: ./.github/workflows/_publish.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
 
   create-tag:
-    name: Create tag
-    needs: [publish]
     if: ${{ inputs.add_version_tag == 'true' }}
+    name: Create tag
+    needs: [ publish ]
     runs-on: ubuntu-latest
     steps:
       - name: Create tag
@@ -75,15 +83,15 @@ jobs:
             })
 
   announce:
-    name: Discord Announcement
     if: ${{ inputs.announce == 'true' }}
+    name: Discord Announcement
     needs: [ publish ]
     uses: ./.github/workflows/_announce-latest-build.yml
     secrets: inherit
 
   release-cf:
-    name: Release Alpha on CurseForge
     if: ${{ inputs.release_cf == 'true' }}
+    name: Release Alpha on CurseForge
     needs: [ publish ]
     uses: ./.github/workflows/_release-cf-alpha.yml
     secrets: inherit
