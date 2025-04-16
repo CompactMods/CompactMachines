@@ -1,0 +1,61 @@
+# REQUIRES DATAGEN TO BE CALLED IN A JOB BEFORE THIS!!
+
+name: Make Release JAR
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  publish:
+    name: Publish Code as Releasable JAR - ${{ inputs.version }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Pull Built Generated Data
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-data
+          path: neoforge-main/src/generated/resources
+
+      - name: Pull Compilation Data (Core)
+        uses: actions/download-artifact@v4
+        with:
+          name: build-core
+          path: core-api/build
+
+      - name: Pull Compilation Data (Main)
+        uses: actions/download-artifact@v4
+        with:
+          name: build-main
+          path: neoforge-main/build
+
+      - name: JAR
+        run: ./gradlew :neoforge-main:jar
+        env:
+          VERSION: ${{ inputs.version }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Store Built Assets
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-jars
+          path: neoforge-main/build/libs
