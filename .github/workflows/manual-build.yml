@@ -42,7 +42,7 @@ jobs:
       version: ${{ inputs.version }}
 
   tests:
-    if: ${{ inputs.run_tests == 'true' }}
+    if: ${{ inputs.run_tests }}
     needs: [ datagen ]
     uses: ./.github/workflows/_run-gametests.yml
     secrets: inherit
@@ -50,7 +50,7 @@ jobs:
       version: ${{ inputs.version }}
 
   build:
-    if: ${{ inputs.release_packages == 'false' }}
+    if: ${{ inputs.release_packages }}
     name: JAR
     needs: [ tests ]
     uses: ./.github/workflows/_make-release-jar.yml
@@ -59,7 +59,7 @@ jobs:
       version: ${{ inputs.version }}
 
   publish:
-    if: ${{ inputs.release_packages == 'true' }}
+    if: ${{ inputs.release_packages }}
     needs: [ tests ]
     uses: ./.github/workflows/_publish.yml
     secrets: inherit
@@ -67,7 +67,7 @@ jobs:
       version: ${{ inputs.version }}
 
   create-tag:
-    if: ${{ inputs.add_version_tag == 'true' }}
+    if: ${{ inputs.add_version_tag }}
     name: Create tag
     needs: [ publish ]
     runs-on: ubuntu-latest
@@ -84,14 +84,14 @@ jobs:
             })
 
   announce:
-    if: ${{ inputs.announce == 'true' }}
+    if: ${{ inputs.announce }}
     name: Discord Announcement
     needs: [ publish ]
     uses: ./.github/workflows/_announce-latest-build.yml
     secrets: inherit
 
   release-cf:
-    if: ${{ inputs.release_cf == 'true' }}
+    if: ${{ inputs.release_cf }}
     name: Release Alpha on CurseForge
     needs: [ publish ]
     uses: ./.github/workflows/_release-cf-alpha.yml
