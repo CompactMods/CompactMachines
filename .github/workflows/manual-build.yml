@@ -53,7 +53,7 @@ jobs:
     if: ${{ inputs.release_packages == 'false' }}
     name: JAR
     needs: [ tests ]
-    uses: ./.github/workflows/_make_release_jar.yml
+    uses: ./.github/workflows/_make-release-jar.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
