@@ -51,8 +51,9 @@ jobs:
 
   build:
     if: ${{ inputs.release_packages == 'false' }}
+    name: JAR
     needs: [ tests ]
-    uses: ./.github/workflows/_manual_build.yml
+    uses: ./.github/workflows/_make_release_jar.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
