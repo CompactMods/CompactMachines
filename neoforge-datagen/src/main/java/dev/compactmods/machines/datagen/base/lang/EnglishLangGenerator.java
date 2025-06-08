@@ -78,6 +78,12 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         add(RoomUpgradeUIMapping.NAME, "Open Room Upgrade Screen");
 
         addJade();
+
+        add("gamerule.compactmachines.allow_creative_oob", "Allow Creative Players to Outside of Machine Bounds");
+        add("gamerule.compactmachines.allow_spectator_oob", "Allow Spectators to Outside of Machine Bounds");
+        add("gamerule.compactmachines.allow_survival_oob", "Allow Survival Players to Outside of Machine Bounds");
+        add("gamerule.compactmachines.damage_oob", "Damage Players Outside of Machine Bounds");
+        add("gamerule.compactmachines.damage_psd_on_next", "Damage Players Using Personal Shrinking Device on Next Use");
     }
 
     private void blocksAndItems() {
