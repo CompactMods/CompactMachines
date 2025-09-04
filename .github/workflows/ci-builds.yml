@@ -38,7 +38,7 @@ jobs:
         uses: paulhatch/semantic-version@v5.4.0
         with:
           change_path: "neoforge-main"
-          version_format: "v${major}.${minor}.${patch}"
+          version_format: "${major}.${minor}.${patch}"
           search_commit_body: true
           bump_each_commit: true
 
