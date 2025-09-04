@@ -52,6 +52,9 @@ jobs:
           echo "Version: ${{ steps.download-info.outputs.version }}"
           cat compactmachines.json
 
+      - name: Version JSON
+        run: echo "{\"version\": \"${{ steps.download-info.outputs.version }}\"}" >> "release/version-info.json"
+
       - name: Read info into variable [latest]
         id: info
         run: echo "latestJson=$(cat compactmachines.json)" >> $GITHUB_OUTPUT
