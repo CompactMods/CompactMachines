@@ -58,7 +58,6 @@ jobs:
 
       - name: Download JAR and prepare artifacts
         run: |
-          mkdir release
           curl -L "${{ fromJson(steps.info.outputs.latestJson)[0].url }}" -o "release/${{ fromJson(steps.info.outputs.latestJson)[0].name }}"
           mv compactmachines.json release/compactmachines.json     
 
