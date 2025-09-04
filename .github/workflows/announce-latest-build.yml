@@ -6,29 +6,12 @@ on: workflow_dispatch
 
 jobs:
   get-package-info:
-    name: Latest Package Info
-    runs-on: ubuntu-22.04
-    outputs:
-      version: ${{ steps.download-info.outputs.version }}
-    steps:
-      - name: Download Package Info
-        id: download-info
-        uses: compactmods/dl-package-info@1.0.3
-        env:
-          GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          owner: compactmods
-          repo: compactmachines
-          group: dev.compactmods.compactmachines.compactmachines-neoforge
-          filter: "^compactmachines-neoforge-(?:[\\d\\.]+).jar$"
-          outputFile: compactmachines.json
-
-      - name: Debug output
-        run: |
-          echo "Version: ${{ steps.download-info.outputs.version }}"
-          cat compactmachines.json
+    name: Get Package Info
+    uses: ./.github/workflows/_download-latest-package-info.yml
+    secrets: inherit
 
   announce:
     name: Discord Announcement
+    needs: [get-package-info]
     uses: ./.github/workflows/_announce-latest-build.yml
     secrets: inherit

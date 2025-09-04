@@ -11,74 +11,8 @@ on:
         required: true
 
 jobs:
-  get-package-info:
-    name: Get Latest Package Info
-    runs-on: ubuntu-22.04
-    outputs:
-      version: ${{ steps.download-info.outputs.version }}
-      jarFile: ${{ fromJson(steps.info.outputs.latestJson)[0].name }}
-      mcVersion: ${{steps.minecraft.outputs.prop}}
-      neoVersion: ${{steps.neoforge.outputs.prop}}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Setup Groovy
-        uses: wtfjoke/setup-groovy@v2
-        with:
-          groovy-version: '4.x'
-
-      - name: Download Package Info
-        id: download-info
-        uses: compactmods/dl-package-info@1.0.3
-        env:
-          GQL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          owner: compactmods
-          repo: compactmachines
-          group: dev.compactmods.compactmachines.compactmachines-neoforge
-          filter: "^compactmachines-neoforge-(?:[\\d\\.]+).jar$"
-          outputFile: compactmachines.json
-
-      - name: Debug output
-        run: |
-          echo "Version: ${{ steps.download-info.outputs.version }}"
-          cat compactmachines.json
-
-      - name: Read info into variable [latest]
-        id: info
-        run: echo "latestJson=$(cat compactmachines.json)" >> $GITHUB_OUTPUT
-
-      - name: Download JAR and prepare artifacts
-        run: |
-          mkdir release
-          curl -L "${{ fromJson(steps.info.outputs.latestJson)[0].url }}" -o "release/${{ fromJson(steps.info.outputs.latestJson)[0].name }}"
-          mv compactmachines.json release/compactmachines.json     
-
-      - name: MC Version
-        id: minecraft
-        run:  groovy read-manifest.groovy release/${{ fromJson(steps.info.outputs.latestJson)[0].name }} "Minecraft-Version" >> "$GITHUB_OUTPUT"
-
-      - name: NeoForge Version
-        id: neoforge
-        run:  groovy read-manifest.groovy release/${{ fromJson(steps.info.outputs.latestJson)[0].name }} "NeoForge-Version" >> "$GITHUB_OUTPUT"
-
-      - name: Add Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release
-          path: release
-
   announce:
     name: Discord Announcement
-    needs: [ get-package-info ]
     runs-on: ubuntu-22.04
     steps:
       - name: Grab JAR and Info

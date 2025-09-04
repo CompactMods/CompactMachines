@@ -13,7 +13,7 @@ on:
       - "neoforge-datagen/**"
       - "neoforge-main/**"
   workflow_dispatch:
-    
+
 jobs:
   vars:
     name: Get Variables
@@ -77,14 +77,20 @@ jobs:
               sha: context.sha
             })
 
+  get-package-info:
+    name: Get Package Info
+    needs: [ publish ]
+    uses: ./.github/workflows/_download-latest-package-info.yml
+    secrets: inherit
+
   announce:
     name: Discord Announcement
-    needs: [ publish ]
+    needs: [ get-package-info ]
     uses: ./.github/workflows/_announce-latest-build.yml
     secrets: inherit
 
   release-cf:
     name: Release Alpha on CurseForge
-    needs: [ publish ]
+    needs: [ get-package-info ]
     uses: ./.github/workflows/_release-cf-alpha.yml
     secrets: inherit
