@@ -14,18 +14,12 @@ jobs:
   get-package-info:
     name: Get Latest Package Info
     runs-on: ubuntu-22.04
-    outputs:
-      version: ${{ steps.download-info.outputs.version }}
-      jarFile: ${{ fromJson(steps.info.outputs.latestJson)[0].name }}
-      mcVersion: ${{steps.minecraft.outputs.prop}}
-      neoVersion: ${{steps.neoforge.outputs.prop}}
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -65,14 +59,6 @@ jobs:
           mkdir release
           curl -L "${{ fromJson(steps.info.outputs.latestJson)[0].url }}" -o "release/${{ fromJson(steps.info.outputs.latestJson)[0].name }}"
           mv compactmachines.json release/compactmachines.json     
-
-      - name: MC Version
-        id: minecraft
-        run:  groovy read-manifest.groovy release/${{ fromJson(steps.info.outputs.latestJson)[0].name }} "Minecraft-Version" >> "$GITHUB_OUTPUT"
-
-      - name: NeoForge Version
-        id: neoforge
-        run:  groovy read-manifest.groovy release/${{ fromJson(steps.info.outputs.latestJson)[0].name }} "NeoForge-Version" >> "$GITHUB_OUTPUT"
 
       - name: Add Artifact
         uses: actions/upload-artifact@v4
