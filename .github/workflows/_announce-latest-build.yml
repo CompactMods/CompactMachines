@@ -31,7 +31,7 @@ jobs:
 
       - name: Read Version Info
         id: version_info
-        run: echo "version=${{ fromJson($(cat version-info.json)).version }}" >> $GITHUB_OUTPUT
+        run: echo "version=" fromJson( $(cat version-info.json) ).version >> $GITHUB_OUTPUT
 
       - name: Announce Release
         uses: tsickert/discord-webhook@v6.0.0
