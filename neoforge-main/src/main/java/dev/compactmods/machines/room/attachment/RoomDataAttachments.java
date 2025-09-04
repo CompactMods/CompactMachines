@@ -16,9 +16,14 @@ import net.neoforged.neoforge.attachment.AttachmentHolder;
 import java.nio.file.Path;
 import java.util.function.Function;
 
-public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachments, RoomDataAttachments.AdditionalData> {
+public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachments, RoomDataAttachments.AdditionalData> implements AutoCloseable {
 
     private final String roomCode;
+
+    @Override
+    public void close() throws Exception {
+        // save
+    }
 
     public record AdditionalData(String roomCode) {
         public static final MapCodec<AdditionalData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(

@@ -1,0 +1,6 @@
+Specification-Title: Compact Machines
+Specification-Vendor: CompactMods
+Specification-Version: 2
+Implementation-Title: Compact Machines
+Implementation-Vendor: CompactMods
+MixinConfigs: compactmachines.mixins.json

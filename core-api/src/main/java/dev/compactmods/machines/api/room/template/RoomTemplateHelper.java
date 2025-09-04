@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelReader;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class RoomTemplateHelper {
 
@@ -19,6 +20,10 @@ public class RoomTemplateHelper {
 		return getTemplateOptional(registryAccess, id)
 			.orElse(RoomTemplate.INVALID_TEMPLATE);
 	}
+
+    public static Stream<RoomTemplate> getTemplates(RegistryAccess registryAccess) {
+        return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY).stream();
+    }
 
 	public static Optional<RoomTemplate> getTemplateOptional(RegistryAccess registryAccess, ResourceLocation id) {
 		return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)

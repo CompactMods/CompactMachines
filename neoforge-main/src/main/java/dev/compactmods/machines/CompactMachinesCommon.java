@@ -17,6 +17,7 @@ import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.room.capability.BasicRoomCapabilities;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeEventHandlers;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
+import dev.compactmods.machines.server.event.RoomTemplatesCheckEventHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.FastColor;
@@ -52,7 +53,7 @@ public class CompactMachinesCommon {
         RoomUpgrades.prepare();
         Dimension.prepare();
         Commands.prepare();
-        Villagers.prepare();
+//        Villagers.prepare();
 
         CMDataComponents.prepare();
         CMDataAttachments.prepare();
@@ -63,6 +64,8 @@ public class CompactMachinesCommon {
         RoomUpgrades.registerEvents(modBus);
         WorldBorderFixer.registerEvents();
         PlayerEventHandler.registerEvents();
+
+        RoomTemplatesCheckEventHandler.registerEvents();
 
         modBus.addListener(CompactMachinesCommon::commonSetup);
         modBus.addListener(CMFeaturePacks::addFeaturePacks);

@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.data.Saveable;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeHelper;
+import dev.compactmods.machines.server.event.RoomTemplatesCheckEventHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;

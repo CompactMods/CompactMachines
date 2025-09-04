@@ -43,7 +43,7 @@ public class RoomUpgradeEventHandlers {
                 .get()
                 .forEach(upgradeType -> {
                     var inst = upgradeType.constructor().get();
-                    if(inst instanceof NeoForgeEventListener listener) {
+                    if (inst instanceof NeoForgeEventListener listener) {
                         var eventTypes = listener.gatherNeoEvents()
                                 .map(NeoForgeEventHandler::eventType)
                                 .distinct()
@@ -63,8 +63,8 @@ public class RoomUpgradeEventHandlers {
                     .collect(Collectors.toUnmodifiableSet());
 
             for (var room : registeredRooms) {
-                CompactMachines.existingRoomData(room.code())
-                        .flatMap(rd -> rd.getExistingData(CMDataAttachments.UPGRADE_ITEMS))
+                room.getCapability(RoomCapabilities.ROOM_DATA_ATTACHMENTS)
+                        .getExistingData(CMDataAttachments.UPGRADE_ITEMS)
                         .ifPresent(i -> forEach.accept(room, i));
             }
         }
@@ -113,7 +113,7 @@ public class RoomUpgradeEventHandlers {
                 .collect(Collectors.toUnmodifiableSet());
 
         final var upgradeAccessor = room.getCapability(RoomCapabilities.UPGRADES);
-        if(upgradeAccessor != null) {
+        if (upgradeAccessor != null) {
             for (final var upgradeId : upgradeInstances) {
                 final var instance = upgradeAccessor.getOrCreateInstance(upgradeId);
                 if (instance.upgradeItem().isEmpty()) {
@@ -141,7 +141,7 @@ public class RoomUpgradeEventHandlers {
 
         ItemStack stack = evt.getItemStack();
 
-        if(stack.has(CMDataComponents.UPGRADE_INSTANCE_ID)) {
+        if (stack.has(CMDataComponents.UPGRADE_INSTANCE_ID)) {
             var id = stack.get(CMDataComponents.UPGRADE_INSTANCE_ID);
             tooltips.accept(Component.literal("ID: " + id).withColor(CommonColors.GRAY));
         }

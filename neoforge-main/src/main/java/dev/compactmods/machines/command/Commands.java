@@ -31,6 +31,7 @@ public class Commands {
         Commands.CM_COMMAND_ROOT.then(CMGiveMachineSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(RoomUpgradesSubcommand.make());
+        Commands.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());
 
         event.getDispatcher().register(Commands.CM_COMMAND_ROOT);
     }

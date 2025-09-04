@@ -10,7 +10,7 @@ import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CMServerRoomUpgradeDataAccessor implements IRoomUpgradeDataAttachmentAccessor {
+public class CMServerRoomUpgradeDataAccessor implements IRoomUpgradeDataAttachmentAccessor, AutoCloseable {
     private final CMKeyedDataFileManager<RoomUpgradeInstanceKey, RoomUpgradeDataAttachments> DATA_ATTACHMENTS;
 
     public CMServerRoomUpgradeDataAccessor() {
@@ -35,5 +35,10 @@ public class CMServerRoomUpgradeDataAccessor implements IRoomUpgradeDataAttachme
     @Override
     public void save() {
         DATA_ATTACHMENTS.save();
+    }
+
+    @Override
+    public void close() {
+        save();
     }
 }

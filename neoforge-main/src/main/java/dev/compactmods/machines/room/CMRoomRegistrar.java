@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class CMRoomRegistrar implements IRoomRegistrar {
+public class CMRoomRegistrar implements IRoomRegistrar, AutoCloseable {
 
     private final MinecraftServer server;
     private final CMSingletonDataFileManager<RoomRegistrarData> ROOM_REGISTRAR_DATA;
@@ -111,5 +111,10 @@ public class CMRoomRegistrar implements IRoomRegistrar {
         final var inst = new RoomInstance(server, CompactDimension.LEVEL_KEY, regNode.code(), regNode.defaultMachineColor(), regNode);
         instanceCache.put(regNode.code(), inst);
         return inst;
+    }
+
+    @Override
+    public void close() throws Exception {
+        save();
     }
 }

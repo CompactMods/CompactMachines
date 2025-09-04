@@ -96,7 +96,7 @@ neoForge {
             additional.dependencies.add(compactmods.feather.get())
             additional.dependencies.add(libs.jnanoid.get())
         }
-
+        
         create("client") {
             client()
             gameDirectory.set(file("runs/client"))
@@ -265,19 +265,15 @@ tasks.withType<Jar> {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
-                "Specification-Title" to "Compact Machines",
-                "Specification-Vendor" to "CompactMods",
-                "Specification-Version" to "2",
-                "Implementation-Title" to "Compact Machines",
                 "Implementation-Version" to archiveVersion,
-                "Implementation-Vendor" to "CompactMods",
                 "Implementation-Timestamp" to now,
                 "Minecraft-Version" to mojang.versions.minecraft.get(),
                 "NeoForge-Version" to neoforged.versions.neoforge.get(),
-                "Main-Commit" to gitVersion,
-                "MixinConfigs" to "compactmachines.mixins.json"
+                "Main-Commit" to gitVersion.trimEnd()
             )
         )
+
+        from("src/main/resources/META-INF/MANIFEST.MF")
     }
 }
 

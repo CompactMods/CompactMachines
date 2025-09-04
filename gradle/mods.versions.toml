@@ -21,7 +21,7 @@ jei = ["jeiCommon", "jeiNeo"]
 # Kube JS
 [libraries.kubeJS]
 module = "dev.latvian.mods:kubejs-neoforge"
-version = "2101.7.1-build.181"
+version = "2101.7.2-build.247"
 
 [libraries.rhino]
 module = "dev.latvian.mods:rhino"
