@@ -50,7 +50,7 @@ jobs:
 
       - name: Version JSON
         run: |
-          echo '{ "version": "' ${{ steps.download-info.outputs.version }} '" }' > release/version-info.json
+          echo '{ "version": "'${{ steps.download-info.outputs.version }}'" }' > release/version-info.json
 
       - name: Read info into variable [latest]
         id: info
