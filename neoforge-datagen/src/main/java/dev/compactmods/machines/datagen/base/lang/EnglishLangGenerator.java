@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.base.lang;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.i18n.Translations;
 import dev.compactmods.machines.api.advancement.Advancements;
 import dev.compactmods.machines.i18n.CommandTranslations;
@@ -78,6 +79,12 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         add(RoomUpgradeUIMapping.NAME, "Open Room Upgrade Screen");
 
         addJade();
+
+        addGamerule(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS_KEY, "Allow Survival OOB", "Allow out-of-bounds survival players");
+        addGamerule(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS_KEY, "Allow Creative OOB", "Allow out-of-bounds creative players");
+        addGamerule(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS_KEY, "Allow Spectators OOB", "Allow out-of-bounds spectators");
+        addGamerule(CMGameRules.DAMAGE_OOB_PLAYERS_KEY, "Damage OOB Players", "Damage players that are out of bounds");
+        addGamerule(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT_KEY, "Damage PSDs on Exit", "Damage shrinking devices by leaving rooms");
     }
 
     private void blocksAndItems() {
