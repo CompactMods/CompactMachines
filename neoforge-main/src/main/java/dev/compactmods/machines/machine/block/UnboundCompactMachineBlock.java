@@ -15,6 +15,7 @@ import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -49,6 +50,10 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 				be.getExistingData(CMDataAttachments.MACHINE_COLOR).ifPresent(color -> {
 					item.set(CMDataComponents.MACHINE_COLOR, color);
 				});
+
+                final var cn = be.customName();
+                if(cn != null)
+                    item.set(DataComponents.CUSTOM_NAME, cn);
 
 				return item;
 			}

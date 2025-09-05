@@ -16,6 +16,7 @@ import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -46,7 +47,13 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         try {
             if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
-                return Machines.Items.boundToRoom(be.connectedRoom(), be.getData(CMDataAttachments.MACHINE_COLOR));
+                final var stack = Machines.Items.boundToRoom(be.connectedRoom(), be.getData(CMDataAttachments.MACHINE_COLOR));
+
+                be.getCustomName().ifPresent(cn -> {
+                    stack.set(DataComponents.CUSTOM_NAME, cn);
+                });
+
+                return stack;
             }
 
             return Machines.Items.unbound();
