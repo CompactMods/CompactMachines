@@ -25,6 +25,12 @@ public class RoomTemplateHelper {
         return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY).stream();
     }
 
+    public static Stream<Holder.Reference<RoomTemplate>> getTemplateHolders(RegistryAccess registryAccess) {
+        return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)
+                .asLookup()
+                .listElements();
+    }
+
 	public static Optional<RoomTemplate> getTemplateOptional(RegistryAccess registryAccess, ResourceLocation id) {
 		return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)
 			.getOptional(id);

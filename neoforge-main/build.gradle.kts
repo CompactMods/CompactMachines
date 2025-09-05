@@ -234,6 +234,10 @@ dependencies {
     accessTransformers(compactmods.ganderRendering)
     jarJar(compactmods.bundles.gander)
 
+    // Just Enough Items
+    compileOnly(mods.jeiCommon)
+    compileOnly(mods.jeiNeo)
+
     // Curios API
     compileOnly(libs.curios)
 
