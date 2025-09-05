@@ -92,6 +92,7 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 						// Set up binding and enter
 						level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get()).ifPresent(ent -> {
 							ent.setConnectedRoom(newRoom.code());
+                            ent.setOwner(sp.getUUID());
 							ent.setData(CMDataAttachments.MACHINE_COLOR, color);
 
 							try {

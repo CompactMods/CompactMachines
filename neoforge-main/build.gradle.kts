@@ -240,6 +240,9 @@ dependencies {
     // KubeJS Support
     compileOnly(mods.kubeJS)
     compileOnly(mods.rhino)
+
+    // Jade Support
+    compileOnly(mods.jade)
 }
 
 tasks.withType<Test> {
