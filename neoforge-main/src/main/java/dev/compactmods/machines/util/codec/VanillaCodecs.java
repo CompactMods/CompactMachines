@@ -12,9 +12,7 @@ public interface VanillaCodecs {
     StreamCodec<ByteBuf, StructureTemplate> STRUCTURE_TEMPLATE_STREAM_CODEC = ByteBufCodecs.TRUSTED_COMPOUND_TAG
             .map(nbt -> {
                 final var struct = new StructureTemplate();
-                struct.load(BuiltInRegistries.BLOCK.asLookup(), nbt);
+                struct.load(BuiltInRegistries.BLOCK, nbt);
                 return struct;
-            }, template -> {
-                return template.save(new CompoundTag());
-            });
+            }, template -> template.save(new CompoundTag()));
 }

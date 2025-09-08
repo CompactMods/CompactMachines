@@ -2,8 +2,8 @@ package dev.compactmods.machines.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Divisor;
@@ -14,8 +14,11 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.joml.Matrix3x2f;
 import org.joml.Matrix4f;
+import org.joml.Matrix4x3f;
 
 public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, int sliceWidth, int sliceHeight,
                                 int uWidth, int vHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int cornerWidth,
@@ -26,11 +29,11 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
     }
 
     public void render(GuiGraphics graphics) {
-        ProfilerFiller profiler = Minecraft.getInstance().getProfiler();
+        ProfilerFiller profiler = Profiler.get();
         profiler.push("blit setup");
-        RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        Matrix4f matrix4f = graphics.pose().last().pose();
+//        RenderSystem.setShaderTexture(0, texture);
+//        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        var pose = new PoseStack();
         profiler.pop();
 
         BufferBuilder bufferbuilder = Tesselator.getInstance()
@@ -42,50 +45,50 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
         int y = area.position().y();
 
         if (area.width() == uWidth && area.height() == vHeight) {
-            blit(bufferbuilder, matrix4f, x, y, uOffset, vOffset, area.width(), area.height(), textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y, uOffset, vOffset, area.width(), area.height(), textureWidth, textureHeight);
         } else if (area.height() == vHeight) {
-            blit(bufferbuilder, matrix4f, x, y, uOffset, vOffset, cornerWidth, area.height(), textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x + cornerWidth, y, area.width() - edgeWidth - cornerWidth, area.height(), uOffset + cornerWidth, vOffset, uWidth - edgeWidth - cornerWidth, vHeight, textureWidth, textureHeight);
-            blit(bufferbuilder, matrix4f, x + area.width() - edgeWidth, y, uOffset + uWidth - edgeWidth, vOffset, edgeWidth, area.height(), textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y, uOffset, vOffset, cornerWidth, area.height(), textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x + cornerWidth, y, area.width() - edgeWidth - cornerWidth, area.height(), uOffset + cornerWidth, vOffset, uWidth - edgeWidth - cornerWidth, vHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x + area.width() - edgeWidth, y, uOffset + uWidth - edgeWidth, vOffset, edgeWidth, area.height(), textureWidth, textureHeight);
         } else if (area.width() == uWidth) {
-            blit(bufferbuilder, matrix4f, x, y, uOffset, vOffset, area.width(), cornerHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x, y + cornerHeight, area.width(), area.height() - edgeHeight - cornerHeight, uOffset, vOffset + cornerHeight, uWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
-            blit(bufferbuilder, matrix4f, x, y + area.height() - edgeHeight, uOffset, vOffset + vHeight - edgeHeight, area.width(), edgeHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y, uOffset, vOffset, area.width(), cornerHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x, y + cornerHeight, area.width(), area.height() - edgeHeight - cornerHeight, uOffset, vOffset + cornerHeight, uWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y + area.height() - edgeHeight, uOffset, vOffset + vHeight - edgeHeight, area.width(), edgeHeight, textureWidth, textureHeight);
         } else {
-            blit(bufferbuilder, matrix4f, x, y, uOffset, vOffset, cornerWidth, cornerHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x + cornerWidth, y, area.width() - edgeWidth - cornerWidth, cornerHeight, uOffset + cornerWidth, vOffset, uWidth - edgeWidth - cornerWidth, cornerHeight, textureWidth, textureHeight);
-            blit(bufferbuilder, matrix4f, x + area.width() - edgeWidth, y, uOffset + uWidth - edgeWidth, vOffset, edgeWidth, cornerHeight, textureWidth, textureHeight);
-            blit(bufferbuilder, matrix4f, x, y + area.height() - edgeHeight, uOffset, vOffset + vHeight - edgeHeight, cornerWidth, edgeHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x + cornerWidth, y + area.height() - edgeHeight, area.width() - edgeWidth - cornerWidth, edgeHeight, uOffset + cornerWidth, vOffset + vHeight - edgeHeight, uWidth - edgeWidth - cornerWidth, edgeHeight, textureWidth, textureHeight);
-            blit(bufferbuilder, matrix4f, x + area.width() - edgeWidth, y + area.height() - edgeHeight, uOffset + uWidth - edgeWidth, vOffset + vHeight - edgeHeight, edgeWidth, edgeHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x, y + cornerHeight, cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset, vOffset + cornerHeight, cornerWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x + cornerWidth, y + cornerHeight, area.width() - edgeWidth - cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset + cornerWidth, vOffset + cornerHeight, uWidth - edgeWidth - cornerWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
-            blitRepeating(bufferbuilder, matrix4f, x + area.width() - edgeWidth, y + cornerHeight, cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset + uWidth - edgeWidth, vOffset + cornerHeight, edgeWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y, uOffset, vOffset, cornerWidth, cornerHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x + cornerWidth, y, area.width() - edgeWidth - cornerWidth, cornerHeight, uOffset + cornerWidth, vOffset, uWidth - edgeWidth - cornerWidth, cornerHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x + area.width() - edgeWidth, y, uOffset + uWidth - edgeWidth, vOffset, edgeWidth, cornerHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x, y + area.height() - edgeHeight, uOffset, vOffset + vHeight - edgeHeight, cornerWidth, edgeHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x + cornerWidth, y + area.height() - edgeHeight, area.width() - edgeWidth - cornerWidth, edgeHeight, uOffset + cornerWidth, vOffset + vHeight - edgeHeight, uWidth - edgeWidth - cornerWidth, edgeHeight, textureWidth, textureHeight);
+            blit(bufferbuilder, pose.last(), x + area.width() - edgeWidth, y + area.height() - edgeHeight, uOffset + uWidth - edgeWidth, vOffset + vHeight - edgeHeight, edgeWidth, edgeHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x, y + cornerHeight, cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset, vOffset + cornerHeight, cornerWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x + cornerWidth, y + cornerHeight, area.width() - edgeWidth - cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset + cornerWidth, vOffset + cornerHeight, uWidth - edgeWidth - cornerWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
+            blitRepeating(bufferbuilder, pose.last(), x + area.width() - edgeWidth, y + cornerHeight, cornerWidth, area.height() - edgeHeight - cornerHeight, uOffset + uWidth - edgeWidth, vOffset + cornerHeight, edgeWidth, vHeight - edgeHeight - cornerHeight, textureWidth, textureHeight);
         }
         profiler.pop();
 
         profiler.push("drawing");
         //cachedBuffer.bind();
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+//        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
 
         profiler.pop();
     }
 
-    private static void blit(BufferBuilder bufferbuilder, Matrix4f matrix4f, int pX, int pY, float pUOffset, float pVOffset, int pWidth, int pHeight, int pTextureWidth, int pTextureHeight) {
-        bufferbuilder.addVertex(matrix4f, (float) pX, (float) pY, (float) 0)
+    private static void blit(BufferBuilder bufferbuilder, PoseStack.Pose pose, int pX, int pY, float pUOffset, float pVOffset, int pWidth, int pHeight, int pTextureWidth, int pTextureHeight) {
+        bufferbuilder.addVertex(pose, (float) pX, (float) pY, (float) 0)
             .setUv((pUOffset + 0.0F) / (float) pTextureWidth, (pVOffset + 0.0F) / (float) pTextureHeight);
 
-        bufferbuilder.addVertex(matrix4f, (float) pX, (float) (pY + pHeight), (float) 0)
+        bufferbuilder.addVertex(pose, (float) pX, (float) (pY + pHeight), (float) 0)
             .setUv((pUOffset + 0.0F) / (float) pTextureWidth, (pVOffset + (float) pHeight) / (float) pTextureHeight);
 
-        bufferbuilder.addVertex(matrix4f, (float) (pX + pWidth), (float) (pY + pHeight), (float) 0)
+        bufferbuilder.addVertex(pose, (float) (pX + pWidth), (float) (pY + pHeight), (float) 0)
             .setUv((pUOffset + (float) pWidth) / (float) pTextureWidth, (pVOffset + (float) pHeight) / (float) pTextureHeight);
 
-        bufferbuilder.addVertex(matrix4f, (float) (pX + pWidth), (float) pY, (float) 0)
+        bufferbuilder.addVertex(pose, (float) (pX + pWidth), (float) pY, (float) 0)
             .setUv((pUOffset + (float) pWidth) / (float) pTextureWidth, (pVOffset + 0.0F) / (float) pTextureHeight);
     }
 
-    private static void blitRepeating(BufferBuilder bufferbuilder, Matrix4f matrix4f, int pX, int pY, int pWidth, int pHeight, int pUOffset, int pVOffset, int pSourceWidth, int pSourceHeight, int textureWidth, int textureHeight) {
+    private static void blitRepeating(BufferBuilder bufferbuilder, PoseStack.Pose pose, int pX, int pY, int pWidth, int pHeight, int pUOffset, int pVOffset, int pSourceWidth, int pSourceHeight, int textureWidth, int textureHeight) {
         int i = pX;
 
         int j;
@@ -98,7 +101,7 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
             for (IntIterator intiterator1 = slices(pHeight, pSourceHeight); intiterator1.hasNext(); l += i1) {
                 i1 = intiterator1.nextInt();
                 int j1 = (pSourceHeight - i1) / 2;
-                blit(bufferbuilder, matrix4f, i, l, pUOffset + k, pVOffset + j1, j, i1, textureWidth, textureHeight);
+                blit(bufferbuilder, pose, i, l, pUOffset + k, pVOffset + j1, j, i1, textureWidth, textureHeight);
             }
         }
     }

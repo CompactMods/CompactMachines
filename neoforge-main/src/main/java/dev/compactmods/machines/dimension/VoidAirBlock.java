@@ -1,19 +1,24 @@
 package dev.compactmods.machines.dimension;
 
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AirBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -21,8 +26,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public class VoidAirBlock extends AirBlock {
     // FIXME final public static DamageSource DAMAGE_SOURCE = new DamageSource(MOD_ID + "_voidair");
 
+    public static final ResourceKey<Block> RESOURCE_KEY = ResourceKey.create(Registries.BLOCK, CompactMachines.modRL("void_air"));
+
     public VoidAirBlock() {
         super(BlockBehaviour.Properties.of()
+                .setId(RESOURCE_KEY)
                 .isValidSpawn((state, level, pos, entity) -> false)
                 .strength(-1.0F, 3600000.0F)
                 .noTerrainParticles()
@@ -41,16 +49,16 @@ public class VoidAirBlock extends AirBlock {
     }
 
     @Override
-    public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
-        if (pLevel.isClientSide) return;
-        if (!CompactDimension.isLevelCompact(pLevel)) return;
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
+        if (level.isClientSide) return;
+        if (!CompactDimension.isLevelCompact(level)) return;
 
-        if (pEntity instanceof ServerPlayer player) {
+        if (entity instanceof ServerPlayer player) {
             // If players are allowed outside of machine bounds, early exit -- but damage them if configured
-            final var rules = pLevel.getGameRules();
+            final var rules = level.getServer().getGameRules();
 
             if (rules.getBoolean(CMGameRules.DAMAGE_OOB_PLAYERS))
-                tryDamagingAdventurousPlayer(pLevel, player);
+                tryDamagingAdventurousPlayer(level, player);
 
             // FIXME - Achievement
             // PlayerUtil.howDidYouGetThere(player);
@@ -63,7 +71,7 @@ public class VoidAirBlock extends AirBlock {
             };
 
             if (!allowedOutOfBounds)
-                PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
+                PlayerUtil.teleportPlayerToRespawnOrOverworld(player.getServer(), player);
         }
     }
 
@@ -77,9 +85,9 @@ public class VoidAirBlock extends AirBlock {
     private static void tryDamagingAdventurousPlayer(Level pLevel, ServerPlayer player) {
         if (player.isCreative() || player.isSpectator()) return;
 
-        if (!player.hasEffect(MobEffects.CONFUSION)) {
-            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 20));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5 * 20));
+        if (!player.hasEffect(MobEffects.NAUSEA)) {
+            player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 5 * 20));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 5 * 20));
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 5 * 20));
         }
 

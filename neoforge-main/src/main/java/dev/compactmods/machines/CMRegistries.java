@@ -20,6 +20,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public interface CMRegistries {
@@ -46,8 +47,8 @@ public interface CMRegistries {
 
 	DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachines.MOD_ID);
 
-	static Item basicItem() {
-		return new Item(new Item.Properties());
+	static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
+		return new Item(moreProps.apply(new Item.Properties()));
 	}
 
 	static void setup(IEventBus modBus) {

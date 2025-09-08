@@ -1,8 +1,11 @@
 package dev.compactmods.machines.api.room.upgrade.component;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponent;
 import dev.compactmods.machines.api.room.upgrade.RoomUpgradeCodecs;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -11,6 +14,7 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,32 +26,32 @@ import java.util.function.Consumer;
  */
 public record RoomUpgradeComponentList(List<RoomUpgradeComponent> components) implements TooltipProvider {
 
-  public static final Codec<RoomUpgradeComponentList> CODEC = RoomUpgradeCodecs.DISPATCH_CODEC.listOf()
-      .xmap(RoomUpgradeComponentList::new, RoomUpgradeComponentList::components);
+    public static final Codec<RoomUpgradeComponentList> CODEC = RoomUpgradeCodecs.DISPATCH_CODEC.listOf()
+            .xmap(RoomUpgradeComponentList::new, RoomUpgradeComponentList::components);
 
-  public static final StreamCodec<RegistryFriendlyByteBuf, RoomUpgradeComponentList> STREAM_CODEC = StreamCodec.composite(
-      RoomUpgradeCodecs.STREAM_CODEC.apply(ByteBufCodecs.list()), RoomUpgradeComponentList::components,
-      RoomUpgradeComponentList::new
-  );
+    public static final StreamCodec<RegistryFriendlyByteBuf, RoomUpgradeComponentList> STREAM_CODEC = StreamCodec.composite(
+            RoomUpgradeCodecs.STREAM_CODEC.apply(ByteBufCodecs.list()), RoomUpgradeComponentList::components,
+            RoomUpgradeComponentList::new
+    );
 
-  @Override
-  public void addToTooltip(Item.TooltipContext ctx, Consumer<Component> tooltips, TooltipFlag flags) {
-    tooltips.accept(Component.empty());
+    @Override
+    public void addToTooltip(Item.TooltipContext ctx, Consumer<Component> tooltips, TooltipFlag flags, DataComponentGetter componentsGetter) {
+        tooltips.accept(Component.empty());
 
-    tooltips.accept(Component.translatableWithFallback("cm.components.list_header", "Room Upgrades:")
-        .withColor(CommonColors.GRAY)
-        .withStyle(s -> s.withUnderlined(true)));
+        tooltips.accept(Component.translatableWithFallback("cm.components.list_header", "Room Upgrades:")
+                .withColor(CommonColors.GRAY)
+                .withStyle(s -> s.withUnderlined(true)));
 
-    Consumer<Component> tooltipsWInsert = (comp) -> {
-      var reformatted = Component.literal(" - ")
-          .withColor(CommonColors.LIGHT_GRAY)
-          .append(comp.copy())
-          .withStyle(s -> s.withItalic(true));
+        Consumer<Component> tooltipsWInsert = (comp) -> {
+            var reformatted = Component.literal(" - ")
+                    .withColor(CommonColors.LIGHT_GRAY)
+                    .append(comp.copy())
+                    .withStyle(s -> s.withItalic(true));
 
-      tooltips.accept(reformatted);
-    };
+            tooltips.accept(reformatted);
+        };
 
-    for(var upgrade : components)
-      upgrade.addToTooltip(ctx, tooltipsWInsert, flags);
-  }
+        for (var upgrade : components)
+            upgrade.addToTooltip(ctx, tooltipsWInsert, flags, componentsGetter);
+    }
 }

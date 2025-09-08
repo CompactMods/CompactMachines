@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class RoomBlocks {
@@ -32,7 +33,7 @@ public class RoomBlocks {
             tem.fillFromWorld(compactDim,
                     BlockPos.containing(bounds.minX, bounds.minY - 1, bounds.minZ),
                     new Vec3i((int) bounds.getXsize(), (int) bounds.getYsize() + 1, (int) bounds.getZsize()),
-                    false, Blocks.AIR
+                    false, List.of(Blocks.AIR)
             );
 
             return tem;

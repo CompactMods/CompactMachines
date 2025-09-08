@@ -2,6 +2,7 @@ package dev.compactmods.machines.api.attachment;
 
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -39,5 +40,15 @@ public interface IForwardingAttachmentHolder extends IAttachmentHolder {
     @Override
     default <T> @Nullable T removeData(AttachmentType<T> attachmentType) {
         return attachmentHolder().get().removeData(attachmentType);
+    }
+
+    @Override
+    default <T> @Nullable T getExistingDataOrNull(Supplier<AttachmentType<T>> type) {
+        return attachmentHolder().get().getExistingDataOrNull(type);
+    }
+
+    @Override
+    default <T> @Nullable T getExistingDataOrNull(@NotNull AttachmentType<T> attachmentType) {
+        return attachmentHolder().get().getExistingDataOrNull(attachmentType);
     }
 }

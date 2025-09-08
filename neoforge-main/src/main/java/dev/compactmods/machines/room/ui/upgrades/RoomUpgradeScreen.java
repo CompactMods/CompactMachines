@@ -11,11 +11,12 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +58,7 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
                 .size(8, 12)
                 .message(Component.literal("Close"))
                 .onPress(button -> {
-                    PacketDistributor.sendToServer(new PlayerRequestedRoomUIPacket(menu.roomCode));
+                    ClientPacketDistributor.sendToServer(new PlayerRequestedRoomUIPacket(menu.roomCode));
                 })
                 .build();
 
@@ -76,17 +77,17 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         final var pose = graphics.pose();
 
-        pose.pushPose();
-        pose.translate(leftPos, topPos, 0);
+        pose.pushMatrix();
+        pose.translate(leftPos, topPos);
         backgroundRenderer.render(graphics);
-        pose.popPose();
+        pose.popMatrix();
 
-        pose.pushPose();
-        pose.translate(leftPos, topPos, 100);
+        pose.pushMatrix();
+        pose.translate(leftPos, topPos);
         for(var i : this.menu.slots) {
             graphics.fill(i.x, i.y, i.x + 16, i.y + 16, 0x0F000000);
         }
-        pose.popPose();
+        pose.popMatrix();
     }
 
     @Override
@@ -107,16 +108,14 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
 
     private void renderGhostSlot(@NotNull GuiGraphics graphics, @NotNull ItemStack itemstack, @NotNull Slot slot, @Nullable String countString) {
         graphics.renderItem(slot.getItem(), slot.x, slot.y);
-        graphics.fill(RenderType.guiGhostRecipeOverlay(), slot.x, slot.y, slot.x + 16, slot.y + 16, FastColor.ARGB32.color(150, 30, 70, 210));
+        graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, ARGB.color(150, 30, 70, 210));
 
         if (!itemstack.isEmpty()) {
-            graphics.pose().pushPose();
             if (itemstack.getCount() != 1 || countString != null) {
                 String s = countString == null ? String.valueOf(itemstack.getCount()) : countString;
-                graphics.pose().translate(0.0F, 0.0F, 200.0F);
-                graphics.drawString(this.font, s, slot.x + 19 - 2 - this.font.width(s), slot.y + 6 + 3, FastColor.ARGB32.color(120, 255, 255, 255), false);
+                graphics.drawString(this.font, s, slot.x + 19 - 2 - this.font.width(s), slot.y + 6 + 3,
+                        ARGB.color(120, 255, 255, 255), false);
             }
-            graphics.pose().popPose();
         }
     }
 }

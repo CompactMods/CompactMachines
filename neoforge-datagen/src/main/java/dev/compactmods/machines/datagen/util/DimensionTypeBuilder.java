@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 
+import java.util.Optional;
 import java.util.OptionalLong;
 
 /**
@@ -128,7 +129,7 @@ public class DimensionTypeBuilder {
     public DimensionType build() {
         // TODO: Add MonsterSettings here, right now it copies overworld
         return new DimensionType(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks,
-                respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight,
+                respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight, Optional.empty(),
                 new DimensionType.MonsterSettings(piglinSafe, hasRaids, UniformInt.of(0, 7), 0));
     }
 }

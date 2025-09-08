@@ -11,6 +11,7 @@ import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -40,7 +41,7 @@ public class RoomUpgradeUIMapping {
 	  if (player != null && level != null && level.dimension().equals(CompactDimension.LEVEL_KEY)) {
 		  if(CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(level.enabledFeatures())) {
 			  player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(currentRoom -> {
-                  PacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(currentRoom, true));
+                  ClientPacketDistributor.sendToServer(new PlayerRequestedUpgradeUIPacket(currentRoom, true));
 			  });
 		  } else {
 			  player.displayClientMessage(Component.literal("You must enable room components for this keybind!"), true);

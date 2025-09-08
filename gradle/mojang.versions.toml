@@ -1,7 +1,7 @@
 [versions]
-minecraft = "1.21.1"
+minecraft = "1.21.8"
 
 [versions.minecraftRange]
-require = "[1.21.1, 1.21.2)"
-prefer = "1.21.1"
+require = "[1.21.8, 1.21.9)"
+prefer = "1.21.8"
 

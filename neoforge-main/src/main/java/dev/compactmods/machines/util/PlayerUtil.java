@@ -6,9 +6,12 @@ import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.server.CompactMachinesServer;
+import dev.compactmods.machines.shrinking.Shrinking;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
@@ -29,13 +32,14 @@ public abstract class PlayerUtil {
     }
 
     public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @NotNull ServerPlayer player) {
-        ServerLevel level = Optional.ofNullable(serv.getLevel(player.getRespawnDimension())).orElse(serv.overworld());
-        Vec3 worldPos = Vec3.atCenterOf(level.getSharedSpawnPos());
+        final var config = player.getRespawnConfig();
 
-        if (player.getRespawnPosition() != null)
-            worldPos = Vec3.atCenterOf(player.getRespawnPosition());
+        final var transition = Optional.ofNullable(config)
+                .map(c -> CompactDimensionTransitions.to(serv.getLevel(c.dimension()), Vec3.atBottomCenterOf(c.pos())))
+                .orElse(CompactDimensionTransitions.to(serv.overworld(),
+                        Vec3.atBottomCenterOf(serv.overworld().getSharedSpawnPos())));
 
-        player.changeDimension(CompactDimensionTransitions.to(level, worldPos));
+        player.teleport(transition);
     }
 
     public static Optional<GameProfile> getProfileByUUID(MinecraftServer server, UUID uuid) {
@@ -71,7 +75,7 @@ public abstract class PlayerUtil {
             l.playSeededSound(
                     null,
                     pos.x(), pos.y(), pos.z(),
-                    stack.getBreakingSound(),
+                    stack.getOrDefault(DataComponents.BREAK_SOUND, SoundEvents.ITEM_BREAK),
                     player.getSoundSource(),
                     1.0F,
                     0.8F + l.random.nextFloat() * 0.4F,

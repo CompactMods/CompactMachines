@@ -1,6 +1,5 @@
 package dev.compactmods.machines.test.gametest.data;
 
-import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.player.PlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.RoomEntryResult;

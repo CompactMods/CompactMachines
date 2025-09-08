@@ -12,6 +12,7 @@ import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventHandler;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventListener;
 import dev.compactmods.machines.server.CompactMachinesServer;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
@@ -71,8 +72,8 @@ public class ChunkLoaderUpgradeComponent implements RoomUpgradeComponent, NeoFor
     }
 
     @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
-        tooltipAdder.accept(Component.literal("Chunk Loader").withColor(CommonColors.LIGHT_GRAY));
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        consumer.accept(Component.literal("Chunk Loader").withColor(CommonColors.LIGHT_GRAY));
     }
 
     public static class AppliedHandler implements UpgradeAppliedEventListener {

@@ -1,12 +1,7 @@
-modLoader = "javafml" #mandatory
-loaderVersion = "${loader_version_range}"
 license = "MIT"
 
 [[accessTransformers]]
 file = "META-INF/accesstransformer.cfg"
-
-[[mixins]]
-config = "compactmachines.mixins.json"
 
 [[mods]] #mandatory
 modId = "compactmachines"

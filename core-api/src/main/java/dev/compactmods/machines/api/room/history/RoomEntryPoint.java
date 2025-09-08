@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.room.history;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.location.GlobalPosWithRotation;
 import net.minecraft.util.StringRepresentable;
@@ -12,7 +13,7 @@ public record RoomEntryPoint(GlobalPosWithRotation entryLocation, EntryMethod me
     public static final RoomEntryPoint INVALID = new RoomEntryPoint(GlobalPosWithRotation.INVALID, EntryMethod.OTHER);
 
 
-    public static final Codec<RoomEntryPoint> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final MapCodec<RoomEntryPoint> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             GlobalPosWithRotation.CODEC.fieldOf("entry_location").forGetter(RoomEntryPoint::entryLocation),
             EntryMethod.CODEC.fieldOf("method").forGetter(RoomEntryPoint::method)
     ).apply(i, RoomEntryPoint::new));

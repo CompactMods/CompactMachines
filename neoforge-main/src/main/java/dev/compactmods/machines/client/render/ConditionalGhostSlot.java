@@ -11,7 +11,7 @@ public class ConditionalGhostSlot extends Slot {
     }
 
     public boolean matched(ItemStack stack) {
-        return true; // stack.is(RoomUpgrade.ITEM_TAG) || stack.is(MachineConstants.NEW_MACHINE_ITEM);
+        return true;
     }
 
     @Override

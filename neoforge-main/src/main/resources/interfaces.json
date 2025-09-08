@@ -1,5 +1,0 @@
-{
-  "net/minecraft/nbt/CompoundTag": [
-    "dev/compactmods/machines/mixin/CodecNbtFunctions"
-  ]
-}

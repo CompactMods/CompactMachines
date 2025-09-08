@@ -57,8 +57,6 @@ sourceSets.test {
 neoForge {
     version = neoforged.versions.neoforge.get()
 
-    interfaceInjectionData.from("src/main/resources/interfaces.json")
-
     val cmMain = this.mods.create(modId) {
         modSourceSets.add(coreApi.sourceSets.main)
         modSourceSets.add(sourceSets.main)
@@ -230,23 +228,23 @@ dependencies {
     jarJar(compactmods.spatial) { isTransitive = false }
 
     // Gander
-    implementation(compactmods.bundles.gander)
-    accessTransformers(compactmods.ganderRendering)
-    jarJar(compactmods.bundles.gander)
+//    implementation(compactmods.bundles.gander)
+//    accessTransformers(compactmods.ganderRendering)
+//    jarJar(compactmods.bundles.gander)
 
     // Just Enough Items
-    compileOnly(mods.jeiCommon)
-    compileOnly(mods.jeiNeo)
+//    compileOnly(mods.jeiCommon)
+//    compileOnly(mods.jeiNeo)
 
     // Curios API
-    compileOnly(libs.curios)
+//    compileOnly(libs.curios)
 
     // KubeJS Support
-    compileOnly(mods.kubeJS)
-    compileOnly(mods.rhino)
+//    compileOnly(mods.kubeJS)
+//    compileOnly(mods.rhino)
 
     // Jade Support
-    compileOnly(mods.jade)
+//    compileOnly(mods.jade)
 }
 
 tasks.withType<Test> {

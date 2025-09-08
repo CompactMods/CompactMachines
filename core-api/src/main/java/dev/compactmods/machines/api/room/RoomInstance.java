@@ -14,7 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public record RoomInstance(MinecraftServer server, ResourceKey<Level> levelKey, String code, MachineColor defaultMachineColor, IRoomBoundaries boundaries) implements IForwardingAttachmentHolder {
+public record RoomInstance(
+        MinecraftServer server, ResourceKey<Level> levelKey,
+        String code, MachineColor defaultMachineColor,
+        IRoomBoundaries boundaries
+) implements IForwardingAttachmentHolder {
 
     public ServerLevel level() {
         return server.getLevel(levelKey);

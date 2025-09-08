@@ -27,7 +27,7 @@ public class DataFileUtil {
 
 	public static <T> T loadFileWithCodec(File file, Codec<T> codec) {
 		try {
-			IOUtilities.cleanupTempFiles(Path.of(file.getParent()), file.getName());
+			IOUtilities.tryCleanupTempFiles(Path.of(file.getParent()), file.getName());
 			try (var is = new FileInputStream(file)) {
 				final var tag = NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
 				return tag.read("data", codec).orElseThrow();

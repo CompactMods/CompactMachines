@@ -20,7 +20,7 @@ import dev.compactmods.machines.room.upgrade.RoomUpgrades;
 import dev.compactmods.machines.server.event.RoomTemplatesCheckEventHandler;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.villager.Villagers;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -31,7 +31,7 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(CompactMachines.MOD_ID)
 public class CompactMachinesCommon {
 
-    public static final int BRAND_MACHINE_COLOR = FastColor.ARGB32.color(255, 248, 246, 76);
+    public static final int BRAND_MACHINE_COLOR = ARGB.color(255, 248, 246, 76);
 
     @SuppressWarnings("unused")
     public CompactMachinesCommon(IEventBus modBus, ModContainer modContainer) {

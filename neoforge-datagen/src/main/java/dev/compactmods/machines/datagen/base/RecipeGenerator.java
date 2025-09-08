@@ -25,21 +25,39 @@ import java.util.function.UnaryOperator;
 
 public class RecipeGenerator extends RecipeProvider {
 
-	public RecipeGenerator(PackOutput packOut, CompletableFuture<HolderLookup.Provider> holders) {
-		super(packOut, holders);
+    public static class Runner extends RecipeProvider.Runner {
+        private final String name;
+
+        public Runner(String name, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+            super(packOutput, registries);
+            this.name = name;
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+            return new RecipeGenerator(provider, recipeOutput);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
+	public RecipeGenerator(HolderLookup.Provider holders, RecipeOutput output) {
+		super(holders, output);
 	}
 
-	@Override
-	protected void buildRecipes(RecipeOutput recipeOutput, HolderLookup.Provider provider) {
-		ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Rooms.Items.BREAKABLE_WALL.get(), 8)
+    @Override
+    protected void buildRecipes() {
+		shaped(RecipeCategory.BUILDING_BLOCKS, Rooms.Items.BREAKABLE_WALL.get(), 8)
 			.pattern("DDD")
 			.pattern("D D")
 			.pattern("DDD")
 			.define('D', Items.POLISHED_DEEPSLATE)
-			.unlockedBy("picked_up_deepslate", RecipeProvider.has(Tags.Items.COBBLESTONES_DEEPSLATE))
-			.save(recipeOutput);
+			.unlockedBy("picked_up_deepslate", has(Tags.Items.COBBLESTONES_DEEPSLATE))
+			.save(this.output);
 
-		ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Shrinking.PERSONAL_SHRINKING_DEVICE.get())
+		shaped(RecipeCategory.TOOLS, Shrinking.PERSONAL_SHRINKING_DEVICE.get())
 			.pattern("121")
 			.pattern("345")
 			.pattern("676")
@@ -50,10 +68,10 @@ public class RecipeGenerator extends RecipeProvider {
 			.define('5', Shrinking.SHRINKING_MODULE)
 			.define('6', Tags.Items.INGOTS_IRON)
 			.define('7', Tags.Items.INGOTS_COPPER)
-			.unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
-			.save(recipeOutput);
+			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
+			.save(this.output);
 
-		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Shrinking.ENLARGING_MODULE)
+		shaped(RecipeCategory.MISC, Shrinking.ENLARGING_MODULE)
 			.pattern("BPB")
 			.pattern("BEB")
 			.pattern("BLB")
@@ -61,10 +79,10 @@ public class RecipeGenerator extends RecipeProvider {
 			.define('P', Items.PISTON)
 			.define('E', Items.ENDER_EYE)
 			.define('L', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
-			.unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
-			.save(recipeOutput);
+			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
+			.save(this.output);
 
-		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Shrinking.SHRINKING_MODULE)
+		shaped(RecipeCategory.MISC, Shrinking.SHRINKING_MODULE)
 			.pattern("BPB")
 			.pattern("BEB")
 			.pattern("BLB")
@@ -72,7 +90,7 @@ public class RecipeGenerator extends RecipeProvider {
 			.define('P', Items.STICKY_PISTON)
 			.define('E', Items.ENDER_EYE)
 			.define('L', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
-			.unlockedBy("picked_up_ender_eye", RecipeProvider.has(Items.ENDER_EYE))
-			.save(recipeOutput);
+			.unlockedBy("picked_up_ender_eye", has(Items.ENDER_EYE))
+			.save(this.output);
 	}
 }

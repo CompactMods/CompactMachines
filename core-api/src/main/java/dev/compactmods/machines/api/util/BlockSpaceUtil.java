@@ -39,8 +39,8 @@ public class BlockSpaceUtil {
     }
 
     public static AABB getPlaneAABB(Direction up, Direction right) {
-        Vec3i rightNorm = right.getNormal();
-        Vec3i upNorm = up.getNormal();
+        Vec3i rightNorm = right.getUnitVec3i();
+        Vec3i upNorm = up.getUnitVec3i();
 
         return AABB.ofSize(Vec3.ZERO, rightNorm.getX() + upNorm.getX(),
                 rightNorm.getY() + upNorm.getY(),
@@ -53,8 +53,8 @@ public class BlockSpaceUtil {
 
         var normal = getPlaneAABB(wallDirection);
         return AABB.ofSize(wallCenter,
-                area.getXsize() * normal.getXsize() + (wallDirection.getNormal().getX() * thickness),
-                area.getYsize() * normal.getYsize() + (wallDirection.getNormal().getY() * thickness),
-                area.getZsize() * normal.getZsize() + (wallDirection.getNormal().getZ() * thickness));
+                area.getXsize() * normal.getXsize() + (wallDirection.getStepX() * thickness),
+                area.getYsize() * normal.getYsize() + (wallDirection.getStepY() * thickness),
+                area.getZsize() * normal.getZsize() + (wallDirection.getStepZ() * thickness));
     }
 }

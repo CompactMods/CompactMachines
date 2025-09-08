@@ -39,7 +39,7 @@ public class Suggestors {
 
 	private static <T> Set<ResourceLocation> getRegistryValues(CommandContext<CommandSourceStack> ctx, ResourceKey<Registry<T>> keyType) {
 	  return ctx.getSource().registryAccess()
-		  .registryOrThrow(keyType)
+		  .lookupOrThrow(keyType)
 		  .keySet();
    }
 }

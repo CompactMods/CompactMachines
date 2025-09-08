@@ -24,11 +24,11 @@ import java.util.List;
 public class DataGeneration {
 
     @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent.Client event) {
         final var baseResults = BaseDatapack.generatePack(event);
         BasicRoomTemplatesDatapack.generatePack(event, baseResults.holderLookupProvider());
 
-        addExperimentalPacks(event);
+//        addExperimentalPacks(event);
     }
 
     private static void addExperimentalPacks(GatherDataEvent event) {

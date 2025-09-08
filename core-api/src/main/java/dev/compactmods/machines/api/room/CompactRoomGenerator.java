@@ -45,7 +45,7 @@ public class CompactRoomGenerator {
      * @param outerBounds Outer dimensions of the room.
      */
     public static void generateRoom(LevelAccessor world, AABB outerBounds) {
-        final var block = BuiltInRegistries.BLOCK.get(WallConstants.SOLID_WALL);
+        final var block = BuiltInRegistries.BLOCK.getValue(WallConstants.SOLID_WALL);
         if (block != null) {
             final var solidWall = block.defaultBlockState();
             generateRoom(world, outerBounds, solidWall);

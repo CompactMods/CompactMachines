@@ -5,7 +5,9 @@ import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

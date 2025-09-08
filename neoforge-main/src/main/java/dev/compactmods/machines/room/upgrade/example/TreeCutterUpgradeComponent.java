@@ -15,6 +15,7 @@ import dev.compactmods.spatial.aabb.AABBHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -52,11 +53,11 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
     public static void prepare() {}
 
     @Override
-    public void addToTooltip(@NotNull Item.TooltipContext ctx, Consumer<Component> tooltips, @NotNull TooltipFlag flags) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         final var c = Component.literal("Tree Cutter")
                 .withColor(CommonColors.LIGHT_GRAY);
 
-        tooltips.accept(c);
+        consumer.accept(c);
     }
 
     @Override
@@ -191,7 +192,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
     }
 
     public static class Data {
-        public static final Codec<Data> CODEC = RecordCodecBuilder.create(i -> i.group(
+        public static final MapCodec<Data> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                 ExtraCodecs.NON_NEGATIVE_INT.fieldOf("cooldown").forGetter(d -> d.cooldown)
         ).apply(i, Data::new));
 

@@ -1,11 +1,11 @@
 package dev.compactmods.machines.datagen.base;
 
-import dev.compactmods.machines.datagen.base.compat.PSDCuriosProvider;
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.base.tags.ItemTagGenerator;
-import dev.compactmods.machines.datagen.base.tags.PointOfInterestTagGenerator;
+import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplateRecipeGenerator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -13,6 +13,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class BaseDatapack {
@@ -21,41 +22,39 @@ public class BaseDatapack {
         //
     }
 
-    public static BaseDatapackGenerationResults generatePack(GatherDataEvent event) {
-        final var fileHelper = event.getExistingFileHelper();
+    public static BaseDatapackGenerationResults generatePack(GatherDataEvent.Client event) {
         final var generator = event.getGenerator();
 
         final var basePackOutput = generator.getPackOutput();
         final var holderLookup = event.getLookupProvider();
 
         // Server
-        boolean server = event.includeServer();
+        event.createProvider(ModelAndStateGenerator::new);
 
-        var dataRegistered = generator.addProvider(server, new DatapackRegisteredStuff(basePackOutput, holderLookup));
-        generator.addProvider(server, new LootTableProvider(basePackOutput,
+        event.createDatapackRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachines.MOD_ID));
+
+        event.addProvider(new LootTableProvider(basePackOutput,
                 Collections.emptySet(),
                 List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK)),
                 holderLookup
         ));
 
-        generator.addProvider(server, new RecipeGenerator(basePackOutput, dataRegistered.getRegistryProvider()));
+        event.createProvider((output,provider)
+                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachines.dotPrefix("base"), output, provider));
 
-        final var blocks = new BlockTagGenerator(basePackOutput, fileHelper, holderLookup);
-        generator.addProvider(server, blocks);
-        generator.addProvider(server, new ItemTagGenerator(basePackOutput, blocks, holderLookup));
+        event.createProvider(BlockTagGenerator::new);
+        event.createProvider(ItemTagGenerator::new);
 
         // CURIOS Integration
-        generator.addProvider(server, new PSDCuriosProvider(basePackOutput, holderLookup, fileHelper));
+//        generator.addProvider(server, new PSDCuriosProvider(basePackOutput, holderLookup, fileHelper));
 
-        generator.addProvider(server, new PointOfInterestTagGenerator(basePackOutput, holderLookup, fileHelper));
+//        generator.addProvider(server, new PointOfInterestTagGenerator(basePackOutput, holderLookup, fileHelper));
 
         // Client
-        boolean client = event.includeClient();
-        generator.addProvider(client, new StateGenerator(basePackOutput, fileHelper));
-        generator.addProvider(client, new ItemModelGenerator(basePackOutput, fileHelper));
+//        event.createProvider(StateGenerator::new);
 
-        generator.addProvider(client, new EnglishLangGenerator(basePackOutput));
+        event.createProvider(EnglishLangGenerator::new);
 
-        return new BaseDatapackGenerationResults(dataRegistered.getRegistryProvider());
+        return new BaseDatapackGenerationResults(holderLookup);
     }
 }

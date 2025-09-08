@@ -22,17 +22,16 @@ public class RoomTemplateHelper {
 	}
 
     public static Stream<RoomTemplate> getTemplates(RegistryAccess registryAccess) {
-        return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY).stream();
+        return registryAccess.lookupOrThrow(RoomTemplate.REGISTRY_KEY).stream();
     }
 
     public static Stream<Holder.Reference<RoomTemplate>> getTemplateHolders(RegistryAccess registryAccess) {
-        return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)
-                .asLookup()
+        return registryAccess.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
                 .listElements();
     }
 
 	public static Optional<RoomTemplate> getTemplateOptional(RegistryAccess registryAccess, ResourceLocation id) {
-		return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)
+		return registryAccess.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
 			.getOptional(id);
 	}
 
@@ -41,7 +40,7 @@ public class RoomTemplateHelper {
 	}
 
 	public static Holder.Reference<RoomTemplate> getTemplateHolder(RegistryAccess registryAccess, ResourceLocation id) {
-		return registryAccess.registryOrThrow(RoomTemplate.REGISTRY_KEY)
-			.getHolderOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
+		return registryAccess.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
+                .getOrThrow(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id));
 	}
 }

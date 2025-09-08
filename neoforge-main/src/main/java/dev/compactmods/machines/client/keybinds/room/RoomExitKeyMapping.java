@@ -7,6 +7,7 @@ import dev.compactmods.machines.network.room.PlayerRequestedLeavePacket;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -35,6 +36,6 @@ public class RoomExitKeyMapping {
    public static void handle() {
 	  final var level = Minecraft.getInstance().level;
 	  if (level != null && level.dimension().equals(CompactDimension.LEVEL_KEY))
-		 PacketDistributor.sendToServer(new PlayerRequestedLeavePacket());
+		 ClientPacketDistributor.sendToServer(new PlayerRequestedLeavePacket());
    }
 }

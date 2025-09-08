@@ -8,16 +8,19 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
+import java.util.Optional;
+
 public interface RoomUpgradeCodecs {
+    @SuppressWarnings("unchecked")
     Codec<RoomUpgradeComponent> DISPATCH_CODEC = Codec.lazyInitialized(() -> {
-       @SuppressWarnings("unchecked") final var reg = (Registry<RoomUpgradeComponentType<?>>) BuiltInRegistries.REGISTRY.get(CompactMachines.modRL("room_upgrades"));
+        final var reg = BuiltInRegistries.REGISTRY
+                .getOptional(CompactMachines.modRL("room_upgrades"))
+                .map(r -> (Registry<RoomUpgradeComponentType<?>>) r);
 
-       if (reg != null) {
-          var upgradeRegistry = reg.byNameCodec();
-          return upgradeRegistry.dispatchStable(RoomUpgradeComponent::getType, RoomUpgradeComponentType::codec);
-       }
-
-       throw new RuntimeException("Room upgrade registry not registered yet; calling too early?");
+        return (Codec<RoomUpgradeComponent>) reg
+                .map(Registry::byNameCodec)
+                .map(c -> c.dispatchStable(RoomUpgradeComponent::getType, RoomUpgradeComponentType::codec))
+                .orElseThrow(() -> new RuntimeException("Room upgrade registry not registered yet; calling too early?"));
     });
 
     StreamCodec<RegistryFriendlyByteBuf, RoomUpgradeComponent> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(DISPATCH_CODEC);

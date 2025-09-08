@@ -78,11 +78,11 @@ public abstract class RoomHelper {
             player.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
 
             return serv.submit(() -> {
-                player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
+                player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.getId(), 25);
 
                 final var spawns = CompactMachines.spawnManagers().get(room.code()).spawns();
                 final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
-                player.changeDimension(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
+                player.teleport(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
 
                 PacketDistributor.sendToPlayer(player, new SyncRoomMetadataPacket(room.code(), Util.NIL_UUID));
 
@@ -105,7 +105,7 @@ public abstract class RoomHelper {
         return serv.submit(() -> {
             final var lastHistory = history.lastHistory(serverPlayer).orElse(null);
             if(lastHistory != null) {
-                serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
+                serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.getId(), 25);
 
                 serverPlayer.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, lastHistory.entryPoint());
                 history.popHistory(serverPlayer, 1);
@@ -116,7 +116,7 @@ public abstract class RoomHelper {
                 final var level = serv.getLevel(location.dimension());
                 if (level != null) {
                     LOGS.debug("Teleporting player {} to {} as they jump up a level...", serverPlayer.getUUID(), location);
-                    serverPlayer.changeDimension(CompactDimensionTransitions.to(level, location.position(), location.rotation()));
+                    serverPlayer.teleport(CompactDimensionTransitions.to(level, location.position(), location.rotation()));
 
                     return RoomExitResult.SUCCESS_WENT_TO_LAST_ENTRYPOINT;
                 } else {

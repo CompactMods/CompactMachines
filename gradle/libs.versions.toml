@@ -2,8 +2,8 @@
 jnanoid = "[2.0.0, 3)"
 
 # Get versions from https://parchmentmc.org/docs/getting-started
-parchmentMC = "1.21.1"
-parchment = "2024.11.17"
+parchmentMC = "1.21.8"
+parchment = "2025.07.20"
 
 [libraries.jnanoid]
 module = "com.aventrix.jnanoid:jnanoid"

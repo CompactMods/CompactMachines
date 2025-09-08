@@ -6,15 +6,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.data.AttachmentBasedDataFile;
 import dev.compactmods.machines.data.AttachmentDataFileFactoryInput;
-import dev.compactmods.machines.data.SafeAttachmentsCodec;
-import dev.compactmods.machines.data.CMDataFile;
-import dev.compactmods.machines.data.CodecHolder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
 
 import java.nio.file.Path;
-import java.util.function.Function;
 
 public class RoomDataAttachments extends AttachmentBasedDataFile<RoomDataAttachments, RoomDataAttachments.AdditionalData> implements AutoCloseable {
 

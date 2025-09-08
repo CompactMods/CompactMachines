@@ -6,14 +6,21 @@ import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.machine.Machines;
 import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Represents a machine item that has not been bound to a room yet,
@@ -26,14 +33,8 @@ public class UnboundCompactMachineItem extends BlockItem {
     }
 
     @Override
-    public Component getName(ItemStack pStack) {
-        return Component.translatableWithFallback(getDescriptionId(pStack), "Compact Machine");
-    }
-
-    @NotNull
-    @Override
-    public String getDescriptionId(ItemStack stack) {
-        return Util.makeDescriptionId("machine", getTemplateId(stack));
+    public Component getName(ItemStack stack) {
+        return Component.translatableWithFallback(Util.makeDescriptionId("machine", getTemplateId(stack)), "Compact Machine");
     }
 
     @Override
@@ -49,10 +50,10 @@ public class UnboundCompactMachineItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        super.appendHoverText(stack, context, tooltip, flags);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltipDisplay, tooltip, flag);
 
-        tooltip.add(Component.translatableWithFallback(MachineTranslations.IDs.NEW_MACHINE, "New Machine"));
+        tooltip.accept(Component.translatableWithFallback(MachineTranslations.IDs.NEW_MACHINE, "New Machine"));
 
         if(stack.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
             // TODO Room Dimensions

@@ -30,12 +30,9 @@ neoForge {
 
     runs {
         this.create("data") {
-            this.data()
+            this.clientData()
 
             this.gameDirectory.set(file("runs/data"))
-
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            systemProperty("forge.enabledGameTestNamespaces", modId)
 
             programArguments.addAll("--mod", modId)
             programArguments.addAll("--all")
@@ -68,7 +65,7 @@ dependencies {
     compileOnly(coreApi)
     compileOnly(mainProject)
 
-    implementation(libs.curios)
+//    implementation(libs.curios)
 }
 
 tasks.compileJava {

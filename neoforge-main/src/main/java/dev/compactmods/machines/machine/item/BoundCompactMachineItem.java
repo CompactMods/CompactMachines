@@ -10,40 +10,31 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class BoundCompactMachineItem extends BlockItem {
 
     public static final String NBT_ROOM_DIMENSIONS = "room_dimensions";
 
-    private static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.modRL("bound_machine_fallback"));
+    public static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.modRL("bound_machine_fallback"));
 
     public BoundCompactMachineItem(Properties builder) {
         super(Machines.Blocks.BOUND_MACHINE.get(), builder);
     }
 
     @Override
-    public Component getName(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_NAME, Component.translatableWithFallback(FALLBACK_ID, "Compact Machine"));
-    }
-
-    @NotNull
-    @Override
-    public String getDescriptionId(ItemStack stack) {
-        return FALLBACK_ID;
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltips, TooltipFlag flags) {
-        super.appendHoverText(stack, ctx, tooltips, flags);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, flag);
 
         var roomCode = stack.get(CMDataComponents.BOUND_ROOM_CODE);
         if (roomCode != null) {
             // TODO - Server-synced room name list
             // tooltip.add(TranslationUtil.tooltip(Tooltips.ROOM_NAME, room));
-            tooltips.add(Component.translatableWithFallback(MachineTranslations.IDs.BOUND_TO, "Bound To: %s", roomCode));
+            tooltipAdder.accept(Component.translatableWithFallback(MachineTranslations.IDs.BOUND_TO, "Bound To: %s", roomCode));
         }
     }
 }

@@ -1,5 +1,6 @@
 package dev.compactmods.machines.datagen.base.tags;
 
+import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.CMRegistries;
@@ -8,15 +9,15 @@ import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
 import dev.compactmods.machines.shrinking.Shrinking;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ItemTagGenerator extends ItemTagsProvider {
-    public ItemTagGenerator(PackOutput packOut, dev.compactmods.machines.datagen.base.tags.BlockTagGenerator blocks, CompletableFuture<HolderLookup.Provider> lookups) {
-        super(packOut, lookups, blocks.contentsGetter());
+    public ItemTagGenerator(PackOutput packOut, CompletableFuture<HolderLookup.Provider> lookups) {
+        super(packOut, lookups, CompactMachines.MOD_ID);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
     private void shrinkingDevices(PersonalShrinkingDevice psd) {
         final var cmShrinkTag = tag(PSDTags.ITEM);
         cmShrinkTag.add(psd);
-        cmShrinkTag.addOptional(ResourceLocation.fromNamespaceAndPath("shrink", "shrinking_device"));
+//        cmShrinkTag.addOptional(ResourceLocation.fromNamespaceAndPath("shrink", "shrinking_device"));
     }
 
     private void curiosTags(PersonalShrinkingDevice psd) {

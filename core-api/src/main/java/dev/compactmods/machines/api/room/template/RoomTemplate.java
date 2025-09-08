@@ -8,6 +8,7 @@ import dev.compactmods.machines.api.room.RoomDimensions;
 import dev.compactmods.machines.api.room.RoomStructureInfo;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -84,7 +85,7 @@ public record RoomTemplate(RoomDimensions internalDimensions, MachineColor defau
     public static final String I18N_STRUCTURE_GEN_TOOLTIP = CompactMachines.dotPrefix("rooms.templates.structure_tooltip");
 
     @Override
-    public void addToTooltip(Item.TooltipContext ctx, Consumer<Component> tooltips, TooltipFlag flags) {
+    public void addToTooltip(Item.TooltipContext ctx, Consumer<Component> tooltips, TooltipFlag flags, DataComponentGetter data) {
         final var roomDimensions = internalDimensions();
 
         tooltips.accept(Component.translatableWithFallback(I18N_INTERNAL_ROOM_DIMS, "Internal Size: %s", roomDimensions.toString())

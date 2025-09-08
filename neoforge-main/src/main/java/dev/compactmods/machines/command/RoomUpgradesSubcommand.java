@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RoomUpgradesSubcommand {
 
@@ -44,26 +45,27 @@ public class RoomUpgradesSubcommand {
         return subRoot;
     }
 
-    private static @Nullable RoomUpgradeComponentType<?> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
+    private static Optional<RoomUpgradeComponentType<?>> getTargetedUpgradeType(CommandContext<CommandSourceStack> ctx) {
         final var src = ctx.getSource();
 
         final var upgradeType = ResourceLocationArgument.getId(ctx, "upgrade");
         return src.getServer()
                 .registryAccess()
-                .registryOrThrow(RoomUpgradeComponentType.REGISTRY_KEY)
-                .get(upgradeType);
+                .lookupOrThrow(RoomUpgradeComponentType.REGISTRY_KEY)
+                .getOptional(upgradeType);
     }
 
     private static int applyUpgrade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var player = ctx.getSource().getPlayerOrException();
         var realUpgradeType = getTargetedUpgradeType(ctx);
+        if(realUpgradeType.isEmpty()) return 0;
 
-        if(realUpgradeType == null) return 0;
+        var upgradeType = realUpgradeType.get();
 
         var heldItem = player.getMainHandItem();
         var currentUpgrades = heldItem.get(CMDataComponents.UPGRADE_LIST_COMPONENT);
 
-        if(!realUpgradeType.canApplyTo(heldItem)) {
+        if(!upgradeType.canApplyTo(heldItem)) {
             ctx.getSource().sendFailure(Component.literal("That upgrade cannot be applied to the held item."));
             return 0;
         }
@@ -72,13 +74,13 @@ public class RoomUpgradesSubcommand {
             var addedList = new ArrayList<>(currentUpgrades.components());
 
             // TODO: Room Upgrade context (level, itemstack, etc)
-            addedList.add(realUpgradeType.constructor().get());
+            addedList.add(upgradeType.constructor().get());
 
             var newList = new RoomUpgradeComponentList(addedList);
             heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         } else {
             // TODO: Room Upgrade context (level, itemstack, etc)
-            var newList = new RoomUpgradeComponentList(List.of(realUpgradeType.constructor().get()));
+            var newList = new RoomUpgradeComponentList(List.of(upgradeType.constructor().get()));
             heldItem.set(CMDataComponents.UPGRADE_LIST_COMPONENT, newList);
         }
 

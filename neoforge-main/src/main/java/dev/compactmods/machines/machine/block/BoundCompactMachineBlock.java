@@ -21,7 +21,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
@@ -44,10 +43,10 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         try {
             if (level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity be) {
-                final var stack = Machines.Items.boundToRoom(be.connectedRoom(), be.getData(CMDataAttachments.MACHINE_COLOR));
+                final var stack = Machines.Items.boundToRoom(be.connectedRoom(), be.getMachineColor());
 
                 be.getCustomName().ifPresent(cn -> {
                     stack.set(DataComponents.CUSTOM_NAME, cn);
@@ -103,7 +102,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack mainItem, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack mainItem, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (mainItem.getItem() instanceof DyeItem dye && !level.isClientSide && level instanceof ServerLevel sl) {
             return tryDyingMachine(sl, pos, player, dye, mainItem);
         }
@@ -120,10 +119,10 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                 }
             });
 
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -137,7 +136,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                         sp.setData(CMDataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
 
                         try {
-                            final var roomBlocks = RoomBlocks.getInternalBlocks(sp.server, inst).get();
+                            final var roomBlocks = RoomBlocks.getInternalBlocks(sp.getServer(), inst).get();
 
                             PacketDistributor.sendToPlayer(sp,
                                     new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode, roomBlocks)
@@ -150,11 +149,6 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
             });
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
+        return level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 }

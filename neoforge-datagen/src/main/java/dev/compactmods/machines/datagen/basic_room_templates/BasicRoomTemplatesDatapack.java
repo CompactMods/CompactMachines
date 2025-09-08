@@ -22,13 +22,10 @@ public class BasicRoomTemplatesDatapack {
                 Component.literal("Enables the basic room templates, built in to the mod.")
         ));
 
-        if(event.includeServer()) {
-            final var rtOut = basicTemplates.addProvider(output -> new RoomTemplatesGenerator(output, registryProvider));
-            basicTemplates.addProvider(output -> new BasicRoomTemplateRecipeGenerator(output, rtOut.getRegistryProvider()));
-        }
+        final var rtOut = basicTemplates.addProvider(output -> new RoomTemplatesGenerator(output, registryProvider));
+        event.createProvider((output,provider)
+                -> new BasicRoomTemplateRecipeGenerator.Runner(CompactMachines.dotPrefix("basic_room_templates"), output, provider));
 
-        if(event.includeClient()) {
-            basicTemplates.addProvider(RoomTemplatesEnglishLangGenerator::new);
-        }
+        basicTemplates.addProvider(RoomTemplatesEnglishLangGenerator::new);
     }
 }

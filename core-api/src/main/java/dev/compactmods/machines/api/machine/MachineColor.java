@@ -5,17 +5,19 @@ import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.DyeColor;
 
 import java.util.Locale;
 
 public record MachineColor(int red, int green, int blue) {
 
+    public static final MachineColor DEFAULT = fromDyeColor(DyeColor.WHITE);
+
     public static MachineColor fromARGB(int argb) {
-        var red = FastColor.ARGB32.red(argb);
-        var green = FastColor.ARGB32.green(argb);
-        var blue = FastColor.ARGB32.blue(argb);
+        var red = ARGB.red(argb);
+        var green = ARGB.green(argb);
+        var blue = ARGB.blue(argb);
         return new MachineColor(red, green, blue);
     }
 
@@ -47,7 +49,7 @@ public record MachineColor(int red, int green, int blue) {
     }
 
     public int rgb() {
-        return FastColor.ARGB32.color(red, green, blue);
+        return ARGB.color(red, green, blue);
     }
 
     private String formatValue() {

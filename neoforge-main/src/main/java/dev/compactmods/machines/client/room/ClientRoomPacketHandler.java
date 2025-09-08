@@ -1,9 +1,6 @@
 package dev.compactmods.machines.client.room;
 
-import dev.compactmods.gander.level.VirtualLevel;
-import dev.compactmods.gander.render.geometry.LevelBakery;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
-import dev.compactmods.machines.room.Rooms;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -22,19 +19,19 @@ public class ClientRoomPacketHandler {
 
             var bounds = AABB.of(blocks.getBoundingBox(new StructurePlaceSettings(), BlockPos.ZERO));
 
-            var virtualLevel = new VirtualLevel(Minecraft.getInstance().level.registryAccess(), true, level -> {
-                level.refreshBlockEntityModels();
-
-                var bakedLevel = LevelBakery.bakeVertices(level, bounds, new Vector3f());
-                mrs.updateScene(bakedLevel);
-            });
-
-            virtualLevel.setBounds(bounds);
-            blocks.placeInWorld(virtualLevel, BlockPos.ZERO, BlockPos.ZERO, new StructurePlaceSettings().setKnownShape(true), RandomSource.create(), Block.UPDATE_CLIENTS);
-            virtualLevel.refreshBlockEntityModels();
-
-            var bakedLevel = LevelBakery.bakeVertices(virtualLevel, bounds, new Vector3f());
-            mrs.updateScene(bakedLevel);
+//            var virtualLevel = new VirtualLevel(Minecraft.getInstance().level.registryAccess(), true, level -> {
+//                level.refreshBlockEntityModels();
+//
+//                var bakedLevel = LevelBakery.bakeVertices(level, bounds, new Vector3f());
+//                mrs.updateScene(bakedLevel);
+//            });
+//
+//            virtualLevel.setBounds(bounds);
+//            blocks.placeInWorld(virtualLevel, BlockPos.ZERO, BlockPos.ZERO, new StructurePlaceSettings().setKnownShape(true), RandomSource.create(), Block.UPDATE_CLIENTS);
+//            virtualLevel.refreshBlockEntityModels();
+//
+//            var bakedLevel = LevelBakery.bakeVertices(virtualLevel, bounds, new Vector3f());
+//            mrs.updateScene(bakedLevel);
 
 //            mrs.getMenu().setBlocks(blocks);
 //            mrs.updateBlockRender();

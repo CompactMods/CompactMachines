@@ -1,10 +1,10 @@
 package dev.compactmods.machines.machine.block;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
+import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.block.IBoundCompactMachineBlockEntity;
 import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.machine.Machines;
@@ -12,16 +12,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,110 +32,95 @@ import java.util.UUID;
 
 public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoundCompactMachineBlockEntity {
 
-   protected UUID owner;
-   private String roomCode;
+    protected UUID owner;
+    private String roomCode;
 
-   @Nullable
-   private Component customName;
+    private MachineColor machineColor;
 
-   public BoundCompactMachineBlockEntity(BlockPos pos, BlockState state) {
-	  super(Machines.BlockEntities.MACHINE.get(), pos, state);
-   }
+    @Nullable
+    private Component customName;
 
-	@Override
-	protected void applyImplicitComponents(DataComponentInput components) {
-		super.applyImplicitComponents(components);
-		this.roomCode = components.get(CMDataComponents.BOUND_ROOM_CODE);
+    public BoundCompactMachineBlockEntity(BlockPos pos, BlockState state) {
+        super(Machines.BlockEntities.MACHINE.get(), pos, state);
+        this.machineColor = MachineColor.DEFAULT;
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        this.roomCode = components.get(CMDataComponents.BOUND_ROOM_CODE);
         this.customName = components.get(DataComponents.CUSTOM_NAME);
+        this.machineColor = components.get(CMDataComponents.MACHINE_COLOR);
+    }
 
-		final var desiredColor = components.get(CMDataComponents.MACHINE_COLOR);
-		if (desiredColor != null) {
-			this.setData(CMDataAttachments.MACHINE_COLOR, desiredColor);
-		}
-	}
-
-	@Override
-	protected void collectImplicitComponents(DataComponentMap.Builder builder) {
-		super.collectImplicitComponents(builder);
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+        super.collectImplicitComponents(builder);
         builder.set(DataComponents.CUSTOM_NAME, this.customName);
-		builder.set(CMDataComponents.BOUND_ROOM_CODE, this.roomCode);
-		builder.set(CMDataComponents.MACHINE_COLOR, this.getData(CMDataAttachments.MACHINE_COLOR));
-	}
+        builder.set(CMDataComponents.BOUND_ROOM_CODE, this.roomCode);
+        builder.set(CMDataComponents.MACHINE_COLOR, this.machineColor);
+    }
 
-	@Override
-	public void removeComponentsFromTag(CompoundTag tag) {
-		super.removeComponentsFromTag(tag);
-        tag.remove("CustomName");
-		tag.remove(CMDataComponents.KEY_ROOM_CODE);
-		tag.remove(CMDataComponents.KEY_MACHINE_COLOR);
-	}
+    @Override
+    public void removeComponentsFromTag(ValueOutput out) {
+        super.removeComponentsFromTag(out);
+        out.discard("CustomName");
+        out.discard(CMDataComponents.KEY_ROOM_CODE);
+        out.discard(CMDataComponents.KEY_MACHINE_COLOR);
+    }
 
-   @Override
-   protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider holders) {
-	  super.loadAdditional(nbt, holders);
-      this.customName = nbt.read("CustomName", ComponentSerialization.CODEC).orElse(null);
-      this.roomCode = nbt.read(NBT_ROOM_CODE, Codec.STRING).orElse(null);
-      this.owner = nbt.read(NBT_OWNER, UUIDUtil.CODEC).orElse(null);
-   }
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.machineColor = input.read(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC).orElse(MachineColor.DEFAULT);
+        this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
+        this.roomCode = input.read(NBT_ROOM_CODE, Codec.STRING).orElse(null);
+        this.owner = input.read(NBT_OWNER, UUIDUtil.CODEC).orElse(null);
+    }
 
-   @Override
-   protected void saveAdditional(@NotNull CompoundTag nbt, HolderLookup.Provider holders) {
-	  super.saveAdditional(nbt, holders);
-      nbt.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
-      nbt.storeNullable(NBT_ROOM_CODE, Codec.STRING, this.roomCode);
-      nbt.storeNullable(NBT_OWNER, UUIDUtil.CODEC, this.owner);
-   }
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store(CMDataComponents.KEY_MACHINE_COLOR, MachineColor.CODEC, this.machineColor);
+        output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
+        output.storeNullable(NBT_ROOM_CODE, Codec.STRING, this.roomCode);
+        output.storeNullable(NBT_OWNER, UUIDUtil.CODEC, this.owner);
+    }
 
-   @Override
-   public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-	  var data = super.getUpdateTag(provider);
-	  saveAdditional(data, provider);
-	  return data;
-   }
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        CompoundTag data = super.getUpdateTag(provider);
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
+        saveAdditional(out);
+        return data.merge(out.buildResult());
+    }
 
-   public Optional<UUID> getOwnerUUID() {
-	  return Optional.ofNullable(this.owner);
-   }
+    public GlobalPos getLevelPosition() {
+        return GlobalPos.of(level.dimension(), worldPosition);
+    }
 
-   public void setOwner(UUID owner) {
-	  this.owner = owner;
-   }
+    public void setConnectedRoom(String roomCode) {
+        this.roomCode = roomCode;
+        this.setChanged();
+    }
 
-   public boolean hasPlayersInside() {
-	  // TODO
-	  return false;
-   }
+    @NotNull
+    public String connectedRoom() {
+        return roomCode;
+    }
 
-   public GlobalPos getLevelPosition() {
-	  return GlobalPos.of(level.dimension(), worldPosition);
-   }
+    public Optional<Component> getCustomName() {
+        return Optional.ofNullable(customName);
+    }
 
-   public void setConnectedRoom(String roomCode) {
-	  if (level != null && !level.isClientSide()) {
-		 this.roomCode = roomCode;
+    @Override
+    public MachineColor getMachineColor() {
+        return this.machineColor;
+    }
 
-		 CompactMachines.room(roomCode).ifPresentOrElse(inst -> {
-				this.setData(CMDataAttachments.MACHINE_COLOR, inst.defaultMachineColor());
-			 },
-			 () -> {
-				this.setData(CMDataAttachments.MACHINE_COLOR, MachineColors.WHITE);
-			 });
-
-		 this.setChanged();
-	  }
-   }
-
-   @NotNull
-   public String connectedRoom() {
-	  return roomCode;
-   }
-
-   public Optional<Component> getCustomName() {
-	  return Optional.ofNullable(customName);
-   }
-
-   public void setCustomName(Component customName) {
-	  this.customName = customName;
-	  this.setChanged();
-   }
+    @Override
+    public void setMachineColor(MachineColor machineColor) {
+        this.machineColor = machineColor;
+        this.setChanged();
+    }
 }

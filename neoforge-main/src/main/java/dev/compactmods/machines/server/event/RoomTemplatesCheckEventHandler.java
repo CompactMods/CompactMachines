@@ -41,7 +41,7 @@ public class RoomTemplatesCheckEventHandler {
 
             final var action = Component.translatableWithFallback("compactmachines.warning.no_templates.action", "[click here]")
                     .withStyle(s -> s.withColor(CommonColors.SOFT_YELLOW)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compactmachines enable_basic_templates"))
+                            .withClickEvent(new ClickEvent.RunCommand("/compactmachines enable_basic_templates"))
                             .withUnderlined(true));
 
             final var warning = Component.translatableWithFallback("compactmachines.warning.no_templates_registered", "No Room Templates are registered! " +

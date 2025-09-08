@@ -12,7 +12,6 @@ public class CMPlayerFaceRenderer {
         final var skins = Minecraft.getInstance().getSkinManager();
         final var playerSkin = skins.getInsecureSkin(profile);
 
-        // pose, x, y, ???, hatLayer, upsideDown
-        net.minecraft.client.gui.components.PlayerFaceRenderer.draw(graphics, playerSkin.texture(), x, y, size, false, false);
+        net.minecraft.client.gui.components.PlayerFaceRenderer.draw(graphics, playerSkin, x, y, size);
     }
 }
