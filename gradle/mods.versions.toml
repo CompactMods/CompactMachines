@@ -1,5 +1,6 @@
 [versions]
-jei = "19.22.1.316"
+# https://maven.blamejared.com/mezz/jei/
+jei = "24.0.0.2"
 
 # Jade
 [libraries.jade]
@@ -8,11 +9,11 @@ version = "6853386"
 
 # Just Enough Items
 [libraries.jeiCommon]
-module = "mezz.jei:jei-1.21.1-common-api"
+module = "mezz.jei:jei-1.21.8-common-api"
 version.ref = "jei"
 
 [libraries.jeiNeo]
-module = "mezz.jei:jei-1.21.1-neoforge-api"
+module = "mezz.jei:jei-1.21.8-neoforge-api"
 version.ref = "jei"
 
 [bundles]

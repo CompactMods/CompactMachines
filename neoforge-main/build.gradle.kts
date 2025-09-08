@@ -233,8 +233,7 @@ dependencies {
 //    jarJar(compactmods.bundles.gander)
 
     // Just Enough Items
-//    compileOnly(mods.jeiCommon)
-//    compileOnly(mods.jeiNeo)
+    compileOnly(mods.bundles.jei)
 
     // Curios API
 //    compileOnly(libs.curios)
