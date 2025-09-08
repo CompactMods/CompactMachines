@@ -243,7 +243,7 @@ dependencies {
 //    compileOnly(mods.rhino)
 
     // Jade Support
-//    compileOnly(mods.jade)
+    compileOnly(mods.jade)
 }
 
 tasks.withType<Test> {

@@ -5,7 +5,7 @@ jei = "24.0.0.2"
 # Jade
 [libraries.jade]
 module = "curse.maven:jade-324717"
-version = "6853386"
+version = "6902747"
 
 # Just Enough Items
 [libraries.jeiCommon]
