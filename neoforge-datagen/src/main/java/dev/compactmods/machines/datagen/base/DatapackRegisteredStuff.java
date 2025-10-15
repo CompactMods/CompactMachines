@@ -54,7 +54,7 @@ public class DatapackRegisteredStuff {
 				.build())
 			.build();
 
-		ctx.register(ResourceKey.create(Registries.BIOME, COMPACT_BIOME), compactBiome);
+		ctx.register(ResourceKey.create(Registries.BIOME, CompactDimension.COMPACT_BIOME), compactBiome);
 	}
 
 	private static void generateDimensionTypes(BootstrapContext<DimensionType> ctx) {
@@ -72,7 +72,7 @@ public class DatapackRegisteredStuff {
 		final var biomes = ctx.lookup(Registries.BIOME);
 		final var dimTypes = ctx.lookup(Registries.DIMENSION_TYPE);
 
-		final var cmBiome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, COMPACT_BIOME));
+		final var cmBiome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, CompactDimension.COMPACT_BIOME));
 
 		var flatSettings = new FlatLevelGeneratorSettings(Optional.empty(), cmBiome, Collections.emptyList())
 			.withBiomeAndLayers(

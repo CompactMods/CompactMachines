@@ -14,7 +14,7 @@ public class CMFeaturePacks {
 
     public static void addFeaturePacks(final AddPackFindersEvent event) {
         addOptionalRoomTemplateDataPack(event, CompactMachines.modRL("basic_templates"), Component.literal("Compact Machines: Basic Room Templates"));
-//        addOptionalFeaturePack(event, CompactMachines.modRL("room_upgrades"), Component.literal("Compact Machines: Room Upgrades"));
+        addOptionalFeaturePack(event, CompactMachines.modRL("room_upgrades"), Component.literal("Compact Machines: Room Upgrades"));
     }
 
     private static void addOptionalFeaturePack(AddPackFindersEvent event, ResourceLocation packName, Component displayName) {

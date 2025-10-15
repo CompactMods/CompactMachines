@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
@@ -43,7 +44,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
         this.add(Machines.Blocks.UNBOUND_MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
             .setRolls(ConstantValue.exactly(1))
             .when(ExplosionCondition.survivesExplosion())
-            .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+            .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
                 .include(DataComponents.CUSTOM_NAME)
                 .include(CMDataComponents.MACHINE_COLOR.get())
                 .include(CMDataComponents.ROOM_TEMPLATE_ID.get()))
@@ -52,7 +53,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
         this.add(Machines.Blocks.BOUND_MACHINE.get(), LootTable.lootTable().withPool(LootPool.lootPool()
             .setRolls(ConstantValue.exactly(1))
             .when(ExplosionCondition.survivesExplosion())
-            .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+            .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
                 .include(DataComponents.CUSTOM_NAME)
                 .include(CMDataComponents.MACHINE_COLOR.get())
                 .include(CMDataComponents.BOUND_ROOM_CODE.get()))

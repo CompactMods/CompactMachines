@@ -49,8 +49,8 @@ public class VoidAirBlock extends AirBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
-        if (level.isClientSide) return;
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean p_451772_) {
+        if (level.isClientSide()) return;
         if (!CompactDimension.isLevelCompact(level)) return;
 
         if (entity instanceof ServerPlayer player) {
@@ -71,7 +71,7 @@ public class VoidAirBlock extends AirBlock {
             };
 
             if (!allowedOutOfBounds)
-                PlayerUtil.teleportPlayerToRespawnOrOverworld(player.getServer(), player);
+                PlayerUtil.teleportPlayerToRespawnOrOverworld(level.getServer(), player);
         }
     }
 

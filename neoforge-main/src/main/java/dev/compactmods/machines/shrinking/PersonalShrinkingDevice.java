@@ -66,9 +66,10 @@ public class PersonalShrinkingDevice extends Item {
 
             // Player Not Sneaking - Teleport from Room
             else {
-                RoomHelper.teleportPlayerOutOfRoom(serverPlayer).thenAccept(result -> {
+                final var server = world.getServer();
+                RoomHelper.teleportPlayerOutOfRoom(server, serverPlayer).thenAccept(result -> {
                     // Check Result - If successful, maybe attempt to damage the PSD item
-                    if (result.successful() && world.getServer().getGameRules().getBoolean(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT)) {
+                    if (result.successful() && server.getGameRules().getBoolean(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT)) {
                         handleSuccessfulAtomicShift(stack, serverPlayer, config);
                     }
                 });

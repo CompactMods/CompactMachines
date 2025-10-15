@@ -29,7 +29,7 @@ public class RoomEventHandler {
 
         if(!CompactDimension.isLevelCompact(dimensionEvent.getDimension())) {
             if(p instanceof ServerPlayer sp) {
-                LOGS.debug("Resetting player {}'s room history due to dimension change.", sp.getGameProfile().getName());
+                LOGS.debug("Resetting player {}'s room history due to dimension change.", sp.getGameProfile().name());
                 PlayerUtil.resetPlayerHistory(sp);
             }
         }
@@ -39,7 +39,7 @@ public class RoomEventHandler {
         Entity ent = evt.getEntity();
 
         // no-op clients and non-compact dimensions, we only care about server spawns
-        if (!CompactDimension.isLevelCompact(ent.level()) || ent.level().isClientSide)
+        if (!CompactDimension.isLevelCompact(ent.level()) || ent.level().isClientSide())
             return;
 
         // Handle players

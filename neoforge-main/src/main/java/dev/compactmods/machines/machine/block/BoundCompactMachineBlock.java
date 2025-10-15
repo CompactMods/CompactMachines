@@ -103,11 +103,11 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
 
     @Override
     protected InteractionResult useItemOn(ItemStack mainItem, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (mainItem.getItem() instanceof DyeItem dye && !level.isClientSide && level instanceof ServerLevel sl) {
+        if (mainItem.getItem() instanceof DyeItem dye && !level.isClientSide() && level instanceof ServerLevel sl) {
             return tryDyingMachine(sl, pos, player, dye, mainItem);
         }
 
-        if ((mainItem.is(PSDTags.ITEM) || mainItem.has(Shrinking.DataComponents.SHRINKING_CONFIG))
+        if (mainItem.has(Shrinking.DataComponents.SHRINKING_CONFIG)
                 && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof BoundCompactMachineBlockEntity tile) {
 
@@ -128,7 +128,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         // All other items, open preview screen
-        if (!level.isClientSide && !(player instanceof FakePlayer)) {
+        if (!level.isClientSide() && !(player instanceof FakePlayer)) {
             level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get()).ifPresent(machine -> {
                 final var roomCode = machine.connectedRoom();
                 CompactMachines.room(roomCode).ifPresent(inst -> {
@@ -136,7 +136,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
                         sp.setData(CMDataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
 
                         try {
-                            final var roomBlocks = RoomBlocks.getInternalBlocks(sp.getServer(), inst).get();
+                            final var roomBlocks = RoomBlocks.getInternalBlocks(level.getServer(), inst).get();
 
                             PacketDistributor.sendToPlayer(sp,
                                     new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode, roomBlocks)
@@ -149,6 +149,6 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
             });
         }
 
-        return level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
+        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 }

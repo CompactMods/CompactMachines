@@ -27,7 +27,7 @@ public record PlayerStartedRoomTrackingPacket(String roomCode) implements Custom
 
     public static final IPayloadHandler<PlayerStartedRoomTrackingPacket> HANDLER = (pkt, ctx) -> {
         var sender = ctx.player();
-        var server = ctx.player().getServer();
+        var server = ctx.player().level().getServer();
 
         CompactMachines.room(pkt.roomCode).ifPresent(instance -> {
             final StructureTemplate blocks;

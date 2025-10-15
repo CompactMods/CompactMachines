@@ -10,10 +10,16 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.debug.DebugEntryCategory;
+import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.client.gui.GuiLayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -31,7 +37,7 @@ public class RoomMetadataDebugOverlay implements GuiLayer {
 
             CMPlayerFaceRenderer.render(ownerInfo, graphics, -6, -14, 12);
 
-            final var text = Component.translatable(MachineTranslations.IDs.OWNER, ownerInfo.getName());
+            final var text = Component.translatable(MachineTranslations.IDs.OWNER, ownerInfo.name());
             graphics.drawString(font, text,
                     -(font.width(text) / 2), 0, CommonColors.WHITE);
         });
@@ -40,7 +46,7 @@ public class RoomMetadataDebugOverlay implements GuiLayer {
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         final var mc = Minecraft.getInstance();
-        if (!mc.getDebugOverlay().showDebugScreen())
+        if (!mc.debugEntries.isF3Visible())
             return;
 
         if (mc.player == null)
@@ -72,4 +78,23 @@ public class RoomMetadataDebugOverlay implements GuiLayer {
 
         poseStack.popMatrix();
     }
+
+    // TODO
+//    public static class ScreenEntry implements DebugScreenEntry {
+//
+//        @Override
+//        public void display(DebugScreenDisplayer displayer, @Nullable Level level, @Nullable LevelChunk clientChunk, @Nullable LevelChunk serverChunk) {
+//
+//        }
+//
+//        @Override
+//        public boolean isAllowed(boolean reducedDebugInfo) {
+//            return true;
+//        }
+//
+//        @Override
+//        public DebugEntryCategory category() {
+//            return DebugEntryCategory.RENDERER;
+//        }
+//    }
 }

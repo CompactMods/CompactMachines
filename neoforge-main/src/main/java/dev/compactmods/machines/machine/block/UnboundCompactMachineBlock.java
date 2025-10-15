@@ -67,12 +67,12 @@ public class UnboundCompactMachineBlock extends CompactMachineBlock implements E
 
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand p_316595_, BlockHitResult p_316140_) {
-		if (stack.getItem() instanceof DyeItem dye && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+		if (stack.getItem() instanceof DyeItem dye && !level.isClientSide() && level instanceof ServerLevel serverLevel) {
 			return tryDyingMachine(serverLevel, pos, player, dye, stack);
 		}
 
 		MinecraftServer server = level.getServer();
-		if ((stack.is(PSDTags.ITEM) || stack.has(Shrinking.DataComponents.SHRINKING_CONFIG)) && player instanceof ServerPlayer sp) {
+		if (stack.has(Shrinking.DataComponents.SHRINKING_CONFIG) && player instanceof ServerPlayer sp) {
 			level.getBlockEntity(pos, Machines.BlockEntities.UNBOUND_MACHINE.get()).ifPresent(unboundEntity -> {
 
 				RoomTemplate template = RoomTemplateHelper.getTemplate(level, unboundEntity.templateId());

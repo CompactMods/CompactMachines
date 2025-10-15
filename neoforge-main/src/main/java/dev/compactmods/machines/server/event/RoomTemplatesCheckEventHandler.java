@@ -23,19 +23,19 @@ public class RoomTemplatesCheckEventHandler {
         if (!(player instanceof ServerPlayer serverPlayer))
             return;
 
-        final var serv = serverPlayer.getServer();
+        final var serv = serverPlayer.level().getServer();
         if (serv == null)
             return;
 
         final var isOp = serv.getPlayerList()
-                .isOp(serverPlayer.getGameProfile());
+                .isOp(serverPlayer.nameAndId());
 
         if(!isOp) return;
 
         final var numTemplates = RoomTemplateHelper.getTemplates(serv.registryAccess())
                 .count();
 
-        if(numTemplates == 0 && isOp)
+        if(numTemplates == 0)
         {
             final var displayName = Component.translatableWithFallback("compactmachines.display_name", "Compact Machines");
 

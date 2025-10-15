@@ -19,6 +19,7 @@ public class RoomClientEvents {
     }
 
     public static void onKeybindRegistration(final RegisterKeyMappingsEvent evt) {
+        evt.registerCategory(RoomKeyMappings.CATEGORY);
         evt.register(RoomExitKeyMapping.MAPPING);
         evt.register(RoomUpgradeUIMapping.MAPPING);
     }
@@ -32,6 +33,7 @@ public class RoomClientEvents {
     }
 
     public static void onOverlayRegistration(final RegisterGuiLayersEvent layers) {
-        layers.registerAbove(VanillaGuiLayers.DEBUG_OVERLAY, CompactMachines.modRL("room_meta_debug"), new RoomMetadataDebugOverlay());
+        // FIXME: Register a debug thing correctly
+        layers.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, CompactMachines.modRL("room_meta_debug"), new RoomMetadataDebugOverlay());
     }
 }

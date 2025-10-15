@@ -47,7 +47,7 @@ public class BoundMachineProviders {
                         final var face = new PlayerFaceElement(ownerProfile);
 
                         var ownerName = JadeUI.text(Component
-                                .translatable(MachineTranslations.IDs.OWNER, ownerProfile.getName())
+                                .translatable(MachineTranslations.IDs.OWNER, ownerProfile.name())
                                 .withStyle(ChatFormatting.DARK_GRAY));
 
                         int sizeDiffY = Mth.floor(face.getHeight() - ownerName.getHeight()) / 2;

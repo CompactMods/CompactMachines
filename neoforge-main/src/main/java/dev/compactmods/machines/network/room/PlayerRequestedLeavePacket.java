@@ -13,7 +13,7 @@ public record PlayerRequestedLeavePacket() implements CustomPacketPayload {
     public static final IPayloadHandler<PlayerRequestedLeavePacket> HANDLER = (pkt, ctx) -> {
         final var player = ctx.player();
         if(player instanceof ServerPlayer sp) {
-            RoomHelper.teleportPlayerOutOfRoom(sp);
+            RoomHelper.teleportPlayerOutOfRoom(sp.level().getServer(), sp);
         }
     };
 

@@ -23,7 +23,7 @@ public class ItemBlockWall extends BlockItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, flag);
         if (stack.is(WallConstants.TAG_SOLID_WALL_ITEMS)) {
-            tooltipAdder.accept(Screen.hasShiftDown() ?
+            tooltipAdder.accept(flag.hasShiftDown() ?
                     Translations.UNBREAKABLE_BLOCK.get() : Translations.HINT_HOLD_SHIFT.get());
         }
     }

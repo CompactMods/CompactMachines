@@ -7,7 +7,7 @@ public class CMClientCommands {
     public static void registerClientCommands(RegisterClientCommandsEvent evt) {
         final var dispatcher = evt.getDispatcher();
 
-        if (!FMLEnvironment.production) {
+        if (!FMLEnvironment.isProduction()) {
             ScreenSizesCommand.registerScreenSizesCommands(dispatcher);
         }
     }

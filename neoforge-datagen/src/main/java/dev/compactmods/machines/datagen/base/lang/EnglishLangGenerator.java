@@ -3,6 +3,7 @@ package dev.compactmods.machines.datagen.base.lang;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.client.room.RoomKeyMappings;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.i18n.Translations;
@@ -78,7 +79,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         add(Villagers.SPATIAL_WORKBENCH.get(), "Spatial Workbench");
         addVillagerProfession(Villagers.TINKERER, "Spatial Tinkerer");
 
-        add(RoomExitKeyMapping.I18n.CATEGORY, "Compact Machines");
+        add(RoomKeyMappings.CATEGORY.id().toLanguageKey(), "Compact Machines");
         add(RoomExitKeyMapping.I18n.NAME, "Quick-Exit Compact Machine");
         add(RoomUpgradeUIMapping.NAME, "Open Room Upgrade Screen");
 

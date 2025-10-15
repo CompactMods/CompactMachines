@@ -8,7 +8,6 @@ import dev.compactmods.machines.compat.InterModCompat;
 import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.dimension.Dimension;
-import dev.compactmods.machines.dimension.WorldBorderFixer;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.player.PlayerEventHandler;
@@ -62,7 +61,6 @@ public class CompactMachinesCommon {
     private static void registerEvents(IEventBus modBus) {
         Rooms.registerEvents(modBus);
         RoomUpgrades.registerEvents(modBus);
-        WorldBorderFixer.registerEvents();
         PlayerEventHandler.registerEvents();
         Villagers.registerEvents();
 

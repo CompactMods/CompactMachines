@@ -26,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
@@ -93,16 +94,13 @@ public abstract class RoomHelper {
         return CompletableFuture.completedFuture(result);
     }
 
-    public static CompletableFuture<RoomExitResult> teleportPlayerOutOfRoom(@Nonnull ServerPlayer serverPlayer) {
+    public static CompletableFuture<RoomExitResult> teleportPlayerOutOfRoom(@NotNull MinecraftServer server, @Nonnull ServerPlayer serverPlayer) {
         if (!CompactDimension.isLevelCompact(serverPlayer.level()))
             return CompletableFuture.completedFuture(RoomExitResult.FAILED_NOT_IN_COMPACT_DIM);
 
-        MinecraftServer serv = serverPlayer.getServer();
-        assert serv != null;
-
         final IPlayerEntryPointHistoryManager history = CompactMachines.playerHistoryApi().entryPoints();
 
-        return serv.submit(() -> {
+        return server.submit(() -> {
             final var lastHistory = history.lastHistory(serverPlayer).orElse(null);
             if(lastHistory != null) {
                 serverPlayer.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.getId(), 25);
@@ -113,7 +111,7 @@ public abstract class RoomHelper {
                 serverPlayer.setData(CMDataAttachments.CURRENT_ROOM_CODE, lastHistory.roomCode());
 
                 final var location = lastHistory.entryPoint().entryLocation();
-                final var level = serv.getLevel(location.dimension());
+                final var level = server.getLevel(location.dimension());
                 if (level != null) {
                     LOGS.debug("Teleporting player {} to {} as they jump up a level...", serverPlayer.getUUID(), location);
                     serverPlayer.teleport(CompactDimensionTransitions.to(level, location.position(), location.rotation()));
@@ -121,14 +119,14 @@ public abstract class RoomHelper {
                     return RoomExitResult.SUCCESS_WENT_TO_LAST_ENTRYPOINT;
                 } else {
                     LOGS.error("Player tracking points to an unknown dimension. Teleporting player {} to their default spawn instead.", serverPlayer.getUUID());
-                    PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                    PlayerUtil.teleportPlayerToRespawnOrOverworld(server, serverPlayer);
 
                     return RoomExitResult.SUCCESS_WENT_TO_SPAWN;
                 }
 
             } else {
                 serverPlayer.removeData(CMDataAttachments.LAST_ROOM_ENTRYPOINT);
-                PlayerUtil.teleportPlayerToRespawnOrOverworld(serv, serverPlayer);
+                PlayerUtil.teleportPlayerToRespawnOrOverworld(server, serverPlayer);
 
                 return RoomExitResult.SUCCESS_WENT_TO_SPAWN;
             }

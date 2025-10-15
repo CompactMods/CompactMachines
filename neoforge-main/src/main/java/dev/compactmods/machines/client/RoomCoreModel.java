@@ -9,6 +9,7 @@ import dev.compactmods.machines.room.Rooms;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +23,7 @@ public class RoomCoreModel implements SpecialModelRenderer<RoomTemplate> {
     protected static final Minecraft minecraft = Minecraft.getInstance();
 
     @Override
-    public void render(@Nullable RoomTemplate patterns, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, boolean hasFoilType) {
+    public void submit(@Nullable RoomTemplate argument, ItemDisplayContext displayContext, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight, int packedOverlay, boolean hasFoil, int outlineColor) {
 
         poseStack.pushPose();
 
@@ -32,15 +33,14 @@ public class RoomCoreModel implements SpecialModelRenderer<RoomTemplate> {
         poseStack.scale(.25f, .25f, .25f);
         poseStack.translate(3.50D, 0.0D, 0.0D);
 
-        final var renderer = minecraft.getBlockRenderer();
-        renderer.renderSingleBlock(Machines.Blocks.UNBOUND_MACHINE.get().defaultBlockState(), poseStack, bufferSource, packedLight, packedOverlay);
+        nodeCollector.submitBlock(poseStack, Machines.Blocks.UNBOUND_MACHINE.get().defaultBlockState(),
+                packedLight, packedOverlay, outlineColor);
 
         poseStack.pushPose();
         poseStack.translate(-2.0D, 0.0D, 0.0D);
-        renderer.renderSingleBlock(Rooms.Blocks.BREAKABLE_WALL.get().defaultBlockState(), poseStack, bufferSource, packedLight, packedOverlay);
+        nodeCollector.submitBlock(poseStack, Rooms.Blocks.BREAKABLE_WALL.get().defaultBlockState(),
+                packedLight, packedOverlay, outlineColor);
         poseStack.popPose();
-
-
 
         poseStack.popPose();
     }
@@ -64,13 +64,13 @@ public class RoomCoreModel implements SpecialModelRenderer<RoomTemplate> {
         }
 
         @Override
-        public MapCodec<Unbaked> type() {
-            return MAP_CODEC;
+        public @Nullable SpecialModelRenderer<?> bake(BakingContext context) {
+            return new RoomCoreModel();
         }
 
         @Override
-        public @Nullable SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
-            return new RoomCoreModel();
+        public MapCodec<Unbaked> type() {
+            return MAP_CODEC;
         }
     }
 }

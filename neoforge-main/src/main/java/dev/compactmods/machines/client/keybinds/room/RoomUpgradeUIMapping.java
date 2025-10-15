@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.client.room.RoomKeyMappings;
 import dev.compactmods.machines.feature.CMFeatureFlags;
 import dev.compactmods.machines.network.room.PlayerRequestedUpgradeUIPacket;
 import dev.compactmods.machines.room.Rooms;
@@ -17,7 +18,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class RoomUpgradeUIMapping {
 
-   public static final String CATEGORY = Util.makeDescriptionId("key.category", CompactMachines.modRL("general"));
    public static final String NAME = Util.makeDescriptionId("key.mapping", CompactMachines.modRL("open_upgrade_screen"));
 
    public static final IKeyConflictContext CONFLICT_CONTEXT = new IKeyConflictContext() {
@@ -33,7 +33,7 @@ public class RoomUpgradeUIMapping {
 	  }
    };
 
-   public static final KeyMapping MAPPING = new KeyMapping(NAME, CONFLICT_CONTEXT, InputConstants.UNKNOWN, CATEGORY);
+   public static final KeyMapping MAPPING = new KeyMapping(NAME, CONFLICT_CONTEXT, InputConstants.UNKNOWN, RoomKeyMappings.CATEGORY);
 
    public static void handle() {
 	  final var level = Minecraft.getInstance().level;

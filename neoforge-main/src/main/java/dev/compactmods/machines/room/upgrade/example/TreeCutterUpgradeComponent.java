@@ -1,6 +1,6 @@
 package dev.compactmods.machines.room.upgrade.example;
 
-import com.mojang.serialization.Codec;
+import com.google.common.base.Predicates;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
@@ -10,11 +10,11 @@ import dev.compactmods.machines.api.room.upgrade.RoomUpgradeComponentType;
 import dev.compactmods.machines.api.room.upgrade.event.RoomUpgradeComponentEvent;
 import dev.compactmods.machines.api.room.upgrade.event.lifecycle.UpgradeTickedEventListener;
 import dev.compactmods.machines.room.upgrade.RoomUpgrades;
-import dev.compactmods.machines.util.item.ItemHandlerUtil;
 import dev.compactmods.spatial.aabb.AABBHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -30,10 +30,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -45,12 +49,19 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
 
     public static final MapCodec<TreeCutterUpgradeComponent> CODEC = MapCodec.unit(TreeCutterUpgradeComponent::new);
 
+    public enum SuccessfulActionBehavior {
+        DoNothing,
+        DamageItem,
+        DrainEnergy
+    }
+
     public static final Supplier<AttachmentType<Data>> TREECUTTER_DATA = CMDataAttachments.ATTACHMENT_TYPES
             .register("treecutter", key -> AttachmentType.builder(() -> new Data())
                     .serialize(Data.CODEC)
                     .build());
 
-    public static void prepare() {}
+    public static void prepare() {
+    }
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
@@ -74,7 +85,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
     public static void onTick(RoomUpgradeInstance instance) {
         final var data = instance.getData(TREECUTTER_DATA);
 
-        if(data.cooldown > 0) {
+        if (data.cooldown > 0) {
             data.cooldown--;
             return;
         }
@@ -93,21 +104,19 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
         final var innerBounds = room.boundaries().innerBounds();
 
         final var upgradeItem = instance.upgradeItem();
-        var energyHandler = upgradeItem.getCapability(Capabilities.EnergyStorage.ITEM);
+        var energyHandler = ItemAccess.forStack(upgradeItem).getCapability(Capabilities.Energy.ITEM);
 
-        boolean doItemDamage = false;
-        boolean preferEnergy = false;
+        SuccessfulActionBehavior behavior = SuccessfulActionBehavior.DoNothing;
         int maxAllowed = 0;
         if (upgradeItem.isDamageableItem()) {
-            doItemDamage = true;
+            behavior = SuccessfulActionBehavior.DamageItem;
             var durabilityLeft = upgradeItem.getMaxDamage() - upgradeItem.getDamageValue();
             maxAllowed = Math.clamp(durabilityLeft, 0, 5);
         }
 
-        if (energyHandler != null && energyHandler.canExtract()) {
-            doItemDamage = true;
-            preferEnergy = true;
-            maxAllowed = Math.clamp(energyHandler.getEnergyStored() / 10, 0, 10);
+        if (energyHandler != null) {
+            behavior = SuccessfulActionBehavior.DrainEnergy;
+            maxAllowed = Math.clamp(energyHandler.getAmountAsLong() / 10, 0, 10);
         }
 
         final var treeBlocks = BlockPos.betweenClosedStream(innerBounds)
@@ -131,11 +140,7 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
         final var numLogs = treeBlocks.size();
 
         if (!treeBlocks.isEmpty()) {
-
             final var bounds = room.boundaries().innerBounds();
-            final var minCorner = AABBHelper.minCorner(bounds);
-            final var lastDitch = BlockPos.containing(minCorner.x(), minCorner.y() + 1, minCorner.z());
-
             final var inventories = getInventories(level, bounds).toList();
 
             // If we have no valid inventories, do nothing
@@ -143,49 +148,66 @@ public class TreeCutterUpgradeComponent implements RoomUpgradeComponent {
                 return;
 
             for (Pair<BlockPos, BlockState> pos : treeBlocks) {
-                final var blockEntity = level.getBlockEntity(pos.left());
-                final var drops = Block.getDrops(pos.right(), level, pos.left(), blockEntity, null, upgradeItem);
-
-                level.destroyBlock(pos.left(), false);
-
-                if (!drops.isEmpty()) {
-                    List<ItemStack> remaining = new ArrayList<>();
-                    for (final var cornerInv : inventories) {
-                        remaining = ItemHandlerUtil.insertMultipleStacks(cornerInv.inventory, drops);
-                        if (remaining.isEmpty()) break;
-                    }
-
-                    if (!remaining.isEmpty()) {
-                        for (var failedStack : remaining) {
-                            Block.popResource(level, lastDitch, failedStack);
-                        }
-                    }
-                }
-            }
-
-            if (preferEnergy) {
-                energyHandler.extractEnergy(numLogs * 10, false);
-            } else {
-                if(doItemDamage) {
-                    upgradeItem.hurtAndBreak(numLogs, level, null, (item) -> {
-                        upgradeItem.shrink(1);
-                    });
-                }
+                breakSingleBlock(pos, level, upgradeItem, inventories, energyHandler, behavior);
             }
         }
 
         data.cooldown = 1;
     }
 
-    private record LocatedInventory(BlockPos pos, IItemHandler inventory) {
+    private static void breakSingleBlock(Pair<BlockPos, BlockState> pos, ServerLevel level, ItemStack upgradeItem, List<LocatedInventory> inventories, EnergyHandler energyHandler, SuccessfulActionBehavior actionBehavior) {
+        final var blockEntity = level.getBlockEntity(pos.left());
+
+        final var drops = Block.getDrops(pos.right(), level, pos.left(), blockEntity, null, upgradeItem);
+        ResourceHandler<ItemResource> memory = new ItemStacksResourceHandler(NonNullList.copyOf(drops));
+
+        try (final var blockTx = Transaction.openRoot()) {
+            switch (actionBehavior) {
+                case DoNothing:
+                    break;
+
+                case DamageItem:
+                    // FIXME - Revert item damage if drops did not fit
+                    upgradeItem.hurtAndBreak(1, level, null, (item) -> {
+                        upgradeItem.shrink(1);
+                    });
+                    break;
+
+                case DrainEnergy:
+                    int pulled = energyHandler.extract(10, blockTx);
+
+                    // Revert transaction, abort
+                    if (pulled < 10) return;
+                    break;
+            }
+
+            if (!drops.isEmpty()) {
+
+                for (final var cornerInv : inventories) {
+                    int moved = ResourceHandlerUtil.move(memory, cornerInv.inventory, Predicates.alwaysTrue(), Integer.MAX_VALUE, blockTx);
+
+                    // Nothing left to move or nothing moved - exit
+                    if (moved == 0)
+                        break;
+                }
+
+                if (ResourceHandlerUtil.isEmpty(memory)) {
+                    level.destroyBlock(pos.left(), false);
+                    blockTx.commit();
+                }
+            }
+        }
+    }
+
+    private record LocatedInventory(BlockPos pos, ResourceHandler<ItemResource> inventory) {
     }
 
     private static Stream<LocatedInventory> getInventories(ServerLevel level, AABB bounds) {
         return AABBHelper.allCorners(bounds)
                 .map(BlockPos::immutable)
                 .flatMap(pos -> Stream.of(
-                                level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null),
-                                level.getCapability(Capabilities.ItemHandler.BLOCK, pos, Direction.UP)
+                                level.getCapability(Capabilities.Item.BLOCK, pos, null),
+                                level.getCapability(Capabilities.Item.BLOCK, pos, Direction.UP)
                         )
                         .filter(Objects::nonNull)
                         .map(handler -> new LocatedInventory(pos, handler)));

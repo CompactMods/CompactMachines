@@ -25,7 +25,7 @@ public abstract class CodecExtensions {
                     .map(arr -> new ChunkPos(arr[0], arr[1])), pos -> IntStream.of(pos.x, pos.z));
 
     public static <T extends Enum<T> & StringRepresentable> StreamCodec<ByteBuf, T> stringRepresentableStreamCodec(T[] values) {
-        final var lookup = StringRepresentable.createNameLookup(values, Function.identity());
+        final var lookup = StringRepresentable.createNameLookup(values, StringRepresentable::getSerializedName);
         return ByteBufCodecs.STRING_UTF8.map(lookup, T::getSerializedName);
     }
 }

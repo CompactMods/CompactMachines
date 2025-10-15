@@ -3,6 +3,7 @@ package dev.compactmods.machines.room.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -17,12 +18,12 @@ public abstract class ProtectedWallBlock extends Block {
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         if(!canPlayerBreak(player))
             return false;
 
         level.gameEvent(player, GameEvent.BLOCK_DESTROY, pos);
-        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide ? 11 : 3);
+        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide() ? 11 : 3);
     }
 
     @Override

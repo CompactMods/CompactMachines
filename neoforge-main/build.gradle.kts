@@ -90,9 +90,9 @@ neoForge {
 
             systemProperties.put("terminal.ansi", "true")
 
-            var additional = this.additionalRuntimeClasspathConfiguration
-            additional.dependencies.add(compactmods.feather.get())
-            additional.dependencies.add(libs.jnanoid.get())
+//            var additional = this.additionalRuntimeClasspathConfiguration
+//            additional.dependencies.add(compactmods.feather.get())
+//            additional.dependencies.add(libs.jnanoid.get())
         }
         
         create("client") {
@@ -205,7 +205,7 @@ repositories {
 dependencies {
     // Core Projects and Libraries
     this {
-        compileOnly(libs.jnanoid)
+        implementation(libs.jnanoid)
         testImplementation(libs.jnanoid)
         jarJar(libs.jnanoid)
 
@@ -219,7 +219,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 
-    compileOnly(compactmods.feather)
+    implementation(compactmods.feather)
     testImplementation(compactmods.feather)
     jarJar(compactmods.feather) { isTransitive = false }
 

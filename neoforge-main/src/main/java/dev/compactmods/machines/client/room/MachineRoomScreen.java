@@ -17,6 +17,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
@@ -86,7 +87,9 @@ public class MachineRoomScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
+
+        final var keyCode = event.key();
         final float rotateSpeed = 1 / 12f;
 
         if(roomPreviewEnabled) {
@@ -121,7 +124,7 @@ public class MachineRoomScreen extends Screen {
             }
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
