@@ -1,7 +1,9 @@
 package dev.compactmods.machines.datagen.base.lang;
 
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
+import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.i18n.Translations;
 import dev.compactmods.machines.api.advancement.Advancements;
@@ -13,6 +15,7 @@ import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.client.keybinds.room.RoomUpgradeUIMapping;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
@@ -63,7 +66,8 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
 
         addCreativeTab(CreativeTabs.MAIN_RL, "Compact Machines");
 
-        add("biome." + CompactMachines.MOD_ID + ".machine", "Compact Machine");
+        addBiome(CompactDimension.COMPACT_BIOME_KEY, "Compact Machine");
+        addDimension(CompactDimension.LEVEL_KEY, "Compact Machine");
 
         add("jei.compactmachines.machines", "Machines are used to make pocket dimensions. Craft a machine and place it in world, then use a Personal Shrinking Device to go inside.");
         add("jei.compactmachines.shrinking_device", "Use the Personal Shrinking Device (PSD) on a machine in order to enter a compact space.");
@@ -71,8 +75,8 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
 
         add("curios.identifier.psd", "Personal Shrinking Device");
 
-        // add(MachineRoomUpgrades.WORKBENCH_BLOCK.get(), "Workbench");
-        add("entity.minecraft.villager.compactmachines.tinkerer", "Spatial Tinkerer");
+        add(Villagers.SPATIAL_WORKBENCH.get(), "Spatial Workbench");
+        addVillagerProfession(Villagers.TINKERER, "Spatial Tinkerer");
 
         add(RoomExitKeyMapping.I18n.CATEGORY, "Compact Machines");
         add(RoomExitKeyMapping.I18n.NAME, "Quick-Exit Compact Machine");
@@ -85,6 +89,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addGamerule(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS_KEY, "Allow Spectators OOB", "Allow out-of-bounds spectators");
         addGamerule(CMGameRules.DAMAGE_OOB_PLAYERS_KEY, "Damage OOB Players", "Damage players that are out of bounds");
         addGamerule(CMGameRules.DAMAGE_PSD_ITEMS_ON_ROOM_EXIT_KEY, "Damage PSDs on Exit", "Damage shrinking devices by leaving rooms");
+
     }
 
     private void blocksAndItems() {

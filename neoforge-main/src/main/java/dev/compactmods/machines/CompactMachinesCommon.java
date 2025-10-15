@@ -53,7 +53,7 @@ public class CompactMachinesCommon {
         RoomUpgrades.prepare();
         Dimension.prepare();
         Commands.prepare();
-//        Villagers.prepare();
+        Villagers.prepare();
 
         CMDataComponents.prepare();
         CMDataAttachments.prepare();
@@ -64,6 +64,7 @@ public class CompactMachinesCommon {
         RoomUpgrades.registerEvents(modBus);
         WorldBorderFixer.registerEvents();
         PlayerEventHandler.registerEvents();
+        Villagers.registerEvents();
 
         RoomTemplatesCheckEventHandler.registerEvents();
 

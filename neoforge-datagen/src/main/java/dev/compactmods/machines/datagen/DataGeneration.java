@@ -25,10 +25,10 @@ public class DataGeneration {
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent.Client event) {
-        final var baseResults = BaseDatapack.generatePack(event);
-        BasicRoomTemplatesDatapack.generatePack(event, baseResults.holderLookupProvider());
+        BaseDatapack.generatePack(event);
+        BasicRoomTemplatesDatapack.generatePack(event);
 
-//        addExperimentalPacks(event);
+        addExperimentalPacks(event);
     }
 
     private static void addExperimentalPacks(GatherDataEvent event) {

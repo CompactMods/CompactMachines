@@ -4,11 +4,13 @@ import dev.compactmods.machines.api.CompactMachines;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -24,6 +26,11 @@ public abstract class CompactDimension {
 
     public static final ResourceKey<DimensionType> DIM_TYPE_KEY = ResourceKey
             .create(Registries.DIMENSION_TYPE, CompactMachines.modRL("compact_world"));
+
+    public static final ResourceLocation COMPACT_BIOME = CompactMachines.modRL("machine");
+
+    public static final ResourceKey<Biome> COMPACT_BIOME_KEY = ResourceKey
+            .create(Registries.BIOME, COMPACT_BIOME);
 
     private CompactDimension() {}
 

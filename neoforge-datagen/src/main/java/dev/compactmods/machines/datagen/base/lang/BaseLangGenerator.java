@@ -3,9 +3,11 @@ package dev.compactmods.machines.datagen.base.lang;
 import dev.compactmods.machines.api.CompactMachines;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.GameRules;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +24,11 @@ public abstract class BaseLangGenerator extends LanguageProvider {
 
     @Override
     protected void addTranslations() {}
+
+    protected void addVillagerProfession(Holder<VillagerProfession> profession, String name) {
+        final var rl = profession.getKey().location();
+        add("entity." + rl.getNamespace() + ".villager." + rl.getPath(), name);
+    }
 
     protected void addGamerule(String key, String title, String description) {
         add("gamerule." + key, title);

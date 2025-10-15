@@ -51,6 +51,11 @@ public interface Rooms {
     interface Items {
         Supplier<Item.Properties> WALL_ITEM_PROPS = Item.Properties::new;
 
+        DeferredItem<Item> ROOM_CORE = CMRegistries.ITEMS.register("room_core", () ->
+                new Item(new Item.Properties()
+                        .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("room_core")))
+                        .stacksTo(1)));
+
         DeferredItem<ItemBlockWall> ITEM_SOLID_WALL = CMRegistries.ITEMS.register("solid_wall", () ->
                 new ItemBlockWall(Blocks.SOLID_WALL.get(), WALL_ITEM_PROPS.get()
                         .setId(ResourceKey.create(Registries.ITEM, CompactMachines.modRL("solid_wall")))));

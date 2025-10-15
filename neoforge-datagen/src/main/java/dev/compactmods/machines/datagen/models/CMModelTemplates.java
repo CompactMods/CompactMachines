@@ -4,9 +4,11 @@ import dev.compactmods.machines.api.CompactMachines;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.renderer.special.SpecialModelRenderers;
 import net.minecraft.resources.ResourceLocation;
 
-public class CompactMachineModelTemplate {
+public class CMModelTemplates {
 
     public static final TextureSlot OVERLAY_SLOT = TextureSlot.create("overlay");
     public static final TextureSlot TINT_SLOT = TextureSlot.create("tint");
@@ -33,5 +35,14 @@ public class CompactMachineModelTemplate {
                     .cullface(dir)
                     .tintindex(1)))
             .build();
+
+    public static final ModelTemplate ROOM_CORE_TEMPLATE = ModelTemplates.create(CompactMachines.id("room_core"), TextureSlot.PARTICLE)
+            .extend()
+
+            .build();
+
+    static {
+
+    }
 
 }

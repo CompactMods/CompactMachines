@@ -5,6 +5,7 @@ import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.base.tags.ItemTagGenerator;
+import dev.compactmods.machines.datagen.base.tags.PointOfInterestTagGenerator;
 import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplateRecipeGenerator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.LootTableProvider;
@@ -33,6 +34,8 @@ public class BaseDatapack {
 
         event.createDatapackRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachines.MOD_ID));
 
+        event.createProvider(PointOfInterestTagGenerator::new);
+
         event.addProvider(new LootTableProvider(basePackOutput,
                 Collections.emptySet(),
                 List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK)),
@@ -51,8 +54,6 @@ public class BaseDatapack {
 //        generator.addProvider(server, new PointOfInterestTagGenerator(basePackOutput, holderLookup, fileHelper));
 
         // Client
-//        event.createProvider(StateGenerator::new);
-
         event.createProvider(EnglishLangGenerator::new);
 
         return new BaseDatapackGenerationResults(holderLookup);

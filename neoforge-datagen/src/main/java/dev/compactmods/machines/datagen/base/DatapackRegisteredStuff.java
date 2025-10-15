@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DatapackRegisteredStuff {
-	private static final ResourceLocation COMPACT_BIOME = CompactMachines.modRL("machine");
+
 	private static final int DIMENSION_HEIGHT = 48;
 
 	public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()

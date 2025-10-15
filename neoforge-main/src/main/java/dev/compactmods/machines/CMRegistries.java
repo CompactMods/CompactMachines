@@ -1,19 +1,23 @@
 package dev.compactmods.machines;
 
+import com.sun.jna.platform.unix.solaris.LibKstat;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -42,21 +46,22 @@ public interface CMRegistries {
 	// LootFunctions
 	DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTIONS = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, CompactMachines.MOD_ID);
 
-	// Villagers
-	DeferredRegister<VillagerProfession> VILLAGERS = DeferredRegister.create(BuiltInRegistries.VILLAGER_PROFESSION, CompactMachines.MOD_ID);
+    DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachines.MOD_ID);
 
-	DeferredRegister<PoiType> POINTS_OF_INTEREST = DeferredRegister.create(BuiltInRegistries.POINT_OF_INTEREST_TYPE, CompactMachines.MOD_ID);
-
-	static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
+    static Item basicItem(UnaryOperator<Item.Properties> moreProps) {
 		return new Item(moreProps.apply(new Item.Properties()));
 	}
 
 	static void setup(IEventBus modBus) {
 		Stream.of(BLOCKS, ITEMS, BLOCK_ENTITIES, CONTAINERS, COMMAND_ARGUMENT_TYPES, LOOT_FUNCTIONS,
-			VILLAGERS, POINTS_OF_INTEREST, TABS,
+                POINTS_OF_INTEREST, Villagers.VILLAGERS, Villagers.TRADES, TABS,
 				CMDataAttachments.ATTACHMENT_TYPES,
 				CMDataComponents.DATA_COMPONENTS
 		).forEach(r -> r.register(modBus));
+
+        Villagers.TRADES.makeRegistry(builder -> {
+            builder.sync(true);
+        });
 
 		modBus.addListener((DataPackRegistryEvent.NewRegistry newRegistries) -> {
 			newRegistries.dataPackRegistry(RoomTemplate.REGISTRY_KEY, RoomTemplate.CODEC, RoomTemplate.CODEC);

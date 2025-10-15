@@ -15,6 +15,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true, since = "21.8")
 public class WorldBorderFixer {
 
 	public static void registerEvents() {
