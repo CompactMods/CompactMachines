@@ -2,7 +2,6 @@ package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.registration.IRoomBuilder;
 import dev.compactmods.machines.api.room.registration.IRoomRegistrar;
@@ -29,7 +28,7 @@ public class CMRoomRegistrar implements IRoomRegistrar, AutoCloseable {
     public CMRoomRegistrar(MinecraftServer server) {
         this.instanceCache = new Object2ObjectArrayMap<>();
         this.server = server;
-        ROOM_REGISTRAR_DATA = new CMSingletonDataFileManager<>(server, "room_registrations", new RoomRegistrarData(server));
+        ROOM_REGISTRAR_DATA = new CMSingletonDataFileManager<>(server, "room_registrations", new RoomRegistrarData());
         ROOM_REGISTRAR_DATA.load();
     }
 
@@ -114,7 +113,7 @@ public class CMRoomRegistrar implements IRoomRegistrar, AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         save();
     }
 }

@@ -5,11 +5,9 @@ import dev.compactmods.machines.api.room.capability.CompactRoomCapability;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
-import java.util.stream.Stream;
-
 public class BasicRoomCapabilities {
 
-    public static void register(RegisterCapabilitiesEvent event) {
+    public static void register(RegisterCapabilitiesEvent ignored) {
 
         CompactRoomCapability.register(RoomCapabilities.ROOM_DATA_ATTACHMENTS, (server, roomCode, v)
                 -> CompactMachines.roomData(roomCode));

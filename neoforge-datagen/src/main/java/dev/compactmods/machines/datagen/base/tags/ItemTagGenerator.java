@@ -2,7 +2,6 @@ package dev.compactmods.machines.datagen.base.tags;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineConstants;
-import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.CMRegistries;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.shrinking.PersonalShrinkingDevice;
@@ -25,14 +24,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
         final var psd = Shrinking.PERSONAL_SHRINKING_DEVICE.get();
 
         machines();
-        shrinkingDevices(psd);
         curiosTags(psd);
-    }
-
-    private void shrinkingDevices(PersonalShrinkingDevice psd) {
-        final var cmShrinkTag = tag(PSDTags.ITEM);
-        cmShrinkTag.add(psd);
-//        cmShrinkTag.addOptional(ResourceLocation.fromNamespaceAndPath("shrink", "shrinking_device"));
     }
 
     private void curiosTags(PersonalShrinkingDevice psd) {

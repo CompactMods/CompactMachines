@@ -1,5 +1,6 @@
 package dev.compactmods.machines.room.ui.upgrades;
 
+import com.google.common.base.Predicates;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.room.RoomInstance;
@@ -7,38 +8,41 @@ import dev.compactmods.machines.client.render.ConditionalGhostSlot;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import dev.compactmods.machines.util.SlotRangeUtil;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.client.gui.screens.recipebook.GhostSlots;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.SlotRange;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
+import net.neoforged.neoforge.transfer.RangedResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.access.HandlerItemAccess;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemAccessItemHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jetbrains.annotations.NotNull;
 
 public class RoomUpgradeMenu extends AbstractContainerMenu {
-    private final Inventory playerInv;
     public final String roomCode;
     public boolean showBackButton = true;
 
-    private IItemHandler playerInvHandler;
-    private IItemHandler upgradeInvHandler;
+    private final PlayerInventoryWrapper playerInvHandler;
+    private final RoomUpgradeInventory upgradeInvHandler;
 
     private final SlotRange playerInvRange;
 
     protected RoomUpgradeMenu(int winId, Inventory playerInv, String roomCode, RoomUpgradeInventory upgradeInv) {
         super(Rooms.Menus.ROOM_UPGRADES.get(), winId);
-        this.playerInv = playerInv;
         this.roomCode = roomCode;
 
-        this.playerInvHandler = new PlayerMainInvWrapper(playerInv);
+        this.playerInvHandler = PlayerInventoryWrapper.of(playerInv);
         this.upgradeInvHandler = upgradeInv;
 
         // this.upgradeInvRange = SlotRangeUtil.makeSlotRange("components", 0, 9);
@@ -48,7 +52,8 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
         for (int slot = 0; slot < 9; slot++) {
             int slotX = 8 + slot * 18;
 
-            this.addSlot(new SlotItemHandler(upgradeInv, slot, slotX, 18));
+            final var s = new ResourceHandlerSlot(this.upgradeInvHandler, this.upgradeInvHandler::set, slot, slotX, 18);
+            this.addSlot(s);
         }
 
         int slotY = 38 + 31;
@@ -74,22 +79,19 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
         if (stackToMove.isEmpty())
             return ItemStack.EMPTY;
 
-        ItemStack remainder;
+        ResourceHandler<ItemResource> source, destination;
         if (playerInvRange.slots().contains(pIndex)) {
             // Move from player to components
-            remainder = ItemHandlerHelper.insertItemStacked(upgradeInvHandler, stackToMove, false);
+            source = RangedResourceHandler.ofSingleIndex(playerInvHandler, slot.getContainerSlot());
+            destination = upgradeInvHandler;
         } else {
             // Move from components to player
-            remainder = ItemHandlerHelper.insertItemStacked(playerInvHandler, stackToMove, false);
+            source = RangedResourceHandler.ofSingleIndex(upgradeInvHandler, pIndex);
+            destination = playerInvHandler;
         }
 
-        if (remainder.isEmpty()) {
-            slot.setByPlayer(ItemStack.EMPTY);
-        } else {
-            slot.setChanged();
-        }
-
-        return remainder;
+        ResourceHandlerUtil.move(source, destination, Predicates.alwaysTrue(), stackToMove.getCount(), null);
+        return ItemStack.EMPTY;
     }
 
     @Override

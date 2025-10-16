@@ -65,7 +65,7 @@ public class CompactMachinesServer {
         }
     }
 
-    public static void serverStopping(final ServerStoppingEvent evt) {
+    public static void serverStopping(final ServerStoppingEvent ignored) {
         saveAll();
     }
 

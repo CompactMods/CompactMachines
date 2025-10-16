@@ -18,10 +18,6 @@ public class Commands {
 
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> getRoot() {
-        return CM_COMMAND_ROOT;
-    }
-
     public static void onCommandsRegister(final RegisterCommandsEvent event) {
         Commands.CM_COMMAND_ROOT.then(CMTeleportSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMEjectSubcommand.make());

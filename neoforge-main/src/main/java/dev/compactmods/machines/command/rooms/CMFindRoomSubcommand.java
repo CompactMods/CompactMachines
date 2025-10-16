@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.i18n.MachineTranslations;
@@ -14,8 +15,11 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class CMFindRoomSubcommand {
     static @NotNull LiteralArgumentBuilder<CommandSourceStack> create() {
@@ -43,10 +47,11 @@ public class CMFindRoomSubcommand {
                         .executes(CMFindRoomSubcommand::findByContainingPlayer)
         ));
 
-//        find.then(Commands.literal("owner").then(
-//                Commands.argument("owner", EntityArgument.player())
-//                        .executes(CMRoomsSubcommand::findByOwner)
-//        ));
+        find.then(Commands.literal("owner").then(
+                Commands.argument("owner", EntityArgument.player())
+                        .executes(CMFindRoomSubcommand::findByOwner)
+        ));
+
         return find;
     }
 
@@ -111,14 +116,17 @@ public class CMFindRoomSubcommand {
         final var owner = EntityArgument.getPlayer(ctx, "owner");
         final var source = ctx.getSource();
 
-//        final var owned = CompactMachines.roomApi().owners().findByOwner(owner.getUUID()).toList();
-//
-//        // TODO Localization
-//        if (owned.isEmpty()) {
-//            source.sendSuccess(() -> Component.literal("No rooms found."), false);
-//        } else {
-//            owned.forEach(roomCode -> source.sendSuccess(() -> Component.literal("Room: " + roomCode), false));
-//        }
+        final var owned = CompactMachines.roomRegistrar()
+                .allRooms()
+                .filter(i -> i.getExistingData(CMDataAttachments.ROOM_OWNER).map(id -> id.equals(owner)).orElse(false))
+                .toList();
+
+        // TODO Localization
+        if (owned.isEmpty()) {
+            source.sendSuccess(() -> Component.literal("No rooms found."), false);
+        } else {
+            owned.forEach(instance -> source.sendSuccess(() -> Component.literal("Room: " + instance.code()), false));
+        }
 
 
         return 0;

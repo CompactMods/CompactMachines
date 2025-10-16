@@ -2,26 +2,18 @@ package dev.compactmods.machines.api.attachment;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.PrimitiveCodec;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
-import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.util.CommonColors;
-import net.minecraft.world.entity.animal.Cod;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -42,11 +34,6 @@ public interface CMDataAttachments {
             .serialize(GlobalPos.MAP_CODEC, Predicates.alwaysFalse())
             .build());
 
-    Supplier<AttachmentType<RoomUpgradeComponentList>> PERMANENT_UPGRADES = ATTACHMENT_TYPES.register("permanent_upgrades", () -> AttachmentType
-            .builder(() -> new RoomUpgradeComponentList(List.of()))
-            .serialize(RoomUpgradeComponentList.CODEC.fieldOf("upgrades"))
-            .build());
-
     Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
             .<String>builder(() -> null)
             .serialize(Codec.STRING.fieldOf("code"))
@@ -55,10 +42,6 @@ public interface CMDataAttachments {
     Supplier<AttachmentType<UUID>> ROOM_OWNER = ATTACHMENT_TYPES.register("room_owner", () -> AttachmentType
             .builder(() -> Util.NIL_UUID)
             .serialize(UUIDUtil.CODEC.fieldOf("owner"))
-            .build());
-
-    Supplier<AttachmentType<RoomUpgradeInstance>> UPGRADE_INSTANCE = ATTACHMENT_TYPES.register("room_upgrade_instance", () -> AttachmentType
-            .<RoomUpgradeInstance>builder(() -> null)
             .build());
 
     static void prepare() {

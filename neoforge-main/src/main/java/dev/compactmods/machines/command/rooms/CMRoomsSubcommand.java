@@ -29,9 +29,6 @@ public class CMRoomsSubcommand {
 
     private static int execRoomSummary(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
-        var serv = src.getServer();
-
-        final var ls = LongStream.builder();
 
         // FIXME: Per-dimension machine count
 //        serv.getAllLevels().forEach(sl -> {

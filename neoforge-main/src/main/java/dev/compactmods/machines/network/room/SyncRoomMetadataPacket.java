@@ -22,7 +22,7 @@ public record SyncRoomMetadataPacket(String roomCode, UUID owner) implements Cus
   );
 
   public static final IPayloadHandler<SyncRoomMetadataPacket> HANDLER = (pkt, ctx) -> {
-	 ClientRoomPacketHandler.handleRoomSync(pkt.roomCode, pkt.owner);
+	 ClientRoomPacketHandler.handleRoomSync(pkt.roomCode);
   };
 
   @Override

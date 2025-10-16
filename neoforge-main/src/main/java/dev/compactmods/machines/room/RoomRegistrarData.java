@@ -1,35 +1,21 @@
 package dev.compactmods.machines.room;
 
 import com.mojang.serialization.Codec;
-import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.data.CMDataFile;
-import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.template.RoomTemplate;
-import dev.compactmods.machines.api.room.registration.IRoomRegistrar;
-import dev.compactmods.machines.api.room.registration.IRoomBuilder;
-import dev.compactmods.feather.MemoryGraph;
 import dev.compactmods.machines.data.CodecHolder;
 import dev.compactmods.machines.room.graph.node.RoomRegistrationNode;
 import dev.compactmods.machines.util.MathUtil;
 import dev.compactmods.spatial.aabb.AABBAligner;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 class RoomRegistrarData implements CodecHolder<RoomRegistrarData>, CMDataFile {
@@ -39,16 +25,14 @@ class RoomRegistrarData implements CodecHolder<RoomRegistrarData>, CMDataFile {
             .xmap(RoomRegistrarData::new, (RoomRegistrarData x) -> List.copyOf(x.registrationNodes.values()))
             .codec();
 
-    private final MinecraftServer server;
     private final Map<String, RoomRegistrationNode> registrationNodes;
 
-    public RoomRegistrarData(MinecraftServer server) {
-        this.server = server;
+    public RoomRegistrarData() {
         this.registrationNodes = new Object2ReferenceArrayMap<>();
     }
 
     private RoomRegistrarData(List<RoomRegistrationNode> regNodes) {
-        this(ServerLifecycleHooks.getCurrentServer());
+        this();
         regNodes.forEach(this::registerDirty);
     }
 

@@ -2,7 +2,6 @@ package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.compactmods.machines.api.CompactMachines;
-import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.client.config.ClientConfig;
 import dev.compactmods.machines.client.widget.ImageButtonBuilder;
 import dev.compactmods.machines.feature.CMFeatureFlags;
@@ -23,7 +22,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class MachineRoomScreen extends Screen {
@@ -154,7 +152,7 @@ public class MachineRoomScreen extends Screen {
         if (player.isCreative()) return true;
 
         final var hasPsdInInv = player.getInventory()
-                .contains(slotItem -> slotItem.has(Shrinking.DataComponents.SHRINKING_CONFIG) || slotItem.is(PSDTags.ITEM));
+                .contains(slotItem -> slotItem.has(Shrinking.DataComponents.SHRINKING_CONFIG));
 
         if (hasPsdInInv)
             return true;
