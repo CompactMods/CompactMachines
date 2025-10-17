@@ -87,7 +87,7 @@ neoForge {
 
             // JetBrains Runtime Hotswap
             if (!System.getenv().containsKey("CI")) {
-              jvmArgument("-XX:+AllowEnhancedClassRedefinition")
+                jvmArgument("-XX:+AllowEnhancedClassRedefinition")
             }
 
             systemProperties.put("terminal.ansi", "true")
@@ -96,7 +96,7 @@ neoForge {
             additional.dependencies.add(compactmods.feather.get())
             additional.dependencies.add(libs.jnanoid.get())
         }
-        
+
         create("client") {
             client()
             gameDirectory.set(file("runs/client"))
@@ -249,6 +249,48 @@ dependencies {
     compileOnly(mods.jade)
 }
 
+var additionalAccessTransformerFiles = mutableListOf<File>()
+fun additionalAccessTransformersToModsToml(): String {
+    val sb = StringBuilder()
+    additionalAccessTransformerFiles.forEach {
+        sb.appendLine("[[accessTransformers]]");
+        sb.appendLine("file = \"META-INF/additional-ats/${it.name}\"")
+        sb.appendLine()
+    }
+
+    var t = sb.toString();
+    return t.substring(0, t.lastIndexOf("\n"));
+}
+
+var calculateAdditionalAccessTransformerFiles = tasks.create<Task>("calculateAdditionalAccessTransformerFiles") {
+    var included = listOf(compactmods.ganderRendering.get())
+        .map { it.group + ":" + it.name }
+
+    val t1 = configurations.accessTransformers.get()
+    var t2 = t1.resolvedConfiguration.resolvedArtifacts
+        .filter { f -> included.contains(f.moduleVersion.id.module.toString()) }
+
+    t2.forEach {
+        println("Including: ${it.moduleVersion.id.module} (version: ${it.moduleVersion.id.version})")
+        println(it.file.absoluteFile)
+        additionalAccessTransformerFiles.add(it.file.absoluteFile)
+    }
+}
+
+val copyAdditionalAccessTransformers = tasks.create<Copy>("copyAdditionalAccessTransformers") {
+    dependsOn(calculateAdditionalAccessTransformerFiles)
+
+    val targetDir = layout.buildDirectory.get().dir("resources/main/META-INF/additional-ats")
+
+    doLast { println("Copying additional AT files to: $targetDir") }
+    from(additionalAccessTransformerFiles.map { it.absoluteFile })
+    into(targetDir)
+}
+
+tasks.build {
+    finalizedBy(copyAdditionalAccessTransformers)
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -285,6 +327,9 @@ tasks.withType<Jar> {
 }
 
 tasks.withType<ProcessResources>().configureEach {
+    dependsOn(calculateAdditionalAccessTransformerFiles)
+
+    val additionalATs = additionalAccessTransformersToModsToml()
     val replaceProperties: Map<String, Any> = mapOf(
         "minecraft_version" to mojang.versions.minecraft.get(),
         "neo_version" to neoforged.versions.neoforge.get(),
@@ -292,7 +337,8 @@ tasks.withType<ProcessResources>().configureEach {
         "neo_version_range" to neoforged.versions.neoforgeRange.get(),
         "loader_version_range" to "[1,)",
         "mod_id" to modId,
-        "mod_version" to envVersion
+        "mod_version" to envVersion,
+        "additional_access_transformers" to additionalATs
     )
 
     inputs.properties(replaceProperties)
