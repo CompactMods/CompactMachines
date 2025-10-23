@@ -22,8 +22,6 @@ import java.util.List;
 
 public class RoomUpgradesSubcommand {
 
-    private static final Logger LOGGER = LoggingUtil.modLog();
-
     public static LiteralArgumentBuilder<CommandSourceStack> make() {
         final var subRoot = Commands.literal("upgrades")
                 .requires(cs -> CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(cs.enabledFeatures())

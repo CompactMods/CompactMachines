@@ -6,7 +6,6 @@ import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.client.render.CMPlayerFaceRenderer;
 import dev.compactmods.machines.i18n.MachineTranslations;
-import dev.compactmods.machines.i18n.RoomTranslations;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -21,7 +20,7 @@ import java.util.UUID;
 
 public class RoomMetadataDebugOverlay implements LayeredDraw.Layer {
 
-    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, Player player, PoseStack poseStack, int center, int screenHeight) {
+    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, Player player) {
         player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
             graphics.drawCenteredString(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
         });
@@ -70,7 +69,7 @@ public class RoomMetadataDebugOverlay implements LayeredDraw.Layer {
                     drawRoomOwnerInfo(graphics, mc.font, poseStack, ownerID);
                 });
 
-        drawRoomCode(graphics, mc, mc.player, poseStack, center, screenHeight);
+        drawRoomCode(graphics, mc, mc.player);
 
         poseStack.popPose();
     }

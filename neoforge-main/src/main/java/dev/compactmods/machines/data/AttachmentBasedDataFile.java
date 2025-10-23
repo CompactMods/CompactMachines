@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 public abstract class AttachmentBasedDataFile<T extends AttachmentHolder, TAdditionalData> extends AttachmentHolder implements CMDataFile, CodecHolder<T> {
 
-    protected MinecraftServer server;
     protected final Codec<T> codec;
     private final MapCodec<TAdditionalData> additionalDataCodec;
     private final Function<AttachmentDataFileFactoryInput<TAdditionalData>, T> factory;
@@ -24,7 +23,6 @@ public abstract class AttachmentBasedDataFile<T extends AttachmentHolder, TAddit
     private final Method deserializeAttachments = ObfuscationReflectionHelper.findMethod(AttachmentHolder.class, "deserializeAttachments", HolderLookup.Provider.class, CompoundTag.class);
 
     protected AttachmentBasedDataFile(MinecraftServer server, MapCodec<TAdditionalData> additionalDataCodec, Function<AttachmentDataFileFactoryInput<TAdditionalData>, T> factory) {
-        this.server = server;
         this.additionalDataCodec = additionalDataCodec;
         this.factory = factory;
         this.codec = makeCodec(server);

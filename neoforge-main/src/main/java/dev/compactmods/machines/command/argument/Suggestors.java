@@ -17,16 +17,6 @@ public class Suggestors {
    public static final SuggestionProvider<CommandSourceStack> ROOM_TEMPLATES = (ctx, builder) ->
 	   SharedSuggestionProvider.suggestResource(getRegistryValues(ctx, RoomTemplate.REGISTRY_KEY), builder);
 
-//    public static final SuggestionProvider<CommandSourceStack> OWNED_ROOM_CODES = (ctx, builder) -> {
-//        final var owner = ctx.getSource().getPlayerOrException();
-//
-//        final var codes = CompactMachines.roomApi().owners()
-//                .findByOwner(owner.getUUID())
-//                .toList();
-//
-//        return SharedSuggestionProvider.suggest(codes, builder);
-//    };
-
    public static final SuggestionProvider<CommandSourceStack> ROOM_CODES = (ctx, builder) -> {
 	  final var codes = CompactMachines.roomRegistrar()
 		  .allRoomCodes()

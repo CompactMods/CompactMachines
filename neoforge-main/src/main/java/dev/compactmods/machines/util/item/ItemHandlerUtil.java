@@ -10,18 +10,6 @@ import java.util.List;
 
 public class ItemHandlerUtil {
 
-    public static boolean canAcceptAllItemTypes(IItemHandler itemHandler, List<ItemStack> items) {
-        if(items.isEmpty()) return true;
-
-        for(final var type : items) {
-            var scan = ItemHandlerScan.scanInventory(itemHandler, type);
-            if(!scan.hasSpaceAvailable())
-                return false;
-        }
-
-        return true;
-    }
-
     public static List<ItemStack> insertMultipleStacks(IItemHandler itemHandler, List<ItemStack> drops) {
         Deque<ItemStack> remainingDrops = new ArrayDeque<>(drops);
         final var failedToPush = ImmutableList.<ItemStack>builder();

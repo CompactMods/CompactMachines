@@ -29,7 +29,7 @@ public class Commands {
         Commands.CM_COMMAND_ROOT.then(CMUnbindSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMRoomsSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(CMGiveMachineSubcommand.make());
-        Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
+//        Commands.CM_COMMAND_ROOT.then(SpawnSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(RoomUpgradesSubcommand.make());
         Commands.CM_COMMAND_ROOT.then(EnableBasicTemplatesSubcommand.make());
 

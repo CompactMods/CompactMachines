@@ -35,7 +35,7 @@ public class CMUnbindSubcommand {
 
         final var rebindingMachine = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
 
-        if (!(level.getBlockEntity(rebindingMachine) instanceof BoundCompactMachineBlockEntity machine)) {
+        if (!(level.getBlockEntity(rebindingMachine) instanceof BoundCompactMachineBlockEntity)) {
             LoggingUtil.modLog().error("Refusing to rebind block at {}; block has invalid machine data.", rebindingMachine);
             source.sendFailure(MachineTranslations.NOT_A_MACHINE_BLOCK.apply(rebindingMachine));
             return -1;

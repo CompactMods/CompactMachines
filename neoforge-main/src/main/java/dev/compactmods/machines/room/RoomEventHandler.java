@@ -2,8 +2,10 @@ package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachines;
+import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.i18n.Translations;
 import dev.compactmods.machines.api.dimension.CompactDimension;
+import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -13,6 +15,7 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
 public class RoomEventHandler {
@@ -44,14 +47,12 @@ public class RoomEventHandler {
 
         // Handle players
         if (ent instanceof ServerPlayer serverPlayer) {
-            // FIXME sync current room info to client player
-//            final var roomProvider = CompactRoomProvider.instance(serverPlayer.getLevel());
-//            roomProvider.findByChunk(serverPlayer.chunkPosition()).ifPresent(roomInfo -> {
-//                CompactMachinesNet.CHANNEL.send(
-//                        PacketDistributor.PLAYER.with(() -> serverPlayer),
-//                        new SyncRoomMetadataPacket(roomInfo.code(), roomInfo.owner(roomProvider))
-//                );
-//            });
+            CompactMachines.chunkManager()
+                    .findRoomByChunk(serverPlayer.chunkPosition())
+                    .flatMap(CompactMachines::room)
+                    .ifPresent(room -> {
+                        PacketDistributor.sendToPlayer(serverPlayer, new SyncRoomMetadataPacket(room.code(), room.getData(CMDataAttachments.ROOM_OWNER)));
+                    });
         } else {
             if (!positionInsideRoom(ent, ent.position())) {
                 evt.setCanceled(true);
@@ -90,7 +91,6 @@ public class RoomEventHandler {
      * @return True if position is inside a room; false otherwise.
      */
     private static boolean positionInsideRoom(Entity entity, Vec3 target) {
-        final var level = entity.level();
         if (!CompactDimension.isLevelCompact(entity.level())) return false;
 
         return CompactMachines.chunkManager()

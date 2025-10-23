@@ -1,7 +1,6 @@
 package dev.compactmods.machines.util;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.AABB;
@@ -16,10 +15,6 @@ public class MathUtil {
         ChunkPos max = new ChunkPos(BlockPos.containing(bounds.maxX, bounds.maxY, bounds.maxZ));
         
         return ChunkPos.rangeClosed(min, max);
-    }
-
-    public static int volumeOf(Vec3i dimensions) {
-        return dimensions.getX() * dimensions.getY() * dimensions.getZ();
     }
 
     /**

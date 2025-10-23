@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class BasicRoomCapabilities {
 
-    public static void register(RegisterCapabilitiesEvent event) {
+    public static void register(RegisterCapabilitiesEvent ignoredEvent) {
 
         CompactRoomCapability.register(RoomCapabilities.ROOM_DATA_ATTACHMENTS, (server, roomCode, v)
                 -> CompactMachines.roomData(roomCode));

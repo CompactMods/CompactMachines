@@ -34,16 +34,11 @@ public class CompactMachinesCommon {
     public static final int BRAND_MACHINE_COLOR = FastColor.ARGB32.color(255, 248, 246, 76);
 
     @SuppressWarnings("unused")
-    public CompactMachinesCommon(IEventBus modBus, ModContainer modContainer) {
-        initConfigs(modContainer);
+    public CompactMachinesCommon(IEventBus modBus) {
         prepare();
         registerEvents(modBus);
 
         CMRegistries.setup(modBus);
-    }
-
-    private static void initConfigs(ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfig.CONFIG);
     }
 
     private static void prepare() {

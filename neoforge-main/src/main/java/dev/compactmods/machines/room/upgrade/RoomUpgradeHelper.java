@@ -2,10 +2,8 @@ package dev.compactmods.machines.room.upgrade;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
-import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.world.chunk.TicketHelper;
 
@@ -28,7 +26,7 @@ public class RoomUpgradeHelper {
                 .toList();
     }
 
-    public static void verifyChunkloaderUpgrades(ServerLevel serverLevel, TicketHelper ticketHelper) {
+    public static void verifyChunkloaderUpgrades(TicketHelper ticketHelper) {
         final var manager = CompactMachines.upgradeManager();
         if(manager == null) return;
 

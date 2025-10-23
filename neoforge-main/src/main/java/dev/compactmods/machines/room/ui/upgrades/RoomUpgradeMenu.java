@@ -24,7 +24,6 @@ import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 import org.jetbrains.annotations.NotNull;
 
 public class RoomUpgradeMenu extends AbstractContainerMenu {
-    private final Inventory playerInv;
     public final String roomCode;
     public boolean showBackButton = true;
 
@@ -35,7 +34,6 @@ public class RoomUpgradeMenu extends AbstractContainerMenu {
 
     protected RoomUpgradeMenu(int winId, Inventory playerInv, String roomCode, RoomUpgradeInventory upgradeInv) {
         super(Rooms.Menus.ROOM_UPGRADES.get(), winId);
-        this.playerInv = playerInv;
         this.roomCode = roomCode;
 
         this.playerInvHandler = new PlayerMainInvWrapper(playerInv);

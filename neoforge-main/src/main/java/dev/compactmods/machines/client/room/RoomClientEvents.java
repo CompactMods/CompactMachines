@@ -23,7 +23,7 @@ public class RoomClientEvents {
         evt.register(RoomUpgradeUIMapping.MAPPING);
     }
 
-    public static void handleKeybinds(final ClientTickEvent.Post clientTick) {
+    public static void handleKeybinds(final ClientTickEvent.Post ignoredClientTick) {
         if (RoomExitKeyMapping.MAPPING.consumeClick())
             RoomExitKeyMapping.handle();
 

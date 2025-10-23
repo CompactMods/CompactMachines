@@ -1,7 +1,6 @@
 package dev.compactmods.machines.machine.block;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
@@ -17,9 +16,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -91,20 +87,11 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoun
 	  return data;
    }
 
-   public Optional<UUID> getOwnerUUID() {
-	  return Optional.ofNullable(this.owner);
-   }
-
-   public void setOwner(UUID owner) {
+    public void setOwner(UUID owner) {
 	  this.owner = owner;
    }
 
-   public boolean hasPlayersInside() {
-	  // TODO
-	  return false;
-   }
-
-   public GlobalPos getLevelPosition() {
+    public GlobalPos getLevelPosition() {
 	  return GlobalPos.of(level.dimension(), worldPosition);
    }
 
@@ -132,8 +119,4 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoun
 	  return Optional.ofNullable(customName);
    }
 
-   public void setCustomName(Component customName) {
-	  this.customName = customName;
-	  this.setChanged();
-   }
 }

@@ -72,7 +72,6 @@ public class RoomGenerationTests {
     @GameTest
     @EmptyTemplate(EmptyTestSizes.FIFTEEN_CUBED)
     public static void checkOffsetsNormalTest(final CompactGameTestHelper testHelper) {
-        final var logs = LogManager.getLogger();
 
         AABB localBounds = testHelper.localBounds();
 

@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class CompactMachines {
 	public final static String MOD_ID = "compactmachines";
 
@@ -100,7 +101,7 @@ public class CompactMachines {
 	 * @param <T>
 	 */
 	private static <T> T cmService(Class<T> serviceClass, String packagePrefix) {
-		final var loader = ServiceLoader.load(serviceClass);
+		final var loader = ServiceLoader.load(serviceClass, serviceClass.getClassLoader());
 		logger.debug("Attempting to find implementation for {}...", serviceClass.getName());
 
 		for(var s : loader) {

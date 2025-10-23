@@ -3,7 +3,6 @@ package dev.compactmods.machines.room;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.room.RoomInstance;
-import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.history.IPlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.LoggingUtil;
@@ -13,7 +12,6 @@ import dev.compactmods.machines.api.room.history.RoomEntryResult;
 import dev.compactmods.machines.api.room.history.RoomExitResult;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
 import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
-import dev.compactmods.machines.room.capability.BasicRoomCapabilities;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
@@ -22,7 +20,6 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
@@ -33,15 +30,6 @@ import java.util.concurrent.CompletableFuture;
 public abstract class RoomHelper {
 
     private static final Logger LOGS = LoggingUtil.modLog();
-
-    public static boolean entityInsideRoom(LivingEntity entity, String roomCode) {
-        // Recursion check. Player is inside the room being queried.
-        if (entity.level().dimension().equals(CompactDimension.LEVEL_KEY)) {
-            return CompactMachines.roomChunks(roomCode).hasChunk(entity.chunkPosition());
-        }
-
-        return false;
-    }
 
     public static CompletableFuture<RoomEntryResult> teleportPlayerIntoMachine(Level machineLevel, ServerPlayer player, GlobalPos machinePos, String roomCode) {
         MinecraftServer serv = machineLevel.getServer();

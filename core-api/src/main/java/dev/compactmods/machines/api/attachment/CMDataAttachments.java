@@ -5,8 +5,6 @@ import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
-import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
-import dev.compactmods.machines.api.room.upgrade.component.RoomUpgradeComponentList;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -18,7 +16,6 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -39,11 +36,6 @@ public interface CMDataAttachments {
             .serialize(GlobalPos.CODEC, Predicates.alwaysFalse())
             .build());
 
-    Supplier<AttachmentType<RoomUpgradeComponentList>> PERMANENT_UPGRADES = ATTACHMENT_TYPES.register("permanent_upgrades", () -> AttachmentType
-            .builder(() -> new RoomUpgradeComponentList(List.of()))
-            .serialize(RoomUpgradeComponentList.CODEC)
-            .build());
-
     Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
             .<String>builder(() -> null)
             .serialize(Codec.STRING)
@@ -57,10 +49,6 @@ public interface CMDataAttachments {
     Supplier<AttachmentType<MachineColor>> MACHINE_COLOR = ATTACHMENT_TYPES.register("machine_color", () -> AttachmentType
             .builder(() -> MachineColor.fromARGB(CommonColors.WHITE))
             .serialize(MachineColor.CODEC)
-            .build());
-
-    Supplier<AttachmentType<RoomUpgradeInstance>> UPGRADE_INSTANCE = ATTACHMENT_TYPES.register("room_upgrade_instance", () -> AttachmentType
-            .<RoomUpgradeInstance>builder(() -> null)
             .build());
 
     static void prepare() {

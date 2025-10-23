@@ -1,12 +1,10 @@
 package dev.compactmods.machines.client.render;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class CMPlayerFaceRenderer {
-    public static final GameProfile EMPTY_PROFILE = new GameProfile(Util.NIL_UUID, "Empty Player");
 
     public static void render(GameProfile profile, GuiGraphics graphics, int x, int y, int size) {
         final var skins = Minecraft.getInstance().getSkinManager();

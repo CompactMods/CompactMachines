@@ -1,11 +1,8 @@
 package dev.compactmods.machines.client.room;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.compactmods.gander.level.VirtualLevel;
 import dev.compactmods.gander.render.geometry.BakedLevel;
-import dev.compactmods.gander.render.geometry.LevelBakery;
 import dev.compactmods.gander.ui.widget.SpatialRenderer;
-import dev.compactmods.machines.CommonConfig;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.shrinking.PSDTags;
 import dev.compactmods.machines.client.config.ClientConfig;
@@ -21,22 +18,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Vector3f;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -291,7 +282,6 @@ public class MachineRoomScreen extends Screen {
     }
 
     private static float calculateZoomForRoom(AABB internalSize) {
-        boolean tallRoom = Math.max(internalSize.getXsize(), internalSize.getZsize()) < internalSize.getYsize();
         boolean sidesEqual = internalSize.getXsize() == internalSize.getZsize();
         boolean isCube = sidesEqual && internalSize.getZsize() == internalSize.getYsize();
 

@@ -130,7 +130,7 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
         private int textureWidth;
         private int textureHeight;
 
-        public Builder(ResourceLocation texture) {
+        private Builder(ResourceLocation texture) {
             this.texture = texture;
             this.area = ScreenRectangle.empty();
         }
@@ -143,11 +143,6 @@ public record NineSliceRenderer(ResourceLocation texture, ScreenRectangle area, 
 
         public Builder area(int x, int y, int width, int height) {
             this.area = new ScreenRectangle(x, y, width, height);
-            return this;
-        }
-
-        public Builder area(ScreenRectangle area) {
-            this.area = area;
             return this;
         }
 

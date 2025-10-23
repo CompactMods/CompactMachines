@@ -16,8 +16,6 @@ import java.util.List;
 
 public class BoundCompactMachineItem extends BlockItem {
 
-    public static final String NBT_ROOM_DIMENSIONS = "room_dimensions";
-
     private static final String FALLBACK_ID = Util.makeDescriptionId("block", CompactMachines.modRL("bound_machine_fallback"));
 
     public BoundCompactMachineItem(Properties builder) {

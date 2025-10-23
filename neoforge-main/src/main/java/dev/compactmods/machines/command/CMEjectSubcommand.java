@@ -39,9 +39,7 @@ public class CMEjectSubcommand {
 		final ServerPlayer player = ctx.getSource().getPlayerOrException();
 		final MinecraftServer server = ctx.getSource().getServer();
 
-		server.submitAsync(() -> {
-			CompactMachines.playerHistoryApi().entryPoints().clearHistory(player);
-		});
+		server.submitAsync(() -> CompactMachines.playerHistoryApi().entryPoints().clearHistory(player));
 
 		PlayerUtil.teleportPlayerToRespawnOrOverworld(ctx.getSource().getServer(), player);
 

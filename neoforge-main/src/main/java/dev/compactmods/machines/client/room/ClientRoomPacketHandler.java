@@ -3,7 +3,6 @@ package dev.compactmods.machines.client.room;
 import dev.compactmods.gander.level.VirtualLevel;
 import dev.compactmods.gander.render.geometry.LevelBakery;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
-import dev.compactmods.machines.room.Rooms;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -12,8 +11,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 import org.joml.Vector3f;
-
-import java.util.UUID;
 
 public class ClientRoomPacketHandler {
     public static void handleBlockData(StructureTemplate blocks) {
@@ -41,7 +38,7 @@ public class ClientRoomPacketHandler {
         }
     }
 
-    public static void handleRoomSync(String roomCode, UUID owner) {
+    public static void handleRoomSync(String roomCode) {
         final var mc = Minecraft.getInstance();
 
         // FIXME - Current Room Owner

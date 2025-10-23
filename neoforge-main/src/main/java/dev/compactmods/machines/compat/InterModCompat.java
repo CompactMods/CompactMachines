@@ -6,7 +6,7 @@ import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 
 public class InterModCompat {
 
-    public static void enqueueCompatMessages(final InterModEnqueueEvent evt) {
+    public static void enqueueCompatMessages(final InterModEnqueueEvent ignoredEvt) {
 //        if(ModList.get().isLoaded("theoneprobe"))
 //            TheOneProbeCompat.sendIMC();
 //

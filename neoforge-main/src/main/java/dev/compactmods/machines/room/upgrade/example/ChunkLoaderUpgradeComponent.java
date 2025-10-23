@@ -88,7 +88,7 @@ public class ChunkLoaderUpgradeComponent implements RoomUpgradeComponent, NeoFor
         }
     }
 
-    public class RemovedHandler implements UpgradeRemovedEventListener {
+    public static class RemovedHandler implements UpgradeRemovedEventListener {
         @Override
         public void handle(RoomUpgradeInstance instance) {
             final var roomInstance = instance.roomInstance();

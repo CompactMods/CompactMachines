@@ -16,7 +16,6 @@ public record PlayerRequestedRoomUIPacket(String roomCode) implements CustomPack
     );
 
     public static final IPayloadHandler<PlayerRequestedRoomUIPacket> HANDLER = (pkt, ctx) -> {
-        final var player = ctx.player();
         CompactMachines.room(pkt.roomCode).ifPresent(inst -> {
 
         });

@@ -5,7 +5,4 @@ public class MissingDimensionException extends Throwable {
         super("Could not find compact machine dimension. This is likely a bug; please report it.");
     }
 
-    public MissingDimensionException(String msg) {
-        super(msg);
-    }
 }

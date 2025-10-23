@@ -4,11 +4,8 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.data.Saveable;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.room.upgrade.RoomUpgradeHelper;
-import dev.compactmods.machines.server.event.RoomTemplatesCheckEventHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -21,7 +18,6 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -30,7 +26,8 @@ public class CompactMachinesServer {
 
     private static @Nullable MinecraftServer CURRENT_SERVER;
 
-    public static TicketController CHUNK_TICKET_CONTROLLER = new TicketController(CompactMachines.modRL("chunkloader_upgrade"), RoomUpgradeHelper::verifyChunkloaderUpgrades);
+    public static TicketController CHUNK_TICKET_CONTROLLER = new TicketController(CompactMachines.modRL("chunkloader_upgrade"),
+            (serverLevel, ticketHelper) -> RoomUpgradeHelper.verifyChunkloaderUpgrades(ticketHelper));
 
     public CompactMachinesServer(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, CompactMachinesServer::serverAboutToStart);
@@ -65,7 +62,7 @@ public class CompactMachinesServer {
         }
     }
 
-    public static void serverStopping(final ServerStoppingEvent evt) {
+    public static void serverStopping(final ServerStoppingEvent ignored) {
         saveAll();
     }
 

@@ -21,9 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> {
-    private final Inventory inventory;
-
-    private static ResourceLocation CONTAINER_BACKGROUND = CompactMachines.modRL("textures/gui/psd_screen_9slice.png");
 
     WidgetSprites BACK_BTN_SPRITES = new WidgetSprites(
         ResourceLocation.withDefaultNamespace("recipe_book/page_backward"),
@@ -34,7 +31,6 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
 
     public RoomUpgradeScreen(RoomUpgradeMenu menu, Inventory playerInv, Component title) {
         super(menu, playerInv, title);
-        this.inventory = playerInv;
         this.titleLabelY = 6;
         this.inventoryLabelY = 26 + 32;
         this.imageHeight = 114 + 18 + 20;
@@ -97,7 +93,7 @@ public class RoomUpgradeScreen extends AbstractContainerScreen<RoomUpgradeMenu> 
 
     @Override
     protected void renderSlotContents(GuiGraphics guiGraphics, ItemStack itemstack, Slot slot, @Nullable String countString) {
-        if (slot instanceof ConditionalGhostSlot cgs && cgs.matched(itemstack)) {
+        if (slot instanceof ConditionalGhostSlot) {
             renderGhostSlot(guiGraphics, itemstack, slot, countString);
             return;
         }

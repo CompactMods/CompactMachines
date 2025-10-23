@@ -82,7 +82,6 @@ public class BoundMachineProviders {
     public static final IServerDataProvider<BlockAccessor> SERVER_DATA = new IServerDataProvider<>() {
         @Override
         public void appendServerData(CompoundTag tag, BlockAccessor blockAccessor) {
-            final var player = blockAccessor.getPlayer();
             if (blockAccessor.getBlockEntity() instanceof BoundCompactMachineBlockEntity machine) {
                 CompactMachines.room(machine.connectedRoom()).ifPresent(inst -> {
                     tag.store("room_code", Codec.STRING, inst.code());

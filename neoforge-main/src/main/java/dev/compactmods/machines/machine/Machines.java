@@ -1,6 +1,5 @@
 package dev.compactmods.machines.machine;
 
-import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.api.component.CMDataComponents;
 import dev.compactmods.machines.api.machine.MachineColor;
 import dev.compactmods.machines.api.machine.MachineConstants;
@@ -20,8 +19,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.PushReaction;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -70,15 +67,7 @@ public interface Machines {
 			return stack;
 		}
 
-		static ItemStack boundToRoom(String roomCode) {
-			return boundToRoom(roomCode, 0xFFFFFFFF);
-		}
-
-		static ItemStack boundToRoom(String roomCode, int color) {
-			return boundToRoom(roomCode, MachineColor.fromARGB(color));
-		}
-
-		static ItemStack boundToRoom(String roomCode, MachineColor color) {
+        static ItemStack boundToRoom(String roomCode, MachineColor color) {
 			ItemStack stack = BOUND_MACHINE.toStack();
 			stack.set(CMDataComponents.BOUND_ROOM_CODE, roomCode);
 			stack.set(CMDataComponents.MACHINE_COLOR, color);
@@ -113,9 +102,5 @@ public interface Machines {
 		Blocks.prepare();
 		Items.prepare();
 		BlockEntities.prepare();
-	}
-
-	static void registerEvents(IEventBus modBus) {
-
 	}
 }

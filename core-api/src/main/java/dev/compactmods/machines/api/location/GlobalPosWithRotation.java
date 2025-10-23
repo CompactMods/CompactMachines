@@ -30,10 +30,6 @@ public record GlobalPosWithRotation(ResourceKey<Level> dimension, Vec3 position,
         this(pos.dimension(), Vec3.atBottomCenterOf(pos.pos()), rotation);
     }
 
-    public GlobalPosWithRotation(ResourceKey<Level> dimension, BlockPos position, Vec2 rotation) {
-        this(dimension, Vec3.atBottomCenterOf(position), rotation);
-    }
-
     public static GlobalPosWithRotation fromPlayer(Player player) {
         return new GlobalPosWithRotation(player.level().dimension(), player.position(), new Vec2(player.xRotO, player.yRotO));
     }
