@@ -164,8 +164,8 @@ public class CompactMachines {
 		final var spawnManager = SPAWN_MANAGERS.get(instance.code());
 		template.optionalFloor().ifPresent(floorState -> {
 			var fixedSpawn = instance.boundaries()
-					.defaultSpawn()
-					.add(0, 1, 0);
+				.defaultSpawn()
+				.add(0, 1, 0);
 
 			spawnManager.setDefaultSpawn(fixedSpawn, Vec2.ZERO);
 
