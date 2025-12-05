@@ -136,6 +136,9 @@ public class CompactMachines {
 	}
 
 	public static Optional<RoomInstance> room(String roomCode) {
+		if (ROOM_REGISTRAR == null) {
+			return Optional.empty();
+		}
 		return ROOM_REGISTRAR.get(roomCode);
 	}
 
