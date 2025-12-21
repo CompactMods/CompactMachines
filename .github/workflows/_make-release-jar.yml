@@ -55,7 +55,7 @@ jobs:
 
       - name: Store Built Assets
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release-jars
           path: neoforge-main/build/libs
