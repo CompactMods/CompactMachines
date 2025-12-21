@@ -1,6 +1,7 @@
 package dev.compactmods.machines.api.room.template;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,13 @@ public class RoomTemplateHelper {
 	public static RoomTemplate getTemplate(RegistryAccess registryAccess, ResourceLocation id) {
 		return getTemplateOptional(registryAccess, id)
 			.orElse(RoomTemplate.INVALID_TEMPLATE);
+	}
+
+	public static RoomTemplate getTemplate(HolderLookup.Provider lookup, ResourceLocation id) {
+		return lookup.lookupOrThrow(RoomTemplate.REGISTRY_KEY)
+				.get(ResourceKey.create(RoomTemplate.REGISTRY_KEY, id))
+				.map(Holder.Reference::value)
+				.orElse(RoomTemplate.INVALID_TEMPLATE);
 	}
 
     public static Stream<RoomTemplate> getTemplates(RegistryAccess registryAccess) {
