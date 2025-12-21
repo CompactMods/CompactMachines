@@ -29,10 +29,11 @@ public class CMRoomsSubcommand {
 
     private static int execRoomSummary(CommandContext<CommandSourceStack> ctx) {
         var src = ctx.getSource();
+        final var server = src.getServer();
 
         // FIXME: Per-dimension machine count
 
-        final var roomCount = CompactMachines.roomRegistrar().count();
+        final var roomCount = CompactMachines.roomRegistrar(server).count();
         src.sendSuccess(() -> Component.translatable(CommandTranslations.IDs.ROOM_COUNT, roomCount), false);
 
         return 0;

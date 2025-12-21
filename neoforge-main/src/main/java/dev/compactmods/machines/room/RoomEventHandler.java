@@ -49,7 +49,7 @@ public class RoomEventHandler {
         if (ent instanceof ServerPlayer serverPlayer) {
             CompactMachines.chunkManager()
                     .findRoomByChunk(serverPlayer.chunkPosition())
-                    .flatMap(CompactMachines::room)
+                    .flatMap((String roomCode) -> CompactMachines.room(serverPlayer.server, roomCode))
                     .ifPresent(room -> {
                         PacketDistributor.sendToPlayer(serverPlayer, new SyncRoomMetadataPacket(room.code(), room.getData(CMDataAttachments.ROOM_OWNER)));
                     });
@@ -95,7 +95,7 @@ public class RoomEventHandler {
 
         return CompactMachines.chunkManager()
                 .findRoomByChunk(entity.chunkPosition())
-                .flatMap(CompactMachines::room)
+                .flatMap((String roomCode) -> CompactMachines.room(entity.getServer(), roomCode))
                 .map(ib -> ib.boundaries().innerBounds().contains(target))
                 .orElse(false);
     }

@@ -124,7 +124,7 @@ neoForge {
         create("server") {
             server()
             gameDirectory.set(file("runs/server"))
-            programArgument("nogui")
+//            programArgument("nogui")
         }
 
         create("gameTestServer") {

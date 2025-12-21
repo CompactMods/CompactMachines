@@ -9,6 +9,6 @@ import org.jetbrains.annotations.NotNull;
 public class CMRoomChunkManagerProvider implements RoomChunkManagerProvider {
     @Override
     public @NotNull IRoomChunkManager makeServiceInstance(MinecraftServer server) {
-        return new GraphChunkManager();
+        return new GraphChunkManager(server);
     }
 }

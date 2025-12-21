@@ -53,7 +53,7 @@ public class CompactMachinesServer {
 
     public static void saveAll() {
         if (CURRENT_SERVER != null) {
-            Stream.of(CompactMachines.roomRegistrar(), CompactMachines.roomDataAccessor(),
+            Stream.of(CompactMachines.roomRegistrar(CURRENT_SERVER), CompactMachines.roomDataAccessor(),
                             CompactMachines.playerHistoryApi(),
                             CompactMachines.spawnManagers(),
                             CompactMachines.upgradeDataAccessor())

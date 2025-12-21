@@ -11,6 +11,7 @@ import dev.compactmods.machines.room.graph.edge.RoomChunkEdge;
 import dev.compactmods.machines.room.graph.node.RoomChunkNode;
 import dev.compactmods.machines.room.graph.node.RoomReferenceNode;
 import dev.compactmods.machines.util.MathUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 
 import java.lang.ref.WeakReference;
@@ -26,11 +27,11 @@ public class GraphChunkManager implements IRoomChunkManager {
     private final MemoryGraph graph;
     private final Map<ChunkPos, RoomChunkNode> chunks;
 
-    public GraphChunkManager() {
+    public GraphChunkManager(MinecraftServer server) {
         this.graph = new MemoryGraph();
         this.chunks = new HashMap<>();
 
-        CompactMachines.roomRegistrar()
+        CompactMachines.roomRegistrar(server)
                 .allRooms()
                 .forEach(inst -> calculateChunks(inst.code(), inst.boundaries()));
     }

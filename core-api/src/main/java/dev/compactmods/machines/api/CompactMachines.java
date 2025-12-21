@@ -28,6 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -71,24 +72,24 @@ public class CompactMachines {
 	 * to call this!
 	 */
 	public static void reloadServices(MinecraftServer server) {
-		reloadServices("dev.compactmods.machines", server);
-	}
-
-	public static void reloadServices(String prefix, MinecraftServer server) {
 		logger.debug("Reloading Compact services...");
-		ROOM_REGISTRAR = serverProvidedService(IRoomRegistrar.class, RoomRegistrarProvider.class, prefix, server);
-		CHUNK_MANAGER = serverProvidedService(IRoomChunkManager.class, RoomChunkManagerProvider.class, prefix, server);
-		SPAWN_MANAGERS = serverProvidedService(IRoomSpawnManagers.class, RoomSpawnManagersProvider.class, prefix, server);
+		reloadRoomRegistrar(server);
+		CHUNK_MANAGER = serverProvidedService(IRoomChunkManager.class, RoomChunkManagerProvider.class, server);
+		SPAWN_MANAGERS = serverProvidedService(IRoomSpawnManagers.class, RoomSpawnManagersProvider.class, server);
 
-		ROOM_DATA_ACCESSOR = cmService(IRoomDataAttachmentAccessor.class, prefix);
-		PLAYER_HISTORY_API = cmService(IPlayerHistoryApi.class, prefix);
-		UPGRADE_MANAGER = cmService(IRoomUpgradeManager.class, prefix);
-		ROOM_UPGRADE_DATA_ACCESSOR = cmService(IRoomUpgradeDataAttachmentAccessor.class, prefix);
+		ROOM_DATA_ACCESSOR = cmService(IRoomDataAttachmentAccessor.class);
+		PLAYER_HISTORY_API = cmService(IPlayerHistoryApi.class);
+		UPGRADE_MANAGER = cmService(IRoomUpgradeManager.class);
+		ROOM_UPGRADE_DATA_ACCESSOR = cmService(IRoomUpgradeDataAttachmentAccessor.class);
 		logger.debug("Compact services loaded.");
 	}
 
-	private static <T, TP extends ServerServiceProvider<T>> T serverProvidedService(Class<T> ignored, Class<TP> providerClass, String packagePrefix, MinecraftServer server) {
-		final var registrarProvider = cmService(providerClass, packagePrefix);
+	private static void reloadRoomRegistrar(MinecraftServer server) {
+		ROOM_REGISTRAR = serverProvidedService(IRoomRegistrar.class, RoomRegistrarProvider.class, server);
+	}
+
+	private static <T, TP extends ServerServiceProvider<T>> T serverProvidedService(Class<T> ignored, Class<TP> providerClass, MinecraftServer server) {
+		final var registrarProvider = cmService(providerClass);
 		if(registrarProvider == null) return null;
 		return registrarProvider.makeServiceInstance(server);
 	}
@@ -100,12 +101,12 @@ public class CompactMachines {
 	 * @return
 	 * @param <T>
 	 */
-	private static <T> T cmService(Class<T> serviceClass, String packagePrefix) {
+	private static <T> T cmService(Class<T> serviceClass) {
 		final var loader = ServiceLoader.load(serviceClass, serviceClass.getClassLoader());
 		logger.debug("Attempting to find implementation for {}...", serviceClass.getName());
 
 		for(var s : loader) {
-			if(s.getClass().getPackageName().startsWith(packagePrefix)) {
+			if(s.getClass().getPackageName().startsWith("dev.compactmods.machines")) {
 				logger.debug("Located implementation for {}: {}", serviceClass.getName(), s.getClass().getName());
 				return s;
 			}
@@ -135,8 +136,13 @@ public class CompactMachines {
 		return PLAYER_HISTORY_API;
 	}
 
+	@Deprecated
 	public static Optional<RoomInstance> room(String roomCode) {
-		return ROOM_REGISTRAR.get(roomCode);
+		return roomRegistrar(ServerLifecycleHooks.getCurrentServer()).get(roomCode);
+	}
+
+	public static Optional<RoomInstance> room(MinecraftServer server, String roomCode) {
+		return roomRegistrar(server).get(roomCode);
 	}
 
 	/**
@@ -148,7 +154,7 @@ public class CompactMachines {
 	 * @return
 	 */
 	public static RoomInstance newRoom(MinecraftServer server, RoomTemplate template, UUID owner) throws MissingDimensionException {
-		final var instance = ROOM_REGISTRAR.createNew(template, owner);
+		final var instance = roomRegistrar(server).createNew(template, owner);
 		final var compactDim = CompactDimension.forServer(server);
 		CompactRoomGenerator.generateRoom(compactDim, instance.boundaries().outerBounds());
 
@@ -175,10 +181,6 @@ public class CompactMachines {
 		return instance;
 	}
 
-	public static Optional<? extends IAttachmentHolder> existingRoomData(String code) {
-		return ROOM_DATA_ACCESSOR.get(code);
-	}
-
 	public static IRoomDataAttachmentAccessor roomDataAccessor() {
 		return ROOM_DATA_ACCESSOR;
 	}
@@ -203,7 +205,10 @@ public class CompactMachines {
 		return UPGRADE_MANAGER;
 	}
 
-	public static IRoomRegistrar roomRegistrar() {
+	public static IRoomRegistrar roomRegistrar(MinecraftServer server) {
+		if(ROOM_REGISTRAR == null)
+			reloadRoomRegistrar(server);
+
 		return ROOM_REGISTRAR;
 	}
 

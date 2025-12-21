@@ -15,6 +15,7 @@ import dev.compactmods.machines.feature.CMFeatureFlags;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventHandler;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventListener;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
@@ -56,8 +57,8 @@ public class RoomUpgradeEventHandlers {
         allEvents.forEach(RoomUpgrades::eventProcessor);
     }
 
-    private static void doRoomUpgradeLoop(BiConsumer<RoomInstance, RoomUpgradeInventory> forEach) {
-        final var rooms = CompactMachines.roomRegistrar();
+    private static void doRoomUpgradeLoop(MinecraftServer server, BiConsumer<RoomInstance, RoomUpgradeInventory> forEach) {
+        final var rooms = CompactMachines.roomRegistrar(server);
         if (rooms != null) {
             final var registeredRooms = rooms.allRooms()
                     .collect(Collectors.toUnmodifiableSet());
@@ -71,10 +72,11 @@ public class RoomUpgradeEventHandlers {
     }
 
     public static void cleanupDeadUpgrades(final ServerStartedEvent serverStartedEvent) {
-        if (!CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(serverStartedEvent.getServer().getWorldData().enabledFeatures()))
+        final var server = serverStartedEvent.getServer();
+        if (!CMFeatureFlags.ROOM_UPGRADES.isSubsetOf(server.getWorldData().enabledFeatures()))
             return;
 
-        CompactMachines.roomRegistrar()
+        CompactMachines.roomRegistrar(server)
                 .allRooms()
                 .forEach(RoomUpgradeHelper::cleanDeadUpgrades);
     }
@@ -84,7 +86,7 @@ public class RoomUpgradeEventHandlers {
             return;
 
         if (loaded.getLevel() instanceof ServerLevel serverLevel && CompactDimension.isLevelCompact(serverLevel)) {
-            doRoomUpgradeLoop((room, inv) -> handleBasicEvent(room, inv, LevelLoadedUpgradeEventListener.class));
+            doRoomUpgradeLoop(serverLevel.getServer(), (room, inv) -> handleBasicEvent(room, inv, LevelLoadedUpgradeEventListener.class));
         }
     }
 
@@ -93,7 +95,7 @@ public class RoomUpgradeEventHandlers {
             return;
 
         if (loaded.getLevel() instanceof ServerLevel serverLevel && CompactDimension.isLevelCompact(serverLevel)) {
-            doRoomUpgradeLoop((room, inv) -> handleBasicEvent(room, inv, LevelUnloadedUpgradeEventListener.class));
+            doRoomUpgradeLoop(serverLevel.getServer(), (room, inv) -> handleBasicEvent(room, inv, LevelUnloadedUpgradeEventListener.class));
         }
     }
 
@@ -102,7 +104,7 @@ public class RoomUpgradeEventHandlers {
             return;
 
         if (postTick.getLevel() instanceof ServerLevel serverLevel && CompactDimension.isLevelCompact(serverLevel)) {
-            doRoomUpgradeLoop((room, inv) -> handleBasicEvent(room, inv, UpgradeTickedEventListener.class));
+            doRoomUpgradeLoop(serverLevel.getServer(), (room, inv) -> handleBasicEvent(room, inv, UpgradeTickedEventListener.class));
         }
     }
 

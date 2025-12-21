@@ -6,13 +6,14 @@ import dev.compactmods.machines.api.room.upgrade.RoomUpgradeInstance;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventHandler;
 import dev.compactmods.machines.api.room.upgrade.event.NeoForgeEventListener;
 import net.neoforged.bus.api.Event;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.stream.Collectors;
 
 public record NeoForgeEventProcessor<TEvt extends Event>(Class<TEvt> type) {
 
     public void process(TEvt event) {
-        final var allRoomInstances = CompactMachines.roomRegistrar()
+        final var allRoomInstances = CompactMachines.roomRegistrar(ServerLifecycleHooks.getCurrentServer())
                 .allRooms()
                 .collect(Collectors.toSet());
 
