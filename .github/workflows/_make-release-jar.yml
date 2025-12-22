@@ -29,19 +29,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Pull Built Generated Data
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: generated-data
           path: neoforge-main/src/generated/resources
 
       - name: Pull Compilation Data (Core)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: build-core
           path: core-api/build
 
       - name: Pull Compilation Data (Main)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: build-main
           path: neoforge-main/build

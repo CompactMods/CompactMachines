@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Grab JAR and Info
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: release
           path: .
