@@ -10,9 +10,9 @@ on:
       - "v**"
     paths:
       - "gradle/*.versions.toml"
-      - "core-api/**"
-      - "neoforge-datagen/**"
-      - "neoforge-main/**"
+      - "core-api/**/*"
+      - "neoforge-datagen/**/*"
+      - "neoforge-main/**/*"
 
 jobs:
   vars:

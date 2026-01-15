@@ -9,24 +9,17 @@ file = "META-INF/accesstransformer.cfg"
 [[mixins]]
 config = "compactmachines.mixins.json"
 
-[[mods]] #mandatory
+[[mods]]
 modId = "compactmachines"
 version = "${mod_version}"
 displayName = "Compact Machines"
-authors = "Davenonymous, RobotGryphon" #optional
+authors = "Davenonymous, RobotGryphon"
 description = "It's all so tiny!"
 featureFlags="META-INF/feature_flags.json"
-
 issueTrackerURL = "https://github.com/CompactMods/CompactMachines/issues"
-
-#updateJSONURL="http://myurl.me/" #optional
 displayURL = "https://compactmods.dev"
 
-# A file name (in the root of the mod JAR) containing a logo for display
-# logoFile="examplemod.png" #optional
-
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.compactmachines]] #optional
+[[dependencies.compactmachines]]
 modId = "neoforge"
 type = "required"
 versionRange = "${neo_version_range}"
