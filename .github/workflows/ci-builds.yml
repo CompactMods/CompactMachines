@@ -6,8 +6,6 @@ env:
 on:
   workflow_dispatch:
   push:
-    tags-ignore:
-      - "v**"
     paths:
       - "gradle/*.versions.toml"
       - "core-api/**/*"
@@ -33,7 +31,7 @@ jobs:
 
       - name: Version
         id: version
-        uses: paulhatch/semantic-version@v5.4.0
+        uses: paulhatch/semantic-version@v6.0.1
         with:
           version_format: "${major}.${minor}.${patch}"
           search_commit_body: true
@@ -66,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             github.rest.git.createRef({
