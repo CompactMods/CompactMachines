@@ -16,7 +16,7 @@ public record PlayerRequestedUpgradeUIPacket(String roomCode, boolean isIsolated
 
    public static final IPayloadHandler<PlayerRequestedUpgradeUIPacket> HANDLER = (pkt, ctx) -> {
 	  final var player = ctx.player();
-	  CompactMachines.room(pkt.roomCode()).ifPresent(inst -> {
+	  CompactMachines.room(player.getServer(), pkt.roomCode()).ifPresent(inst -> {
 		 player.openMenu(RoomUpgradeMenu.provider(inst), buf -> {
 			buf.writeBoolean(pkt.isIsolated);
 			buf.writeUtf(pkt.roomCode());

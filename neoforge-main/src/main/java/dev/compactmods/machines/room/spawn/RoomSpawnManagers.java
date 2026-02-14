@@ -10,7 +10,7 @@ public class RoomSpawnManagers implements IRoomSpawnManagers {
     private final CMKeyedDataFileManager<String, SpawnManager> spawnManagers;
 
     public RoomSpawnManagers(MinecraftServer server) {
-        this.spawnManagers = new CMKeyedDataFileManager<>(server, (serv, code) -> new SpawnManager(code));
+        this.spawnManagers = new CMKeyedDataFileManager<>(server, SpawnManager::new);
     }
 
     @Override

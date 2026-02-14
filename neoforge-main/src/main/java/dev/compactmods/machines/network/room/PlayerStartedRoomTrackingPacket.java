@@ -29,7 +29,7 @@ public record PlayerStartedRoomTrackingPacket(String roomCode) implements Custom
         var sender = ctx.player();
         var server = ctx.player().getServer();
 
-        CompactMachines.room(pkt.roomCode).ifPresent(instance -> {
+        CompactMachines.room(server, pkt.roomCode).ifPresent(instance -> {
             final StructureTemplate blocks;
             try {
                 blocks = RoomBlocks.getInternalBlocks(server, instance).get(5, TimeUnit.SECONDS);

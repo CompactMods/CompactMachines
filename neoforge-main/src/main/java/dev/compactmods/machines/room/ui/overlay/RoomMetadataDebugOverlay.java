@@ -15,15 +15,14 @@ import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.UUID;
 
 public class RoomMetadataDebugOverlay implements LayeredDraw.Layer {
 
-    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, Player player) {
-        player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE).ifPresent(code -> {
-            graphics.drawCenteredString(mc.font, Component.literal("Current Room: " + code), 0, 0, CommonColors.LIGHT_GRAY);
-        });
+    private static void drawRoomCode(GuiGraphics graphics, Minecraft mc, String roomCode) {
+        graphics.drawCenteredString(mc.font, Component.literal("Current Room: " + roomCode), 0, 0, CommonColors.LIGHT_GRAY);
     }
 
     private static void drawRoomOwnerInfo(GuiGraphics graphics, Font font, PoseStack poseStack, UUID owner) {
@@ -59,18 +58,15 @@ public class RoomMetadataDebugOverlay implements LayeredDraw.Layer {
 
         final var poseStack = graphics.pose();
 
-        poseStack.pushPose();
-        poseStack.translate(center, screenHeight - 75, 0);
 
-        mc.player.getExistingData(CMDataAttachments.CURRENT_ROOM_CODE)
-                .flatMap(CompactMachines::room)
-                .flatMap(ri -> ri.getExistingData(CMDataAttachments.ROOM_OWNER))
-                .ifPresent(ownerID -> {
-                    drawRoomOwnerInfo(graphics, mc.font, poseStack, ownerID);
-                });
+        mc.player.getExistingData(CMDataAttachments.CURRENT_ROOM_DEBUG_INFO).ifPresent(debugInfo -> {
+            poseStack.pushPose();
+            poseStack.translate(center, screenHeight - 75, 0);
 
-        drawRoomCode(graphics, mc, mc.player);
+            drawRoomOwnerInfo(graphics, mc.font, poseStack, debugInfo.owner());
+            drawRoomCode(graphics, mc, debugInfo.roomCode());
 
-        poseStack.popPose();
+            poseStack.popPose();
+        });
     }
 }

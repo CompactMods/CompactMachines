@@ -4,6 +4,7 @@ import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.machine.MachineColor;
+import dev.compactmods.machines.api.room.RoomDebugInformation;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
 import dev.compactmods.machines.api.room.upgrade.inventory.RoomUpgradeInventory;
 import net.minecraft.Util;
@@ -39,6 +40,12 @@ public interface CMDataAttachments {
     Supplier<AttachmentType<String>> CURRENT_ROOM_CODE = ATTACHMENT_TYPES.register("current_room_code", () -> AttachmentType
             .<String>builder(() -> null)
             .serialize(Codec.STRING)
+            .build());
+
+    Supplier<AttachmentType<RoomDebugInformation>> CURRENT_ROOM_DEBUG_INFO = ATTACHMENT_TYPES.register("current_room_debug_info", () -> AttachmentType
+            .builder(() -> new RoomDebugInformation("", Util.NIL_UUID))
+            .serialize(RoomDebugInformation.CODEC)
+            .sync(RoomDebugInformation.STREAM_CODEC)
             .build());
 
     Supplier<AttachmentType<UUID>> ROOM_OWNER = ATTACHMENT_TYPES.register("room_owner", () -> AttachmentType

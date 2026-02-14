@@ -2,7 +2,6 @@ package dev.compactmods.machines.client.room;
 
 import dev.compactmods.gander.level.VirtualLevel;
 import dev.compactmods.gander.render.geometry.LevelBakery;
-import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -38,11 +37,4 @@ public class ClientRoomPacketHandler {
         }
     }
 
-    public static void handleRoomSync(String roomCode) {
-        final var mc = Minecraft.getInstance();
-
-        // FIXME - Current Room Owner
-        mc.player.setData(CMDataAttachments.CURRENT_ROOM_CODE, roomCode);
-        // mc.player.setData(Rooms.DataAttachments)
-    }
 }

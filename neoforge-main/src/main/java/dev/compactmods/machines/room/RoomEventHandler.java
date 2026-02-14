@@ -3,9 +3,9 @@ package dev.compactmods.machines.room;
 import dev.compactmods.machines.LoggingUtil;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.room.RoomDebugInformation;
 import dev.compactmods.machines.i18n.Translations;
 import dev.compactmods.machines.api.dimension.CompactDimension;
-import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -51,7 +51,9 @@ public class RoomEventHandler {
                     .findRoomByChunk(serverPlayer.chunkPosition())
                     .flatMap((String roomCode) -> CompactMachines.room(serverPlayer.server, roomCode))
                     .ifPresent(room -> {
-                        PacketDistributor.sendToPlayer(serverPlayer, new SyncRoomMetadataPacket(room.code(), room.getData(CMDataAttachments.ROOM_OWNER)));
+                        serverPlayer.setData(CMDataAttachments.CURRENT_ROOM_CODE, room.code());
+                        serverPlayer.setData(CMDataAttachments.CURRENT_ROOM_DEBUG_INFO,
+                                new RoomDebugInformation(room.code(), room.getData(CMDataAttachments.ROOM_OWNER)));
                     });
         } else {
             if (!positionInsideRoom(ent, ent.position())) {

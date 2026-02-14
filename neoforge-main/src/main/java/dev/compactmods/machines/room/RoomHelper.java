@@ -2,6 +2,7 @@ package dev.compactmods.machines.room;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
+import dev.compactmods.machines.api.room.RoomDebugInformation;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.history.IPlayerEntryPointHistoryManager;
 import dev.compactmods.machines.api.room.history.RoomEntryPoint;
@@ -11,7 +12,6 @@ import dev.compactmods.machines.api.dimension.MissingDimensionException;
 import dev.compactmods.machines.api.room.history.RoomEntryResult;
 import dev.compactmods.machines.api.room.history.RoomExitResult;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
-import dev.compactmods.machines.network.room.SyncRoomMetadataPacket;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.ChatFormatting;
@@ -61,18 +61,18 @@ public abstract class RoomHelper {
         }
 
         if(result.successful()) {
-            // Mark current room
-            player.setData(CMDataAttachments.CURRENT_ROOM_CODE, room.code());
-            player.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
+            player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
 
             return serv.submit(() -> {
-                player.getCooldowns().addCooldown(Shrinking.PERSONAL_SHRINKING_DEVICE.get(), 25);
-
                 final var spawns = CompactMachines.spawnManagers().get(room.code()).spawns();
                 final var spawn = spawns.forPlayer(player.getUUID()).orElse(spawns.defaultSpawn());
                 player.changeDimension(CompactDimensionTransitions.to(compactDim, spawn.position(), spawn.rotation()));
 
-                PacketDistributor.sendToPlayer(player, new SyncRoomMetadataPacket(room.code(), Util.NIL_UUID));
+                // Mark current room
+                player.setData(CMDataAttachments.CURRENT_ROOM_CODE, room.code());
+                player.setData(CMDataAttachments.LAST_ROOM_ENTRYPOINT, RoomEntryPoint.playerEnteringMachine(player));
+                player.setData(CMDataAttachments.CURRENT_ROOM_DEBUG_INFO, new RoomDebugInformation(room.code(),
+                        room.getData(CMDataAttachments.ROOM_OWNER)));
 
                 return result;
             });

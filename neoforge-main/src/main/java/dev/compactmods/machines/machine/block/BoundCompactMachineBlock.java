@@ -132,7 +132,7 @@ public class BoundCompactMachineBlock extends CompactMachineBlock implements Ent
         if (!level.isClientSide && !(player instanceof FakePlayer)) {
             level.getBlockEntity(pos, Machines.BlockEntities.MACHINE.get()).ifPresent(machine -> {
                 final var roomCode = machine.connectedRoom();
-                CompactMachines.room(roomCode).ifPresent(inst -> {
+                CompactMachines.room(player.getServer(), roomCode).ifPresent(inst -> {
                     if (player instanceof ServerPlayer sp) {
                         sp.setData(CMDataAttachments.OPEN_MACHINE_POS, machine.getLevelPosition());
 

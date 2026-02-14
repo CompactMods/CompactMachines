@@ -7,29 +7,26 @@ import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.data.CMDataFile;
-import dev.compactmods.machines.api.room.spatial.IRoomBoundaries;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawn;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawnManager;
 import dev.compactmods.machines.api.room.spawn.IRoomSpawns;
 import dev.compactmods.machines.data.CodecHolder;
+import dev.compactmods.machines.data.ServerHolder;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager>, CMDataFile {
+public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager>, CMDataFile, ServerHolder {
 
     private final Logger LOGS = LogManager.getLogger();
 
@@ -40,6 +37,7 @@ public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager
             RoomSpawn.CODEC.fieldOf("default_spawn").forGetter(x -> x.defaultSpawn)
     ).apply(inst, SpawnManager::new));
 
+    private MinecraftServer server;
     private final String roomCode;
 
     @Nullable
@@ -50,7 +48,8 @@ public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager
 
     private final Map<UUID, RoomSpawn> playerSpawns;
 
-    public SpawnManager(String roomCode) {
+    public SpawnManager(MinecraftServer server, String roomCode) {
+        this.server = server;
         this.roomCode = roomCode;
         this.playerSpawns = new HashMap<>();
     }
@@ -104,11 +103,21 @@ public class SpawnManager implements IRoomSpawnManager, CodecHolder<SpawnManager
 
     private RoomInstance getRoomInstance() {
         if (roomInstance == null) {
-            final var instance = CompactMachines.room(this.roomCode).orElseThrow();
+            final var instance = CompactMachines.room(this.server, this.roomCode).orElseThrow();
             this.roomInstance = instance;
         }
 
         return this.roomInstance;
+    }
+
+    @Override
+    public MinecraftServer server() {
+        return this.server;
+    }
+
+    @Override
+    public void setServer(MinecraftServer server) {
+        this.server = server;
     }
 
     private record RoomSpawns(RoomSpawn defaultSpawn,

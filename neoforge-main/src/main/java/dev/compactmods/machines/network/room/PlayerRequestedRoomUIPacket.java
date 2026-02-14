@@ -16,9 +16,7 @@ public record PlayerRequestedRoomUIPacket(String roomCode) implements CustomPack
     );
 
     public static final IPayloadHandler<PlayerRequestedRoomUIPacket> HANDLER = (pkt, ctx) -> {
-        CompactMachines.room(pkt.roomCode).ifPresent(inst -> {
 
-        });
     };
 
     @Override

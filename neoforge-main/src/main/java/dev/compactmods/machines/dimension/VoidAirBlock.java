@@ -5,12 +5,12 @@ import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AirBlock;
@@ -55,15 +55,7 @@ public class VoidAirBlock extends AirBlock {
             // FIXME - Achievement
             // PlayerUtil.howDidYouGetThere(player);
 
-            boolean allowedOutOfBounds = switch (player.gameMode.getGameModeForPlayer()) {
-                case GameType.ADVENTURE, GameType.SURVIVAL ->
-                        rules.getBoolean(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS);
-                case GameType.CREATIVE -> rules.getBoolean(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS);
-                case GameType.SPECTATOR -> rules.getBoolean(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS);
-            };
-
-            if (!allowedOutOfBounds)
-                PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
+            PlayerUtil.handlePlayerMaybeEscaped(player, rules);
         }
     }
 

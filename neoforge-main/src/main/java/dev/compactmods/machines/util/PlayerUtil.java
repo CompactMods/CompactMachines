@@ -4,11 +4,14 @@ import com.mojang.authlib.GameProfile;
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.api.attachment.CMDataAttachments;
 import dev.compactmods.machines.dimension.CompactDimensionTransitions;
+import dev.compactmods.machines.gamerule.CMGameRules;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +26,18 @@ public abstract class PlayerUtil {
         player.removeData(CMDataAttachments.LAST_ROOM_ENTRYPOINT);
         history.entryPoints().clearHistory(player);
         history.save();
+    }
+
+    public static void handlePlayerMaybeEscaped(ServerPlayer player, GameRules rules) {
+        boolean allowedOutOfBounds = switch (player.gameMode.getGameModeForPlayer()) {
+            case GameType.ADVENTURE, GameType.SURVIVAL ->
+                    rules.getBoolean(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS);
+            case GameType.CREATIVE -> rules.getBoolean(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS);
+            case GameType.SPECTATOR -> rules.getBoolean(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS);
+        };
+
+        if (!allowedOutOfBounds)
+            PlayerUtil.teleportPlayerToRespawnOrOverworld(player.server, player);
     }
 
     public static void teleportPlayerToRespawnOrOverworld(MinecraftServer serv, @NotNull ServerPlayer player) {

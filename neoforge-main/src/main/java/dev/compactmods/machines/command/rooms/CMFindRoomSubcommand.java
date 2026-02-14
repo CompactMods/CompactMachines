@@ -67,7 +67,9 @@ public class CMFindRoomSubcommand {
 
     private static int fetchByMachineBlock(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         final var block = BlockPosArgument.getLoadedBlockPos(ctx, "pos");
-        final var level = ctx.getSource().getLevel();
+        final var source = ctx.getSource();
+
+        final var level = source.getLevel();
 
         if (!level.getBlockState(block).is(MachineConstants.MACHINE_BLOCK)) {
             ctx.getSource().sendFailure(MachineTranslations.NOT_A_MACHINE_BLOCK.apply(block));
@@ -76,7 +78,7 @@ public class CMFindRoomSubcommand {
 
         if (level.getBlockEntity(block) instanceof BoundCompactMachineBlockEntity be) {
             final var roomCode = be.connectedRoom();
-            CompactMachines.room(roomCode).ifPresent(roomInfo -> {
+            CompactMachines.room(source.getServer(), roomCode).ifPresent(roomInfo -> {
                 ctx.getSource().sendSuccess(() -> RoomTranslations.MACHINE_ROOM_INFO.apply(block, roomInfo), false);
             });
         } else {

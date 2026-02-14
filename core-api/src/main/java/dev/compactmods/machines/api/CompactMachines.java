@@ -136,7 +136,7 @@ public class CompactMachines {
 		return PLAYER_HISTORY_API;
 	}
 
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static Optional<RoomInstance> room(String roomCode) {
 		return roomRegistrar(ServerLifecycleHooks.getCurrentServer()).get(roomCode);
 	}

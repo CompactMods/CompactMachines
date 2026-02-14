@@ -99,7 +99,7 @@ public class BoundCompactMachineBlockEntity extends BlockEntity implements IBoun
 	  if (level != null && !level.isClientSide()) {
 		 this.roomCode = roomCode;
 
-		 CompactMachines.room(roomCode).ifPresentOrElse(inst -> {
+		 CompactMachines.room(level.getServer(), roomCode).ifPresentOrElse(inst -> {
 				this.setData(CMDataAttachments.MACHINE_COLOR, inst.defaultMachineColor());
 			 },
 			 () -> {

@@ -5,6 +5,7 @@ import dev.compactmods.machines.api.room.data.CMRoomDataLocations;
 import dev.compactmods.machines.data.CMDataFile;
 import dev.compactmods.machines.data.CodecHolder;
 import dev.compactmods.machines.data.DataFileUtil;
+import dev.compactmods.machines.data.ServerHolder;
 import dev.compactmods.machines.player.PlayerEntryPointHistoryManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -38,6 +39,8 @@ public class CMSingletonDataFileManager<T extends CMDataFile & CodecHolder<T>> i
 
         if (file.exists()) {
             this.instance = DataFileUtil.loadFileWithCodec(file, instance.codec());
+            if(instance instanceof ServerHolder sh)
+                sh.setServer(server);
         }
     }
 

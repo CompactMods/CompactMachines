@@ -18,7 +18,7 @@ public class BasicRoomCapabilities {
                 -> CompactMachines.roomUpgradeData(roomCode, upgradeId));
 
         CompactRoomCapability.register(RoomCapabilities.UPGRADES, ((server, roomCode, v) -> {
-            final var room = CompactMachines.room(roomCode)
+            final var room = CompactMachines.room(server, roomCode)
                     .map(CompactMachines::upgradeAccessor);
 
             return room.orElse(null);
