@@ -25,7 +25,7 @@ jobs:
           java-version: 21
 
       - name: Setup Groovy
-        uses: wtfjoke/setup-groovy@v2
+        uses: wtfjoke/setup-groovy@v3
         with:
           groovy-version: '4.x'
 
