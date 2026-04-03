@@ -43,10 +43,13 @@ public class CompactMachinesJeiPlugin implements IModPlugin {
                 Component.translatable("jei.compactmachines.machines"));
 
         // Add all known template JEI infos
-        RoomTemplateHelper.getTemplateHolders(ServerLifecycleHooks.getCurrentServer().registryAccess())
-                .map(Machines.Items::forNewRoom)
-                .forEach(t -> registration.addIngredientInfo(t, VanillaTypes.ITEM_STACK,
-                        Component.translatable("jei.compactmachines.machines")));
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            RoomTemplateHelper.getTemplateHolders(server.registryAccess())
+                    .map(Machines.Items::forNewRoom)
+                    .forEach(t -> registration.addIngredientInfo(t, VanillaTypes.ITEM_STACK,
+                            Component.translatable("jei.compactmachines.machines")));
+        }
 
         registration.addIngredientInfo(
                 new ItemStack(Shrinking.PERSONAL_SHRINKING_DEVICE.get()),
