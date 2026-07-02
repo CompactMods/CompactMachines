@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.base;
 
 import dev.compactmods.machines.datagen.base.compat.PSDCuriosProvider;
 import dev.compactmods.machines.datagen.base.lang.EnglishLangGenerator;
+import dev.compactmods.machines.datagen.base.lang.FrenchLangGenerator;
 import dev.compactmods.machines.datagen.base.loot.BlockLootGenerator;
 import dev.compactmods.machines.datagen.base.tags.BlockTagGenerator;
 import dev.compactmods.machines.datagen.base.tags.ItemTagGenerator;
@@ -55,6 +56,7 @@ public class BaseDatapack {
         generator.addProvider(client, new ItemModelGenerator(basePackOutput, fileHelper));
 
         generator.addProvider(client, new EnglishLangGenerator(basePackOutput));
+        generator.addProvider(client, new FrenchLangGenerator(basePackOutput));
 
         return new BaseDatapackGenerationResults(dataRegistered.getRegistryProvider());
     }
