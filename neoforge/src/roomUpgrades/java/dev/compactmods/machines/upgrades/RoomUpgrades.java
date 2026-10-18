@@ -4,10 +4,12 @@ import dev.compactmods.machines.upgrades.api.RoomUpgradeComponentType;
 import dev.compactmods.machines.upgrades.api.RoomUpgradesApi;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.CMFeatureFlags;
+import dev.compactmods.machines.upgrades.canvas.RoomCanvases;
 import dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderTickets;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
+import dev.compactmods.machines.upgrades.example.TreeCutterState;
 import dev.compactmods.machines.upgrades.storage.ResourceTypes;
 import dev.compactmods.machines.upgrades.storage.StorageCapabilities;
 import dev.compactmods.machines.upgrades.system.RoomSystems;
@@ -58,6 +60,8 @@ public final class RoomUpgrades {
         ResourceTypes.init(modBus);
 
         RoomSystems.init(modBus);
+        RoomCanvases.init();
+        TreeCutterState.init();
     }
 
     static void registerEvents(IEventBus modBus) {
@@ -81,5 +85,6 @@ public final class RoomUpgrades {
 
     static void onRegisterCapabilities(RegisterCapabilitiesEvent r) {
         StorageCapabilities.registerProviders();
+        RoomCanvases.registerProviders();
     }
 }

@@ -83,6 +83,11 @@ public final class RoomPreviewClient {
         current.addAll(ClientRoomPreviews.watched());
         if (current.equals(lastSent)) return;
 
+        // Entities stop arriving for rooms we drop, so forget them now rather than freeze them in place
+        for (String dropped : lastSent)
+            if (!current.contains(dropped))
+                ClientRoomEntities.remove(dropped);
+
         lastSent = current;
         dev.compactmods.machines.core.CompactMachinesCore.modLog().info("[RoomPreview] client subscribing to {}", current);
         ClientPacketDistributor.sendToServer(new RoomPreviewSubscribePacket(new ArrayList<>(current)));

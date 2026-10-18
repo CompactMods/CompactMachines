@@ -102,6 +102,11 @@ public final class RoomPreviewService {
                 PacketDistributor.sendToPlayer(player, new RoomPreviewSnapshotPacket(code, cached.snapshot));
             if (rooms != null)
                 rooms.get(code).ifPresent(room -> sendSpawnIfChanged(player, room, code, state));
+
+            // An empty room sends no entity updates, so clear anything stale the client still holds
+            // (e.g. themselves, from before they left it). Occupied rooms send every entity tick anyway.
+            if (state.lastEntityCount.getOrDefault(code, 0) == 0)
+                PacketDistributor.sendToPlayer(player, new RoomEntitiesPacket(code, List.of()));
         }
     }
 

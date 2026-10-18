@@ -8,6 +8,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.api.machine.block.IBoundCompactMachineBlockEntity;
 import dev.compactmods.machines.api.machine.block.ICompactMachineBlockEntity;
+import dev.compactmods.machines.machine.MachineRoomEntry;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.machine.network.MachineColorSyncPacket;
@@ -25,7 +26,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -161,7 +164,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
                         .orElse(null);
 
                 if (room != null) {
-                    tryEnterRoom(mainItem, player, serverPlayer, room, tile);
+                    MachineRoomEntry.tryEnter(serverPlayer, room, tile, mainItem);
                 }
             }
 
@@ -196,7 +199,7 @@ public class CompactMachineBlock extends Block implements EntityBlock {
 
                         // Enter the room
                         final var instance = roomRegistry.get(room).orElseThrow();
-                        tryEnterRoom(mainItem, player, serverPlayer, instance, tile);
+                        MachineRoomEntry.tryEnter(serverPlayer, instance, tile, mainItem);
                     });
                 } catch (RoomGenerationException e) {
                     throw new RuntimeException(e);
@@ -207,25 +210,6 @@ public class CompactMachineBlock extends Block implements EntityBlock {
         }
 
         return InteractionResult.PASS;
-    }
-
-    private static boolean tryEnterRoom(ItemStack mainItem, Player player, ServerPlayer serverPlayer, RoomInstance room, CompactMachineBlockEntity tile) {
-        final var shrinkHandler = serverPlayer.getCapability(Shrinking.SHRINK, room);
-        if (shrinkHandler == null) {
-            CompactMachinesCore.modLog().error("Error: Could not fetch or create a shrinking handler for room roomCode [{}], player [{}].",
-                    room.code(), player.getUUID());
-
-            return false;
-        }
-
-        final var method = new UsedShrinkingDeviceOnMachine(serverPlayer, room, tile.getLevelPosition());
-        shrinkHandler.tryEnter(method).thenAccept(result -> {
-            if (result.successful()) {
-                ShrinkingHelper.handleSuccessfulAtomicShift(serverPlayer, mainItem);
-            }
-        });
-
-        return true;
     }
 
     @Override
@@ -244,11 +228,21 @@ public class CompactMachineBlock extends Block implements EntityBlock {
             final var machinePos = GlobalPos.of(level.dimension(), pos);
             sp.setData(Machines.Attachments.OPEN_MACHINE_POS, machinePos);
 
-            sp.openMenu(new SimpleMenuProvider(
-                    (int i, Inventory _, Player p) -> new MachineUIMenu(i, p, machinePos),
-                    Component.empty()
-            ), buffer -> {
-                buffer.writeGlobalPos(machinePos);
+            sp.openMenu(new MenuProvider() {
+                @Override
+                public Component getDisplayName() {
+                    return Component.empty();
+                }
+
+                @Override
+                public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player p) {
+                    return new MachineUIMenu(containerId, p, machinePos);
+                }
+
+                @Override
+                public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+                    MachineUIMenu.writeClientSideData(menu, buffer);
+                }
             });
 //                                                PacketDistributor.sendToPlayer(sp,
 //                                                        new OpenMachinePreviewScreenPacket(GlobalPos.of(level.dimension(), pos), roomCode)

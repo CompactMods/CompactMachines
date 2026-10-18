@@ -37,6 +37,11 @@ public final class ClientRoomEntities {
         return ENTITIES.getOrDefault(roomCode, List.of());
     }
 
+    /** Forgets {@code roomCode}'s entities (its render instances drop on the next prune). */
+    public static void remove(String roomCode) {
+        ENTITIES.remove(roomCode);
+    }
+
     public static void clear() {
         ENTITIES.clear();
     }

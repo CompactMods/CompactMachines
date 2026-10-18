@@ -6,6 +6,7 @@ import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.machine.MachineUpgradeCanvas;
 import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.room.preview.server.RoomPreviewService;
 import dev.compactmods.machines.room.RoomSystem;
@@ -41,6 +42,7 @@ public class CompactMachines {
         Machines.init(modBus);
         RoomSystem.init(modBus);
         RoomUpgrades.init(modBus);
+        modBus.addListener(MachineUpgradeCanvas::registerCapabilities);
         Shrinking.init(modBus);
 
         CrashReportCallables.registerCrashCallable("Compact Machines", CompactMachines::crashReport);

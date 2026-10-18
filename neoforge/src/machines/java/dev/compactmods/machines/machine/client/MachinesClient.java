@@ -18,6 +18,7 @@ public interface MachinesClient {
 	  modBus.addListener(MachineColors::onItemColors);
 	  modBus.addListener(MachinesClient::registerRenderers);
 	  modBus.addListener(MachinesClient::registerRenderPipelines);
+	  MachineToolbar.BUTTONS.register(modBus);
 
        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, MachineShaderRenderer::extractPrideRenderState);
        NeoForge.EVENT_BUS.addListener(MachineShaderRenderer::prepareBuffers);

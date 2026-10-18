@@ -52,6 +52,7 @@ public class BaseDatapack {
 
         // Client
         event.createProvider(EnglishLangGenerator::new);
+        event.createProvider(NodeAppearanceGenerator::new);
 
         return new BaseDatapackGenerationResults(event.getReloadableLookupProvider());
     }

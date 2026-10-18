@@ -9,6 +9,8 @@ import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.core.Translations;
 import dev.compactmods.machines.Advancements;
 import dev.compactmods.machines.room.command.CommandTranslations;
+import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeNode;
 import dev.compactmods.machines.machine.i18n.MachineTranslations;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.creative.CreativeTabs;
@@ -80,6 +82,11 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
 
         addJade();
 
+        add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node"), "Tree Cutter Upgrade");
+        add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.ENABLED.name()), "Enabled");
+        add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.TOOLS.name()), "Tools");
+        add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.DROPS.name()), "Drops");
+
         addGamerule(CMGameRules.ALLOW_SURVIVAL_OUT_OF_BOUNDS_KEY, "Allow Survival OOB", "Allow out-of-bounds survival players");
         addGamerule(CMGameRules.ALLOW_CREATIVE_OUT_OF_BOUNDS_KEY, "Allow Creative OOB", "Allow out-of-bounds creative players");
         addGamerule(CMGameRules.ALLOW_SPECTATORS_OUT_OF_BOUNDS_KEY, "Allow Spectators OOB", "Allow out-of-bounds spectators");
@@ -90,6 +97,7 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
     private void blocksAndItems() {
         final var machineTranslation = getMachineTranslation();
 
+        addBlock(Machines.Blocks.MACHINE, machineTranslation);
         addBlock(Rooms.Blocks.BREAKABLE_WALL, "Compact Machine Wall");
         addBlock(Rooms.Blocks.SOLID_WALL, "Solid Compact Machine Wall");
 

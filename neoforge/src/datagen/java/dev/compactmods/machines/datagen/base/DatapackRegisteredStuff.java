@@ -7,6 +7,8 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.util.DimensionTypeBuilder;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.upgrades.api.system.CompiledRoomUpgrade;
+import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeNode;
+import dev.robotgryphon.screenlib.graph.schema.NodeDefinition;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
 import net.minecraft.core.RegistrySetBuilder;
@@ -41,7 +43,13 @@ public class DatapackRegisteredStuff {
             .add(RoomTemplate.REGISTRY_KEY, (ctx) -> {
             })
             .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions)
-            .add(CompiledRoomUpgrade.REGISTRY_KEY, DatapackRegisteredStuff::generateCompiledRoomUpgrades);
+            .add(CompiledRoomUpgrade.REGISTRY_KEY, DatapackRegisteredStuff::generateCompiledRoomUpgrades)
+            .add(NodeDefinition.REGISTRY_KEY, DatapackRegisteredStuff::generateNodeDefinitions);
+
+    /** Screenlib canvas nodes for the room upgrade canvas (see {@code RoomCanvases}). */
+    private static void generateNodeDefinitions(BootstrapContext<NodeDefinition> ctx) {
+        ctx.register(TreeCutterUpgradeNode.KEY, TreeCutterUpgradeNode.definition());
+    }
 
     private static void generateCompiledRoomUpgrades(BootstrapContext<CompiledRoomUpgrade> ctx) {
         ctx.register(
