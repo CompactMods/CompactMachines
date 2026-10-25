@@ -8,10 +8,12 @@ import dev.robotgryphon.screenlib.ui.api.layout.Placement;
 import dev.robotgryphon.screenlib.ui.api.layout.UiLayout;
 import dev.robotgryphon.screenlib.ui.api.layout.VerticalAnchor;
 import dev.robotgryphon.screenlib.ui.api.toolbar.ToolbarOrientation;
+import dev.robotgryphon.screenlib.ui.api.toolbar.ToolbarStyle;
 import dev.robotgryphon.screenlib.ui.api.toolbar.ToolbarTriggers;
 import dev.robotgryphon.screenlib.ui.api.toolbar.Toolbars;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -63,14 +65,29 @@ public final class MachineUI {
 
             // Screenlib's node palettes for the upgrade canvas. After the main slot: they look up the
             // canvas panel when they're created.
-            if (menu.canvasHost().isPresent())
+            if (menu.canvasHost().isPresent()) {
                 builder.tabs(Placement.anchored(HorizontalAnchor.LEFT, VerticalAnchor.CENTER, MARGIN, 0),
                         MachineToolbar.UPGRADE_PALETTES);
+                builder.panels(Placement.anchored(HorizontalAnchor.CENTER, VerticalAnchor.BOTTOM, 0, MARGIN),
+                        List.of(MachineToolbar.INVENTORY_PANEL));
+            }
         } else {
             builder.panel(center, host -> new MachineInfoPanel(menu));
         }
 
         return builder;
+    }
+
+    /**
+     * The largest a centred main panel can be: the whole screen, less a margin, and clear of the
+     * toolbars along the top (and the same at the bottom, since it's centred).
+     */
+    public static ScreenRectangle fullPanelSize() {
+        final var window = Minecraft.getInstance().getWindow();
+        final int topSpace = MARGIN + ToolbarStyle.THICKNESS + GAP;
+        return new ScreenRectangle(0, 0,
+                Math.max(0, window.getGuiScaledWidth() - 2 * MARGIN),
+                Math.max(0, window.getGuiScaledHeight() - 2 * topSpace));
     }
 
     private static void besideViews(UiLayout layout, AbstractWidget views, AbstractWidget toolbar) {

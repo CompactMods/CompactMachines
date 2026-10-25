@@ -28,8 +28,8 @@ public final class TreeCutterUpgradeNode {
         return new NodeDefinitionBuilder()
                 .hidden()
                 .addProperty(ENABLED.name(), prop -> prop.type(ENABLED.type()).input().optional())
-                .addProperty(TOOLS.name(), prop -> prop.type(TOOLS.type()).input())
-                .addProperty(DROPS.name(), prop -> prop.type(DROPS.type()).input())
+                .addProperty(TOOLS.name(), prop -> prop.type(TOOLS.type()).wired())
+                .addProperty(DROPS.name(), prop -> prop.type(DROPS.type()).wired())
                 .build();
     }
 }

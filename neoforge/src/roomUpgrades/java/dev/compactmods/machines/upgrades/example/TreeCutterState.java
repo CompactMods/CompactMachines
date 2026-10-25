@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
@@ -122,10 +121,6 @@ public record TreeCutterState(boolean enabled, Optional<ItemHandlerAccess> tools
     }
 
     private static Optional<ResourceHandler<ItemResource>> resolve(MinecraftServer server, ItemHandlerAccess access) {
-        final var level = server.getLevel(access.level());
-        // Never load a chunk just to reach the storage
-        if (level == null || !level.isLoaded(access.pos()))
-            return Optional.empty();
-        return Optional.ofNullable(level.getCapability(Capabilities.Item.BLOCK, access.pos(), access.side()));
+        return access.resolve(server);
     }
 }

@@ -8,6 +8,7 @@ import dev.compactmods.machines.room.preview.client.gui.RoomPreviewPanel;
 import dev.compactmods.machines.upgrades.client.RoomUpgradesPanel;
 import dev.robotgryphon.screenlib.nodes.api.canvas.CanvasPanels;
 import dev.robotgryphon.screenlib.ui.api.UiHost;
+import dev.robotgryphon.screenlib.ui.api.panel.InventoryPanel;
 import dev.robotgryphon.screenlib.ui.api.panel.Panel;
 import dev.robotgryphon.screenlib.ui.api.panel.PanelType;
 import dev.robotgryphon.screenlib.ui.api.panel.PanelTypes;
@@ -36,12 +37,13 @@ public final class MachineScreenPanels {
                     return new RoomPreviewPanel(host, menu.currentRoom().orElseThrow(), () -> MachineUI.core(menu));
                 });
 
+        PANELS.register(MachineToolbar.INVENTORY_PANEL.identifier().getPath(),
+                () -> (PanelType<InventoryPanel>) host -> new InventoryPanel(boundMenu(), Component.translatable("container.inventory")));
+
         PANELS.register(MachineToolbar.ROOM_UPGRADES_PANEL.identifier().getPath(),
                 () -> (PanelType<Panel>) MachineScreenPanels::upgradesPanel);
     }
 
-    private static final int CANVAS_WIDTH = 240;
-    private static final int CANVAS_HEIGHT = 180;
 
     private static Panel upgradesPanel(UiHost host) {
         final MachineUIMenu menu = boundMenu();
@@ -49,7 +51,9 @@ public final class MachineScreenPanels {
             return new RoomUpgradesPanel(menu.currentRoom().orElseThrow());
 
         final Panel canvas = CanvasPanels.forHost(menu, Component.literal("Room Upgrades")).create(host);
-        canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+        // Starts filling the screen; it's created once per screen, so later resizing/moving sticks
+        final var full = MachineUI.fullPanelSize();
+        canvas.setSize(full.width(), full.height());
         // Canvas panels open themselves; this one starts hidden until toggled from the toolbar
         canvas.close();
         return canvas;

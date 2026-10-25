@@ -11,6 +11,7 @@ import dev.compactmods.machines.Advancements;
 import dev.compactmods.machines.room.command.CommandTranslations;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeNode;
+import dev.compactmods.machines.datagen.debug.DebugNodesDatapack;
 import dev.compactmods.machines.machine.i18n.MachineTranslations;
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
 import dev.compactmods.machines.client.creative.CreativeTabs;
@@ -83,6 +84,13 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         addJade();
 
         add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node"), "Tree Cutter Upgrade");
+
+        // Debug nodes (dev-only datapack)
+        add(DebugNodesDatapack.INFINITE_ITEMS.identifier().toLanguageKey("node"), "Infinite Items");
+        add(DebugNodesDatapack.INFINITE_ITEMS.identifier().toLanguageKey("node", "item"), "Item");
+        add(DebugNodesDatapack.INFINITE_ITEMS.identifier().toLanguageKey("node", "storage"), "Storage");
+        add(DebugNodesDatapack.VOID_ITEMS.identifier().toLanguageKey("node"), "Void");
+        add(DebugNodesDatapack.VOID_ITEMS.identifier().toLanguageKey("node", "storage"), "Storage");
         add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.ENABLED.name()), "Enabled");
         add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.TOOLS.name()), "Tools");
         add(TreeCutterUpgradeNode.KEY.identifier().toLanguageKey("node", TreeCutterUpgradeNode.DROPS.name()), "Drops");

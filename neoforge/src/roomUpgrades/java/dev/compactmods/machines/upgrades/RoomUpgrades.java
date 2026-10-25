@@ -5,6 +5,7 @@ import dev.compactmods.machines.upgrades.api.RoomUpgradesApi;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.CMFeatureFlags;
 import dev.compactmods.machines.upgrades.canvas.RoomCanvases;
+import dev.compactmods.machines.upgrades.debug.DebugStorages;
 import dev.compactmods.machines.upgrades.command.RoomUpgradesSubcommand;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderTickets;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
@@ -61,6 +62,7 @@ public final class RoomUpgrades {
 
         RoomSystems.init(modBus);
         RoomCanvases.init();
+        DebugStorages.register(modBus);
         TreeCutterState.init();
     }
 

@@ -15,6 +15,7 @@ import dev.robotgryphon.screenlib.ui.api.toolbar.ToolbarIcons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -39,6 +40,14 @@ public final class MachineToolbar {
     /** Screenlib's node palettes for the upgrade canvas, shown one at a time beside it. */
     public static final List<ResourceKey<PanelType<?>>> UPGRADE_PALETTES =
             List.of(CanvasTools.ADD_NODE_PANEL, CanvasTools.PROVIDED_PANEL);
+
+    /** The player's inventory, for picking up items to set on the canvas (e.g. an item property). */
+    public static final ResourceKey<PanelType<?>> INVENTORY_PANEL =
+            ResourceKey.create(PanelTypes.REGISTRY_KEY, CompactMachinesCore.identifier("inventory"));
+
+    /** Panels that belong to the upgrades view, closed when leaving it. */
+    private static final List<ResourceKey<PanelType<?>>> UPGRADE_VIEW_PANELS =
+            List.of(CanvasTools.ADD_NODE_PANEL, CanvasTools.PROVIDED_PANEL, INVENTORY_PANEL);
 
     public static final DeferredRegister<ToolbarButton> BUTTONS =
             DeferredRegister.create(ToolbarButtons.REGISTRY_KEY, CompactMachinesCore.MOD_ID);
@@ -77,12 +86,16 @@ public final class MachineToolbar {
 
         BUTTONS.register("add_node", () -> IconToolbarButton.panelTab(
                 ToolbarIcons.ADD_NODE, Component.literal("Add node"), CanvasTools.ADD_NODE_PANEL));
+
+        BUTTONS.register("inventory", () -> new ItemToolbarButton(
+                Items.CHEST, Component.translatable("container.inventory"), INVENTORY_PANEL));
     }
 
     public static final ResourceKey<ToolbarButton> ROOM_PREVIEW_BUTTON = key("room_preview");
     public static final ResourceKey<ToolbarButton> ROOM_UPGRADES_BUTTON = key("room_upgrades");
     public static final ResourceKey<ToolbarButton> ENTER_ROOM_BUTTON = key("enter_room");
     public static final ResourceKey<ToolbarButton> ADD_NODE_BUTTON = key("add_node");
+    public static final ResourceKey<ToolbarButton> INVENTORY_BUTTON = key("inventory");
 
     /** Switches the main panel between the room preview and room upgrades. */
     public static final List<List<ResourceKey<ToolbarButton>>> VIEWS =
@@ -94,7 +107,7 @@ public final class MachineToolbar {
 
     /** Shown with the room upgrades canvas. */
     public static final List<List<ResourceKey<ToolbarButton>>> UPGRADE_ACTIONS =
-            List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED));
+            List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED), List.of(INVENTORY_BUTTON));
 
     public static boolean roomActionsShown(ToolbarContext context) {
         return context.isPanelOpen(ROOM_PREVIEW_PANEL);
@@ -108,16 +121,16 @@ public final class MachineToolbar {
 
     /**
      * Opens {@code panel} as the main panel. It shares a slot with the other one, so opening it closes
-     * that; leaving the upgrades view also closes its node palettes.
+     * that; leaving the upgrades view also closes its palettes and the inventory.
      */
     private static void show(ToolbarContext context, ResourceKey<PanelType<?>> panel) {
         if (context.isPanelOpen(panel))
             return;
 
         if (!panel.equals(ROOM_UPGRADES_PANEL)) {
-            for (ResourceKey<PanelType<?>> palette : UPGRADE_PALETTES)
-                if (context.isPanelOpen(palette))
-                    context.togglePanel(palette);
+            for (ResourceKey<PanelType<?>> side : UPGRADE_VIEW_PANELS)
+                if (context.isPanelOpen(side))
+                    context.togglePanel(side);
         }
 
         context.togglePanel(panel);

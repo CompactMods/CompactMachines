@@ -4,6 +4,7 @@ package dev.compactmods.machines.datagen;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.datagen.base.BaseDatapack;
 import dev.compactmods.machines.datagen.basic_room_templates.BasicRoomTemplatesDatapack;
+import dev.compactmods.machines.datagen.debug.DebugNodesDatapack;
 import dev.compactmods.machines.room.CMFeatureFlags;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.metadata.PackMetadataGenerator;
@@ -22,6 +23,7 @@ public class DataGeneration {
         BasicRoomTemplatesDatapack.generatePack(event);
 
         addExperimentalPacks(event);
+        DebugNodesDatapack.generatePack(event);
     }
 
     private static void addExperimentalPacks(GatherDataEvent event) {

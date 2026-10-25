@@ -1,6 +1,7 @@
 package dev.compactmods.machines.client;
 
 import dev.compactmods.machines.client.machine.MachineScreenPanels;
+import dev.compactmods.machines.upgrades.client.StorageRenderers;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.command.client.CMClientCommands;
 import dev.compactmods.machines.client.config.ClientConfig;
@@ -32,6 +33,7 @@ public class CompactMachinesClient {
 	  RoomsClient.registerEvents(modBus);
 	  RoomPreviewClient.registerEvents(modBus);
 	  MachineScreenPanels.PANELS.register(modBus);
+	  StorageRenderers.register(modBus);
 
 	  NeoForge.EVENT_BUS.addListener(CMClientCommands::registerClientCommands);
    }
