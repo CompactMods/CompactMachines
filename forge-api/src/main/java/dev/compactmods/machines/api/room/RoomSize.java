@@ -34,7 +34,9 @@ public enum RoomSize implements StringRepresentable {
 
     public AABB getBounds(BlockPos center) {
         AABB bounds = new AABB(center);
-        return bounds.inflate(Math.floorDiv(internalSize, 2));
+        // Stored center is one block below the middle of the interior (floor wall at Y=F,
+        // interior starts at F+1), so shift up one to cover the whole interior.
+        return bounds.inflate(Math.floorDiv(internalSize, 2)).move(0, 1, 0);
     }
 
     public int getInternalSize() {
