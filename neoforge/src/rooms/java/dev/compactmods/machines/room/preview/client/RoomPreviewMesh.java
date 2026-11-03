@@ -10,9 +10,11 @@ import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.room.preview.RoomBlockEntitySnapshot;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
@@ -45,6 +47,7 @@ public final class RoomPreviewMesh {
 
     public final int sizeX, sizeY, sizeZ;
     private final Map<ChunkSectionLayer, LayerMesh> layers;
+    private final @Nullable PreviewLevel level;
 
     /**
      * One layer's uploaded geometry: a vertex buffer plus its index count. Opaque layers draw with the
@@ -52,19 +55,27 @@ public final class RoomPreviewMesh {
      */
     public record LayerMesh(GpuBuffer vertexBuffer, int indexCount, @Nullable TranslucentSort sort) {}
 
-    private RoomPreviewMesh(int sizeX, int sizeY, int sizeZ, Map<ChunkSectionLayer, LayerMesh> layers) {
+    private RoomPreviewMesh(int sizeX, int sizeY, int sizeZ, Map<ChunkSectionLayer, LayerMesh> layers,
+                            @Nullable PreviewLevel level) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.layers = layers;
+        this.level = level;
+    }
+
+    /** {@return the room's rebuilt block entities}, for block entity renderers; null without a client level */
+    public @Nullable PreviewLevel level() {
+        return level;
     }
 
     public int maxDimension() {
         return Math.max(sizeX, Math.max(sizeY, sizeZ));
     }
 
+    /** {@return true if there's nothing to draw}: no geometry and no block entities for their renderers */
     public boolean isEmpty() {
-        return layers.isEmpty();
+        return layers.isEmpty() && (level == null || level.blockEntities().isEmpty());
     }
 
     /** Draw order for the layers: opaque, then cutout, then translucent last. */
@@ -101,14 +112,30 @@ public final class RoomPreviewMesh {
         layers.clear();
     }
 
-    /** Bakes {@code snapshot}'s block models into per-layer GPU buffers. Render thread only. */
-    public static RoomPreviewMesh build(RoomPreviewSnapshot snapshot) {
+    /**
+     * Bakes {@code snapshot}'s block models into per-layer GPU buffers. Render thread only.
+     *
+     * @param latest   block entity data newer than the snapshot's, by room-local position
+     * @param previous the room's block entities from its last mesh, updated in place when possible so
+     *                 they keep their client state (animation); null to start fresh
+     */
+    public static RoomPreviewMesh build(RoomPreviewSnapshot snapshot, Map<BlockPos, RoomBlockEntitySnapshot> latest,
+                                        @Nullable PreviewLevel previous) {
         final int sx = snapshot.sizeX(), sy = snapshot.sizeY(), sz = snapshot.sizeZ();
 
         final var mc = Minecraft.getInstance();
         final var modelSet = mc.getModelManager().getBlockStateModelSet();
-        final var level = new SnapshotBlockGetter(snapshot, resolveBiomes(mc, snapshot), compactBiome(mc),
+        final var tints = new SnapshotBlockGetter(snapshot, resolveBiomes(mc, snapshot), compactBiome(mc),
                 mc.options.biomeBlendRadius().get());
+        // With block entities when possible, so models that read their data (pipe connections) bake right
+        final PreviewLevel blockEntities;
+        if (mc.level == null)
+            blockEntities = null;
+        else if (previous != null && previous.canUpdate(mc.level, snapshot))
+            blockEntities = previous.update(snapshot, latest, tints);
+        else
+            blockEntities = PreviewLevel.create(snapshot, latest, mc.level, tints);
+        final BlockAndTintGetter level = blockEntities != null ? blockEntities : tints;
         final var renderer = new ModelBlockRenderer(true /*AO*/, true /*cull internal faces*/, mc.getBlockColors());
         final var fluidRenderer = new FluidRenderer(mc.getModelManager().getFluidStateModelSet());
         final var fluidConsumer = new SectionOffsetVertexConsumer();
@@ -122,20 +149,24 @@ public final class RoomPreviewMesh {
         final BlockQuadOutput forcedSolid = (x, y, z, quad, instance) ->
                 layerBuilder(scratch, builders, ChunkSectionLayer.SOLID).putBlockBakedQuad(x, y, z, quad, instance);
 
+        // Levels are queried at world positions (block entities' data can name other blocks by them);
+        // vertices are written at room-local ones
+        final BlockPos origin = snapshot.origin();
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int y = 0; y < sy; y++) {
             for (int z = 0; z < sz; z++) {
                 for (int x = 0; x < sx; x++) {
                     final BlockState state = snapshot.blockAt(x, y, z);
                     if (state.isAir()) continue;
-                    pos.set(x, y, z);
+                    pos.set(origin.getX() + x, origin.getY() + y, origin.getZ() + z);
 
                     // Fluids (water, lava, waterlogged blocks) have no block model; vanilla bakes them separately.
                     final var fluidState = state.getFluidState();
                     if (!fluidState.isEmpty()) {
                         final int fx = x, fy = y, fz = z;
+                        final BlockPos world = pos.immutable();
                         fluidRenderer.tesselate(level, pos,
-                                layer -> fluidConsumer.target(layerBuilder(scratch, builders, layer), fx, fy, fz),
+                                layer -> fluidConsumer.target(layerBuilder(scratch, builders, layer), fx, fy, fz, world),
                                 state, fluidState);
                     }
 
@@ -171,7 +202,7 @@ public final class RoomPreviewMesh {
         for (ByteBufferBuilder b : scratch.values())
             b.close();
 
-        return new RoomPreviewMesh(sx, sy, sz, result);
+        return new RoomPreviewMesh(sx, sy, sz, result, blockEntities);
     }
 
     /** {@return the snapshot's biome keys resolved against the client's synced biome registry} */

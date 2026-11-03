@@ -142,6 +142,20 @@ public final class PreviewCamera {
                 .translate(-position.x(), -position.y(), -position.z());
     }
 
+    /**
+     * {@return the unit direction, room-local, of the ray through a point of the preview}
+     *
+     * @param ndcX   -1 (left edge) to 1 (right edge)
+     * @param ndcY   -1 (bottom edge) to 1 (top edge)
+     * @param aspect the preview's width over its height
+     */
+    public static Vector3f ray(float ndcX, float ndcY, float aspect, float yaw, float pitch) {
+        final float tan = (float) Math.tan(RoomPreviewGuiRenderer.FOV_DEGREES * Mth.DEG_TO_RAD / 2f);
+        final Vector3f dir = new Vector3f(ndcX * tan * aspect, ndcY * tan, -1f).normalize();
+        // Camera space to room space: the inverse of view()'s rotation
+        return new Matrix4f().rotateX(pitch).rotateY(yaw).transpose3x3().transformDirection(dir).normalize();
+    }
+
     /** Unit vector pointing behind the camera (opposite to where it looks). */
     static Vector3f backward(float yaw, float pitch) {
         final float cosPitch = Mth.cos(pitch);

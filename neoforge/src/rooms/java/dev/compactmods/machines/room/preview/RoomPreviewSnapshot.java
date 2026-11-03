@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -36,15 +37,21 @@ import java.util.List;
  * <p>{@link #biomes} carries the interior's biomes (see {@link RoomPreviewBiomes}) so the client can
  * biome-tint the preview.
  *
+ * <p>{@link #origin} is the interior's minimum corner in the world, so the client can place block
+ * entities at their real positions: mods' sync data often names other blocks by world position.
+ *
+ * <p>{@link #blockEntities} carries each block entity's sync tag (see {@link RoomBlockEntitySnapshot}),
+ * for models that read block entity data and for block entity renderers.
+ *
  * <p>{@link #capture(ServerLevel, AABB)} runs on the server thread (it reads the level); turning a
  * snapshot into a mesh is pure data and may run off-thread on the client.
  */
-public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockState> palette, int[] indices,
-                                  RoomPreviewBiomes biomes) {
+public record RoomPreviewSnapshot(BlockPos origin, int sizeX, int sizeY, int sizeZ, List<BlockState> palette, int[] indices,
+                                  RoomPreviewBiomes biomes, List<RoomBlockEntitySnapshot> blockEntities) {
 
     /** A room that isn't loaded / has no interior yields this; renderers should skip it. */
     public static final RoomPreviewSnapshot EMPTY =
-            new RoomPreviewSnapshot(0, 0, 0, List.of(Blocks.AIR.defaultBlockState()), new int[0], RoomPreviewBiomes.EMPTY);
+            new RoomPreviewSnapshot(BlockPos.ZERO, 0, 0, 0, List.of(Blocks.AIR.defaultBlockState()), new int[0], RoomPreviewBiomes.EMPTY, List.of());
 
     /** Single-block-state codec: encodes a {@link BlockState} as its global block-state registry id. */
     public static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE_STREAM_CODEC =
@@ -53,10 +60,14 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
     private static final StreamCodec<ByteBuf, List<BlockState>> PALETTE_STREAM_CODEC =
             BLOCK_STATE_STREAM_CODEC.apply(ByteBufCodecs.list());
 
+    private static final StreamCodec<ByteBuf, List<RoomBlockEntitySnapshot>> BLOCK_ENTITIES_STREAM_CODEC =
+            RoomBlockEntitySnapshot.STREAM_CODEC.apply(ByteBufCodecs.list());
+
     public static final StreamCodec<ByteBuf, RoomPreviewSnapshot> STREAM_CODEC =
             new StreamCodec<>() {
                 @Override
                 public RoomPreviewSnapshot decode(ByteBuf buf) {
+                    final BlockPos origin = BlockPos.STREAM_CODEC.decode(buf);
                     final int sizeX = ByteBufCodecs.VAR_INT.decode(buf);
                     final int sizeY = ByteBufCodecs.VAR_INT.decode(buf);
                     final int sizeZ = ByteBufCodecs.VAR_INT.decode(buf);
@@ -65,17 +76,20 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
                     final int cellCount = Math.multiplyExact(Math.multiplyExact(sizeX, sizeY), sizeZ);
                     final int[] indices = unpack(buf, cellCount, bitsFor(palette.size()));
                     final RoomPreviewBiomes biomes = RoomPreviewBiomes.STREAM_CODEC.decode(buf);
-                    return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices, biomes);
+                    final List<RoomBlockEntitySnapshot> blockEntities = BLOCK_ENTITIES_STREAM_CODEC.decode(buf);
+                    return new RoomPreviewSnapshot(origin, sizeX, sizeY, sizeZ, palette, indices, biomes, blockEntities);
                 }
 
                 @Override
                 public void encode(ByteBuf buf, RoomPreviewSnapshot snapshot) {
+                    BlockPos.STREAM_CODEC.encode(buf, snapshot.origin);
                     ByteBufCodecs.VAR_INT.encode(buf, snapshot.sizeX);
                     ByteBufCodecs.VAR_INT.encode(buf, snapshot.sizeY);
                     ByteBufCodecs.VAR_INT.encode(buf, snapshot.sizeZ);
                     PALETTE_STREAM_CODEC.encode(buf, snapshot.palette);
                     pack(buf, snapshot.indices, bitsFor(snapshot.palette.size()));
                     RoomPreviewBiomes.STREAM_CODEC.encode(buf, snapshot.biomes);
+                    BLOCK_ENTITIES_STREAM_CODEC.encode(buf, snapshot.blockEntities);
                 }
             };
 
@@ -106,6 +120,7 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
         lookup.put(Blocks.AIR.defaultBlockState(), 0);
 
         final int[] indices = new int[sizeX * sizeY * sizeZ];
+        final List<RoomBlockEntitySnapshot> blockEntities = new ArrayList<>();
         final BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
         for (int y = 0; y < sizeY; y++) {
@@ -119,12 +134,20 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
                         lookup.put(state, id);
                     }
                     indices[cellIndex(x, y, z, sizeX, sizeZ)] = id;
+
+                    if (state.hasBlockEntity()) {
+                        final BlockEntity be = level.getBlockEntity(cursor);
+                        if (be != null)
+                            blockEntities.add(new RoomBlockEntitySnapshot(new BlockPos(x, y, z), be.getType(),
+                                    be.getUpdateTag(level.registryAccess())));
+                    }
                 }
             }
         }
 
         final RoomPreviewBiomes biomes = RoomPreviewBiomes.capture(level, minX, minY, minZ, sizeX, sizeY, sizeZ);
-        return new RoomPreviewSnapshot(sizeX, sizeY, sizeZ, palette, indices, biomes);
+        return new RoomPreviewSnapshot(new BlockPos(minX, minY, minZ), sizeX, sizeY, sizeZ, palette, indices, biomes,
+                List.copyOf(blockEntities));
     }
 
     /** {@return the block-local cell index for local coordinates in a grid of the given dimensions} */
@@ -137,6 +160,11 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
         if (x < 0 || y < 0 || z < 0 || x >= sizeX || y >= sizeY || z >= sizeZ)
             return palette.get(0);
         return palette.get(indices[cellIndex(x, y, z, sizeX, sizeZ)]);
+    }
+
+    /** {@return the block state at a world position}; outside the interior is air. */
+    public BlockState blockAtWorld(BlockPos pos) {
+        return blockAt(pos.getX() - origin.getX(), pos.getY() - origin.getY(), pos.getZ() - origin.getZ());
     }
 
     /** {@return true if this snapshot has no volume or only contains air} */
@@ -152,14 +180,19 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
     /**
      * {@return a cheap content hash} Used by the server to detect whether a room actually changed
      * between scans, so unchanged rooms are not re-sent. Two snapshots with equal geometry hash equal.
+     * Block entities count by position and type only: their changing data goes out every tick in
+     * {@code RoomBlockEntitiesPacket}s, and mustn't make the whole room resend.
      */
     public int contentHash() {
-        int h = sizeX;
+        int h = origin.hashCode();
+        h = 31 * h + sizeX;
         h = 31 * h + sizeY;
         h = 31 * h + sizeZ;
         h = 31 * h + palette.hashCode();
         h = 31 * h + Arrays.hashCode(indices);
         h = 31 * h + biomes.contentHash();
+        for (RoomBlockEntitySnapshot be : blockEntities)
+            h = 31 * (31 * h + be.local().hashCode()) + be.type().hashCode();
         return h;
     }
 
@@ -235,9 +268,9 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof RoomPreviewSnapshot other)) return false;
-        return sizeX == other.sizeX && sizeY == other.sizeY && sizeZ == other.sizeZ
+        return origin.equals(other.origin) && sizeX == other.sizeX && sizeY == other.sizeY && sizeZ == other.sizeZ
                 && palette.equals(other.palette) && Arrays.equals(indices, other.indices)
-                && biomes.equals(other.biomes);
+                && biomes.equals(other.biomes) && blockEntities.equals(other.blockEntities);
     }
 
     @Override
@@ -248,6 +281,6 @@ public record RoomPreviewSnapshot(int sizeX, int sizeY, int sizeZ, List<BlockSta
     @Override
     public String toString() {
         return "RoomPreviewSnapshot[" + sizeX + "x" + sizeY + "x" + sizeZ
-                + ", palette=" + palette.size() + "]";
+                + ", palette=" + palette.size() + ", blockEntities=" + blockEntities.size() + "]";
     }
 }

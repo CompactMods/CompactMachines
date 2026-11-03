@@ -1,6 +1,7 @@
 package dev.compactmods.machines.room.preview.client;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.core.BlockPos;
 
 /**
  * Re-adds the 16-block section origin that {@link net.minecraft.client.renderer.block.FluidRenderer}
@@ -12,12 +13,16 @@ final class SectionOffsetVertexConsumer implements VertexConsumer {
     private VertexConsumer delegate;
     private float offsetX, offsetY, offsetZ;
 
-    /** Point at the layer buffer for the block at room-local {@code (x, y, z)}. */
-    SectionOffsetVertexConsumer target(VertexConsumer delegate, int x, int y, int z) {
+    /**
+     * Point at the layer buffer for the block at room-local {@code (x, y, z)}, which the fluid renderer
+     * sees at world position {@code world}: it writes {@code world & 15}, and this moves that to the local
+     * position.
+     */
+    SectionOffsetVertexConsumer target(VertexConsumer delegate, int x, int y, int z, BlockPos world) {
         this.delegate = delegate;
-        this.offsetX = x & ~15;
-        this.offsetY = y & ~15;
-        this.offsetZ = z & ~15;
+        this.offsetX = x - (world.getX() & 15);
+        this.offsetY = y - (world.getY() & 15);
+        this.offsetZ = z - (world.getZ() & 15);
         return this;
     }
 

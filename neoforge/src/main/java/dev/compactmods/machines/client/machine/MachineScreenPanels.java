@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * Registers the machine screen's toggleable panels with screenlib (keys in {@link MachineToolbar}).
- * Lives in the main mod because it ties together panels from several features. Both need a bound
+ * Lives in the main mod because it ties together panels from several features. All need a bound
  * room; the machine screen only adds them then, sharing one slot so only one is open at a time.
  *
  * <p>The upgrades panel is the room's upgrade canvas when the menu hosts one (room upgrades enabled);
@@ -42,6 +42,9 @@ public final class MachineScreenPanels {
 
         PANELS.register(MachineToolbar.ROOM_UPGRADES_PANEL.identifier().getPath(),
                 () -> (PanelType<Panel>) MachineScreenPanels::upgradesPanel);
+
+        PANELS.register(MachineToolbar.MACHINE_CONFIG_PANEL.identifier().getPath(),
+                () -> (PanelType<Panel>) MachineScreenPanels::configPanel);
     }
 
 
@@ -50,11 +53,22 @@ public final class MachineScreenPanels {
         if (menu.canvasHost().isEmpty())
             return new RoomUpgradesPanel(menu.currentRoom().orElseThrow());
 
-        final Panel canvas = CanvasPanels.forHost(menu, Component.literal("Room Upgrades")).create(host);
-        // Starts filling the screen; it's created once per screen, so later resizing/moving sticks
-        final var full = MachineUI.fullPanelSize();
-        canvas.setSize(full.width(), full.height());
-        // Canvas panels open themselves; this one starts hidden until toggled from the toolbar
+        return hiddenCanvas(host, CanvasPanels.forHost(menu, Component.literal("Room Upgrades")));
+    }
+
+    /** The machine's configuration canvas: named storages wired to the machine's sides. */
+    private static Panel configPanel(UiHost host) {
+        final MachineUIMenu menu = boundMenu();
+        final var canvas = menu.configCanvasHost()
+                .orElseThrow(() -> new IllegalStateException("Bound machine without a configuration canvas"));
+        return hiddenCanvas(host, CanvasPanels.forHost(canvas, Component.translatableWithFallback(
+                CompactMachinesCore.dotPrefix("machine_config"), "Machine Configuration")));
+    }
+
+    /** A canvas panel, hidden until toggled from the toolbar; {@code MachineViewLayout} sizes it. */
+    private static Panel hiddenCanvas(UiHost host, PanelType<?> type) {
+        final Panel canvas = type.create(host);
+        // Canvas panels open themselves
         canvas.close();
         return canvas;
     }

@@ -6,6 +6,7 @@ import dev.compactmods.machines.room.client.RoomClientConfig;
 import dev.compactmods.machines.room.preview.client.ClientRoomPreviews;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMesh;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMeshCache;
+import dev.compactmods.machines.room.preview.client.RoomPreviewOverlay;
 import dev.robotgryphon.screenlib.ui.api.UiHost;
 import dev.robotgryphon.screenlib.ui.api.panel.Panel;
 import dev.robotgryphon.screenlib.ui.api.widget.ContextMenu;
@@ -81,11 +82,14 @@ public class RoomPreviewPanel extends Panel {
 
         applyKeyMovement(mesh);
 
-        RoomPreviewGui.submit(graphics, content, roomCode,
-                camera.position(mesh.sizeX, mesh.sizeY, mesh.sizeZ), camera.yaw(), camera.pitch());
+        final Vector3f position = camera.position(mesh.sizeX, mesh.sizeY, mesh.sizeZ);
+        final var hit = pick(content, position, mouseX, mouseY);
+        RoomPreviewGui.submit(graphics, content, roomCode, position, camera.yaw(), camera.pitch(),
+                hit.map(RoomPreviewOverlay.Hit::id).orElse(null));
 
         // Overlays on top of the 3D preview
         graphics.nextStratum();
+        hit.ifPresent(h -> graphics.setTooltipForNextFrame(Minecraft.getInstance().font, h.tooltip(), Optional.empty(), mouseX, mouseY));
         renderCoreSlot(graphics, content, mouseX, mouseY);
         headerButton(graphics, headerSlot(1), "?", true, mouseX, mouseY, controlsHelp());
         headerButton(graphics, headerSlot(2), "\u25CE", true, mouseX, mouseY,
@@ -95,13 +99,36 @@ public class RoomPreviewPanel extends Panel {
                 List.of(Component.literal(hasSpawn ? "Look at your spawn" : "Your spawn isn't known yet")));
     }
 
+    /**
+     * {@return the overlay marker under the mouse}, if it's over the preview itself (not the core slot,
+     * and the header buttons are outside the content area anyway).
+     */
+    private Optional<RoomPreviewOverlay.Hit> pick(ScreenRectangle content, Vector3f position, int mouseX, int mouseY) {
+        if (!content.containsPoint(mouseX, mouseY) || content.width() <= 0 || content.height() <= 0)
+            return Optional.empty();
+        if (!core.get().isEmpty() && coreSlot(content).containsPoint(mouseX, mouseY))
+            return Optional.empty();
+
+        // Pixel centres, so the ray matches what's drawn under the cursor
+        final float ndcX = 2f * (mouseX + 0.5f - content.left()) / content.width() - 1f;
+        final float ndcY = 1f - 2f * (mouseY + 0.5f - content.top()) / content.height();
+        final Vector3f direction = PreviewCamera.ray(ndcX, ndcY, (float) content.width() / content.height(),
+                camera.yaw(), camera.pitch());
+        return RoomPreviewOverlay.pickAll(roomCode, position, direction);
+    }
+
+    private static ScreenRectangle coreSlot(ScreenRectangle content) {
+        return new ScreenRectangle(content.left() + 2, content.top() + 2, 18, 18);
+    }
+
     /** The machine's core as an item slot in the preview's top-left corner; hover for its tooltip. */
     private void renderCoreSlot(GuiGraphicsExtractor graphics, ScreenRectangle content, int mouseX, int mouseY) {
         final ItemStack stack = core.get();
         if (stack.isEmpty())
             return;
 
-        final int x = content.left() + 2, y = content.top() + 2;
+        final var slot = coreSlot(content);
+        final int x = slot.left(), y = slot.top();
         graphics.fill(x, y, x + 18, y + 18, 0xA0000000);
         graphics.outline(x, y, 18, 18, 0x60FFFFFF);
         graphics.item(stack, x + 1, y + 1);
@@ -129,21 +156,6 @@ public class RoomPreviewPanel extends Panel {
     /** The {@code n}th header button slot from the right (1 = rightmost). */
     private ScreenRectangle headerSlot(int n) {
         return new ScreenRectangle(getRight() - n * HEADER, getY(), HEADER, HEADER);
-    }
-
-    /**
-     * Fills 2/3 of the screen, centred — until the player moves or resizes the panel, after which
-     * their layout is kept. Screenlib calls this with the screen area right after placing the panel.
-     */
-    @Override
-    public void constrain(ScreenRectangle bounds) {
-        if (!isMoved()) {
-            final int width = bounds.width() * 2 / 3, height = bounds.height() * 2 / 3;
-            setRectangle(width, height,
-                    bounds.left() + (bounds.width() - width) / 2,
-                    bounds.top() + (bounds.height() - height) / 2);
-        }
-        super.constrain(bounds);
     }
 
     /** Header buttons sit on the panel's drag handle, so they're checked before the panel's own handling. */

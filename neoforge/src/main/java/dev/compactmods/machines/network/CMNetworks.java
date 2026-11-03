@@ -2,7 +2,6 @@ package dev.compactmods.machines.network;
 
 import dev.compactmods.machines.machine.network.MachineColorSyncPacket;
 import dev.compactmods.machines.machine.network.MachineEnterRoomPacket;
-import dev.compactmods.machines.machine.network.OpenMachineConfigPacket;
 import dev.compactmods.machines.network.machine.OpenMachinePreviewScreenPacket;
 import dev.compactmods.machines.room.network.RoomNetworking;
 import dev.compactmods.machines.shrinking.network.ShrinkingNetworking;
@@ -29,6 +28,5 @@ public class CMNetworks {
         main.playToClient(MachineColorSyncPacket.TYPE, MachineColorSyncPacket.STREAM_CODEC, MachineColorSyncPacket.HANDLER);
         main.playToClient(OpenMachinePreviewScreenPacket.TYPE, OpenMachinePreviewScreenPacket.STREAM_CODEC, OpenMachinePreviewScreenPacket.HANDLER);
         main.playToServer(MachineEnterRoomPacket.TYPE, MachineEnterRoomPacket.STREAM_CODEC, MachineEnterRoomPacket.HANDLER);
-        main.playToServer(OpenMachineConfigPacket.TYPE, OpenMachineConfigPacket.STREAM_CODEC, OpenMachineConfigPacket.HANDLER);
     }
 }

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEven
 import org.joml.Matrix3x2f;
 import org.joml.Vector2f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 /** Entry points for drawing room previews in GUIs. */
 public final class RoomPreviewGui {
@@ -23,7 +24,7 @@ public final class RoomPreviewGui {
      * Draws nothing until the room's snapshot has arrived.
      */
     public static void submit(GuiGraphicsExtractor graphics, ScreenRectangle area, String roomCode,
-                              Vector3fc camera, float yaw, float pitch) {
+                              Vector3fc camera, float yaw, float pitch, @Nullable Object hovered) {
         // PiP textures are axis-aligned in absolute GUI space: resolve the pose up front
         final Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         final Vector2f topLeft = pose.transformPosition(area.left(), area.top(), new Vector2f());
@@ -37,7 +38,7 @@ public final class RoomPreviewGui {
 
         final var scissor = graphics.peekScissorStack();
         graphics.submitPictureInPictureRenderState(new RoomPreviewGuiState(roomCode,
-                camera.x(), camera.y(), camera.z(), yaw, pitch,
+                camera.x(), camera.y(), camera.z(), yaw, pitch, hovered,
                 x0, y0, x1, y1, scissor,
                 PictureInPictureRenderState.getBounds(x0, y0, x1, y1, scissor)));
     }

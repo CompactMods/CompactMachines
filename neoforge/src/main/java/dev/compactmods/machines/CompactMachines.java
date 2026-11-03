@@ -83,6 +83,7 @@ public class CompactMachines {
         NeoForge.EVENT_BUS.addListener(ProtectedBlockEventHandler::leftClickBlock);
 
         // Room preview pipeline: capture loaded-room interiors and push snapshots to subscribed clients.
+        RoomPreviewService.init();
         NeoForge.EVENT_BUS.addListener(RoomPreviewService::onLevelTick);
         NeoForge.EVENT_BUS.addListener(RoomPreviewService::onPlayerLoggedOut);
         NeoForge.EVENT_BUS.addListener(RoomPreviewService::onServerStopping);

@@ -75,6 +75,8 @@ public final class RoomPreviewClient {
     private static void onClientTick(final ClientTickEvent.Post event) {
         // Every tick: advance preview entities' animation via their own tick().
         RoomPreviewEntities.tickAll();
+        // ... and the preview block entities' client tickers (items moving through pipes, ...)
+        RoomPreviewMeshCache.tickAll();
 
         if (++tickCounter < SUBSCRIBE_INTERVAL_TICKS) return;
         tickCounter = 0;

@@ -7,6 +7,7 @@ import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.pipeline.IndexType;
+import dev.compactmods.machines.room.preview.client.RoomPreviewBlockEntitySubmitter;
 import dev.compactmods.machines.room.preview.client.RoomPreviewEntitySubmitter;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -21,6 +22,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.room.preview.client.ClientRoomPreviews;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMesh;
 import dev.compactmods.machines.room.preview.client.RoomPreviewMeshCache;
+import dev.compactmods.machines.room.preview.client.RoomPreviewOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
@@ -34,6 +36,7 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -56,7 +59,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class RoomPreviewGuiRenderer extends PictureInPictureRenderer<RoomPreviewGuiState> {
 
-    private static final float FOV_DEGREES = 50f;
+    static final float FOV_DEGREES = 50f;
 
     private static final Vector4f COLOR_MODULATOR = new Vector4f(1, 1, 1, 1);
     private static final Vector3f MODEL_OFFSET = new Vector3f();
@@ -131,10 +134,19 @@ public final class RoomPreviewGuiRenderer extends PictureInPictureRenderer<RoomP
         final float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         RoomPreviewEntitySubmitter.submit(state.roomCode(), new PoseStack(), submitNodes, new CameraRenderState(), partialTick);
 
+        // Block entity renderers (chests, ...), for the block entities rebuilt with the mesh
+        if (mesh.level() != null)
+            RoomPreviewBlockEntitySubmitter.submit(mesh.level(), new Vec3(camera.x, camera.y, camera.z),
+                    new PoseStack(), submitNodes, new CameraRenderState(), partialTick);
+
         // Where (and which way) the viewing player will arrive
         final var spawn = ClientRoomPreviews.spawn(state.roomCode());
         if (spawn != null)
             SpawnGhost.submit(spawn, new PoseStack(), submitNodes, partialTick);
+
+        // Other systems' markers (tunnels, ...)
+        for (RoomPreviewOverlay overlay : RoomPreviewOverlay.all())
+            overlay.submit(state.roomCode(), new PoseStack(), submitNodes, state.hovered(), partialTick);
 
         try (var features = featureRenderDispatcher.prepareFrame(submitNodes);
              var pass = device.createCommandEncoder().createRenderPass(

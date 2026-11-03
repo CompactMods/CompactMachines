@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The machine screen, built with screenlib. Toolbars along the top switch between the room preview
- * and room upgrades panels, with actions for whichever is open (see {@link MachineToolbar}). A
+ * The machine screen, built with screenlib. Toolbars along the top switch between the room preview,
+ * room upgrades and machine configuration panels, with actions for whichever is open (see {@link MachineToolbar}). A
  * machine bound to a room opens on its live room preview panel (with the core in the panel's corner); otherwise an info panel
  * describes the core — e.g. the template a pending room will be created from. Register with
  * {@link UiScreens#register} as the {@link MachineUIMenu} screen.
@@ -55,17 +55,18 @@ public final class MachineUI {
                     MachineToolbar.ROOM_ACTIONS, MachineToolbar::roomActionsShown,
                     List.of(ToolbarTriggers.panels(), ToolbarTriggers.inventory())));
             besideViews(layout, views, Toolbars.create(host, ToolbarOrientation.HORIZONTAL,
-                    MachineToolbar.UPGRADE_ACTIONS, MachineToolbar::upgradeActionsShown,
+                    MachineToolbar.CANVAS_ACTIONS, MachineToolbar::canvasActionsShown,
                     List.of(ToolbarTriggers.panels())));
         });
 
         if (menu.currentRoom().isPresent()) {
-            // One slot, so opening either main panel closes the other (the preview opens itself)
-            builder.panels(center, List.of(MachineToolbar.ROOM_PREVIEW_PANEL, MachineToolbar.ROOM_UPGRADES_PANEL));
+            // A slot each, so any can be open at once; they tile around each other (the preview opens itself)
+            for (MachineViewLayout.View view : MachineViewLayout.View.values())
+                builder.panels(MachineViewLayout.placement(view), List.of(view.panel()));
 
-            // Screenlib's node palettes for the upgrade canvas. After the main slot: they look up the
-            // canvas panel when they're created.
-            if (menu.canvasHost().isPresent()) {
+            // Screenlib's node palettes, for whichever canvas is open. After the main slot: they look up
+            // the canvas panels when they're created.
+            if (!menu.canvasHosts().isEmpty()) {
                 builder.tabs(Placement.anchored(HorizontalAnchor.LEFT, VerticalAnchor.CENTER, MARGIN, 0),
                         MachineToolbar.UPGRADE_PALETTES);
                 builder.panels(Placement.anchored(HorizontalAnchor.CENTER, VerticalAnchor.BOTTOM, 0, MARGIN),
@@ -76,6 +77,12 @@ public final class MachineUI {
         }
 
         return builder;
+    }
+
+    /** {@return the area the views tile}: the whole screen, less a margin, below the toolbars */
+    public static ScreenRectangle viewArea() {
+        final var size = fullPanelSize();
+        return new ScreenRectangle(MARGIN, MARGIN + ToolbarStyle.THICKNESS + GAP, size.width(), size.height());
     }
 
     /**

@@ -11,8 +11,10 @@ import org.jspecify.annotations.Nullable;
  * @param camX  camera position, room-local blocks (see {@link PreviewCamera})
  * @param yaw   camera rotation around the vertical axis, radians
  * @param pitch camera tilt, radians (positive looks down)
+ * @param hovered the {@link dev.compactmods.machines.room.preview.client.RoomPreviewOverlay.Hit#id() overlay hit} under the mouse, or null
  */
 public record RoomPreviewGuiState(String roomCode, float camX, float camY, float camZ, float yaw, float pitch,
+                                  @Nullable Object hovered,
                                   int x0, int y0, int x1, int y1,
                                   @Nullable ScreenRectangle scissorArea,
                                   @Nullable ScreenRectangle bounds) implements PictureInPictureRenderState {

@@ -4,6 +4,7 @@ import dev.compactmods.machines.api.room.template.RoomTemplate;
 import dev.compactmods.machines.api.room.template.RoomTemplateHelper;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
+import dev.compactmods.machines.machine.config.MachineConfigCanvas;
 import dev.compactmods.machines.room.Rooms;
 import dev.robotgryphon.screenlib.nodes.api.ScreenLibCapabilities;
 import dev.robotgryphon.screenlib.nodes.api.canvas.CanvasHost;
@@ -20,12 +21,17 @@ import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
- * The machine screen's menu. Besides the core slot it hosts the bound room's upgrade canvas, when
- * the machine exposes one through {@link ScreenLibCapabilities#CANVAS} (see
- * {@link #writeClientSideData}).
+ * The machine screen's menu. Besides the core slot it hosts two canvases, each shown in its own panel:
+ * the bound room's upgrade canvas, when the machine exposes one through
+ * {@link ScreenLibCapabilities#CANVAS}, and the machine's configuration canvas
+ * ({@link MachineConfigCanvas#CAPABILITY}, {@linkplain #CONFIG_CANVAS_ID by id}). See
+ * {@link #writeClientSideData}.
  */
 public class MachineUIMenu extends AbstractContainerMenu implements CanvasHostMenu {
     private final GlobalPos machinePos;
@@ -33,21 +39,28 @@ public class MachineUIMenu extends AbstractContainerMenu implements CanvasHostMe
 
     private final @Nullable Slot coreSlot;
     private final @Nullable CanvasHost canvas;
+    private final @Nullable CanvasHost configCanvas;
+
+    /** The machine configuration canvas's {@linkplain CanvasHost#id id}; the upgrade canvas has the default one. */
+    public static final String CONFIG_CANVAS_ID = "machine_config";
 
     @ApiStatus.Internal
     public MachineUIMenu(int containerId, Player player, GlobalPos machinePos) {
-        this(containerId, player, machinePos, serverCanvas(player, machinePos));
+        this(containerId, player, machinePos, serverCanvas(player, machinePos), serverConfigCanvas(player, machinePos));
     }
 
     public MachineUIMenu(int containerId, Inventory playerInv, RegistryFriendlyByteBuf extraData) {
         this(containerId, playerInv.player, extraData.readGlobalPos(),
+                extraData.readBoolean() ? CanvasHosts.read(extraData) : null,
                 extraData.readBoolean() ? CanvasHosts.read(extraData) : null);
     }
 
-    private MachineUIMenu(int containerId, Player player, GlobalPos machinePos, @Nullable CanvasHost canvas) {
+    private MachineUIMenu(int containerId, Player player, GlobalPos machinePos, @Nullable CanvasHost canvas,
+                          @Nullable CanvasHost configCanvas) {
         super(Machines.MACHINE_UI_MENU.get(), containerId);
         this.machinePos = machinePos;
         this.canvas = canvas;
+        this.configCanvas = configCanvas;
 
         final var inv = player.getInventory();
         this.addStandardInventorySlots(inv, 10, 84);
@@ -70,6 +83,11 @@ public class MachineUIMenu extends AbstractContainerMenu implements CanvasHostMe
         return canvas != null ? CanvasHosts.server(canvas, player) : null;
     }
 
+    private static @Nullable CanvasHost serverConfigCanvas(Player player, GlobalPos machinePos) {
+        final var canvas = player.level().getCapability(MachineConfigCanvas.CAPABILITY, machinePos.pos());
+        return canvas != null ? CanvasHosts.server(canvas, player, CONFIG_CANVAS_ID) : null;
+    }
+
     /** Client-side data for the menu, read by the buffer constructor. Called by the menu's provider. */
     public static void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
         final var machineMenu = (MachineUIMenu) menu;
@@ -77,11 +95,25 @@ public class MachineUIMenu extends AbstractContainerMenu implements CanvasHostMe
         buffer.writeBoolean(machineMenu.canvas != null);
         if (machineMenu.canvas != null)
             machineMenu.canvas.write(buffer);
+        buffer.writeBoolean(machineMenu.configCanvas != null);
+        if (machineMenu.configCanvas != null)
+            machineMenu.configCanvas.write(buffer);
     }
 
+    /** {@return the room upgrade canvas} */
     @Override
     public Optional<CanvasHost> canvasHost() {
         return Optional.ofNullable(canvas);
+    }
+
+    /** {@return the machine configuration canvas}, present while the machine is bound to a room */
+    public Optional<CanvasHost> configCanvasHost() {
+        return Optional.ofNullable(configCanvas);
+    }
+
+    @Override
+    public List<CanvasHost> canvasHosts() {
+        return Stream.of(canvas, configCanvas).filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -89,6 +121,8 @@ public class MachineUIMenu extends AbstractContainerMenu implements CanvasHostMe
         super.broadcastChanges();
         if (canvas != null)
             canvas.tick();
+        if (configCanvas != null)
+            configCanvas.tick();
     }
 
     @Override

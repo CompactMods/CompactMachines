@@ -3,7 +3,8 @@ package dev.compactmods.machines.machine.client;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.MachineRoomEntry;
 import dev.compactmods.machines.machine.network.MachineEnterRoomPacket;
-import dev.compactmods.machines.machine.network.OpenMachineConfigPacket;
+import dev.compactmods.machines.machine.Machines;
+import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.robotgryphon.screenlib.nodes.api.canvas.CanvasTools;
 import dev.robotgryphon.screenlib.ui.api.panel.PanelType;
@@ -23,10 +24,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.List;
 
 /**
- * The machine screen's toolbars. {@link #VIEWS} switches the main panel between the room preview and
- * room upgrades (exactly one is open); beside it, {@link #ROOM_ACTIONS} ("enter room") shows while the
- * preview is open and {@link #UPGRADE_ACTIONS} (the upgrade canvas's node palettes) while the upgrades
- * canvas is. Buttons are registered in screenlib's toolbar button registry (client only); the panels
+ * The machine screen's toolbars. {@link #VIEWS} toggles the room preview, room upgrades and machine
+ * configuration, which can be open together (tiled by {@link MachineViewLayout}); beside it, {@link #ROOM_ACTIONS} ("enter
+ * room") shows while the preview is open and {@link #CANVAS_ACTIONS} (node palettes, inventory) while
+ * either canvas is. Buttons are registered in screenlib's toolbar button registry (client only); the panels
  * they toggle are registered by the main mod, which can see every feature's panel class.
  */
 public final class MachineToolbar {
@@ -37,8 +38,10 @@ public final class MachineToolbar {
             ResourceKey.create(PanelTypes.REGISTRY_KEY, CompactMachinesCore.identifier("room_preview"));
     public static final ResourceKey<PanelType<?>> ROOM_UPGRADES_PANEL =
             ResourceKey.create(PanelTypes.REGISTRY_KEY, CompactMachinesCore.identifier("room_upgrades"));
+    public static final ResourceKey<PanelType<?>> MACHINE_CONFIG_PANEL =
+            ResourceKey.create(PanelTypes.REGISTRY_KEY, CompactMachinesCore.identifier("machine_config"));
 
-    /** Screenlib's node palettes for the upgrade canvas, shown one at a time beside it. */
+    /** Screenlib's node palettes, shown one at a time beside whichever canvas is open. */
     public static final List<ResourceKey<PanelType<?>>> UPGRADE_PALETTES =
             List.of(CanvasTools.ADD_NODE_PANEL, CanvasTools.PROVIDED_PANEL);
 
@@ -46,8 +49,11 @@ public final class MachineToolbar {
     public static final ResourceKey<PanelType<?>> INVENTORY_PANEL =
             ResourceKey.create(PanelTypes.REGISTRY_KEY, CompactMachinesCore.identifier("inventory"));
 
-    /** Panels that belong to the upgrades view, closed when leaving it. */
-    private static final List<ResourceKey<PanelType<?>>> UPGRADE_VIEW_PANELS =
+    /** The main panels that are canvases. */
+    private static final List<ResourceKey<PanelType<?>>> CANVAS_VIEWS = List.of(ROOM_UPGRADES_PANEL, MACHINE_CONFIG_PANEL);
+
+    /** Panels that belong to the canvas views, closed when leaving them. */
+    private static final List<ResourceKey<PanelType<?>>> CANVAS_VIEW_PANELS =
             List.of(CanvasTools.ADD_NODE_PANEL, CanvasTools.PROVIDED_PANEL, INVENTORY_PANEL);
 
     public static final DeferredRegister<ToolbarButton> BUTTONS =
@@ -61,26 +67,25 @@ public final class MachineToolbar {
                         : Component.literal("Room preview (no room bound)"),
                 menu -> menu.currentRoom().isPresent(),
                 (context, menu) -> context.isPanelOpen(ROOM_PREVIEW_PANEL),
-                (context, menu) -> show(context, ROOM_PREVIEW_PANEL)));
+                (context, menu) -> toggle(context, ROOM_PREVIEW_PANEL)));
 
-        BUTTONS.register("room_upgrades", () -> new MachineToolbarButton(
-                CompactMachinesCore.identifier("upgrade_btn"),
+        BUTTONS.register("room_upgrades", () -> MachineToolbarButton.item(
+                Rooms.Items.SOLID_WALL,
                 menu -> menu.currentRoom().isPresent()
                         ? Component.literal("Room upgrades")
                         : Component.literal("Room upgrades (no room bound)"),
                 menu -> menu.currentRoom().isPresent(),
                 (context, menu) -> context.isPanelOpen(ROOM_UPGRADES_PANEL),
-                (context, menu) -> show(context, ROOM_UPGRADES_PANEL)));
+                (context, menu) -> toggle(context, ROOM_UPGRADES_PANEL)));
 
-        BUTTONS.register("machine_config", () -> new MachineToolbarButton(
-                CompactMachinesCore.identifier("machine_config_btn"),
-                menu -> menu.currentRoom().isPresent()
+        BUTTONS.register("machine_config", () -> MachineToolbarButton.item(
+                Machines.Items.MACHINE,
+                menu -> menu.configCanvasHost().isPresent()
                         ? Component.literal("Machine configuration")
                         : Component.literal("Machine configuration (no room bound)"),
-                menu -> menu.currentRoom().isPresent(),
-                (context, menu) -> false,
-                // The server opens the configuration screen in place of this one
-                (context, menu) -> ClientPacketDistributor.sendToServer(new OpenMachineConfigPacket(menu.machinePos()))));
+                menu -> menu.configCanvasHost().isPresent(),
+                (context, menu) -> context.isPanelOpen(MACHINE_CONFIG_PANEL),
+                (context, menu) -> toggle(context, MACHINE_CONFIG_PANEL)));
 
         BUTTONS.register("enter_room", () -> new MachineToolbarButton(
                 CompactMachinesCore.identifier("personal_shrinking_device"),
@@ -109,7 +114,7 @@ public final class MachineToolbar {
     public static final ResourceKey<ToolbarButton> ADD_NODE_BUTTON = key("add_node");
     public static final ResourceKey<ToolbarButton> INVENTORY_BUTTON = key("inventory");
 
-    /** Switches the main panel between the room preview and room upgrades. */
+    /** Toggles the room preview, room upgrades and machine configuration. */
     public static final List<List<ResourceKey<ToolbarButton>>> VIEWS =
             List.of(List.of(ROOM_PREVIEW_BUTTON, ROOM_UPGRADES_BUTTON), List.of(MACHINE_CONFIG_BUTTON));
 
@@ -117,39 +122,35 @@ public final class MachineToolbar {
     public static final List<List<ResourceKey<ToolbarButton>>> ROOM_ACTIONS =
             List.of(List.of(ENTER_ROOM_BUTTON));
 
-    /** Shown with the room upgrades canvas. */
-    public static final List<List<ResourceKey<ToolbarButton>>> UPGRADE_ACTIONS =
+    /** Shown with either canvas: its node palettes and the inventory. */
+    public static final List<List<ResourceKey<ToolbarButton>>> CANVAS_ACTIONS =
             List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED), List.of(INVENTORY_BUTTON));
-
-    /** The machine configuration screen's toolbar: its canvas's node palettes. */
-    public static final List<List<ResourceKey<ToolbarButton>>> CONFIG_ACTIONS =
-            List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED));
 
     public static boolean roomActionsShown(ToolbarContext context) {
         return context.isPanelOpen(ROOM_PREVIEW_PANEL);
     }
 
     /** Only with an actual canvas — the upgrades panel falls back to a message without one. */
-    public static boolean upgradeActionsShown(ToolbarContext context) {
-        return context.isPanelOpen(ROOM_UPGRADES_PANEL)
-                && MachineUI.currentMenu().flatMap(MachineUIMenu::canvasHost).isPresent();
+    public static boolean canvasActionsShown(ToolbarContext context) {
+        final var menu = MachineUI.currentMenu();
+        return (context.isPanelOpen(ROOM_UPGRADES_PANEL) && menu.flatMap(MachineUIMenu::canvasHost).isPresent())
+                || (context.isPanelOpen(MACHINE_CONFIG_PANEL) && menu.flatMap(MachineUIMenu::configCanvasHost).isPresent());
     }
 
     /**
-     * Opens {@code panel} as the main panel. It shares a slot with the other one, so opening it closes
-     * that; leaving the upgrades view also closes its palettes and the inventory.
+     * Opens or closes a view, then re-tiles the open ones. Closing the last canvas view also closes the
+     * canvas palettes and the inventory.
      */
-    private static void show(ToolbarContext context, ResourceKey<PanelType<?>> panel) {
-        if (context.isPanelOpen(panel))
-            return;
+    private static void toggle(ToolbarContext context, ResourceKey<PanelType<?>> panel) {
+        context.togglePanel(panel);
 
-        if (!panel.equals(ROOM_UPGRADES_PANEL)) {
-            for (ResourceKey<PanelType<?>> side : UPGRADE_VIEW_PANELS)
+        if (CANVAS_VIEWS.stream().noneMatch(context::isPanelOpen)) {
+            for (ResourceKey<PanelType<?>> side : CANVAS_VIEW_PANELS)
                 if (context.isPanelOpen(side))
                     context.togglePanel(side);
         }
 
-        context.togglePanel(panel);
+        MachineViewLayout.arrange();
     }
 
     private static ResourceKey<ToolbarButton> key(String name) {

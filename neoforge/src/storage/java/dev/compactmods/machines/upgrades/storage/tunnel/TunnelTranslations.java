@@ -16,6 +16,13 @@ public interface TunnelTranslations {
     Function<Integer, Component> CAPACITY = (cap) -> Component.translatableWithFallback(IDs.CAPACITY, "Capacity: %s", cap);
     Function<Component, Component> CONTAINER_HINT = (item) -> Component.translatableWithFallback(IDs.CONTAINER_HINT, "Add %s to increase capacity", item);
 
+    interface Preview {
+        Supplier<Component> CONNECTED = () -> Component.translatableWithFallback(IDs.Preview.CONNECTED, "Connected machines:");
+        Supplier<Component> NO_CONNECTIONS = () -> Component.translatableWithFallback(IDs.Preview.NO_CONNECTIONS, "No connected machines");
+        /** Args: x, y, z, dimension, faces. */
+        Function<Object[], Component> MACHINE = (args) -> Component.translatableWithFallback(IDs.Preview.MACHINE, "%s, %s, %s (%s): %s", args);
+    }
+
     interface Errors {
         Supplier<Component> EMPTY_NAME = () -> Component.translatableWithFallback(IDs.Errors.EMPTY_NAME, "A storage needs a name.");
         Function<Integer, Component> NAME_TOO_LONG = (max) -> Component.translatableWithFallback(IDs.Errors.NAME_TOO_LONG, "Names can be at most %s characters.", max);
@@ -35,6 +42,12 @@ public interface TunnelTranslations {
         String SAVE = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("screen.save"));
         String CAPACITY = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("screen.capacity"));
         String CONTAINER_HINT = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("screen.container_hint"));
+
+        interface Preview {
+            String CONNECTED = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("preview.connected"));
+            String NO_CONNECTIONS = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("preview.no_connections"));
+            String MACHINE = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("preview.machine"));
+        }
 
         interface Errors {
             String EMPTY_NAME = Util.makeDescriptionId("tunnel", CompactMachinesCore.identifier("error.empty_name"));

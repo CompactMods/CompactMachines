@@ -4,6 +4,8 @@ import dev.compactmods.machines.api.dimension.CompactDimension;
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.room.preview.server.RoomPreviewService;
+import dev.compactmods.machines.upgrades.storage.tunnel.preview.TunnelPreviewContributor;
 import dev.compactmods.machines.upgrades.storage.tunnel.block.TunnelWallBlock;
 import dev.compactmods.machines.upgrades.storage.tunnel.block.TunnelWallBlockEntity;
 import dev.compactmods.machines.upgrades.storage.tunnel.menu.TunnelConfigMenu;
@@ -96,6 +98,7 @@ public interface Tunnels {
         Items.prepare();
         BlockEntities.prepare();
         RoomNamedStorages.init();
+        RoomStorageLinks.init();
 
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
@@ -103,6 +106,7 @@ public interface Tunnels {
         MENUS.register(modBus);
 
         modBus.addListener(Tunnels::registerCapabilities);
+        RoomPreviewService.addContributor(TunnelPreviewContributor.INSTANCE);
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {

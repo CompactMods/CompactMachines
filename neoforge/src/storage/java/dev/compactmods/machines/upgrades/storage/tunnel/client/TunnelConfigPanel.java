@@ -7,6 +7,7 @@ import dev.compactmods.machines.upgrades.storage.tunnel.TunnelTranslations;
 import dev.compactmods.machines.upgrades.storage.tunnel.TunnelType;
 import dev.compactmods.machines.upgrades.storage.tunnel.menu.TunnelConfigMenu;
 import dev.compactmods.machines.upgrades.storage.tunnel.network.TunnelConfigSubmitPacket;
+import dev.robotgryphon.screenlib.ui.api.panel.InventoryPanel;
 import dev.robotgryphon.screenlib.ui.api.panel.Panel;
 import dev.robotgryphon.screenlib.ui.api.toolbar.ToolbarStyle;
 import net.minecraft.client.Minecraft;
@@ -270,7 +271,8 @@ public class TunnelConfigPanel extends Panel {
             final var mc = Minecraft.getInstance();
             if (mc.gameMode != null && mc.player != null) {
                 final var input = event.hasShiftDown() ? ContainerInput.QUICK_MOVE : ContainerInput.PICKUP;
-                mc.gameMode.handleContainerInput(menu.containerId, menu.containerSlot().index, event.button(), input, mc.player);
+                mc.gameMode.handleContainerInput(menu.containerId, menu.containerSlot().index,
+                        InventoryPanel.containerButton(event), input, mc.player);
             }
             return true;
         }

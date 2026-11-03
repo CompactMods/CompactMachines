@@ -18,11 +18,12 @@ import org.jspecify.annotations.Nullable;
 import java.util.Map;
 
 /**
- * A read-only, fully-lit virtual level over a {@link RoomPreviewSnapshot}, in room-local coordinates
- * (the snapshot's {@code (x,y,z)} indices). It's just enough of a {@link BlockAndTintGetter} for
+ * A read-only, fully-lit virtual level over a {@link RoomPreviewSnapshot}, in world coordinates (the
+ * room's real positions, from the snapshot's {@link RoomPreviewSnapshot#origin() origin}). It's just enough of a {@link BlockAndTintGetter} for
  * {@link net.minecraft.client.renderer.block.ModelBlockRenderer} to bake the room's block models:
  * neighbour states drive face culling, and brightness is pinned to full so the mesh isn't rendered
- * black (the snapshot carries no light data). No block entities. Tints (grass, foliage, water) resolve
+ * black (the snapshot carries no light data). No block entities: when the client has a level, the
+ * mesher bakes from a {@link PreviewLevel} instead, which adds them and borrows this getter's tints. Tints (grass, foliage, water) resolve
  * against the snapshot's captured biomes, blended over the same radius vanilla uses, so the preview
  * matches the real room. Snapshots without biome data fall back to a single biome.
  */
@@ -49,7 +50,7 @@ public final class SnapshotBlockGetter implements BlockAndTintGetter {
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        return snapshot.blockAt(pos.getX(), pos.getY(), pos.getZ());
+        return snapshot.blockAtWorld(pos);
     }
 
     @Override
@@ -69,7 +70,7 @@ public final class SnapshotBlockGetter implements BlockAndTintGetter {
 
     @Override
     public int getMinY() {
-        return 0;
+        return snapshot.origin().getY();
     }
 
     @Override
@@ -84,7 +85,8 @@ public final class SnapshotBlockGetter implements BlockAndTintGetter {
 
     /** Mirrors {@code ClientLevel#calculateBlockTint}: average the colour over the blend square at {@code pos.y}. */
     @Override
-    public int getBlockTint(BlockPos pos, ColorResolver color) {
+    public int getBlockTint(BlockPos worldPos, ColorResolver color) {
+        final BlockPos pos = worldPos.subtract(snapshot.origin());
         final int y = pos.getY();
         if (blendRadius == 0)
             return colorAt(color, pos.getX(), y, pos.getZ());

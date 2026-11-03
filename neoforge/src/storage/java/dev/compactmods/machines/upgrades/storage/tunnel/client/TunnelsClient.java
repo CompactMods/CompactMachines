@@ -1,5 +1,6 @@
 package dev.compactmods.machines.upgrades.storage.tunnel.client;
 
+import dev.compactmods.machines.room.preview.client.RoomPreviewOverlay;
 import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import dev.compactmods.machines.upgrades.storage.tunnel.block.TunnelWallBlockEntity;
 import dev.compactmods.machines.upgrades.storage.tunnel.menu.TunnelConfigMenu;
@@ -23,7 +24,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-/** Client side of tunnels: the config screen and the tunnel wall's tint. */
+/** Client side of tunnels: the config screen, the tunnel wall's tint and the room preview markers. */
 public final class TunnelsClient {
 
     private static final int MARGIN = 5;
@@ -34,6 +35,7 @@ public final class TunnelsClient {
     public static void registerEvents(IEventBus modBus) {
         modBus.addListener(TunnelsClient::registerMenuScreens);
         modBus.addListener(TunnelsClient::registerBlockTints);
+        RoomPreviewOverlay.register(TunnelPreviewOverlay.INSTANCE);
     }
 
     private static void registerMenuScreens(RegisterMenuScreensEvent event) {

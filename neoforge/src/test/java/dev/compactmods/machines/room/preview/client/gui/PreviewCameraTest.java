@@ -157,4 +157,28 @@ class PreviewCameraTest {
         assertTrue(initial.equals(camera.position(SX, SY, SZ), EPS));
         assertStraightAhead(camera, center());
     }
+
+    @Test
+    void centreRayLooksWhereTheCameraLooks() {
+        final float yaw = 0.7f, pitch = -0.3f;
+        final Vector3f ray = PreviewCamera.ray(0f, 0f, 1.6f, yaw, pitch);
+        final Vector3f forward = PreviewCamera.backward(yaw, pitch).negate();
+        assertEquals(forward.x, ray.x, 1e-4f);
+        assertEquals(forward.y, ray.y, 1e-4f);
+        assertEquals(forward.z, ray.z, 1e-4f);
+    }
+
+    @Test
+    void rayPassesThroughItsScreenPoint() {
+        final var camera = new PreviewCamera();
+        camera.look(40, -25);
+        final float aspect = 1.5f, ndcX = 0.6f, ndcY = -0.8f;
+        final float tan = (float) Math.tan(Math.toRadians(RoomPreviewGuiRenderer.FOV_DEGREES / 2f));
+
+        final Vector3f ray = PreviewCamera.ray(ndcX, ndcY, aspect, camera.yaw(), camera.pitch());
+        final Vector3f e = eye(camera, camera.position(SX, SY, SZ).fma(10f, ray));
+        assertTrue(e.z < 0f, "should be in front of the camera: " + e);
+        assertEquals(ndcX, e.x / -e.z / (tan * aspect), 1e-4f);
+        assertEquals(ndcY, e.y / -e.z / tan, 1e-4f);
+    }
 }

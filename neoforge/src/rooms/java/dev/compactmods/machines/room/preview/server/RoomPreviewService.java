@@ -5,11 +5,15 @@ import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapabilities;
 import dev.compactmods.machines.api.room.registry.RoomRegistry;
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.core.sync.BlockEntitySyncHooks;
+import dev.compactmods.machines.room.network.RoomBlockEntitiesPacket;
 import dev.compactmods.machines.room.network.RoomEntitiesPacket;
 import dev.compactmods.machines.room.network.RoomPreviewSnapshotPacket;
 import dev.compactmods.machines.room.network.RoomPreviewSpawnPacket;
+import dev.compactmods.machines.room.preview.RoomBlockEntitySnapshot;
 import dev.compactmods.machines.room.preview.RoomEntitySnapshot;
 import dev.compactmods.machines.room.preview.RoomPreviewSnapshot;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -19,12 +23,16 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +42,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Server-side driver for room previews: tracks which players want which rooms, periodically captures
@@ -73,6 +83,13 @@ public final class RoomPreviewService {
 
     private static final Map<MinecraftServer, ServerState> STATES = new WeakHashMap<>();
 
+    private static final List<RoomPreviewContributor> CONTRIBUTORS = new CopyOnWriteArrayList<>();
+
+    /** Adds a source of extra per-room preview data. Call during mod construction. */
+    public static void addContributor(RoomPreviewContributor contributor) {
+        CONTRIBUTORS.add(contributor);
+    }
+
     private RoomPreviewService() {}
 
     // --- subscription management ------------------------------------------------------
@@ -100,8 +117,17 @@ public final class RoomPreviewService {
             final CachedSnapshot cached = state.cache.get(code);
             if (cached != null)
                 PacketDistributor.sendToPlayer(player, new RoomPreviewSnapshotPacket(code, cached.snapshot));
-            if (rooms != null)
-                rooms.get(code).ifPresent(room -> sendSpawnIfChanged(player, room, code, state));
+            if (rooms != null) {
+                rooms.get(code).ifPresent(room -> {
+                    sendSpawnIfChanged(player, room, code, state);
+                    sendContributions(server, room, code, state, player);
+                });
+            }
+
+            // Block entity data newer than the cached snapshot
+            final Map<BlockPos, RoomBlockEntitySnapshot> tags = state.blockEntityTags.get(code);
+            if (tags != null && !tags.isEmpty())
+                PacketDistributor.sendToPlayer(player, new RoomBlockEntitiesPacket(code, List.copyOf(tags.values())));
 
             // An empty room sends no entity updates, so clear anything stale the client still holds
             // (e.g. themselves, from before they left it). Occupied rooms send every entity tick anyway.
@@ -132,6 +158,12 @@ public final class RoomPreviewService {
         final boolean doEntities = now % ENTITY_INTERVAL_TICKS == 0L;
         if (!doBlocks && !doEntities) return;
 
+        // This tick's reported block entity changes, taken whole so new reports start a fresh set
+        final Set<BlockPos> dirtyBlocks = state.dirtyBlocks.isEmpty() ? Set.of() : Set.copyOf(state.dirtyBlocks);
+        final Set<Long> dirtyChunks = state.dirtyChunks.isEmpty() ? Set.of() : Set.copyOf(state.dirtyChunks);
+        state.dirtyBlocks.clear();
+        state.dirtyChunks.clear();
+
         // Snapshot the subscribed-room set so a subscription change mid-loop can't disturb iteration.
         for (String code : new ArrayList<>(state.byRoom.keySet())) {
             final Set<UUID> subscribers = state.byRoom.get(code);
@@ -142,12 +174,17 @@ public final class RoomPreviewService {
 
             if (doBlocks) {
                 gatherBlocks(server, level, room, code, subscribers, state);
+                sendContributions(server, room, code, state, null);
                 for (UUID id : subscribers) {
                     final ServerPlayer player = server.getPlayerList().getPlayer(id);
                     if (player != null) sendSpawnIfChanged(player, room, code, state);
                 }
             }
-            if (doEntities) gatherEntities(server, level, room, code, subscribers, state);
+            if (doEntities) {
+                gatherEntities(server, level, room, code, subscribers, state);
+                if (!dirtyBlocks.isEmpty() || !dirtyChunks.isEmpty())
+                    gatherBlockEntities(server, level, room, code, subscribers, state, dirtyBlocks, dirtyChunks);
+            }
         }
     }
 
@@ -193,6 +230,28 @@ public final class RoomPreviewService {
     }
 
     /**
+     * Captures every {@link RoomPreviewContributor}'s payload for the room and sends the ones that
+     * changed since last sent to all of the room's watchers. A {@code newcomer} also gets the unchanged ones.
+     */
+    private static void sendContributions(MinecraftServer server, RoomInstance room, String code,
+                                          ServerState state, @Nullable ServerPlayer newcomer) {
+        final ServerLevel level = server.getLevel(CompactDimension.LEVEL_KEY);
+        if (level == null || CONTRIBUTORS.isEmpty()) return;
+
+        final Map<RoomPreviewContributor, CustomPacketPayload> sent =
+                state.contributions.computeIfAbsent(code, c -> new HashMap<>());
+        for (RoomPreviewContributor contributor : CONTRIBUTORS) {
+            contributor.capture(level, room).ifPresent(payload -> {
+                final boolean changed = !payload.equals(sent.put(contributor, payload));
+                if (changed)
+                    broadcast(server, state.byRoom.getOrDefault(code, Set.of()), payload);
+                else if (newcomer != null)
+                    PacketDistributor.sendToPlayer(newcomer, payload);
+            });
+        }
+    }
+
+    /**
      * Captures the (non-player) entities in the room, in room-local space, and sends them live. Skips
      * sending repeated empties: an empty is sent only once, to clear the client when the last entity
      * leaves.
@@ -221,6 +280,83 @@ public final class RoomPreviewService {
         if (snaps.isEmpty() && previous == 0) return; // nothing there and nothing to clear
         state.lastEntityCount.put(code, snaps.size());
         broadcast(server, subscribers, new RoomEntitiesPacket(code, snaps));
+    }
+
+    /**
+     * Sends the sync tags of the room's block entities that changed since last sent, out of those
+     * {@linkplain BlockEntitySyncHooks reported} as changed this tick: by position (changed or synced the
+     * vanilla way), or by chunk (a mod's own packet to the chunk's trackers, as Mekanism sends for items in
+     * pipes). Reactive, so idle rooms cost nothing; the comparison only stops resending data that didn't
+     * actually change.
+     */
+    private static void gatherBlockEntities(MinecraftServer server, ServerLevel level, RoomInstance room,
+                                            String code, Set<UUID> subscribers, ServerState state,
+                                            Set<BlockPos> dirtyBlocks, Set<Long> dirtyChunks) {
+        final AABB inner = room.boundaries().innerBounds();
+        final Set<BlockPos> candidates = new HashSet<>();
+        for (BlockPos pos : dirtyBlocks) {
+            if (inner.contains(Vec3.atCenterOf(pos)))
+                candidates.add(pos);
+        }
+        if (!dirtyChunks.isEmpty()) {
+            room.boundaries().innerChunkPositions()
+                    .filter(cp -> dirtyChunks.contains(ChunkPos.pack(cp.x(), cp.z())))
+                    .forEach(cp -> level.getChunk(cp.x(), cp.z()).getBlockEntities().keySet().stream()
+                            .filter(pos -> inner.contains(Vec3.atCenterOf(pos)))
+                            .forEach(candidates::add));
+        }
+        if (candidates.isEmpty()) return;
+
+        final BlockPos origin = BlockPos.containing(inner.minX, inner.minY, inner.minZ);
+        final Map<BlockPos, RoomBlockEntitySnapshot> sent = state.blockEntityTags.computeIfAbsent(code, c -> new HashMap<>());
+        final List<RoomBlockEntitySnapshot> changed = new ArrayList<>();
+        for (BlockPos pos : candidates) {
+            final BlockPos local = pos.subtract(origin);
+            final BlockEntity be = level.getBlockEntity(pos);
+            if (be == null || be.isRemoved()) {
+                // Gone ones leave with the next block snapshot; forget them so they're sent again if they come back
+                sent.remove(local);
+                continue;
+            }
+
+            final var current = new RoomBlockEntitySnapshot(local, be.getType(), be.getUpdateTag(level.registryAccess()));
+            if (!current.equals(sent.get(local))) {
+                sent.put(local, current);
+                changed.add(current);
+            }
+        }
+
+        if (!changed.isEmpty())
+            broadcast(server, subscribers, new RoomBlockEntitiesPacket(code, changed));
+    }
+
+    /** Collects reported block entity changes in the compact dimension, while any room is watched. */
+    private static final BlockEntitySyncHooks.Listener SYNC_LISTENER = new BlockEntitySyncHooks.Listener() {
+        @Override
+        public void blockChanged(ServerLevel level, BlockPos pos) {
+            final ServerState state = watching(level);
+            if (state != null)
+                state.dirtyBlocks.add(pos.immutable());
+        }
+
+        @Override
+        public void chunkSynced(ServerLevel level, ChunkPos chunk) {
+            final ServerState state = watching(level);
+            if (state != null)
+                state.dirtyChunks.add(ChunkPos.pack(chunk.x(), chunk.z()));
+        }
+
+        private static @Nullable ServerState watching(ServerLevel level) {
+            if (!level.dimension().equals(CompactDimension.LEVEL_KEY))
+                return null;
+            final ServerState state = STATES.get(level.getServer());
+            return state == null || state.byRoom.isEmpty() ? null : state;
+        }
+    };
+
+    /** Starts listening for block entity changes. Call during mod construction. */
+    public static void init() {
+        BlockEntitySyncHooks.setListener(SYNC_LISTENER);
     }
 
     /** {@return true if every chunk the room's interior spans is already loaded} */
@@ -297,6 +433,14 @@ public final class RoomPreviewService {
         private final Set<String> ticketed = new HashSet<>();
         /** Last entity count sent per room, so repeated empties aren't re-sent. */
         private final Map<String, Integer> lastEntityCount = new HashMap<>();
+        /** Block entities reported changed since the last tick, by world position (see {@link BlockEntitySyncHooks}). */
+        private final Set<BlockPos> dirtyBlocks = ConcurrentHashMap.newKeySet();
+        /** Chunks a mod sent its own packets to since the last tick, packed. */
+        private final Set<Long> dirtyChunks = ConcurrentHashMap.newKeySet();
+        /** Last block entity data sent per room, by room-local position, so unchanged ones aren't re-sent. */
+        private final Map<String, Map<BlockPos, RoomBlockEntitySnapshot>> blockEntityTags = new HashMap<>();
+        /** Last payload sent per room and contributor, so unchanged ones aren't re-sent. */
+        private final Map<String, Map<RoomPreviewContributor, CustomPacketPayload>> contributions = new HashMap<>();
         /** Last spawn sent per player and room, so unchanged spawns aren't re-sent. */
         private final Map<UUID, Map<String, RoomPreviewSpawnPacket>> lastSpawns = new HashMap<>();
 
@@ -320,6 +464,8 @@ public final class RoomPreviewService {
                     byRoom.remove(code);
                     cache.remove(code); // no one watching — drop the cached snapshot too
                     lastEntityCount.remove(code);
+                    contributions.remove(code);
+                    blockEntityTags.remove(code);
                 }
             }
         }

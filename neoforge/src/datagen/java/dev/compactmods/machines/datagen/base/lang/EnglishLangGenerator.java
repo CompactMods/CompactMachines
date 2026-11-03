@@ -171,6 +171,10 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         add(TunnelTranslations.IDs.CAPACITY, "Capacity: %s");
         add(TunnelTranslations.IDs.CONTAINER_HINT, "Add %s to increase capacity");
 
+        add(TunnelTranslations.IDs.Preview.CONNECTED, "Connected machines:");
+        add(TunnelTranslations.IDs.Preview.NO_CONNECTIONS, "No connected machines");
+        add(TunnelTranslations.IDs.Preview.MACHINE, "%s, %s, %s (%s): %s");
+
         add(TunnelTranslations.IDs.Errors.EMPTY_NAME, "A storage needs a name.");
         add(TunnelTranslations.IDs.Errors.NAME_TOO_LONG, "Names can be at most %s characters.");
         add(TunnelTranslations.IDs.Errors.DUPLICATE_NAME, "This room already has a storage named '%s'.");

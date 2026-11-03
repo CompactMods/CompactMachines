@@ -30,12 +30,13 @@ public class BaseDatapack {
         // Server
         event.createProvider(ModelAndStateGenerator::new);
 
-        event.createWorldRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachinesCore.MOD_ID));
+        final var pack = event.getDefaultPackGenerator();
+        pack.createWorldRegistryObjects(DatapackRegisteredStuff.BUILDER, Set.of(CompactMachinesCore.MOD_ID));
 
         event.createProvider(PointOfInterestTagGenerator::new);
 
         // Loot tables and recipes are reloadable registries now
-        event.createReloadableRegistryObjects(new RegistrySetBuilder()
+        pack.createReloadableRegistryObjects(new RegistrySetBuilder()
                 .add(Registries.LOOT_TABLE, new LootTableProvider(
                         Collections.emptySet(),
                         List.of(new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK))))

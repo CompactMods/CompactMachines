@@ -4,7 +4,10 @@
   "compatibilityLevel": "JAVA_25",
   "refmap": "modid.refmap.json",
   "mixins": [
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "LevelBlockEntityChangedMixin",
+    "ServerLevelBlockUpdateMixin",
+    "PacketDistributorMixin"
   ],
   "client": [
   ],
