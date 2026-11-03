@@ -11,8 +11,10 @@ import dev.compactmods.machines.upgrades.example.ChunkLoaderTickets;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterState;
+import dev.compactmods.machines.upgrades.storage.ResourceStorageTypes;
 import dev.compactmods.machines.upgrades.storage.ResourceTypes;
 import dev.compactmods.machines.upgrades.storage.StorageCapabilities;
+import dev.compactmods.machines.upgrades.storage.nodes.StorageNodes;
 import dev.compactmods.machines.upgrades.system.RoomSystems;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
@@ -59,10 +61,12 @@ public final class RoomUpgrades {
         RURegistries.ROOM_UPGRADE_DEFINITIONS.register(modBus);
 
         ResourceTypes.init(modBus);
+        ResourceStorageTypes.init(modBus);
 
         RoomSystems.init(modBus);
         RoomCanvases.init();
         DebugStorages.register(modBus);
+        StorageNodes.register(modBus);
         TreeCutterState.init();
     }
 

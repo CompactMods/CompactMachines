@@ -1,5 +1,7 @@
 package dev.compactmods.machines.upgrades.canvas;
 
+import dev.compactmods.machines.upgrades.storage.nodes.StorageNodes;
+
 import dev.compactmods.machines.api.room.RoomInstance;
 import dev.compactmods.machines.api.room.capability.RoomCapability;
 import dev.compactmods.machines.core.CompactMachinesCore;
@@ -75,6 +77,7 @@ public final class RoomCanvases {
     private static CanvasSupplier build(MinecraftServer server, RoomInstance room) {
         final var definition = new CanvasDefinition(room.getData(STATE));
         final var context = new Context(room, definition);
+        StorageNodes.registerChoices(definition, room);
 
         final var upgrades = server.registryAccess().lookupOrThrow(CompiledRoomUpgrade.REGISTRY_KEY);
         room.getData(RoomSystems.ENABLED_UPGRADES).stream()

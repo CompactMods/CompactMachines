@@ -80,6 +80,25 @@ public class CMModelTemplates {
                         .tintindex(0));
     }
 
+    public static final TextureSlot WALL_SLOT = TextureSlot.create("wall");
+    public static final TextureSlot TUNNEL_SLOT = TextureSlot.create("tunnel");
+
+    /**
+     * A solid wall with a tunnel overlay, layered like the grass block's side overlay. The overlay's
+     * tintindex 0 is fed the tunnel type's color by {@code TunnelsClient}.
+     */
+    public static final ModelTemplate TUNNEL_WALL_TEMPLATE = ModelTemplates.create(CompactMachinesCore.id("tunnel_wall"),
+                    TextureSlot.PARTICLE,
+                    WALL_SLOT,
+                    TUNNEL_SLOT)
+            .extend()
+            .parent(Identifier.withDefaultNamespace("block/block"))
+            .element(e -> e.from(0, 0, 0).to(16, 16, 16)
+                    .allFaces((dir, face) -> face.texture(WALL_SLOT).uvs(0, 0, 16, 16).cullface(dir)))
+            .element(e -> e.from(0, 0, 0).to(16, 16, 16)
+                    .allFaces((dir, face) -> face.texture(TUNNEL_SLOT).uvs(0, 0, 16, 16).cullface(dir).tintindex(0)))
+            .build();
+
     public static final ModelTemplate ROOM_CORE_TEMPLATE = ModelTemplates.create(CompactMachinesCore.id("room_core"), TextureSlot.PARTICLE)
             .extend()
 

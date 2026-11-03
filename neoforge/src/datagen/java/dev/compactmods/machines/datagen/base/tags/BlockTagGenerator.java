@@ -2,6 +2,8 @@ package dev.compactmods.machines.datagen.base.tags;
 
 
 import dev.compactmods.machines.core.CompactMachinesCore;
+import dev.compactmods.machines.core.WallConstants;
+import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import dev.compactmods.machines.api.machine.MachineConstants;
 import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;
@@ -28,6 +30,11 @@ public class BlockTagGenerator extends BlockTagsProvider {
         final var machineBlock = Machines.Blocks.MACHINE.getKey();
         final var voidAir = Dimension.BLOCK_MACHINE_VOID_AIR.getKey();
         final var spatialWorkbench = Villagers.SPATIAL_WORKBENCH.getKey();
+        final var tunnelWall = Tunnels.Blocks.TUNNEL_WALL.getKey();
+
+        tag(WallConstants.TAG_SOLID_WALL_BLOCKS)
+                .add(solidWall)
+                .add(tunnelWall);
 
         tag(MachineConstants.MACHINE_BLOCK)
                 .add(machineBlock);
@@ -43,6 +50,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
         tag(Tags.Blocks.RELOCATION_NOT_SUPPORTED)
                 .add(machineBlock)
                 .add(solidWall)
+                .add(tunnelWall)
                 .add(voidAir);
 
         tag(Tags.Blocks.VILLAGER_JOB_SITES)

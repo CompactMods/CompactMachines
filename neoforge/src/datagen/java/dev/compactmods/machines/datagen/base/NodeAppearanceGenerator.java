@@ -1,5 +1,7 @@
 package dev.compactmods.machines.datagen.base;
 
+import dev.compactmods.machines.upgrades.storage.nodes.StorageNodes;
+
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeNode;
 import dev.robotgryphon.screenlib.nodes.api.appearance.NodeAppearance;
@@ -22,6 +24,10 @@ public class NodeAppearanceGenerator extends NodeAppearanceProvider {
         this.add(TreeCutterUpgradeNode.KEY, NodeAppearance.builder()
                 .property(TreeCutterUpgradeNode.TOOLS.name(), p -> p.withRenderer(StorageRenderers.STORAGE))
                 .property(TreeCutterUpgradeNode.DROPS.name(), p -> p.withRenderer(StorageRenderers.STORAGE))
+                .build());
+
+        this.add(StorageNodes.NAMED_ITEM_STORAGE, NodeAppearance.builder()
+                .property(StorageNodes.HANDLER, p -> p.withRenderer(StorageRenderers.STORAGE))
                 .build());
 
         // Debug nodes (dev-only datapack); harmless without it

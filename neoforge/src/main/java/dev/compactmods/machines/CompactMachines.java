@@ -7,11 +7,13 @@ import dev.compactmods.machines.feature.CMFeaturePacks;
 import dev.compactmods.machines.gamerule.CMGameRules;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.machine.MachineUpgradeCanvas;
+import dev.compactmods.machines.machine.config.MachineConfiguration;
 import dev.compactmods.machines.network.CMNetworks;
 import dev.compactmods.machines.room.preview.server.RoomPreviewService;
 import dev.compactmods.machines.room.RoomSystem;
 import dev.compactmods.machines.shrinking.Shrinking;
 import dev.compactmods.machines.upgrades.RoomUpgrades;
+import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import dev.compactmods.machines.room.block.ProtectedBlockEventHandler;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.ARGB;
@@ -42,7 +44,9 @@ public class CompactMachines {
         Machines.init(modBus);
         RoomSystem.init(modBus);
         RoomUpgrades.init(modBus);
+        Tunnels.init(modBus);
         modBus.addListener(MachineUpgradeCanvas::registerCapabilities);
+        MachineConfiguration.init(modBus);
         Shrinking.init(modBus);
 
         CrashReportCallables.registerCrashCallable("Compact Machines", CompactMachines::crashReport);

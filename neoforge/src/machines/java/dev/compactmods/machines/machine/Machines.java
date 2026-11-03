@@ -8,6 +8,7 @@ import dev.compactmods.machines.core.machine.MachineColor;
 import dev.compactmods.machines.machine.block.CompactMachineBlock;
 import dev.compactmods.machines.machine.block.CompactMachineBlockEntity;
 import dev.compactmods.machines.machine.item.BoundCompactMachineItem;
+import dev.compactmods.machines.machine.ui.MachineConfigMenu;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.compactmods.machines.room.Rooms;
 import net.minecraft.core.BlockPos;
@@ -144,6 +145,9 @@ public interface Machines {
 
     DeferredHolder<MenuType<?>, MenuType<MachineUIMenu>> MACHINE_UI_MENU = MENUS.register("machine_ui",
             () -> IMenuTypeExtension.create(MachineUIMenu::new));
+
+    DeferredHolder<MenuType<?>, MenuType<MachineConfigMenu>> MACHINE_CONFIG_MENU = MENUS.register("machine_config",
+            () -> IMenuTypeExtension.create(MachineConfigMenu::new));
 
     static void prepare() {
         Blocks.prepare();

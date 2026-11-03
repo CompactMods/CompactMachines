@@ -23,8 +23,6 @@ import java.util.function.Supplier;
 @Mod(value = CompactMachinesCore.MOD_ID)
 public class CompactMachinesServer {
 
-//    public static TicketController CHUNK_TICKET_CONTROLLER = new TicketController(CompactMachinesCore.identifier("chunkloader_upgrade"), RoomUpgradeHelper::verifyChunkloaderUpgrades);
-
     public static final Supplier<AttachmentType<IServerCapabilities>> SERVER_CAPABILITIES = CMDataAttachments.ATTACHMENT_TYPES
             .register("server_capabilities", () -> AttachmentType
                 .<IServerCapabilities>builder((server) -> new ServerCapabilities((MinecraftServer) server))

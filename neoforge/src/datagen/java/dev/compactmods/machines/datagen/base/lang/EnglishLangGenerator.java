@@ -18,9 +18,18 @@ import dev.compactmods.machines.client.creative.CreativeTabs;
 import dev.compactmods.machines.room.RoomTranslations;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.upgrades.storage.tunnel.TunnelTranslations;
+import dev.compactmods.machines.upgrades.storage.nodes.StorageNodes;
+import dev.compactmods.machines.machine.config.MachineSideNode;
+import dev.compactmods.machines.upgrades.storage.tunnel.TunnelType;
+import dev.compactmods.machines.upgrades.storage.tunnel.TunnelTypes;
+import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.util.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
+
+import java.util.List;
 
 public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.lang.BaseLangGenerator {
     public EnglishLangGenerator(PackOutput packOutput) {
@@ -58,6 +67,8 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
 
         commands();
         advancements();
+        tunnels();
+        storageNodes();
 
         add(CompactMachinesCore.MOD_ID + ".direction.side", "Side: %s");
         add(CompactMachinesCore.MOD_ID + ".connected_block", "Connected: %s");
@@ -124,6 +135,51 @@ public class EnglishLangGenerator extends dev.compactmods.machines.datagen.base.
         advancement(Advancements.GOT_SHRINKING_DEVICE, "Personal Shrinking Device", "Obtain a Personal Shrinking Device");
         advancement(Advancements.HOW_DID_YOU_GET_HERE, "How Did You Get Here?!", "Which machine is the player in?!");
         advancement(Advancements.RECURSIVE_ROOMS, "Recursive Rooms", "To understand recursion, you must first understand recursion.");
+    }
+
+    private void storageNodes() {
+        add(StorageNodes.NAMED_ITEM_STORAGE.identifier().toLanguageKey("node"), "Named Item Storage");
+        add(StorageNodes.NAMED_FLUID_STORAGE.identifier().toLanguageKey("node"), "Named Fluid Storage");
+        for (var node : List.of(StorageNodes.NAMED_ITEM_STORAGE, StorageNodes.NAMED_FLUID_STORAGE)) {
+            add(node.identifier().toLanguageKey("node", StorageNodes.STORAGE.name()), "Storage");
+            add(node.identifier().toLanguageKey("node", StorageNodes.HANDLER), "Handler");
+        }
+
+        add(MachineSideNode.KEY.identifier().toLanguageKey("node"), "Machine Sides");
+        add(MachineSideNode.KEY.identifier().toLanguageKey("node", MachineSideNode.RESOURCE_TYPE), "Resource");
+        for (var side : Direction.values()) {
+            final var name = MachineSideNode.input(side);
+            add(MachineSideNode.KEY.identifier().toLanguageKey("node", name), Character.toUpperCase(name.charAt(0)) + name.substring(1));
+        }
+
+        add(StorageNodes.NAMED_STORAGE_TYPE.getId().toLanguageKey("graph_type"), "Named Storage");
+        add(StorageNodes.RESOURCE_TYPE.getId().toLanguageKey("graph_type"), "Resource Type");
+        add(CompactMachinesCore.dotPrefix("machine_config"), "Machine Configuration");
+    }
+
+    private void tunnels() {
+        addBlock(Tunnels.Blocks.TUNNEL_WALL, "Tunnel Wall");
+        addItem(Tunnels.Items.TUNNEL, "Tunnel");
+
+        add(TunnelType.translationKey(TunnelTypes.ITEM.identifier()), "Items");
+        add(TunnelType.translationKey(TunnelTypes.FLUID.identifier()), "Fluids");
+
+        add(TunnelTranslations.IDs.SCREEN_TITLE, "Tunnel");
+        add(TunnelTranslations.IDs.NAME, "Storage name");
+        add(TunnelTranslations.IDs.CREATE, "Create");
+        add(TunnelTranslations.IDs.SAVE, "Save");
+        add(TunnelTranslations.IDs.CAPACITY, "Capacity: %s");
+        add(TunnelTranslations.IDs.CONTAINER_HINT, "Add %s to increase capacity");
+
+        add(TunnelTranslations.IDs.Errors.EMPTY_NAME, "A storage needs a name.");
+        add(TunnelTranslations.IDs.Errors.NAME_TOO_LONG, "Names can be at most %s characters.");
+        add(TunnelTranslations.IDs.Errors.DUPLICATE_NAME, "This room already has a storage named '%s'.");
+        add(TunnelTranslations.IDs.Errors.MISSING_CONTAINER, "Put at least one %s in the slot.");
+        add(TunnelTranslations.IDs.Errors.MISSING_TUNNEL, "You need a tunnel in hand.");
+        add(TunnelTranslations.IDs.Errors.NO_TYPE, "Pick a tunnel type.");
+        add(TunnelTranslations.IDs.Errors.UNKNOWN_TYPE, "That tunnel type isn't available.");
+        add(TunnelTranslations.IDs.Errors.UNKNOWN_STORAGE, "No storage named '%s'.");
+        add(TunnelTranslations.IDs.Errors.WALL_CHANGED, "The wall changed; try again.");
     }
 
     private void commands() {

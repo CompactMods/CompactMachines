@@ -3,6 +3,7 @@ package dev.compactmods.machines.machine.client;
 import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.MachineRoomEntry;
 import dev.compactmods.machines.machine.network.MachineEnterRoomPacket;
+import dev.compactmods.machines.machine.network.OpenMachineConfigPacket;
 import dev.compactmods.machines.machine.ui.MachineUIMenu;
 import dev.robotgryphon.screenlib.nodes.api.canvas.CanvasTools;
 import dev.robotgryphon.screenlib.ui.api.panel.PanelType;
@@ -71,6 +72,16 @@ public final class MachineToolbar {
                 (context, menu) -> context.isPanelOpen(ROOM_UPGRADES_PANEL),
                 (context, menu) -> show(context, ROOM_UPGRADES_PANEL)));
 
+        BUTTONS.register("machine_config", () -> new MachineToolbarButton(
+                CompactMachinesCore.identifier("machine_config_btn"),
+                menu -> menu.currentRoom().isPresent()
+                        ? Component.literal("Machine configuration")
+                        : Component.literal("Machine configuration (no room bound)"),
+                menu -> menu.currentRoom().isPresent(),
+                (context, menu) -> false,
+                // The server opens the configuration screen in place of this one
+                (context, menu) -> ClientPacketDistributor.sendToServer(new OpenMachineConfigPacket(menu.machinePos()))));
+
         BUTTONS.register("enter_room", () -> new MachineToolbarButton(
                 CompactMachinesCore.identifier("personal_shrinking_device"),
                 MachineToolbar::enterTooltip,
@@ -93,13 +104,14 @@ public final class MachineToolbar {
 
     public static final ResourceKey<ToolbarButton> ROOM_PREVIEW_BUTTON = key("room_preview");
     public static final ResourceKey<ToolbarButton> ROOM_UPGRADES_BUTTON = key("room_upgrades");
+    public static final ResourceKey<ToolbarButton> MACHINE_CONFIG_BUTTON = key("machine_config");
     public static final ResourceKey<ToolbarButton> ENTER_ROOM_BUTTON = key("enter_room");
     public static final ResourceKey<ToolbarButton> ADD_NODE_BUTTON = key("add_node");
     public static final ResourceKey<ToolbarButton> INVENTORY_BUTTON = key("inventory");
 
     /** Switches the main panel between the room preview and room upgrades. */
     public static final List<List<ResourceKey<ToolbarButton>>> VIEWS =
-            List.of(List.of(ROOM_PREVIEW_BUTTON, ROOM_UPGRADES_BUTTON));
+            List.of(List.of(ROOM_PREVIEW_BUTTON, ROOM_UPGRADES_BUTTON), List.of(MACHINE_CONFIG_BUTTON));
 
     /** Shown with the room preview. */
     public static final List<List<ResourceKey<ToolbarButton>>> ROOM_ACTIONS =
@@ -108,6 +120,10 @@ public final class MachineToolbar {
     /** Shown with the room upgrades canvas. */
     public static final List<List<ResourceKey<ToolbarButton>>> UPGRADE_ACTIONS =
             List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED), List.of(INVENTORY_BUTTON));
+
+    /** The machine configuration screen's toolbar: its canvas's node palettes. */
+    public static final List<List<ResourceKey<ToolbarButton>>> CONFIG_ACTIONS =
+            List.of(List.of(ADD_NODE_BUTTON, CanvasTools.PROVIDED));
 
     public static boolean roomActionsShown(ToolbarContext context) {
         return context.isPanelOpen(ROOM_PREVIEW_PANEL);

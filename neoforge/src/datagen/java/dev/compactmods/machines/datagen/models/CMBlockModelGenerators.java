@@ -42,4 +42,14 @@ public class CMBlockModelGenerators extends BlockModelGenerators {
 
         return createSimpleWithTextures(block, CMModelTemplates.MACHINE_TEMPLATE, textures);
     }
+
+    public Identifier createTunnelWall(Holder<Block> block) {
+        final var wall = new Material(CompactMachinesCore.identifier("block/solid_wall"));
+        final var textures = new TextureMapping()
+                .put(TextureSlot.PARTICLE, wall)
+                .put(CMModelTemplates.WALL_SLOT, wall)
+                .put(CMModelTemplates.TUNNEL_SLOT, new Material(CompactMachinesCore.identifier("block/tunnels/tunnel")));
+
+        return createSimpleWithTextures(block, CMModelTemplates.TUNNEL_WALL_TEMPLATE, textures);
+    }
 }

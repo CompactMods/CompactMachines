@@ -1,6 +1,7 @@
 package dev.compactmods.machines.upgrades.client;
 
 import dev.compactmods.machines.upgrades.debug.DebugStorages;
+import dev.compactmods.machines.upgrades.storage.nodes.NamedStorageAccess;
 import dev.robotgryphon.screenlib.graph.schema.types.ItemHandlerAccess;
 import dev.robotgryphon.screenlib.nodes.api.render.PropertyValueRenderer;
 import dev.robotgryphon.screenlib.nodes.api.render.PropertyValueRenderers;
@@ -21,7 +22,8 @@ import java.util.List;
 /**
  * Draws an item handler value as an icon, whatever its kind: a block's storage as screenlib's block
  * preview, an {@linkplain DebugStorages.InfiniteItems infinite source} as its item with an infinity
- * sign over it, and a {@linkplain DebugStorages.VoidItems void} as a barrier.
+ * sign over it, a {@linkplain DebugStorages.VoidItems void} as a barrier, and a
+ * {@linkplain NamedStorageAccess.Items named storage} as a chest, named in its tooltip.
  */
 public final class StorageRenderer implements PropertyValueRenderer<ItemHandlerAccess> {
 
@@ -30,6 +32,7 @@ public final class StorageRenderer implements PropertyValueRenderer<ItemHandlerA
     private static final Component INFINITY = Component.literal("∞").withStyle(ChatFormatting.AQUA);
 
     private @Nullable ItemStack barrier;
+    private @Nullable ItemStack chest;
 
     @Override
     public Class<ItemHandlerAccess> valueType() {
@@ -81,6 +84,9 @@ public final class StorageRenderer implements PropertyValueRenderer<ItemHandlerA
             case DebugStorages.VoidItems ignored -> List.of(
                     Component.literal("Void"),
                     Component.literal("Debug storage: destroys everything put in").withStyle(ChatFormatting.DARK_GRAY));
+            case NamedStorageAccess.Items named -> List.of(
+                    Component.literal(named.storage().name()),
+                    Component.literal("Named storage").withStyle(ChatFormatting.DARK_GRAY));
             default -> null;
         };
         if (lines == null) {
@@ -100,6 +106,11 @@ public final class StorageRenderer implements PropertyValueRenderer<ItemHandlerA
                 if (barrier == null)
                     barrier = new ItemStack(Items.BARRIER);
                 yield barrier;
+            }
+            case NamedStorageAccess.Items ignored -> {
+                if (chest == null)
+                    chest = new ItemStack(Items.CHEST);
+                yield chest;
             }
             default -> null;
         };

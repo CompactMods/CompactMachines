@@ -11,6 +11,13 @@ import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeNode;
 import dev.robotgryphon.screenlib.graph.schema.NodeDefinition;
 import dev.compactmods.machines.upgrades.example.ChunkLoaderUpgradeComponent;
 import dev.compactmods.machines.upgrades.example.TreeCutterUpgradeComponent;
+import dev.compactmods.machines.upgrades.storage.ResourceStorageTypes;
+import dev.compactmods.machines.upgrades.storage.ResourceTypes;
+import dev.compactmods.machines.upgrades.storage.tunnel.TunnelType;
+import dev.compactmods.machines.upgrades.storage.tunnel.TunnelTypes;
+import dev.compactmods.machines.upgrades.storage.nodes.StorageNodes;
+import dev.compactmods.machines.machine.config.MachineSideNode;
+import net.minecraft.world.item.Items;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -44,11 +51,27 @@ public class DatapackRegisteredStuff {
             })
             .add(FlagShader.REGISTRY_KEY, DatapackRegisteredStuff::generateFlagDefinitions)
             .add(CompiledRoomUpgrade.REGISTRY_KEY, DatapackRegisteredStuff::generateCompiledRoomUpgrades)
-            .add(NodeDefinition.REGISTRY_KEY, DatapackRegisteredStuff::generateNodeDefinitions);
+            .add(NodeDefinition.REGISTRY_KEY, DatapackRegisteredStuff::generateNodeDefinitions)
+            .add(TunnelType.REGISTRY_KEY, DatapackRegisteredStuff::generateTunnelTypes);
+
+    private static void generateTunnelTypes(BootstrapContext<TunnelType> ctx) {
+        ctx.register(TunnelTypes.ITEM, new TunnelType(
+                ResourceTypes.ITEM.getKey(), ResourceStorageTypes.ITEM_BLOCK.getKey(),
+                0xFFB300, CompactMachinesCore.identifier("tunnels/item"),
+                Items.CHEST.builtInRegistryHolder(), 9));
+
+        ctx.register(TunnelTypes.FLUID, new TunnelType(
+                ResourceTypes.FLUID.getKey(), ResourceStorageTypes.FLUID_BLOCK.getKey(),
+                0x2196F3, CompactMachinesCore.identifier("tunnels/fluid"),
+                Items.BUCKET.builtInRegistryHolder(), 4));
+    }
 
     /** Screenlib canvas nodes for the room upgrade canvas (see {@code RoomCanvases}). */
     private static void generateNodeDefinitions(BootstrapContext<NodeDefinition> ctx) {
         ctx.register(TreeCutterUpgradeNode.KEY, TreeCutterUpgradeNode.definition());
+        ctx.register(StorageNodes.NAMED_ITEM_STORAGE, StorageNodes.namedItemStorage());
+        ctx.register(StorageNodes.NAMED_FLUID_STORAGE, StorageNodes.namedFluidStorage());
+        ctx.register(MachineSideNode.KEY, MachineSideNode.definition());
     }
 
     private static void generateCompiledRoomUpgrades(BootstrapContext<CompiledRoomUpgrade> ctx) {

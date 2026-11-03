@@ -300,6 +300,7 @@ dependencies {
 
     "storageCompileOnly"(project(":api"))
     "storageCompileOnly"(roomsSrc.get().output)
+    "storageCompileOnly"(compactmods.bundles.screenlib) // tunnel config screen
 
     "machinesCompileOnly"(project(":api"))
     "machinesCompileOnly"(roomsSrc.get().output)

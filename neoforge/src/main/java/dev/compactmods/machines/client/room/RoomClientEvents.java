@@ -1,6 +1,7 @@
 package dev.compactmods.machines.client.room;
 
 import dev.compactmods.machines.client.keybinds.room.RoomExitKeyMapping;
+import dev.compactmods.machines.machine.client.MachineConfigUI;
 import dev.compactmods.machines.machine.client.MachineUI;
 import dev.robotgryphon.screenlib.ui.api.UiScreens;
 import dev.compactmods.machines.machine.Machines;
@@ -14,6 +15,7 @@ public class RoomClientEvents {
 
     public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
         UiScreens.register(evt, Machines.MACHINE_UI_MENU.get(), MachineUI::create);
+        UiScreens.register(evt, Machines.MACHINE_CONFIG_MENU.get(), MachineConfigUI::create);
     }
 
     public static void onKeybindRegistration(final RegisterKeyMappingsEvent evt) {

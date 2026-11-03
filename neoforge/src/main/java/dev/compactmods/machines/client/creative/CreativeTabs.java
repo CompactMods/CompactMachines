@@ -4,6 +4,7 @@ import dev.compactmods.machines.core.CompactMachinesCore;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
@@ -29,6 +30,7 @@ public interface CreativeTabs {
         output.accept(Shrinking.Items.PERSONAL_SHRINKING_DEVICE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Shrinking.Items.SHRINKING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         output.accept(Shrinking.Items.ENLARGING_MODULE.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        output.accept(Tunnels.Items.TUNNEL.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
 
         // TODO: Items with a room mapping (paper room cores?)
 //        final var lookup = params.holders().lookupOrThrow(RoomTemplate.REGISTRY_KEY);

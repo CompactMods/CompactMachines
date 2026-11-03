@@ -10,6 +10,7 @@ import dev.compactmods.machines.dimension.Dimension;
 import dev.compactmods.machines.machine.Machines;
 import dev.compactmods.machines.room.Rooms;
 import dev.compactmods.machines.shrinking.Shrinking;
+import dev.compactmods.machines.upgrades.storage.tunnel.Tunnels;
 import dev.compactmods.machines.villager.Villagers;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
@@ -48,6 +49,9 @@ public class ModelAndStateGenerator extends CMModelProvider {
 
         itemModels.generateFlatItem(Shrinking.Items.SHRINKING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(Shrinking.Items.ENLARGING_MODULE.asItem(), ModelTemplates.FLAT_ITEM);
+
+        blockModels.createTunnelWall(Tunnels.Blocks.TUNNEL_WALL);
+        itemModels.generateFlatItem(Tunnels.Items.TUNNEL.asItem(), ModelTemplates.FLAT_ITEM);
     }
 
 }
