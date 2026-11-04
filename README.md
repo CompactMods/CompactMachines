@@ -5,9 +5,9 @@ A Minecraft mod that adds one simple game mechanic: small rooms inside of blocks
 
 | Version         | Minecraft Version |      Released | Support | Support Ends   |
 |:----------------|:-----------------:|--------------:|:-------:|----------------|
-| **7.0**         |      1.21.1       |          2024 |    ✅    | -              |
-| 6.0             |      1.20.1       |          2024 |    ✅    | -              |
-| 5.1             |      1.19.2       |     July 2022 |    ✅    | December 2024  |
+| **7.0**         |      1.21.1       | November 2024 |    🟨	   | 2026           |
+| 6.0             |      1.20.1       | December 2024 |    ❌    | 2025           |
+| 5.1             |      1.19.2       |     July 2022 |    ❌    | December 2024  |
 | 5.0             |      1.19.2       |     July 2022 |    ❌    | July 2022      |
 | 4.5             |      1.18.2       |     July 2022 |    ❌    | September 2022 |
 | 4.4             |      1.18.2       |     July 2022 |    ❌    | July 2022      |
