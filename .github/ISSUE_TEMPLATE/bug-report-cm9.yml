@@ -1,12 +1,10 @@
-name: Bug Report - Compact Machines 6 (20.1)
-description: Submit a report for Compact Machines 6
-labels:
-  - triage
-  - 20.1
-  - bug
-  - unverified
+name: Bug Report - Compact Machines 9
+description: Submit a report for Compact Machines 9
 type: Bug
-projects: compactmods/7
+projects:
+  - "CompactMods/11"
+labels:
+  - "unverified"
 assignees: []
 body:
   - type: markdown
@@ -31,7 +29,7 @@ body:
 
   - type: markdown
     attributes:
-      value: "## Mod and Forge Versions"
+      value: "## Mod and Mod Loader Versions"
       
   - type: markdown
     attributes:
@@ -42,14 +40,14 @@ body:
   - type: input
     attributes:
       label: Mod Version
-      placeholder: 6.0.0
+      placeholder: 9.0.0
     validations:
       required: true
 
   - type: input
     attributes:
-      label: Forge Version
-      placeholder: 1.20.1 - 47.3.0
+      label: NeoForge Version
+      placeholder: 26.0.0.1-beta
     validations:
       required: true
 
