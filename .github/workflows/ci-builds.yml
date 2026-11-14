@@ -80,8 +80,8 @@ jobs:
     uses: ./.github/workflows/_announce-latest-build.yml
     secrets: inherit
 
-  release-cf:
-    name: Release Alpha on CurseForge
-    needs: [ get-package-info ]
-    uses: ./.github/workflows/_release-cf-alpha.yml
-    secrets: inherit
+#  release-cf:
+#    name: Release Alpha on CurseForge
+#    needs: [ get-package-info ]
+#    uses: ./.github/workflows/_release-cf-alpha.yml
+#    secrets: inherit

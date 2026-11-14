@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "dev.compactmods.machines.core.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "refmap": "modid.refmap.json",
+  "mixins": [
+    "MinecraftServerMixin",
+    "LevelBlockEntityChangedMixin",
+    "ServerLevelBlockUpdateMixin",
+    "PacketDistributorMixin"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}

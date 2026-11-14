@@ -1,7 +1,7 @@
 [versions]
-minecraft = "26.1.2"
+minecraft = "26.3.0"
 
 [versions.minecraftRange]
-require = "[26.1.2, 26.2)"
-prefer = "26.1.2"
+require = "[26.3.0, 26.4)"
+prefer = "26.3.0"
 

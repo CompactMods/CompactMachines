@@ -1,2 +1,0 @@
-FMLModType: GAMELIBRARY
-Automatic-Module-Name: compactmachinesdata

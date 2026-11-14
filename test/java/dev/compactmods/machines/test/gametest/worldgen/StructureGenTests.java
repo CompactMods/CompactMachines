@@ -1,6 +1,6 @@
 package dev.compactmods.machines.test.gametest.worldgen;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import dev.compactmods.machines.api.room.CompactRoomGenerator;
 import dev.compactmods.machines.api.room.RoomStructureInfo;
 import dev.compactmods.machines.test.gametest.core.CompactGameTestHelper;
@@ -29,7 +29,7 @@ public class StructureGenTests {
 	  CompactRoomGenerator.generateRoom(testHelper.getLevel(), roomDims, Blocks.WHITE_STAINED_GLASS.defaultBlockState());
 
 	  CompactRoomGenerator.populateStructure(testHelper.getLevel(),
-		  CompactMachines.modRL("gold_1x1"),
+		  CompactMachinesCore.modRL("gold_1x1"),
 		  roomDims.deflate(1), RoomStructureInfo.RoomStructurePlacement.CENTERED);
 
 	  testHelper.succeed();
@@ -48,7 +48,7 @@ public class StructureGenTests {
 	  CompactRoomGenerator.generateRoom(testHelper.getLevel(), roomDims, Blocks.WHITE_STAINED_GLASS.defaultBlockState());
 
 	  CompactRoomGenerator.populateStructure(testHelper.getLevel(),
-		  CompactMachines.modRL("gold_1x1"),
+		  CompactMachinesCore.modRL("gold_1x1"),
 		  roomDims.deflate(1), RoomStructureInfo.RoomStructurePlacement.CENTERED_CEILING);
 
 	  testHelper.succeed();
@@ -67,7 +67,7 @@ public class StructureGenTests {
 	  CompactRoomGenerator.generateRoom(testHelper.getLevel(), roomDims, Blocks.WHITE_STAINED_GLASS.defaultBlockState());
 
 	  CompactRoomGenerator.populateStructure(testHelper.getLevel(),
-		  CompactMachines.modRL("gold_1x1"),
+		  CompactMachinesCore.modRL("gold_1x1"),
 		  roomDims.deflate(1), RoomStructureInfo.RoomStructurePlacement.CENTERED_FLOOR);
 
 	  testHelper.succeed();

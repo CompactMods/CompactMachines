@@ -1,6 +1,7 @@
 [versions]
 #gander = "[0.2.31]"
 feather = "[0.1.8]"
+screenlib = "0.2.0"
 
 [versions.spatial]
 require = "[0.2.0, 0.3)"
@@ -13,6 +14,24 @@ version.ref = "feather"
 [libraries.spatial]
 module = "dev.compactmods:spatial"
 version.ref = "spatial"
+
+# ScreenLib APIs (GAMELIBRARY jars); the implementation ships in the separate `screenlib` mod
+[libraries.screenlibUi]
+module = "dev.robotgryphon.screenlib:ui"
+version.ref = "screenlib"
+
+# Node graph API (nodes.api + graph.schema); depends on screenlibUi
+[libraries.screenlibNodes]
+module = "dev.robotgryphon.screenlib:graph"
+version.ref = "screenlib"
+
+# The screenlib mod itself — provides the UI/nodes API implementations at runtime
+[libraries.screenlibMod]
+module = "dev.robotgryphon.screenlib:screenlib"
+version.ref = "screenlib"
+
+[bundles]
+screenlib = ["screenlibUi", "screenlibNodes"]
 
 #[libraries.ganderCore]
 #module = "dev.compactmods.gander:core"

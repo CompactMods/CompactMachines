@@ -7,7 +7,7 @@ A Minecraft mod that adds one simple game mechanic: small rooms inside of blocks
 
 | Status | Loader | Version | Minecraft Version | First Released |   Support End |
 |:------:|:------:|:-------:|:------------------|---------------:|--------------:|
-|   🟨   |   🦊   | **9.x** | 26.1              |            --- |             - |
+|   🟨   |   🦊   | **9.x** | 26.2              |            --- |             - |
 |   🟦   |   🦊   |   8.x   | 1.21.8            | September 2025 |    April 2026 |
 |   🟩   |   🦊   |   7.0   | 1.21.1            |  November 2024 | February 2026 |
 |   🟦   |   🔥   |   6.0   | 1.20.1            |  November 2024 | February 2026 |

@@ -1,11 +1,11 @@
 package dev.compactmods.machines.test.gametest.core;
 
-import dev.compactmods.machines.api.CompactMachines;
+
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 
-@Mod(value = CompactMachines.MOD_ID)
+@Mod(value = CompactMachinesCore.MOD_ID)
 public class CompactMachinesTest {
 
     public CompactMachinesTest(ModContainer container, IEventBus modBus) {

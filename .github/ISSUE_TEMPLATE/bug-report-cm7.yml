@@ -1,10 +1,10 @@
 name: Bug Report - Compact Machines 7 (21.1)
 description: Submit a report for Compact Machines 7
+type: Bug
 labels:
-  - triage
-  - 21.1
-  - bug
-  - unverified
+  - "triage"
+  - "21.1"
+  - "unverified"
 assignees: []
 body:
   - type: markdown
