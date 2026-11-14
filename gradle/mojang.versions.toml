@@ -3,5 +3,5 @@ minecraft = "26.1.2"
 
 [versions.minecraftRange]
 require = "[26.1.2, 26.2)"
-prefer = "26.1.2s"
+prefer = "26.1.2"
 

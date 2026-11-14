@@ -1,7 +1,7 @@
 [versions]
-neoforge = "26.1.2.43-beta"
+neoforge = "26.1.2.71"
 mdg = "2.0.141"
-neoforgeRange = { require = "[26.1.2.1-beta,)", prefer = "26.1.2.43-beta" }
+neoforgeRange = { require = "[26.1.2.71,)", prefer = "26.1.2.71" }
 neoform = "no"
 
 [libraries.testframework]
