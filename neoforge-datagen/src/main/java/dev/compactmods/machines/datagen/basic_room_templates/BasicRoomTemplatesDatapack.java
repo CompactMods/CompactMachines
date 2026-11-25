@@ -2,6 +2,7 @@ package dev.compactmods.machines.datagen.basic_room_templates;
 
 import dev.compactmods.machines.api.CompactMachines;
 import dev.compactmods.machines.datagen.basic_room_templates.lang.RoomTemplatesEnglishLangGenerator;
+import dev.compactmods.machines.datagen.basic_room_templates.lang.RoomTemplatesFrenchLangGenerator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -29,6 +30,7 @@ public class BasicRoomTemplatesDatapack {
 
         if(event.includeClient()) {
             basicTemplates.addProvider(RoomTemplatesEnglishLangGenerator::new);
+            basicTemplates.addProvider(RoomTemplatesFrenchLangGenerator::new);
         }
     }
 }
