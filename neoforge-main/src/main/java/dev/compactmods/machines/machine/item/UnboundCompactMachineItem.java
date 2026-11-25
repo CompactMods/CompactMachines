@@ -8,6 +8,7 @@ import dev.compactmods.machines.machine.MachineColors;
 import dev.compactmods.machines.machine.Machines;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
@@ -17,13 +18,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represents a machine item that has not been bound to a room yet,
- * but has an assigned template to use.
- */
+/// Represents a machine item that has not been bound to a room yet,
+/// but has an assigned template to use.
+@ParametersAreNonnullByDefault
 public class UnboundCompactMachineItem extends BlockItem {
 
     public UnboundCompactMachineItem(Properties builder) {
@@ -62,16 +63,19 @@ public class UnboundCompactMachineItem extends BlockItem {
 
         if(stack.has(CMDataComponents.ROOM_TEMPLATE_ID)) {
             var templateID = stack.get(CMDataComponents.ROOM_TEMPLATE_ID);
-            var template = RoomTemplateHelper.getTemplate(Objects.requireNonNull(context.registries()), templateID);
-            if(template != RoomTemplate.INVALID_TEMPLATE) {
-                if(flags.hasShiftDown())
-                    tooltip.add(Component.translatable(MachineTranslations.IDs.SIZE,
-                        template.internalDimensions().toString())
-                            .withColor(FastColor.ARGB32.color(120, 120, 120)));
+            var registries = context.registries();
+            if(registries != null) {
+                var template = RoomTemplateHelper.getTemplate(registries, templateID);
+                if (template != RoomTemplate.INVALID_TEMPLATE) {
+                    if (flags.hasShiftDown())
+                        tooltip.add(Component.translatable(MachineTranslations.IDs.SIZE,
+                                        template.internalDimensions().toString())
+                                .withColor(FastColor.ARGB32.color(120, 120, 120)));
 
-                if(flags.hasShiftDown())
-                    tooltip.add(Component.literal(templateID.toString())
-                            .withColor(FastColor.ARGB32.color(50, 50, 50)));
+                    if (flags.hasShiftDown())
+                        tooltip.add(Component.literal(templateID.toString())
+                                .withColor(FastColor.ARGB32.color(50, 50, 50)));
+                }
             }
         }
     }
