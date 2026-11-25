@@ -28,6 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +37,7 @@ public class MachineRoomScreen extends Screen {
     private final GlobalPos machinePos;
     private final String roomCode;
 
+    private @Nullable BakedLevel currentLevel;
     private SpatialRenderer renderer;
     private AABB renderSize;
 
@@ -258,6 +260,8 @@ public class MachineRoomScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
+        if(currentLevel != null)
+            currentLevel.close();
     }
 
     public void updateSceneRenderer(CompletableFuture<BakedLevel> future) {
@@ -267,9 +271,15 @@ public class MachineRoomScreen extends Screen {
 
     public void updateScene(BakedLevel bakedLevel) {
         if (this.renderer != null) {
+            if(currentLevel != null) {
+                currentLevel.close();
+                currentLevel = null;
+            }
+
             renderables.remove(renderer);
         }
 
+        this.currentLevel = bakedLevel;
         this.renderer = addRenderableOnly(new SpatialRenderer(bakedLevel, screenArea.left(), screenArea.top(),
                 screenArea.width(), screenArea.height()));
 
